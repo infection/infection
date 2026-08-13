@@ -3758,20 +3758,8 @@ count = 2
 
 [[issues]]
 file = "src/Testing/BaseMutatorTestCase.php"
-code = "imprecise-type"
-message = "Type `array` in parameter `$settings` is imprecise, equivalent to `array<array-key, mixed>`."
-count = 3
-
-[[issues]]
-file = "src/Testing/BaseMutatorTestCase.php"
 code = "invalid-type-cast"
 message = "Casting type `null` to `array` will produce an empty array."
-count = 1
-
-[[issues]]
-file = "src/Testing/BaseMutatorTestCase.php"
-code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Mutator\MutatorFactory::create`: expected `array<class-string<Infection\Mutator\Mutator<PhpParser\Node>&Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<array-key, mixed>>`, but possibly received `non-empty-array<string, array{'settings': array<array-key, mixed>}>`.'''
 count = 1
 
 [[issues]]
@@ -4707,12 +4695,6 @@ message = '''Possible argument type mismatch for argument #1 of `Infection\Mutat
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Mutator/IgnoreMutatorTest.php"
-code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #2 of `Infection\Mutator\IgnoreMutator::__construct`: expected `Infection\Mutator\Mutator<('TNode.infection\mutator\ignoremutator extends PhpParser\Node)>`, but possibly received `PHPUnit\Framework\MockObject\MockObject&Infection\Mutator\Mutator`.'''
-count = 4
-
-[[issues]]
 file = "tests/phpunit/Mutator/MutatorCategoryTest.php"
 code = "invalid-method-access"
 message = "Attempting to access a method on a non-object type (`false`)."
@@ -4887,12 +4869,6 @@ message = 'Possible argument type mismatch for argument #1 of `Infection\Mutator
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Mutator/NoopMutatorTest.php"
-code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Mutator\NoopMutator::__construct`: expected `Infection\Mutator\Mutator<('TNode.infection\mutator\noopmutator extends PhpParser\Node)>`, but possibly received `PHPUnit\Framework\MockObject\MockObject&Infection\Mutator\Mutator`.'''
-count = 3
-
-[[issues]]
 file = "tests/phpunit/Mutator/ProfileListProvider.php"
 code = "invalid-destructuring-source"
 message = "Invalid destructuring assignment: Cannot unpack type `mixed` into variables."
@@ -4974,12 +4950,6 @@ count = 1
 file = "tests/phpunit/PhpParser/FakeTokenTest.php"
 code = "string-member-selector"
 message = "This member selector uses a non-literal string type (`string`); its specific value cannot be statically determined."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/MutatedNodeTest.php"
-code = "docblock-type-mismatch"
-message = 'Docblock type `PhpParser\Node|array<array-key, PhpParser\Node>` for parameter `$node` is incompatible with native type `PhpParser\Node\Scalar\Int_|array<array-key, mixed>`.'
 count = 1
 
 [[issues]]
@@ -5266,12 +5236,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #1 of `Infection\TestFramework\Coverage\XmlReport\TestLocator::__construct`: expected `Infection\TestFramework\Tracing\Trace\TestLocations`, but found `mixed`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php"
 code = "possibly-invalid-argument"
 message = 'Possible argument type mismatch for argument #1 of `Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer::normalize`: expected `array<array-key, Infection\AbstractTestFramework\Coverage\TestLocation|Infection\TestFramework\Tracing\Trace\TestLocations>`, but possibly received `iterable<mixed, Infection\AbstractTestFramework\Coverage\TestLocation>`.'
 count = 2
@@ -5454,18 +5418,6 @@ count = 1
 file = "tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php"
 code = "invalid-type-cast"
 message = "Casting `mixed` to `array`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php"
-code = "missing-parameter-type"
-message = "Parameter `$mixed` is missing a type hint."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php"
-code = "missing-return-type"
-message = "Function `serializeValue` is missing a return type hint."
 count = 1
 
 [[issues]]

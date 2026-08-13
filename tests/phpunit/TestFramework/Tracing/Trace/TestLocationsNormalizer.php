@@ -63,7 +63,7 @@ final class TestLocationsNormalizer
         return self::serializeValue($value);
     }
 
-    private static function serializeValue($mixed)
+    private static function serializeValue(mixed $mixed): mixed
     {
         if ($mixed === null) {
             return null;
