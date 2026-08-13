@@ -67,7 +67,7 @@ final class DebugCommandLine
      *
      * @throws FinderException
      *
-     * @return list<string>
+     * @return string[]
      */
     public function create(
         string $runtime,

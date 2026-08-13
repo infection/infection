@@ -65,12 +65,12 @@ class CommandLineBuilder
      * @param string[] $frameworkArgs
      * @param string[] $phpExtraArgs
      *
-     * @return list<string>
+     * @return string[]
      */
     public function build(string $testFrameworkExecutable, array $phpExtraArgs, array $frameworkArgs): array
     {
         if ($this->isBatchFile($testFrameworkExecutable)) {
-            return array_values(array_merge([$testFrameworkExecutable], $frameworkArgs));
+            return array_merge([$testFrameworkExecutable], $frameworkArgs);
         }
 
         /*

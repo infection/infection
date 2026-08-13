@@ -95,7 +95,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     }
 
     /**
-     * @return list<string>
+     * @return string[]
      */
     public function getInitialRunCommandLine(): array
     {
