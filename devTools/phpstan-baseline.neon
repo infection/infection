@@ -1309,12 +1309,6 @@ parameters:
 			path: ../tests/phpunit/MockedContainer.php
 
 		-
-			rawMessage: 'Method Infection\Tests\MockedContainer::createWithServices() has parameter $values with no value type specified in iterable type array<class-string<object>, mixed>.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/MockedContainer.php
-
-		-
 			rawMessage: 'Parameter #3 $mutators of method Infection\Mutation\FileMutationGenerator::generate() expects array<Infection\Mutator\Mutator<PhpParser\Node>>, array{Infection\Mutator\Arithmetic\Plus} given.'
 			identifier: argument.type
 			count: 1
@@ -1519,12 +1513,6 @@ parameters:
 			path: ../tests/phpunit/Mutator/ProfileListProvider.php
 
 		-
-			rawMessage: 'Method Infection\Tests\Mutator\ProfileListTest::test_all_mutator_profiles_are_sorted_lexicographically() has parameter $profileOrMutators with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/ProfileListTest.php
-
-		-
 			rawMessage: 'Parameter #1 $kind (array<int|string>|int|string) of method Infection\Tests\PhpParser\FakeToken::is() should be contravariant with parameter $kind (array|int|string) of method PhpToken::is()'
 			identifier: method.childParameterType
 			count: 1
@@ -1535,18 +1523,6 @@ parameters:
 			identifier: method.dynamicName
 			count: 1
 			path: ../tests/phpunit/PhpParser/FakeTokenTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\PhpParser\MutatedNodeTest::test_it_can_be_instantiated() has parameter $node with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/PhpParser/MutatedNodeTest.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $node with type array<PhpParser\Node>|PhpParser\Node is not subtype of native type array|PhpParser\Node\Scalar\Int_.
-			identifier: parameter.phpDocType
-			count: 1
-			path: ../tests/phpunit/PhpParser/MutatedNodeTest.php
 
 		-
 			rawMessage: Infection\Tests\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\StopAtSkippedArgVisitor should not exist
@@ -1675,12 +1651,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Coverage/Locator/BaseReportLocator/DemoReportLocator.php
 
 		-
-			rawMessage: 'Method Infection\Tests\TestFramework\Coverage\XmlReport\TestLocatorTest::getTestsLocations() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php
-
-		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
 			identifier: ternary.shortNotAllowed
 			count: 1
@@ -1751,18 +1721,6 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestFramework/Tracing/Trace/SyntheticTrace.php
-
-		-
-			rawMessage: 'Method Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer::serializeValue() has no return type specified.'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
-
-		-
-			rawMessage: 'Method Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer::serializeValue() has parameter $mixed with no type specified.'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
 
 		-
 			rawMessage: Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion should not exist
