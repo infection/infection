@@ -47,6 +47,8 @@ use Symfony\Component\Process\Process;
  * @internal
  *
  * Provides test framework adapters with a testable boundary for running blocking shell commands.
+ *
+ * @phpstan-type ProcessCallback = Closure('out'|'err', string): void
  */
 interface ShellCommandRunner
 {
@@ -59,6 +61,7 @@ interface ShellCommandRunner
 
     /**
      * @param string[] $command
+     * @param ProcessCallback|null $callback
      * @param array<string, string|Stringable|false> $env
      *
      * @throws ProcessFailedException When process didn't terminate successfully.
@@ -78,7 +81,7 @@ interface ShellCommandRunner
 
     /**
      * @param string[] $command
-     * @param (Closure('out'|'err', string): void)|null $callback
+     * @param ProcessCallback|null $callback
      * @param array<string, string|Stringable|false> $env
      *
      * @throws RuntimeException When process can't be launched.
