@@ -43,6 +43,7 @@ use function implode;
 use Infection\Framework\ClassName;
 use Infection\Framework\Str;
 use Infection\Mutation\Mutation;
+use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
@@ -153,6 +154,7 @@ abstract class BaseMutatorTestCase extends TestCase
      */
     final protected function createMutator(array $settings = []): Mutator
     {
+        /** @var class-string<ConfigurableMutator<Node>> $mutatorClassName */
         $mutatorClassName = $this->getTestedMutatorClassName();
 
         $mutators = SingletonContainer::getContainer()

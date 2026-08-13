@@ -140,10 +140,6 @@ parameters:
             message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
             count: 1
             path: ../tests/phpunit/Process/Runner/DryProcessRunnerTest.php
-        -
-            message: "#^PHPDoc tag @param for parameter \\$values contains unresolvable type\\.$#"
-            count: 1
-            path: ../tests/phpunit/MockedContainer.php
 
         # Permanent PHPat exceptions: these PHPUnit support classes are intentionally not tested directly.
         -

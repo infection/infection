@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser;
 
 use Infection\PhpParser\MutatedNode;
-use PhpParser\Node;
 use PhpParser\Node\Scalar\Int_;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

@@ -74,7 +74,8 @@
     },
     "conflict": {
         "antecedent/patchwork": "<2.1.25",
-        "dg/bypass-finals": "<1.4.1"
+        "dg/bypass-finals": "<1.4.1",
+        "marc-mabe/php-enum": "<4.4"
     },
     "require-dev": {
         "ext-simplexml": "*",
