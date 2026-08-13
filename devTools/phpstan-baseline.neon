@@ -217,20 +217,8 @@ parameters:
 			path: ../src/FileSystem/Finder/NonExecutableFinder.php
 
 		-
-			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-empty-string}.'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: ../src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php
-
-		-
 			rawMessage: Infection\FileSystem\Finder\TestFrameworkFinder should not exist
 			identifier: phpat.testSourceConcreteClassesAreFinals
-			count: 1
-			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
-
-		-
-			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-empty-string}.'
-			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
