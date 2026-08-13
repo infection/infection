@@ -39,6 +39,7 @@ use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Symfony\Component\Process\Process;
 
 /**
@@ -67,7 +68,7 @@ final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMuta
                         'mutationHash' => $mutant->getMutation()->getHash(),
                     ],
                 ),
-                env: ['SHELL_VERBOSITY' => '0'],
+                env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
                 timeout: $this->timeout,
             ),
             $mutant,

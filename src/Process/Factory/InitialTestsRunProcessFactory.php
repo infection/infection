@@ -37,6 +37,7 @@ namespace Infection\Process\Factory;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\OriginalPhpProcess;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Symfony\Component\Process\Process;
 
 /**
@@ -69,7 +70,7 @@ class InitialTestsRunProcessFactory
                 $phpExtraOptions,
                 $skipCoverage,
             ),
-            env: ['SHELL_VERBOSITY' => '0'],
+            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
             timeout: null, // Ignore the default timeout of 60 seconds
         );
     }

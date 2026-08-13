@@ -116,7 +116,7 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
         $process = new Process(
             $command,
             $cwd,
-            array_merge(['SHELL_VERBOSITY' => '0'], $env),
+            array_merge(['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY], $env),
             $input,
             $timeout,
         );

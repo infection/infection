@@ -42,6 +42,7 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use function min;
 use Symfony\Component\Process\Process;
 
@@ -80,7 +81,7 @@ class MutantProcessContainerFactory
                 $mutant->getMutation()->getOriginalFilePath(),
                 $testFrameworkExtraOptions,
             ),
-            env: ['SHELL_VERBOSITY' => '0'],
+            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
             timeout: $timeout,
         );
 

@@ -52,6 +52,8 @@ use Symfony\Component\Process\Process;
  */
 interface ShellCommandRunner
 {
+    public const string DEFAULT_SHELL_VERBOSITY = '0';
+
     /**
      * The default timeout used by Symfony Process.
      *
