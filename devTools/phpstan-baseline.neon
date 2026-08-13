@@ -352,42 +352,6 @@ parameters:
 			path: ../src/Mutator/Extensions/MBString.php
 
 		-
-			rawMessage: '''
-				Fetching deprecated class constant MODIFIER_PRIVATE of class PhpParser\Node\Stmt\Class_:
-				Use Modifiers::PRIVATE instead
-			'''
-			identifier: classConstant.deprecated
-			count: 1
-			path: ../src/Mutator/FunctionSignature/ProtectedVisibility.php
-
-		-
-			rawMessage: '''
-				Fetching deprecated class constant MODIFIER_PROTECTED of class PhpParser\Node\Stmt\Class_:
-				Use Modifiers::PROTECTED instead
-			'''
-			identifier: classConstant.deprecated
-			count: 1
-			path: ../src/Mutator/FunctionSignature/ProtectedVisibility.php
-
-		-
-			rawMessage: '''
-				Fetching deprecated class constant MODIFIER_PROTECTED of class PhpParser\Node\Stmt\Class_:
-				Use Modifiers::PROTECTED instead
-			'''
-			identifier: classConstant.deprecated
-			count: 1
-			path: ../src/Mutator/FunctionSignature/PublicVisibility.php
-
-		-
-			rawMessage: '''
-				Fetching deprecated class constant MODIFIER_PUBLIC of class PhpParser\Node\Stmt\Class_:
-				Use Modifiers::PUBLIC instead
-			'''
-			identifier: classConstant.deprecated
-			count: 1
-			path: ../src/Mutator/FunctionSignature/PublicVisibility.php
-
-		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 1
