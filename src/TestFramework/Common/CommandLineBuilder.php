@@ -65,14 +65,12 @@ class CommandLineBuilder
      * @param string[] $frameworkArgs
      * @param string[] $phpExtraArgs
      *
-     * @return list<string>
+     * @return string[]
      */
     public function build(string $testFrameworkExecutable, array $phpExtraArgs, array $frameworkArgs): array
     {
         if ($this->isBatchFile($testFrameworkExecutable)) {
-            return array_values(
-                array_merge([$testFrameworkExecutable], $frameworkArgs),
-            );
+            return array_merge([$testFrameworkExecutable], $frameworkArgs);
         }
 
         /*
@@ -87,9 +85,7 @@ class CommandLineBuilder
          * This lets folks use, say, a bash wrapper over phpunit.
          */
         if ('cli' === PHP_SAPI && $phpExtraArgs === [] && is_executable($testFrameworkExecutable) && shell_exec('command -v php') !== null) {
-            return array_values(
-                array_merge([$testFrameworkExecutable], $frameworkArgs),
-            );
+            return array_merge([$testFrameworkExecutable], $frameworkArgs);
         }
 
         /*

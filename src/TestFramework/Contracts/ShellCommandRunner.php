@@ -77,7 +77,7 @@ interface ShellCommandRunner
     ): string;
 
     /**
-     * @param list<string> $command
+     * @param string[] $command
      * @param (Closure('out'|'err', string): void)|null $callback
      * @param array<string, string|Stringable|false> $env
      *

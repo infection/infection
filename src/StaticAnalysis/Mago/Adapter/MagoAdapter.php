@@ -77,6 +77,9 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
         return 'Mago';
     }
 
+    /**
+     * @return string[]
+     */
     public function getInitialRunCommandLine(): array
     {
         $options = array_merge([

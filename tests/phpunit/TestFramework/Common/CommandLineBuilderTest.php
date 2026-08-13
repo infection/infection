@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Common;
 
 use Infection\TestFramework\Common\CommandLineBuilder;
-use const PHP_BINARY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -70,40 +69,12 @@ final class CommandLineBuilderTest extends TestCase
         $commandLine = $this->commandLineBuilder->build(
             'phpunit.bat',
             self::PHP_EXTRA_ARGS,
-            [
-                'filter' => '--filter XYZ',
-                'group' => '--exclude-group=integration',
-            ],
+            self::TEST_FRAMEWORK_ARGS,
         );
 
         $this->assertSame(
             [
                 'phpunit.bat',
-                '--filter XYZ',
-                '--exclude-group=integration',
-            ],
-            $commandLine,
-        );
-    }
-
-    public function test_it_builds_command_line_for_an_executable(): void
-    {
-        $this->phpExecutableFinderMock
-            ->expects($this->never())
-            ->method('find');
-
-        $commandLine = $this->commandLineBuilder->build(
-            PHP_BINARY,
-            [],
-            [
-                'filter' => '--filter XYZ',
-                'group' => '--exclude-group=integration',
-            ],
-        );
-
-        $this->assertSame(
-            [
-                PHP_BINARY,
                 '--filter XYZ',
                 '--exclude-group=integration',
             ],

@@ -45,7 +45,7 @@ interface StaticAnalysisToolAdapter
     public function getName(): string;
 
     /**
-     * @return list<string>
+     * @return string[]
      */
     public function getInitialRunCommandLine(): array;
 
