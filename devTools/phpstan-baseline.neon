@@ -1135,6 +1135,12 @@ parameters:
 			path: ../tests/phpunit/CI/MemoizedCiDetectorTest.php
 
 		-
+			rawMessage: 'Property Infection\Tests\Configuration\ConfigurationBuilder::$mutators (array<string, Infection\Mutator\Mutator<PhpParser\Node>>) does not accept array<string, Infection\Mutator\Mutator<covariant PhpParser\Node>>.'
+			identifier: assign.propertyType
+			count: 1
+			path: ../tests/phpunit/Configuration/ConfigurationBuilder.php
+
+		-
 			rawMessage: Infection\Tests\Configuration\ProjectDirectoryProvider\FixedProjectDirectoryProvider should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
