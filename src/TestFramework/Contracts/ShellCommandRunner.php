@@ -47,9 +47,18 @@ use Symfony\Component\Process\Process;
  * @internal
  *
  * Provides test framework adapters with a testable boundary for running blocking shell commands.
+ *
+ * @phpstan-type ProcessCallback = Closure('out'|'err', string): void
  */
 interface ShellCommandRunner
 {
+    /**
+     * Disables shell verbosity inherited from the parent process. 0 = normal verbosity.
+     *
+     * @see https://symfony.com/doc/current/console/verbosity.html
+     */
+    public const string DEFAULT_SHELL_VERBOSITY = '0';
+
     /**
      * The default timeout used by Symfony Process.
      *
@@ -59,6 +68,7 @@ interface ShellCommandRunner
 
     /**
      * @param string[] $command
+     * @param ProcessCallback|null $callback
      * @param array<string, string|Stringable|false> $env
      *
      * @throws ProcessFailedException When process didn't terminate successfully.
@@ -77,8 +87,8 @@ interface ShellCommandRunner
     ): string;
 
     /**
-     * @param list<string> $command
-     * @param (Closure('out'|'err', string): void)|null $callback
+     * @param string[] $command
+     * @param ProcessCallback|null $callback
      * @param array<string, string|Stringable|false> $env
      *
      * @throws RuntimeException When process can't be launched.

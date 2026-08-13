@@ -50,6 +50,7 @@ final class BCMathTest extends BaseMutatorTestCase
 {
     /**
      * @param string|string[]|null $expected
+     * @param mixed[] $settings
      */
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, string|array|null $expected = [], array $settings = []): void

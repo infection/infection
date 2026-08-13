@@ -37,6 +37,7 @@ namespace Infection\Tests\Testing\TestFramework\Debug;
 
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisMutantProcessFactory;
+use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -44,7 +45,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
 #[CoversClass(DebugStaticAnalysisMutantProcessFactory::class)]
 final class DebugStaticAnalysisMutantProcessFactoryTest extends TestCase
 {
-    public function test_it_can_be_created(): void
+    public function test_it_creates_a_process_with_normal_shell_verbosity(): void
     {
         $factory = new DebugStaticAnalysisMutantProcessFactory(
             '/debug.php',
@@ -53,6 +54,10 @@ final class DebugStaticAnalysisMutantProcessFactoryTest extends TestCase
             new DebugCommandLine(new PhpExecutableFinder()),
         );
 
-        $this->assertInstanceOf(DebugStaticAnalysisMutantProcessFactory::class, $factory);
+        $process = $factory
+            ->create(MutantBuilder::withMinimalTestData()->build())
+            ->getProcess();
+
+        $this->assertSame(['SHELL_VERBOSITY' => '0'], $process->getEnv());
     }
 }
