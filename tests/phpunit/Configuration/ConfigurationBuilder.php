@@ -370,7 +370,7 @@ final class ConfigurationBuilder
     }
 
     /**
-     * @param array<string, Mutator<Node>> $mutators
+     * @param array<string, Mutator<covariant Node>> $mutators
      */
     public function withMutators(array $mutators): self
     {
