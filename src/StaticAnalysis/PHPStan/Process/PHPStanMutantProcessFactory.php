@@ -41,6 +41,7 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
@@ -77,6 +78,7 @@ final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFac
                     $mutant->getMutation()->getHash(),
                 ),
             ),
+            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
             timeout: $this->timeout,
         );
 

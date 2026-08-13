@@ -143,6 +143,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
         $process = $mutantProcess->getProcess();
 
         $this->assertSame(100.0, $process->getTimeout());
+        $this->assertSame(['SHELL_VERBOSITY' => '0'], $process->getEnv());
         $this->assertFalse($process->isStarted());
 
         $this->assertSame($mutant, $mutantProcess->getMutant());
