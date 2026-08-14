@@ -217,20 +217,8 @@ parameters:
 			path: ../src/FileSystem/Finder/NonExecutableFinder.php
 
 		-
-			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-empty-string}.'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: ../src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php
-
-		-
 			rawMessage: Infection\FileSystem\Finder\TestFrameworkFinder should not exist
 			identifier: phpat.testSourceConcreteClassesAreFinals
-			count: 1
-			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
-
-		-
-			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-empty-string}.'
-			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
@@ -817,12 +805,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-falsy-string}.'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -928,12 +910,6 @@ parameters:
 			rawMessage: Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider should not depend on Infection\TestFramework\XML\SafeDOMXPath
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 2
-			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
-
-		-
-			rawMessage: 'Offset 1 might not exist on array{}|array{0: non-falsy-string, 1: non-falsy-string, 2?: ''/phpunit''}.'
-			identifier: offsetAccess.notFound
-			count: 1
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
 
 		-
