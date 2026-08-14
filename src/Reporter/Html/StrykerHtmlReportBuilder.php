@@ -334,7 +334,7 @@ final readonly class StrykerHtmlReportBuilder
         $matches = [];
 
         if (preg_match('/(?<name>\S+::\S+)(?<dataname> with data set (?:#\d+|"[^"]+"))?/', $processOutput, $matches) === 1) {
-            Assert::keyExists($matches, 'name', 'The regex has a mandatory capture group; its absence indicates the pattern above was changed without updating this code.');
+            Assert::keyExists($matches, 'name');
 
             return [$this->buildTestMethodId($matches['name'] . ($matches['dataname'] ?? ''))];
         }

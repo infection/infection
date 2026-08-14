@@ -96,7 +96,7 @@ final class XmlConfigurationVersionProvider
         $match = [];
 
         if (preg_match('#(\d+\.\d)(/phpunit)?\.xsd$#', $schemaUri, $match) === 1) {
-            Assert::keyExists($match, 1, 'The regex has a mandatory capture group; its absence indicates the pattern above was changed without updating this code.');
+            Assert::keyExists($match, 1);
 
             return $match[1];
         }

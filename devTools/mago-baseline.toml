@@ -4417,12 +4417,6 @@ message = "This member selector uses a non-literal string type (`string`); its s
 count = 1
 
 [[issues]]
-file = "tests/phpunit/FileSystem/Locator/FileOrDirectoryNotFoundTest.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\FileSystem\Locator\FileOrDirectoryNotFound::multipleFilesDoNotExist`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/Framework/Enum/EnumBucket/EnumBucketTest.php"
 code = "less-specific-nested-argument-type"
 message = 'Argument type mismatch for argument #2 of `Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory::takeArguments`: expected `iterable<array-key, array<array-key, mixed>>`, but provided type `iterable<mixed, mixed>` is less specific.'

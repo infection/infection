@@ -188,7 +188,7 @@ class StaticAnalysisToolExecutableFinder
          *   php %~dp0/path %*
          */
         if (preg_match('/%~dp0(.+$)/mi', file_get_contents($path), $match) === 1) {
-            Assert::keyExists($match, 1, 'Capture group not found');
+            Assert::keyExists($match, 1);
 
             $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
             $script = realpath(dirname($path) . '/' . $target);
