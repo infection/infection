@@ -48,15 +48,14 @@ use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPublicMethodParameterRector;
 use Rector\DeadCode\Rector\ConstFetch\RemovePhpVersionIdCheckRector;
-use Rector\EarlyReturn\Rector\StmtsAwareInterface\ReturnEarlyIfVariableRector;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector;
 use Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector;
+use Rector\EarlyReturn\Rector\StmtsAwareInterface\ReturnEarlyIfVariableRector;
 use Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector;
 use Rector\Php73\Rector\String_\SensitiveHereNowDocRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
-use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AddInstanceofAssertForNullableInstanceRector;
 use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\DataProviderArrayItemsNewLinedRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertCompareOnCountableWithMethodToAssertCountRector;
@@ -136,10 +135,6 @@ $config = RectorConfig::configure()
         ],
     )
     ->withSkip([
-        AddOverrideAttributeToOverriddenMethodsRector::class => [
-            // To remove this skip once we drop support for Symfony 6.4.
-            'src/FileSystem/FileSystem.php',
-        ],
         'Rector\PHPUnit\CodeQuality\Rector\ClassMethod\BareCreateMockAssignToDirectUseRector',
         AbsolutizeRequireAndIncludePathRector::class,
         AddArrowFunctionReturnTypeRector::class,
@@ -169,6 +164,7 @@ $config = RectorConfig::configure()
             __DIR__ . '/tests/phpunit/Fixtures/',
         ],
         RemovePhpVersionIdCheckRector::class => true,
+        // This appears to break our build.
         ReturnEarlyIfVariableRector::class,
         RemoveUnreachableStatementRector::class => [
             __DIR__ . '/tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php',
