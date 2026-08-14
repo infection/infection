@@ -75,6 +75,6 @@ final readonly class StaticAnalysisConfigLocator implements TestFrameworkConfigL
             $triedFiles[] = sprintf('%s.%s', $cliTool, $extension);
         }
 
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+        throw FileOrDirectoryNotFound::fromFiles($triedFiles, [$dir]);
     }
 }
