@@ -119,6 +119,8 @@ readonly class Configuration
         Assert::nullOrGreaterThanEq($minMsi, 0.);
         Assert::greaterThanEq($threadCount, 0);
 
+        var_dump(LogVerbosity::resolveDisplayedStatuses($this->logVerbosity));die;
+
         if (is_string($dotsPerRow)) {
             Assert::same($dotsPerRow, 'max');
         } else {

@@ -89,6 +89,7 @@ final readonly class MagoMutantProcessFactory implements LazyMutantProcessFactor
         $options = array_merge(
             [
                 '--colors=never',
+                '--threads=1',
                 'analyze',
                 '--reporting-format=short',
                 '--substitute',
