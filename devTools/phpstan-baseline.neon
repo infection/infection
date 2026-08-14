@@ -529,12 +529,6 @@ parameters:
 			path: ../src/Source/Collector/GitDiffSourceCollector.php
 
 		-
-			rawMessage: 'Call to deprecated method multipleFilesDoNotExist() of class Infection\FileSystem\Locator\FileOrDirectoryNotFound.'
-			identifier: staticMethod.deprecated
-			count: 1
-			path: ../src/StaticAnalysis/Config/StaticAnalysisConfigLocator.php
-
-		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
 			identifier: ternary.shortNotAllowed
 			count: 1
@@ -725,12 +719,6 @@ parameters:
 			identifier: phpat.testTestFrameworkCommonUtilitiesStayWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Common/CommandLineBuilder.php
-
-		-
-			rawMessage: 'Call to deprecated method multipleFilesDoNotExist() of class Infection\FileSystem\Locator\FileOrDirectoryNotFound.'
-			identifier: staticMethod.deprecated
-			count: 1
-			path: ../src/TestFramework/Config/TestFrameworkConfigLocator.php
 
 		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
@@ -1109,12 +1097,6 @@ parameters:
 			identifier: method.dynamicName
 			count: 1
 			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
-
-		-
-			rawMessage: 'Call to deprecated method multipleFilesDoNotExist() of class Infection\FileSystem\Locator\FileOrDirectoryNotFound.'
-			identifier: staticMethod.deprecated
-			count: 1
-			path: ../tests/phpunit/FileSystem/Locator/FileOrDirectoryNotFoundTest.php
 
 		-
 			rawMessage: Infection\Tests\Logger\Console\BufferedOutputWithStdErrOutput should not exist
