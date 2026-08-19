@@ -214,7 +214,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
     public static function supportsExecutionOrderDefectsRandom(string $version): bool
     {
         // ordering by defects needs the test run history, which the initial run deactivates. PHPUnit ignored that combination silently until 13.3 turned it into a warning https://github.com/sebastianbergmann/phpunit/blob/13.3.0/src/TextUI/Application.php
-        if (version_compare($version, '13.3', '>=')) {
+        if (version_compare($version, '13.0', '>=')) {
             return false;
         }
 

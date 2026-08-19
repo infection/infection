@@ -347,9 +347,10 @@ final class PhpUnitAdapterTest extends TestCase
 
         yield [true, '12.2.99'];
 
-        yield [true, '13.0'];
+        // because it's silently ignored https://github.com/infection/infection/pull/3458#discussion_r3743322156
+        yield [false, '13.0'];
 
-        yield [true, '13.2.99'];
+        yield [false, '13.2.99'];
 
         yield [false, '13.3'];
 
