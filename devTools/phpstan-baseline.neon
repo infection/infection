@@ -885,7 +885,7 @@ parameters:
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator should not depend on Infection\TestFramework\XML\SafeDOMXPath
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 21
+			count: 22
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
 
 		-

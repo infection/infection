@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="app/autoload2.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+         executionOrder="depends,defects"
+>
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>./*Bundle</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
