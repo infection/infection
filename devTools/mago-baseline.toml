@@ -944,12 +944,6 @@ count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
-code = "docblock-type-mismatch"
-message = '''Docblock type `('T.infection\container\container::clonewithservice() extends object)|(closure(infection\container\container): ('T.infection\container\container::clonewithservice() extends object))` for parameter `$value` is incompatible with native type `object`.'''
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
 code = "less-specific-nested-argument-type"
 message = '''Argument type mismatch for argument #2 of `Infection\Container\Container::offsetSet`: expected `(closure(Infection\Container\Container): ('T.infection\container\container::clonewithservice() extends object))`, but provided type `('T.infection\container\container::clonewithservice() extends Closure)|(closure(infection\container\container): ('T.infection\container\container::clonewithservice() extends object))` is less specific.'''
 count = 1
@@ -1875,7 +1869,7 @@ count = 1
 [[issues]]
 file = "src/Logger/Console/ConsoleLogger.php"
 code = "possibly-invalid-argument"
-message = "Possible argument type mismatch for argument #2 of `strtr`: expected `array<string, string>|string`, but possibly received `array<non-empty-string, (has-method<'__toString'>&has-method<'__toString'>)|non-empty-string|null>`."
+message = "Possible argument type mismatch for argument #2 of `strtr`: expected `array<string, string>|string`, but possibly received `array<non-empty-string, (has-method<'__toString'>&has-method<'__toString'>)|null|scalar>`."
 count = 1
 
 [[issues]]
@@ -2897,18 +2891,6 @@ file = "src/Reporter/FileReporterFactory.php"
 code = "invalid-yield-key-type"
 message = "Invalid key type yielded; expected `string`, but found `null|string`."
 count = 8
-
-[[issues]]
-file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
-code = "imprecise-type"
-message = "Type `array` in return type of `build` is imprecise, equivalent to `array<array-key, mixed>`."
-count = 1
-
-[[issues]]
-file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
-code = "imprecise-type"
-message = "Type `array` in return type of `retrieveMutants` is imprecise, equivalent to `array<array-key, mixed>`."
-count = 1
 
 [[issues]]
 file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
@@ -4084,6 +4066,12 @@ count = 1
 file = "tests/phpunit/AutoReview/Mutator/MutatorProvider.php"
 code = "less-specific-nested-argument-type"
 message = "Argument type mismatch for argument #1 of `array_column`: expected `array<array-key, array<int(1), ('V.array_column() extends mixed)>|object>|list<array<int(1), ('V.array_column() extends mixed)>|object>`, but provided type `array<array-key, mixed>` is less specific."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/Mutator/MutatorProvider.php"
+code = "missing-property-type"
+message = "Property `$configurableMutatorClasses` is missing a type hint."
 count = 1
 
 [[issues]]
