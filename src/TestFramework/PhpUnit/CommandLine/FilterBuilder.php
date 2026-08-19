@@ -59,6 +59,14 @@ final class FilterBuilder
     // The real limit is likely higher, but it is better to be safe than sorry.
     private const int PCRE_LIMIT = 30_000;
 
+    /*
+     * Symfony may transport command arguments through the environment on Windows, where the
+     * complete environment block is limited to 32,767 UTF-16 code units. This conservative
+     * limit reserves headroom for inherited variables, may intentionally degrade filters
+     * earlier, and is not an exact guarantee.
+     */
+    private const int WINDOWS_FILTER_LIMIT = 10_000;
+
     private const int NO_OPTIMIZATION_LEVEL = 0;
 
     private const int DROP_DATA_PROVIDER_KEY_OPTIMIZATION_LEVEL = 1;
@@ -69,17 +77,22 @@ final class FilterBuilder
 
     /**
      * @param non-empty-array<TestLocation> $tests
+     * @param self::NO_OPTIMIZATION_LEVEL|self::DROP_DATA_PROVIDER_KEY_OPTIMIZATION_LEVEL|self::DROP_TEST_CASE_OPTIMIZATION_LEVEL|self::BAILOUT_OPTIMIZATION_LEVEL $optimizationLevel
      *
      * @return list<string>
      */
     public static function createFilters(
         array $tests,
         string $testFrameworkVersion,
+        bool $useWindowsFilterLimit = false,
         int $optimizationLevel = self::NO_OPTIMIZATION_LEVEL,
     ): array {
         $usedTests = [];
         $filters = [];
         $totalFilterLength = 0;
+        $maxFilterLength = $useWindowsFilterLimit
+            ? self::WINDOWS_FILTER_LIMIT
+            : self::PCRE_LIMIT;
 
         if ($optimizationLevel === self::BAILOUT_OPTIMIZATION_LEVEL) {
             // We have no further optimisation strategy at this point, so we
@@ -114,12 +127,14 @@ final class FilterBuilder
             $usedTests[$test] = true;
 
             $filter = preg_quote($test, '/');
+
             $totalFilterLength += strlen($filter);
 
-            if ($totalFilterLength > self::PCRE_LIMIT) {
+            if ($totalFilterLength > $maxFilterLength) {
                 return self::createFilters(
                     $tests,
                     $testFrameworkVersion,
+                    $useWindowsFilterLimit,
                     $optimizationLevel + 1,
                 );
             }

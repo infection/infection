@@ -39,10 +39,9 @@ use function array_map;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\FileSystem\FileSystem;
-use Infection\Framework\OperatingSystem;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
@@ -119,10 +118,10 @@ final class PhpUnitAdapterTest extends TestCase
 
     public function test_it_retrieves_version(): void
     {
-        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
-        $shellCommandLineExecutor
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
             ->expects($this->once())
-            ->method('execute')
+            ->method('mustRun')
             ->with([self::PHP_EXECUTABLE, '/path/to/phpunit', '--version'])
             ->willReturn('PHPUnit 10.5.1 by Sebastian Bergmann and contributors.');
 
@@ -134,7 +133,7 @@ final class PhpUnitAdapterTest extends TestCase
                 <phpunit/>
                 XML,
             version: null,
-            shellCommandLineExecutor: $shellCommandLineExecutor,
+            shellCommandRunner: $shellCommandRunner,
         );
 
         $actual = $adapter->getVersion();
@@ -751,9 +750,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '-d',
                     'memory_limit=-1',
                     '-d',
-                    OperatingSystem::isWindows()
-                        ? 'pcov.directory="."'
-                        : "pcov.directory='.'",
+                    'pcov.directory=.',
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -1081,15 +1078,13 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
-        yield 'with PCOV directory requiring shell escaping' => [
+        yield 'with PCOV directory containing spaces' => [
             $default
                 ->withPcovDirectory('/path with spaces/src')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '-d',
-                    OperatingSystem::isWindows()
-                        ? 'pcov.directory="/path with spaces/src"'
-                        : "pcov.directory='/path with spaces/src'",
+                    'pcov.directory=/path with spaces/src',
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -1629,7 +1624,7 @@ final class PhpUnitAdapterTest extends TestCase
         array $filteredSourceFilesToMutate = [],
         bool $executeOnlyCoveringTestCases = false,
         ?string $mapSourceClassToTestStrategy = null,
-        ?ShellCommandLineExecutor $shellCommandLineExecutor = null,
+        ?ShellCommandRunner $shellCommandRunner = null,
     ): PhpUnitAdapter {
         $tmpDir = '/tmp';
         $projectDir = '/path/to/project';
@@ -1673,8 +1668,9 @@ final class PhpUnitAdapterTest extends TestCase
                 $executeOnlyCoveringTestCases,
                 $filteredSourceFilesToMutate,
                 $mapSourceClassToTestStrategy,
+                false,
             ),
-            $shellCommandLineExecutor ?? $this->createStub(ShellCommandLineExecutor::class),
+            $shellCommandRunner ?? $this->createStub(ShellCommandRunner::class),
             new VersionParser(),    // won't be used since we pass the version
             new CommandLineBuilder($this->phpExecutableFinderMock),
             $version,

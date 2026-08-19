@@ -41,9 +41,10 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Process\ShellCommandLineExecutor;
+use Infection\Framework\OperatingSystem;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
@@ -73,7 +74,7 @@ final readonly class Factory
         private Configuration $infectionConfig,
         private SourceCollector $sourceCollector,
         private array $installedExtensions,
-        private ShellCommandLineExecutor $shellCommandLineExecutor,
+        private ShellCommandRunner $shellCommandRunner,
     ) {
     }
 
@@ -105,8 +106,9 @@ final readonly class Factory
                 $this->infectionConfig->executeOnlyCoveringTestCases,
                 $this->getFilteredSourceFilesToMutate(),
                 $this->infectionConfig->mapSourceClassToTestStrategy,
-                $this->shellCommandLineExecutor,
+                $this->shellCommandRunner,
                 sourceDirectoryBasePath: dirname($this->infectionConfig->configurationPathname),
+                useWindowsFilterLimit: OperatingSystem::isWindows(),
             );
         }
 

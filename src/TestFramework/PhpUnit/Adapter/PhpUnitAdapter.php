@@ -35,24 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
-use function escapeshellarg;
 use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Override;
 use function Safe\preg_match;
 use function sprintf;
 use function trim;
 use function version_compare;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -69,7 +69,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
-        ShellCommandLineExecutor $shellCommandLineExecutor,
+        ShellCommandRunner $shellCommandRunner,
         VersionParser $versionParser,
         CommandLineBuilder $commandLineBuilder,
         ?string $version = null,
@@ -79,7 +79,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
             $initialConfigBuilder,
             $mutationConfigBuilder,
             $argumentsAndOptionsBuilder,
-            $shellCommandLineExecutor,
+            $shellCommandRunner,
             $versionParser,
             $commandLineBuilder,
             $version,
@@ -126,7 +126,10 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
             // all target source code in the coverage report.
             if ($this->pcovDirectoryProvider->shouldProvide()) {
                 $phpExtraArgs[] = '-d';
-                $phpExtraArgs[] = sprintf('pcov.directory=%s', escapeshellarg($this->pcovDirectoryProvider->getDirectory()));
+                $phpExtraArgs[] = sprintf(
+                    'pcov.directory=%s',
+                    $this->pcovDirectoryProvider->getDirectory(),
+                );
             }
         }
 
@@ -166,6 +169,8 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
     public function getMemoryUsed(string $output): float
     {
         if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match) === 1) {
+            Assert::keyExists($match, 1);
+
             return (float) $match[1];
         }
 

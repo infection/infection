@@ -15,7 +15,7 @@ help:
 # Variables
 #---------------------------------------------------------------------------
 BOX=./.tools/box
-BOX_URL="https://github.com/humbug/box/releases/download/4.5.1/box.phar"
+BOX_URL="https://github.com/humbug/box/releases/download/4.7.0/box.phar"
 
 PHP_CS_FIXER=./.tools/php-cs-fixer
 PHP_CS_FIXER_URL="https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.92.5/php-cs-fixer.phar"
@@ -76,7 +76,7 @@ sbx-create: sbx-image-build sbx-project-local-kit sbx-kit-validate
 	sbx run codex \
 		--template=infection-sbx-php-8.4:latest \
 		--kit=./devTools/sbx/kits/codex-otel \
-		--kit "git+https://github.com/docker/sbx-kits-contrib#ref=v0.9.0&dir=git-ssh-sign" . \
+		--kit="git+https://github.com/docker/sbx-kits-contrib#ref=1f2f62200d68b8e1f653730ab29134a1a06755db&dir=git-ssh-sign" . \
 		--kit=$(SBX_PROJECT_LOCAL_KIT)
 
 .PHONY: sbx-project-local-kit

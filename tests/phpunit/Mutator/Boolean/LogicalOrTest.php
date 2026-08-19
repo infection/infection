@@ -153,6 +153,81 @@ final class LogicalOrTest extends BaseMutatorTestCase
                     PHP,
             ),
         ];
+
+        yield 'It mutates logical or when used with a variable variable' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    ${$s} === 'hello' || $myVar === 'world';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    ${$s} === 'hello' && $myVar === 'world';
+                    PHP,
+            ),
+        ];
+
+        yield 'It mutates logical or when used with a variable variable (inverse)' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    $myVar === 'hello' || ${$s} === 'world';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    $myVar === 'hello' && ${$s} === 'world';
+                    PHP,
+            ),
+        ];
+
+        yield 'It mutates logical or when a variable variable is the right operand' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    'hello' === ${$s} || $myVar === 'world';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    'hello' === ${$s} && $myVar === 'world';
+                    PHP,
+            ),
+        ];
+
+        yield 'It mutates logical or when a variable variable is the right operand (inverse)' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    $myVar === 'hello' || 'world' === ${$s};
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    $myVar === 'hello' && 'world' === ${$s};
+                    PHP,
+            ),
+        ];
+
+        yield 'It mutates logical or when the same variable variable is tested against "Identical" on both sides' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    ${$s} === 'hello' || ${$s} === 'world';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    ${$s} === 'hello' && ${$s} === 'world';
+                    PHP,
+            ),
+        ];
     }
 
     private static function nonMutableSmallerAndGreaterMatrixMutationsProvider(): iterable
@@ -548,6 +623,32 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <<<'PHP'
                     $s = 'other';
                     $myVar <= 5 && $myVar > ${$s};
+                    PHP,
+            ),
+        ];
+
+        yield 'It mutates logical or when the left comparison starts with a string' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    '1' < $myVar || $myVar > 5;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    '1' < $myVar && $myVar > 5;
+                    PHP,
+            ),
+        ];
+
+        yield 'It mutates logical or when the right comparison starts with a string' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $myVar < 5 || '9' > $myVar;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $myVar < 5 && '9' > $myVar;
                     PHP,
             ),
         ];

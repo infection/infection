@@ -55,14 +55,17 @@ make _sbx-image-build
 To run a sandbox manually with the loaded template from the repository root:
 
 ```shell
+# In case the following gets outdated, you can check `make sbx-create`.
 sbx run codex \
   --template=infection-sbx-php-8.4:latest \
   --kit=./devTools/sbx/kits/codex-otel \
+  --kit="git+https://github.com/docker/sbx-kits-contrib#ref=1f2f62200d68b8e1f653730ab29134a1a06755db&dir=git-ssh-sign" \
   --kit=./devTools/sbx/kits/project-local
 ```
 
 The `--kit` flag only applies when the sandbox is created. For an existing
-sandbox, recreate it or apply the kit explicitly with `sbx kit add`.
+sandbox, recreate it. The Codex OTEL kit uses startup hooks and generated files
+that `sbx kit add` cannot apply to an existing sandbox.
 
 To add user-specific sandbox customisation, edit:
 

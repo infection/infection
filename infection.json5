@@ -30,7 +30,19 @@
 
         "ArrayItemRemoval": {
             "ignore": [
-                "Infection\\Logger\\GitHub\\GitDiffFileProvider::provideDefaultBase"
+                "Infection\\Logger\\GitHub\\GitDiffFileProvider::provideDefaultBase",
+                "Infection\\Git\\CommandLineGit::getProjectDirectory",
+                "Infection\\Git\\CommandLineGit::readSymbolicReference"
+            ]
+        },
+        "ArrayOneItem": {
+            "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::makeSourcePathsAbsolute"
+            ]
+        },
+        "FalseValue": {
+            "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::create"
             ]
         },
         "MethodCallRemoval": {
@@ -50,6 +62,7 @@
         },
         "UnwrapArrayMap": {
             "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::create",
                 "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::makeSourcePathsAbsolute"
             ]
         },

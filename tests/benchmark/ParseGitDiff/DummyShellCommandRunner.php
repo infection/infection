@@ -33,32 +33,53 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\Benchmark\ParseGitDiff;
 
-use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use Symfony\Component\Process\Process;
-use function trim;
+use Closure;
+use Infection\TestFramework\Contracts\CompletedProcess;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 
 /**
  * @internal
- *
- * @final
- *
- * Tiny wrapper around the Symfony Process component to easily get the output of a command.
  */
-class ShellCommandLineExecutor
+final readonly class DummyShellCommandRunner implements ShellCommandRunner
 {
-    /**
-     * @param string[] $command
-     *
-     * @throws ProcessTimedOutException
-     * @throws ProcessFailedException
-     * @throws ProcessException
-     */
-    public function execute(array $command): string
-    {
-        return trim((new Process($command))->mustRun()->getOutput());
+    public function __construct(
+        public string $executeResult,
+        public string $workingDirectory,
+    ) {
+    }
+
+    public function mustRun(
+        array $command,
+        ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
+        ?float $timeout = self::DEFAULT_TIMEOUT,
+        ?float $idleTimeout = null,
+    ): string {
+        if ($command === ['git', '-C', $this->workingDirectory, 'rev-parse', '--show-toplevel']) {
+            return $this->workingDirectory;
+        }
+
+        return $this->executeResult;
+    }
+
+    public function run(
+        array $command,
+        ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
+        ?float $timeout = self::DEFAULT_TIMEOUT,
+        ?float $idleTimeout = null,
+    ): CompletedProcess {
+        return new CompletedProcess(
+            command: $command,
+            exitCode: 0,
+            stdout: $this->executeResult,
+            stderr: '',
+        );
     }
 }

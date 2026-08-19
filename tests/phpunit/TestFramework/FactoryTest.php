@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Factory;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
@@ -63,7 +63,7 @@ final class FactoryTest extends TestCase
             ConfigurationBuilder::withMinimalTestData()->build(),
             new FakeSourceCollector(),
             [],
-            $this->createStub(ShellCommandLineExecutor::class),
+            $this->createStub(ShellCommandRunner::class),
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -87,7 +87,7 @@ final class FactoryTest extends TestCase
                     'version' => '1.0.0',
                 ],
             ],
-            $this->createStub(ShellCommandLineExecutor::class),
+            $this->createStub(ShellCommandRunner::class),
         );
 
         $adapter = $factory->create('dummy', false);

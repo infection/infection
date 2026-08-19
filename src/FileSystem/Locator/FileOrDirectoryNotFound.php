@@ -62,22 +62,6 @@ final class FileOrDirectoryNotFound extends RuntimeException
     }
 
     /**
-     * @deprecated
-     *
-     * @param string[] $files
-     */
-    public static function multipleFilesDoNotExist(string $path, array $files): self
-    {
-        return new self(
-            sprintf(
-                'The path "%s" does not contain any of the requested files: "%s"',
-                $path,
-                implode('", "', $files),
-            ),
-        );
-    }
-
-    /**
      * @param string[] $files
      * @param string[] $roots
      */

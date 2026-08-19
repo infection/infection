@@ -40,7 +40,7 @@ use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Git\NoGitProjectFound;
-use Infection\Process\ShellCommandLineExecutor;
+use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\TestingUtility\FS;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -61,12 +61,12 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
     // At minimum we will have the following files in the entire output:
     // - src/Git/CommandLineGit.php
     // - src/Git/Git.php
-    // - src/Process/ShellCommandLineExecutor.php
+    // - src/Process/SymfonyProcessShellCommandRunner.php
     // - tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
     // - tests/phpunit/Differ/FilesDiffChangedLinesTest.php
     // - tests/phpunit/Git/CommandLineGitIntegrationTest.php
     // - tests/phpunit/Git/CommandLineGitTest.php
-    // - tests/phpunit/Process/ShellCommandLineExecutorTest.php
+    // - tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php
     private const string COMMIT_REFERENCE = '40d08afda22d5fe6d0d87ffb95fd609dcb01992a';
 
     private const string BAD_COMMIT_REFERENCE = '40d08afda22d5fe6d0d87ffb95fd609dcb01992a40d08afda22d5fe6d0d87ffb95fd609dcb01992a';
@@ -88,7 +88,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         chdir($this->cwd);
 
         $this->git = new CommandLineGit(
-            new ShellCommandLineExecutor(),
+            new SymfonyProcessShellCommandRunner(),
         );
     }
 
@@ -124,10 +124,10 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         FS::dumpFile($projectDirectory . '/src/SourceClass.php', 'before');
         FS::dumpFile($this->tmp . '/shared/SharedClass.php', 'before');
 
-        $executor = new ShellCommandLineExecutor();
-        $executor->execute(['git', '-C', $this->tmp, 'init', '--quiet']);
-        $executor->execute(['git', '-C', $this->tmp, 'add', '.']);
-        $executor->execute([
+        $executor = new SymfonyProcessShellCommandRunner();
+        $executor->mustRun(['git', '-C', $this->tmp, 'init', '--quiet']);
+        $executor->mustRun(['git', '-C', $this->tmp, 'add', '.']);
+        $executor->mustRun([
             'git',
             '-C',
             $this->tmp,
@@ -305,7 +305,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
     private static function checkIfCommitReferenceExists(): bool
     {
         try {
-            (new ShellCommandLineExecutor())->execute([
+            (new SymfonyProcessShellCommandRunner())->mustRun([
                 'git',
                 'cat-file',
                 '-e',
