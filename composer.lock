@@ -2477,16 +2477,16 @@
     "packages-dev": [
         {
             "name": "carthage-software/mago",
-            "version": "1.47.1",
+            "version": "1.47.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/carthage-software/mago.git",
-                "reference": "92ac16458f5c1ad26767b7aae5922a93fec129ad"
+                "reference": "6d09af9b5980d0e9219642c19521a76883d863db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/carthage-software/mago/zipball/92ac16458f5c1ad26767b7aae5922a93fec129ad",
-                "reference": "92ac16458f5c1ad26767b7aae5922a93fec129ad",
+                "url": "https://api.github.com/repos/carthage-software/mago/zipball/6d09af9b5980d0e9219642c19521a76883d863db",
+                "reference": "6d09af9b5980d0e9219642c19521a76883d863db",
                 "shasum": ""
             },
             "require": {
@@ -2528,7 +2528,7 @@
             ],
             "support": {
                 "issues": "https://github.com/carthage-software/mago/issues",
-                "source": "https://github.com/carthage-software/mago/tree/1.47.1"
+                "source": "https://github.com/carthage-software/mago/tree/1.47.2"
             },
             "funding": [
                 {
@@ -2536,7 +2536,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-18T15:28:43+00:00"
+            "time": "2026-08-19T17:32:04+00:00"
         },
         {
             "name": "doctrine/annotations",
