@@ -41,7 +41,6 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
@@ -73,7 +72,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         private InitialTestsRunner $initialTestsRunner,
         private Configuration $config,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private MutantExecutionResultFactory $mutantExecutionResultFactory,
     ) {
     }
 
@@ -129,7 +128,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         );
     }
 
-    public function test(Mutant $mutant): MutantExecutionResult|MutantEvaluationPipe
+    public function test(Mutant $mutant): MutantEvaluationPipe
     {
         return new LazyMutantEvaluationPipe(
             fn () => $this->createTestProcess($mutant),

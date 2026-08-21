@@ -54,7 +54,7 @@ final class LazyMutantEvaluationPipe implements MutantEvaluationPipe
     /**
      * @var list<MutantProcessFactory>
      */
-    private array $factories = [];
+    private array $factories;
 
     /**
      * @var list<MutantProcess>

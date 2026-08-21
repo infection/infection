@@ -38,7 +38,6 @@ namespace Infection\TestFramework;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
@@ -117,7 +116,7 @@ final readonly class LegacyStaticAnalysisBridge implements TestFramework
         );
     }
 
-    public function test(Mutant $mutant): MutantExecutionResult|MutantEvaluationPipe
+    public function test(Mutant $mutant): MutantEvaluationPipe
     {
         Assert::notNull($this->adapter);
 

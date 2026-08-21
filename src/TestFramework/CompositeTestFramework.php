@@ -38,7 +38,6 @@ namespace Infection\TestFramework;
 use function array_map;
 use function implode;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\TestFramework\Common\LazyMutantEvaluationPipe;
 use Infection\TestFramework\Contracts\CompositeInitialRunResults;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -50,7 +49,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class CompositeTestFramework implements TestFramework
+final readonly class CompositeTestFramework implements TestFramework
 {
     /**
      * @param non-empty-list<TestFramework> $decoratedTestFrameworks
@@ -101,7 +100,7 @@ final class CompositeTestFramework implements TestFramework
         );
     }
 
-    public function test(Mutant $mutant): MutantExecutionResult|MutantEvaluationPipe
+    public function test(Mutant $mutant): MutantEvaluationPipe
     {
         return LazyMutantEvaluationPipe::merge(
             array_map(

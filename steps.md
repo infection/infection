@@ -1,3 +1,2 @@
 - Introduce the TestFramework contract.
 - Make the Static Analysis into a TestFramework contract.
-- 
