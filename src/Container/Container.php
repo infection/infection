@@ -64,6 +64,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Differ\UnifiedDiffOutputBuilder;
+use Infection\Engine;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
@@ -153,6 +154,7 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\GitDiffSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
@@ -190,6 +192,7 @@ use Psr\Log\NullLogger;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
 /**
@@ -318,6 +321,7 @@ final class Container extends DIContainer
                     $container->getStaticAnalysisToolExecutableFinder(),
                     $container->getStaticAnalysisConfigLocator(),
                     $container->getShellCommandLineExecutor(),
+                    new PhpExecutableFinder(),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
@@ -387,6 +391,7 @@ final class Container extends DIContainer
                 $config = $container->getConfiguration();
 
                 return new MinMsiChecker(
+                    $container->getConsoleOutput(),
                     $config->ignoreMsiWithNoMutations,
                     (float) $config->minMsi,
                     (float) $config->minCoveredMsi,
@@ -678,14 +683,34 @@ final class Container extends DIContainer
                 $container->getCoverageChecker(),
                 $container->getInitialTestsRunner(),
                 $container->getConfiguration(),
-                $container->getMutantProcessContainerFactory(),
                 $container->getTestFrameworkExtraOptionsFilter(),
+                $container->getMutantExecutionResultFactory(),
             ),
             StaticAnalysisTestFramework::class => static fn (self $container) => new LegacyStaticAnalysisBridge(
                 $container->getStaticAnalysisToolAdapter(),
                 $container->getInitialStaticAnalysisRunner(),
-                $container->get(ConsoleOutput::class),
+                $container->getConfiguration(),
             ),
+            PreloadedSourceChecker::class => PreloadedSourceChecker::create(...),
+            Engine::class => static function (self $container): Engine {
+                $config = $container->getConfiguration();
+
+                return new Engine(
+                    $config,
+                    $container->getTestFramework(),
+                    $config->isStaticAnalysisEnabled()
+                        ? $container->getStaticAnalysisTestFramework()
+                        : null,
+                    $container->getEventDispatcher(),
+                    $container->getMemoryLimiter(),
+                    $container->getMutationGenerator(),
+                    $container->getMutationTestingRunner(),
+                    $container->getMinMsiChecker(),
+                    $container->getMaxTimeoutsChecker(),
+                    $container->getMetricsCalculator(),
+                    $container->getPreloadedSourceChecker(),
+                );
+            },
         ]);
 
         return $container->withValues(
@@ -904,6 +929,11 @@ final class Container extends DIContainer
         return $this->get(SourceCollector::class);
     }
 
+    public function getPreloadedSourceChecker(): PreloadedSourceChecker
+    {
+        return $this->get(PreloadedSourceChecker::class);
+    }
+
     public function getNodeTraverserFactory(): NodeTraverserFactory
     {
         return $this->get(NodeTraverserFactory::class);
@@ -1012,6 +1042,16 @@ final class Container extends DIContainer
     public function getConfiguration(): Configuration
     {
         return $this->get(Configuration::class);
+    }
+
+    public function getConsoleOutput(): ConsoleOutput
+    {
+        return $this->get(ConsoleOutput::class);
+    }
+
+    public function getEngine(): Engine
+    {
+        return $this->get(Engine::class);
     }
 
     public function getLineRangeCalculator(): LineRangeCalculator

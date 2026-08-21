@@ -65,17 +65,22 @@ final readonly class LegacyStaticAnalysisBridge implements TestFramework
 
     public function getName(): string
     {
+        Assert::notNull($this->adapter);
+
         return $this->adapter->getName();
     }
 
     public function getVersion(): string
     {
+        Assert::notNull($this->adapter);
+
         return $this->adapter->getVersion();
     }
 
     public function checkRequirements(): void
     {
         if ($this->config->isStaticAnalysisEnabled()) {
+            Assert::notNull($this->adapter);
             $this->adapter->assertMinimumVersionSatisfied();
         }
     }

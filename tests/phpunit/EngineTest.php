@@ -37,7 +37,6 @@ namespace Infection\Tests;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
 use Infection\Engine;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
@@ -50,6 +49,7 @@ use Infection\Mutation\MutationGenerator;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
+use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -82,8 +82,6 @@ final class EngineTest extends TestCase
 
     private MockObject&MaxTimeoutsChecker $maxTimeoutsChecker;
 
-    private \PHPUnit\Framework\MockObject\Stub&ConsoleOutput $consoleOutput;
-
     private MockObject&MetricsCalculator $metricsCalculator;
 
     protected function setUp(): void
@@ -97,7 +95,6 @@ final class EngineTest extends TestCase
         $this->mutationTestingRunner = $this->createMock(MutationTestingRunner::class);
         $this->minMsiChecker = $this->createMock(MinMsiChecker::class);
         $this->maxTimeoutsChecker = $this->createMock(MaxTimeoutsChecker::class);
-        $this->consoleOutput = $this->createStub(ConsoleOutput::class);
         $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
     }
 
@@ -177,7 +174,7 @@ final class EngineTest extends TestCase
         $this->minMsiChecker
             ->expects($this->once())
             ->method('checkMetrics')
-            ->with(1000, 2.0, 3.0, $this->consoleOutput);
+            ->with(1000, 2.0, 3.0);
 
         $this->metricsCalculator
             ->expects($this->once())
@@ -248,7 +245,7 @@ final class EngineTest extends TestCase
         $this->minMsiChecker
             ->expects($this->once())
             ->method('checkMetrics')
-            ->with(100, 80.0, 85.0, $this->consoleOutput);
+            ->with(100, 80.0, 85.0);
 
         $this->metricsCalculator
             ->method('getTestedMutantsCount')
@@ -443,7 +440,7 @@ final class EngineTest extends TestCase
         $this->minMsiChecker
             ->expects($this->once())
             ->method('checkMetrics')
-            ->with(100, 50.0, 55.0, $this->consoleOutput)
+            ->with(100, 50.0, 55.0)
             ->willThrowException(MinMsiCheckFailed::createForMsi(80.0, 50.0));
 
         $this->metricsCalculator
@@ -510,8 +507,8 @@ final class EngineTest extends TestCase
             mutationTestingRunner: $this->mutationTestingRunner,
             minMsiChecker: $this->minMsiChecker,
             maxTimeoutsChecker: $this->maxTimeoutsChecker,
-            consoleOutput: $this->consoleOutput,
             metricsCalculator: $this->metricsCalculator,
+            preloadedSourceChecker: new PreloadedSourceChecker(''),
         );
     }
 }

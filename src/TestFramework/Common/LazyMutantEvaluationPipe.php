@@ -35,19 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Common;
 
-use Closure;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Process\MutantProcess;
-use Webmozart\Assert\Assert;
 use function array_key_exists;
-use Infection\Mutant\DetectionStatus;
-use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
-use function array_map;
 use function array_merge;
+use function array_values;
+use Closure;
+use Infection\Mutant\DetectionStatus;
+use Infection\Process\MutantProcess;
+use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Webmozart\Assert\Assert;
 
 /**
- * @phpstan-type MutantProcessFactory = Closure():(MutantProcess|MutantExecutionResult)
+ * @phpstan-type MutantProcessFactory = Closure():MutantProcess
  *
  * @internal
  */
@@ -73,7 +71,7 @@ final class LazyMutantEvaluationPipe implements MutantEvaluationPipe
     public function __construct(
         Closure ...$factories,
     ) {
-        $this->factories = $factories;
+        $this->factories = array_values($factories);
     }
 
     /**
@@ -116,6 +114,13 @@ final class LazyMutantEvaluationPipe implements MutantEvaluationPipe
     public function getCurrent(): MutantProcess
     {
         $this->consumed = true;
+
+        if (!array_key_exists($this->currentProcessIndex, $this->processes)) {
+            $factory = $this->factories[$this->currentProcessIndex];
+            $process = $factory();
+            Assert::isInstanceOf($process, MutantProcess::class);
+            $this->processes[] = $process;
+        }
 
         return $this->processes[$this->currentProcessIndex];
     }

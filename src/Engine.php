@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection;
 
 use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
 use Infection\Metrics\MaxTimeoutCountReached;
@@ -51,6 +50,7 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Source\Exception\NoSourceFound;
+use Infection\Source\PreloadedSourceChecker;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\JUnit\TestNotFound;
@@ -58,6 +58,7 @@ use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -74,8 +75,8 @@ final readonly class Engine
         private MutationTestingRunner $mutationTestingRunner,
         private MinMsiChecker $minMsiChecker,
         private MaxTimeoutsChecker $maxTimeoutsChecker,
-        private ConsoleOutput $consoleOutput,
         private MetricsCalculator $metricsCalculator,
+        private PreloadedSourceChecker $preloadedSourceChecker,
     ) {
     }
 
@@ -94,6 +95,8 @@ final readonly class Engine
      */
     public function execute(): void
     {
+        $this->preloadedSourceChecker->check();
+
         $initialRunResults = $this->runInitialTestSuite();
         $this->runInitialStaticAnalysis();
 
@@ -116,7 +119,6 @@ final readonly class Engine
                 $this->metricsCalculator->getTestedMutantsCount(),
                 $this->metricsCalculator->getMutationScoreIndicator(),
                 $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
-                $this->consoleOutput,
             );
         } finally {
             $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
@@ -131,22 +133,21 @@ final readonly class Engine
             return null;
         }
 
-        return $this->testFramework->executeInitialRun();
+        $initialRunResults = $this->testFramework->executeInitialRun();
+        Assert::isInstanceOf($initialRunResults, InitialRunResults::class);
+
+        return $initialRunResults;
     }
 
-    private function runInitialStaticAnalysis(): ?InitialRunResults
+    private function runInitialStaticAnalysis(): void
     {
         $this->staticAnalysisTestFramework?->checkRequirements();
 
         if ($this->config->skipInitialTests) {
-            return null;
+            return;
         }
 
         $this->staticAnalysisTestFramework?->executeInitialRun();
-
-        // TODO: return the result!
-
-        return null;
     }
 
     /**

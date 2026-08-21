@@ -85,9 +85,10 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
   scenarios also run via `--group e2e`.
 - `tests/benchmark/` - PHPBench suites (mutation generation, git-diff parsing, tracing).
   Performance PRs cite before/after numbers from these.
-- `devTools/` - `phpstan.neon` (+ baseline), `mago-baseline.toml`, Docker bits. Baselines
-  are for pre-existing debt only; never baseline a finding your new code introduced.
-  Regenerate with `make phpstan-baseline` or `make mago-baseline`.
+- `devTools/` - `phpstan.neon`, Docker bits, and both static-analysis baselines:
+  `devTools/phpstan-baseline.neon` and `devTools/mago-baseline.toml` (Mago's config itself is
+  `mago.toml` in the root). Baselines are for pre-existing debt only; never baseline a finding
+  your new code introduced. Regenerate with `make phpstan-baseline` or `make mago-baseline`.
 - `doc/` - `nomenclature.md`, `benchmarking.md`. User docs are NOT here - they live in the
   separate repo github.com/infection/site.
 - `adr/` - Architecture Decision Records; short rationale for standing conventions. See
@@ -290,6 +291,29 @@ This style rule often surprises agents. Code is structured for killability:
 An escaping mutant means either a missing test or code that should be reshaped; "only
 performance" escapes can be accepted, but say so explicitly in the PR.
 
+### Propose the smallest change that does the job
+
+Agents default to a complete, defensible artifact: a class where a function works, a test
+suite where a CI check already fails, a generator script where `git diff` answers the
+question. Every line is individually justifiable and the total is still wrong - reviewers
+here read totals, not lines. Removing or reducing code outranks adding it. Where CI already
+fails on the condition your change prevents, that failure is the test; do not restate it as
+unit tests. In tests, one data provider with named cases beats a row of near-identical test
+methods. Tooling gets the same size bar as `src/`: every contributor reads it and no user
+exercises it, so "it is only tooling" makes it cheaper to write and not cheaper to keep.
+
+Work in two passes:
+
+1. **Write** the change as you planned it.
+2. **Re-read it as a reviewer, then cut.** Delete what nothing needs, merge what repeats,
+   shorten what stands. Count the files and the lines you added, and drop the ones you
+   cannot defend one by one.
+
+The second pass is not polish, and it is where most of the value is. It does not override
+the killability rules above: keep separate `return` statements and early returns even when
+one expression would be shorter. Do the task asked; when you see adjacent work, name it and
+stop.
+
 ## Subsystem invariants
 
 These are the ten places where a confident rewrite can break an invariant. Read the target
@@ -340,7 +364,7 @@ Memory is released by `unset()` of the container reference before freeing the sl
 
 `XmlConfigurationManipulator` is ~15 small public methods, one edit each, composed by two
 builders; the
-`version_compare` cutoffs (5.2, 7.2, 7.3, 9.3, 10, 10.1, 11.0, 12.0) each have a comment
+`version_compare` cutoffs (5.2, 7.2, 7.3, 9.3, 10, 10.1, 11.0, 12.0, 13.3) each have a comment
 linking the phpunit.xsd change - keep them. Hard rules: PHPUnit >= 12's coverage/`<source>`
 config is authoritative - leave it untouched (#3043 regression); when the user has an
 include filter and no source filtering is requested, preserve their config rather than
@@ -584,6 +608,8 @@ The costliest traps:
     "optimizing" (`make benchmark`), and re-validate old perf hacks before extending them.
 12. Escaped mutant on a literal? Extract a named constant. Escaped mutant on a loose mock?
     Tighten `->with(...)`. Truly unkillable? Discuss a bypass - do not fake a test.
+13. Volume is not rigor. Fewer files is the default; adding one means saying why the
+    smaller shape fails.
 
 ## Maintaining this file
 

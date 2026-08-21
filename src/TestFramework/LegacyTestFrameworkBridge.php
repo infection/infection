@@ -35,27 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\DryRunProcess;
-use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
-use Infection\TestFramework\Common\LazyMutantEvaluationPipe;
-use Symfony\Component\Process\Process;
 use function explode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Mutant;
-use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\DryRunProcess;
+use Infection\Process\MutantProcess;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Common\LazyMutantEvaluationPipe;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use function min;
+use Symfony\Component\Process\Process;
 
 /**
  * @deprecated This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
@@ -74,7 +72,6 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         private CoverageChecker $coverageChecker,
         private InitialTestsRunner $initialTestsRunner,
         private Configuration $config,
-        private MutantProcessContainerFactory $processFactory,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
     ) {
@@ -122,18 +119,20 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
             $output,
         );
 
+        $memoryUsage = $this->adapter instanceof MemoryUsageAware
+            ? $this->adapter->getMemoryUsed($output)
+            : null;
+
         return new InitialRunResults(
             output: $output,
-            memoryUsage: $this->adapter instanceof MemoryUsageAware
-                ? $this->adapter->getMemoryUsed($output)
-                : null,
+            memoryUsage: $memoryUsage === -1. ? null : $memoryUsage,
         );
     }
 
     public function test(Mutant $mutant): MutantExecutionResult|MutantEvaluationPipe
     {
         return new LazyMutantEvaluationPipe(
-            static fn () => $this->createTestProcess($mutant),
+            fn () => $this->createTestProcess($mutant),
         );
     }
 
