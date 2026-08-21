@@ -39,7 +39,6 @@ use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Console\ConsoleOutput;
 use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
@@ -283,9 +282,6 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $this->assertSame($mutant, $actual->getCurrent()->getMutant());
     }
 
-    /**
-     * @param list<LazyMutantProcessFactory> $mutantProcessKillerFactories
-     */
     private function createTestFramework(
         ?TestFrameworkAdapter $adapter = null,
         ?ConsoleOutput $consoleOutput = null,
@@ -293,7 +289,6 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         ?InitialTestsRunner $initialTestsRunner = null,
         ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter = null,
         ?MemoryLimiterEnvironment $memoryLimiterEnvironment = null,
-        array $mutantProcessKillerFactories = [],
         bool $skipInitialTests = false,
         ?string $initialTestsPhpOptions = null,
         string $testFrameworkExtraOptions = '',
@@ -313,7 +308,6 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter ?? $this->createStub(TestFrameworkExtraOptionsFilter::class),
             mutantExecutionResultFactory: $this->createStub(MutantExecutionResultFactory::class),
             memoryLimiterEnvironment: $memoryLimiterEnvironment ?? new MemoryLimiterEnvironment(),
-            mutantProcessKillerFactories: $mutantProcessKillerFactories,
         );
     }
 

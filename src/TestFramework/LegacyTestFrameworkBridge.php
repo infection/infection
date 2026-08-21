@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use function array_map;
-use Closure;
 use function explode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -45,7 +43,6 @@ use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
-use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
@@ -77,9 +74,6 @@ final class LegacyTestFrameworkBridge implements TestFramework
      */
     private array $mutantPhpExtraArgs = [];
 
-    /**
-     * @param list<LazyMutantProcessFactory> $mutantProcessKillerFactories
-     */
     public function __construct(
         private readonly TestFrameworkAdapter $adapter,
         private readonly ConsoleOutput $consoleOutput,
@@ -89,7 +83,6 @@ final class LegacyTestFrameworkBridge implements TestFramework
         private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly MemoryLimiterEnvironment $memoryLimiterEnvironment,
-        private readonly array $mutantProcessKillerFactories,
     ) {
     }
 
@@ -146,10 +139,6 @@ final class LegacyTestFrameworkBridge implements TestFramework
     {
         return new LazyMutantEvaluationPipe(
             fn () => $this->createTestProcess($mutant),
-            ...array_map(
-                static fn (LazyMutantProcessFactory $factory): Closure => static fn () => $factory->create($mutant),
-                $this->mutantProcessKillerFactories,
-            ),
         );
     }
 

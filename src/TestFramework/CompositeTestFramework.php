@@ -52,10 +52,10 @@ use Webmozart\Assert\Assert;
 final readonly class CompositeTestFramework implements TestFramework
 {
     /**
-     * @param non-empty-list<TestFramework> $decoratedTestFrameworks
+     * @param non-empty-list<TestFramework> $testFrameworks
      */
     public function __construct(
-        private array $decoratedTestFrameworks,
+        private array $testFrameworks,
     ) {
     }
 
@@ -63,25 +63,31 @@ final readonly class CompositeTestFramework implements TestFramework
     {
         return sprintf(
             'Composite(%s)',
-            implode('", "', array_map(
-                static fn (TestFramework $testFramework): string => $testFramework->getName(),
-                $this->decoratedTestFrameworks,
-            )),
+            implode(
+                ', ',
+                array_map(
+                    static fn (TestFramework $testFramework): string => $testFramework->getName(),
+                    $this->testFrameworks,
+                ),
+            ),
         );
     }
 
     public function getVersion(): string
     {
-        return implode('", "', array_map(
-            static fn (TestFramework $testFramework): string => $testFramework->getVersion(),
-            $this->decoratedTestFrameworks,
-        ));
+        return implode(
+            ', ',
+            array_map(
+                static fn (TestFramework $testFramework): string => $testFramework->getVersion(),
+                $this->testFrameworks,
+            ),
+        );
     }
 
     public function checkRequirements(): void
     {
-        foreach ($this->decoratedTestFrameworks as $decoratedTestFramework) {
-            $decoratedTestFramework->checkRequirements();
+        foreach ($this->testFrameworks as $testFramework) {
+            $testFramework->checkRequirements();
         }
     }
 
@@ -95,7 +101,7 @@ final readonly class CompositeTestFramework implements TestFramework
 
                     return [$testFramework, $result];
                 },
-                $this->decoratedTestFrameworks,
+                $this->testFrameworks,
             ),
         );
     }
@@ -110,7 +116,7 @@ final readonly class CompositeTestFramework implements TestFramework
 
                     return $pipe;
                 },
-                $this->decoratedTestFrameworks,
+                $this->testFrameworks,
             ),
         );
     }

@@ -41,7 +41,7 @@ namespace Infection\TestFramework\Contracts;
 final readonly class CompositeInitialRunResults
 {
     /**
-     * @param list<array{TestFramework, InitialRunResults}> $results
+     * @param non-empty-list<array{TestFramework, InitialRunResults}> $results
      */
     public function __construct(
         public array $results,

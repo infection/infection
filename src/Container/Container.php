@@ -159,6 +159,7 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
+use Infection\TestFramework\CompositeTestFramework;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -672,13 +673,7 @@ final class Container extends DIContainer
             ),
             TestFramework::class => static function (self $container): TestFramework {
                 $config = $container->getConfiguration();
-                $mutantProcessKillerFactories = [];
-
-                if ($config->isStaticAnalysisEnabled()) {
-                    $mutantProcessKillerFactories[] = $container->getStaticAnalysisToolAdapter()->createMutantProcessFactory();
-                }
-
-                return new LegacyTestFrameworkBridge(
+                $testFramework = new LegacyTestFrameworkBridge(
                     $container->getTestFrameworkAdapter(),
                     $container->get(ConsoleOutput::class),
                     $container->getCoverageChecker(),
@@ -687,8 +682,16 @@ final class Container extends DIContainer
                     $container->getTestFrameworkExtraOptionsFilter(),
                     $container->getMutantExecutionResultFactory(),
                     new MemoryLimiterEnvironment(),
-                    $mutantProcessKillerFactories,
                 );
+
+                if (!$config->isStaticAnalysisEnabled()) {
+                    return $testFramework;
+                }
+
+                return new CompositeTestFramework([
+                    $testFramework,
+                    $container->getStaticAnalysisTestFramework(),
+                ]);
             },
             StaticAnalysisTestFramework::class => static fn (self $container) => new LegacyStaticAnalysisBridge(
                 $container->getStaticAnalysisToolAdapter(),
@@ -702,9 +705,6 @@ final class Container extends DIContainer
                 return new Engine(
                     $config,
                     $container->getTestFramework(),
-                    $config->isStaticAnalysisEnabled()
-                        ? $container->getStaticAnalysisTestFramework()
-                        : null,
                     $container->getEventDispatcher(),
                     $container->getMutationGenerator(),
                     $container->getMutationTestingRunner(),

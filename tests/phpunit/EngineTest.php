@@ -409,7 +409,6 @@ final class EngineTest extends TestCase
                 ->withUncovered(true)
                 ->build(),
             testFramework: $this->testFramework,
-            staticAnalysisTestFramework: null,
             eventDispatcher: $this->eventDispatcher,
             mutationGenerator: $this->mutationGenerator,
             mutationTestingRunner: $this->mutationTestingRunner,

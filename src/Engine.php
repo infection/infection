@@ -50,14 +50,14 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\PreloadedSourceChecker;
-use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as TestFrameworkInitialTestsFailed;
+use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\Coverage\JUnit\TestNotFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -67,7 +67,6 @@ final readonly class Engine
     public function __construct(
         private Configuration $config,
         private TestFramework $testFramework,
-        private ?TestFramework $staticAnalysisTestFramework,
         private EventDispatcher $eventDispatcher,
         private MutationGenerator $mutationGenerator,
         private MutationTestingRunner $mutationTestingRunner,
@@ -81,6 +80,8 @@ final readonly class Engine
     /**
      * @throws InitialTestsFailed
      * @throws InitialStaticAnalysisRunFailed
+     * @throws TestFrameworkInitialTestsFailed
+     * @throws RequirementChecksFailed
      * @throws MinMsiCheckFailed
      * @throws MaxTimeoutCountReached
      * @throws UnparsableFile
@@ -95,8 +96,7 @@ final readonly class Engine
     {
         $this->preloadedSourceChecker->check();
 
-        $this->runInitialTestSuite();
-        $this->runInitialStaticAnalysis();
+        $this->runInitialTestFramework();
 
         $this->runMutationAnalysis();
 
@@ -115,7 +115,11 @@ final readonly class Engine
         }
     }
 
-    private function runInitialTestSuite(): void
+    /**
+     * @throws TestFrameworkInitialTestsFailed
+     * @throws RequirementChecksFailed
+     */
+    private function runInitialTestFramework(): void
     {
         $this->testFramework->checkRequirements();
 
@@ -123,19 +127,7 @@ final readonly class Engine
             return;
         }
 
-        $initialRunResults = $this->testFramework->executeInitialRun();
-        Assert::isInstanceOf($initialRunResults, InitialRunResults::class);
-    }
-
-    private function runInitialStaticAnalysis(): void
-    {
-        $this->staticAnalysisTestFramework?->checkRequirements();
-
-        if ($this->config->skipInitialTests) {
-            return;
-        }
-
-        $this->staticAnalysisTestFramework?->executeInitialRun();
+        $this->testFramework->executeInitialRun();
     }
 
     /**
