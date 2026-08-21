@@ -1,2 +1,3 @@
 - Introduce the TestFramework contract.
 - Make the Static Analysis into a TestFramework contract.
+- Move the memory limit control to the test framework.

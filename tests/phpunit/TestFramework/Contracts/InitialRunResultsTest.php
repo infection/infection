@@ -36,41 +36,18 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Contracts;
 
 use Infection\TestFramework\Contracts\InitialRunResults;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(InitialRunResults::class)]
 final class InitialRunResultsTest extends TestCase
 {
-    public function test_it_accepts_unknown_memory_usage(): void
+    public function test_it_carries_the_output(): void
     {
-        $expected = new InitialRunResults(
-            output: 'output',
-            memoryUsage: null,
-        );
+        $expected = new InitialRunResults(output: 'output');
 
-        $actual = new InitialRunResults('output', null);
+        $actual = new InitialRunResults('output');
 
         $this->assertEquals($expected, $actual);
-    }
-
-    public function test_it_accepts_positive_memory_usage(): void
-    {
-        $expected = new InitialRunResults(
-            output: 'output',
-            memoryUsage: 10.0,
-        );
-
-        $actual = new InitialRunResults('output', 10.0);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function test_it_rejects_negative_memory_usage(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        new InitialRunResults('output', -1.0);
     }
 }

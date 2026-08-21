@@ -39,14 +39,16 @@ use function array_key_exists;
 use function explode;
 use const FILTER_VALIDATE_FLOAT;
 use function filter_var;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\MutantPhpExtraArgsAware;
 use function Safe\preg_match;
 
 /**
  * @internal
  */
-final readonly class DebugTestFrameworkAdapter implements MemoryUsageAware, TestFrameworkAdapter
+final readonly class DebugTestFrameworkAdapter implements MemoryUsageAware, MutantPhpExtraArgsAware, TestFrameworkAdapter
 {
     private const int MEMORY_OUTPUT_PARTS_LIMIT = 2;
 
@@ -94,9 +96,30 @@ final readonly class DebugTestFrameworkAdapter implements MemoryUsageAware, Test
         string $mutationOriginalFilePath,
         string $extraOptions,
     ): array {
+        return $this->getMutantCommandLineWithPhpExtraArgs(
+            $coverageTests,
+            $mutatedFilePath,
+            $mutationHash,
+            $mutationOriginalFilePath,
+            $extraOptions,
+            [],
+        );
+    }
+
+    /**
+     * @param TestLocation[] $coverageTests
+     */
+    public function getMutantCommandLineWithPhpExtraArgs(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
+        string $extraOptions,
+        array $phpExtraArgs,
+    ): array {
         return $this->commandLine->create(
             runtime: $this->runtime,
-            phpArguments: [],
+            phpArguments: $phpExtraArgs,
             options: [
                 'stage' => 'test-framework-mutant',
                 'log' => $this->logFile,

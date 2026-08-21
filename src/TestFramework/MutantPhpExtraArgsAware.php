@@ -33,20 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Memory;
+namespace Infection\TestFramework;
 
-use function Safe\ini_get;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 
 /**
  * @internal
- * @final
+ *
+ * @deprecated This should only live so long as the PHPUnit adapter is using the old API.
  */
-class MemoryLimiterEnvironment
+interface MutantPhpExtraArgsAware
 {
-    public function hasMemoryLimitSet(): bool
-    {
-        // -1 means no memory limit. Anything else means the user has set their own limits, which we
-        // don't want to mess with
-        return ini_get('memory_limit') !== '-1';
-    }
+    /**
+     * @param TestLocation[] $coverageTests
+     * @param list<string> $phpExtraArgs
+     * @return string[]
+     */
+    public function getMutantCommandLineWithPhpExtraArgs(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
+        string $extraOptions,
+        array $phpExtraArgs,
+    ): array;
 }

@@ -44,7 +44,7 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\LazyMutantEvaluationPipe;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
-use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Webmozart\Assert\Assert;
 
@@ -53,7 +53,7 @@ use Webmozart\Assert\Assert;
  *
  * @internal
  */
-final readonly class LegacyStaticAnalysisBridge implements TestFramework
+final readonly class LegacyStaticAnalysisBridge implements StaticAnalysisTestFramework
 {
     public function __construct(
         private ?StaticAnalysisToolAdapter $adapter,
@@ -112,7 +112,6 @@ final readonly class LegacyStaticAnalysisBridge implements TestFramework
 
         return new InitialRunResults(
             output: $initialStaticAnalysisProcess->getOutput(),
-            memoryUsage: null,
         );
     }
 

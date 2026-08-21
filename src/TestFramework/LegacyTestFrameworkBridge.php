@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use function array_map;
+use Closure;
 use function explode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -43,15 +45,18 @@ use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
+use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\TestFramework\Common\LazyMutantEvaluationPipe;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use function min;
+use function sprintf;
 use Symfony\Component\Process\Process;
 
 /**
@@ -59,20 +64,32 @@ use Symfony\Component\Process\Process;
  *
  * @internal
  */
-final readonly class LegacyTestFrameworkBridge implements TestFramework
+final class LegacyTestFrameworkBridge implements TestFramework
 {
     private const int TIMEOUT_FACTOR = 5;
 
     private const int TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
 
+    private const int MEMORY_LIMIT_FACTOR = 2;
+
+    /**
+     * @var list<string>
+     */
+    private array $mutantPhpExtraArgs = [];
+
+    /**
+     * @param list<LazyMutantProcessFactory> $mutantProcessKillerFactories
+     */
     public function __construct(
-        private TestFrameworkAdapter $adapter,
-        private ConsoleOutput $consoleOutput,
-        private CoverageChecker $coverageChecker,
-        private InitialTestsRunner $initialTestsRunner,
-        private Configuration $config,
-        private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
-        private MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly TestFrameworkAdapter $adapter,
+        private readonly ConsoleOutput $consoleOutput,
+        private readonly CoverageChecker $coverageChecker,
+        private readonly InitialTestsRunner $initialTestsRunner,
+        private readonly Configuration $config,
+        private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly MemoryLimiterEnvironment $memoryLimiterEnvironment,
+        private readonly array $mutantProcessKillerFactories,
     ) {
     }
 
@@ -118,13 +135,10 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
             $output,
         );
 
-        $memoryUsage = $this->adapter instanceof MemoryUsageAware
-            ? $this->adapter->getMemoryUsed($output)
-            : null;
+        $this->configureMutantMemoryLimit($output);
 
         return new InitialRunResults(
             output: $output,
-            memoryUsage: $memoryUsage === -1. ? null : $memoryUsage,
         );
     }
 
@@ -132,6 +146,10 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
     {
         return new LazyMutantEvaluationPipe(
             fn () => $this->createTestProcess($mutant),
+            ...array_map(
+                static fn (LazyMutantProcessFactory $factory): Closure => static fn () => $factory->create($mutant),
+                $this->mutantProcessKillerFactories,
+            ),
         );
     }
 
@@ -145,13 +163,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
 
         // TODO: we should strive to remove this Process instantiation.
         $process = new Process(
-            command: $this->adapter->getMutantCommandLine(
-                $mutant->getTests(),
-                $mutant->getFilePath(),
-                $mutant->getMutation()->getHash(),
-                $mutant->getMutation()->getOriginalFilePath(),
-                $this->getFilteredExtraOptionsForMutant(),
-            ),
+            command: $this->getMutantCommandLine($mutant),
             timeout: $timeout,
         );
 
@@ -184,5 +196,46 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         }
 
         return $this->config->testFrameworkExtraOptions;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getMutantCommandLine(Mutant $mutant): array
+    {
+        $arguments = [
+            $mutant->getTests(),
+            $mutant->getFilePath(),
+            $mutant->getMutation()->getHash(),
+            $mutant->getMutation()->getOriginalFilePath(),
+            $this->getFilteredExtraOptionsForMutant(),
+        ];
+
+        return $this->adapter instanceof MutantPhpExtraArgsAware
+            ? $this->adapter->getMutantCommandLineWithPhpExtraArgs(
+                ...$arguments,
+                phpExtraArgs: $this->mutantPhpExtraArgs,
+            )
+            : $this->adapter->getMutantCommandLine(...$arguments);
+    }
+
+    private function configureMutantMemoryLimit(string $output): void
+    {
+        if (!$this->adapter instanceof MemoryUsageAware
+            || $this->memoryLimiterEnvironment->hasMemoryLimitSet()
+        ) {
+            return;
+        }
+
+        $memoryUsage = $this->adapter->getMemoryUsed($output);
+
+        if ($memoryUsage < 0.) {
+            return;
+        }
+
+        $this->mutantPhpExtraArgs = [
+            '-d',
+            sprintf('memory_limit=%dM', (int) (self::MEMORY_LIMIT_FACTOR * $memoryUsage)),
+        ];
     }
 }

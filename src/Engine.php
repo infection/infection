@@ -48,7 +48,6 @@ use Infection\PhpParser\UnparsableFile;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\PreloadedSourceChecker;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -70,7 +69,6 @@ final readonly class Engine
         private TestFramework $testFramework,
         private ?TestFramework $staticAnalysisTestFramework,
         private EventDispatcher $eventDispatcher,
-        private MemoryLimiter $memoryLimiter,
         private MutationGenerator $mutationGenerator,
         private MutationTestingRunner $mutationTestingRunner,
         private MinMsiChecker $minMsiChecker,
@@ -97,16 +95,8 @@ final readonly class Engine
     {
         $this->preloadedSourceChecker->check();
 
-        $initialRunResults = $this->runInitialTestSuite();
+        $this->runInitialTestSuite();
         $this->runInitialStaticAnalysis();
-
-        // TODO: actually this should be done by the adapter itself?
-        /*
-         * Limit the memory used for the mutation processes based on the memory
-         * used for the initial test run.
-         * This is done AFTER static analysis to avoid restricting PHPStan's memory.
-         */
-        $this->memoryLimiter->limitMemory($initialRunResults);
 
         $this->runMutationAnalysis();
 
@@ -125,18 +115,16 @@ final readonly class Engine
         }
     }
 
-    private function runInitialTestSuite(): ?InitialRunResults
+    private function runInitialTestSuite(): void
     {
         $this->testFramework->checkRequirements();
 
         if ($this->config->skipInitialTests) {
-            return null;
+            return;
         }
 
         $initialRunResults = $this->testFramework->executeInitialRun();
         Assert::isInstanceOf($initialRunResults, InitialRunResults::class);
-
-        return $initialRunResults;
     }
 
     private function runInitialStaticAnalysis(): void

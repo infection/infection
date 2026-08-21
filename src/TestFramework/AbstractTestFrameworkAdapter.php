@@ -47,7 +47,7 @@ use function sprintf;
 /**
  * @internal
  */
-abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
+abstract class AbstractTestFrameworkAdapter implements MutantPhpExtraArgsAware, TestFrameworkAdapter
 {
     public function __construct(
         private readonly string $testFrameworkExecutable,
@@ -99,8 +99,31 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         string $mutationOriginalFilePath,
         string $extraOptions,
     ): array {
-        return $this->getCommandLine(
+        return $this->getMutantCommandLineWithPhpExtraArgs(
+            $coverageTests,
+            $mutatedFilePath,
+            $mutationHash,
+            $mutationOriginalFilePath,
+            $extraOptions,
             [],
+        );
+    }
+
+    /**
+     * @param TestLocation[] $coverageTests
+     * @param list<string> $phpExtraArgs
+     * @return string[]
+     */
+    public function getMutantCommandLineWithPhpExtraArgs(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
+        string $extraOptions,
+        array $phpExtraArgs,
+    ): array {
+        return $this->getCommandLine(
+            $phpExtraArgs,
             $this->argumentsAndOptionsBuilder->buildForMutant(
                 $this->buildMutationConfigFile(
                     $coverageTests,

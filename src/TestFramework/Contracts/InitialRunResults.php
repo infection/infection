@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
-use Webmozart\Assert\Assert;
-
 /**
  * Carries the observable outcome of a test framework initial run for later orchestration steps.
  *
@@ -44,15 +42,10 @@ use Webmozart\Assert\Assert;
  */
 final readonly class InitialRunResults
 {
-    /**
-     * @param float|null $memoryUsage Memory usage in megabytes. Null if it cannot be determined.
-     */
     public function __construct(
         public string $output,
-        public ?float $memoryUsage,
         // If additional properties are added at any point, beware that they should be optional to
         // avoid any BC break.
     ) {
-        Assert::nullOrGreaterThan($memoryUsage, limit: 0);
     }
 }

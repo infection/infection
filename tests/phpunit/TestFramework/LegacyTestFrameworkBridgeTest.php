@@ -35,15 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
+use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Console\ConsoleOutput;
 use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
+use Infection\TestFramework\MutantPhpExtraArgsAware;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -109,7 +113,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $testFramework->checkRequirements();
     }
 
-    public function test_it_executes_initial_run_and_reports_memory_usage(): void
+    public function test_it_executes_the_initial_run(): void
     {
         $process = $this->createSuccessfulInitialRunProcess('output');
 
@@ -136,7 +140,6 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
 
         $expected = new InitialRunResults(
             output: 'output',
-            memoryUsage: 42.0,
         );
 
         $actual = $testFramework->executeInitialRun();
@@ -166,6 +169,61 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $testFramework->executeInitialRun();
     }
 
+    public function test_it_applies_the_detected_memory_limit_to_mutant_processes(): void
+    {
+        $adapter = $this->createMockForIntersectionOfInterfaces([
+            TestFrameworkAdapter::class,
+            MemoryUsageAware::class,
+            MutantPhpExtraArgsAware::class,
+        ]);
+        $adapter
+            ->expects($this->once())
+            ->method('getMemoryUsed')
+            ->with('output')
+            ->willReturn(42.0)
+        ;
+
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+        $adapter
+            ->expects($this->once())
+            ->method('getMutantCommandLineWithPhpExtraArgs')
+            ->with(
+                $mutant->getTests(),
+                $mutant->getFilePath(),
+                $mutant->getMutation()->getHash(),
+                $mutant->getMutation()->getOriginalFilePath(),
+                '',
+                ['-d', 'memory_limit=84M'],
+            )
+            ->willReturn(['/bin/phpunit'])
+        ;
+
+        $initialTestsRunner = $this->createStub(InitialTestsRunner::class);
+        $initialTestsRunner
+            ->method('run')
+            ->willReturn($this->createSuccessfulInitialRunProcess('output'))
+        ;
+
+        $memoryLimiterEnvironment = $this->createMock(MemoryLimiterEnvironment::class);
+        $memoryLimiterEnvironment
+            ->expects($this->once())
+            ->method('hasMemoryLimitSet')
+            ->willReturn(false)
+        ;
+
+        $testFramework = $this->createTestFramework(
+            adapter: $adapter,
+            initialTestsRunner: $initialTestsRunner,
+            memoryLimiterEnvironment: $memoryLimiterEnvironment,
+        );
+
+        $testFramework->executeInitialRun();
+        $evaluation = $testFramework->test($mutant);
+
+        $this->assertInstanceOf(MutantEvaluationPipe::class, $evaluation);
+        $this->assertSame($mutant, $evaluation->getCurrent()->getMutant());
+    }
+
     public function test_it_throws_when_the_initial_run_fails(): void
     {
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
@@ -190,52 +248,6 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $this->expectException(InitialTestsFailed::class);
 
         $testFramework->executeInitialRun();
-    }
-
-    public function test_it_reports_unknown_memory_usage_when_the_legacy_adapter_does_not_report_it(): void
-    {
-        $initialTestsRunner = $this->createStub(InitialTestsRunner::class);
-        $initialTestsRunner
-            ->method('run')
-            ->willReturn($this->createSuccessfulInitialRunProcess('output'))
-        ;
-
-        $testFramework = $this->createTestFramework(
-            adapter: new DummyTestFrameworkAdapter(),
-            initialTestsRunner: $initialTestsRunner,
-        );
-
-        $expected = new InitialRunResults(
-            output: 'output',
-            memoryUsage: null,
-        );
-
-        $actual = $testFramework->executeInitialRun();
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function test_it_normalizes_unknown_legacy_memory_usage(): void
-    {
-        $initialTestsRunner = $this->createStub(InitialTestsRunner::class);
-        $initialTestsRunner
-            ->method('run')
-            ->willReturn($this->createSuccessfulInitialRunProcess('output'))
-        ;
-
-        $testFramework = $this->createTestFramework(
-            adapter: new FakeAwareAdapter(-1.0),
-            initialTestsRunner: $initialTestsRunner,
-        );
-
-        $expected = new InitialRunResults(
-            output: 'output',
-            memoryUsage: null,
-        );
-
-        $actual = $testFramework->executeInitialRun();
-
-        $this->assertEquals($expected, $actual);
     }
 
     public function test_it_creates_a_mutant_evaluation(): void
@@ -271,12 +283,17 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $this->assertSame($mutant, $actual->getCurrent()->getMutant());
     }
 
+    /**
+     * @param list<LazyMutantProcessFactory> $mutantProcessKillerFactories
+     */
     private function createTestFramework(
         ?TestFrameworkAdapter $adapter = null,
         ?ConsoleOutput $consoleOutput = null,
         ?CoverageChecker $coverageChecker = null,
         ?InitialTestsRunner $initialTestsRunner = null,
         ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter = null,
+        ?MemoryLimiterEnvironment $memoryLimiterEnvironment = null,
+        array $mutantProcessKillerFactories = [],
         bool $skipInitialTests = false,
         ?string $initialTestsPhpOptions = null,
         string $testFrameworkExtraOptions = '',
@@ -295,6 +312,8 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
                 ->build(),
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter ?? $this->createStub(TestFrameworkExtraOptionsFilter::class),
             mutantExecutionResultFactory: $this->createStub(MutantExecutionResultFactory::class),
+            memoryLimiterEnvironment: $memoryLimiterEnvironment ?? new MemoryLimiterEnvironment(),
+            mutantProcessKillerFactories: $mutantProcessKillerFactories,
         );
     }
 

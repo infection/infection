@@ -35,14 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Resource\Memory;
 
-use Composer\XdebugHandler\XdebugHandler;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
-use const PHP_SAPI;
-use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use function Safe\ini_get;
 use function Safe\ini_set;
 
@@ -71,63 +67,6 @@ final class MemoryLimiterEnvironmentTest extends TestCase
         @ini_set('memory_limit', $memoryLimit);
 
         $this->assertSame($expected, $this->environment->hasMemoryLimitSet());
-    }
-
-    public function test_it_uses_the_system_ini_if_phpdbg_is_enabled(): void
-    {
-        if (PHP_SAPI !== 'phpdbg') {
-            $this->markTestSkipped('This test requires PHPDBG');
-        }
-
-        $this->assertTrue($this->environment->isUsingSystemIni());
-    }
-
-    public function test_it_uses_the_system_ini_if_xdebug_handler_is_not_detected(): void
-    {
-        if (PHP_SAPI === 'phpdbg') {
-            $this->markTestSkipped('This test requires running without PHPDBG');
-        }
-
-        // We don't expect the Xdebug handler to be executed for the tests hence
-        // there is no need to disable it here
-        $this->assertTrue($this->environment->isUsingSystemIni());
-    }
-
-    public function test_it_uses_the_system_ini_if_phpdbg_is_enabled_and_xdebug_handler_is_not_detected(): void
-    {
-        if (PHP_SAPI !== 'phpdbg') {
-            $this->markTestSkipped('This test requires PHPDBG');
-        }
-
-        // We don't expect the Xdebug handler to be executed for the tests hence
-        // there is no need to disable it here
-        $this->assertTrue($this->environment->isUsingSystemIni());
-    }
-
-    public function test_it_does_not_use_the_system_ini_if_phpdbg_is_disabled_and_xdebug_handler_is_detected(): void
-    {
-        if (PHP_SAPI === 'phpdbg') {
-            $this->markTestSkipped('This test requires running without PHPDBG');
-        }
-
-        $reflectionClass = new ReflectionClass(XdebugHandler::class);
-
-        if (PHP_VERSION_ID < 80300) {
-            $reflectionClass->getProperty('skipped')->setValue('infection-fake');
-        } else {
-            $reflectionClass->setStaticPropertyValue('skipped', 'infection-fake');
-        }
-
-        try {
-            $this->assertFalse($this->environment->isUsingSystemIni());
-        } finally {
-            // Restore original value
-            if (PHP_VERSION_ID < 80300) {
-                $reflectionClass->getProperty('skipped')->setValue(null);
-            } else {
-                $reflectionClass->setStaticPropertyValue('skipped', null);
-            }
-        }
     }
 
     public static function memoryLimitProvider(): iterable
