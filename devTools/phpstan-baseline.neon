@@ -2030,55 +2030,10 @@ parameters:
 
 		-
 			rawMessage: '''
-				Call to method checkRequirements() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
-				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
-			'''
-			identifier: method.deprecatedClass
-			count: 2
-			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
-
-		-
-			rawMessage: '''
-				Call to method executeInitialRun() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
-				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
-			'''
-			identifier: method.deprecatedClass
-			count: 4
-			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
-
-		-
-			rawMessage: '''
-				Call to method getName() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
-				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
-			'''
-			identifier: method.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
-
-		-
-			rawMessage: '''
-				Call to method test() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
-				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
-			'''
-			identifier: method.deprecatedClass
-			count: 3
-			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
-
-		-
-			rawMessage: '''
 				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
 			identifier: new.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
-
-		-
-			rawMessage: '''
-				Return type of method Infection\Tests\TestFramework\LegacyTestFrameworkBridgeTest::createTestFramework() has typehint with deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
-				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
-			'''
-			identifier: return.deprecatedClass
 			count: 1
 			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
 

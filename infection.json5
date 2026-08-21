@@ -19,6 +19,7 @@
             "report": "master"
         }
     },
+    "staticAnalysisTool": "phpstan",
     "phpStan": {
         "configDir": "devTools"
     },

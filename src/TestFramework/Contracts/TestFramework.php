@@ -55,6 +55,8 @@ interface TestFramework
 
     public function getVersion(): string;
 
+    public function getBinary(): string;
+
     /**
      * Checks that the version of the tool used is compatible with the adapter.
      *

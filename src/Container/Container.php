@@ -682,6 +682,7 @@ final class Container extends DIContainer
                     $container->getTestFrameworkExtraOptionsFilter(),
                     $container->getMutantExecutionResultFactory(),
                     new MemoryLimiterEnvironment(),
+                    $container->getFactory()->findBinary($config->testFramework),
                 );
 
                 if (!$config->isStaticAnalysisEnabled()) {
@@ -693,11 +694,17 @@ final class Container extends DIContainer
                     $container->getStaticAnalysisTestFramework(),
                 ]);
             },
-            StaticAnalysisTestFramework::class => static fn (self $container) => new LegacyStaticAnalysisBridge(
-                $container->getStaticAnalysisToolAdapter(),
-                $container->getInitialStaticAnalysisRunner(),
-                $container->getConfiguration(),
-            ),
+            StaticAnalysisTestFramework::class => static function (self $container): StaticAnalysisTestFramework {
+                $config = $container->getConfiguration();
+                Assert::notNull($config->staticAnalysisTool);
+
+                return new LegacyStaticAnalysisBridge(
+                    $container->getStaticAnalysisToolAdapter(),
+                    $container->getInitialStaticAnalysisRunner(),
+                    $config,
+                    $container->getStaticAnalysisToolFactory()->findBinary($config->staticAnalysisTool),
+                );
+            },
             PreloadedSourceChecker::class => PreloadedSourceChecker::create(...),
             Engine::class => static function (self $container): Engine {
                 $config = $container->getConfiguration();

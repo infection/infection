@@ -59,6 +59,7 @@ final readonly class LegacyStaticAnalysisBridge implements StaticAnalysisTestFra
         private ?StaticAnalysisToolAdapter $adapter,
         private ?InitialStaticAnalysisRunner $initialStaticAnalysisRunner,
         private Configuration $config,
+        private string $binary,
     ) {
     }
 
@@ -74,6 +75,11 @@ final readonly class LegacyStaticAnalysisBridge implements StaticAnalysisTestFra
         Assert::notNull($this->adapter);
 
         return $this->adapter->getVersion();
+    }
+
+    public function getBinary(): string
+    {
+        return $this->binary;
     }
 
     public function checkRequirements(): void

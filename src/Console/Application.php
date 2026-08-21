@@ -48,6 +48,7 @@ use Infection\Command\InitialTest\InitialTestRunCommand;
 use Infection\Command\ListSourcesCommand;
 use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
+use Infection\Command\TestFrameworkCommand;
 use Infection\Container\Container;
 use Infection\Framework\InfectionVersion;
 use OutOfBoundsException;
@@ -140,6 +141,7 @@ final class Application extends BaseApplication
                 new GitDefaultBaseCommand(),
                 new RunCommand(),
                 new DescribeCommand(),
+                new TestFrameworkCommand(),
                 new ListSourcesCommand(),
                 new MakeCustomMutatorCommand(),
                 new InitialTestRunCommand(),

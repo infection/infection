@@ -84,6 +84,25 @@ final readonly class CompositeTestFramework implements TestFramework
         );
     }
 
+    public function getBinary(): string
+    {
+        return implode(
+            ', ',
+            array_map(
+                static fn (TestFramework $testFramework): string => $testFramework->getBinary(),
+                $this->testFrameworks,
+            ),
+        );
+    }
+
+    /**
+     * @return non-empty-list<TestFramework>
+     */
+    public function getTestFrameworks(): array
+    {
+        return $this->testFrameworks;
+    }
+
     public function checkRequirements(): void
     {
         foreach ($this->testFrameworks as $testFramework) {

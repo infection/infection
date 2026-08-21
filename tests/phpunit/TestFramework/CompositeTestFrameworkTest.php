@@ -75,9 +75,15 @@ final class CompositeTestFrameworkTest extends TestCase
         $this->secondTestFramework->method('getName')->willReturn('PHPStan');
         $this->firstTestFramework->method('getVersion')->willReturn('12.0.0');
         $this->secondTestFramework->method('getVersion')->willReturn('2.1.0');
+        $this->firstTestFramework->method('getBinary')->willReturn('/project/vendor/bin/phpunit');
+        $this->secondTestFramework->method('getBinary')->willReturn('/project/vendor/bin/phpstan');
 
         $this->assertSame('Composite(PHPUnit, PHPStan)', $this->testFramework->getName());
         $this->assertSame('12.0.0, 2.1.0', $this->testFramework->getVersion());
+        $this->assertSame(
+            '/project/vendor/bin/phpunit, /project/vendor/bin/phpstan',
+            $this->testFramework->getBinary(),
+        );
     }
 
     public function test_it_checks_each_test_framework_requirements(): void
@@ -86,6 +92,14 @@ final class CompositeTestFrameworkTest extends TestCase
         $this->secondTestFramework->expects($this->once())->method('checkRequirements');
 
         $this->testFramework->checkRequirements();
+    }
+
+    public function test_it_exposes_the_aggregated_test_frameworks(): void
+    {
+        $this->assertSame(
+            [$this->firstTestFramework, $this->secondTestFramework],
+            $this->testFramework->getTestFrameworks(),
+        );
     }
 
     public function test_it_executes_each_initial_run(): void

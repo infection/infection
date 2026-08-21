@@ -80,10 +80,7 @@ final readonly class StaticAnalysisToolFactory
 
             return PHPStanAdapterFactory::create(
                 $phpStanConfigPath,
-                $this->staticAnalysisToolExecutableFiner->find(
-                    StaticAnalysisToolTypes::PHPSTAN,
-                    (string) $this->infectionConfig->phpStan->customPath,
-                ),
+                $this->findBinary($adapterName),
                 $timeout,
                 $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
@@ -96,10 +93,7 @@ final readonly class StaticAnalysisToolFactory
 
             return MagoAdapterFactory::create(
                 $magoConfigPath,
-                $this->staticAnalysisToolExecutableFiner->find(
-                    StaticAnalysisToolTypes::MAGO,
-                    (string) $this->infectionConfig->mago->customPath,
-                ),
+                $this->findBinary($adapterName),
                 $timeout,
                 $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
@@ -118,5 +112,28 @@ final readonly class StaticAnalysisToolFactory
             $adapterName,
             implode(', ', $availableTestFrameworks),
         ));
+    }
+
+    public function findBinary(string $adapterName): string
+    {
+        if ($adapterName === StaticAnalysisToolTypes::DEBUG) {
+            return self::DEBUG_RUNTIME_SCRIPT;
+        }
+
+        if ($adapterName === StaticAnalysisToolTypes::PHPSTAN) {
+            return $this->staticAnalysisToolExecutableFiner->find(
+                StaticAnalysisToolTypes::PHPSTAN,
+                (string) $this->infectionConfig->phpStan->customPath,
+            );
+        }
+
+        if ($adapterName === StaticAnalysisToolTypes::MAGO) {
+            return $this->staticAnalysisToolExecutableFiner->find(
+                StaticAnalysisToolTypes::MAGO,
+                (string) $this->infectionConfig->mago->customPath,
+            );
+        }
+
+        throw new InvalidArgumentException(sprintf('Invalid name of static analysis tool "%s"', $adapterName));
     }
 }

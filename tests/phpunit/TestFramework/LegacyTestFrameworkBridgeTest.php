@@ -44,6 +44,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
 use Infection\TestFramework\MutantPhpExtraArgsAware;
@@ -259,6 +260,14 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $this->assertInstanceOf(MutantEvaluationPipe::class, $actual);
     }
 
+    public function test_it_exposes_the_test_framework_binary(): void
+    {
+        $this->assertSame(
+            '/project/vendor/bin/phpunit',
+            $this->createTestFramework()->getBinary(),
+        );
+    }
+
     public function test_it_filters_initial_run_only_options_from_mutant_evaluation(): void
     {
         $mutant = MutantBuilder::withMinimalTestData()->build();
@@ -293,7 +302,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         ?string $initialTestsPhpOptions = null,
         string $testFrameworkExtraOptions = '',
         bool $skipCoverage = false,
-    ): LegacyTestFrameworkBridge {
+    ): TestFramework {
         return new LegacyTestFrameworkBridge(
             adapter: $adapter ?? new FakeAwareAdapter(1.0),
             consoleOutput: $consoleOutput ?? $this->createStub(ConsoleOutput::class),
@@ -308,6 +317,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter ?? $this->createStub(TestFrameworkExtraOptionsFilter::class),
             mutantExecutionResultFactory: $this->createStub(MutantExecutionResultFactory::class),
             memoryLimiterEnvironment: $memoryLimiterEnvironment ?? new MemoryLimiterEnvironment(),
+            binary: '/project/vendor/bin/phpunit',
         );
     }
 

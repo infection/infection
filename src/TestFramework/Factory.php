@@ -91,10 +91,7 @@ final readonly class Factory
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
             return PhpUnitAdapterFactory::create(
-                $this->testFrameworkFinder->find(
-                    TestFrameworkTypes::PHPUNIT,
-                    (string) $this->infectionConfig->phpUnit->customPath,
-                ),
+                $this->findBinary($adapterName),
                 $this->tmpDir,
                 $phpUnitConfigPath,
                 (string) $this->infectionConfig->phpUnit->configDir,
@@ -127,7 +124,7 @@ final readonly class Factory
                 $configuration = $this->infectionConfig;
 
                 return $factory::create(
-                    $this->testFrameworkFinder->find($factory::getExecutableName()),
+                    $this->findBinary($adapterName),
                     $this->tmpDir,
                     $this->configLocator->locate($factory::getAdapterName()),
                     null,
@@ -144,6 +141,36 @@ final readonly class Factory
             $adapterName,
             implode(', ', $availableTestFrameworks),
         ));
+    }
+
+    public function findBinary(string $adapterName): string
+    {
+        if ($adapterName === TestFrameworkTypes::DEBUG) {
+            return self::DEBUG_RUNTIME_SCRIPT;
+        }
+
+        if ($adapterName === TestFrameworkTypes::PHPUNIT) {
+            return $this->testFrameworkFinder->find(
+                TestFrameworkTypes::PHPUNIT,
+                (string) $this->infectionConfig->phpUnit->customPath,
+            );
+        }
+
+        foreach ($this->installedExtensions as $installedExtension) {
+            $factory = $installedExtension['extra']['class'];
+
+            Assert::classExists($factory);
+
+            if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
+                continue;
+            }
+
+            if ($adapterName === $factory::getAdapterName()) {
+                return $this->testFrameworkFinder->find($factory::getExecutableName());
+            }
+        }
+
+        throw new InvalidArgumentException(sprintf('Invalid name of test framework "%s"', $adapterName));
     }
 
     /**

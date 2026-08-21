@@ -83,6 +83,7 @@ final class LegacyTestFrameworkBridge implements TestFramework
         private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly MemoryLimiterEnvironment $memoryLimiterEnvironment,
+        private readonly string $binary,
     ) {
     }
 
@@ -94,6 +95,11 @@ final class LegacyTestFrameworkBridge implements TestFramework
     public function getVersion(): string
     {
         return $this->adapter->getVersion();
+    }
+
+    public function getBinary(): string
+    {
+        return $this->binary;
     }
 
     public function checkRequirements(): void
