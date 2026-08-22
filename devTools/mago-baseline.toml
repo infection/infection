@@ -1910,12 +1910,6 @@ count = 1
 
 [[issues]]
 file = "src/Metrics/TargetDetectionStatusesProvider.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\Metrics\TargetDetectionStatusesProvider::findRequired`.'
-count = 1
-
-[[issues]]
-file = "src/Metrics/TargetDetectionStatusesProvider.php"
 code = "docblock-type-mismatch"
 message = 'Docblock return type `array<key-of<enum(Infection\Mutant\DetectionStatus)>, enum(Infection\Mutant\DetectionStatus)>` is incompatible with native return type `array<array-key, mixed>`.'
 count = 1
@@ -2260,6 +2254,12 @@ count = 1
 file = "src/Mutator/MutatorResolver.php"
 code = "less-specific-return-statement"
 message = 'Returned type `array<array-key, mixed>` is less specific than the declared return type `array<string, array<array-key, mixed>>|bool` for function `Infection\Mutator\MutatorResolver::resolveSettings`.'
+count = 2
+
+[[issues]]
+file = "src/Mutator/MutatorResolver.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `array<string, mixed>` is less specific than the declared return type `array<string, array<array-key, mixed>>|bool` for function `Infection\Mutator\MutatorResolver::resolveSettings` due to nested 'mixed'.'''
 count = 2
 
 [[issues]]

@@ -51,6 +51,7 @@ use Infection\Reporter\GitLabCodeQualityReporter;
 use Infection\Reporter\Html\HtmlFileReporter;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\JsonReporter;
+use Infection\Reporter\LineMutationTestingResultsReporter;
 use Infection\Reporter\PerMutatorReporter;
 use Infection\Reporter\Reporter;
 use Infection\Reporter\SummaryFileReporter;
@@ -102,6 +103,9 @@ final class FileReporterFactoryTest extends TestCase
         $this->assertRegisteredReportersAre([], $reporter);
     }
 
+    /**
+     * @param class-string[] $expectedReporterClassNames
+     */
     #[DataProvider('configProvider')]
     public function test_it_creates_a_reporter_for_log_type_on_normal_verbosity(
         Logs $logs,
@@ -347,6 +351,9 @@ final class FileReporterFactoryTest extends TestCase
         );
     }
 
+    /**
+     * @param class-string[] $expectedReporterClassNames
+     */
     private function assertRegisteredReportersAre(
         array $expectedReporterClassNames,
         Reporter $reporter,
@@ -354,13 +361,16 @@ final class FileReporterFactoryTest extends TestCase
         $this->assertInstanceOf(FederatedReporter::class, $reporter);
 
         $reportersReflection = (new ReflectionClass(FederatedReporter::class))->getProperty('reporters');
+
+        /** @var Reporter[] $reporters */
         $reporters = $reportersReflection->getValue($reporter);
 
         $fileReporterDecoratedReporter = (new ReflectionClass(FileReporter::class))->getProperty('lineReporter');
 
         $actualReporterClassNames = array_map(
-            static function ($reporter) use ($fileReporterDecoratedReporter): string {
+            static function (Reporter $reporter) use ($fileReporterDecoratedReporter): string {
                 if ($reporter instanceof FileReporter) {
+                    /** @var LineMutationTestingResultsReporter $reporter */
                     $reporter = $fileReporterDecoratedReporter->getValue($reporter);
                 }
 

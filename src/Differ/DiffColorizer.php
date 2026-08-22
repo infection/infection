@@ -99,13 +99,17 @@ class DiffColorizer
         $previousLineLength = mb_strlen($previousLine);
         $nextLineLength = mb_strlen($nextLine);
 
-        for ($start = $previousLineLength; $start !== 0; --$start) {
+        $start = $previousLineLength;
+
+        for (; $start !== 0; --$start) {
             if (mb_strpos($nextLine, mb_substr($previousLine, 0, $start)) === 0) {
                 break;
             }
         }
 
-        for ($end = $start; $end < $previousLineLength; ++$end) {
+        $end = $start;
+
+        for (; $end < $previousLineLength; ++$end) {
             $t = mb_substr($previousLine, $end);
 
             if (mb_strrpos($nextLine, $t, $start) === ($nextLineLength - mb_strlen($t))) {

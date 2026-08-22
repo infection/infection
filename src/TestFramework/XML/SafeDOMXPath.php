@@ -67,6 +67,7 @@ final readonly class SafeDOMXPath
         string $pathname,
         ?string $namespace = null,
     ): self {
+        Assert::stringNotEmpty($pathname);
         Assert::file($pathname);
         Assert::readable($pathname);
 

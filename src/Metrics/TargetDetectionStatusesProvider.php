@@ -60,24 +60,22 @@ class TargetDetectionStatusesProvider
     /**
      * Implementation follows the logic in LoggerFactory, TextFileLogger, etc.
      *
+     * TODO This has to be a responsibility of loggers.
+     *
      * @see TextFileReporter
+     * @see https://github.com/infection/infection/pull/1430#pullrequestreview-535715334
      *
      * @return array<key-of<DetectionStatus>, DetectionStatus>
      */
     public function get(): array
     {
-        return iterator_to_array($this->findRequired());
+        return iterator_to_array($this->findRequiredStatuses());
     }
 
     /**
-     * TODO This has to be a responsibility of loggers.
-     *
-     * @see https://github.com/infection/infection/pull/1430#pullrequestreview-535715334
-     * @deprecated
-     *
      * @return Generator<string, DetectionStatus>
      */
-    private function findRequired(): Generator
+    private function findRequiredStatuses(): Generator
     {
         if ($this->numberOfShownMutations !== 0) {
             yield DetectionStatus::ESCAPED->name => DetectionStatus::ESCAPED;

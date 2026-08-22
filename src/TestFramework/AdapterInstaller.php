@@ -76,7 +76,8 @@ final readonly class AdapterInstaller
 
         $loader = new ClassLoader();
 
-        /** @var array<string, string[]> $map */
+        // composer always generates this file with a `list<string>` of paths per namespace.
+        /** @var array<string, list<string>> $map */
         $map = require 'vendor/composer/autoload_psr4.php';
 
         foreach ($map as $namespace => $paths) {

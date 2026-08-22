@@ -35,14 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing\Trace;
 
-use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\Testing\SingletonContainer;
-use PhpParser\Node;
 use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
-use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -66,10 +62,7 @@ final class LineRangeCalculatorTest extends TestCase
         $traverser->addVisitor($spy);
         $traverser->traverse($nodes);
 
-        // TODO: fix this; it is out of the contract of NodeVisitor...
-        $range = $spy->range;
-
-        $this->assertSame($nodeRange, $range);
+        $this->assertSame($nodeRange, $spy->range);
     }
 
     public static function provideCodeAndRangeCases(): iterable
@@ -157,30 +150,8 @@ final class LineRangeCalculatorTest extends TestCase
         ];
     }
 
-    private function createSpyTraverser(): NodeVisitor
+    private function createSpyTraverser(): RangeSpyVisitor
     {
-        return new class extends NodeVisitorAbstract {
-            /**
-             * @var int[]
-             */
-            public array $range = [];
-
-            public function leaveNode(Node $node)
-            {
-                if ($node instanceof Node\Stmt\ClassMethod && $node->name->name === 'findMe') {
-                    $node->setAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, true);
-
-                    $lineRange = new LineRangeCalculator();
-                    $this->range = $lineRange->calculateRange($node)->range;
-                }
-
-                if ($node instanceof Node\Expr\Variable && $node->name === 'findMe') {
-                    $lineRange = new LineRangeCalculator();
-                    $this->range = $lineRange->calculateRange($node)->range;
-                }
-
-                return null;
-            }
-        };
+        return new RangeSpyVisitor();
     }
 }

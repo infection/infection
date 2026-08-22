@@ -57,7 +57,9 @@ final class ClassName
     use CannotBeInstantiated;
 
     /**
-     * @param class-string $className
+     * Pure string manipulation: splits on the namespace separator. The input need not be a
+     * real, autoloadable class - callers may pass a class name parsed out of a coverage or
+     * junit report (see FilterBuilder), which PHPStan cannot prove is a class-string.
      *
      * @return non-empty-string
      */
