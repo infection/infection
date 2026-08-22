@@ -35,10 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Reporter;
 
+use function in_array;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
+use Infection\Mutant\DetectionStatus;
 use Infection\Reporter\Html\HtmlFileReporter;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Psr\Log\LoggerInterface;
@@ -133,23 +135,29 @@ class FileReporterFactory
 
     private function createTextLogger(Logs $logConfig): LineMutationTestingResultsReporter
     {
+        $displayedStatuses = LogVerbosity::resolveDisplayedStatuses($this->logVerbosity);
+        $debugVerbosity = in_array(DetectionStatus::KILLED_BY_TESTS, $displayedStatuses, true)
+            || in_array(DetectionStatus::ERROR, $displayedStatuses, true);
+
         if (
             $logConfig->getUseGitHubAnnotationsLogger()
             && $logConfig->getTextLogFilePath() === 'php://stdout'
         ) {
             return new GitHubActionsLogTextFileReporter(
                 $this->resultsCollector,
-                $this->logVerbosity === LogVerbosity::DEBUG,
+                $debugVerbosity,
                 $this->onlyCoveredCode,
                 $this->debugMode,
+                $displayedStatuses,
             );
         }
 
         return new TextFileReporter(
             $this->resultsCollector,
-            $this->logVerbosity === LogVerbosity::DEBUG,
+            $debugVerbosity,
             $this->onlyCoveredCode,
             $this->debugMode,
+            $displayedStatuses,
         );
     }
 

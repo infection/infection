@@ -38,8 +38,11 @@ namespace Infection\Reporter;
 use function array_map;
 use function explode;
 use function implode;
+use function in_array;
+use Infection\Console\LogVerbosity;
 use Infection\Framework\Str;
 use Infection\Metrics\ResultsCollector;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use const PHP_EOL;
 use function sprintf;
@@ -49,17 +52,24 @@ use function sprintf;
  */
 abstract readonly class BaseTextFileReporter implements LineMutationTestingResultsReporter
 {
+    /**
+     * @param array<int, DetectionStatus>|null $displayedStatuses
+     */
     public function __construct(
         private ResultsCollector $resultsCollector,
         private bool $debugVerbosity,
         private bool $onlyCoveredMode,
         private bool $debugMode,
+        private ?array $displayedStatuses = null,
     ) {
     }
 
     public function getLines(): array
     {
         $separateSections = false;
+
+        $displayedStatuses = $this->displayedStatuses
+            ?? ($this->debugVerbosity ? LogVerbosity::ALL_STATUSES : LogVerbosity::DEFAULT_STATUSES);
 
         $logs = [];
 
@@ -80,43 +90,55 @@ abstract readonly class BaseTextFileReporter implements LineMutationTestingResul
             $logs[] = '';
         }
 
-        $logs[] = $this->getResultsLine(
-            $this->resultsCollector->getEscapedExecutionResults(),
-            'Escaped',
-            $separateSections,
-        );
+        if (in_array(DetectionStatus::ESCAPED, $displayedStatuses, true)) {
+            $logs[] = $this->getResultsLine(
+                $this->resultsCollector->getEscapedExecutionResults(),
+                'Escaped',
+                $separateSections,
+            );
+        }
 
-        $logs[] = $this->getResultsLine(
-            $this->resultsCollector->getTimedOutExecutionResults(),
-            'Timed Out',
-            $separateSections,
-        );
+        if (in_array(DetectionStatus::TIMED_OUT, $displayedStatuses, true)) {
+            $logs[] = $this->getResultsLine(
+                $this->resultsCollector->getTimedOutExecutionResults(),
+                'Timed Out',
+                $separateSections,
+            );
+        }
 
-        $logs[] = $this->getResultsLine(
-            $this->resultsCollector->getSkippedExecutionResults(),
-            'Skipped',
-            $separateSections,
-        );
+        if (in_array(DetectionStatus::SKIPPED, $displayedStatuses, true)) {
+            $logs[] = $this->getResultsLine(
+                $this->resultsCollector->getSkippedExecutionResults(),
+                'Skipped',
+                $separateSections,
+            );
+        }
 
-        if ($this->debugVerbosity) {
+        if (in_array(DetectionStatus::KILLED_BY_TESTS, $displayedStatuses, true)) {
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getKilledExecutionResults(),
                 'Killed by Test Framework',
                 $separateSections,
             );
+        }
 
+        if (in_array(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, $displayedStatuses, true)) {
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getKilledByStaticAnalysisExecutionResults(),
                 'Killed by Static Analysis',
                 $separateSections,
             );
+        }
 
+        if (in_array(DetectionStatus::ERROR, $displayedStatuses, true)) {
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getErrorExecutionResults(),
                 'Errors',
                 $separateSections,
             );
+        }
 
+        if (in_array(DetectionStatus::SYNTAX_ERROR, $displayedStatuses, true)) {
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getSyntaxErrorExecutionResults(),
                 'Syntax Errors',
@@ -124,7 +146,9 @@ abstract readonly class BaseTextFileReporter implements LineMutationTestingResul
             );
         }
 
-        if (!$this->onlyCoveredMode) {
+        if (!$this->onlyCoveredMode
+            && in_array(DetectionStatus::NOT_COVERED, $displayedStatuses, true)
+        ) {
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getNotCoveredExecutionResults(),
                 'Not Covered',

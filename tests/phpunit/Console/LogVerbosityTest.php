@@ -37,6 +37,8 @@ namespace Infection\Tests\Console;
 
 use Infection\Console\ConsoleOutput;
 use Infection\Console\LogVerbosity;
+use Infection\Mutant\DetectionStatus;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -95,6 +97,104 @@ final class LogVerbosityTest extends TestCase
         ;
 
         LogVerbosity::convertVerbosityLevel($this->inputMock, $this->consoleOutputMock);
+    }
+
+    public function test_it_keeps_a_valid_list_option_without_changing_it(): void
+    {
+        $this->setInputExpectationsWhenItDoesNotChange('default,-timeout');
+
+        $this->consoleOutputMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        LogVerbosity::convertVerbosityLevel($this->inputMock, $this->consoleOutputMock);
+    }
+
+    #[DataProvider('isValidOptionProvider')]
+    #[AllowMockObjectsWithoutExpectations]
+    public function test_it_validates_options(string $option, bool $expected): void
+    {
+        $this->assertSame($expected, LogVerbosity::isValidOption($option));
+    }
+
+    /**
+     * @param array<int, DetectionStatus> $expected
+     */
+    #[DataProvider('resolveDisplayedStatusesProvider')]
+    #[AllowMockObjectsWithoutExpectations]
+    public function test_it_resolves_displayed_statuses(string $option, array $expected): void
+    {
+        $this->assertSame($expected, LogVerbosity::resolveDisplayedStatuses($option));
+    }
+
+    public static function isValidOptionProvider(): iterable
+    {
+        yield 'all' => ['all', true];
+
+        yield 'default' => ['default', true];
+
+        yield 'none' => ['none', true];
+
+        yield 'default minus timeout' => ['default,-timeout', true];
+
+        yield 'none plus escaped and timeout' => ['none,+escaped,+timeout', true];
+
+        yield 'unknown slug' => ['default,baz', false];
+
+        yield 'only unknown slugs' => ['foo,bar', false];
+
+        yield 'legacy integer string' => ['1', false];
+    }
+
+    public static function resolveDisplayedStatusesProvider(): iterable
+    {
+        yield 'all' => ['all', LogVerbosity::ALL_STATUSES];
+
+        yield 'default' => ['default', LogVerbosity::DEFAULT_STATUSES];
+
+        yield 'none' => ['none', []];
+
+        yield 'default minus timeout' => [
+            'default,-timeout',
+            [
+                DetectionStatus::ESCAPED,
+                DetectionStatus::SKIPPED,
+                DetectionStatus::NOT_COVERED,
+            ],
+        ];
+
+        yield 'none plus escaped and timeout' => [
+            'none,+escaped,+timeout',
+            [
+                DetectionStatus::ESCAPED,
+                DetectionStatus::TIMED_OUT,
+            ],
+        ];
+
+        yield 'default plus errors' => [
+            'default,+errors',
+            [
+                DetectionStatus::ESCAPED,
+                DetectionStatus::TIMED_OUT,
+                DetectionStatus::SKIPPED,
+                DetectionStatus::NOT_COVERED,
+                DetectionStatus::ERROR,
+            ],
+        ];
+
+        yield 'all minus killed and error' => [
+            'all,-killed,-error',
+            [
+                DetectionStatus::ESCAPED,
+                DetectionStatus::TIMED_OUT,
+                DetectionStatus::SKIPPED,
+                DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
+                DetectionStatus::SYNTAX_ERROR,
+                DetectionStatus::NOT_COVERED,
+                DetectionStatus::IGNORED,
+            ],
+        ];
     }
 
     public static function convertedLogVerbosityProvider(): iterable
