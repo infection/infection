@@ -57,11 +57,11 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\PreloadedSourceChecker;
 use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\Coverage\JUnit\TestNotFound;
-use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
-use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
-use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
-use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use Infection\TestFramework\PhpUnit\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\PhpUnit\Locator\Throwable\ReportLocationThrowable;
+use Infection\TestFramework\PhpUnit\Locator\Throwable\TooManyReportsFound;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\TestNotFound;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\InvalidCoverage;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 

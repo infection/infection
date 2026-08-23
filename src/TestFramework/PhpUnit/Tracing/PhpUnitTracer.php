@@ -35,12 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Tracing;
 
-use Infection\TestFramework\Coverage\CoveredTraceProvider;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
-use Infection\TestFramework\Tracing\Trace\Trace;
-use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
-use Infection\TestFramework\Tracing\Tracer;
+use Infection\TestFramework\Contracts\Tracing\Trace\Trace;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitTestExecutionInfoAdder;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Override;
 use SplFileInfo;
 

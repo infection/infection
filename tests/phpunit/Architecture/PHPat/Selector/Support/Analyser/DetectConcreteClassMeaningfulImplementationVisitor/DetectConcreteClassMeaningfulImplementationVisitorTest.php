@@ -56,7 +56,7 @@ use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteC
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture\UnexpectedCallUsingFactory;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture\UnexpectedCallWithDifferentException;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture\UnexpectedCallWithDifferentMessage;
-use Infection\Tests\TestFramework\Tracing\Trace\FakeTrace;
+use Infection\Tests\TestFramework\Contracts\Tracing\Trace\FakeTrace;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 

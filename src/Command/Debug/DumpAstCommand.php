@@ -50,7 +50,7 @@ use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNod
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Source\Matcher\SimpleSourceLineMatcher;
 use Infection\Source\Matcher\SourceLineMatcher;
-use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Contracts\Tracing\Trace\EmptyTrace;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use Psr\Log\LoggerInterface;

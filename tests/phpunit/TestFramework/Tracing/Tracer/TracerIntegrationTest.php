@@ -37,17 +37,17 @@ namespace Infection\Tests\TestFramework\Tracing\Tracer;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\FileSystem;
-use Infection\TestFramework\Coverage\CoveredTraceProvider;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
-use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
-use Infection\TestFramework\Coverage\Locator\FixedLocator;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
-use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
-use Infection\TestFramework\Tracing\Trace\Trace;
-use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
-use Infection\TestFramework\Tracing\Tracer;
+use Infection\TestFramework\Contracts\Tracing\Trace\Trace;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
+use Infection\TestFramework\PhpUnit\Locator\FixedLocator;
+use Infection\TestFramework\PhpUnit\Tracing\CoveredTraceProvider;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitTestExecutionInfoAdder;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitTestFileDataProvider;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\MemoizedTestFileDataProvider;
+use Infection\TestFramework\PhpUnit\Tracing\TraceProviderAdapterTracer;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageParser;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\PhpUnitXmlCoverageTraceProvider;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\XmlCoverageParser;
 use Infection\Tests\Fixtures\TestFramework\Coverage\JUnit\FakeTestFileDataProvider;
 use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
@@ -55,7 +55,6 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversNothing]

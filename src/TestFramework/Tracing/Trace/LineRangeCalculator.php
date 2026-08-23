@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Tracing\Trace;
 
 use Infection\PhpParser\Visitor\ParentConnector;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\TestFramework\Contracts\Tracing\Trace\NodeLineRangeData;
 use PhpParser\Node;
 
 /**

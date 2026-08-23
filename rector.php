@@ -167,7 +167,7 @@ $config = RectorConfig::configure()
         // This appears to break our build.
         ReturnEarlyIfVariableRector::class,
         RemoveUnreachableStatementRector::class => [
-            __DIR__ . '/tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php',
+            __DIR__ . '/tests/phpunit/TestFramework/PhpUnit/Tracing/JUnit/JUnitTestExecutionInfoAdderTest.php',
         ],
         RemoveUnusedConstructorParamRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/',
