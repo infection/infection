@@ -1712,12 +1712,6 @@ count = 3
 
 [[issues]]
 file = "src/Framework/Enum/EnumBucket.php"
-code = "invalid-return-statement"
-message = '''Invalid return type for function `Infection\Framework\Enum\EnumBucket::getCasesIndexedByName`: expected `array<string, ('E.infection\framework\enum\enumbucket::getcasesindexedbyname() extends BackedEnum)>`, but found `array<string, BackedEnum&static>`.'''
-count = 1
-
-[[issues]]
-file = "src/Framework/Enum/EnumBucket.php"
 code = "mixed-argument"
 message = '''Invalid argument type for argument #1 of `Infection\Framework\Enum\EnumBucket::describeCase`: expected `BackedEnum&'T.infection\framework\enum\enumbucket extends BackedEnum`, but found `mixed`.'''
 count = 2
