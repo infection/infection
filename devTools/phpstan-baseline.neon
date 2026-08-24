@@ -145,7 +145,7 @@ parameters:
 			'''
 			identifier: method.deprecatedClass
 			count: 1
-			path: ../src/Container/Container.php
+			path: ../src/TestFramework/Factory.php
 
 		-
 			rawMessage: '''
@@ -154,13 +154,7 @@ parameters:
 			'''
 			identifier: new.deprecatedClass
 			count: 1
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: 'Parameter #3 $config of class Infection\TestFramework\LegacyStaticAnalysisBridge constructor expects Infection\Configuration\Configuration, Infection\Console\ConsoleOutput given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/Container/Container.php
+			path: ../src/TestFramework/Factory.php
 
 		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'

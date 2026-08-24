@@ -38,6 +38,7 @@ namespace Infection\TestFramework;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
+use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\SourceCollector;
@@ -61,6 +62,7 @@ final readonly class LegacyAdapterFactory
         private SourceCollector $sourceCollector,
         private array $installedExtensions,
         private ShellCommandLineExecutor $shellCommandLineExecutor,
+        private ConsoleOutput $consoleOutput,
     ) {
     }
 
@@ -80,7 +82,7 @@ final readonly class LegacyAdapterFactory
                 $this->configuration->sourceFilter === null ? [] : $this->sourceCollector->collect(),
                 $this->configuration->mapSourceClassToTestStrategy,
                 $this->shellCommandLineExecutor,
-                null,
+                $this->consoleOutput,
                 null,
                 null,
                 $this->configuration,

@@ -40,11 +40,20 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\SourceCollector;
+use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
+use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
@@ -69,6 +78,8 @@ final readonly class Factory
         private string $projectDir,
         private TestFrameworkConfigLocatorInterface $configLocator,
         private TestFrameworkFinder $testFrameworkFinder,
+        private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFinder,
+        private TestFrameworkConfigLocatorInterface $staticAnalysisConfigLocator,
         private string $jUnitFilePath,
         private Configuration $infectionConfig,
         private SourceCollector $sourceCollector,
@@ -79,6 +90,7 @@ final readonly class Factory
         private InitialTestsRunner $initialTestsRunner,
         private MutantProcessContainerFactory $containerFactory,
         private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
+        private EventDispatcher $eventDispatcher,
     ) {
     }
 
@@ -97,6 +109,64 @@ final readonly class Factory
                 $this->containerFactory,
                 $this->extraOptionsFilter,
             );
+    }
+
+    public function createStaticAnalysisTool(string $adapterName, float $timeout): TestFramework
+    {
+        $adapter = $this->createStaticAnalysisToolAdapter($adapterName, $timeout);
+
+        return new LegacyStaticAnalysisBridge(
+            $adapter,
+            new InitialStaticAnalysisRunner(
+                new InitialStaticAnalysisProcessFactory($adapter),
+                $this->eventDispatcher,
+            ),
+            $this->infectionConfig,
+        );
+    }
+
+    public function createStaticAnalysisToolAdapter(string $adapterName, float $timeout): StaticAnalysisToolAdapter
+    {
+        if ($adapterName === StaticAnalysisToolTypes::PHPSTAN) {
+            return $this->createStaticAnalysisToolAdapterFromFactory(
+                PHPStanAdapterFactory::class,
+                $adapterName,
+                (string) $this->infectionConfig->phpStan->customPath,
+                $timeout,
+            );
+        }
+
+        if ($adapterName === StaticAnalysisToolTypes::MAGO) {
+            return $this->createStaticAnalysisToolAdapterFromFactory(
+                MagoAdapterFactory::class,
+                $adapterName,
+                (string) $this->infectionConfig->mago->customPath,
+                $timeout,
+            );
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'Invalid name of static analysis tool "%s". Available names are: %s',
+            $adapterName,
+            implode(', ', [StaticAnalysisToolTypes::PHPSTAN, StaticAnalysisToolTypes::MAGO]),
+        ));
+    }
+
+    /** @param class-string<StaticAnalysisToolAdapterFactory> $factory */
+    private function createStaticAnalysisToolAdapterFromFactory(
+        string $factory,
+        string $adapterName,
+        string $customPath,
+        float $timeout,
+    ): StaticAnalysisToolAdapter {
+        return $factory::create(
+            $this->staticAnalysisConfigLocator->locate($adapterName),
+            $this->staticAnalysisToolExecutableFinder->find($adapterName, $customPath),
+            $timeout,
+            $this->tmpDir,
+            $this->infectionConfig->getStaticAnalysisToolOptions(),
+            $this->shellCommandLineExecutor,
+        );
     }
 
     private function createTestFramework(string $adapterName, bool $skipCoverage): TestFramework|TestFrameworkAdapter

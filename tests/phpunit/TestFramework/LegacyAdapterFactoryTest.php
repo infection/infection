@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
+use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\FakeSourceCollector;
@@ -65,6 +66,7 @@ final class LegacyAdapterFactoryTest extends TestCase
                 ],
             ],
             $this->createStub(ShellCommandLineExecutor::class),
+            $this->createStub(ConsoleOutput::class),
         );
 
         $adapter = $factory->create('dummy', false);

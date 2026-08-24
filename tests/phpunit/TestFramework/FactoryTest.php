@@ -36,12 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\Console\ConsoleOutput;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
@@ -62,6 +65,8 @@ final class FactoryTest extends TestCase
             '',
             $this->createStub(TestFrameworkConfigLocatorInterface::class),
             $this->createStub(TestFrameworkFinder::class),
+            $this->createStub(StaticAnalysisToolExecutableFinder::class),
+            $this->createStub(TestFrameworkConfigLocatorInterface::class),
             '',
             ConfigurationBuilder::withMinimalTestData()->build(),
             new FakeSourceCollector(),
@@ -72,6 +77,7 @@ final class FactoryTest extends TestCase
             $this->createStub(InitialTestsRunner::class),
             $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            $this->createStub(EventDispatcher::class),
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -86,6 +92,8 @@ final class FactoryTest extends TestCase
             '',
             $this->createStub(TestFrameworkConfigLocatorInterface::class),
             $this->createStub(TestFrameworkFinder::class),
+            $this->createStub(StaticAnalysisToolExecutableFinder::class),
+            $this->createStub(TestFrameworkConfigLocatorInterface::class),
             '',
             ConfigurationBuilder::withMinimalTestData()->build(),
             new FakeSourceCollector(),
@@ -102,10 +110,67 @@ final class FactoryTest extends TestCase
             $this->createStub(InitialTestsRunner::class),
             $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            $this->createStub(EventDispatcher::class),
         );
 
         $testFramework = $factory->create('dummy', false);
 
         $this->assertInstanceOf(LegacyTestFrameworkBridge::class, $testFramework);
+    }
+
+    public function test_it_throws_an_exception_if_it_cant_find_the_static_analysis_tool(): void
+    {
+        $factory = new Factory(
+            '',
+            '',
+            $this->createStub(TestFrameworkConfigLocatorInterface::class),
+            $this->createStub(TestFrameworkFinder::class),
+            $this->createStub(StaticAnalysisToolExecutableFinder::class),
+            $this->createStub(TestFrameworkConfigLocatorInterface::class),
+            '',
+            ConfigurationBuilder::withMinimalTestData()->build(),
+            new FakeSourceCollector(),
+            [],
+            $this->createStub(ShellCommandLineExecutor::class),
+            $this->createStub(ConsoleOutput::class),
+            $this->createStub(CoverageChecker::class),
+            $this->createStub(InitialTestsRunner::class),
+            $this->createStub(MutantProcessContainerFactory::class),
+            $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            $this->createStub(EventDispatcher::class),
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid name of static analysis tool "Fake SA Tool". Available names are: phpstan, mago');
+
+        $factory->createStaticAnalysisTool('Fake SA Tool', 30.);
+    }
+
+    public function test_it_bridges_a_legacy_static_analysis_tool(): void
+    {
+        $factory = new Factory(
+            '',
+            '',
+            $this->createStub(TestFrameworkConfigLocatorInterface::class),
+            $this->createStub(TestFrameworkFinder::class),
+            $this->createStub(StaticAnalysisToolExecutableFinder::class),
+            $this->createStub(TestFrameworkConfigLocatorInterface::class),
+            '',
+            ConfigurationBuilder::withMinimalTestData()->build(),
+            new FakeSourceCollector(),
+            [],
+            $this->createStub(ShellCommandLineExecutor::class),
+            $this->createStub(ConsoleOutput::class),
+            $this->createStub(CoverageChecker::class),
+            $this->createStub(InitialTestsRunner::class),
+            $this->createStub(MutantProcessContainerFactory::class),
+            $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            $this->createStub(EventDispatcher::class),
+        );
+
+        $this->assertInstanceOf(
+            TestFramework::class,
+            $factory->createStaticAnalysisTool('mago', 30.),
+        );
     }
 }

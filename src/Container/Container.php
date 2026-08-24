@@ -154,7 +154,6 @@ use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -173,7 +172,6 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\LegacyAdapterFactory;
-use Infection\TestFramework\LegacyStaticAnalysisBridge;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
@@ -302,6 +300,8 @@ final class Container extends DIContainer
                     $container->getProjectDir(),
                     $container->getTestFrameworkConfigLocator(),
                     $container->getTestFrameworkFinder(),
+                    $container->getStaticAnalysisToolExecutableFinder(),
+                    $container->getStaticAnalysisConfigLocator(),
                     $container->getJUnitReportLocator()->getDefaultLocation(),
                     $config,
                     $container->getSourceCollector(),
@@ -312,6 +312,7 @@ final class Container extends DIContainer
                     $container->getInitialTestsRunner(),
                     $container->getMutantProcessContainerFactory(),
                     $container->getTestFrameworkExtraOptionsFilter(),
+                    $container->getEventDispatcher(),
                 );
             },
             LegacyAdapterFactory::class => static function (self $container): LegacyAdapterFactory {
@@ -327,16 +328,7 @@ final class Container extends DIContainer
                     $container->getSourceCollector(),
                     GeneratedExtensionsConfig::EXTENSIONS,
                     $container->getShellCommandLineExecutor(),
-                );
-            },
-            StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
-                $config = $container->getConfiguration();
-
-                return new StaticAnalysisToolFactory(
-                    $config,
-                    $container->getStaticAnalysisToolExecutableFinder(),
-                    $container->getStaticAnalysisConfigLocator(),
-                    $container->getShellCommandLineExecutor(),
+                    $container->get(ConsoleOutput::class),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
@@ -570,7 +562,7 @@ final class Container extends DIContainer
 
                 Assert::notNull($config->staticAnalysisTool);
 
-                return $container->getStaticAnalysisToolFactory()->create(
+                return $container->getFactory()->createStaticAnalysisToolAdapter(
                     $config->staticAnalysisTool,
                     $config->processTimeout,
                 );
@@ -699,11 +691,16 @@ final class Container extends DIContainer
                     $config->skipCoverage,
                 );
             },
-            StaticAnalysisTestFramework::class => static fn (self $container) => new LegacyStaticAnalysisBridge(
-                $container->getStaticAnalysisToolAdapter(),
-                $container->getInitialStaticAnalysisRunner(),
-                $container->get(ConsoleOutput::class),
-            ),
+            StaticAnalysisTestFramework::class => static function (self $container): TestFramework {
+                $config = $container->getConfiguration();
+
+                Assert::notNull($config->staticAnalysisTool);
+
+                return $container->getFactory()->createStaticAnalysisTool(
+                    $config->staticAnalysisTool,
+                    $config->processTimeout,
+                );
+            },
         ]);
 
         return $container->withValues(
@@ -1259,11 +1256,6 @@ final class Container extends DIContainer
     private function getFactory(): Factory
     {
         return $this->get(Factory::class);
-    }
-
-    private function getStaticAnalysisToolFactory(): StaticAnalysisToolFactory
-    {
-        return $this->get(StaticAnalysisToolFactory::class);
     }
 
     private function getJUnitTestExecutionInfoAdder(): JUnitTestExecutionInfoAdder
