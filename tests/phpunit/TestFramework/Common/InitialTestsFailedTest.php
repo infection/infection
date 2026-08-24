@@ -33,16 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Runner;
+namespace Infection\Tests\TestFramework\Common;
 
-use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
+use Infection\TestFramework\Common\InitialTestsFailed;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-#[CoversClass(InitialStaticAnalysisRunFailed::class)]
-final class InitialStaticAnalysisRunFailedTest extends TestCase
+#[CoversClass(InitialTestsFailed::class)]
+final class InitialTestsFailedTest extends TestCase
 {
     public function test_it_creates_a_failure_from_a_process(): void
     {
@@ -51,13 +51,14 @@ final class InitialStaticAnalysisRunFailedTest extends TestCase
         $process->expects($this->once())->method('getOutput')->willReturn('output string');
         $process->expects($this->once())->method('getErrorOutput')->willReturn('error string');
 
-        $exception = InitialStaticAnalysisRunFailed::fromProcess($process, 'PHPStan');
+        $exception = InitialTestsFailed::fromProcess($process, 'PHPUnit', 'Recommendations');
 
         $this->assertInstanceOf(InitialTestsFailedContract::class, $exception);
         $this->assertSame(<<<'MESSAGE'
-            Project static analysis must be in a passing state before running Infection.
-            PHPStan reported an exit code of 1.
-            Refer to the PHPStan's output below:
+            Project tests must be in a passing state before running Infection.
+            Recommendations
+            PHPUnit reported an exit code of 1.
+            Refer to the PHPUnit's output below:
             STDOUT:
             output string
             STDERR:

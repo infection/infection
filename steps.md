@@ -8,3 +8,5 @@
 - Move StaticAnalysisToolFactory to Factory.
 - Remove unnecessary parts of TestFrameworkAdapter in the PHPUnitAdapter
 - Remove StaticAnalysisToolAdapter.
+- Migrate InitialTestsRunProcessFactory & InitialStaticAnalysisProcessFactory
+- Migrate InitialTestsFailed & InitialStaticAnalysisRunFailed

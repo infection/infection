@@ -116,7 +116,7 @@ final class PHPStanAdapter implements LazyMutantProcessFactory, StaticAnalysisTe
         $process->run($onProgress);
 
         if (!$process->isSuccessful()) {
-            throw InitialStaticAnalysisRunFailed::fromProcessAndAdapter($process, $this->getName());
+            throw InitialStaticAnalysisRunFailed::fromProcess($process, $this->getName());
         }
 
         return new InitialTestsResult($process->getOutput());

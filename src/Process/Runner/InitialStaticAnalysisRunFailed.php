@@ -37,41 +37,33 @@ namespace Infection\Process\Runner;
 
 use Exception;
 use function implode;
+use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use function sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 
-/**
- * @internal
- */
-final class InitialStaticAnalysisRunFailed extends Exception
+/** @internal */
+final class InitialStaticAnalysisRunFailed extends Exception implements InitialTestsFailedContract
 {
-    public static function fromProcessAndAdapter(Process $initialTestSuiteProcess, string $staticAnalysisTool): self
+    public static function fromProcess(Process $process, string $staticAnalysisTool): self
     {
-        $exitCode = $initialTestSuiteProcess->getExitCode();
+        $exitCode = $process->getExitCode();
         Assert::notNull($exitCode);
 
         $lines = [
             'Project static analysis must be in a passing state before running Infection.',
-            sprintf(
-                '%s reported an exit code of %d.',
-                $staticAnalysisTool,
-                $exitCode,
-            ),
-            sprintf(
-                'Refer to the %s\'s output below:',
-                $staticAnalysisTool,
-            ),
+            sprintf('%s reported an exit code of %d.', $staticAnalysisTool, $exitCode),
+            sprintf('Refer to the %s\'s output below:', $staticAnalysisTool),
         ];
 
-        $stdOut = $initialTestSuiteProcess->getOutput();
+        $stdOut = $process->getOutput();
 
         if ($stdOut !== '') {
             $lines[] = 'STDOUT:';
             $lines[] = $stdOut;
         }
 
-        $stdError = $initialTestSuiteProcess->getErrorOutput();
+        $stdError = $process->getErrorOutput();
 
         if ($stdError !== '') {
             $lines[] = 'STDERR:';

@@ -33,35 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Runner;
+namespace Infection\TestFramework\Common;
 
-use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
+use Exception;
+use function implode;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use function sprintf;
 use Symfony\Component\Process\Process;
+use Webmozart\Assert\Assert;
 
-#[CoversClass(InitialStaticAnalysisRunFailed::class)]
-final class InitialStaticAnalysisRunFailedTest extends TestCase
+/** @internal */
+final class InitialTestsFailed extends Exception implements InitialTestsFailedContract
 {
-    public function test_it_creates_a_failure_from_a_process(): void
-    {
-        $process = $this->createMock(Process::class);
-        $process->expects($this->once())->method('getExitCode')->willReturn(1);
-        $process->expects($this->once())->method('getOutput')->willReturn('output string');
-        $process->expects($this->once())->method('getErrorOutput')->willReturn('error string');
+    public static function fromProcess(
+        Process $process,
+        string $testFramework,
+        string $recommendations,
+    ): self {
+        $exitCode = $process->getExitCode();
+        Assert::notNull($exitCode);
 
-        $exception = InitialStaticAnalysisRunFailed::fromProcess($process, 'PHPStan');
+        $lines = [
+            'Project tests must be in a passing state before running Infection.',
+            $recommendations,
+            sprintf('%s reported an exit code of %d.', $testFramework, $exitCode),
+            sprintf('Refer to the %s\'s output below:', $testFramework),
+        ];
 
-        $this->assertInstanceOf(InitialTestsFailedContract::class, $exception);
-        $this->assertSame(<<<'MESSAGE'
-            Project static analysis must be in a passing state before running Infection.
-            PHPStan reported an exit code of 1.
-            Refer to the PHPStan's output below:
-            STDOUT:
-            output string
-            STDERR:
-            error string
-            MESSAGE, $exception->getMessage());
+        $stdOut = $process->getOutput();
+
+        if ($stdOut !== '') {
+            $lines[] = 'STDOUT:';
+            $lines[] = $stdOut;
+        }
+
+        $stdError = $process->getErrorOutput();
+
+        if ($stdError !== '') {
+            $lines[] = 'STDERR:';
+            $lines[] = $stdError;
+        }
+
+        return new self(implode("\n", $lines));
     }
 }

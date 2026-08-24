@@ -46,11 +46,11 @@ use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
+use Infection\TestFramework\Common\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
@@ -253,7 +253,11 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         });
 
         if (!$initialTestSuiteProcess->isSuccessful()) {
-            throw InitialTestsFailed::fromProcessAndAdapter($initialTestSuiteProcess, $this);
+            throw InitialTestsFailed::fromProcess(
+                $initialTestSuiteProcess,
+                $this->getName(),
+                $this->getInitialTestsFailRecommendations($initialTestSuiteProcess->getCommandLine()),
+            );
         }
 
         $output = $initialTestSuiteProcess->getOutput();
