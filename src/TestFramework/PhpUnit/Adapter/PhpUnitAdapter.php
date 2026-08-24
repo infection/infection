@@ -65,7 +65,6 @@ use function Safe\preg_match;
 use function sprintf;
 use function trim;
 use function version_compare;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -85,12 +84,12 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         ShellCommandLineExecutor $shellCommandLineExecutor,
         VersionParser $versionParser,
         CommandLineBuilder $commandLineBuilder,
-        private readonly ?ConsoleOutput $consoleOutput,
-        private readonly ?CoverageChecker $coverageChecker,
-        private readonly ?InitialTestsRunner $initialTestsRunner,
-        private readonly ?Configuration $configuration,
-        private readonly ?MutantProcessContainerFactory $processFactory,
-        private readonly ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private readonly ConsoleOutput $consoleOutput,
+        private readonly CoverageChecker $coverageChecker,
+        private readonly InitialTestsRunner $initialTestsRunner,
+        private readonly Configuration $configuration,
+        private readonly MutantProcessContainerFactory $processFactory,
+        private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         ?string $version = null,
     ) {
         parent::__construct(
@@ -196,10 +195,6 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
 
     public function checkRequirements(): void
     {
-        Assert::notNull($this->configuration);
-        Assert::notNull($this->consoleOutput);
-        Assert::notNull($this->coverageChecker);
-
         // TODO: check supported version
 
         if ($this->configuration->skipInitialTests) {
@@ -210,10 +205,6 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
 
     public function executeInitialRun(): InitialRunResults
     {
-        Assert::notNull($this->configuration);
-        Assert::notNull($this->initialTestsRunner);
-        Assert::notNull($this->coverageChecker);
-
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
             $this->configuration->testFrameworkExtraOptions,
             explode(' ', (string) $this->configuration->initialTestsPhpOptions),
@@ -239,10 +230,6 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
 
     public function test(Mutant $mutant): MutantEvaluationPipe
     {
-        Assert::notNull($this->configuration);
-        Assert::notNull($this->processFactory);
-        Assert::notNull($this->testFrameworkExtraOptionsFilter);
-
         return $this->processFactory->create(
             $mutant,
             $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
