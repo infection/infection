@@ -1,6 +1,6 @@
 - Introduce the TestFramework contract.
 - Make the Static Analysis into a TestFramework contract.
-- Move the memory limit to the test frameworks.
+- Move the memory limit to the test frameworks (beware, not triival, see src/TestFramework/PhpUnit/Adapter/MEMORY_LIMITER.md).
 - Introduce the new TestFramework Factory (for test framework adapters only).
 - Migrate the PHPUnitAdapter from TestFrameworkAdapter to TestFramework.
 - Update the TestFrameworkFactory with new arguments.

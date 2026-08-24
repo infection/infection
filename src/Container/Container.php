@@ -140,8 +140,6 @@ use Infection\Reporter\ShowMutationsReporter;
 use Infection\Reporter\StrykerReporterFactory;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
 use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Memory\MemoryLimiter;
-use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Collector\LazySourceCollector;
@@ -178,7 +176,6 @@ use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
 use OndraM\CiDetector\CiDetector;
-use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinterAbstract;
@@ -361,11 +358,6 @@ final class Container extends DIContainer
             MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator(
                 $container->getConfiguration()->msiPrecision,
                 $container->getConfiguration()->timeoutsAsEscaped,
-            ),
-            MemoryLimiter::class => static fn (self $container): MemoryLimiter => new MemoryLimiter(
-                $container->getFileSystem(),
-                (string) php_ini_loaded_file(),
-                new MemoryLimiterEnvironment(),
             ),
             SchemaConfigurationLoader::class => static fn (self $container): SchemaConfigurationLoader => new SchemaConfigurationLoader(
                 $container->getRootsFileLocator(),
@@ -887,11 +879,6 @@ final class Container extends DIContainer
     public function getResultsCollector(): ResultsCollector
     {
         return $this->get(ResultsCollector::class);
-    }
-
-    public function getMemoryLimiter(): MemoryLimiter
-    {
-        return $this->get(MemoryLimiter::class);
     }
 
     public function getMutatorResolver(): MutatorResolver

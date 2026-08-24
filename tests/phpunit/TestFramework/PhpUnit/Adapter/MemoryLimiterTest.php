@@ -33,106 +33,71 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Resource\Memory;
+namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
-use Infection\Resource\Memory\MemoryLimiter;
-use Infection\Resource\Memory\MemoryLimiterEnvironment;
-use Infection\TestFramework\Contracts\InitialRunResults;
-use Infection\Tests\FileSystem\FileSystemTestCase;
-use function microtime;
-use const PHP_EOL;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use Infection\TestFramework\PhpUnit\Adapter\MemoryLimiter;
+use Infection\TestFramework\PhpUnit\Adapter\MemoryLimiterEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
-use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
+use PHPUnit\Framework\TestCase;
 
-#[AllowMockObjectsWithoutExpectations]
-#[Group('integration')]
 #[CoversClass(MemoryLimiter::class)]
-final class MemoryLimiterTest extends FileSystemTestCase
+final class MemoryLimiterTest extends TestCase
 {
-    private MockObject&Filesystem $fileSystemMock;
-
     private MockObject&MemoryLimiterEnvironment $environmentMock;
 
     protected function setUp(): void
     {
-        $this->fileSystemMock = $this->createMock(Filesystem::class);
         $this->environmentMock = $this->createMock(MemoryLimiterEnvironment::class);
-
-        parent::setUp();
     }
 
-    public function test_it_does_nothing_when_adapter_is_not_memory_limit_aware(): void
-    {
-        $this->environmentMock
-            ->expects($this->never())
-            ->method('hasMemoryLimitSet')
-        ;
-
-        $this->environmentMock
-            ->expects($this->never())
-            ->method('isUsingSystemIni')
-        ;
-
-        $memoryLimiter = new MemoryLimiter($this->fileSystemMock, 'foo/bar', $this->environmentMock);
-
-        $memoryLimiter->limitMemory(null);
-    }
-
-    public function test_it_does_not_apply_a_limit_if_no_ini_file_loaded(): void
+    public function test_it_provides_a_memory_limit_twice_the_observed_usage(): void
     {
         $this->configureEnvironmentToBeCalledOnce();
 
-        $memoryLimiter = new MemoryLimiter($this->fileSystemMock, 'foo/bar', $this->environmentMock);
+        $memoryLimiter = new MemoryLimiter($this->environmentMock);
 
-        $memoryLimiter->limitMemory(new InitialRunResults('', 10.));
-    }
-
-    public function test_it_applies_memory_limit_if_possible(): void
-    {
-        $filename = $this->tmp . '/fake-ini' . microtime() . '.ini';
-
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('exists')
-            ->willReturn(true)
-        ;
-
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('appendToFile')
-            ->with(
-                $filename,
-                PHP_EOL . sprintf('memory_limit = %dM', 40),
-            );
-
-        $this->configureEnvironmentToBeCalledOnce();
-
-        $memoryLimiter = new MemoryLimiter($this->fileSystemMock, $filename, $this->environmentMock);
-
-        $memoryLimiter->limitMemory(new InitialRunResults('foo', 20.));
+        $this->assertSame(['-d', 'memory_limit=40M'], $memoryLimiter->getPhpExtraArguments(20.));
     }
 
     public function test_it_does_nothing_when_the_adapter_cannot_detect_the_memory_used(): void
     {
-        $filename = $this->tmp . '/fake-ini' . microtime() . '.ini';
+        $this->configureEnvironmentToBeCalledOnce();
 
+        $memoryLimiter = new MemoryLimiter($this->environmentMock);
+
+        $this->assertSame([], $memoryLimiter->getPhpExtraArguments(-1.));
+    }
+
+    public function test_it_does_nothing_when_a_memory_limit_is_already_set(): void
+    {
         $this->environmentMock
-            ->expects($this->never())
+            ->expects($this->once())
             ->method('hasMemoryLimitSet')
-        ;
-
+            ->willReturn(true);
         $this->environmentMock
             ->expects($this->never())
+            ->method('isUsingSystemIni');
+
+        $memoryLimiter = new MemoryLimiter($this->environmentMock);
+
+        $this->assertSame([], $memoryLimiter->getPhpExtraArguments(20.));
+    }
+
+    public function test_it_does_nothing_when_using_the_system_ini(): void
+    {
+        $this->environmentMock
+            ->expects($this->once())
+            ->method('hasMemoryLimitSet')
+            ->willReturn(false);
+        $this->environmentMock
+            ->expects($this->once())
             ->method('isUsingSystemIni')
-        ;
+            ->willReturn(true);
 
-        $memoryLimiter = new MemoryLimiter($this->fileSystemMock, $filename, $this->environmentMock);
+        $memoryLimiter = new MemoryLimiter($this->environmentMock);
 
-        $memoryLimiter->limitMemory(new InitialRunResults('', null));
+        $this->assertSame([], $memoryLimiter->getPhpExtraArguments(20.));
     }
 
     private function configureEnvironmentToBeCalledOnce(): void

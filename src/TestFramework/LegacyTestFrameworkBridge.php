@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use function explode;
-use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
@@ -44,7 +43,6 @@ use Infection\Mutant\Mutant;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
-use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -85,7 +83,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         }
     }
 
-    public function executeInitialRun(): InitialRunResults
+    public function executeInitialRun(): void
     {
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
             $this->config->testFrameworkExtraOptions,
@@ -105,13 +103,6 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         $this->coverageChecker->checkCoverageHasBeenGenerated(
             $initialTestSuiteProcess->getCommandLine(),
             $output,
-        );
-
-        return new InitialRunResults(
-            output: $output,
-            memoryUsage: $this->adapter instanceof MemoryUsageAware
-                ? $this->adapter->getMemoryUsed($output)
-                : null,
         );
     }
 

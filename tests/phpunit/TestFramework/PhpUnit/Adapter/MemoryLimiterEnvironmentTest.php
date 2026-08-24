@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Resource\Memory;
+namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use Composer\XdebugHandler\XdebugHandler;
-use Infection\Resource\Memory\MemoryLimiterEnvironment;
+use Infection\TestFramework\PhpUnit\Adapter\MemoryLimiterEnvironment;
 use const PHP_SAPI;
 use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\CoversClass;

@@ -53,10 +53,8 @@ use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Resource\Memory\MemoryLimiter;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -79,7 +77,7 @@ final class EngineTest extends TestCase
 
     private MockObject&InitialTestsRunner $initialTestsRunner;
 
-    private MockObject&MemoryLimiter $memoryLimiter;
+    private MockObject&TestFramework $testFramework;
 
     private MockObject&MutationGenerator $mutationGenerator;
 
@@ -99,7 +97,7 @@ final class EngineTest extends TestCase
         $this->coverageChecker = $this->createMock(CoverageChecker::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
         $this->initialTestsRunner = $this->createMock(InitialTestsRunner::class);
-        $this->memoryLimiter = $this->createMock(MemoryLimiter::class);
+        $this->testFramework = $this->createMock(TestFramework::class);
         $this->mutationGenerator = $this->createMock(MutationGenerator::class);
         $this->mutationTestingRunner = $this->createMock(MutationTestingRunner::class);
         $this->minMsiChecker = $this->createMock(MinMsiChecker::class);
@@ -140,7 +138,6 @@ final class EngineTest extends TestCase
 
         $this->coverageChecker->expects($this->never())->method($this->anything());
         $this->eventDispatcher->expects($this->never())->method($this->anything());
-        $this->memoryLimiter->expects($this->never())->method($this->anything());
         $this->mutationGenerator->expects($this->never())->method($this->anything());
         $this->mutationTestingRunner->expects($this->never())->method($this->anything());
         $this->minMsiChecker->expects($this->never())->method($this->anything());
@@ -170,11 +167,6 @@ final class EngineTest extends TestCase
             ->expects($this->once())
             ->method('checkCoverageHasBeenGenerated')
             ->with('/tmp/bar', 'testing');
-
-        $this->memoryLimiter
-            ->expects($this->once())
-            ->method('limitMemory')
-            ->with(new InitialRunResults('testing', null));
 
         $this->mutationGenerator
             ->expects($this->once())
@@ -213,7 +205,7 @@ final class EngineTest extends TestCase
         $this->createEngine($config)->execute();
     }
 
-    public function test_memory_limiter_is_applied_after_static_analysis_when_enabled(): void
+    public function test_static_analysis_is_executed_before_mutation_generation(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
             ->withSkipInitialTests(false)
@@ -243,17 +235,13 @@ final class EngineTest extends TestCase
         $initialStaticAnalysisRunner
             ->expects($this->once())
             ->method('run')
-            ->willReturn($staticAnalysisProcess);
+            ->willReturnCallback(static function () use ($staticAnalysisProcess, &$callOrder): Process {
+                $callOrder[] = 'staticAnalysis';
+
+                return $staticAnalysisProcess;
+            });
 
         $staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
-
-        $this->memoryLimiter
-            ->expects($this->once())
-            ->method('limitMemory')
-            ->with(new InitialRunResults('test output', null))
-            ->willReturnCallback(static function () use (&$callOrder): void {
-                $callOrder[] = 'limitMemory';
-            });
 
         $this->mutationGenerator
             ->expects($this->once())
@@ -298,10 +286,10 @@ final class EngineTest extends TestCase
 
         $engine->execute();
 
-        $this->assertSame(['limitMemory', 'generate'], $callOrder);
+        $this->assertSame(['staticAnalysis', 'generate'], $callOrder);
     }
 
-    public function test_memory_limiter_is_not_applied_when_initial_tests_are_skipped(): void
+    public function test_mutation_testing_runs_when_initial_tests_are_skipped(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
             ->withSkipInitialTests(true)
@@ -317,7 +305,6 @@ final class EngineTest extends TestCase
             ->method('logSkippingInitialTests');
 
         $this->initialTestsRunner->expects($this->never())->method($this->anything());
-        $this->memoryLimiter->expects($this->never())->method('limitMemory');
 
         $this->mutationGenerator
             ->expects($this->once())
@@ -371,7 +358,6 @@ final class EngineTest extends TestCase
             ->method('logSkippingInitialTests');
 
         $this->initialTestsRunner->expects($this->never())->method($this->anything());
-        $this->memoryLimiter->expects($this->never())->method('limitMemory');
 
         $this->mutationGenerator
             ->expects($this->once())
@@ -432,7 +418,6 @@ final class EngineTest extends TestCase
             ->method('logSkippingInitialTests');
 
         $this->initialTestsRunner->expects($this->never())->method($this->anything());
-        $this->memoryLimiter->expects($this->never())->method('limitMemory');
 
         $this->mutationGenerator
             ->expects($this->once())
@@ -484,7 +469,6 @@ final class EngineTest extends TestCase
             ->method('logSkippingInitialTests');
 
         $this->initialTestsRunner->expects($this->never())->method($this->anything());
-        $this->memoryLimiter->expects($this->never())->method('limitMemory');
 
         $this->mutationGenerator
             ->expects($this->once())
@@ -561,8 +545,7 @@ final class EngineTest extends TestCase
             ->withUncovered(true)
             ->build();
 
-        $testFramework = $this->createMock(TestFramework::class);
-        $testFramework
+        $this->testFramework
             ->method('checkRequirements')
             ->willReturnCallback(function () use ($configuration): void {
                 if ($configuration->skipInitialTests) {
@@ -570,9 +553,9 @@ final class EngineTest extends TestCase
                     $this->coverageChecker->checkCoverageExists();
                 }
             });
-        $testFramework
+        $this->testFramework
             ->method('executeInitialRun')
-            ->willReturnCallback(function () use ($configuration): InitialRunResults {
+            ->willReturnCallback(function () use ($configuration): void {
                 $process = $this->initialTestsRunner->run(
                     $configuration->testFrameworkExtraOptions,
                     explode(' ', (string) $configuration->initialTestsPhpOptions),
@@ -585,8 +568,6 @@ final class EngineTest extends TestCase
 
                 $output = $process->getOutput();
                 $this->coverageChecker->checkCoverageHasBeenGenerated($process->getCommandLine(), $output);
-
-                return new InitialRunResults($output, null);
             });
 
         $staticAnalysisTestFramework = null;
@@ -604,23 +585,20 @@ final class EngineTest extends TestCase
                 });
             $staticAnalysisTestFramework
                 ->method('executeInitialRun')
-                ->willReturnCallback(static function () use ($initialStaticAnalysisRunner, $staticAnalysisToolAdapter): InitialRunResults {
+                ->willReturnCallback(static function () use ($initialStaticAnalysisRunner, $staticAnalysisToolAdapter): void {
                     $process = $initialStaticAnalysisRunner->run();
 
                     if (!$process->isSuccessful()) {
                         throw InitialStaticAnalysisRunFailed::fromProcessAndAdapter($process, $staticAnalysisToolAdapter->getName());
                     }
-
-                    return new InitialRunResults($process->getOutput(), null);
                 });
         }
 
         return new Engine(
             config: $configuration,
-            testFramework: $testFramework,
+            testFramework: $this->testFramework,
             staticAnalysisTestFramework: $staticAnalysisTestFramework,
             eventDispatcher: $this->eventDispatcher,
-            memoryLimiter: $this->memoryLimiter,
             mutationGenerator: $this->mutationGenerator,
             mutationTestingRunner: $this->mutationTestingRunner,
             minMsiChecker: $this->minMsiChecker,

@@ -181,12 +181,6 @@ parameters:
 			path: ../src/Differ/Tokens.php
 
 		-
-			rawMessage: 'Method Infection\Engine::runInitialStaticAnalysis() never returns Infection\TestFramework\Contracts\InitialRunResults so it can be removed from the return type.'
-			identifier: return.unusedType
-			count: 1
-			path: ../src/Engine.php
-
-		-
 			rawMessage: 'Call to method maybe() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
 			identifier: method.internalClass
 			count: 1
@@ -875,24 +869,6 @@ parameters:
 			identifier: ternary.shortNotAllowed
 			count: 1
 			path: ../src/TestFramework/Config/TestFrameworkConfigLocator.php
-
-		-
-			rawMessage: Infection\TestFramework\Contracts\InitialRunResults should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/TestFramework/Contracts/InitialRunResults.php
-
-		-
-			rawMessage: Infection\TestFramework\Contracts\InitialRunResults should not exist
-			identifier: phpat.testNonExtensionPointsAreInternal
-			count: 1
-			path: ../src/TestFramework/Contracts/InitialRunResults.php
-
-		-
-			rawMessage: Property Infection\TestFramework\Contracts\InitialRunResults::$output is never read
-			identifier: shipmonk.deadProperty.neverRead
-			count: 1
-			path: ../src/TestFramework/Contracts/InitialRunResults.php
 
 		-
 			rawMessage: Infection\TestFramework\Contracts\MutantEvaluationPipe should not depend on Infection\Process\MutantProcess

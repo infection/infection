@@ -26,8 +26,8 @@ if ($iniPath === false || $iniPath === '') {
 
 $iniContents = file_get_contents($iniPath);
 
-if ($iniContents === false || preg_match('/^memory_limit\s*=\s*32M$/m', $iniContents) !== 1) {
-    fwrite(STDERR, "Mutant PHPStan is expected to inherit the MemoryLimiter php.ini cap.\n");
+if ($iniContents === false || preg_match('/^memory_limit\s*=\s*32M$/m', $iniContents) === 1) {
+    fwrite(STDERR, "Mutant PHPStan must not inherit PHPUnit's derived memory limit.\n");
 
     exit(255);
 }

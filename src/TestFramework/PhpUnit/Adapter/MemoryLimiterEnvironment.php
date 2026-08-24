@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Memory;
+namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use Composer\XdebugHandler\XdebugHandler;
 use const PHP_SAPI;

@@ -36,11 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
 use function array_map;
+use function array_slice;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
+use Infection\Mutant\Mutant;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
@@ -48,6 +50,7 @@ use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
+use Infection\TestFramework\PhpUnit\Adapter\MemoryLimiter;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
@@ -65,6 +68,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(PhpUnitAdapter::class)]
@@ -82,11 +86,20 @@ final class PhpUnitAdapterTest extends TestCase
 
     private MockObject&PhpExecutableFinder $phpExecutableFinderMock;
 
+    private MockObject&MemoryLimiter $memoryLimiter;
+
+    private MockObject&InitialTestsRunner $initialTestsRunner;
+
+    private MockObject&MutantProcessContainerFactory $processFactory;
+
     protected function setUp(): void
     {
         $this->pcovDirectoryProvider = $this->createMock(PCOVDirectoryProvider::class);
         $this->fileSystemMock = $this->createMock(FileSystem::class);
         $this->phpExecutableFinderMock = $this->createMock(PhpExecutableFinder::class);
+        $this->memoryLimiter = $this->createMock(MemoryLimiter::class);
+        $this->initialTestsRunner = $this->createMock(InitialTestsRunner::class);
+        $this->processFactory = $this->createMock(MutantProcessContainerFactory::class);
         $this->phpExecutableFinderMock
             ->method('find')
             ->willReturn(self::PHP_EXECUTABLE);
@@ -197,6 +210,43 @@ final class PhpUnitAdapterTest extends TestCase
         $result = $this->adapter->getMemoryUsed($output);
 
         $this->assertSame($expectedResult, $result);
+    }
+
+    public function test_it_applies_the_initial_run_memory_usage_to_phpunit_mutant_commands(): void
+    {
+        $process = $this->createStub(Process::class);
+        $process->method('isSuccessful')->willReturn(true);
+        $process->method('getOutput')->willReturn('Memory: 12.50 MB');
+
+        $this->initialTestsRunner
+            ->expects($this->once())
+            ->method('run')
+            ->willReturn($process);
+
+        $this->memoryLimiter
+            ->expects($this->once())
+            ->method('getPhpExtraArguments')
+            ->with(12.5)
+            ->willReturn(['-d', 'memory_limit=25M']);
+
+        $this->adapter->executeInitialRun();
+
+        $command = $this->adapter->getMutantCommandLine([], '/mutant.php', 'hash', '/original.php', '');
+
+        $this->assertSame(self::PHP_EXECUTABLE, $command[0]);
+        $this->assertSame(['-d', 'memory_limit=25M'], array_slice($command, 1, 2));
+    }
+
+    public function test_it_uses_itself_to_build_the_phpunit_mutant_process(): void
+    {
+        $mutant = $this->createStub(Mutant::class);
+
+        $this->processFactory
+            ->expects($this->once())
+            ->method('create')
+            ->with($mutant, '', $this->adapter);
+
+        $this->adapter->test($mutant);
     }
 
     public function test_it_provides_initial_run_only_options(): void
@@ -1678,10 +1728,11 @@ final class PhpUnitAdapterTest extends TestCase
             new CommandLineBuilder($this->phpExecutableFinderMock),
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
-            $this->createStub(InitialTestsRunner::class),
+            $this->initialTestsRunner,
             ConfigurationBuilder::withMinimalTestData()->build(),
-            $this->createStub(MutantProcessContainerFactory::class),
+            $this->processFactory,
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            $this->memoryLimiter,
             $version,
         );
     }

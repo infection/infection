@@ -43,7 +43,6 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -78,7 +77,7 @@ final readonly class LegacyStaticAnalysisBridge implements TestFramework
         }
     }
 
-    public function executeInitialRun(): InitialRunResults
+    public function executeInitialRun(): void
     {
         Assert::notNull($this->initialStaticAnalysisRunner);
         Assert::notNull($this->adapter);
@@ -103,11 +102,6 @@ final readonly class LegacyStaticAnalysisBridge implements TestFramework
         //            $initialTestSuiteProcess->getCommandLine(),
         //            $initialTestSuiteProcess->getOutput(),
         //        );
-
-        return new InitialRunResults(
-            output: $initialStaticAnalysisProcess->getOutput(),
-            memoryUsage: null,
-        );
     }
 
     public function test(Mutant $mutant): MutantExecutionResult|MutantEvaluationPipe

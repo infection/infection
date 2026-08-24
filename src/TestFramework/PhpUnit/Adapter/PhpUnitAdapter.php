@@ -54,7 +54,6 @@ use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
-use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -73,6 +72,8 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
 {
     final public const string COVERAGE_DIR = 'coverage-xml';
 
+    private float $initialRunMemoryUsage = -1.;
+
     public function __construct(
         string $testFrameworkExecutable,
         private readonly string $tmpDir,
@@ -90,6 +91,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         private readonly Configuration $configuration,
         private readonly MutantProcessContainerFactory $processFactory,
         private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private readonly MemoryLimiter $memoryLimiter,
         ?string $version = null,
     ) {
         parent::__construct(
@@ -203,7 +205,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         }
     }
 
-    public function executeInitialRun(): InitialRunResults
+    public function executeInitialRun(): void
     {
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
             $this->configuration->testFrameworkExtraOptions,
@@ -217,14 +219,11 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
 
         $output = $initialTestSuiteProcess->getOutput();
 
+        $this->initialRunMemoryUsage = $this->getMemoryUsed($output);
+
         $this->coverageChecker->checkCoverageHasBeenGenerated(
             $initialTestSuiteProcess->getCommandLine(),
             $output,
-        );
-
-        return new InitialRunResults(
-            output: $output,
-            memoryUsage: $this->getMemoryUsed($output),
         );
     }
 
@@ -236,6 +235,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
                 $this->configuration->testFrameworkExtraOptions,
                 $this->getInitialRunOnlyOptions(),
             ),
+            $this,
         );
     }
 
@@ -288,5 +288,12 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
     public function getInitialRunOnlyOptions(): array
     {
         return ['--configuration', '--filter', '--testsuite'];
+    }
+
+    /** @return list<string> */
+    #[Override]
+    protected function getMutantPhpExtraArgs(): array
+    {
+        return $this->memoryLimiter->getPhpExtraArguments($this->initialRunMemoryUsage);
     }
 }

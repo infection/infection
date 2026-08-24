@@ -72,7 +72,7 @@ interface TestFramework
      *
      * @throws InitialTestsFailed
      */
-    public function executeInitialRun(): InitialRunResults;
+    public function executeInitialRun(): void;
 
     /**
      * Evaluates the Mutant. Some test frameworks may be able to do this in-memory, e.g.

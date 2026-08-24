@@ -397,7 +397,6 @@ final class RunCommand extends BaseCommand
                     ? $container->getStaticAnalysisTestFramework()
                     : null,
                 $container->getEventDispatcher(),
-                $container->getMemoryLimiter(),
                 $container->getMutationGenerator(),
                 $container->getMutationTestingRunner(),
                 $container->getMinMsiChecker(),

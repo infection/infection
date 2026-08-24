@@ -145,6 +145,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             configuration: $configuration,
             processFactory: $processFactory,
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter,
+            memoryLimiter: new MemoryLimiter(new MemoryLimiterEnvironment()),
         );
     }
 
