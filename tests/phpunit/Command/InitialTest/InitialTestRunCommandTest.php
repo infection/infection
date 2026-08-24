@@ -43,6 +43,7 @@ use Infection\Framework\Str;
 use Infection\Git\Git;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Contracts\TestFramework;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -210,6 +211,11 @@ final class InitialTestRunCommandTest extends TestCase
             ->method('getName')
             ->willReturn('DemoTestFramework');
 
+        $testFrameworkMock = $this->createStub(TestFramework::class);
+        $testFrameworkMock
+            ->method('getName')
+            ->willReturn('DemoTestFramework');
+
         $initialTestsProcessMock = $this->createMock(Process::class);
         $initialTestsProcessMock
             ->method('getCommandLine')
@@ -240,6 +246,7 @@ final class InitialTestRunCommandTest extends TestCase
         $container = Container::create()
             ->cloneWithService(Git::class, $gitMock)
             ->cloneWithService(TestFrameworkAdapter::class, $testFrameworkAdapterMock)
+            ->cloneWithService(TestFramework::class, $testFrameworkMock)
             ->cloneWithService(InitialTestsRunner::class, $initialTestsRunnerMock);
 
         $application = new Application($container);

@@ -38,7 +38,7 @@ namespace Infection\Tests\Logger\ArtefactCollection\InitialStaticAnalysisExecuti
 use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
 use Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger;
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLoggerFactory;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\Contracts\TestFramework;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -50,14 +50,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[CoversClass(InitialStaticAnalysisExecutionLoggerFactory::class)]
 final class InitialStaticAnalysisExecutionLoggerFactoryTest extends TestCase
 {
-    private StaticAnalysisToolAdapter&MockObject $staticAnalysisAdapterMock;
+    private TestFramework&MockObject $testFrameworkMock;
 
     private OutputInterface&MockObject $outputMock;
 
     protected function setUp(): void
     {
-        $this->staticAnalysisAdapterMock = $this->createMock(StaticAnalysisToolAdapter::class);
-        $this->staticAnalysisAdapterMock
+        $this->testFrameworkMock = $this->createMock(TestFramework::class);
+        $this->testFrameworkMock
             ->expects($this->never())
             ->method($this->anything());
 
@@ -109,7 +109,7 @@ final class InitialStaticAnalysisExecutionLoggerFactoryTest extends TestCase
         return new InitialStaticAnalysisExecutionLoggerFactory(
             $skipProgressBar,
             $debug,
-            $this->staticAnalysisAdapterMock,
+            $this->testFrameworkMock,
             $this->outputMock,
         );
     }

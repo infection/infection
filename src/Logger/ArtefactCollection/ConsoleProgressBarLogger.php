@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Logger\ArtefactCollection;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\Contracts\TestFramework;
 use InvalidArgumentException;
 use function sprintf;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -53,7 +52,7 @@ final readonly class ConsoleProgressBarLogger implements InitialStaticAnalysisEx
 
     public function __construct(
         private OutputInterface $output,
-        private TestFrameworkAdapter|StaticAnalysisToolAdapter $testFramework,
+        private TestFramework $testFramework,
         private bool $debug,
     ) {
         $this->progressBar = new ProgressBar($this->output);
