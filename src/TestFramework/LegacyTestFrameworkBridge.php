@@ -59,7 +59,6 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         private InitialTestsRunner $initialTestsRunner,
         private Configuration $config,
         private MutantProcessContainerFactory $processFactory,
-        private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ) {
     }
 
@@ -110,7 +109,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
     {
         return $this->processFactory->create(
             $mutant,
-            $this->getFilteredExtraOptionsForMutant(),
+            $this->config->testFrameworkExtraOptions,
         );
     }
 
@@ -120,17 +119,5 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
     private function getInitialTestsPhpOptionsArray(): array
     {
         return explode(' ', (string) $this->config->initialTestsPhpOptions);
-    }
-
-    private function getFilteredExtraOptionsForMutant(): string
-    {
-        if ($this->adapter instanceof ProvidesInitialRunOnlyOptions) {
-            return $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
-                $this->config->testFrameworkExtraOptions,
-                $this->adapter->getInitialRunOnlyOptions(),
-            );
-        }
-
-        return $this->config->testFrameworkExtraOptions;
     }
 }

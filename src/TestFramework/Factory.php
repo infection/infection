@@ -107,7 +107,6 @@ final readonly class Factory
                 $this->initialTestsRunner,
                 $this->infectionConfig,
                 $this->containerFactory,
-                $this->extraOptionsFilter,
             );
     }
 

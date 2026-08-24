@@ -38,8 +38,8 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 use function escapeshellarg;
 use function explode;
 use function implode;
-use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
@@ -48,7 +48,6 @@ use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
@@ -57,7 +56,6 @@ use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Override;
 use function Safe\preg_match;
@@ -68,42 +66,16 @@ use function version_compare;
 /**
  * @internal
  */
-final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware, TestFramework
+final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrameworkAdapter
 {
     final public const string COVERAGE_DIR = 'coverage-xml';
 
+    private const array INITIAL_RUN_ONLY_OPTIONS = ['--configuration', '--filter', '--testsuite'];
+
     private float $initialRunMemoryUsage = -1.;
 
-    public function __construct(
-        string $testFrameworkExecutable,
-        private readonly string $tmpDir,
-        private readonly string $jUnitFilePath,
-        private readonly PCOVDirectoryProvider $pcovDirectoryProvider,
-        InitialConfigBuilder $initialConfigBuilder,
-        MutationConfigBuilder $mutationConfigBuilder,
-        CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
-        ShellCommandLineExecutor $shellCommandLineExecutor,
-        VersionParser $versionParser,
-        CommandLineBuilder $commandLineBuilder,
-        private readonly ConsoleOutput $consoleOutput,
-        private readonly CoverageChecker $coverageChecker,
-        private readonly InitialTestsRunner $initialTestsRunner,
-        private readonly Configuration $configuration,
-        private readonly MutantProcessContainerFactory $processFactory,
-        private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
-        private readonly MemoryLimiter $memoryLimiter,
-        ?string $version = null,
-    ) {
-        parent::__construct(
-            $testFrameworkExecutable,
-            $initialConfigBuilder,
-            $mutationConfigBuilder,
-            $argumentsAndOptionsBuilder,
-            $shellCommandLineExecutor,
-            $versionParser,
-            $commandLineBuilder,
-            $version,
-        );
+    public function __construct(private readonly string $testFrameworkExecutable, private readonly string $tmpDir, private readonly string $jUnitFilePath, private readonly PCOVDirectoryProvider $pcovDirectoryProvider, private readonly InitialConfigBuilder $initialConfigBuilder, private readonly MutationConfigBuilder $mutationConfigBuilder, private readonly CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder, private readonly ShellCommandLineExecutor $shellCommandLineExecutor, private readonly VersionParser $versionParser, private readonly CommandLineBuilder $commandLineBuilder, private readonly ConsoleOutput $consoleOutput, private readonly CoverageChecker $coverageChecker, private readonly InitialTestsRunner $initialTestsRunner, private readonly Configuration $configuration, private readonly MutantProcessContainerFactory $processFactory, private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter, private readonly MemoryLimiter $memoryLimiter, private ?string $version = null)
+    {
     }
 
     public function hasJUnitReport(): bool
@@ -148,7 +120,46 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
             }
         }
 
-        return parent::getInitialTestRunCommandLine($extraOptions, $phpExtraArgs, $skipCoverage);
+        return $this->getCommandLine(
+            $phpExtraArgs,
+            $this->argumentsAndOptionsBuilder->buildForInitialTestsRun(
+                $this->initialConfigBuilder->build($this->getVersion()),
+                $extraOptions,
+            ),
+        );
+    }
+
+    public function getMutantCommandLine(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
+        string $extraOptions,
+    ): array {
+        return $this->getCommandLine(
+            $this->getMutantPhpExtraArgs(),
+            $this->argumentsAndOptionsBuilder->buildForMutant(
+                $this->mutationConfigBuilder->build(
+                    $coverageTests,
+                    $mutatedFilePath,
+                    $mutationHash,
+                    $mutationOriginalFilePath,
+                    $this->getVersion(),
+                ),
+                $extraOptions,
+                $coverageTests,
+                $this->getVersion(),
+            ),
+        );
+    }
+
+    public function getVersion(): string
+    {
+        return $this->version ??= $this->versionParser->parse(
+            $this->shellCommandLineExecutor->execute(
+                $this->commandLineBuilder->build($this->testFrameworkExecutable, [], ['--version']),
+            ),
+        );
     }
 
     public function testsPass(string $output): bool
@@ -181,15 +192,6 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         return preg_match('/ParseError: syntax error/i', $output) === 1;
     }
 
-    public function getMemoryUsed(string $output): float
-    {
-        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match) === 1) {
-            return (float) $match[1];
-        }
-
-        return -1.;
-    }
-
     public function getName(): string
     {
         return 'PHPUnit';
@@ -219,7 +221,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
 
         $output = $initialTestSuiteProcess->getOutput();
 
-        $this->initialRunMemoryUsage = $this->getMemoryUsed($output);
+        $this->initialRunMemoryUsage = self::retrieveMemoryUsed($output);
 
         $this->coverageChecker->checkCoverageHasBeenGenerated(
             $initialTestSuiteProcess->getCommandLine(),
@@ -233,7 +235,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
             $mutant,
             $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
                 $this->configuration->testFrameworkExtraOptions,
-                $this->getInitialRunOnlyOptions(),
+                self::INITIAL_RUN_ONLY_OPTIONS,
             ),
             $this,
         );
@@ -242,7 +244,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
     #[Override]
     public function getInitialTestsFailRecommendations(string $commandLine): string
     {
-        $recommendations = parent::getInitialTestsFailRecommendations($commandLine);
+        $recommendations = $this->createInitialTestsFailRecommendations($commandLine);
 
         if (self::supportsExecutionOrderDefectsRandom($this->getVersion())) {
             $recommendations = sprintf(
@@ -250,7 +252,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
                 "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
                 . 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="defects,random" resolveDependencies="true" ...',
                 'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
-                parent::getInitialTestsFailRecommendations($commandLine),
+                $this->createInitialTestsFailRecommendations($commandLine),
             );
         } elseif (version_compare($this->getVersion(), '7.2', '>=')) {
             $recommendations = sprintf(
@@ -258,7 +260,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
                 "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
                 . 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="random" resolveDependencies="true" ...',
                 'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
-                parent::getInitialTestsFailRecommendations($commandLine),
+                $this->createInitialTestsFailRecommendations($commandLine),
             );
         }
 
@@ -282,18 +284,38 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         ;
     }
 
-    /**
-     * @return string[]
-     */
-    public function getInitialRunOnlyOptions(): array
-    {
-        return ['--configuration', '--filter', '--testsuite'];
-    }
-
     /** @return list<string> */
-    #[Override]
-    protected function getMutantPhpExtraArgs(): array
+    private function getMutantPhpExtraArgs(): array
     {
         return $this->memoryLimiter->getPhpExtraArguments($this->initialRunMemoryUsage);
+    }
+
+    /**
+     * @param string[] $phpExtraArgs
+     * @param string[] $testFrameworkArgs
+     *
+     * @return string[]
+     */
+    private function getCommandLine(array $phpExtraArgs, array $testFrameworkArgs): array
+    {
+        return $this->commandLineBuilder->build(
+            $this->testFrameworkExecutable,
+            $phpExtraArgs,
+            $testFrameworkArgs,
+        );
+    }
+
+    private function createInitialTestsFailRecommendations(string $commandLine): string
+    {
+        return sprintf('Check the executed command to identify the problem: %s', $commandLine);
+    }
+
+    private static function retrieveMemoryUsed(string $output): float
+    {
+        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match) === 1) {
+            return (float) $match[1];
+        }
+
+        return -1.;
     }
 }

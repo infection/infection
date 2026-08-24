@@ -195,23 +195,6 @@ final class PhpUnitAdapterTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    #[DataProvider('memoryReportProvider')]
-    public function test_it_can_tell_the_memory_usage_from_the_output(
-        string $output,
-        float $expectedResult,
-    ): void {
-        $this->fileSystemMock
-            ->expects($this->never())
-            ->method('dumpFile');
-        $this->pcovDirectoryProvider
-            ->expects($this->never())
-            ->method('shallProvide');
-
-        $result = $this->adapter->getMemoryUsed($output);
-
-        $this->assertSame($expectedResult, $result);
-    }
-
     public function test_it_applies_the_initial_run_memory_usage_to_phpunit_mutant_commands(): void
     {
         $process = $this->createStub(Process::class);
@@ -247,23 +230,6 @@ final class PhpUnitAdapterTest extends TestCase
             ->with($mutant, '', $this->adapter);
 
         $this->adapter->test($mutant);
-    }
-
-    public function test_it_provides_initial_run_only_options(): void
-    {
-        $this->fileSystemMock
-            ->expects($this->never())
-            ->method('dumpFile');
-        $this->pcovDirectoryProvider
-            ->expects($this->never())
-            ->method('shallProvide');
-
-        $options = $this->adapter->getInitialRunOnlyOptions();
-
-        $this->assertSame(
-            ['--configuration', '--filter', '--testsuite'],
-            $options,
-        );
     }
 
     #[DataProvider('initialTestRunProvider')]
@@ -356,17 +322,6 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['OK, but incomplete, skipped, or risky tests!', false];
 
         yield ['ParseError: syntax error, unexpected ">"', true];
-    }
-
-    public static function memoryReportProvider(): iterable
-    {
-        yield ['Memory: 8.00MB', 8.0];
-
-        yield ['Memory: 68.00MB', 68.0];
-
-        yield ['Memory: 68.00 MB', 68.0];
-
-        yield ['Time: 2.51 seconds', -1.0];
     }
 
     #[DataProvider('executionOrderProvider')]
