@@ -38,11 +38,15 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use function array_map;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
@@ -51,7 +55,9 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -1670,6 +1676,12 @@ final class PhpUnitAdapterTest extends TestCase
             $shellCommandLineExecutor ?? $this->createStub(ShellCommandLineExecutor::class),
             new VersionParser(),    // won't be used since we pass the version
             new CommandLineBuilder($this->phpExecutableFinderMock),
+            $this->createStub(ConsoleOutput::class),
+            $this->createStub(CoverageChecker::class),
+            $this->createStub(InitialTestsRunner::class),
+            ConfigurationBuilder::withMinimalTestData()->build(),
+            $this->createStub(MutantProcessContainerFactory::class),
+            $this->createStub(TestFrameworkExtraOptionsFilter::class),
             $version,
         );
     }

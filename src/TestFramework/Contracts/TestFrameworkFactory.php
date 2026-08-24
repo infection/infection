@@ -35,6 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
+use Infection\Configuration\Configuration;
+use Infection\Console\ConsoleOutput;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
+use Infection\Process\ShellCommandLineExecutor;
+use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use SplFileInfo;
+
 /**
  * @internal This is the upgraded version of TestFrameworkAdapterFactory.
  * @see TestFrameworkAdapterFactory
@@ -43,6 +52,7 @@ interface TestFrameworkFactory
 {
     /**
      * @param list<string> $sourceDirectories
+     * @param SplFileInfo[] $filteredSourceFilesToMutate
      */
     public static function create(
         string $testFrameworkExecutable,
@@ -53,6 +63,16 @@ interface TestFrameworkFactory
         string $projectDir,
         array $sourceDirectories,
         bool $skipCoverage,
+        bool $executeOnlyCoveringTestCases,
+        array $filteredSourceFilesToMutate,
+        ?string $mapSourceClassToTestStrategy,
+        ShellCommandLineExecutor $shellCommandLineExecutor,
+        ConsoleOutput $consoleOutput,
+        CoverageChecker $coverageChecker,
+        InitialTestsRunner $initialTestsRunner,
+        Configuration $configuration,
+        MutantProcessContainerFactory $processFactory,
+        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework;
 
     public static function getAdapterName(): string;

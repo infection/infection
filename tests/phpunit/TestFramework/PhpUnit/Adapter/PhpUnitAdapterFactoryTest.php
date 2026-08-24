@@ -35,9 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
+use Infection\Console\ConsoleOutput;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -57,7 +63,16 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             '/path/to/project',
             [],
             true,
-            shellCommandLineExecutor: new ShellCommandLineExecutor(),
+            false,
+            [],
+            null,
+            new ShellCommandLineExecutor(),
+            $this->createStub(ConsoleOutput::class),
+            $this->createStub(CoverageChecker::class),
+            $this->createStub(InitialTestsRunner::class),
+            ConfigurationBuilder::withMinimalTestData()->build(),
+            $this->createStub(MutantProcessContainerFactory::class),
+            $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 
         $this->assertInstanceOf(TestFramework::class, $adapter);

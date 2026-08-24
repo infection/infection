@@ -2,3 +2,5 @@
 - Make the Static Analysis into a TestFramework contract.
 - Move the memory limit to the test frameworks.
 - Introduce the new TestFramework Factory (for test framework adapters only).
+- Migrate the PHPUnitAdapter from TestFrameworkAdapter to TestFramework.
+- Update the TestFrameworkFactory with new arguments.
