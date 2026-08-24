@@ -39,7 +39,6 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
-use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Symfony\Component\Process\Process;
 
 /**
@@ -49,14 +48,17 @@ use Symfony\Component\Process\Process;
 readonly class InitialStaticAnalysisRunner
 {
     public function __construct(
-        private InitialStaticAnalysisProcessFactory $initialStaticAnalysisProcessFactory,
         private EventDispatcher $eventDispatcher,
     ) {
     }
 
-    public function run(): Process
+    /** @param array<string> $commandLine */
+    public function run(array $commandLine): Process
     {
-        $process = $this->initialStaticAnalysisProcessFactory->createProcess();
+        $process = new Process(
+            command: $commandLine,
+            timeout: null,
+        );
 
         $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
 

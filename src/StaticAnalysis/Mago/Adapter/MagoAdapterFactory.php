@@ -36,18 +36,18 @@ declare(strict_types=1);
 namespace Infection\StaticAnalysis\Mago\Adapter;
 
 use Infection\CannotBeInstantiated;
+use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * @internal
  */
-final class MagoAdapterFactory implements StaticAnalysisToolAdapterFactory
+final class MagoAdapterFactory
 {
     use CannotBeInstantiated;
 
@@ -57,22 +57,22 @@ final class MagoAdapterFactory implements StaticAnalysisToolAdapterFactory
     public static function create(
         string $staticAnalysisConfigPath,
         string $staticAnalysisToolExecutable,
-        float $timeout,
-        string $tmpDir,
         array $staticAnalysisToolOptions,
         ShellCommandLineExecutor $shellCommandLineExecutor,
-    ): StaticAnalysisToolAdapter {
+        InitialStaticAnalysisRunner $initialRun,
+        LazyMutantProcessFactory $mutantProcessFactory,
+    ): StaticAnalysisTestFramework {
         return new MagoAdapter(
-            new MagoMutantExecutionResultFactory(),
             $staticAnalysisConfigPath,
             $staticAnalysisToolExecutable,
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
             new VersionParser(),
-            $timeout,
             $staticAnalysisToolOptions,
             $shellCommandLineExecutor,
+            $initialRun,
+            $mutantProcessFactory,
         );
     }
 }

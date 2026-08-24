@@ -119,11 +119,10 @@ use Infection\PhpParser\FileParser;
 use Infection\PhpParser\InfectionPrettyPrinter;
 use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeTraverserFactory;
-use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
+use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
@@ -151,7 +150,6 @@ use Infection\Source\Matcher\GitDiffSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -549,30 +547,13 @@ final class Container extends DIContainer
                     $config->skipCoverage,
                 );
             },
-            StaticAnalysisToolAdapter::class => static function (self $container): StaticAnalysisToolAdapter {
-                $config = $container->getConfiguration();
-
-                Assert::notNull($config->staticAnalysisTool);
-
-                return $container->getFactory()->createStaticAnalysisToolAdapter(
-                    $config->staticAnalysisTool,
-                    $config->processTimeout,
-                );
-            },
-            InitialStaticAnalysisProcessFactory::class => static fn (self $container): InitialStaticAnalysisProcessFactory => new InitialStaticAnalysisProcessFactory(
-                $container->getStaticAnalysisToolAdapter(),
-            ),
-            InitialStaticAnalysisRunner::class => static fn (self $container): InitialStaticAnalysisRunner => new InitialStaticAnalysisRunner(
-                $container->getInitialStaticAnalysisProcessFactory(),
-                $container->getEventDispatcher(),
-            ),
             MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
                 $config = $container->getConfiguration();
 
                 $mutantProcessKillerFactories = [];
 
                 if ($config->isStaticAnalysisEnabled()) {
-                    $mutantProcessKillerFactories[] = $container->getStaticAnalysisToolAdapter()->createMutantProcessFactory();
+                    $mutantProcessKillerFactories[] = $container->getStaticAnalysisTestFramework();
                 }
 
                 $configuration = $container->getConfiguration();
@@ -683,7 +664,7 @@ final class Container extends DIContainer
                     $config->skipCoverage,
                 );
             },
-            StaticAnalysisTestFramework::class => static function (self $container): TestFramework {
+            StaticAnalysisTestFramework::class => static function (self $container): StaticAnalysisTestFramework {
                 $config = $container->getConfiguration();
 
                 Assert::notNull($config->staticAnalysisTool);
@@ -946,9 +927,13 @@ final class Container extends DIContainer
         return $this->get(TestFramework::class);
     }
 
-    public function getStaticAnalysisTestFramework(): TestFramework
+    public function getStaticAnalysisTestFramework(): LazyMutantProcessFactory&StaticAnalysisTestFramework
     {
-        return $this->get(StaticAnalysisTestFramework::class);
+        $testFramework = $this->get(StaticAnalysisTestFramework::class);
+
+        Assert::isInstanceOf($testFramework, LazyMutantProcessFactory::class);
+
+        return $testFramework;
     }
 
     public function getTestFrameworkAdapter(): TestFrameworkAdapter
@@ -956,19 +941,9 @@ final class Container extends DIContainer
         return $this->get(TestFrameworkAdapter::class);
     }
 
-    public function getStaticAnalysisToolAdapter(): StaticAnalysisToolAdapter
-    {
-        return $this->get(StaticAnalysisToolAdapter::class);
-    }
-
     public function getInitialTestRunProcessFactory(): InitialTestsRunProcessFactory
     {
         return $this->get(InitialTestsRunProcessFactory::class);
-    }
-
-    public function getInitialStaticAnalysisProcessFactory(): InitialStaticAnalysisProcessFactory
-    {
-        return $this->get(InitialStaticAnalysisProcessFactory::class);
     }
 
     public function getInitialTestsRunProcessFactory(): InitialTestsRunProcessFactory
@@ -979,11 +954,6 @@ final class Container extends DIContainer
     public function getInitialTestsRunner(): InitialTestsRunner
     {
         return $this->get(InitialTestsRunner::class);
-    }
-
-    public function getInitialStaticAnalysisRunner(): InitialStaticAnalysisRunner
-    {
-        return $this->get(InitialStaticAnalysisRunner::class);
     }
 
     public function getMutantProcessContainerFactory(): MutantProcessContainerFactory

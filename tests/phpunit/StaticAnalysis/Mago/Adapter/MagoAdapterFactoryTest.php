@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\Mago\Adapter;
 
+use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -48,10 +50,10 @@ final class MagoAdapterFactoryTest extends TestCase
         $adapter = MagoAdapterFactory::create(
             '/path/to/mago-config-path',
             '/path/to/mago',
-            32.3,
-            '/tmp',
             [],
             new ShellCommandLineExecutor(),
+            $this->createStub(InitialStaticAnalysisRunner::class),
+            $this->createStub(LazyMutantProcessFactory::class),
         );
 
         $this->assertSame('Mago', $adapter->getName());

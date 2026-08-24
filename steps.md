@@ -7,3 +7,4 @@
 - Remove the special case of PHPUnit in the Factory.
 - Move StaticAnalysisToolFactory to Factory.
 - Remove unnecessary parts of TestFrameworkAdapter in the PHPUnitAdapter
+- Remove StaticAnalysisToolAdapter.

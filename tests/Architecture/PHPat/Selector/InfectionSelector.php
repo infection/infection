@@ -114,6 +114,14 @@ final class InfectionSelector
         );
     }
 
+    public static function testFrameworkRuntimeCandidate(): SelectorInterface
+    {
+        return Selector::AnyOf(
+            Selector::inNamespace('Infection\Mutant'),
+            Selector::inNamespace('Infection\Process'),
+        );
+    }
+
     public static function phpunitTestCode(): SelectorInterface
     {
         return Selector::AllOf(

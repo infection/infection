@@ -51,6 +51,7 @@ final class AdapterExtractionBoundariesTest
                 InfectionSelector::magoAdapterCandidate(),
                 InfectionSelector::testFrameworkContractCandidate(),
                 InfectionSelector::adapterCommonCandidate(),
+                InfectionSelector::testFrameworkRuntimeCandidate(),
                 // Note that this is only true because adapters are not available
                 // here, otherwise we would need to be stricter.
                 InfectionSelector::nonSourceCode(),
@@ -68,6 +69,7 @@ final class AdapterExtractionBoundariesTest
                 InfectionSelector::phpStanAdapterCandidate(),
                 InfectionSelector::testFrameworkContractCandidate(),
                 InfectionSelector::adapterCommonCandidate(),
+                InfectionSelector::testFrameworkRuntimeCandidate(),
                 // Note that this is only true because adapters are not available
                 // here, otherwise we would need to be stricter.
                 InfectionSelector::nonSourceCode(),

@@ -43,18 +43,21 @@ use Infection\Console\ConsoleOutput;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\SourceCollector;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
+use Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory;
+use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
+use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
+use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -63,6 +66,8 @@ use InvalidArgumentException;
 use function is_a;
 use SplFileInfo;
 use function sprintf;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
 /**
@@ -110,37 +115,58 @@ final readonly class Factory
             );
     }
 
-    public function createStaticAnalysisTool(string $adapterName, float $timeout): TestFramework
-    {
-        $adapter = $this->createStaticAnalysisToolAdapter($adapterName, $timeout);
-
-        return new LegacyStaticAnalysisBridge(
-            $adapter,
-            new InitialStaticAnalysisRunner(
-                new InitialStaticAnalysisProcessFactory($adapter),
-                $this->eventDispatcher,
-            ),
-            $this->infectionConfig,
-        );
-    }
-
-    public function createStaticAnalysisToolAdapter(string $adapterName, float $timeout): StaticAnalysisToolAdapter
+    public function createStaticAnalysisTool(string $adapterName, float $timeout): StaticAnalysisTestFramework
     {
         if ($adapterName === StaticAnalysisToolTypes::PHPSTAN) {
-            return $this->createStaticAnalysisToolAdapterFromFactory(
-                PHPStanAdapterFactory::class,
+            $configPath = $this->staticAnalysisConfigLocator->locate($adapterName);
+            $executable = $this->staticAnalysisToolExecutableFinder->find(
                 $adapterName,
                 (string) $this->infectionConfig->phpStan->customPath,
-                $timeout,
+            );
+            $options = $this->infectionConfig->getStaticAnalysisToolOptions();
+            $commandLineBuilder = new CommandLineBuilder(new PhpExecutableFinder());
+
+            return PHPStanAdapterFactory::create(
+                $configPath,
+                $executable,
+                $options,
+                $this->shellCommandLineExecutor,
+                new InitialStaticAnalysisRunner($this->eventDispatcher),
+                new PHPStanMutantProcessFactory(
+                    new Filesystem(),
+                    new PHPStanMutantExecutionResultFactory(),
+                    $configPath,
+                    $executable,
+                    $commandLineBuilder,
+                    $timeout,
+                    $this->tmpDir,
+                    $options,
+                ),
             );
         }
 
         if ($adapterName === StaticAnalysisToolTypes::MAGO) {
-            return $this->createStaticAnalysisToolAdapterFromFactory(
-                MagoAdapterFactory::class,
+            $configPath = $this->staticAnalysisConfigLocator->locate($adapterName);
+            $executable = $this->staticAnalysisToolExecutableFinder->find(
                 $adapterName,
                 (string) $this->infectionConfig->mago->customPath,
-                $timeout,
+            );
+            $options = $this->infectionConfig->getStaticAnalysisToolOptions();
+            $commandLineBuilder = new CommandLineBuilder(new PhpExecutableFinder());
+
+            return MagoAdapterFactory::create(
+                $configPath,
+                $executable,
+                $options,
+                $this->shellCommandLineExecutor,
+                new InitialStaticAnalysisRunner($this->eventDispatcher),
+                new MagoMutantProcessFactory(
+                    new MagoMutantExecutionResultFactory(),
+                    $executable,
+                    $commandLineBuilder,
+                    $timeout,
+                    $options,
+                ),
             );
         }
 
@@ -149,23 +175,6 @@ final readonly class Factory
             $adapterName,
             implode(', ', [StaticAnalysisToolTypes::PHPSTAN, StaticAnalysisToolTypes::MAGO]),
         ));
-    }
-
-    /** @param class-string<StaticAnalysisToolAdapterFactory> $factory */
-    private function createStaticAnalysisToolAdapterFromFactory(
-        string $factory,
-        string $adapterName,
-        string $customPath,
-        float $timeout,
-    ): StaticAnalysisToolAdapter {
-        return $factory::create(
-            $this->staticAnalysisConfigLocator->locate($adapterName),
-            $this->staticAnalysisToolExecutableFinder->find($adapterName, $customPath),
-            $timeout,
-            $this->tmpDir,
-            $this->infectionConfig->getStaticAnalysisToolOptions(),
-            $this->shellCommandLineExecutor,
-        );
     }
 
     private function createTestFramework(string $adapterName, bool $skipCoverage): TestFramework|TestFrameworkAdapter

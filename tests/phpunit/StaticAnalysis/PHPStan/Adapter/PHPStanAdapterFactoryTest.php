@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
 
+use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[Group('integration')]
 #[CoversClass(PHPStanAdapterFactory::class)]
 final class PHPStanAdapterFactoryTest extends TestCase
 {
@@ -50,10 +50,10 @@ final class PHPStanAdapterFactoryTest extends TestCase
         $adapter = PHPStanAdapterFactory::create(
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
-            32.3,
-            '/tmp',
             [],
             new ShellCommandLineExecutor(),
+            $this->createStub(InitialStaticAnalysisRunner::class),
+            $this->createStub(LazyMutantProcessFactory::class),
         );
 
         $this->assertSame('PHPStan', $adapter->getName());

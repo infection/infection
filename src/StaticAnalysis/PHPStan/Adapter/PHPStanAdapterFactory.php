@@ -36,19 +36,18 @@ declare(strict_types=1);
 namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
 use Infection\CannotBeInstantiated;
+use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
-use Symfony\Component\Filesystem\Filesystem;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * @internal
  */
-final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
+final class PHPStanAdapterFactory
 {
     use CannotBeInstantiated;
 
@@ -58,24 +57,22 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
     public static function create(
         string $staticAnalysisConfigPath,
         string $staticAnalysisToolExecutable,
-        float $timeout,
-        string $tmpDir,
         array $staticAnalysisToolOptions,
         ShellCommandLineExecutor $shellCommandLineExecutor,
-    ): StaticAnalysisToolAdapter {
+        InitialStaticAnalysisRunner $initialRun,
+        LazyMutantProcessFactory $mutantProcessFactory,
+    ): StaticAnalysisTestFramework {
         return new PHPStanAdapter(
-            new Filesystem(),
-            new PHPStanMutantExecutionResultFactory(),
             $staticAnalysisConfigPath,
             $staticAnalysisToolExecutable,
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
             new VersionParser(),
-            $timeout,
-            $tmpDir,
             $staticAnalysisToolOptions,
             $shellCommandLineExecutor,
+            $initialRun,
+            $mutantProcessFactory,
         );
     }
 }

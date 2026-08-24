@@ -41,21 +41,16 @@ use function array_values;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
-use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
 
 #[CoversClass(InitialStaticAnalysisRunner::class)]
 final class InitialStaticAnalysisRunnerTest extends TestCase
 {
-    private InitialStaticAnalysisProcessFactory&Stub $processFactoryStub;
-
     private EventDispatcherCollector $eventDispatcher;
 
     private InitialStaticAnalysisRunner $runner;
@@ -66,27 +61,21 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             $this->markTestSkipped('The processes do not work the same way in PGPDBG');
         }
 
-        $this->processFactoryStub = $this->createStub(InitialStaticAnalysisProcessFactory::class);
-
         $this->eventDispatcher = new EventDispatcherCollector();
 
-        $this->runner = new InitialStaticAnalysisRunner($this->processFactoryStub, $this->eventDispatcher);
+        $this->runner = new InitialStaticAnalysisRunner($this->eventDispatcher);
     }
 
     public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(): void
     {
-        $process = $this->createProcessForCode(<<<STR
-            echo 'ping';
-            echo 'pong';
-            STR
-        );
-
-        $this->processFactoryStub
-            ->method('createProcess')
-            ->willReturn($process)
-        ;
-
-        $this->runner->run();
+        $this->runner->run([
+            TestPhpExecutableFinder::find(),
+            '-r',
+            <<<'PHP'
+                echo 'ping';
+                echo 'pong';
+                PHP,
+        ]);
 
         $this->assertSame(
             [
@@ -96,14 +85,5 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             ],
             array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
         );
-    }
-
-    private function createProcessForCode(string $code): Process
-    {
-        return new Process([
-            TestPhpExecutableFinder::find(),
-            '-r',
-            $code,
-        ]);
     }
 }

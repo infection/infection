@@ -48,12 +48,9 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
-use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -63,7 +60,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
-use Webmozart\Assert\Assert;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(Engine::class)]
@@ -225,23 +221,16 @@ final class EngineTest extends TestCase
             ->method('checkCoverageHasBeenGenerated')
             ->with('/tmp/bar', 'test output');
 
-        $staticAnalysisProcess = $this->createMock(Process::class);
-        $staticAnalysisProcess
+        $staticAnalysisTestFramework = $this->createMock(TestFramework::class);
+        $staticAnalysisTestFramework
             ->expects($this->once())
-            ->method('isSuccessful')
-            ->willReturn(true);
-
-        $initialStaticAnalysisRunner = $this->createMock(InitialStaticAnalysisRunner::class);
-        $initialStaticAnalysisRunner
+            ->method('checkRequirements');
+        $staticAnalysisTestFramework
             ->expects($this->once())
-            ->method('run')
-            ->willReturnCallback(static function () use ($staticAnalysisProcess, &$callOrder): Process {
+            ->method('executeInitialRun')
+            ->willReturnCallback(static function () use (&$callOrder): void {
                 $callOrder[] = 'staticAnalysis';
-
-                return $staticAnalysisProcess;
             });
-
-        $staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
 
         $this->mutationGenerator
             ->expects($this->once())
@@ -280,8 +269,7 @@ final class EngineTest extends TestCase
 
         $engine = $this->createEngine(
             $config,
-            $initialStaticAnalysisRunner,
-            $staticAnalysisToolAdapter,
+            $staticAnalysisTestFramework,
         );
 
         $engine->execute();
@@ -537,8 +525,7 @@ final class EngineTest extends TestCase
 
     private function createEngine(
         ?Configuration $config = null,
-        ?InitialStaticAnalysisRunner $initialStaticAnalysisRunner = null,
-        ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter = null,
+        ?TestFramework $staticAnalysisTestFramework = null,
     ): Engine {
         $configuration = $config ?? ConfigurationBuilder::withMinimalTestData()
             ->withSkipInitialTests(false)
@@ -569,30 +556,6 @@ final class EngineTest extends TestCase
                 $output = $process->getOutput();
                 $this->coverageChecker->checkCoverageHasBeenGenerated($process->getCommandLine(), $output);
             });
-
-        $staticAnalysisTestFramework = null;
-
-        if ($staticAnalysisToolAdapter !== null) {
-            Assert::notNull($initialStaticAnalysisRunner);
-
-            $staticAnalysisTestFramework = $this->createMock(TestFramework::class);
-            $staticAnalysisTestFramework
-                ->method('checkRequirements')
-                ->willReturnCallback(static function () use ($configuration, $staticAnalysisToolAdapter): void {
-                    if ($configuration->isStaticAnalysisEnabled()) {
-                        $staticAnalysisToolAdapter->assertMinimumVersionSatisfied();
-                    }
-                });
-            $staticAnalysisTestFramework
-                ->method('executeInitialRun')
-                ->willReturnCallback(static function () use ($initialStaticAnalysisRunner, $staticAnalysisToolAdapter): void {
-                    $process = $initialStaticAnalysisRunner->run();
-
-                    if (!$process->isSuccessful()) {
-                        throw InitialStaticAnalysisRunFailed::fromProcessAndAdapter($process, $staticAnalysisToolAdapter->getName());
-                    }
-                });
-        }
 
         return new Engine(
             config: $configuration,

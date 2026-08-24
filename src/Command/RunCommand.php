@@ -591,10 +591,6 @@ final class RunCommand extends BaseCommand
 
         $consoleOutput->logRunningWithThreadCount($config->threadCount);
 
-        if ($config->isStaticAnalysisEnabled()) {
-            $container->getStaticAnalysisToolAdapter()->assertMinimumVersionSatisfied();
-        }
-
         $container->getFileSystem()->mkdir($config->tmpDir);
 
         LogVerbosity::convertVerbosityLevel($io->getInput(), $consoleOutput);

@@ -37,23 +37,26 @@ namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
 use function array_merge;
 use function explode;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use RuntimeException;
 use function sprintf;
 use function str_starts_with;
-use Symfony\Component\Filesystem\Filesystem;
 use function version_compare;
 
 /**
  * @internal
  */
-final class PHPStanAdapter implements StaticAnalysisToolAdapter
+final class PHPStanAdapter implements LazyMutantProcessFactory, StaticAnalysisTestFramework
 {
     private const int VERSION_1 = 1;
 
@@ -63,16 +66,14 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
-        private readonly Filesystem $fileSystem,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly VersionParser $versionParser,
-        private readonly float $timeout,
-        private readonly string $tmpDir,
         private readonly array $staticAnalysisToolOptions,
         private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
+        private readonly InitialStaticAnalysisRunner $initialRun,
+        private readonly LazyMutantProcessFactory $mutantProcessFactory,
         private ?string $version = null,
     ) {
     }
@@ -83,7 +84,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     }
 
     /**
-     * @return string[]
+     * @return array<string>
      */
     public function getInitialRunCommandLine(): array
     {
@@ -102,18 +103,28 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         );
     }
 
-    public function createMutantProcessFactory(): LazyMutantProcessFactory
+    public function checkRequirements(): void
     {
-        return new PHPStanMutantProcessFactory(
-            $this->fileSystem,
-            $this->mutantExecutionResultFactory,
-            $this->staticAnalysisConfigPath,
-            $this->staticAnalysisToolExecutable,
-            $this->commandLineBuilder,
-            $this->timeout,
-            $this->tmpDir,
-            $this->staticAnalysisToolOptions,
-        );
+        $this->assertMinimumVersionSatisfied();
+    }
+
+    public function executeInitialRun(): void
+    {
+        $process = $this->initialRun->run($this->getInitialRunCommandLine());
+
+        if (!$process->isSuccessful()) {
+            throw InitialStaticAnalysisRunFailed::fromProcessAndAdapter($process, $this->getName());
+        }
+    }
+
+    public function test(Mutant $mutant): MutantEvaluationPipe
+    {
+        return new MutantProcessContainer($this->create($mutant), []);
+    }
+
+    public function create(Mutant $mutant): MutantProcess
+    {
+        return $this->mutantProcessFactory->create($mutant);
     }
 
     public function getVersion(): string
