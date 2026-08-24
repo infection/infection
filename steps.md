@@ -1,3 +1,4 @@
 - Introduce the TestFramework contract.
 - Make the Static Analysis into a TestFramework contract.
-- 
+- Move the memory limit to the test frameworks.
+- Introduce the new TestFramework Factory (for test framework adapters only).

@@ -35,52 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
-use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\Factory;
-use Infection\TestFramework\LegacyTestFrameworkBridge;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\TestFramework\LegacyAdapterFactory;
 use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Factory::class)]
-final class FactoryTest extends TestCase
+#[CoversClass(LegacyAdapterFactory::class)]
+final class LegacyAdapterFactoryTest extends TestCase
 {
-    public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
+    public function test_it_creates_an_installed_legacy_adapter(): void
     {
-        $factory = new Factory(
-            '',
-            '',
-            $this->createStub(TestFrameworkConfigLocatorInterface::class),
-            $this->createStub(TestFrameworkFinder::class),
-            '',
-            ConfigurationBuilder::withMinimalTestData()->build(),
-            new FakeSourceCollector(),
-            [],
-            $this->createStub(ShellCommandLineExecutor::class),
-            $this->createStub(ConsoleOutput::class),
-            $this->createStub(CoverageChecker::class),
-            $this->createStub(InitialTestsRunner::class),
-            $this->createStub(MutantProcessContainerFactory::class),
-            $this->createStub(TestFrameworkExtraOptionsFilter::class),
-        );
-
-        $this->expectException(InvalidArgumentException::class);
-        $factory->create('Fake Test Framework', false);
-    }
-
-    public function test_it_uses_installed_test_framework_adapters(): void
-    {
-        $factory = new Factory(
+        $factory = new LegacyAdapterFactory(
             '',
             '',
             $this->createStub(TestFrameworkConfigLocatorInterface::class),
@@ -96,15 +67,10 @@ final class FactoryTest extends TestCase
                 ],
             ],
             $this->createStub(ShellCommandLineExecutor::class),
-            $this->createStub(ConsoleOutput::class),
-            $this->createStub(CoverageChecker::class),
-            $this->createStub(InitialTestsRunner::class),
-            $this->createStub(MutantProcessContainerFactory::class),
-            $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 
-        $testFramework = $factory->create('dummy', false);
+        $adapter = $factory->create('dummy', false);
 
-        $this->assertInstanceOf(LegacyTestFrameworkBridge::class, $testFramework);
+        $this->assertInstanceOf(DummyTestFrameworkAdapter::class, $adapter);
     }
 }

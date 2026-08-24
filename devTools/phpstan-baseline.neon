@@ -139,6 +139,30 @@ parameters:
 			path: ../src/Container/Container.php
 
 		-
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: 'Parameter #3 $config of class Infection\TestFramework\LegacyStaticAnalysisBridge constructor expects Infection\Configuration\Configuration, Infection\Console\ConsoleOutput given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 2
@@ -161,6 +185,12 @@ parameters:
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/Differ/Tokens.php
+
+		-
+			rawMessage: 'Method Infection\Engine::runInitialStaticAnalysis() never returns Infection\TestFramework\Contracts\InitialRunResults so it can be removed from the return type.'
+			identifier: return.unusedType
+			count: 1
+			path: ../src/Engine.php
 
 		-
 			rawMessage: 'Call to method maybe() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
@@ -859,6 +889,114 @@ parameters:
 			path: ../src/TestFramework/Config/TestFrameworkConfigLocator.php
 
 		-
+			rawMessage: Infection\TestFramework\Contracts\InitialRunResults should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/TestFramework/Contracts/InitialRunResults.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\InitialRunResults should not exist
+			identifier: phpat.testNonExtensionPointsAreInternal
+			count: 1
+			path: ../src/TestFramework/Contracts/InitialRunResults.php
+
+		-
+			rawMessage: Property Infection\TestFramework\Contracts\InitialRunResults::$output is never read
+			identifier: shipmonk.deadProperty.neverRead
+			count: 1
+			path: ../src/TestFramework/Contracts/InitialRunResults.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\MutantEvaluationPipe should not depend on Infection\Process\MutantProcess
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 2
+			path: ../src/TestFramework/Contracts/MutantEvaluationPipe.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\MutantProcess should not depend on Infection\Mutant\Mutant
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/MutantProcess.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\MutantProcess should not depend on Infection\Mutant\MutantExecutionResult
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/MutantProcess.php
+
+		-
+			rawMessage: Unused Infection\TestFramework\Contracts\MutantProcess::getFinishedAt
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/TestFramework/Contracts/MutantProcess.php
+
+		-
+			rawMessage: Unused Infection\TestFramework\Contracts\MutantProcess::getMutant
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/TestFramework/Contracts/MutantProcess.php
+
+		-
+			rawMessage: Unused Infection\TestFramework\Contracts\MutantProcess::getProcess
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/TestFramework/Contracts/MutantProcess.php
+
+		-
+			rawMessage: Unused Infection\TestFramework\Contracts\MutantProcess::getResult
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/TestFramework/Contracts/MutantProcess.php
+
+		-
+			rawMessage: Unused Infection\TestFramework\Contracts\MutantProcess::isTimedOut
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/TestFramework/Contracts/MutantProcess.php
+
+		-
+			rawMessage: Unused Infection\TestFramework\Contracts\MutantProcess::markAsFinished
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/TestFramework/Contracts/MutantProcess.php
+
+		-
+			rawMessage: Unused Infection\TestFramework\Contracts\MutantProcess::markAsTimedOut
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/TestFramework/Contracts/MutantProcess.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\Mutant
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFramework.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\MutantExecutionResult
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFramework.php
+
+		-
+			rawMessage: Unused Infection\TestFramework\Contracts\TestFramework::getVersion
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFramework.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\Throwable\InitialTestsFailed should not exist
+			identifier: phpat.testNonExtensionPointsAreInternal
+			count: 1
+			path: ../src/TestFramework/Contracts/Throwable/InitialTestsFailed.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed should not exist
+			identifier: phpat.testNonExtensionPointsAreInternal
+			count: 1
+			path: ../src/TestFramework/Contracts/Throwable/RequirementChecksFailed.php
+
+		-
 			rawMessage: Function ini_get is unsafe to use. It can return FALSE instead of throwing an exception. Please add 'use function Safe\ini_get;' at the beginning of the file to use the variant provided by the 'thecodingmachine/safe' library.
 			identifier: theCodingMachineSafe.function
 			count: 1
@@ -887,6 +1025,78 @@ parameters:
 			identifier: arrayFilter.strict
 			count: 1
 			path: ../src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php
+
+		-
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../src/TestFramework/Factory.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../src/TestFramework/Factory.php
+
+		-
+			rawMessage: 'Cannot call method assertMinimumVersionSatisfied() on Infection\StaticAnalysis\StaticAnalysisToolAdapter|null.'
+			identifier: method.nonObject
+			count: 1
+			path: ../src/TestFramework/LegacyStaticAnalysisBridge.php
+
+		-
+			rawMessage: 'Cannot call method getName() on Infection\StaticAnalysis\StaticAnalysisToolAdapter|null.'
+			identifier: method.nonObject
+			count: 1
+			path: ../src/TestFramework/LegacyStaticAnalysisBridge.php
+
+		-
+			rawMessage: 'Cannot call method getVersion() on Infection\StaticAnalysis\StaticAnalysisToolAdapter|null.'
+			identifier: method.nonObject
+			count: 1
+			path: ../src/TestFramework/LegacyStaticAnalysisBridge.php
+
+		-
+			rawMessage: Infection\TestFramework\LegacyStaticAnalysisBridge should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/TestFramework/LegacyStaticAnalysisBridge.php
+
+		-
+			rawMessage: Infection\TestFramework\LegacyStaticAnalysisBridge should not exist
+			identifier: phpat.testNonExtensionPointsAreInternal
+			count: 1
+			path: ../src/TestFramework/LegacyStaticAnalysisBridge.php
+
+		-
+			rawMessage: Unused Infection\TestFramework\LegacyStaticAnalysisBridge::getVersion
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/TestFramework/LegacyStaticAnalysisBridge.php
+
+		-
+			rawMessage: Infection\TestFramework\LegacyTestFrameworkBridge should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/TestFramework/LegacyTestFrameworkBridge.php
+
+		-
+			rawMessage: Infection\TestFramework\LegacyTestFrameworkBridge should not exist
+			identifier: phpat.testNonExtensionPointsAreInternal
+			count: 1
+			path: ../src/TestFramework/LegacyTestFrameworkBridge.php
+
+		-
+			rawMessage: Unused Infection\TestFramework\LegacyTestFrameworkBridge::getVersion
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/TestFramework/LegacyTestFrameworkBridge.php
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
@@ -1301,6 +1511,54 @@ parameters:
 			identifier: method.dynamicName
 			count: 1
 			path: ../tests/phpunit/Container/ContainerTest.php
+
+		-
+			rawMessage: 'Missing parameter $staticAnalysisTestFramework (Infection\TestFramework\Contracts\TestFramework|null) in call to Infection\Engine constructor.'
+			identifier: argument.missing
+			count: 1
+			path: ../tests/phpunit/EngineTest.php
+
+		-
+			rawMessage: 'Missing parameter $testFramework (Infection\TestFramework\Contracts\TestFramework) in call to Infection\Engine constructor.'
+			identifier: argument.missing
+			count: 1
+			path: ../tests/phpunit/EngineTest.php
+
+		-
+			rawMessage: Unknown parameter $adapter in call to Infection\Engine constructor.
+			identifier: argument.unknown
+			count: 1
+			path: ../tests/phpunit/EngineTest.php
+
+		-
+			rawMessage: Unknown parameter $coverageChecker in call to Infection\Engine constructor.
+			identifier: argument.unknown
+			count: 1
+			path: ../tests/phpunit/EngineTest.php
+
+		-
+			rawMessage: Unknown parameter $initialStaticAnalysisRunner in call to Infection\Engine constructor.
+			identifier: argument.unknown
+			count: 1
+			path: ../tests/phpunit/EngineTest.php
+
+		-
+			rawMessage: Unknown parameter $initialTestsRunner in call to Infection\Engine constructor.
+			identifier: argument.unknown
+			count: 1
+			path: ../tests/phpunit/EngineTest.php
+
+		-
+			rawMessage: Unknown parameter $staticAnalysisToolAdapter in call to Infection\Engine constructor.
+			identifier: argument.unknown
+			count: 1
+			path: ../tests/phpunit/EngineTest.php
+
+		-
+			rawMessage: Unknown parameter $testFrameworkExtraOptionsFilter in call to Infection\Engine constructor.
+			identifier: argument.unknown
+			count: 1
+			path: ../tests/phpunit/EngineTest.php
 
 		-
 			rawMessage: 'Call to static method createFromBoolean() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
@@ -1798,6 +2056,12 @@ parameters:
 			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
 
 		-
+			rawMessage: 'Parameter #1 $testFramework of class Infection\Process\Runner\MutationTestingRunner constructor expects Infection\TestFramework\Contracts\TestFramework, Infection\Process\Factory\MutantProcessContainerFactory&PHPUnit\Framework\MockObject\MockObject given.'
+			identifier: argument.type
+			count: 7
+			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
+
+		-
 			rawMessage: Infection\Tests\Process\ShellCommandLineExecutorTest should not exist
 			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
 			count: 1
@@ -1946,6 +2210,15 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/FactoryTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::queryXpath() return type with generic class DOMNodeList does not specify its types: TNode'

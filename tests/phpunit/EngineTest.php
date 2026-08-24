@@ -561,10 +561,7 @@ final class EngineTest extends TestCase
                 ->withSkipInitialTests(false)
                 ->withUncovered(true)
                 ->build(),
-            adapter: $this->adapter,
-            coverageChecker: $this->coverageChecker,
             eventDispatcher: $this->eventDispatcher,
-            initialTestsRunner: $this->initialTestsRunner,
             memoryLimiter: $this->memoryLimiter,
             mutationGenerator: $this->mutationGenerator,
             mutationTestingRunner: $this->mutationTestingRunner,
@@ -572,6 +569,9 @@ final class EngineTest extends TestCase
             maxTimeoutsChecker: $this->maxTimeoutsChecker,
             consoleOutput: $this->consoleOutput,
             metricsCalculator: $this->metricsCalculator,
+            adapter: $this->adapter,
+            coverageChecker: $this->coverageChecker,
+            initialTestsRunner: $this->initialTestsRunner,
             testFrameworkExtraOptionsFilter: $this->testFrameworkExtraOptionsFilter,
             initialStaticAnalysisRunner: $initialStaticAnalysisRunner,
             staticAnalysisToolAdapter: $staticAnalysisToolAdapter,

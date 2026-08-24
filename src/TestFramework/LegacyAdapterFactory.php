@@ -35,112 +35,69 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Contracts\TestFramework;
-use Infection\TestFramework\Contracts\TestFrameworkFactory;
-use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
-use SplFileInfo;
-use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final readonly class Factory
+final readonly class LegacyAdapterFactory
 {
-    /**
-     * @param array<string, array<string, mixed>> $installedExtensions
-     */
+    /** @param array<string, array<string, mixed>> $installedExtensions */
     public function __construct(
         private string $tmpDir,
         private string $projectDir,
         private TestFrameworkConfigLocatorInterface $configLocator,
         private TestFrameworkFinder $testFrameworkFinder,
         private string $jUnitFilePath,
-        private Configuration $infectionConfig,
+        private Configuration $configuration,
         private SourceCollector $sourceCollector,
         private array $installedExtensions,
         private ShellCommandLineExecutor $shellCommandLineExecutor,
-        private ConsoleOutput $consoleOutput,
-        private CoverageChecker $coverageChecker,
-        private InitialTestsRunner $initialTestsRunner,
-        private MutantProcessContainerFactory $containerFactory,
-        private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
     ) {
     }
 
-    public function create(string $adapterName, bool $skipCoverage): TestFramework
-    {
-        $testFramework = $this->createTestFramework($adapterName, $skipCoverage);
-
-        return $testFramework instanceof TestFramework
-            ? $testFramework
-            : new LegacyTestFrameworkBridge(
-                $testFramework,
-                $this->consoleOutput,
-                $this->coverageChecker,
-                $this->initialTestsRunner,
-                $this->infectionConfig,
-                $this->containerFactory,
-                $this->extraOptionsFilter,
-            );
-    }
-
-    private function createTestFramework(string $adapterName, bool $skipCoverage): TestFramework|TestFrameworkAdapter
+    public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
-            $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
-
             return PhpUnitAdapterFactory::create(
                 $this->testFrameworkFinder->find(
                     TestFrameworkTypes::PHPUNIT,
-                    (string) $this->infectionConfig->phpUnit->customPath,
+                    (string) $this->configuration->phpUnit->customPath,
                 ),
                 $this->tmpDir,
-                $phpUnitConfigPath,
-                (string) $this->infectionConfig->phpUnit->configDir,
+                $this->configLocator->locate(TestFrameworkTypes::PHPUNIT),
+                (string) $this->configuration->phpUnit->configDir,
                 $this->jUnitFilePath,
                 $this->projectDir,
-                $this->infectionConfig->source->directories,
+                $this->configuration->source->directories,
                 $skipCoverage,
-                $this->infectionConfig->executeOnlyCoveringTestCases,
-                $this->getFilteredSourceFilesToMutate(),
-                $this->infectionConfig->mapSourceClassToTestStrategy,
+                $this->configuration->executeOnlyCoveringTestCases,
+                $this->configuration->sourceFilter === null ? [] : $this->sourceCollector->collect(),
+                $this->configuration->mapSourceClassToTestStrategy,
                 $this->shellCommandLineExecutor,
             );
         }
-
-        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT];
 
         foreach ($this->installedExtensions as $installedExtension) {
             $factory = $installedExtension['extra']['class'];
 
             Assert::classExists($factory);
 
-            if (!is_a($factory, TestFrameworkFactory::class, true)
-                && !is_a($factory, TestFrameworkAdapterFactory::class, true)
-            ) {
+            if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
                 continue;
             }
 
-            $availableTestFrameworks[] = $factory::getAdapterName();
-
             if ($adapterName === $factory::getAdapterName()) {
-                $configuration = $this->infectionConfig;
-
                 return $factory::create(
                     $this->testFrameworkFinder->find($factory::getExecutableName()),
                     $this->tmpDir,
@@ -148,30 +105,12 @@ final readonly class Factory
                     null,
                     $this->jUnitFilePath,
                     $this->projectDir,
-                    $configuration->source->directories,
+                    $this->configuration->source->directories,
                     $skipCoverage,
                 );
             }
         }
 
-        throw new InvalidArgumentException(sprintf(
-            'Invalid name of test framework "%s". Available names are: %s',
-            $adapterName,
-            implode(', ', $availableTestFrameworks),
-        ));
-    }
-
-    /**
-     * Get only those source files that will be mutated. If the source is filtered by the user,
-     * we do not need to execute the initial test run against all the sources, only the necessary
-     * subset.
-     *
-     * @return SplFileInfo[]
-     */
-    private function getFilteredSourceFilesToMutate(): array
-    {
-        return $this->infectionConfig->sourceFilter === null
-            ? []
-            : $this->sourceCollector->collect();
+        throw new InvalidArgumentException('The selected test framework does not use the legacy adapter API.');
     }
 }

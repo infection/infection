@@ -116,7 +116,6 @@ final class MutationTestingRunnerTest extends TestCase
     public function test_it_does_not_create_processes_when_there_is_not_mutations(): void
     {
         $mutations = [];
-        $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
         $this->processRunnerMock
             ->expects($this->once())
@@ -124,7 +123,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->with($this->emptyIterable())
         ;
 
-        $this->runner->run($mutations, $testFrameworkExtraOptions);
+        $this->runner->run($mutations);
 
         $this->assertAreSameEvents(
             [
@@ -200,7 +199,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->with($this->iterableContaining([$process0, $process1]))
         ;
 
-        $this->runner->run($mutations, $testFrameworkExtraOptions);
+        $this->runner->run($mutations);
 
         $this->assertAreSameEvents(
             [
@@ -292,7 +291,7 @@ final class MutationTestingRunnerTest extends TestCase
             'fd952823181329ed33260b45eb3aa956', // mutation with index 0
         );
 
-        $this->runner->run($mutations, $testFrameworkExtraOptions);
+        $this->runner->run($mutations);
 
         $this->assertAreSameEvents(
             [
@@ -375,7 +374,7 @@ final class MutationTestingRunnerTest extends TestCase
             [],
         );
 
-        $this->runner->run($mutations, $testFrameworkExtraOptions);
+        $this->runner->run($mutations);
 
         $this->assertAreSameEvents(
             [
@@ -393,8 +392,6 @@ final class MutationTestingRunnerTest extends TestCase
         $mutations = new ArrayIterator([
             $mutation0 = $this->createMutation(0),
         ]);
-
-        $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
         $mutant = MutantBuilder::materialize(
             '/path/to/mutant0',
@@ -441,7 +438,7 @@ final class MutationTestingRunnerTest extends TestCase
             ],
         );
 
-        $this->runner->run($mutations, $testFrameworkExtraOptions);
+        $this->runner->run($mutations);
 
         $this->assertAreSameEvents(
             [
@@ -459,8 +456,6 @@ final class MutationTestingRunnerTest extends TestCase
         $mutations = new ArrayIterator([
             $mutation0 = $this->createMutation(0),
         ]);
-
-        $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
         $mutant = MutantBuilder::materialize(
             '/path/to/mutant0',
@@ -508,7 +503,7 @@ final class MutationTestingRunnerTest extends TestCase
             'mutant-id-1',
         );
 
-        $this->runner->run($mutations, $testFrameworkExtraOptions);
+        $this->runner->run($mutations);
 
         $this->assertAreSameEvents(
             [
@@ -585,13 +580,12 @@ final class MutationTestingRunnerTest extends TestCase
             [],
         );
 
-        $this->runner->run($mutations, '');
+        $this->runner->run($mutations);
     }
 
     public function test_it_dispatches_events_even_when_no_mutations_is_given(): void
     {
         $mutations = [];
-        $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
         $this->processFactoryMock
             ->expects($this->never())
@@ -609,7 +603,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->with($this->emptyIterable())
         ;
 
-        $this->runner->run($mutations, $testFrameworkExtraOptions);
+        $this->runner->run($mutations);
 
         $this->assertAreSameEvents(
             [
