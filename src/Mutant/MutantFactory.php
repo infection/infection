@@ -38,8 +38,8 @@ namespace Infection\Mutant;
 use Infection\Differ\Differ;
 use Infection\Mutation\Mutation;
 use Later\Interfaces\Deferred;
-use function Later\later;
 use function Later\lazy;
+use function Later\now;
 use function sprintf;
 
 /**
@@ -64,7 +64,7 @@ class MutantFactory
         );
 
         $mutatedCode = lazy($this->createMutatedCode($mutation));
-        $originalPrettyPrintedFile = later(static fn () => yield $mutation->getOriginalFileContent());
+        $originalPrettyPrintedFile = now($mutation->getOriginalFileContent());
 
         return new Mutant(
             $mutantFilePath,
