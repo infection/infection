@@ -75,6 +75,7 @@ final class FactoryTest extends TestCase
         );
 
         $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Available names are: phpunit');
         $factory->create('Fake Test Framework', false);
     }
 

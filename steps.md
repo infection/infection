@@ -4,3 +4,4 @@
 - Introduce the new TestFramework Factory (for test framework adapters only).
 - Migrate the PHPUnitAdapter from TestFrameworkAdapter to TestFramework.
 - Update the TestFrameworkFactory with new arguments.
+- Remove the special case of PHPUnit in the Factory.

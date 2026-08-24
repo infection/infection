@@ -101,37 +101,9 @@ final readonly class Factory
 
     private function createTestFramework(string $adapterName, bool $skipCoverage): TestFramework|TestFrameworkAdapter
     {
-        if ($adapterName === TestFrameworkTypes::PHPUNIT) {
-            $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
+        $availableTestFrameworks = [];
 
-            return PhpUnitAdapterFactory::create(
-                $this->testFrameworkFinder->find(
-                    TestFrameworkTypes::PHPUNIT,
-                    (string) $this->infectionConfig->phpUnit->customPath,
-                ),
-                $this->tmpDir,
-                $phpUnitConfigPath,
-                (string) $this->infectionConfig->phpUnit->configDir,
-                $this->jUnitFilePath,
-                $this->projectDir,
-                $this->infectionConfig->source->directories,
-                $skipCoverage,
-                $this->infectionConfig->executeOnlyCoveringTestCases,
-                $this->getFilteredSourceFilesToMutate(),
-                $this->infectionConfig->mapSourceClassToTestStrategy,
-                $this->shellCommandLineExecutor,
-                $this->consoleOutput,
-                $this->coverageChecker,
-                $this->initialTestsRunner,
-                $this->infectionConfig,
-                $this->containerFactory,
-                $this->extraOptionsFilter,
-            );
-        }
-
-        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT];
-
-        foreach ($this->installedExtensions as $installedExtension) {
+        foreach ($this->getTestFrameworkExtensions() as $installedExtension) {
             $factory = $installedExtension['extra']['class'];
 
             Assert::classExists($factory);
@@ -146,13 +118,18 @@ final readonly class Factory
 
             if ($adapterName === $factory::getAdapterName()) {
                 $configuration = $this->infectionConfig;
+                $executable = $this->testFrameworkFinder->find(
+                    $factory::getExecutableName(),
+                    (string) ($installedExtension['extra']['customPath'] ?? ''),
+                );
+                $configDir = $installedExtension['extra']['configDir'] ?? null;
 
                 if (is_a($factory, TestFrameworkFactory::class, true)) {
                     return $factory::create(
-                        $this->testFrameworkFinder->find($factory::getExecutableName()),
+                        $executable,
                         $this->tmpDir,
                         $this->configLocator->locate($factory::getAdapterName()),
-                        null,
+                        $configDir,
                         $this->jUnitFilePath,
                         $this->projectDir,
                         $configuration->source->directories,
@@ -171,7 +148,7 @@ final readonly class Factory
                 }
 
                 return $factory::create(
-                    $this->testFrameworkFinder->find($factory::getExecutableName()),
+                    $executable,
                     $this->tmpDir,
                     $this->configLocator->locate($factory::getAdapterName()),
                     null,
@@ -188,6 +165,23 @@ final readonly class Factory
             $adapterName,
             implode(', ', $availableTestFrameworks),
         ));
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private function getTestFrameworkExtensions(): array
+    {
+        return [
+            'infection/phpunit-adapter' => [
+                'extra' => [
+                    'class' => PhpUnitAdapterFactory::class,
+                    'configDir' => (string) $this->infectionConfig->phpUnit->configDir,
+                    'customPath' => (string) $this->infectionConfig->phpUnit->customPath,
+                ],
+            ],
+            ...$this->installedExtensions,
+        ];
     }
 
     /**
