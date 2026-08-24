@@ -35,14 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Closure;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
@@ -63,6 +66,12 @@ final readonly class LegacyAdapterFactory
         private array $installedExtensions,
         private ShellCommandLineExecutor $shellCommandLineExecutor,
         private ConsoleOutput $consoleOutput,
+        /** @var Closure(): CoverageChecker */
+        private Closure $coverageChecker,
+        /** @var Closure(): MutantProcessContainerFactory */
+        private Closure $processFactory,
+        /** @var Closure(): TestFrameworkExtraOptionsFilter */
+        private Closure $testFrameworkExtraOptionsFilter,
     ) {
     }
 
@@ -83,11 +92,10 @@ final readonly class LegacyAdapterFactory
                 $this->configuration->mapSourceClassToTestStrategy,
                 $this->shellCommandLineExecutor,
                 $this->consoleOutput,
-                null,
-                null,
+                ($this->coverageChecker)(),
                 $this->configuration,
-                null,
-                null,
+                $this->processFactory,
+                ($this->testFrameworkExtraOptionsFilter)(),
             );
 
             Assert::isInstanceOf($adapter, TestFrameworkAdapter::class);

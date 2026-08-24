@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
 
 use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -52,7 +51,6 @@ final class PHPStanAdapterFactoryTest extends TestCase
             '/path/to/phpstan',
             [],
             new ShellCommandLineExecutor(),
-            $this->createStub(InitialStaticAnalysisRunner::class),
             $this->createStub(LazyMutantProcessFactory::class),
         );
 

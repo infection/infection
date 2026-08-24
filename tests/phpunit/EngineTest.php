@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
-use function explode;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Engine;
@@ -49,9 +47,9 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
 use Infection\Process\Runner\InitialTestsFailed;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -59,19 +57,14 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(Engine::class)]
 final class EngineTest extends TestCase
 {
-    private MockObject&TestFrameworkAdapter $adapter;
-
     private MockObject&CoverageChecker $coverageChecker;
 
     private MockObject&EventDispatcher $eventDispatcher;
-
-    private MockObject&InitialTestsRunner $initialTestsRunner;
 
     private MockObject&TestFramework $testFramework;
 
@@ -89,10 +82,8 @@ final class EngineTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->adapter = $this->createMock(TestFrameworkAdapter::class);
         $this->coverageChecker = $this->createMock(CoverageChecker::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
-        $this->initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $this->testFramework = $this->createMock(TestFramework::class);
         $this->mutationGenerator = $this->createMock(MutationGenerator::class);
         $this->mutationTestingRunner = $this->createMock(MutationTestingRunner::class);
@@ -108,29 +99,10 @@ final class EngineTest extends TestCase
             ->withSkipInitialTests(false)
             ->build();
 
-        $this->adapter
+        $this->testFramework
             ->expects($this->once())
-            ->method('getName')
-            ->willReturn('foo');
-        $this->adapter
-            ->expects($this->once())
-            ->method('getInitialTestsFailRecommendations')
-            ->willReturn('Run tests to see what failed');
-
-        $process = $this->createInitialTestProcess(false, '');
-        $process
-            ->expects($this->once())
-            ->method('getExitCode')
-            ->willReturn(1);
-        $process
-            ->expects($this->atLeastOnce())
-            ->method('getErrorOutput')
-            ->willReturn('');
-
-        $this->initialTestsRunner
-            ->expects($this->once())
-            ->method('run')
-            ->willReturn($process);
+            ->method('executeInitialRun')
+            ->willThrowException(new InitialTestsFailed('Initial tests failed.'));
 
         $this->coverageChecker->expects($this->never())->method($this->anything());
         $this->eventDispatcher->expects($this->never())->method($this->anything());
@@ -152,17 +124,10 @@ final class EngineTest extends TestCase
             ->withUncovered(true)
             ->build();
 
-        $process = $this->createInitialTestProcess(true, 'testing');
-
-        $this->initialTestsRunner
+        $this->testFramework
             ->expects($this->once())
-            ->method('run')
-            ->willReturn($process);
-
-        $this->coverageChecker
-            ->expects($this->once())
-            ->method('checkCoverageHasBeenGenerated')
-            ->with('/tmp/bar', 'testing');
+            ->method('executeInitialRun')
+            ->willReturn(new InitialTestsResult('testing'));
 
         $this->mutationGenerator
             ->expects($this->once())
@@ -211,15 +176,10 @@ final class EngineTest extends TestCase
 
         $callOrder = [];
 
-        $this->initialTestsRunner
+        $this->testFramework
             ->expects($this->once())
-            ->method('run')
-            ->willReturn($this->createInitialTestProcess(true, 'test output'));
-
-        $this->coverageChecker
-            ->expects($this->once())
-            ->method('checkCoverageHasBeenGenerated')
-            ->with('/tmp/bar', 'test output');
+            ->method('executeInitialRun')
+            ->willReturn(new InitialTestsResult('test output'));
 
         $staticAnalysisTestFramework = $this->createMock(TestFramework::class);
         $staticAnalysisTestFramework
@@ -228,8 +188,10 @@ final class EngineTest extends TestCase
         $staticAnalysisTestFramework
             ->expects($this->once())
             ->method('executeInitialRun')
-            ->willReturnCallback(static function () use (&$callOrder): void {
+            ->willReturnCallback(static function () use (&$callOrder): InitialTestsResult {
                 $callOrder[] = 'staticAnalysis';
+
+                return new InitialTestsResult('static analysis output');
             });
 
         $this->mutationGenerator
@@ -292,7 +254,7 @@ final class EngineTest extends TestCase
             ->expects($this->once())
             ->method('logSkippingInitialTests');
 
-        $this->initialTestsRunner->expects($this->never())->method($this->anything());
+        $this->testFramework->expects($this->never())->method('executeInitialRun');
 
         $this->mutationGenerator
             ->expects($this->once())
@@ -345,7 +307,7 @@ final class EngineTest extends TestCase
             ->expects($this->once())
             ->method('logSkippingInitialTests');
 
-        $this->initialTestsRunner->expects($this->never())->method($this->anything());
+        $this->testFramework->expects($this->never())->method('executeInitialRun');
 
         $this->mutationGenerator
             ->expects($this->once())
@@ -405,7 +367,7 @@ final class EngineTest extends TestCase
             ->expects($this->once())
             ->method('logSkippingInitialTests');
 
-        $this->initialTestsRunner->expects($this->never())->method($this->anything());
+        $this->testFramework->expects($this->never())->method('executeInitialRun');
 
         $this->mutationGenerator
             ->expects($this->once())
@@ -456,7 +418,7 @@ final class EngineTest extends TestCase
             ->expects($this->once())
             ->method('logSkippingInitialTests');
 
-        $this->initialTestsRunner->expects($this->never())->method($this->anything());
+        $this->testFramework->expects($this->never())->method('executeInitialRun');
 
         $this->mutationGenerator
             ->expects($this->once())
@@ -506,23 +468,6 @@ final class EngineTest extends TestCase
         $this->createEngine($config)->execute();
     }
 
-    private function createInitialTestProcess(bool $successful, string $output): MockObject&Process
-    {
-        $process = $this->createMock(Process::class);
-        $process
-            ->expects($this->once())
-            ->method('isSuccessful')
-            ->willReturn($successful);
-        $process
-            ->method('getCommandLine')
-            ->willReturn('/tmp/bar');
-        $process
-            ->method('getOutput')
-            ->willReturn($output);
-
-        return $process;
-    }
-
     private function createEngine(
         ?Configuration $config = null,
         ?TestFramework $staticAnalysisTestFramework = null,
@@ -539,22 +484,6 @@ final class EngineTest extends TestCase
                     $this->consoleOutput->logSkippingInitialTests();
                     $this->coverageChecker->checkCoverageExists();
                 }
-            });
-        $this->testFramework
-            ->method('executeInitialRun')
-            ->willReturnCallback(function () use ($configuration): void {
-                $process = $this->initialTestsRunner->run(
-                    $configuration->testFrameworkExtraOptions,
-                    explode(' ', (string) $configuration->initialTestsPhpOptions),
-                    $configuration->skipCoverage,
-                );
-
-                if (!$process->isSuccessful()) {
-                    throw InitialTestsFailed::fromProcessAndAdapter($process, $this->adapter);
-                }
-
-                $output = $process->getOutput();
-                $this->coverageChecker->checkCoverageHasBeenGenerated($process->getCommandLine(), $output);
             });
 
         return new Engine(

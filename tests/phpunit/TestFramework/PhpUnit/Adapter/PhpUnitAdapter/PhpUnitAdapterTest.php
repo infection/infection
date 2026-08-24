@@ -44,9 +44,9 @@ use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
@@ -88,7 +88,7 @@ final class PhpUnitAdapterTest extends TestCase
 
     private MockObject&MemoryLimiter $memoryLimiter;
 
-    private MockObject&InitialTestsRunner $initialTestsRunner;
+    private InitialRunProcessFactory&MockObject $initialRunProcessFactory;
 
     private MockObject&MutantProcessContainerFactory $processFactory;
 
@@ -98,7 +98,7 @@ final class PhpUnitAdapterTest extends TestCase
         $this->fileSystemMock = $this->createMock(FileSystem::class);
         $this->phpExecutableFinderMock = $this->createMock(PhpExecutableFinder::class);
         $this->memoryLimiter = $this->createMock(MemoryLimiter::class);
-        $this->initialTestsRunner = $this->createMock(InitialTestsRunner::class);
+        $this->initialRunProcessFactory = $this->createMock(InitialRunProcessFactory::class);
         $this->processFactory = $this->createMock(MutantProcessContainerFactory::class);
         $this->phpExecutableFinderMock
             ->method('find')
@@ -201,9 +201,9 @@ final class PhpUnitAdapterTest extends TestCase
         $process->method('isSuccessful')->willReturn(true);
         $process->method('getOutput')->willReturn('Memory: 12.50 MB');
 
-        $this->initialTestsRunner
+        $this->initialRunProcessFactory
             ->expects($this->once())
-            ->method('run')
+            ->method('create')
             ->willReturn($process);
 
         $this->memoryLimiter
@@ -1683,9 +1683,9 @@ final class PhpUnitAdapterTest extends TestCase
             new CommandLineBuilder($this->phpExecutableFinderMock),
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
-            $this->initialTestsRunner,
+            $this->initialRunProcessFactory,
             ConfigurationBuilder::withMinimalTestData()->build(),
-            $this->processFactory,
+            fn (): MutantProcessContainerFactory => $this->processFactory,
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
             $this->memoryLimiter,
             $version,

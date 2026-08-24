@@ -37,10 +37,13 @@ namespace Infection\Tests\TestFramework;
 
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\LegacyAdapterFactory;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
@@ -67,6 +70,9 @@ final class LegacyAdapterFactoryTest extends TestCase
             ],
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(ConsoleOutput::class),
+            fn (): CoverageChecker => $this->createStub(CoverageChecker::class),
+            fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
+            fn (): TestFrameworkExtraOptionsFilter => $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 
         $adapter = $factory->create('dummy', false);

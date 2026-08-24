@@ -35,17 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Closure;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
-use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\SourceCollector;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
@@ -92,10 +91,11 @@ final readonly class Factory
         private ShellCommandLineExecutor $shellCommandLineExecutor,
         private ConsoleOutput $consoleOutput,
         private CoverageChecker $coverageChecker,
-        private InitialTestsRunner $initialTestsRunner,
-        private MutantProcessContainerFactory $containerFactory,
+        /** @var Closure(): InitialTestsRunProcessFactory */
+        private Closure $initialRunProcessFactory,
+        /** @var Closure(): MutantProcessContainerFactory */
+        private Closure $containerFactory,
         private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
-        private EventDispatcher $eventDispatcher,
     ) {
     }
 
@@ -109,9 +109,9 @@ final readonly class Factory
                 $testFramework,
                 $this->consoleOutput,
                 $this->coverageChecker,
-                $this->initialTestsRunner,
+                ($this->initialRunProcessFactory)(),
                 $this->infectionConfig,
-                $this->containerFactory,
+                ($this->containerFactory)(),
             );
     }
 
@@ -131,7 +131,6 @@ final readonly class Factory
                 $executable,
                 $options,
                 $this->shellCommandLineExecutor,
-                new InitialStaticAnalysisRunner($this->eventDispatcher),
                 new PHPStanMutantProcessFactory(
                     new Filesystem(),
                     new PHPStanMutantExecutionResultFactory(),
@@ -159,7 +158,6 @@ final readonly class Factory
                 $executable,
                 $options,
                 $this->shellCommandLineExecutor,
-                new InitialStaticAnalysisRunner($this->eventDispatcher),
                 new MagoMutantProcessFactory(
                     new MagoMutantExecutionResultFactory(),
                     $executable,
@@ -218,7 +216,6 @@ final readonly class Factory
                         $this->shellCommandLineExecutor,
                         $this->consoleOutput,
                         $this->coverageChecker,
-                        $this->initialTestsRunner,
                         $configuration,
                         $this->containerFactory,
                         $this->extraOptionsFilter,

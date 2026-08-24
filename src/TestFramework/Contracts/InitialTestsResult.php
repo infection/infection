@@ -33,54 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Process\Factory\InitialTestsRunProcessFactory;
-use Symfony\Component\Process\Process;
-
-/**
- * @internal
- * @final
- */
-class InitialTestsRunner
+/** @internal */
+final readonly class InitialTestsResult
 {
     public function __construct(
-        private readonly InitialTestsRunProcessFactory $processBuilder,
-        private readonly EventDispatcher $eventDispatcher,
+        public string $output,
     ) {
-    }
-
-    /**
-     * @param string[] $phpExtraOptions
-     */
-    public function run(
-        string $testFrameworkExtraOptions,
-        array $phpExtraOptions,
-        bool $skipCoverage,
-    ): Process {
-        $process = $this->processBuilder->createProcess(
-            $testFrameworkExtraOptions,
-            $phpExtraOptions,
-            $skipCoverage,
-        );
-
-        $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted());
-
-        $process->run(function (string $type) use ($process): void {
-            if ($type === Process::ERR) {
-                // Stop on the first error encountered
-                $process->stop();
-            }
-
-            $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted());
-        });
-
-        $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($process->getOutput()));
-
-        return $process;
     }
 }

@@ -36,11 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\Console\ConsoleOutput;
-use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
@@ -76,10 +75,9 @@ final class FactoryTest extends TestCase
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
-            $this->createStub(InitialTestsRunner::class),
-            $this->createStub(MutantProcessContainerFactory::class),
+            fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
+            fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
-            $this->createStub(EventDispatcher::class),
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -109,10 +107,9 @@ final class FactoryTest extends TestCase
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
-            $this->createStub(InitialTestsRunner::class),
-            $this->createStub(MutantProcessContainerFactory::class),
+            fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
+            fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
-            $this->createStub(EventDispatcher::class),
         );
 
         $testFramework = $factory->create('dummy', false);
@@ -136,10 +133,9 @@ final class FactoryTest extends TestCase
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
-            $this->createStub(InitialTestsRunner::class),
-            $this->createStub(MutantProcessContainerFactory::class),
+            fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
+            fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
-            $this->createStub(EventDispatcher::class),
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -164,10 +160,9 @@ final class FactoryTest extends TestCase
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
-            $this->createStub(InitialTestsRunner::class),
-            $this->createStub(MutantProcessContainerFactory::class),
+            fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
+            fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
-            $this->createStub(EventDispatcher::class),
         );
 
         $this->assertInstanceOf(

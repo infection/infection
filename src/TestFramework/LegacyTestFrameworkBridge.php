@@ -35,17 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Closure;
 use function explode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Mutant;
+use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsFailed;
-use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use Symfony\Component\Process\Process;
 
 /**
  * @deprecated This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
@@ -56,7 +59,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         private TestFrameworkAdapter $adapter,
         private ConsoleOutput $consoleOutput,
         private CoverageChecker $coverageChecker,
-        private InitialTestsRunner $initialTestsRunner,
+        private InitialTestsRunProcessFactory $initialRunProcessFactory,
         private Configuration $config,
         private MutantProcessContainerFactory $processFactory,
     ) {
@@ -82,13 +85,20 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         }
     }
 
-    public function executeInitialRun(): void
+    public function executeInitialRun(?Closure $onProgress = null): InitialTestsResult
     {
-        $initialTestSuiteProcess = $this->initialTestsRunner->run(
+        $initialTestSuiteProcess = $this->initialRunProcessFactory->createProcess(
             $this->config->testFrameworkExtraOptions,
             $this->getInitialTestsPhpOptionsArray(),
             $this->config->skipCoverage,
         );
+        $initialTestSuiteProcess->run(static function (string $type) use ($initialTestSuiteProcess, $onProgress): void {
+            if ($type === Process::ERR) {
+                $initialTestSuiteProcess->stop();
+            }
+
+            $onProgress?->__invoke();
+        });
 
         if (!$initialTestSuiteProcess->isSuccessful()) {
             throw InitialTestsFailed::fromProcessAndAdapter(
@@ -103,6 +113,8 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
             $initialTestSuiteProcess->getCommandLine(),
             $output,
         );
+
+        return new InitialTestsResult($output);
     }
 
     public function test(Mutant $mutant): MutantEvaluationPipe

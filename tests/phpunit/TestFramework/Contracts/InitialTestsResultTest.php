@@ -33,45 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Factory;
+namespace Infection\Tests\TestFramework\Contracts;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Process\OriginalPhpProcess;
-use Symfony\Component\Process\Process;
+use Infection\TestFramework\Contracts\InitialTestsResult;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @deprecated Should be removed with TestFrameworkAdapter.
- *
- * @internal
- * @final
- */
-class InitialTestsRunProcessFactory
+#[CoversClass(InitialTestsResult::class)]
+final class InitialTestsResultTest extends TestCase
 {
-    public function __construct(
-        private readonly TestFrameworkAdapter $testFrameworkAdapter,
-    ) {
-    }
+    public function test_it_exposes_the_initial_run_output(): void
+    {
+        $result = new InitialTestsResult('framework output');
 
-    /**
-     * Creates process with enabled debugger as test framework is going to use in the code coverage.
-     *
-     * @param string[] $phpExtraOptions
-     */
-    public function createProcess(
-        string $testFrameworkExtraOptions,
-        array $phpExtraOptions,
-        bool $skipCoverage,
-    ): Process {
-        // If we're expecting to receive a code coverage, test process must run in a vanilla environment
-        $processClass = $skipCoverage ? Process::class : OriginalPhpProcess::class;
-
-        return new $processClass(
-            command: $this->testFrameworkAdapter->getInitialTestRunCommandLine(
-                $testFrameworkExtraOptions,
-                $phpExtraOptions,
-                $skipCoverage,
-            ),
-            timeout: null, // Ignore the default timeout of 60 seconds
-        );
+        $this->assertSame('framework output', $result->output);
     }
 }

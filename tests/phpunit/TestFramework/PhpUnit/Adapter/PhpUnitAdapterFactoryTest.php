@@ -37,7 +37,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use Infection\Console\ConsoleOutput;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -69,9 +68,8 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             new ShellCommandLineExecutor(),
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
-            $this->createStub(InitialTestsRunner::class),
             ConfigurationBuilder::withMinimalTestData()->build(),
-            $this->createStub(MutantProcessContainerFactory::class),
+            fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 

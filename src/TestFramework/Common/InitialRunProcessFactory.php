@@ -33,45 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Factory;
+namespace Infection\TestFramework\Common;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\OriginalPhpProcess;
 use Symfony\Component\Process\Process;
 
 /**
- * @deprecated Should be removed with TestFrameworkAdapter.
- *
  * @internal
  * @final
  */
-class InitialTestsRunProcessFactory
+class InitialRunProcessFactory
 {
-    public function __construct(
-        private readonly TestFrameworkAdapter $testFrameworkAdapter,
-    ) {
-    }
+    /** @param array<string> $commandLine */
+    public function create(array $commandLine, bool $useOriginalPhpConfig): Process
+    {
+        $processClass = $useOriginalPhpConfig ? OriginalPhpProcess::class : Process::class;
 
-    /**
-     * Creates process with enabled debugger as test framework is going to use in the code coverage.
-     *
-     * @param string[] $phpExtraOptions
-     */
-    public function createProcess(
-        string $testFrameworkExtraOptions,
-        array $phpExtraOptions,
-        bool $skipCoverage,
-    ): Process {
-        // If we're expecting to receive a code coverage, test process must run in a vanilla environment
-        $processClass = $skipCoverage ? Process::class : OriginalPhpProcess::class;
-
-        return new $processClass(
-            command: $this->testFrameworkAdapter->getInitialTestRunCommandLine(
-                $testFrameworkExtraOptions,
-                $phpExtraOptions,
-                $skipCoverage,
-            ),
-            timeout: null, // Ignore the default timeout of 60 seconds
-        );
+        return new $processClass($commandLine, timeout: null);
     }
 }

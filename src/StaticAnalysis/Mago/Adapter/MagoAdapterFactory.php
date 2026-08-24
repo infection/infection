@@ -37,9 +37,9 @@ namespace Infection\StaticAnalysis\Mago\Adapter;
 
 use Infection\CannotBeInstantiated;
 use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -59,7 +59,6 @@ final class MagoAdapterFactory
         string $staticAnalysisToolExecutable,
         array $staticAnalysisToolOptions,
         ShellCommandLineExecutor $shellCommandLineExecutor,
-        InitialStaticAnalysisRunner $initialRun,
         LazyMutantProcessFactory $mutantProcessFactory,
     ): StaticAnalysisTestFramework {
         return new MagoAdapter(
@@ -71,7 +70,7 @@ final class MagoAdapterFactory
             new VersionParser(),
             $staticAnalysisToolOptions,
             $shellCommandLineExecutor,
-            $initialRun,
+            new InitialRunProcessFactory(),
             $mutantProcessFactory,
         );
     }

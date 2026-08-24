@@ -35,14 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command\InitialTest;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Command\InitialTest\InitialTestRunCommand;
 use Infection\Console\Application;
 use Infection\Container\Container;
 use Infection\Framework\Str;
 use Infection\Git\Git;
 use Infection\Process\Runner\InitialTestsFailed;
-use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\TestFramework;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -53,7 +52,6 @@ use function Safe\chdir;
 use function Safe\getcwd;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
 #[Group('integration')]
@@ -117,7 +115,6 @@ final class InitialTestRunCommandTest extends TestCase
             'expectedInitialTestsPhpOptions' => [''],
             'expectedSkipCoverage' => false,
             'expectedStdout' => <<<STDOUT
-                Command executed:
 
 
                  [OK] Initial test run successfully executed.
@@ -128,7 +125,6 @@ final class InitialTestRunCommandTest extends TestCase
 
                 STDERR,
             'expectedDisplay' => <<<DISPLAY
-                Command executed:
 
 
                  [OK] Initial test run successfully executed.
@@ -206,48 +202,37 @@ final class InitialTestRunCommandTest extends TestCase
             ->method('getBaseReference')
             ->willReturn('<refinedGitReference>');
 
-        $testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
-        $testFrameworkAdapterMock
-            ->method('getName')
-            ->willReturn('DemoTestFramework');
-
-        $testFrameworkMock = $this->createStub(TestFramework::class);
+        $testFrameworkMock = $this->createMock(TestFramework::class);
         $testFrameworkMock
             ->method('getName')
             ->willReturn('DemoTestFramework');
 
-        $initialTestsProcessMock = $this->createMock(Process::class);
-        $initialTestsProcessMock
-            ->method('getCommandLine')
-            ->willReturn('test-framework initialConfig');
-        $initialTestsProcessMock
-            ->method('isSuccessful')
-            ->willReturn($successfulInitialTests);
-        $initialTestsProcessMock
-            ->method('getExitCode')
-            ->willReturn(123);
-        $initialTestsProcessMock
-            ->method('getOutput')
-            ->willReturn('<processOutput>');
-        $initialTestsProcessMock
-            ->method('getErrorOutput')
-            ->willReturn('<processErrorOutput>');
+        if ($successfulInitialTests) {
+            $testFrameworkMock
+                ->expects($this->exactly(2))
+                ->method('executeInitialRun')
+                ->willReturn(new InitialTestsResult('<processOutput>'));
+        } else {
+            $testFrameworkMock
+                ->expects($this->once())
+                ->method('executeInitialRun')
+                ->willThrowException(new InitialTestsFailed(
+                    <<<'MESSAGE'
+                        Project tests must be in a passing state before running Infection.
 
-        $initialTestsRunnerMock = $this->createMock(InitialTestsRunner::class);
-        $initialTestsRunnerMock
-            ->method('run')
-            ->with(
-                $expectedTestFrameworkExtraOptions,
-                $expectedInitialTestsPhpOptions,
-                $expectedSkipCoverage,
-            )
-            ->willReturn($initialTestsProcessMock);
+                        DemoTestFramework reported an exit code of 123.
+                        Refer to the DemoTestFramework's output below:
+                        STDOUT:
+                        <processOutput>
+                        STDERR:
+                        <processErrorOutput>
+                        MESSAGE,
+                ));
+        }
 
         $container = Container::create()
             ->cloneWithService(Git::class, $gitMock)
-            ->cloneWithService(TestFrameworkAdapter::class, $testFrameworkAdapterMock)
-            ->cloneWithService(TestFramework::class, $testFrameworkMock)
-            ->cloneWithService(InitialTestsRunner::class, $initialTestsRunnerMock);
+            ->cloneWithService(TestFramework::class, $testFrameworkMock);
 
         $application = new Application($container);
 

@@ -36,16 +36,18 @@ declare(strict_types=1);
 namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
 use function array_merge;
+use Closure;
 use function explode;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use RuntimeException;
@@ -72,7 +74,7 @@ final class PHPStanAdapter implements LazyMutantProcessFactory, StaticAnalysisTe
         private readonly VersionParser $versionParser,
         private readonly array $staticAnalysisToolOptions,
         private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
-        private readonly InitialStaticAnalysisRunner $initialRun,
+        private readonly InitialRunProcessFactory $initialRunProcessFactory,
         private readonly LazyMutantProcessFactory $mutantProcessFactory,
         private ?string $version = null,
     ) {
@@ -108,13 +110,16 @@ final class PHPStanAdapter implements LazyMutantProcessFactory, StaticAnalysisTe
         $this->assertMinimumVersionSatisfied();
     }
 
-    public function executeInitialRun(): void
+    public function executeInitialRun(?Closure $onProgress = null): InitialTestsResult
     {
-        $process = $this->initialRun->run($this->getInitialRunCommandLine());
+        $process = $this->initialRunProcessFactory->create($this->getInitialRunCommandLine(), false);
+        $process->run($onProgress);
 
         if (!$process->isSuccessful()) {
             throw InitialStaticAnalysisRunFailed::fromProcessAndAdapter($process, $this->getName());
         }
+
+        return new InitialTestsResult($process->getOutput());
     }
 
     public function test(Mutant $mutant): MutantEvaluationPipe

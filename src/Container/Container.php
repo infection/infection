@@ -123,7 +123,6 @@ use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
@@ -166,9 +165,12 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
+use Infection\TestFramework\EventDispatchingStaticAnalysisTestFramework;
+use Infection\TestFramework\EventDispatchingTestFramework;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\LegacyAdapterFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\TestFramework\TestFrameworkTypes;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
@@ -304,10 +306,9 @@ final class Container extends DIContainer
                     $container->getShellCommandLineExecutor(),
                     $container->get(ConsoleOutput::class),
                     $container->getCoverageChecker(),
-                    $container->getInitialTestsRunner(),
-                    $container->getMutantProcessContainerFactory(),
+                    static fn (): InitialTestsRunProcessFactory => $container->getInitialTestsRunProcessFactory(),
+                    static fn (): MutantProcessContainerFactory => $container->getMutantProcessContainerFactory(),
                     $container->getTestFrameworkExtraOptionsFilter(),
-                    $container->getEventDispatcher(),
                 );
             },
             LegacyAdapterFactory::class => static function (self $container): LegacyAdapterFactory {
@@ -324,6 +325,9 @@ final class Container extends DIContainer
                     GeneratedExtensionsConfig::EXTENSIONS,
                     $container->getShellCommandLineExecutor(),
                     $container->get(ConsoleOutput::class),
+                    static fn (): CoverageChecker => $container->getCoverageChecker(),
+                    static fn (): MutantProcessContainerFactory => $container->getMutantProcessContainerFactory(),
+                    static fn (): TestFrameworkExtraOptionsFilter => $container->getTestFrameworkExtraOptionsFilter(),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
@@ -367,16 +371,16 @@ final class Container extends DIContainer
             ),
             CoverageChecker::class => static function (self $container): CoverageChecker {
                 $config = $container->getConfiguration();
-                $testFrameworkAdapter = $container->getTestFrameworkAdapter();
 
                 return new CoverageChecker(
                     $config->skipCoverage,
                     $config->skipInitialTests,
                     $config->initialTestsPhpOptions ?? '',
                     $config->coveragePath,
-                    $testFrameworkAdapter->hasJUnitReport(),
+                    $config->testFramework === TestFrameworkTypes::PHPUNIT
+                        || $config->testFramework === TestFrameworkTypes::CODECEPTION,
                     $container->getJUnitReportLocator(),
-                    $testFrameworkAdapter->getName(),
+                    $config->testFramework,
                     $container->getIndexXmlCoverageLocator(),
                 );
             },
@@ -659,9 +663,12 @@ final class Container extends DIContainer
             TestFramework::class => static function (self $container): TestFramework {
                 $config = $container->getConfiguration();
 
-                return $container->getFactory()->create(
-                    $config->testFramework,
-                    $config->skipCoverage,
+                return new EventDispatchingTestFramework(
+                    $container->getFactory()->create(
+                        $config->testFramework,
+                        $config->skipCoverage,
+                    ),
+                    $container->getEventDispatcher(),
                 );
             },
             StaticAnalysisTestFramework::class => static function (self $container): StaticAnalysisTestFramework {
@@ -669,9 +676,16 @@ final class Container extends DIContainer
 
                 Assert::notNull($config->staticAnalysisTool);
 
-                return $container->getFactory()->createStaticAnalysisTool(
+                $testFramework = $container->getFactory()->createStaticAnalysisTool(
                     $config->staticAnalysisTool,
                     $config->processTimeout,
+                );
+
+                Assert::isInstanceOf($testFramework, LazyMutantProcessFactory::class);
+
+                return new EventDispatchingStaticAnalysisTestFramework(
+                    $testFramework,
+                    $container->getEventDispatcher(),
                 );
             },
         ]);
@@ -949,11 +963,6 @@ final class Container extends DIContainer
     public function getInitialTestsRunProcessFactory(): InitialTestsRunProcessFactory
     {
         return $this->get(InitialTestsRunProcessFactory::class);
-    }
-
-    public function getInitialTestsRunner(): InitialTestsRunner
-    {
-        return $this->get(InitialTestsRunner::class);
     }
 
     public function getMutantProcessContainerFactory(): MutantProcessContainerFactory

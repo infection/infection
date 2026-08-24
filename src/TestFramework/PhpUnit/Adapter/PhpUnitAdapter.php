@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use Closure;
 use function escapeshellarg;
 use function explode;
 use function implode;
@@ -46,13 +47,14 @@ use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsFailed;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
+use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -60,6 +62,7 @@ use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Override;
 use function Safe\preg_match;
 use function sprintf;
+use Symfony\Component\Process\Process;
 use function trim;
 use function version_compare;
 
@@ -74,8 +77,27 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
 
     private float $initialRunMemoryUsage = -1.;
 
-    public function __construct(private readonly string $testFrameworkExecutable, private readonly string $tmpDir, private readonly string $jUnitFilePath, private readonly PCOVDirectoryProvider $pcovDirectoryProvider, private readonly InitialConfigBuilder $initialConfigBuilder, private readonly MutationConfigBuilder $mutationConfigBuilder, private readonly CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder, private readonly ShellCommandLineExecutor $shellCommandLineExecutor, private readonly VersionParser $versionParser, private readonly CommandLineBuilder $commandLineBuilder, private readonly ConsoleOutput $consoleOutput, private readonly CoverageChecker $coverageChecker, private readonly InitialTestsRunner $initialTestsRunner, private readonly Configuration $configuration, private readonly MutantProcessContainerFactory $processFactory, private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter, private readonly MemoryLimiter $memoryLimiter, private ?string $version = null)
-    {
+    public function __construct(
+        private readonly string $testFrameworkExecutable,
+        private readonly string $tmpDir,
+        private readonly string $jUnitFilePath,
+        private readonly PCOVDirectoryProvider $pcovDirectoryProvider,
+        private readonly InitialConfigBuilder $initialConfigBuilder,
+        private readonly MutationConfigBuilder $mutationConfigBuilder,
+        private readonly CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
+        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
+        private readonly VersionParser $versionParser,
+        private readonly CommandLineBuilder $commandLineBuilder,
+        private readonly ConsoleOutput $consoleOutput,
+        private readonly CoverageChecker $coverageChecker,
+        private readonly InitialRunProcessFactory $initialRunProcessFactory,
+        private readonly Configuration $configuration,
+        /** @var Closure(): MutantProcessContainerFactory */
+        private readonly Closure $processFactory,
+        private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private readonly MemoryLimiter $memoryLimiter,
+        private ?string $version = null,
+    ) {
     }
 
     public function hasJUnitReport(): bool
@@ -207,13 +229,28 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         }
     }
 
-    public function executeInitialRun(): void
+    public function executeInitialRun(?Closure $onProgress = null): InitialTestsResult
     {
-        $initialTestSuiteProcess = $this->initialTestsRunner->run(
-            $this->configuration->testFrameworkExtraOptions,
-            explode(' ', (string) $this->configuration->initialTestsPhpOptions),
-            $this->configuration->skipCoverage,
+        $initialTestSuiteProcess = $this->initialRunProcessFactory->create(
+            $this->getInitialTestRunCommandLine(
+                $this->configuration->testFrameworkExtraOptions,
+                explode(' ', (string) $this->configuration->initialTestsPhpOptions),
+                $this->configuration->skipCoverage,
+            ),
+            !$this->configuration->skipCoverage,
         );
+
+        $initialTestSuiteProcess->run(static function (string $type) use ($initialTestSuiteProcess, $onProgress): void {
+            if ($type === Process::ERR) {
+                // Infection forces PHPUnit's `stderr` configuration to false, so stderr is not
+                // expected test-run output. Stop immediately on bootstrap or configuration errors
+                // instead of waiting for the rest of the suite. This is PHPUnit-specific: tools
+                // such as PHPStan legitimately use stderr for non-error output.
+                $initialTestSuiteProcess->stop();
+            }
+
+            $onProgress?->__invoke();
+        });
 
         if (!$initialTestSuiteProcess->isSuccessful()) {
             throw InitialTestsFailed::fromProcessAndAdapter($initialTestSuiteProcess, $this);
@@ -227,11 +264,13 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
             $initialTestSuiteProcess->getCommandLine(),
             $output,
         );
+
+        return new InitialTestsResult($output);
     }
 
     public function test(Mutant $mutant): MutantEvaluationPipe
     {
-        return $this->processFactory->create(
+        return ($this->processFactory)()->create(
             $mutant,
             $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
                 $this->configuration->testFrameworkExtraOptions,

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
+use Closure;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
@@ -72,7 +73,8 @@ interface TestFramework
      *
      * @throws InitialTestsFailed
      */
-    public function executeInitialRun(): void;
+    /** @param Closure(): void|null $onProgress */
+    public function executeInitialRun(?Closure $onProgress = null): InitialTestsResult;
 
     /**
      * Evaluates the Mutant. Some test frameworks may be able to do this in-memory, e.g.
