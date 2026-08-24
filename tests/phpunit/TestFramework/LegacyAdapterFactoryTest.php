@@ -61,9 +61,7 @@ final class LegacyAdapterFactoryTest extends TestCase
             new FakeSourceCollector(),
             [
                 'infection/codeception-adapter' => [
-                    'install_path' => '/path/to/dummy/adapter/factory.php',
                     'extra' => ['class' => DummyTestFrameworkFactory::class],
-                    'version' => '1.0.0',
                 ],
             ],
             $this->createStub(ShellCommandLineExecutor::class),

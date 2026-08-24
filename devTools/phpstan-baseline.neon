@@ -133,12 +133,6 @@ parameters:
 			path: ../src/Console/XdebugHandler.php
 
 		-
-			rawMessage: Anonymous function has invalid return type Infection\TestFramework\LegacyAdapterFactory.
-			identifier: class.notFound
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 1
@@ -150,24 +144,6 @@ parameters:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
 			identifier: method.deprecatedClass
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: 'Call to method create() on an unknown class Infection\TestFramework\LegacyAdapterFactory.'
-			identifier: class.notFound
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: Class Infection\TestFramework\LegacyAdapterFactory not found.
-			identifier: class.notFound
-			count: 2
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: Instantiated class Infection\TestFramework\LegacyAdapterFactory not found.
-			identifier: class.notFound
 			count: 1
 			path: ../src/Container/Container.php
 
@@ -1651,54 +1627,6 @@ parameters:
 			path: ../tests/phpunit/Container/ContainerTest.php
 
 		-
-			rawMessage: 'Missing parameter $staticAnalysisTestFramework (Infection\TestFramework\Contracts\TestFramework|null) in call to Infection\Engine constructor.'
-			identifier: argument.missing
-			count: 1
-			path: ../tests/phpunit/EngineTest.php
-
-		-
-			rawMessage: 'Missing parameter $testFramework (Infection\TestFramework\Contracts\TestFramework) in call to Infection\Engine constructor.'
-			identifier: argument.missing
-			count: 1
-			path: ../tests/phpunit/EngineTest.php
-
-		-
-			rawMessage: Unknown parameter $adapter in call to Infection\Engine constructor.
-			identifier: argument.unknown
-			count: 1
-			path: ../tests/phpunit/EngineTest.php
-
-		-
-			rawMessage: Unknown parameter $coverageChecker in call to Infection\Engine constructor.
-			identifier: argument.unknown
-			count: 1
-			path: ../tests/phpunit/EngineTest.php
-
-		-
-			rawMessage: Unknown parameter $initialStaticAnalysisRunner in call to Infection\Engine constructor.
-			identifier: argument.unknown
-			count: 1
-			path: ../tests/phpunit/EngineTest.php
-
-		-
-			rawMessage: Unknown parameter $initialTestsRunner in call to Infection\Engine constructor.
-			identifier: argument.unknown
-			count: 1
-			path: ../tests/phpunit/EngineTest.php
-
-		-
-			rawMessage: Unknown parameter $staticAnalysisToolAdapter in call to Infection\Engine constructor.
-			identifier: argument.unknown
-			count: 1
-			path: ../tests/phpunit/EngineTest.php
-
-		-
-			rawMessage: Unknown parameter $testFrameworkExtraOptionsFilter in call to Infection\Engine constructor.
-			identifier: argument.unknown
-			count: 1
-			path: ../tests/phpunit/EngineTest.php
-
-		-
 			rawMessage: 'Call to static method createFromBoolean() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
 			identifier: staticMethod.internalClass
 			count: 4
@@ -2194,12 +2122,6 @@ parameters:
 			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
 
 		-
-			rawMessage: 'Parameter #1 $testFramework of class Infection\Process\Runner\MutationTestingRunner constructor expects Infection\TestFramework\Contracts\TestFramework, Infection\Process\Factory\MutantProcessContainerFactory&PHPUnit\Framework\MockObject\MockObject given.'
-			identifier: argument.type
-			count: 7
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
 			rawMessage: Infection\Tests\Process\ShellCommandLineExecutorTest should not exist
 			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
 			count: 1
@@ -2357,24 +2279,6 @@ parameters:
 			identifier: classConstant.deprecatedClass
 			count: 1
 			path: ../tests/phpunit/TestFramework/FactoryTest.php
-
-		-
-			rawMessage: 'Call to method create() on an unknown class Infection\TestFramework\LegacyAdapterFactory.'
-			identifier: class.notFound
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyAdapterFactoryTest.php
-
-		-
-			rawMessage: Class Infection\TestFramework\LegacyAdapterFactory not found.
-			identifier: class.notFound
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyAdapterFactoryTest.php
-
-		-
-			rawMessage: Instantiated class Infection\TestFramework\LegacyAdapterFactory not found.
-			identifier: class.notFound
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyAdapterFactoryTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::queryXpath() return type with generic class DOMNodeList does not specify its types: TNode'

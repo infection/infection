@@ -30,8 +30,8 @@ sbx policy allow network localhost:4318
 make sbx-create
 ```
 
-This will create the Docker Sandbox image with the template and OTEL kit for the current
-branch and will make it available with:
+This will create the Docker Sandbox image with the template, OTEL kit, and project network
+policy for the current branch and will make it available with:
 
 ```shell
 sbx run codex-infection
@@ -58,8 +58,12 @@ To run a sandbox manually with the loaded template from the repository root:
 sbx run codex \
   --template=infection-sbx-php-8.4:latest \
   --kit=./devTools/sbx/kits/codex-otel \
+  --kit=./devTools/sbx/kits/network \
   --kit=./devTools/sbx/kits/project-local
 ```
+
+The network kit allows access to `schema.phpunit.de`, which PHPUnit uses to resolve its XML
+configuration schema.
 
 The `--kit` flag only applies when the sandbox is created. For an existing
 sandbox, recreate it or apply the kit explicitly with `sbx kit add`.

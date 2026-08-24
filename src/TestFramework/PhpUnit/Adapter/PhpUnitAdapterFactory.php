@@ -86,12 +86,12 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         array $filteredSourceFilesToMutate,
         ?string $mapSourceClassToTestStrategy,
         ShellCommandLineExecutor $shellCommandLineExecutor,
-        ConsoleOutput $consoleOutput,
-        CoverageChecker $coverageChecker,
-        InitialTestsRunner $initialTestsRunner,
+        ?ConsoleOutput $consoleOutput,
+        ?CoverageChecker $coverageChecker,
+        ?InitialTestsRunner $initialTestsRunner,
         Configuration $configuration,
-        MutantProcessContainerFactory $processFactory,
-        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        ?MutantProcessContainerFactory $processFactory,
+        ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);

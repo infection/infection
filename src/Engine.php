@@ -102,7 +102,9 @@ final readonly class Engine
          * used for the initial test run.
          * This is done AFTER static analysis to avoid restricting PHPStan's memory.
          */
-        $this->memoryLimiter->limitMemory($initialRunResults);
+        if ($initialRunResults !== null) {
+            $this->memoryLimiter->limitMemory($initialRunResults);
+        }
 
         $this->runMutationAnalysis();
 

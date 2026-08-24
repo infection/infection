@@ -75,6 +75,7 @@ sbx-create: sbx-image-build sbx-project-local-kit sbx-kit-validate
 	sbx run codex \
 		--template=infection-sbx-php-8.4:latest \
 		--kit=./devTools/sbx/kits/codex-otel \
+		--kit=./devTools/sbx/kits/network \
 		--kit "git+https://github.com/docker/sbx-kits-contrib#ref=v0.9.0&dir=git-ssh-sign" . \
 		--kit=$(SBX_PROJECT_LOCAL_KIT)
 
@@ -87,6 +88,7 @@ sbx-project-local-kit: $(SBX_PROJECT_LOCAL_KIT_TEMPLATE)
 sbx-kit-validate:	## Validates the sbx kit specs
 sbx-kit-validate: sbx-project-local-kit
 	sbx kit validate ./devTools/sbx/kits/codex-otel
+	sbx kit validate ./devTools/sbx/kits/network
 	sbx kit validate $(SBX_PROJECT_LOCAL_KIT)
 
 .PHONY: sbx-image-build

@@ -1,0 +1,10 @@
+schemaVersion: "2"
+kind: mixin
+name: infection-network
+displayName: Infection Network
+description: Allow network access required when developing Infection.
+
+permissions:
+  network:
+    allow:
+      - schema.phpunit.de
