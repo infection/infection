@@ -36,19 +36,25 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Configuration\Configuration;
+use Infection\Console\ConsoleOutput;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\TestFrameworkFactory;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use function Safe\file_get_contents;
 use SplFileInfo;
@@ -59,7 +65,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
+final class PhpUnitAdapterFactory implements TestFrameworkFactory
 {
     use CannotBeInstantiated;
 
@@ -80,7 +86,13 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         array $filteredSourceFilesToMutate = [],
         ?string $mapSourceClassToTestStrategy = null,
         ?ShellCommandLineExecutor $shellCommandLineExecutor = null,
-    ): TestFrameworkAdapter {
+        ?ConsoleOutput $consoleOutput = null,
+        ?CoverageChecker $coverageChecker = null,
+        ?InitialTestsRunner $initialTestsRunner = null,
+        ?Configuration $configuration = null,
+        ?MutantProcessContainerFactory $processFactory = null,
+        ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter = null,
+    ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
         Assert::notNull($shellCommandLineExecutor);
 
@@ -129,6 +141,12 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
+            consoleOutput: $consoleOutput,
+            coverageChecker: $coverageChecker,
+            initialTestsRunner: $initialTestsRunner,
+            configuration: $configuration,
+            processFactory: $processFactory,
+            testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter,
         );
     }
 

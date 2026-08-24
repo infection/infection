@@ -120,6 +120,12 @@ final readonly class Factory
                 $this->getFilteredSourceFilesToMutate(),
                 $this->infectionConfig->mapSourceClassToTestStrategy,
                 $this->shellCommandLineExecutor,
+                $this->consoleOutput,
+                $this->coverageChecker,
+                $this->initialTestsRunner,
+                $this->infectionConfig,
+                $this->containerFactory,
+                $this->extraOptionsFilter,
             );
         }
 

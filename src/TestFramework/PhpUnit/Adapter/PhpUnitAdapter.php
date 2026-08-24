@@ -36,10 +36,17 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function escapeshellarg;
+use function explode;
 use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Configuration\Configuration;
+use Infection\Console\ConsoleOutput;
+use Infection\Mutant\Mutant;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
@@ -47,17 +54,23 @@ use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
+use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Override;
 use function Safe\preg_match;
 use function sprintf;
 use function trim;
 use function version_compare;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware
+final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware, TestFramework
 {
     final public const string COVERAGE_DIR = 'coverage-xml';
 
@@ -73,6 +86,12 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         VersionParser $versionParser,
         CommandLineBuilder $commandLineBuilder,
         ?string $version = null,
+        private readonly ?ConsoleOutput $consoleOutput = null,
+        private readonly ?CoverageChecker $coverageChecker = null,
+        private readonly ?InitialTestsRunner $initialTestsRunner = null,
+        private readonly ?Configuration $configuration = null,
+        private readonly ?MutantProcessContainerFactory $processFactory = null,
+        private readonly ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter = null,
     ) {
         parent::__construct(
             $testFrameworkExecutable,
@@ -173,6 +192,64 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
     public function getName(): string
     {
         return 'PHPUnit';
+    }
+
+    public function checkRequirements(): void
+    {
+        Assert::notNull($this->configuration);
+        Assert::notNull($this->consoleOutput);
+        Assert::notNull($this->coverageChecker);
+
+        // TODO: check supported version
+
+        if ($this->configuration->skipInitialTests) {
+            $this->consoleOutput->logSkippingInitialTests();
+            $this->coverageChecker->checkCoverageExists();
+        }
+    }
+
+    public function executeInitialRun(): InitialRunResults
+    {
+        Assert::notNull($this->configuration);
+        Assert::notNull($this->initialTestsRunner);
+        Assert::notNull($this->coverageChecker);
+
+        $initialTestSuiteProcess = $this->initialTestsRunner->run(
+            $this->configuration->testFrameworkExtraOptions,
+            explode(' ', (string) $this->configuration->initialTestsPhpOptions),
+            $this->configuration->skipCoverage,
+        );
+
+        if (!$initialTestSuiteProcess->isSuccessful()) {
+            throw InitialTestsFailed::fromProcessAndAdapter($initialTestSuiteProcess, $this);
+        }
+
+        $output = $initialTestSuiteProcess->getOutput();
+
+        $this->coverageChecker->checkCoverageHasBeenGenerated(
+            $initialTestSuiteProcess->getCommandLine(),
+            $output,
+        );
+
+        return new InitialRunResults(
+            output: $output,
+            memoryUsage: $this->getMemoryUsed($output),
+        );
+    }
+
+    public function test(Mutant $mutant): MutantEvaluationPipe
+    {
+        Assert::notNull($this->configuration);
+        Assert::notNull($this->processFactory);
+        Assert::notNull($this->testFrameworkExtraOptionsFilter);
+
+        return $this->processFactory->create(
+            $mutant,
+            $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
+                $this->configuration->testFrameworkExtraOptions,
+                $this->getInitialRunOnlyOptions(),
+            ),
+        );
     }
 
     #[Override]
