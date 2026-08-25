@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Mago\Process;
 
 use function array_merge;
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Contracts\Mutant;
 use Symfony\Component\Process\Process;
 
 /**
@@ -64,7 +64,7 @@ final readonly class MagoMutantProcessFactory
         $process = new Process(
             command: $this->getMutantCommandLine(
                 $mutant->getFilePath(),
-                $mutant->getMutation()->getOriginalFilePath(),
+                $mutant->getOriginalFilePath(),
             ),
             timeout: $this->timeout,
         );

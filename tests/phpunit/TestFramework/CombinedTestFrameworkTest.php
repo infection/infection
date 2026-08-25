@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\Mutant;
 use Infection\Process\CombinedMutantEvaluationPipe;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\CombinedTestFramework;
+use Infection\TestFramework\Contracts\Mutant;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;

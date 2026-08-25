@@ -808,12 +808,6 @@ parameters:
 			path: ../src/TestFramework/Contracts/MutantProcess.php
 
 		-
-			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\Mutant
-			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Contracts/TestFramework.php
-
-		-
 			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\MutantExecutionResult
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1
@@ -997,12 +991,6 @@ parameters:
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Console\ConsoleOutput
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Mutant\Mutant
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 2
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-

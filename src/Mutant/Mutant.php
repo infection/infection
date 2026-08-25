@@ -37,13 +37,14 @@ namespace Infection\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
+use Infection\TestFramework\Contracts\Mutant as MutantContract;
 use Later\Interfaces\Deferred;
 
 /**
  * @internal
  * @final
  */
-class Mutant
+class Mutant implements MutantContract
 {
     /**
      * @param Deferred<string> $mutatedCode
@@ -104,5 +105,20 @@ class Mutant
     public function getTests(): array
     {
         return $this->mutation->getAllTests();
+    }
+
+    public function getId(): string
+    {
+        return $this->mutation->getHash();
+    }
+
+    public function getOriginalFilePath(): string
+    {
+        return $this->mutation->getOriginalFilePath();
+    }
+
+    public function getNominalTestExecutionTime(): float
+    {
+        return $this->mutation->getNominalTestExecutionTime();
     }
 }

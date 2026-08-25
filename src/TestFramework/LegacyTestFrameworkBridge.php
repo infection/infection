@@ -40,15 +40,17 @@ use function explode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
-use Infection\Mutant\Mutant;
+use Infection\Mutant\Mutant as LegacyMutant;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialTestsResult;
+use Infection\TestFramework\Contracts\Mutant;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Symfony\Component\Process\Process;
+use Webmozart\Assert\Assert;
 
 /**
  * @deprecated This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
@@ -119,6 +121,8 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
 
     public function test(Mutant $mutant): MutantEvaluationPipe
     {
+        Assert::isInstanceOf($mutant, LegacyMutant::class);
+
         return $this->processFactory->create(
             $mutant,
             $this->config->testFrameworkExtraOptions,

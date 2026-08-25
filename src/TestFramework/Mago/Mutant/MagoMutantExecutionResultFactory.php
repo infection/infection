@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Mago\Mutant;
 
 use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
@@ -55,6 +56,7 @@ final class MagoMutantExecutionResultFactory implements MutantExecutionResultFac
     {
         $process = $mutantProcess->getProcess();
         $mutant = $mutantProcess->getMutant();
+        Assert::isInstanceOf($mutant, Mutant::class);
         $mutation = $mutant->getMutation();
 
         return new MutantExecutionResult(

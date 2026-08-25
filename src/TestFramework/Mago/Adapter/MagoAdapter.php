@@ -37,7 +37,6 @@ namespace Infection\TestFramework\Mago\Adapter;
 
 use function array_merge;
 use Closure;
-use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
@@ -46,6 +45,7 @@ use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialTestsResult;
+use Infection\TestFramework\Contracts\Mutant;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;

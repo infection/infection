@@ -45,7 +45,6 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
 use Infection\Process\Factory\MutantProcessContainerFactory;
@@ -60,6 +59,7 @@ use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\Contracts\InitialTestsResult;
+use Infection\TestFramework\Contracts\Mutant;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -334,7 +334,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
     {
         // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
         $timeout = min(
-            MutantProcessContainerFactory::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (MutantProcessContainerFactory::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime()),
+            MutantProcessContainerFactory::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (MutantProcessContainerFactory::TIMEOUT_FACTOR * $mutant->getNominalTestExecutionTime()),
             $this->configuration->processTimeout,
         );
 
@@ -342,8 +342,8 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
             command: $this->getMutantCommandLine(
                 $mutant->getTests(),
                 $mutant->getFilePath(),
-                $mutant->getMutation()->getHash(),
-                $mutant->getMutation()->getOriginalFilePath(),
+                $mutant->getId(),
+                $mutant->getOriginalFilePath(),
                 $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
                     $this->configuration->testFrameworkExtraOptions,
                     self::INITIAL_RUN_ONLY_OPTIONS,

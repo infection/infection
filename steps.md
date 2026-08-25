@@ -17,3 +17,4 @@
 17. Remove SA logger
 18. Remove StaticAnalysisTestFramework
 19. Move the migrated PHPStan & Mago adapters under Test/Framework
+20. Introduce a Mutant contract.

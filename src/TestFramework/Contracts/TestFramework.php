@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Contracts;
 
 use Closure;
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;

@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\TestFramework\Contracts\Mutant;
 use function microtime;
 use Symfony\Component\Process\Process;
 

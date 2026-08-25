@@ -60,6 +60,7 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
     {
         $process = $mutantProcess->getProcess();
         $mutant = $mutantProcess->getMutant();
+        Assert::isInstanceOf($mutant, Mutant::class);
         $mutation = $mutant->getMutation();
 
         return new MutantExecutionResult(
@@ -97,7 +98,7 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
 
     private function retrieveDetectionStatus(MutantProcess $mutantProcess): DetectionStatus
     {
-        if (!$mutantProcess->getMutant()->isCoveredByTest()) {
+        if ($mutantProcess->getMutant()->getTests() === []) {
             return DetectionStatus::NOT_COVERED;
         }
 

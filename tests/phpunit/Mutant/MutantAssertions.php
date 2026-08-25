@@ -68,6 +68,10 @@ trait MutantAssertions
     ): void {
         $this->assertSame($expectedFilePath, $mutant->getFilePath());
         $this->assertEquals($expectedMutation, $mutant->getMutation());
+        $this->assertSame($expectedMutation->getHash(), $mutant->getId());
+        $this->assertSame($expectedMutation->getOriginalFilePath(), $mutant->getOriginalFilePath());
+        $this->assertSame($expectedMutation->getNominalTestExecutionTime(), $mutant->getNominalTestExecutionTime());
+        $this->assertSame($expectedMutation->getAllTests(), $mutant->getTests());
         $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
         $this->assertSame($expectedDiff, $mutant->getDiff()->get());
         $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode()->get());
