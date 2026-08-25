@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
+use Closure;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\MutantProcess;
@@ -50,7 +51,8 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
     private const int PROCESS_MIN_ERROR_CODE = 100;
 
     public function __construct(
-        private TestFrameworkAdapter $testFrameworkAdapter,
+        /** @var Closure(): TestFrameworkAdapter */
+        private Closure $testFrameworkAdapter,
     ) {
     }
 
@@ -111,12 +113,13 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
         }
 
         $output = $this->retrieveProcessOutput($process);
+        $testFrameworkAdapter = ($this->testFrameworkAdapter)();
 
-        if ($process->getExitCode() === 0 && $this->testFrameworkAdapter->testsPass($output)) {
+        if ($process->getExitCode() === 0 && $testFrameworkAdapter->testsPass($output)) {
             return DetectionStatus::ESCAPED;
         }
 
-        if ($this->testFrameworkAdapter instanceof SyntaxErrorAware && $this->testFrameworkAdapter->isSyntaxError($output)) {
+        if ($testFrameworkAdapter instanceof SyntaxErrorAware && $testFrameworkAdapter->isSyntaxError($output)) {
             return DetectionStatus::SYNTAX_ERROR;
         }
 
