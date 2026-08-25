@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Logger\ArtefactCollection;
 
-use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 use function sprintf;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -44,7 +43,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final readonly class ConsoleProgressBarLogger implements InitialStaticAnalysisExecutionLogger, InitialTestsExecutionLogger
+final readonly class ConsoleProgressBarLogger implements InitialTestsExecutionLogger
 {
     private ProgressBar $progressBar;
 
