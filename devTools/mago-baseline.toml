@@ -3543,7 +3543,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Config/Path/PathReplacer.php"
 code = "invalid-property-write"
-message = "Cannot write to private property `$nodeValue` on class `DOMNameSpaceNode`."
+message = 'Cannot initialize readonly property `DOMNameSpaceNode::$nodeValue` from within `Infection\TestFramework\PhpUnit\Config\Path\PathReplacer`.'
 count = 1
 
 [[issues]]
@@ -3645,7 +3645,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/Tracing/TestTotalTimeCalculator.php"
 code = "possibly-invalid-argument"
-message = "Possible argument type mismatch for argument #1 of `array_sum`: expected `array<array-key, float|int>`, but possibly received `array<array-key, float|null>`."
+message = "Possible argument type mismatch for argument #1 of `array_sum`: expected `array<array-key, numeric>`, but possibly received `array<array-key, float|null>`."
 count = 1
 
 [[issues]]
@@ -5447,7 +5447,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestingUtility/Iterable/TrackableIteratorTest.php"
 code = "less-specific-argument"
-message = 'Argument type mismatch for argument #1 of `Infection\Tests\TestingUtility\Iterable\TrackableIteratorTest::assertIteratorStateIs`: expected `Infection\Tests\TestingUtility\Iterable\TrackableIterator<array-key, mixed>`, but provided type `Infection\Tests\TestingUtility\Iterable\TrackableIterator<string, string>` is less specific.'
+message = 'Argument type mismatch for argument #1 of `Infection\Tests\TestingUtility\Iterable\TrackableIteratorTest::assertIteratorStateIs`: expected `Infection\Tests\TestingUtility\Iterable\TrackableIterator<array-key, mixed>`, but provided type `Infection\Tests\TestingUtility\Iterable\TrackableIterator<string|string|string, string|string|string>` is less specific.'
 count = 12
 
 [[issues]]
