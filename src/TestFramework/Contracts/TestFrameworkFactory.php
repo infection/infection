@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Contracts;
 
 use DuoClock\DuoClock;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageReportsValidator;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
@@ -73,7 +73,7 @@ interface TestFrameworkFactory
         ?string $mapSourceClassToTestStrategy,
         ShellCommandLineExecutor $shellCommandLineExecutor,
         LoggerInterface $logger,
-        CoverageChecker $coverageChecker,
+        CoverageReportsValidator $coverageReportsValidator,
     ): TestFramework;
 
     public static function getAdapterName(): string;

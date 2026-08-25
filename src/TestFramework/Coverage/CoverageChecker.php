@@ -51,6 +51,7 @@ use function strtolower;
 /**
  * @internal
  * @final
+ * @deprecated Kept for test frameworks using the legacy adapter API.
  */
 class CoverageChecker
 {

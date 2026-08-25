@@ -45,7 +45,6 @@ use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
-use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
@@ -53,6 +52,8 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageReportsValidator;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageRequirementsChecker;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Psr\Log\LoggerInterface;
 use function Safe\file_get_contents;
@@ -93,7 +94,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         ?string $mapSourceClassToTestStrategy,
         ShellCommandLineExecutor $shellCommandLineExecutor,
         LoggerInterface $logger,
-        CoverageChecker $coverageChecker,
+        CoverageReportsValidator $coverageReportsValidator,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
@@ -142,7 +143,12 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
                 new PhpExecutableFinder(),
             ),
             logger: $logger,
-            coverageChecker: $coverageChecker,
+            coverageRequirementsChecker: new CoverageRequirementsChecker(
+                $skipCoverage,
+                $skipInitialTests,
+                (string) $initialTestsPhpOptions,
+            ),
+            coverageReportsValidator: $coverageReportsValidator,
             initialRunProcessFactory: new InitialRunProcessFactory(),
             skipCoverage: $skipCoverage,
             skipInitialTests: $skipInitialTests,

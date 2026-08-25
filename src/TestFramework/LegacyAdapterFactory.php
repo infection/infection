@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Closure;
 use DuoClock\DuoClock;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
@@ -44,8 +43,8 @@ use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageReportsValidator;
 use InvalidArgumentException;
 use function is_a;
 use Psr\Log\LoggerInterface;
@@ -67,8 +66,7 @@ final readonly class LegacyAdapterFactory
         private array $installedExtensions,
         private ShellCommandLineExecutor $shellCommandLineExecutor,
         private LoggerInterface $logger,
-        /** @var Closure(): CoverageChecker */
-        private Closure $coverageChecker,
+        private CoverageReportsValidator $coverageReportsValidator,
         private Filesystem $filesystem,
         private DuoClock $clock,
     ) {
@@ -98,7 +96,7 @@ final readonly class LegacyAdapterFactory
                 $this->configuration->mapSourceClassToTestStrategy,
                 $this->shellCommandLineExecutor,
                 $this->logger,
-                ($this->coverageChecker)(),
+                $this->coverageReportsValidator,
             );
 
             Assert::isInstanceOf($adapter, TestFrameworkAdapter::class);

@@ -25,3 +25,4 @@
 23. Inject Filesystem and Clock.
 24. Inject Logger
 25. Move TestFrameworkExtraOptionsFilter to the PHPUnit Adapter namespace
+26. CoverageChecker

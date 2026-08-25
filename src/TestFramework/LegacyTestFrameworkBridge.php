@@ -81,6 +81,8 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
     {
         // TODO: check supported version
 
+        $this->coverageChecker->checkCoverageRequirements();
+
         if ($this->config->skipInitialTests) {
             $this->consoleOutput->logSkippingInitialTests();
             $this->coverageChecker->checkCoverageExists();

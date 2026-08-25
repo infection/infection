@@ -579,8 +579,6 @@ final class RunCommand extends BaseCommand
             $consoleOutput->logNotInControlOfExitCodes();
         }
 
-        $container->getCoverageChecker()->checkCoverageRequirements();
-
         $config = $container->getConfiguration();
 
         $consoleOutput->logRunningWithThreadCount($config->threadCount);

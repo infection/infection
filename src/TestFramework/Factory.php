@@ -61,6 +61,7 @@ use Infection\TestFramework\PhpStan\Adapter\PHPStanAdapterFactory;
 use Infection\TestFramework\PhpStan\Mutant\PHPStanMutantDetectionStatusResolver;
 use Infection\TestFramework\PhpStan\Process\PHPStanMutantProcessFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageReportsValidator;
 use InvalidArgumentException;
 use function is_a;
 use Psr\Log\LoggerInterface;
@@ -93,6 +94,7 @@ final readonly class Factory
         private ConsoleOutput $consoleOutput,
         private LoggerInterface $logger,
         private CoverageChecker $coverageChecker,
+        private CoverageReportsValidator $coverageReportsValidator,
         /** @var Closure(): InitialTestsRunProcessFactory */
         private Closure $initialRunProcessFactory,
         /** @var Closure(): MutantProcessContainerFactory */
@@ -227,7 +229,7 @@ final readonly class Factory
                         $configuration->mapSourceClassToTestStrategy,
                         $this->shellCommandLineExecutor,
                         $this->logger,
-                        $this->coverageChecker,
+                        $this->coverageReportsValidator,
                     );
                 }
 

@@ -61,8 +61,9 @@ use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\Mutant;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
-use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraOptionsFilter;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageReportsValidator;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageRequirementsChecker;
 use function min;
 use Override;
 use const PHP_EOL;
@@ -98,7 +99,8 @@ final class PhpUnitAdapter implements MutantProcessDetectionStatusResolver, Test
         private readonly VersionParser $versionParser,
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly LoggerInterface $logger,
-        private readonly CoverageChecker $coverageChecker,
+        private readonly CoverageRequirementsChecker $coverageRequirementsChecker,
+        private readonly CoverageReportsValidator $coverageReportsValidator,
         private readonly InitialRunProcessFactory $initialRunProcessFactory,
         private readonly bool $skipCoverage,
         private readonly bool $skipInitialTests,
@@ -239,6 +241,8 @@ final class PhpUnitAdapter implements MutantProcessDetectionStatusResolver, Test
     {
         // TODO: check supported version
 
+        $this->coverageRequirementsChecker->check();
+
         if ($this->skipInitialTests) {
             $this->logger->warning(implode(
                 PHP_EOL,
@@ -248,7 +252,7 @@ final class PhpUnitAdapter implements MutantProcessDetectionStatusResolver, Test
                     'If this is not done then mutations may report as caught when they are not.',
                 ],
             ));
-            $this->coverageChecker->checkCoverageExists();
+            $this->coverageReportsValidator->checkExists();
         }
     }
 
@@ -287,7 +291,7 @@ final class PhpUnitAdapter implements MutantProcessDetectionStatusResolver, Test
 
         $this->initialRunMemoryUsage = self::retrieveMemoryUsed($output);
 
-        $this->coverageChecker->checkCoverageHasBeenGenerated(
+        $this->coverageReportsValidator->checkGenerated(
             $initialTestSuiteProcess->getCommandLine(),
             $output,
         );

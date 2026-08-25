@@ -164,6 +164,7 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\EventDispatchingTestFramework;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\LegacyAdapterFactory;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageReportsValidator;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
@@ -302,6 +303,7 @@ final class Container extends DIContainer
                     $container->get(ConsoleOutput::class),
                     $container->getLogger(),
                     $container->getCoverageChecker(),
+                    $container->get(CoverageReportsValidator::class),
                     static fn (): InitialTestsRunProcessFactory => $container->getInitialTestsRunProcessFactory(),
                     static fn (): MutantProcessContainerFactory => $container->getMutantProcessContainerFactory(),
                     new SymfonyFilesystem(),
@@ -322,7 +324,7 @@ final class Container extends DIContainer
                     GeneratedExtensionsConfig::EXTENSIONS,
                     $container->getShellCommandLineExecutor(),
                     $container->getLogger(),
-                    static fn (): CoverageChecker => $container->getCoverageChecker(),
+                    $container->get(CoverageReportsValidator::class),
                     new SymfonyFilesystem(),
                     new DuoClock(),
                 );
@@ -381,6 +383,11 @@ final class Container extends DIContainer
                     $container->getIndexXmlCoverageLocator(),
                 );
             },
+            CoverageReportsValidator::class => static fn (self $container): CoverageReportsValidator => new CoverageReportsValidator(
+                $container->getConfiguration()->coveragePath,
+                $container->getJUnitReportLocator(),
+                $container->getIndexXmlCoverageLocator(),
+            ),
             JUnitReportLocator::class => static fn (self $container) => JUnitReportLocator::create(
                 $container->getFileSystem(),
                 $container->getConfiguration()->coveragePath,

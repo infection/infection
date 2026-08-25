@@ -35,11 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use LogicException;
 
 /**
  * @internal
  */
-final class CoverageNotFound extends LogicException
+final class CoverageNotFound extends LogicException implements RequirementChecksFailed
 {
 }
