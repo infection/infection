@@ -21,3 +21,5 @@
 21. Fix MutantProcess; various stuff to break down here:
     - Move the resolution of the detection status to the test framework
     - microtime -> Clock
+22. Remove dependency on Configuration.
+23.

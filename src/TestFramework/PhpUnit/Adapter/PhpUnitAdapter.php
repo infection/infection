@@ -43,7 +43,6 @@ use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Process\DryRunProcess;
 use Infection\Process\Factory\MutantProcessContainerFactory;
@@ -100,7 +99,12 @@ final class PhpUnitAdapter implements MutantProcessDetectionStatusResolver, Test
         private readonly ConsoleOutput $consoleOutput,
         private readonly CoverageChecker $coverageChecker,
         private readonly InitialRunProcessFactory $initialRunProcessFactory,
-        private readonly Configuration $configuration,
+        private readonly bool $skipCoverage,
+        private readonly bool $skipInitialTests,
+        private readonly ?string $initialTestsPhpOptions,
+        private readonly string $testFrameworkExtraOptions,
+        private readonly float $processTimeout,
+        private readonly bool $isDryRun,
         private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private readonly MemoryLimiter $memoryLimiter,
         private readonly DuoClock $clock,
@@ -234,7 +238,7 @@ final class PhpUnitAdapter implements MutantProcessDetectionStatusResolver, Test
     {
         // TODO: check supported version
 
-        if ($this->configuration->skipInitialTests) {
+        if ($this->skipInitialTests) {
             $this->consoleOutput->logSkippingInitialTests();
             $this->coverageChecker->checkCoverageExists();
         }
@@ -244,11 +248,11 @@ final class PhpUnitAdapter implements MutantProcessDetectionStatusResolver, Test
     {
         $initialTestSuiteProcess = $this->initialRunProcessFactory->create(
             $this->getInitialTestRunCommandLine(
-                $this->configuration->testFrameworkExtraOptions,
-                explode(' ', (string) $this->configuration->initialTestsPhpOptions),
-                $this->configuration->skipCoverage,
+                $this->testFrameworkExtraOptions,
+                explode(' ', (string) $this->initialTestsPhpOptions),
+                $this->skipCoverage,
             ),
-            !$this->configuration->skipCoverage,
+            !$this->skipCoverage,
         );
 
         $initialTestSuiteProcess->run(static function (string $type) use ($initialTestSuiteProcess, $onProgress): void {
@@ -365,7 +369,7 @@ final class PhpUnitAdapter implements MutantProcessDetectionStatusResolver, Test
         // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
         $timeout = min(
             MutantProcessContainerFactory::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (MutantProcessContainerFactory::TIMEOUT_FACTOR * $mutant->getNominalTestExecutionTime()),
-            $this->configuration->processTimeout,
+            $this->processTimeout,
         );
 
         $process = new Process(
@@ -375,14 +379,14 @@ final class PhpUnitAdapter implements MutantProcessDetectionStatusResolver, Test
                 $mutant->getId(),
                 $mutant->getOriginalFilePath(),
                 $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
-                    $this->configuration->testFrameworkExtraOptions,
+                    $this->testFrameworkExtraOptions,
                     self::INITIAL_RUN_ONLY_OPTIONS,
                 ),
             ),
             timeout: $timeout,
         );
 
-        if ($this->configuration->isDryRun) {
+        if ($this->isDryRun) {
             $process = DryRunProcess::fromProcess($process);
         }
 

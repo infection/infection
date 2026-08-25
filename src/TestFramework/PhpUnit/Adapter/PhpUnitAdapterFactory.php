@@ -39,7 +39,6 @@ use function array_map;
 use DuoClock\DuoClock;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
@@ -82,13 +81,17 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         string $projectDir,
         array $sourceDirectories,
         bool $skipCoverage,
+        bool $skipInitialTests,
+        ?string $initialTestsPhpOptions,
+        string $testFrameworkExtraOptions,
+        float $processTimeout,
+        bool $isDryRun,
         bool $executeOnlyCoveringTestCases,
         array $filteredSourceFilesToMutate,
         ?string $mapSourceClassToTestStrategy,
         ShellCommandLineExecutor $shellCommandLineExecutor,
         ConsoleOutput $consoleOutput,
         CoverageChecker $coverageChecker,
-        Configuration $configuration,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
@@ -140,7 +143,12 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             consoleOutput: $consoleOutput,
             coverageChecker: $coverageChecker,
             initialRunProcessFactory: new InitialRunProcessFactory(),
-            configuration: $configuration,
+            skipCoverage: $skipCoverage,
+            skipInitialTests: $skipInitialTests,
+            initialTestsPhpOptions: $initialTestsPhpOptions,
+            testFrameworkExtraOptions: $testFrameworkExtraOptions,
+            processTimeout: $processTimeout,
+            isDryRun: $isDryRun,
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter,
             memoryLimiter: new MemoryLimiter(new MemoryLimiterEnvironment()),
             clock: new DuoClock(),

@@ -41,7 +41,6 @@ use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -62,12 +61,16 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             [],
             true,
             false,
+            null,
+            '',
+            10.,
+            false,
+            false,
             [],
             null,
             new ShellCommandLineExecutor(),
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
-            ConfigurationBuilder::withMinimalTestData()->build(),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 

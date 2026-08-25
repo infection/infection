@@ -212,13 +212,17 @@ final readonly class Factory
                         $this->projectDir,
                         $configuration->source->directories,
                         $skipCoverage,
+                        $configuration->skipInitialTests,
+                        $configuration->initialTestsPhpOptions,
+                        $configuration->testFrameworkExtraOptions,
+                        $configuration->processTimeout,
+                        $configuration->isDryRun,
                         $configuration->executeOnlyCoveringTestCases,
                         $this->getFilteredSourceFilesToMutate(),
                         $configuration->mapSourceClassToTestStrategy,
                         $this->shellCommandLineExecutor,
                         $this->consoleOutput,
                         $this->coverageChecker,
-                        $configuration,
                         $this->extraOptionsFilter,
                     );
                 }

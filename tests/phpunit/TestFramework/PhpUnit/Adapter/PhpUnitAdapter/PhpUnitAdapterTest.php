@@ -62,7 +62,6 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
-use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -1701,7 +1700,12 @@ final class PhpUnitAdapterTest extends TestCase
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
             $this->initialRunProcessFactory,
-            ConfigurationBuilder::withMinimalTestData()->build(),
+            false,
+            false,
+            null,
+            '',
+            10.,
+            false,
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
             $this->memoryLimiter,
             new TimeSpy(),

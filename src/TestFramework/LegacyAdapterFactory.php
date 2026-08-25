@@ -84,13 +84,17 @@ final readonly class LegacyAdapterFactory
                 $this->projectDir,
                 $this->configuration->source->directories,
                 $skipCoverage,
+                $this->configuration->skipInitialTests,
+                $this->configuration->initialTestsPhpOptions,
+                $this->configuration->testFrameworkExtraOptions,
+                $this->configuration->processTimeout,
+                $this->configuration->isDryRun,
                 $this->configuration->executeOnlyCoveringTestCases,
                 $this->configuration->sourceFilter === null ? [] : $this->sourceCollector->collect(),
                 $this->configuration->mapSourceClassToTestStrategy,
                 $this->shellCommandLineExecutor,
                 $this->consoleOutput,
                 ($this->coverageChecker)(),
-                $this->configuration,
                 ($this->testFrameworkExtraOptionsFilter)(),
             );
 

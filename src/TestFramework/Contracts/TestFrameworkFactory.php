@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
-use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -61,13 +60,17 @@ interface TestFrameworkFactory
         string $projectDir,
         array $sourceDirectories,
         bool $skipCoverage,
+        bool $skipInitialTests,
+        ?string $initialTestsPhpOptions,
+        string $testFrameworkExtraOptions,
+        float $processTimeout,
+        bool $isDryRun,
         bool $executeOnlyCoveringTestCases,
         array $filteredSourceFilesToMutate,
         ?string $mapSourceClassToTestStrategy,
         ShellCommandLineExecutor $shellCommandLineExecutor,
         ConsoleOutput $consoleOutput,
         CoverageChecker $coverageChecker,
-        Configuration $configuration,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework;
 
