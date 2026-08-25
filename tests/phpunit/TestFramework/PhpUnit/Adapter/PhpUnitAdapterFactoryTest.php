@@ -40,7 +40,6 @@ use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -75,7 +74,6 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             new ShellCommandLineExecutor(),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoverageChecker::class),
-            $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 
         $this->assertInstanceOf(TestFramework::class, $adapter);

@@ -69,8 +69,6 @@ final readonly class LegacyAdapterFactory
         private LoggerInterface $logger,
         /** @var Closure(): CoverageChecker */
         private Closure $coverageChecker,
-        /** @var Closure(): TestFrameworkExtraOptionsFilter */
-        private Closure $testFrameworkExtraOptionsFilter,
         private Filesystem $filesystem,
         private DuoClock $clock,
     ) {
@@ -101,7 +99,6 @@ final readonly class LegacyAdapterFactory
                 $this->shellCommandLineExecutor,
                 $this->logger,
                 ($this->coverageChecker)(),
-                ($this->testFrameworkExtraOptionsFilter)(),
             );
 
             Assert::isInstanceOf($adapter, TestFrameworkAdapter::class);

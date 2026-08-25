@@ -760,12 +760,6 @@ parameters:
 			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\TestFramework\TestFrameworkExtraOptionsFilter
-			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
-
-		-
 			rawMessage: Infection\TestFramework\Contracts\Throwable\InitialTestsFailed should not exist
 			identifier: phpat.testNonExtensionPointsAreInternal
 			count: 1
@@ -940,12 +934,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\TestFrameworkExtraOptionsFilter
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
 			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-falsy-string}.'
 			identifier: offsetAccess.notFound
 			count: 1
@@ -965,12 +953,6 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\Coverage\CoverageChecker
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\TestFrameworkExtraOptionsFilter
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php

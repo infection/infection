@@ -47,12 +47,12 @@ use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
+use Infection\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Psr\Log\LoggerInterface;
 use function Safe\file_get_contents;
@@ -94,7 +94,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         ShellCommandLineExecutor $shellCommandLineExecutor,
         LoggerInterface $logger,
         CoverageChecker $coverageChecker,
-        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
@@ -151,7 +150,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             testFrameworkExtraOptions: $testFrameworkExtraOptions,
             processTimeout: $processTimeout,
             isDryRun: $isDryRun,
-            testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter,
+            testFrameworkExtraOptionsFilter: new TestFrameworkExtraOptionsFilter(),
             memoryLimiter: new MemoryLimiter(new MemoryLimiterEnvironment()),
             clock: $clock,
         );

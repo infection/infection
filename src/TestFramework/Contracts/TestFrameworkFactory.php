@@ -38,7 +38,6 @@ namespace Infection\TestFramework\Contracts;
 use DuoClock\DuoClock;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
@@ -75,7 +74,6 @@ interface TestFrameworkFactory
         ShellCommandLineExecutor $shellCommandLineExecutor,
         LoggerInterface $logger,
         CoverageChecker $coverageChecker,
-        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework;
 
     public static function getAdapterName(): string;

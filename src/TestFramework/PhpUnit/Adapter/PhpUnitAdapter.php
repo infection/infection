@@ -62,7 +62,7 @@ use Infection\TestFramework\Contracts\Mutant;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraOptionsFilter;
 use function min;
 use Override;
 use const PHP_EOL;

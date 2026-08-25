@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\TestFramework\PhpUnit\CommandLine;
 
 use Safe\Exceptions\PcreException;
 use Safe\Exceptions\StringsException;

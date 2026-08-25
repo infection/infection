@@ -48,7 +48,6 @@ use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use InvalidArgumentException;
@@ -81,7 +80,6 @@ final class FactoryTest extends TestCase
             $this->createStub(CoverageChecker::class),
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
-            $this->createStub(TestFrameworkExtraOptionsFilter::class),
             new Filesystem(),
             new DuoClock(),
         );
@@ -116,7 +114,6 @@ final class FactoryTest extends TestCase
             $this->createStub(CoverageChecker::class),
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
-            $this->createStub(TestFrameworkExtraOptionsFilter::class),
             new Filesystem(),
             new DuoClock(),
         );
@@ -145,7 +142,6 @@ final class FactoryTest extends TestCase
             $this->createStub(CoverageChecker::class),
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
-            $this->createStub(TestFrameworkExtraOptionsFilter::class),
             new Filesystem(),
             new DuoClock(),
         );
@@ -175,7 +171,6 @@ final class FactoryTest extends TestCase
             $this->createStub(CoverageChecker::class),
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
-            $this->createStub(TestFrameworkExtraOptionsFilter::class),
             new Filesystem(),
             new DuoClock(),
         );

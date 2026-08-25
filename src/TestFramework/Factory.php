@@ -97,7 +97,6 @@ final readonly class Factory
         private Closure $initialRunProcessFactory,
         /** @var Closure(): MutantProcessContainerFactory */
         private Closure $containerFactory,
-        private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
         private Filesystem $filesystem,
         private DuoClock $clock,
     ) {
@@ -229,7 +228,6 @@ final readonly class Factory
                         $this->shellCommandLineExecutor,
                         $this->logger,
                         $this->coverageChecker,
-                        $this->extraOptionsFilter,
                     );
                 }
 

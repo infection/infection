@@ -164,7 +164,6 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\EventDispatchingTestFramework;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\LegacyAdapterFactory;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
@@ -305,7 +304,6 @@ final class Container extends DIContainer
                     $container->getCoverageChecker(),
                     static fn (): InitialTestsRunProcessFactory => $container->getInitialTestsRunProcessFactory(),
                     static fn (): MutantProcessContainerFactory => $container->getMutantProcessContainerFactory(),
-                    $container->getTestFrameworkExtraOptionsFilter(),
                     new SymfonyFilesystem(),
                     new DuoClock(),
                 );
@@ -325,7 +323,6 @@ final class Container extends DIContainer
                     $container->getShellCommandLineExecutor(),
                     $container->getLogger(),
                     static fn (): CoverageChecker => $container->getCoverageChecker(),
-                    static fn (): TestFrameworkExtraOptionsFilter => $container->getTestFrameworkExtraOptionsFilter(),
                     new SymfonyFilesystem(),
                     new DuoClock(),
                 );
@@ -978,11 +975,6 @@ final class Container extends DIContainer
     public function getStaticAnalysisToolExecutableFinder(): StaticAnalysisToolExecutableFinder
     {
         return $this->get(StaticAnalysisToolExecutableFinder::class);
-    }
-
-    public function getTestFrameworkExtraOptionsFilter(): TestFrameworkExtraOptionsFilter
-    {
-        return $this->get(TestFrameworkExtraOptionsFilter::class);
     }
 
     public function getAdapterInstallationDecider(): AdapterInstallationDecider

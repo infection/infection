@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\TestFramework\PhpUnit\CommandLine;
 
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraOptionsFilter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

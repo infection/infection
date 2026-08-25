@@ -42,7 +42,6 @@ use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\LegacyAdapterFactory;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
@@ -72,7 +71,6 @@ final class LegacyAdapterFactoryTest extends TestCase
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(LoggerInterface::class),
             fn (): CoverageChecker => $this->createStub(CoverageChecker::class),
-            fn (): TestFrameworkExtraOptionsFilter => $this->createStub(TestFrameworkExtraOptionsFilter::class),
             $this->createStub(Filesystem::class),
             new DuoClock(),
         );
