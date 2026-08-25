@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
-use Closure;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
-use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -70,8 +69,7 @@ interface TestFrameworkFactory
         ConsoleOutput $consoleOutput,
         CoverageChecker $coverageChecker,
         Configuration $configuration,
-        /** @param Closure(): MutantProcessContainerFactory $processFactory */
-        Closure $processFactory,
+        MutantExecutionResultFactory $mutantExecutionResultFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework;
 

@@ -38,7 +38,6 @@ namespace Infection\StaticAnalysis\PHPStan\Process;
 use function array_merge;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use function sprintf;
@@ -48,7 +47,7 @@ use Symfony\Component\Process\Process;
 /**
  * @internal
  */
-final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
+final readonly class PHPStanMutantProcessFactory
 {
     /**
      * @param list<string> $staticAnalysisToolOptions

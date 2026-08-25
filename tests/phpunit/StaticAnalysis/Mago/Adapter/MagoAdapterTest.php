@@ -35,9 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\Mago\Adapter;
 
-use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapter;
+use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
@@ -60,7 +61,7 @@ final class MagoAdapterTest extends TestCase
 
     private ShellCommandLineExecutor $shellCommandLineExecutor;
 
-    private LazyMutantProcessFactory $mutantProcessFactory;
+    private MagoMutantProcessFactory $mutantProcessFactory;
 
     private InitialRunProcessFactory $initialRunProcessFactory;
 
@@ -68,7 +69,13 @@ final class MagoAdapterTest extends TestCase
     {
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $this->shellCommandLineExecutor = $this->createStub(ShellCommandLineExecutor::class);
-        $this->mutantProcessFactory = $this->createStub(LazyMutantProcessFactory::class);
+        $this->mutantProcessFactory = new MagoMutantProcessFactory(
+            $this->createStub(MutantExecutionResultFactory::class),
+            '/path/to/mago',
+            $this->commandLineBuilder,
+            10.,
+            [],
+        );
         $this->initialRunProcessFactory = new InitialRunProcessFactory();
 
         $this->adapter = new MagoAdapter(

@@ -37,7 +37,7 @@ namespace Infection\Tests\TestFramework;
 
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
@@ -70,8 +70,8 @@ final class LegacyAdapterFactoryTest extends TestCase
             ],
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(ConsoleOutput::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             fn (): CoverageChecker => $this->createStub(CoverageChecker::class),
-            fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             fn (): TestFrameworkExtraOptionsFilter => $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 

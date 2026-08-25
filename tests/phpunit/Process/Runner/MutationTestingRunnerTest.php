@@ -55,6 +55,7 @@ use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ProcessRunner;
+use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
@@ -79,6 +80,8 @@ final class MutationTestingRunnerTest extends TestCase
 
     private MockObject&TestFramework $testFrameworkMock;
 
+    private CombinedTestFramework $combinedTestFramework;
+
     private MockObject&MutantFactory $mutantFactoryMock;
 
     private MockObject&ProcessRunner $processRunnerMock;
@@ -94,6 +97,7 @@ final class MutationTestingRunnerTest extends TestCase
     protected function setUp(): void
     {
         $this->testFrameworkMock = $this->createMock(TestFramework::class);
+        $this->combinedTestFramework = new CombinedTestFramework($this->testFrameworkMock, null);
         $this->mutantFactoryMock = $this->createMock(MutantFactory::class);
         $this->processRunnerMock = $this->createMock(ProcessRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();
@@ -101,7 +105,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->diffSourceCodeMatcher = $this->createMock(DiffSourceCodeMatcher::class);
 
         $this->runner = new MutationTestingRunner(
-            $this->testFrameworkMock,
+            $this->combinedTestFramework,
             $this->mutantFactoryMock,
             $this->processRunnerMock,
             $this->eventDispatcher,
@@ -275,7 +279,7 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $this->runner = new MutationTestingRunner(
-            $this->testFrameworkMock,
+            $this->combinedTestFramework,
             $this->mutantFactoryMock,
             $this->processRunnerMock,
             $this->eventDispatcher,
@@ -357,7 +361,7 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $this->runner = new MutationTestingRunner(
-            $this->testFrameworkMock,
+            $this->combinedTestFramework,
             $this->mutantFactoryMock,
             $this->processRunnerMock,
             $this->eventDispatcher,
@@ -419,7 +423,7 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $this->runner = new MutationTestingRunner(
-            $this->testFrameworkMock,
+            $this->combinedTestFramework,
             $this->mutantFactoryMock,
             $this->processRunnerMock,
             $this->eventDispatcher,
@@ -483,7 +487,7 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $this->runner = new MutationTestingRunner(
-            $this->testFrameworkMock,
+            $this->combinedTestFramework,
             $this->mutantFactoryMock,
             $this->processRunnerMock,
             $this->eventDispatcher,
@@ -516,7 +520,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->willReturn(false);
 
         $this->runner = new MutationTestingRunner(
-            $this->testFrameworkMock,
+            $this->combinedTestFramework,
             $this->mutantFactoryMock,
             $this->processRunnerMock,
             $this->eventDispatcher,
@@ -563,7 +567,7 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $this->runner = new MutationTestingRunner(
-            $this->testFrameworkMock,
+            $this->combinedTestFramework,
             $this->mutantFactoryMock,
             $this->processRunnerMock,
             $this->eventDispatcher,

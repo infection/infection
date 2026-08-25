@@ -38,7 +38,6 @@ namespace Infection\StaticAnalysis\Mago\Process;
 use function array_merge;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Symfony\Component\Process\Process;
@@ -46,7 +45,7 @@ use Symfony\Component\Process\Process;
 /**
  * @internal
  */
-final readonly class MagoMutantProcessFactory implements LazyMutantProcessFactory
+final readonly class MagoMutantProcessFactory
 {
     /**
      * @param list<string> $staticAnalysisToolOptions

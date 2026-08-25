@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\Mago\Adapter;
 
-use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
+use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
+use Infection\TestFramework\Common\CommandLineBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 #[CoversClass(MagoAdapterFactory::class)]
 final class MagoAdapterFactoryTest extends TestCase
@@ -51,7 +54,13 @@ final class MagoAdapterFactoryTest extends TestCase
             '/path/to/mago',
             [],
             new ShellCommandLineExecutor(),
-            $this->createStub(LazyMutantProcessFactory::class),
+            new MagoMutantProcessFactory(
+                $this->createStub(MutantExecutionResultFactory::class),
+                '/path/to/mago',
+                new CommandLineBuilder(new PhpExecutableFinder()),
+                10.,
+                [],
+            ),
         );
 
         $this->assertSame('Mago', $adapter->getName());

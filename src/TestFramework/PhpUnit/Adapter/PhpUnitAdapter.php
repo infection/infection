@@ -39,13 +39,18 @@ use Closure;
 use function escapeshellarg;
 use function explode;
 use function implode;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\DryRunProcess;
 use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessContainer;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
@@ -59,6 +64,7 @@ use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use function min;
 use Override;
 use function Safe\preg_match;
 use function sprintf;
@@ -92,10 +98,9 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         private readonly CoverageChecker $coverageChecker,
         private readonly InitialRunProcessFactory $initialRunProcessFactory,
         private readonly Configuration $configuration,
-        /** @var Closure(): MutantProcessContainerFactory */
-        private readonly Closure $processFactory,
         private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private readonly MemoryLimiter $memoryLimiter,
+        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         private ?string $version = null,
     ) {
     }
@@ -151,6 +156,9 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         );
     }
 
+    /**
+     * @param TestLocation[] $coverageTests
+     */
     public function getMutantCommandLine(
         array $coverageTests,
         string $mutatedFilePath,
@@ -274,13 +282,8 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
 
     public function test(Mutant $mutant): MutantEvaluationPipe
     {
-        return ($this->processFactory)()->create(
-            $mutant,
-            $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
-                $this->configuration->testFrameworkExtraOptions,
-                self::INITIAL_RUN_ONLY_OPTIONS,
-            ),
-            $this,
+        return MutantProcessContainer::from(
+            fn (): MutantProcess => $this->createMutantProcess($mutant),
         );
     }
 
@@ -325,6 +328,39 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
             || version_compare($version, '11.5.27', '>=') && version_compare($version, '12.0', '<')
             || version_compare($version, '12.2.7', '>=')
         ;
+    }
+
+    private function createMutantProcess(Mutant $mutant): MutantProcess
+    {
+        // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
+        $timeout = min(
+            MutantProcessContainerFactory::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (MutantProcessContainerFactory::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime()),
+            $this->configuration->processTimeout,
+        );
+
+        $process = new Process(
+            command: $this->getMutantCommandLine(
+                $mutant->getTests(),
+                $mutant->getFilePath(),
+                $mutant->getMutation()->getHash(),
+                $mutant->getMutation()->getOriginalFilePath(),
+                $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
+                    $this->configuration->testFrameworkExtraOptions,
+                    self::INITIAL_RUN_ONLY_OPTIONS,
+                ),
+            ),
+            timeout: $timeout,
+        );
+
+        if ($this->configuration->isDryRun) {
+            $process = DryRunProcess::fromProcess($process);
+        }
+
+        return new MutantProcess(
+            $process,
+            $mutant,
+            $this->mutantExecutionResultFactory,
+        );
     }
 
     /** @return list<string> */

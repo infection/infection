@@ -35,9 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
 
-use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter;
+use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
@@ -45,13 +46,16 @@ use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use function sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(PHPStanAdapter::class)]
+#[Group('integration')]
 final class PHPStanAdapterTest extends TestCase
 {
     private PHPStanAdapter $adapter;
@@ -60,7 +64,7 @@ final class PHPStanAdapterTest extends TestCase
 
     private ShellCommandLineExecutor $shellCommandLineExecutor;
 
-    private LazyMutantProcessFactory $mutantProcessFactory;
+    private PHPStanMutantProcessFactory $mutantProcessFactory;
 
     private InitialRunProcessFactory $initialRunProcessFactory;
 
@@ -68,7 +72,16 @@ final class PHPStanAdapterTest extends TestCase
     {
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $this->shellCommandLineExecutor = $this->createStub(ShellCommandLineExecutor::class);
-        $this->mutantProcessFactory = $this->createStub(LazyMutantProcessFactory::class);
+        $this->mutantProcessFactory = new PHPStanMutantProcessFactory(
+            new Filesystem(),
+            $this->createStub(MutantExecutionResultFactory::class),
+            '/path/to/phpstan-config-path',
+            '/path/to/phpstan',
+            $this->commandLineBuilder,
+            10.,
+            '/tmp',
+            [],
+        );
         $this->initialRunProcessFactory = new InitialRunProcessFactory();
 
         $this->adapter = new PHPStanAdapter(

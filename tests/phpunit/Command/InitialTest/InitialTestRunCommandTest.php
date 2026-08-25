@@ -90,9 +90,6 @@ final class InitialTestRunCommandTest extends TestCase
     ): void {
         $tester = $this->createCommandTester(
             $successfulInitialTests,
-            $expectedTestFrameworkExtraOptions,
-            $expectedInitialTestsPhpOptions,
-            $expectedSkipCoverage,
         );
 
         [
@@ -149,9 +146,6 @@ final class InitialTestRunCommandTest extends TestCase
     ): void {
         $tester = $this->createCommandTester(
             $successfulInitialTests,
-            $expectedTestFrameworkExtraOptions,
-            $expectedInitialTestsPhpOptions,
-            $expectedSkipCoverage,
         );
 
         $this->expectExceptionObject($expected);
@@ -188,14 +182,8 @@ final class InitialTestRunCommandTest extends TestCase
         ];
     }
 
-    /**
-     * @param string[] $expectedInitialTestsPhpOptions
-     */
     private function createCommandTester(
         bool $successfulInitialTests,
-        string $expectedTestFrameworkExtraOptions,
-        array $expectedInitialTestsPhpOptions,
-        bool $expectedSkipCoverage,
     ): CommandTester {
         $gitMock = $this->createMock(Git::class);
         $gitMock

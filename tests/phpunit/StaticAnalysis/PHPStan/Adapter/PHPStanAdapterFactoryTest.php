@@ -35,13 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
 
-use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
+use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
+use Infection\TestFramework\Common\CommandLineBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 #[CoversClass(PHPStanAdapterFactory::class)]
+#[Group('integration')]
 final class PHPStanAdapterFactoryTest extends TestCase
 {
     public function test_it_can_create_an_adapter(): void
@@ -51,7 +57,16 @@ final class PHPStanAdapterFactoryTest extends TestCase
             '/path/to/phpstan',
             [],
             new ShellCommandLineExecutor(),
-            $this->createStub(LazyMutantProcessFactory::class),
+            new PHPStanMutantProcessFactory(
+                new Filesystem(),
+                $this->createStub(MutantExecutionResultFactory::class),
+                '/path/to/phpstan-config-path',
+                '/path/to/phpstan',
+                new CommandLineBuilder(new PhpExecutableFinder()),
+                10.,
+                '/tmp',
+                [],
+            ),
         );
 
         $this->assertSame('PHPStan', $adapter->getName());

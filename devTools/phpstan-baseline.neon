@@ -133,8 +133,89 @@ parameters:
 			path: ../src/Console/XdebugHandler.php
 
 		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\Process\Factory\InitialTestsRunProcessFactory:
+				Should be removed with TestFrameworkAdapter.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 2
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\Process\Factory\MutantProcessContainerFactory:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 2
+			path: ../src/Container/Container.php
+
+		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\Process\Factory\MutantProcessContainerFactory:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\Process\Factory\MutantProcessContainerFactory:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: '''
+				Return type of anonymous function has typehint with deprecated class Infection\Process\Factory\InitialTestsRunProcessFactory:
+				Should be removed with TestFrameworkAdapter.
+			'''
+			identifier: return.deprecatedClass
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: '''
+				Return type of anonymous function has typehint with deprecated class Infection\Process\Factory\MutantProcessContainerFactory:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: return.deprecatedClass
+			count: 2
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: '''
+				Return type of method Infection\Container\Container::getInitialTestRunProcessFactory() has typehint with deprecated class Infection\Process\Factory\InitialTestsRunProcessFactory:
+				Should be removed with TestFrameworkAdapter.
+			'''
+			identifier: return.deprecatedClass
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: '''
+				Return type of method Infection\Container\Container::getInitialTestsRunProcessFactory() has typehint with deprecated class Infection\Process\Factory\InitialTestsRunProcessFactory:
+				Should be removed with TestFrameworkAdapter.
+			'''
+			identifier: return.deprecatedClass
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: '''
+				Return type of method Infection\Container\Container::getMutantProcessContainerFactory() has typehint with deprecated class Infection\Process\Factory\MutantProcessContainerFactory:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: return.deprecatedClass
 			count: 1
 			path: ../src/Container/Container.php
 
@@ -649,6 +730,12 @@ parameters:
 			path: ../src/TestFramework/Common/CommandLineBuilder.php
 
 		-
+			rawMessage: Infection\TestFramework\Common\InitialRunProcessFactory should not depend on Infection\Process\OriginalPhpProcess
+			identifier: phpat.testTestFrameworkCommonUtilitiesStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Common/InitialRunProcessFactory.php
+
+		-
 			rawMessage: 'Call to deprecated method multipleFilesDoNotExist() of class Infection\FileSystem\Locator\FileOrDirectoryNotFound.'
 			identifier: staticMethod.deprecated
 			count: 1
@@ -663,7 +750,7 @@ parameters:
 		-
 			rawMessage: Infection\TestFramework\Contracts\MutantEvaluationPipe should not depend on Infection\Process\MutantProcess
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
-			count: 2
+			count: 3
 			path: ../src/TestFramework/Contracts/MutantEvaluationPipe.php
 
 		-
@@ -740,6 +827,12 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\Console\ConsoleOutput
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
@@ -823,6 +916,42 @@ parameters:
 			path: ../src/TestFramework/Factory.php
 
 		-
+			rawMessage: '''
+				Parameter $containerFactory of method Infection\TestFramework\Factory::__construct() has typehint with deprecated class Infection\Process\Factory\MutantProcessContainerFactory:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: parameter.deprecatedClass
+			count: 1
+			path: ../src/TestFramework/Factory.php
+
+		-
+			rawMessage: '''
+				Parameter $initialRunProcessFactory of method Infection\TestFramework\Factory::__construct() has typehint with deprecated class Infection\Process\Factory\InitialTestsRunProcessFactory:
+				Should be removed with TestFrameworkAdapter.
+			'''
+			identifier: parameter.deprecatedClass
+			count: 1
+			path: ../src/TestFramework/Factory.php
+
+		-
+			rawMessage: '''
+				Property $containerFactory references deprecated class Infection\Process\Factory\MutantProcessContainerFactory in its type:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: property.deprecatedClass
+			count: 1
+			path: ../src/TestFramework/Factory.php
+
+		-
+			rawMessage: '''
+				Property $initialRunProcessFactory references deprecated class Infection\Process\Factory\InitialTestsRunProcessFactory in its type:
+				Should be removed with TestFrameworkAdapter.
+			'''
+			identifier: property.deprecatedClass
+			count: 1
+			path: ../src/TestFramework/Factory.php
+
+		-
 			rawMessage: Infection\TestFramework\LegacyTestFrameworkBridge should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
@@ -833,6 +962,24 @@ parameters:
 			identifier: phpat.testNonExtensionPointsAreInternal
 			count: 1
 			path: ../src/TestFramework/LegacyTestFrameworkBridge.php
+
+		-
+			rawMessage: '''
+				Fetching class constant TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD of deprecated class Infection\Process\Factory\MutantProcessContainerFactory:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: '''
+				Fetching class constant TIMEOUT_FACTOR of deprecated class Infection\Process\Factory\MutantProcessContainerFactory:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
@@ -854,6 +1001,36 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Mutant\Mutant
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\DryRunProcess
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\Factory\MutantProcessContainerFactory
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\MutantProcess
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\MutantProcessContainer
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
@@ -914,6 +1091,12 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Console\ConsoleOutput
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
@@ -1225,6 +1408,24 @@ parameters:
 			path: ../tests/phpunit/CI/MemoizedCiDetectorTest.php
 
 		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\Process\Runner\InitialTestsFailed:
+				Should be removed with the legacy TestFrameworkAdapter.
+			'''
+			identifier: new.deprecatedClass
+			count: 2
+			path: ../tests/phpunit/Command/InitialTest/InitialTestRunCommandTest.php
+
+		-
+			rawMessage: '''
+				Parameter $expected of method Infection\Tests\Command\InitialTest\InitialTestRunCommandTest::test_it_executes_the_initial_tests_with_failing_tests() has typehint with deprecated class Infection\Process\Runner\InitialTestsFailed:
+				Should be removed with the legacy TestFrameworkAdapter.
+			'''
+			identifier: parameter.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/Command/InitialTest/InitialTestRunCommandTest.php
+
+		-
 			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationBuilder::withMutators() has parameter $mutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
 			identifier: missingType.generics
 			count: 1
@@ -1283,6 +1484,24 @@ parameters:
 			identifier: method.dynamicName
 			count: 1
 			path: ../tests/phpunit/Container/ContainerTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\Process\Runner\InitialTestsFailed:
+				Should be removed with the legacy TestFrameworkAdapter.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/EngineTest.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\Process\Runner\InitialTestsFailed:
+				Should be removed with the legacy TestFrameworkAdapter.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/EngineTest.php
 
 		-
 			rawMessage: 'Call to static method createFromBoolean() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
@@ -1745,12 +1964,111 @@ parameters:
 
 		-
 			rawMessage: '''
+				Access to constant on deprecated class Infection\Process\Factory\InitialTestsRunProcessFactory:
+				Should be removed with TestFrameworkAdapter.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/Process/Factory/InitialTestsRunProcessFactoryTest.php
+
+		-
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\Process\Factory\InitialTestsRunProcessFactory:
+				Should be removed with TestFrameworkAdapter.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/Process/Factory/InitialTestsRunProcessFactoryTest.php
+
+		-
+			rawMessage: '''
+				Call to method createProcess() of deprecated class Infection\Process\Factory\InitialTestsRunProcessFactory:
+				Should be removed with TestFrameworkAdapter.
+			'''
+			identifier: method.deprecatedClass
+			count: 2
+			path: ../tests/phpunit/Process/Factory/InitialTestsRunProcessFactoryTest.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\Process\Factory\InitialTestsRunProcessFactory:
+				Should be removed with TestFrameworkAdapter.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/Process/Factory/InitialTestsRunProcessFactoryTest.php
+
+		-
+			rawMessage: '''
+				Property $factory references deprecated class Infection\Process\Factory\InitialTestsRunProcessFactory in its type:
+				Should be removed with TestFrameworkAdapter.
+			'''
+			identifier: property.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/Process/Factory/InitialTestsRunProcessFactoryTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\Process\Factory\MutantProcessContainerFactory:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php
+
+		-
+			rawMessage: '''
 				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
 				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
 			'''
 			identifier: staticMethod.deprecated
 			count: 1
 			path: ../tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php
+
+		-
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\Process\Factory\MutantProcessContainerFactory:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php
+
+		-
+			rawMessage: '''
+				Call to method create() of deprecated class Infection\Process\Factory\MutantProcessContainerFactory:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\Process\Factory\MutantProcessContainerFactory:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\Process\Runner\InitialTestsFailed:
+				Should be removed with the legacy TestFrameworkAdapter.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/Process/Runner/InitialTestsFailedTest.php
+
+		-
+			rawMessage: '''
+				Call to method fromProcessAndAdapter() of deprecated class Infection\Process\Runner\InitialTestsFailed:
+				Should be removed with the legacy TestFrameworkAdapter.
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/Process/Runner/InitialTestsFailedTest.php
 
 		-
 			rawMessage: '''
@@ -1931,11 +2249,47 @@ parameters:
 
 		-
 			rawMessage: '''
+				Access to constant on deprecated class Infection\Process\Factory\InitialTestsRunProcessFactory:
+				Should be removed with TestFrameworkAdapter.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 4
+			path: ../tests/phpunit/TestFramework/FactoryTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\Process\Factory\MutantProcessContainerFactory:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 4
+			path: ../tests/phpunit/TestFramework/FactoryTest.php
+
+		-
+			rawMessage: '''
 				Access to constant on deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
 			identifier: classConstant.deprecatedClass
 			count: 1
+			path: ../tests/phpunit/TestFramework/FactoryTest.php
+
+		-
+			rawMessage: '''
+				Return type of anonymous function has typehint with deprecated class Infection\Process\Factory\InitialTestsRunProcessFactory:
+				Should be removed with TestFrameworkAdapter.
+			'''
+			identifier: return.deprecatedClass
+			count: 4
+			path: ../tests/phpunit/TestFramework/FactoryTest.php
+
+		-
+			rawMessage: '''
+				Return type of anonymous function has typehint with deprecated class Infection\Process\Factory\MutantProcessContainerFactory:
+				Should be removed alongside the legacy TestFrameworkAdapter.
+			'''
+			identifier: return.deprecatedClass
+			count: 4
 			path: ../tests/phpunit/TestFramework/FactoryTest.php
 
 		-

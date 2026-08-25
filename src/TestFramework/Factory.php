@@ -43,6 +43,7 @@ use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\ShellCommandLineExecutor;
@@ -91,6 +92,7 @@ final readonly class Factory
         private ShellCommandLineExecutor $shellCommandLineExecutor,
         private ConsoleOutput $consoleOutput,
         private CoverageChecker $coverageChecker,
+        private MutantExecutionResultFactory $mutantExecutionResultFactory,
         /** @var Closure(): InitialTestsRunProcessFactory */
         private Closure $initialRunProcessFactory,
         /** @var Closure(): MutantProcessContainerFactory */
@@ -217,7 +219,7 @@ final readonly class Factory
                         $this->consoleOutput,
                         $this->coverageChecker,
                         $configuration,
-                        $this->containerFactory,
+                        $this->mutantExecutionResultFactory,
                         $this->extraOptionsFilter,
                     );
                 }

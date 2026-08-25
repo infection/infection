@@ -134,7 +134,6 @@ final class MutantProcessContainerFactoryTest extends TestCase
             $testFrameworkAdapterMock,
             $processFactoryTimeout,
             $resultFactoryStub,
-            [],
             $configuration,
         );
 

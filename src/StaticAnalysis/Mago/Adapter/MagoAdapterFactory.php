@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\StaticAnalysis\Mago\Adapter;
 
 use Infection\CannotBeInstantiated;
-use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
@@ -59,7 +59,7 @@ final class MagoAdapterFactory
         string $staticAnalysisToolExecutable,
         array $staticAnalysisToolOptions,
         ShellCommandLineExecutor $shellCommandLineExecutor,
-        LazyMutantProcessFactory $mutantProcessFactory,
+        MagoMutantProcessFactory $mutantProcessFactory,
     ): StaticAnalysisTestFramework {
         return new MagoAdapter(
             $staticAnalysisConfigPath,

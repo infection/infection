@@ -46,23 +46,21 @@ use function min;
 use Symfony\Component\Process\Process;
 
 /**
+ * @deprecated Should be removed alongside the legacy TestFrameworkAdapter.
+ *
  * @internal
  * @final
  */
 class MutantProcessContainerFactory
 {
-    private const int TIMEOUT_FACTOR = 5;
+    public const int TIMEOUT_FACTOR = 5;
 
-    private const int TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
+    public const int TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
 
     public function __construct(
         private readonly TestFrameworkAdapter $testFrameworkAdapter,
         private readonly float $timeout,
         private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
-        /**
-         * @var list<LazyMutantProcessFactory>
-         */
-        private readonly array $lazyMutantProcessCreators,
         private readonly Configuration $configuration,
     ) {
     }
@@ -90,13 +88,12 @@ class MutantProcessContainerFactory
             $process = DryRunProcess::fromProcess($process);
         }
 
-        return new MutantProcessContainer(
-            new MutantProcess(
+        return MutantProcessContainer::from(
+            fn (): MutantProcess => new MutantProcess(
                 $process,
                 $mutant,
                 $this->mutantExecutionResultFactory,
             ),
-            $this->lazyMutantProcessCreators,
         );
     }
 }

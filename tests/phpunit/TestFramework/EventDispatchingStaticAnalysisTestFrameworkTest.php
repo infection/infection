@@ -39,7 +39,6 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
-use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\EventDispatchingStaticAnalysisTestFramework;
@@ -52,10 +51,7 @@ final class EventDispatchingStaticAnalysisTestFrameworkTest extends TestCase
     public function test_it_dispatches_initial_run_events_and_forwards_progress(): void
     {
         $result = new InitialTestsResult('static-analysis output');
-        $decorated = $this->createMockForIntersectionOfInterfaces([
-            LazyMutantProcessFactory::class,
-            StaticAnalysisTestFramework::class,
-        ]);
+        $decorated = $this->createMock(StaticAnalysisTestFramework::class);
         $decorated
             ->expects($this->once())
             ->method('executeInitialRun')

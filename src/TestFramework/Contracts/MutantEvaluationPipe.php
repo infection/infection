@@ -35,11 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
+use Closure;
+use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 
 /**
  * Represents a mutant evaluation as a chain of processes that may require follow-up stages.
  * It exposes the current process and controls whether the evaluation advances to the next one.
+ *
+ * @phpstan-type MutantProcessFactory = Closure(): MutantProcess
  *
  * @internal
  */
@@ -50,4 +54,9 @@ interface MutantEvaluationPipe
     public function hasNext(): bool;
 
     public function createNext(): MutantProcess;
+
+    /**
+     * @param MutantProcessFactory $factory
+     */
+    public function append(Closure $factory): self;
 }

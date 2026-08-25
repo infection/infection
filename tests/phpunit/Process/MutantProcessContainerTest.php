@@ -36,11 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\Mutant;
-use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
-use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -54,38 +51,24 @@ final class MutantProcessContainerTest extends TestCase
 {
     private MockObject&MutantProcess $phpUnitMutantProcess;
 
-    private Mutant $mutant;
-
-    private MockObject&LazyMutantProcessFactory $lazyMutantProcessCreator;
-
     protected function setUp(): void
     {
-        $this->mutant = MutantBuilder::withMinimalTestData()->build();
         $this->phpUnitMutantProcess = $this->createMock(MutantProcess::class);
-        $this->lazyMutantProcessCreator = $this->createMock(LazyMutantProcessFactory::class);
     }
 
     public function test_it_returns_false_when_there_is_no_next_process_to_kill_mutant(): void
     {
-        $container = new MutantProcessContainer($this->phpUnitMutantProcess, []);
+        $container = MutantProcessContainer::from(fn (): MutantProcess => $this->phpUnitMutantProcess);
 
         $this->assertFalse($container->hasNext());
     }
 
     public function test_it_returns_true_when_there_is_next_process_to_kill_mutant(): void
     {
-        $container = new MutantProcessContainer(
-            $this->phpUnitMutantProcess,
-            [$this->lazyMutantProcessCreator],
-        );
+        $container = MutantProcessContainer::from(fn (): MutantProcess => $this->phpUnitMutantProcess);
 
         // Build the first next process to advance the index
         $newMutantProcess = $this->createStub(MutantProcess::class);
-
-        $this->phpUnitMutantProcess
-            ->expects($this->once())
-            ->method('getMutant')
-            ->willReturn($this->mutant);
 
         $mutantExecutionResult = MutantExecutionResultBuilder::withMinimalTestData()
             ->withDetectionStatus(DetectionStatus::ESCAPED)
@@ -96,11 +79,7 @@ final class MutantProcessContainerTest extends TestCase
             ->method('getMutantExecutionResult')
             ->willReturn($mutantExecutionResult);
 
-        $this->lazyMutantProcessCreator
-            ->expects($this->once())
-            ->method('create')
-            ->with($this->mutant)
-            ->willReturn($newMutantProcess);
+        $container->append(static fn (): MutantProcess => $newMutantProcess);
 
         $this->assertTrue($container->hasNext());
 
@@ -111,23 +90,11 @@ final class MutantProcessContainerTest extends TestCase
 
     public function test_it_builds_next_process_to_kill_mutant(): void
     {
-        $container = new MutantProcessContainer(
-            $this->phpUnitMutantProcess,
-            [$this->lazyMutantProcessCreator],
-        );
+        $container = MutantProcessContainer::from(fn (): MutantProcess => $this->phpUnitMutantProcess);
 
         $newMutantProcess = $this->createStub(MutantProcess::class);
 
-        $this->phpUnitMutantProcess
-            ->expects($this->once())
-            ->method('getMutant')
-            ->willReturn($this->mutant);
-
-        $this->lazyMutantProcessCreator
-            ->expects($this->once())
-            ->method('create')
-            ->with($this->mutant)
-            ->willReturn($newMutantProcess);
+        $container->append(static fn (): MutantProcess => $newMutantProcess);
 
         $result = $container->createNext();
 
@@ -136,30 +103,18 @@ final class MutantProcessContainerTest extends TestCase
 
     public function test_it_returns_current_mutant_process(): void
     {
-        $container = new MutantProcessContainer($this->phpUnitMutantProcess, []);
+        $container = MutantProcessContainer::from(fn (): MutantProcess => $this->phpUnitMutantProcess);
 
         $this->assertSame($this->phpUnitMutantProcess, $container->getCurrent());
     }
 
     public function test_it_returns_next_mutant_process_after_building_it(): void
     {
-        $container = new MutantProcessContainer(
-            $this->phpUnitMutantProcess,
-            [$this->lazyMutantProcessCreator],
-        );
+        $container = MutantProcessContainer::from(fn (): MutantProcess => $this->phpUnitMutantProcess);
 
         $newMutantProcess = $this->createStub(MutantProcess::class);
 
-        $this->phpUnitMutantProcess
-            ->expects($this->once())
-            ->method('getMutant')
-            ->willReturn($this->mutant);
-
-        $this->lazyMutantProcessCreator
-            ->expects($this->once())
-            ->method('create')
-            ->with($this->mutant)
-            ->willReturn($newMutantProcess);
+        $container->append(static fn (): MutantProcess => $newMutantProcess);
 
         $container->createNext();
 

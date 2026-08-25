@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework;
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\ShellCommandLineExecutor;
@@ -75,6 +76,7 @@ final class FactoryTest extends TestCase
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
@@ -107,6 +109,7 @@ final class FactoryTest extends TestCase
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
@@ -133,6 +136,7 @@ final class FactoryTest extends TestCase
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
@@ -160,6 +164,7 @@ final class FactoryTest extends TestCase
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),

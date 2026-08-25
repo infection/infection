@@ -39,11 +39,11 @@ use function array_merge;
 use Closure;
 use function explode;
 use Infection\Mutant\Mutant;
-use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
@@ -58,7 +58,7 @@ use function version_compare;
 /**
  * @internal
  */
-final class PHPStanAdapter implements LazyMutantProcessFactory, StaticAnalysisTestFramework
+final class PHPStanAdapter implements StaticAnalysisTestFramework
 {
     private const int VERSION_1 = 1;
 
@@ -75,7 +75,7 @@ final class PHPStanAdapter implements LazyMutantProcessFactory, StaticAnalysisTe
         private readonly array $staticAnalysisToolOptions,
         private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
         private readonly InitialRunProcessFactory $initialRunProcessFactory,
-        private readonly LazyMutantProcessFactory $mutantProcessFactory,
+        private readonly PHPStanMutantProcessFactory $mutantProcessFactory,
         private ?string $version = null,
     ) {
     }
@@ -124,12 +124,9 @@ final class PHPStanAdapter implements LazyMutantProcessFactory, StaticAnalysisTe
 
     public function test(Mutant $mutant): MutantEvaluationPipe
     {
-        return new MutantProcessContainer($this->create($mutant), []);
-    }
-
-    public function create(Mutant $mutant): MutantProcess
-    {
-        return $this->mutantProcessFactory->create($mutant);
+        return MutantProcessContainer::from(
+            fn (): MutantProcess => $this->mutantProcessFactory->create($mutant),
+        );
     }
 
     public function getVersion(): string

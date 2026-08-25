@@ -35,62 +35,71 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use BadMethodCallException;
 use Closure;
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Process\MutantProcess;
 use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use Infection\TestFramework\Contracts\TestFramework;
 
-/** @internal */
-final readonly class EventDispatchingStaticAnalysisTestFramework implements StaticAnalysisTestFramework
+/**
+ * TODO: Note that its current shape is temporary. It will later be more of a test framework registry.
+ *
+ * @internal
+ */
+final readonly class CombinedTestFramework implements TestFramework
 {
+    private const string UNSUPPORTED_OPERATION_MESSAGE = 'CombinedTestFramework only supports mutant evaluation.';
+
     public function __construct(
-        private StaticAnalysisTestFramework $decorated,
-        private EventDispatcher $eventDispatcher,
+        private TestFramework $testFramework,
+        private ?StaticAnalysisTestFramework $staticAnalysis,
     ) {
     }
 
     public function getName(): string
     {
-        return $this->decorated->getName();
+        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
     }
 
     public function getVersion(): string
     {
-        return $this->decorated->getVersion();
+        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
     }
 
     public function checkRequirements(): void
     {
-        $this->decorated->checkRequirements();
+        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
     }
 
     public function executeInitialRun(?Closure $onProgress = null): InitialTestsResult
     {
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
-
-        $result = $this->decorated->executeInitialRun(
-            function () use ($onProgress): void {
-                $onProgress?->__invoke();
-
-                $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted());
-            },
-        );
-
-        $this->eventDispatcher->dispatch(
-            new InitialStaticAnalysisRunWasFinished($result->output),
-        );
-
-        return $result;
+        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
     }
 
     public function test(Mutant $mutant): MutantExecutionResult|MutantEvaluationPipe
     {
-        return $this->decorated->test($mutant);
+        $testFrameworkResult = $this->testFramework->test($mutant);
+
+        if ($testFrameworkResult instanceof MutantExecutionResult) {
+            return $testFrameworkResult;
+        }
+
+        if ($this->staticAnalysis === null) {
+            return $testFrameworkResult;
+        }
+
+        $staticAnalysisResult = $this->staticAnalysis->test($mutant);
+
+        if ($staticAnalysisResult instanceof MutantExecutionResult) {
+            return $staticAnalysisResult;
+        }
+
+        return $testFrameworkResult->append(
+            static fn (): MutantProcess => $staticAnalysisResult->getCurrent(),
+        );
     }
 }

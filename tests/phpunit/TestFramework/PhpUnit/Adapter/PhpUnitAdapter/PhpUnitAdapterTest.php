@@ -43,11 +43,12 @@ use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
 use Infection\Mutant\Mutant;
-use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\Adapter\MemoryLimiter;
@@ -90,8 +91,6 @@ final class PhpUnitAdapterTest extends TestCase
 
     private InitialRunProcessFactory&MockObject $initialRunProcessFactory;
 
-    private MockObject&MutantProcessContainerFactory $processFactory;
-
     protected function setUp(): void
     {
         $this->pcovDirectoryProvider = $this->createMock(PCOVDirectoryProvider::class);
@@ -99,7 +98,6 @@ final class PhpUnitAdapterTest extends TestCase
         $this->phpExecutableFinderMock = $this->createMock(PhpExecutableFinder::class);
         $this->memoryLimiter = $this->createMock(MemoryLimiter::class);
         $this->initialRunProcessFactory = $this->createMock(InitialRunProcessFactory::class);
-        $this->processFactory = $this->createMock(MutantProcessContainerFactory::class);
         $this->phpExecutableFinderMock
             ->method('find')
             ->willReturn(self::PHP_EXECUTABLE);
@@ -220,16 +218,11 @@ final class PhpUnitAdapterTest extends TestCase
         $this->assertSame(['-d', 'memory_limit=25M'], array_slice($command, 1, 2));
     }
 
-    public function test_it_uses_itself_to_build_the_phpunit_mutant_process(): void
+    public function test_it_creates_a_lazy_mutant_evaluation(): void
     {
         $mutant = $this->createStub(Mutant::class);
 
-        $this->processFactory
-            ->expects($this->once())
-            ->method('create')
-            ->with($mutant, '', $this->adapter);
-
-        $this->adapter->test($mutant);
+        $this->assertInstanceOf(MutantEvaluationPipe::class, $this->adapter->test($mutant));
     }
 
     #[DataProvider('initialTestRunProvider')]
@@ -1685,9 +1678,9 @@ final class PhpUnitAdapterTest extends TestCase
             $this->createStub(CoverageChecker::class),
             $this->initialRunProcessFactory,
             ConfigurationBuilder::withMinimalTestData()->build(),
-            fn (): MutantProcessContainerFactory => $this->processFactory,
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
             $this->memoryLimiter,
+            $this->createStub(MutantExecutionResultFactory::class),
             $version,
         );
     }
