@@ -33,38 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
+namespace Infection\Tests\TestFramework\Mago\Adapter;
 
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter;
-use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Mago\Adapter\MagoAdapter;
+use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[AllowMockObjectsWithoutExpectations]
-#[CoversClass(PHPStanAdapter::class)]
-#[Group('integration')]
-final class PHPStanAdapterTest extends TestCase
+#[CoversClass(MagoAdapter::class)]
+final class MagoAdapterTest extends TestCase
 {
-    private PHPStanAdapter $adapter;
+    private MagoAdapter $adapter;
 
     private CommandLineBuilder&MockObject $commandLineBuilder;
 
     private ShellCommandLineExecutor $shellCommandLineExecutor;
 
-    private PHPStanMutantProcessFactory $mutantProcessFactory;
+    private MagoMutantProcessFactory $mutantProcessFactory;
 
     private InitialRunProcessFactory $initialRunProcessFactory;
 
@@ -72,21 +69,18 @@ final class PHPStanAdapterTest extends TestCase
     {
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $this->shellCommandLineExecutor = $this->createStub(ShellCommandLineExecutor::class);
-        $this->mutantProcessFactory = new PHPStanMutantProcessFactory(
-            new Filesystem(),
+        $this->mutantProcessFactory = new MagoMutantProcessFactory(
             $this->createStub(MutantExecutionResultFactory::class),
-            '/path/to/phpstan-config-path',
-            '/path/to/phpstan',
+            '/path/to/mago',
             $this->commandLineBuilder,
             10.,
-            '/tmp',
             [],
         );
         $this->initialRunProcessFactory = new InitialRunProcessFactory();
 
-        $this->adapter = new PHPStanAdapter(
-            '/path/to/phpstan-config-path',
-            '/path/to/phpstan',
+        $this->adapter = new MagoAdapter(
+            '/path/to/mago-config-path',
+            '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser(),
             [],
@@ -99,7 +93,7 @@ final class PHPStanAdapterTest extends TestCase
 
     public function test_it_has_a_name(): void
     {
-        $this->assertSame('PHPStan', $this->adapter->getName());
+        $this->assertSame('Mago', $this->adapter->getName());
     }
 
     public function test_it_builds_initial_run_command_line(): void
@@ -107,25 +101,25 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], ['--configuration=/path/to/phpstan-config-path'])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path'])
+            ->with('/path/to/mago', [], ['--config=/path/to/mago-config-path', 'analyze'])
+            ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze'])
         ;
 
         $this->assertSame([
-            '/usr/bin/php',
-            '/path/to/phpstan',
-            '--configuration=/path/to/phpstan-config-path',
+            '/path/to/mago',
+            '--config=/path/to/mago-config-path',
+            'analyze',
         ], $this->adapter->getInitialRunCommandLine());
     }
 
     public function test_it_builds_initial_run_command_line_with_single_option(): void
     {
-        $adapter = new PHPStanAdapter(
-            '/path/to/phpstan-config-path',
-            '/path/to/phpstan',
+        $adapter = new MagoAdapter(
+            '/path/to/mago-config-path',
+            '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser(),
-            ['--memory-limit=1G'],
+            ['--sort'],
             $this->shellCommandLineExecutor,
             $this->initialRunProcessFactory,
             $this->mutantProcessFactory,
@@ -135,29 +129,29 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], [
-                '--configuration=/path/to/phpstan-config-path',
-                '--memory-limit=1G',
+            ->with('/path/to/mago', [], [
+                '--config=/path/to/mago-config-path',
+                'analyze',
+                '--sort',
             ])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=1G'])
+            ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', '--sort'])
         ;
 
         $this->assertSame([
-            '/usr/bin/php',
-            '/path/to/phpstan',
-            '--configuration=/path/to/phpstan-config-path',
-            '--memory-limit=1G',
+            '/path/to/mago',
+            '--config=/path/to/mago-config-path',
+            '--sort',
         ], $adapter->getInitialRunCommandLine());
     }
 
     public function test_it_builds_initial_run_command_line_with_multiple_options(): void
     {
-        $adapter = new PHPStanAdapter(
-            '/path/to/phpstan-config-path',
-            '/path/to/phpstan',
+        $adapter = new MagoAdapter(
+            '/path/to/mago-config-path',
+            '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser(),
-            ['--memory-limit=-1', '--no-progress'],
+            ['--no-progress'],
             $this->shellCommandLineExecutor,
             $this->initialRunProcessFactory,
             $this->mutantProcessFactory,
@@ -167,31 +161,30 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], [
-                '--configuration=/path/to/phpstan-config-path',
-                '--memory-limit=-1',
+            ->with('/path/to/mago', [], [
+                '--config=/path/to/mago-config-path',
+                'analyze',
                 '--no-progress',
             ])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=-1', '--no-progress'])
+            ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze', '--no-progress'])
         ;
 
         $this->assertSame([
-            '/usr/bin/php',
-            '/path/to/phpstan',
-            '--configuration=/path/to/phpstan-config-path',
-            '--memory-limit=-1',
+            '/path/to/mago',
+            '--config=/path/to/mago-config-path',
+            'analyze',
             '--no-progress',
         ], $adapter->getInitialRunCommandLine());
     }
 
     public function test_it_builds_initial_run_command_line_with_complex_options(): void
     {
-        $adapter = new PHPStanAdapter(
-            '/path/to/phpstan-config-path',
-            '/path/to/phpstan',
+        $adapter = new MagoAdapter(
+            '/path/to/mago-config-path',
+            '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser(),
-            ['--memory-limit=2G', '--level=max', '--no-progress'],
+            ['--no-stubs', '--baseline /path/to/baseline.toml'],
             $this->shellCommandLineExecutor,
             $this->initialRunProcessFactory,
             $this->mutantProcessFactory,
@@ -201,22 +194,21 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], [
-                '--configuration=/path/to/phpstan-config-path',
-                '--memory-limit=2G',
-                '--level=max',
-                '--no-progress',
+            ->with('/path/to/mago', [], [
+                '--config=/path/to/mago-config-path',
+                'analyze',
+                '--no-stubs',
+                '--baseline /path/to/baseline.toml',
             ])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=2G', '--level=max', '--no-progress'])
+            ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze', '--no-stubs', '--baseline /path/to/baseline.toml'])
         ;
 
         $this->assertSame([
-            '/usr/bin/php',
-            '/path/to/phpstan',
-            '--configuration=/path/to/phpstan-config-path',
-            '--memory-limit=2G',
-            '--level=max',
-            '--no-progress',
+            '/path/to/mago',
+            '--config=/path/to/mago-config-path',
+            'analyze',
+            '--no-stubs',
+            '--baseline /path/to/baseline.toml',
         ], $adapter->getInitialRunCommandLine());
     }
 
@@ -232,20 +224,20 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], ['--version'])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--version'])
+            ->with('/path/to/mago', [], ['--version'])
+            ->willReturn(['/path/to/mago', '--version'])
         ;
 
         $shellCommandLineExecutor
             ->expects($this->once())
             ->method('execute')
-            ->with(['/usr/bin/php', '/path/to/phpstan', '--version'])
-            ->willReturn('PHPStan 2.1.17')
+            ->with(['/path/to/mago', '--version'])
+            ->willReturn('mago 1.23.0')
         ;
 
-        $adapter = new PHPStanAdapter(
-            '/path/to/phpstan-config-path',
-            '/path/to/phpstan',
+        $adapter = new MagoAdapter(
+            '/path/to/mago-config-path',
+            '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser(),
             [],
@@ -254,7 +246,7 @@ final class PHPStanAdapterTest extends TestCase
             $this->mutantProcessFactory,
         );
 
-        $this->assertSame('2.1.17', $adapter->getVersion());
+        $this->assertSame('1.23.0', $adapter->getVersion());
     }
 
     public function test_it_is_a_test_framework(): void
@@ -270,12 +262,12 @@ final class PHPStanAdapterTest extends TestCase
     {
         $this->expectNotToPerformAssertions();
 
-        $adapter = new PHPStanAdapter(
-            '/path/to/phpstan-config-path',
-            '/path/to/phpstan',
+        $adapter = new MagoAdapter(
+            '/path/to/mago-config-path',
+            '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser(),
-            ['--memory-limit=-1'],
+            [],
             $this->shellCommandLineExecutor,
             $this->initialRunProcessFactory,
             $this->mutantProcessFactory,
@@ -289,9 +281,9 @@ final class PHPStanAdapterTest extends TestCase
     #[DataProvider('provideInvalidVersions')]
     public function test_it_rejects_invalid_versions(string $version): void
     {
-        $adapter = new PHPStanAdapter(
-            '/path/to/phpstan-config-path',
-            '/path/to/phpstan',
+        $adapter = new MagoAdapter(
+            '/path/to/mago-config-path',
+            '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser(),
             [],
@@ -303,7 +295,7 @@ final class PHPStanAdapterTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(sprintf(
-            'Infection requires PHPStan version >=1.12.27 or >=2.1.17, but "%s" is installed.',
+            'Infection requires Mago version >=1.23.0, but "%s" is installed.',
             $version,
         ));
 
@@ -312,27 +304,11 @@ final class PHPStanAdapterTest extends TestCase
 
     public static function provideValidVersions(): iterable
     {
-        yield 'major version 3' => ['3.0.0'];
+        yield 'major version 1 with valid minor' => ['1.23.0'];
 
-        yield 'major version 2 with valid patch' => ['2.1.17'];
+        yield 'major version 1 with valid patch' => ['1.23.1'];
 
-        yield 'major version 2 with higher minor' => ['2.2.0'];
-
-        yield 'major version 1 with valid patch' => ['1.12.27'];
-
-        yield 'major version 1 with valid patch 2' => ['1.12.28'];
-
-        yield 'major version 1 with higher minor' => ['1.13.0'];
-
-        yield 'dev version 1.12.x' => ['1.12.x-dev@asgar3'];
-
-        yield 'dev version 1.13.x' => ['1.13.x-dev@cfa0299'];
-
-        yield 'dev version 2.1.x' => ['2.1.x-dev@cfa0299'];
-
-        yield 'dev version 2.2.x' => ['2.2.x-dev@cfa0299'];
-
-        yield 'PHPStan-src dev' => ['dev-648dbd911cef28707338fe5c25875d50e7875391@648dbd9'];
+        yield 'major version 2' => ['2.0.0'];
     }
 
     /**
@@ -340,11 +316,7 @@ final class PHPStanAdapterTest extends TestCase
      */
     public static function provideInvalidVersions(): iterable
     {
-        yield 'major version 2 with too low minor' => ['2.0.17'];
-
-        yield 'major version 2 with too low patch' => ['2.1.1'];
-
-        yield 'major version 2 with too low minor and patch' => ['2.0.0'];
+        yield 'major version 1 with too low minor' => ['1.19.0'];
 
         yield 'major version 1 with too low patch' => ['1.12.26'];
 
@@ -353,7 +325,5 @@ final class PHPStanAdapterTest extends TestCase
         yield 'major version 0' => ['0.12.0'];
 
         yield 'dev version 1.0.x' => ['1.0.x-dev@cfa0299'];
-
-        yield 'dev version 2.0.x' => ['2.0.x-dev@cfa0299'];
     }
 }

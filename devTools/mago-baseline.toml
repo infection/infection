@@ -3073,45 +3073,45 @@ message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrD
 count = 1
 
 [[issues]]
-file = "src/StaticAnalysis/Mago/Adapter/MagoAdapter.php"
+file = "src/TestFramework/Mago/Adapter/MagoAdapter.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\StaticAnalysis\Mago\Adapter\MagoAdapter::retrieveVersion`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\TestFramework\Mago\Adapter\MagoAdapter::retrieveVersion`.'
 count = 1
 
 [[issues]]
-file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
+file = "src/TestFramework/PhpStan/Adapter/PHPStanAdapter.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter::assertMinimumVersionSatisfied`.'
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\TestFramework\PhpStan\Adapter\PHPStanAdapter::assertMinimumVersionSatisfied`.'
 count = 1
 
 [[issues]]
-file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
+file = "src/TestFramework/PhpStan/Adapter/PHPStanAdapter.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\TestFramework\PhpStan\Adapter\PHPStanAdapter::retrieveVersion`.'
 count = 1
 
 [[issues]]
-file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
+file = "src/TestFramework/PhpStan/Adapter/PHPStanAdapter.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\TestFramework\PhpStan\Adapter\PHPStanAdapter::retrieveVersion`.'
 count = 1
 
 [[issues]]
-file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
+file = "src/TestFramework/PhpStan/Adapter/PHPStanAdapter.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\TestFramework\PhpStan\Adapter\PHPStanAdapter::retrieveVersion`.'
 count = 1
 
 [[issues]]
-file = "src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php"
+file = "src/TestFramework/PhpStan/Mutant/PHPStanMutantExecutionResultFactory.php"
 code = "possibly-null-operand"
 message = "Left operand in `>` comparison might be `null` (type `int|null`)."
 count = 1
 
 [[issues]]
-file = "src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php"
+file = "src/TestFramework/PhpStan/Process/PHPStanMutantProcessFactory.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory::buildMutationConfigFile`.'
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\TestFramework\PhpStan\Process\PHPStanMutantProcessFactory::buildMutationConfigFile`.'
 count = 1
 
 [[issues]]
@@ -11561,97 +11561,97 @@ message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceF
 count = 1
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+file = "tests/phpunit/TestFramework/Mago/Adapter/MagoAdapterTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `provideValidVersions` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+file = "tests/phpunit/TestFramework/Mago/Adapter/MagoAdapterTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_accepts_valid_versions`.'
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\TestFramework\Mago\Adapter\MagoAdapterTest::test_it_accepts_valid_versions`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+file = "tests/phpunit/TestFramework/Mago/Adapter/MagoAdapterTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_rejects_invalid_versions`.'
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\TestFramework\Mago\Adapter\MagoAdapterTest::test_it_rejects_invalid_versions`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+file = "tests/phpunit/TestFramework/Mago/Adapter/MagoAdapterTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_retrieves_version_with_the_shell_command_line_executor`.'
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\TestFramework\Mago\Adapter\MagoAdapterTest::test_it_retrieves_version_with_the_shell_command_line_executor`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+file = "tests/phpunit/TestFramework/Mago/Adapter/MagoAdapterTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\TestFramework\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+file = "tests/phpunit/TestFramework/Mago/Adapter/MagoAdapterTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_retrieves_version_with_the_shell_command_line_executor`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\TestFramework\Mago\Adapter\MagoAdapterTest::test_it_retrieves_version_with_the_shell_command_line_executor`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+file = "tests/phpunit/TestFramework/Mago/Adapter/MagoAdapterTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\TestFramework\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+file = "tests/phpunit/TestFramework/Mago/Adapter/MagoAdapterTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_retrieves_version_with_the_shell_command_line_executor`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\TestFramework\Mago\Adapter\MagoAdapterTest::test_it_retrieves_version_with_the_shell_command_line_executor`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+file = "tests/phpunit/TestFramework/Mago/Adapter/MagoAdapterTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\TestFramework\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+file = "tests/phpunit/TestFramework/Mago/Adapter/MagoAdapterTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_retrieves_version_with_the_shell_command_line_executor`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\TestFramework\Mago\Adapter\MagoAdapterTest::test_it_retrieves_version_with_the_shell_command_line_executor`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+file = "tests/phpunit/TestFramework/Mago/Adapter/MagoAdapterTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\TestFramework\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+file = "tests/phpunit/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
 code = "deprecated-method"
 message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
 count = 5
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+file = "tests/phpunit/TestFramework/Mago/Process/MagoMutantProcessFactoryTest.php"
 code = "deprecated-method"
 message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
 count = 3
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterTest.php"
+file = "tests/phpunit/TestFramework/PhpStan/Adapter/PHPStanAdapterTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `provideValidVersions` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactoryTest.php"
+file = "tests/phpunit/TestFramework/PhpStan/Mutant/PHPStanMutantExecutionResultFactoryTest.php"
 code = "deprecated-method"
 message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
 count = 4
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactoryTest.php"
+file = "tests/phpunit/TestFramework/PhpStan/Process/PHPStanMutantProcessFactoryTest.php"
 code = "deprecated-method"
 message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
 count = 3

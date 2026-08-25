@@ -2206,7 +2206,7 @@ parameters:
 			'''
 			identifier: staticMethod.deprecated
 			count: 5
-			path: ../tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
+			path: ../tests/phpunit/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
 
 		-
 			rawMessage: '''
@@ -2215,7 +2215,7 @@ parameters:
 			'''
 			identifier: staticMethod.deprecated
 			count: 3
-			path: ../tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php
+			path: ../tests/phpunit/TestFramework/Mago/Process/MagoMutantProcessFactoryTest.php
 
 		-
 			rawMessage: '''
@@ -2224,7 +2224,7 @@ parameters:
 			'''
 			identifier: staticMethod.deprecated
 			count: 4
-			path: ../tests/phpunit/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactoryTest.php
+			path: ../tests/phpunit/TestFramework/PhpStan/Mutant/PHPStanMutantExecutionResultFactoryTest.php
 
 		-
 			rawMessage: '''
@@ -2233,7 +2233,7 @@ parameters:
 			'''
 			identifier: staticMethod.deprecated
 			count: 3
-			path: ../tests/phpunit/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactoryTest.php
+			path: ../tests/phpunit/TestFramework/PhpStan/Process/PHPStanMutantProcessFactoryTest.php
 
 		-
 			rawMessage: Infection\Tests\TestFramework\Coverage\Locator\BaseReportLocator\DemoReportLocator should not exist

@@ -33,35 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis\Mago\Adapter;
+namespace Infection\TestFramework\PhpStan\Adapter;
 
 use function array_merge;
 use Closure;
+use function explode;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\PhpStan\Process\PHPStanMutantProcessFactory;
 use RuntimeException;
-use Safe\Exceptions\PcreException;
 use function sprintf;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\ProcessSignaledException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use function str_starts_with;
 use function version_compare;
 
 /**
  * @internal
  */
-final class MagoAdapter implements TestFramework
+final class PHPStanAdapter implements TestFramework
 {
+    private const int VERSION_1 = 1;
+
+    private const int VERSION_2 = 2;
+
     /**
      * @param list<string> $staticAnalysisToolOptions
      */
@@ -73,14 +75,14 @@ final class MagoAdapter implements TestFramework
         private readonly array $staticAnalysisToolOptions,
         private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
         private readonly InitialRunProcessFactory $initialRunProcessFactory,
-        private readonly MagoMutantProcessFactory $mutantProcessFactory,
+        private readonly PHPStanMutantProcessFactory $mutantProcessFactory,
         private ?string $version = null,
     ) {
     }
 
     public function getName(): string
     {
-        return 'Mago';
+        return 'PHPStan';
     }
 
     /**
@@ -88,9 +90,12 @@ final class MagoAdapter implements TestFramework
      */
     public function getInitialRunCommandLine(): array
     {
+        // we can't rely on stderr because it's used for other output (non-error)
+        // see https://github.com/phpstan/phpstan/issues/11352#issuecomment-2233403781
+
         $options = array_merge([
-            "--config=$this->staticAnalysisConfigPath",
-            'analyze',
+            "--configuration=$this->staticAnalysisConfigPath",
+            // todo [phpstan-integration] add --stop-on-first-error when it's implemented on PHPStan side
         ], $this->staticAnalysisToolOptions);
 
         return $this->commandLineBuilder->build(
@@ -124,34 +129,53 @@ final class MagoAdapter implements TestFramework
         );
     }
 
-    /**
-     * @throws PcreException|ProcessTimedOutException|RuntimeException|ProcessSignaledException|ProcessFailedException
-     */
     public function getVersion(): string
     {
         return $this->version ??= $this->retrieveVersion();
     }
 
-    /**
-     * @throws RuntimeException|PcreException
-     */
     public function assertMinimumVersionSatisfied(): void
     {
         $version = $this->getVersion();
 
-        if (version_compare($version, '1.23.0', '>=')) {
+        // running on phpstan-src itself
+        if (str_starts_with($version, 'dev-')) {
+            return;
+        }
+
+        $majorVersion = (int) explode('.', $version)[0];
+
+        // we assume all versions greater than 2.1.17 have needed functionality
+        if ($majorVersion > self::VERSION_2) {
+            return;
+        }
+
+        if (
+            $majorVersion === self::VERSION_2
+            && (
+                version_compare($version, '2.1.17', '>=')
+                || str_starts_with($version, '2.1.x-dev') // allow dev versions for development
+            )
+        ) {
+            return;
+        }
+
+        if (
+            $majorVersion === self::VERSION_1
+            && (
+                version_compare($version, '1.12.27', '>=')
+                || str_starts_with($version, '1.12.x-dev') // allow dev versions for development
+            )
+        ) {
             return;
         }
 
         throw new RuntimeException(sprintf(
-            'Infection requires Mago version >=1.23.0, but "%s" is installed.',
+            'Infection requires PHPStan version >=1.12.27 or >=2.1.17, but "%s" is installed.',
             $version,
         ));
     }
 
-    /**
-     * @throws PcreException|ProcessTimedOutException|RuntimeException|ProcessSignaledException|ProcessFailedException
-     */
     private function retrieveVersion(): string
     {
         $testFrameworkVersionExecutable = $this->commandLineBuilder->build(

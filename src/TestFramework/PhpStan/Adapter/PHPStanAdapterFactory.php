@@ -33,42 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
+namespace Infection\TestFramework\PhpStan\Adapter;
 
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\CannotBeInstantiated;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
-use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
+use Infection\TestFramework\Common\InitialRunProcessFactory;
+use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\PhpStan\Process\PHPStanMutantProcessFactory;
 use Symfony\Component\Process\PhpExecutableFinder;
 
-#[CoversClass(PHPStanAdapterFactory::class)]
-#[Group('integration')]
-final class PHPStanAdapterFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final class PHPStanAdapterFactory
 {
-    public function test_it_can_create_an_adapter(): void
-    {
-        $adapter = PHPStanAdapterFactory::create(
-            '/path/to/phpstan-config-path',
-            '/path/to/phpstan',
-            [],
-            new ShellCommandLineExecutor(),
-            new PHPStanMutantProcessFactory(
-                new Filesystem(),
-                $this->createStub(MutantExecutionResultFactory::class),
-                '/path/to/phpstan-config-path',
-                '/path/to/phpstan',
-                new CommandLineBuilder(new PhpExecutableFinder()),
-                10.,
-                '/tmp',
-                [],
-            ),
-        );
+    use CannotBeInstantiated;
 
-        $this->assertSame('PHPStan', $adapter->getName());
+    /**
+     * @param list<string> $staticAnalysisToolOptions
+     */
+    public static function create(
+        string $staticAnalysisConfigPath,
+        string $staticAnalysisToolExecutable,
+        array $staticAnalysisToolOptions,
+        ShellCommandLineExecutor $shellCommandLineExecutor,
+        PHPStanMutantProcessFactory $mutantProcessFactory,
+    ): TestFramework {
+        return new PHPStanAdapter(
+            $staticAnalysisConfigPath,
+            $staticAnalysisToolExecutable,
+            new CommandLineBuilder(
+                new PhpExecutableFinder(),
+            ),
+            new VersionParser(),
+            $staticAnalysisToolOptions,
+            $shellCommandLineExecutor,
+            new InitialRunProcessFactory(),
+            $mutantProcessFactory,
+        );
     }
 }

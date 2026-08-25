@@ -79,18 +79,12 @@ final class InfectionSelector
 
     public static function magoAdapterCandidate(): SelectorInterface
     {
-        return Selector::AnyOf(
-            Selector::inNamespace('Infection\StaticAnalysis\Mago'),
-            Selector::inNamespace('Infection\TestFramework\Mago'),
-        );
+        return Selector::inNamespace('Infection\TestFramework\Mago');
     }
 
     public static function phpStanAdapterCandidate(): SelectorInterface
     {
-        return Selector::AnyOf(
-            Selector::inNamespace('Infection\StaticAnalysis\PHPStan'),
-            Selector::inNamespace('Infection\TestFramework\PhpStan'),
-        );
+        return Selector::inNamespace('Infection\TestFramework\PhpStan');
     }
 
     public static function testFrameworkContractCandidate(): SelectorInterface

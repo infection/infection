@@ -33,45 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis\Mago\Adapter;
+namespace Infection\Tests\TestFramework\PhpStan\Adapter;
 
-use Infection\CannotBeInstantiated;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
-use Infection\TestFramework\Common\InitialRunProcessFactory;
-use Infection\TestFramework\Common\VersionParser;
-use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\PhpStan\Adapter\PHPStanAdapterFactory;
+use Infection\TestFramework\PhpStan\Process\PHPStanMutantProcessFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
 
-/**
- * @internal
- */
-final class MagoAdapterFactory
+#[CoversClass(PHPStanAdapterFactory::class)]
+#[Group('integration')]
+final class PHPStanAdapterFactoryTest extends TestCase
 {
-    use CannotBeInstantiated;
-
-    /**
-     * @param list<string> $staticAnalysisToolOptions
-     */
-    public static function create(
-        string $staticAnalysisConfigPath,
-        string $staticAnalysisToolExecutable,
-        array $staticAnalysisToolOptions,
-        ShellCommandLineExecutor $shellCommandLineExecutor,
-        MagoMutantProcessFactory $mutantProcessFactory,
-    ): TestFramework {
-        return new MagoAdapter(
-            $staticAnalysisConfigPath,
-            $staticAnalysisToolExecutable,
-            new CommandLineBuilder(
-                new PhpExecutableFinder(),
+    public function test_it_can_create_an_adapter(): void
+    {
+        $adapter = PHPStanAdapterFactory::create(
+            '/path/to/phpstan-config-path',
+            '/path/to/phpstan',
+            [],
+            new ShellCommandLineExecutor(),
+            new PHPStanMutantProcessFactory(
+                new Filesystem(),
+                $this->createStub(MutantExecutionResultFactory::class),
+                '/path/to/phpstan-config-path',
+                '/path/to/phpstan',
+                new CommandLineBuilder(new PhpExecutableFinder()),
+                10.,
+                '/tmp',
+                [],
             ),
-            new VersionParser(),
-            $staticAnalysisToolOptions,
-            $shellCommandLineExecutor,
-            new InitialRunProcessFactory(),
-            $mutantProcessFactory,
         );
+
+        $this->assertSame('PHPStan', $adapter->getName());
     }
 }

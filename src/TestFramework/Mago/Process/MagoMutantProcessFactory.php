@@ -33,33 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis\PHPStan\Process;
+namespace Infection\TestFramework\Mago\Process;
 
 use function array_merge;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
-use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-final readonly class PHPStanMutantProcessFactory
+final readonly class MagoMutantProcessFactory
 {
     /**
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
-        private Filesystem $fileSystem,
         private MutantExecutionResultFactory $mutantExecutionResultFactory,
-        private string $staticAnalysisConfigPath,
         private string $staticAnalysisToolExecutable,
         private CommandLineBuilder $commandLineBuilder,
         private float $timeout,
-        private string $tmpDir,
         private array $staticAnalysisToolOptions,
     ) {
     }
@@ -70,9 +65,6 @@ final readonly class PHPStanMutantProcessFactory
             command: $this->getMutantCommandLine(
                 $mutant->getFilePath(),
                 $mutant->getMutation()->getOriginalFilePath(),
-                $this->buildMutationConfigFile(
-                    $mutant->getMutation()->getHash(),
-                ),
             ),
             timeout: $this->timeout,
         );
@@ -89,46 +81,23 @@ final readonly class PHPStanMutantProcessFactory
      */
     private function getMutantCommandLine(
         string $mutatedFilePath,
-        string $mutationOriginalFilePath,
-        string $mutantConfigFile,
+        string $originalFilePath,
     ): array {
-        $options = array_merge([
-            "--tmp-file=$mutatedFilePath",
-            "--instead-of=$mutationOriginalFilePath",
-            "--configuration=$mutantConfigFile",
-            '--error-format=json',
-            '--no-progress',
-            '-vv',
-            // todo [phpstan-integration] --stop-on-first-error
-        ], $this->staticAnalysisToolOptions);
+        $options = array_merge(
+            [
+                '--colors=never',
+                'analyze',
+                '--reporting-format=short',
+                '--substitute',
+                "$originalFilePath=$mutatedFilePath",
+            ],
+            $this->staticAnalysisToolOptions,
+        );
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
             [],
             $options,
         );
-    }
-
-    private function buildMutationConfigFile(string $mutationHash): string
-    {
-        $mutantConfigPath = sprintf(
-            '%s/phpstan.%s.infection.neon',
-            $this->tmpDir,
-            $mutationHash,
-        );
-
-        $this->fileSystem->dumpFile(
-            $mutantConfigPath,
-            <<<NEON
-                    includes:
-                        - $this->staticAnalysisConfigPath
-                    parameters:
-                        reportUnmatchedIgnoredErrors: false
-                        parallel:
-                            maximumNumberOfProcesses: 1
-                NEON,
-        );
-
-        return $mutantConfigPath;
     }
 }

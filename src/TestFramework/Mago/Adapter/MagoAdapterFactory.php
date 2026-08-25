@@ -33,36 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis\Mago\Adapter;
+namespace Infection\TestFramework\Mago\Adapter;
 
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\CannotBeInstantiated;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
-use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Infection\TestFramework\Common\InitialRunProcessFactory;
+use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
 use Symfony\Component\Process\PhpExecutableFinder;
 
-#[CoversClass(MagoAdapterFactory::class)]
-final class MagoAdapterFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final class MagoAdapterFactory
 {
-    public function test_it_can_create_an_adapter(): void
-    {
-        $adapter = MagoAdapterFactory::create(
-            '/path/to/mago-config-path',
-            '/path/to/mago',
-            [],
-            new ShellCommandLineExecutor(),
-            new MagoMutantProcessFactory(
-                $this->createStub(MutantExecutionResultFactory::class),
-                '/path/to/mago',
-                new CommandLineBuilder(new PhpExecutableFinder()),
-                10.,
-                [],
-            ),
-        );
+    use CannotBeInstantiated;
 
-        $this->assertSame('Mago', $adapter->getName());
+    /**
+     * @param list<string> $staticAnalysisToolOptions
+     */
+    public static function create(
+        string $staticAnalysisConfigPath,
+        string $staticAnalysisToolExecutable,
+        array $staticAnalysisToolOptions,
+        ShellCommandLineExecutor $shellCommandLineExecutor,
+        MagoMutantProcessFactory $mutantProcessFactory,
+    ): TestFramework {
+        return new MagoAdapter(
+            $staticAnalysisConfigPath,
+            $staticAnalysisToolExecutable,
+            new CommandLineBuilder(
+                new PhpExecutableFinder(),
+            ),
+            new VersionParser(),
+            $staticAnalysisToolOptions,
+            $shellCommandLineExecutor,
+            new InitialRunProcessFactory(),
+            $mutantProcessFactory,
+        );
     }
 }

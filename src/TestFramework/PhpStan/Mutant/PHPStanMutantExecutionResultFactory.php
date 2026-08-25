@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis\Mago\Mutant;
+namespace Infection\TestFramework\PhpStan\Mutant;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
@@ -47,7 +47,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class MagoMutantExecutionResultFactory implements MutantExecutionResultFactory
+final class PHPStanMutantExecutionResultFactory implements MutantExecutionResultFactory
 {
     private const int PROCESS_MIN_ERROR_CODE = 100;
 
@@ -98,14 +98,12 @@ final class MagoMutantExecutionResultFactory implements MutantExecutionResultFac
 
         $process = $mutantProcess->getProcess();
 
-        $exitCode = $process->getExitCode();
-
-        if ($exitCode !== null && $exitCode > self::PROCESS_MIN_ERROR_CODE) {
+        if ($process->getExitCode() > self::PROCESS_MIN_ERROR_CODE) {
             // See \Symfony\Component\Process\Process::$exitCodes
             return DetectionStatus::ERROR;
         }
 
-        if ($exitCode === 0) {
+        if ($process->getExitCode() === 0) {
             return DetectionStatus::ESCAPED;
         }
 

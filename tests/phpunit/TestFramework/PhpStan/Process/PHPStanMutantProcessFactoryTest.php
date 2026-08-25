@@ -33,15 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis\Mago\Process;
+namespace Infection\Tests\TestFramework\PhpStan\Process;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\PhpStan\Process\PHPStanMutantProcessFactory;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
 use PhpParser\Node\Stmt\Nop;
@@ -49,8 +49,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-#[CoversClass(MagoMutantProcessFactory::class)]
-final class MagoMutantProcessFactoryTest extends TestCase
+#[CoversClass(PHPStanMutantProcessFactory::class)]
+final class PHPStanMutantProcessFactoryTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {
@@ -100,26 +100,42 @@ final class MagoMutantProcessFactoryTest extends TestCase
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/mago', [], [
-                '--colors=never',
-                'analyze',
-                '--reporting-format=short',
-                '--substitute',
-                "$originalFilePath=$mutantFilePath",
+            ->with('/path/to/phpstan', [], [
+                "--tmp-file=$mutantFilePath",
+                "--instead-of=$originalFilePath",
+                '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
+                '--error-format=json',
+                '--no-progress',
+                '-vv',
+                '--memory-limit=-1',
             ])
-            ->willReturn(['/path/to/mago'])
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;
 
         $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->never())
-            ->method('dumpFile');
+        $filesystem->expects($this->once())
+            ->method('dumpFile')
+            ->with(
+                '/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
+                <<<NEON
+                        includes:
+                            - /path/to/phpstan-config-folder
+                        parameters:
+                            reportUnmatchedIgnoredErrors: false
+                            parallel:
+                                maximumNumberOfProcesses: 1
+                    NEON,
+            );
 
-        $factory = new MagoMutantProcessFactory(
+        $factory = new PHPStanMutantProcessFactory(
+            $filesystem,
             $phpStanMutantExecutionResultFactory,
-            '/path/to/mago',
+            '/path/to/phpstan-config-folder',
+            '/path/to/phpstan',
             $commandLineBuilder,
             100.0,
-            [],
+            '/tmp',
+            ['--memory-limit=-1'],
         );
 
         $mutantProcess = $factory->create($mutant);
@@ -181,31 +197,43 @@ final class MagoMutantProcessFactoryTest extends TestCase
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/mago', [], [
-                '--colors=never',
-                'analyze',
-                '--reporting-format=short',
-                '--substitute',
-                "$originalFilePath=$mutantFilePath",
-                '--no-stubs',
-                '--baseline /path/to/baseline.toml',
+            ->with('/path/to/phpstan', [], [
+                "--tmp-file=$mutantFilePath",
+                "--instead-of=$originalFilePath",
+                '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
+                '--error-format=json',
+                '--no-progress',
+                '-vv',
+                '--memory-limit=-1',
+                '--level=max',
             ])
-            ->willReturn(['/path/to/mago'])
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;
 
         $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->never())
-            ->method('dumpFile');
+        $filesystem->expects($this->once())
+            ->method('dumpFile')
+            ->with(
+                '/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
+                <<<NEON
+                        includes:
+                            - /path/to/phpstan-config-folder
+                        parameters:
+                            reportUnmatchedIgnoredErrors: false
+                            parallel:
+                                maximumNumberOfProcesses: 1
+                    NEON,
+            );
 
-        $factory = new MagoMutantProcessFactory(
+        $factory = new PHPStanMutantProcessFactory(
+            $filesystem,
             $phpStanMutantExecutionResultFactory,
-            '/path/to/mago',
+            '/path/to/phpstan-config-folder',
+            '/path/to/phpstan',
             $commandLineBuilder,
             100.0,
-            [
-                '--no-stubs',
-                '--baseline /path/to/baseline.toml',
-            ],
+            '/tmp',
+            ['--memory-limit=-1', '--level=max'],
         );
 
         $mutantProcess = $factory->create($mutant);
@@ -267,25 +295,29 @@ final class MagoMutantProcessFactoryTest extends TestCase
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/mago', [], [
-                '--colors=never',
-                'analyze',
-                '--reporting-format=short',
-                '--substitute',
-                "$originalFilePath=$mutantFilePath",
+            ->with('/path/to/phpstan', [], [
+                "--tmp-file=$mutantFilePath",
+                "--instead-of=$originalFilePath",
+                '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
+                '--error-format=json',
+                '--no-progress',
+                '-vv',
             ])
-            ->willReturn(['/path/to/mago'])
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;
 
         $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->never())
+        $filesystem->expects($this->once())
             ->method('dumpFile');
 
-        $factory = new MagoMutantProcessFactory(
+        $factory = new PHPStanMutantProcessFactory(
+            $filesystem,
             $phpStanMutantExecutionResultFactory,
-            '/path/to/mago',
+            '/path/to/phpstan-config-folder',
+            '/path/to/phpstan',
             $commandLineBuilder,
             100.0,
+            '/tmp',
             [],
         );
 

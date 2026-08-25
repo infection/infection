@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis\Mago\Mutant;
+namespace Infection\Tests\TestFramework\Mago\Mutant;
 
 use Generator;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
@@ -42,7 +42,7 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\MutantProcess;
-use Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory;
+use Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultAssertions;
