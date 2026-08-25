@@ -33,23 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration;
+namespace Infection\PhpParser\Visitor;
+
+use Infection\Configuration\SourceSymbolSelector;
+use Infection\Source\Matcher\SourceSymbolMatcher;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
- * Result of positional path classification: source paths (equivalent to --filter)
- * and test paths (equivalent to --test-framework-extra-args, space-joined).
- *
  * @internal
  */
-final readonly class ClassifiedPaths
+final class ExcludeNonSelectedSourceNodesVisitor extends NodeVisitorAbstract
 {
     public function __construct(
-        /** @var list<non-empty-string> */
-        public array $sourcePaths,
-        /** @var list<non-empty-string> */
-        public array $testPaths,
-        /** @var list<SourceSymbolSelector> */
-        public array $sourceSelectors,
+        private readonly SourceSymbolMatcher $matcher,
+        private readonly SourceSymbolSelector $selector,
     ) {
+    }
+
+    public function enterNode(Node $node): null
+    {
+        if (LabelNodesAsEligibleVisitor::isEligible($node) && !$this->matcher->matches($node, $this->selector)) {
+            LabelNodesAsEligibleVisitor::markAsIneligible($node);
+        }
+
+        return null;
     }
 }

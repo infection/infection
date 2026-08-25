@@ -51,6 +51,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalPathsFilter;
+use Infection\Configuration\SourceSymbolSelectorParser;
 use Infection\Console\LogVerbosity;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\TmpDirProvider;
@@ -1689,7 +1690,7 @@ final class ConfigurationFactoryTest extends TestCase
             ),
             $projectDirectoryProviderStub,
             $cpuCoresCountProvider,
-            new PositionalPathsClassifier($fileSystem),
+            new PositionalPathsClassifier($fileSystem, new SourceSymbolSelectorParser()),
         );
     }
 }

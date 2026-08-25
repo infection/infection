@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
-use function class_exists;
 use function ctype_upper;
 use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -60,6 +59,7 @@ final readonly class PositionalPathsClassifier
 
     public function __construct(
         private FileSystem $fileSystem,
+        private SourceSymbolSelectorParser $sourceSymbolSelectorParser,
     ) {
     }
 
@@ -71,7 +71,7 @@ final readonly class PositionalPathsClassifier
         SchemaConfiguration $schema,
     ): ClassifiedPaths {
         if ($paths === []) {
-            return new ClassifiedPaths([], []);
+            return new ClassifiedPaths([], [], []);
         }
 
         $configDir = dirname($schema->pathname);
@@ -79,8 +79,23 @@ final readonly class PositionalPathsClassifier
 
         $sourcePaths = [];
         $testPaths = [];
+        $sourceSelectors = [];
 
         foreach ($paths as $path) {
+            $absolutePath = Path::isAbsolute($path)
+                ? $path
+                : Path::join($configDir, $path);
+
+            if (!$this->isValidPath($absolutePath)) {
+                $selector = $this->sourceSymbolSelectorParser->parse($path);
+
+                if ($selector !== null) {
+                    $sourceSelectors[] = $selector;
+
+                    continue;
+                }
+            }
+
             $kind = $this->classifyPathKind($path, $absoluteSourceDirs, $configDir);
 
             if ($kind === self::KIND_SOURCE) {
@@ -90,7 +105,7 @@ final readonly class PositionalPathsClassifier
             }
         }
 
-        return new ClassifiedPaths($sourcePaths, $testPaths);
+        return new ClassifiedPaths($sourcePaths, $testPaths, $sourceSelectors);
     }
 
     /**
@@ -147,15 +162,6 @@ final readonly class PositionalPathsClassifier
         array $absoluteSourceDirs,
         string $configDir,
     ): string {
-        // TODO: FQCN-style arguments (e.g. "\App\Foo" or "\App\Foo::method::45") will
-        // be supported via https://github.com/infection/infection/issues/2237
-        if (self::looksLikeFqcnWithOptionalMethodOrLine($path)) {
-            throw new InvalidArgumentException(sprintf(
-                'FQCN-style arguments like "%s" are not yet supported. See https://github.com/infection/infection/issues/2237.',
-                $path,
-            ));
-        }
-
         $absolutePath = Path::isAbsolute($path)
             ? $path
             : Path::join($configDir, $path);
@@ -181,21 +187,6 @@ final readonly class PositionalPathsClassifier
             'Invalid path argument "%s": multiple paths must be passed as separate arguments.',
             $path,
         ));
-    }
-
-    /**
-     * \SomeNamespace\Class
-     * \SomeNamespace\Class::method
-     * \SomeNamespace\Class::method::34
-     * App\Foo (bare, unbackslashed)
-     */
-    private static function looksLikeFqcnWithOptionalMethodOrLine(string $value): bool
-    {
-        if (str_starts_with($value, '\\') || str_contains($value, '::')) {
-            return true;
-        }
-
-        return class_exists($value);
     }
 
     private static function looksLikeClassOrFileName(string $value): bool

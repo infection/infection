@@ -33,23 +33,64 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration;
+namespace Infection\Source\Matcher;
+
+use Infection\Configuration\SourceSymbolSelector;
+use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
+use Infection\PhpParser\Visitor\ParentConnector;
+use PhpParser\Node;
+use function strcasecmp;
 
 /**
- * Result of positional path classification: source paths (equivalent to --filter)
- * and test paths (equivalent to --test-framework-extra-args, space-joined).
+ * Matches an enriched AST node against a class, optional method, and optional line.
  *
  * @internal
  */
-final readonly class ClassifiedPaths
+final class SourceSymbolMatcher
 {
-    public function __construct(
-        /** @var list<non-empty-string> */
-        public array $sourcePaths,
-        /** @var list<non-empty-string> */
-        public array $testPaths,
-        /** @var list<SourceSymbolSelector> */
-        public array $sourceSelectors,
-    ) {
+    public function matches(Node $node, SourceSymbolSelector $selector): bool
+    {
+        $class = self::findAncestor($node, Node\Stmt\ClassLike::class);
+
+        if (!$class instanceof Node\Stmt\ClassLike) {
+            return false;
+        }
+
+        $className = FullyQualifiedClassNameManipulator::getFqcn($class);
+
+        if ($className === null || strcasecmp($className->toString(), $selector->className) !== 0) {
+            return false;
+        }
+
+        if ($selector->methodName !== null) {
+            $method = self::findAncestor($node, Node\Stmt\ClassMethod::class);
+
+            if (!$method instanceof Node\Stmt\ClassMethod || strcasecmp($method->name->toString(), $selector->methodName) !== 0) {
+                return false;
+            }
+        }
+
+        if ($selector->line === null) {
+            return true;
+        }
+
+        return $node->getStartLine() <= $selector->line
+            && $node->getEndLine() >= $selector->line;
+    }
+
+    /**
+     * @param class-string<Node> $type
+     */
+    private static function findAncestor(Node $node, string $type): ?Node
+    {
+        do {
+            if ($node instanceof $type) {
+                return $node;
+            }
+
+            $node = ParentConnector::findParent($node);
+        } while ($node !== null);
+
+        return null;
     }
 }

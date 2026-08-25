@@ -33,23 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration;
+namespace Infection\Tests\Source\Matcher\SourceSymbolMatcher;
 
-/**
- * Result of positional path classification: source paths (equivalent to --filter)
- * and test paths (equivalent to --test-framework-extra-args, space-joined).
- *
- * @internal
- */
-final readonly class ClassifiedPaths
+use Infection\Configuration\SourceSymbolSelector;
+use Infection\PhpParser\Visitor\NameResolverFactory;
+use Infection\Source\Matcher\SourceSymbolMatcher;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
+use PhpParser\Node;
+use PhpParser\NodeFinder;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\ParentConnectingVisitor;
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(SourceSymbolMatcher::class)]
+final class SourceSymbolMatcherTest extends VisitorTestCase
 {
-    public function __construct(
-        /** @var list<non-empty-string> */
-        public array $sourcePaths,
-        /** @var list<non-empty-string> */
-        public array $testPaths,
-        /** @var list<SourceSymbolSelector> */
-        public array $sourceSelectors,
-    ) {
+    public function test_it_matches_a_multiline_node_in_the_selected_method(): void
+    {
+        $nodes = $this->parse(<<<'PHP'
+            <?php
+            namespace App;
+            final class Mailer {
+                public function send(): int {
+                    return 1
+                        + 2;
+                }
+            }
+            PHP);
+
+        (new NodeTraverser(NameResolverFactory::create(), new ParentConnectingVisitor()))->traverse($nodes);
+
+        $binaryOperation = (new NodeFinder())->findFirstInstanceOf($nodes, Node\Expr\BinaryOp::class);
+        $this->assertInstanceOf(Node\Expr\BinaryOp::class, $binaryOperation);
+        $matcher = new SourceSymbolMatcher();
+
+        $this->assertTrue($matcher->matches($binaryOperation, new SourceSymbolSelector('App\Mailer', 'send', 6)));
+        $this->assertFalse($matcher->matches($binaryOperation, new SourceSymbolSelector('App\Mailer', 'other', 6)));
+        $this->assertFalse($matcher->matches($binaryOperation, new SourceSymbolSelector('App\Other', 'send', 6)));
     }
 }

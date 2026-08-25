@@ -36,20 +36,16 @@ declare(strict_types=1);
 namespace Infection\Configuration;
 
 /**
- * Result of positional path classification: source paths (equivalent to --filter)
- * and test paths (equivalent to --test-framework-extra-args, space-joined).
+ * A positional source selector. Line numbers are absolute source-file lines.
  *
  * @internal
  */
-final readonly class ClassifiedPaths
+final readonly class SourceSymbolSelector
 {
     public function __construct(
-        /** @var list<non-empty-string> */
-        public array $sourcePaths,
-        /** @var list<non-empty-string> */
-        public array $testPaths,
-        /** @var list<SourceSymbolSelector> */
-        public array $sourceSelectors,
+        public string $className,
+        public ?string $methodName,
+        public ?int $line,
     ) {
     }
 }

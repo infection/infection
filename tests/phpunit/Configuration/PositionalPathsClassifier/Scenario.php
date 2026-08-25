@@ -73,6 +73,7 @@ final class Scenario
             expected: new ClassifiedPaths(
                 sourcePaths: [],
                 testPaths: [],
+                sourceSelectors: [],
             ),
         );
     }
