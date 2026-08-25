@@ -40,7 +40,6 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\Mutant;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
@@ -93,7 +92,7 @@ final readonly class EventDispatchingTestFramework implements TestFramework
         return $result;
     }
 
-    public function test(Mutant $mutant): MutantExecutionResult|MutantEvaluationPipe
+    public function test(Mutant $mutant): MutantEvaluationPipe
     {
         return $this->decorated->test($mutant);
     }

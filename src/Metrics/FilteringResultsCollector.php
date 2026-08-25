@@ -37,8 +37,8 @@ namespace Infection\Metrics;
 
 use function array_filter;
 use function in_array;
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\TestFramework\Contracts\DetectionStatus;
 
 /**
  * @internal

@@ -33,51 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\TestFramework\Mago\Mutant;
 
-use function array_udiff;
-use function array_values;
+use Infection\TestFramework\Contracts\DetectionStatus;
+use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-enum DetectionStatus: string
+#[CoversClass(MagoMutantDetectionStatusResolver::class)]
+final class MagoMutantDetectionStatusResolverTest extends TestCase
 {
-    case KILLED_BY_TESTS = 'killed by tests';
-    case KILLED_BY_STATIC_ANALYSIS = 'killed by SA';
-    case ESCAPED = 'escaped';
-    case ERROR = 'error';
-    case TIMED_OUT = 'timed out';
-    case SKIPPED = 'skipped';
-    case SYNTAX_ERROR = 'syntax error';
-    case NOT_COVERED = 'not covered';
-    case IGNORED = 'ignored';
+    #[DataProvider('statusesProvider')]
+    public function test_it_resolves_the_detection_status(
+        int $exitCode,
+        bool $timedOut,
+        DetectionStatus $expected,
+    ): void {
+        $resolver = new MagoMutantDetectionStatusResolver();
 
-    /**
-     * @return list<DetectionStatus>
-     */
-    public static function getCasesExcluding(DetectionStatus ...$excluded): array
-    {
-        return array_values(
-            array_udiff(
-                DetectionStatus::cases(),
-                $excluded,
-                static fn (DetectionStatus $left, DetectionStatus $right) => $left->value <=> $right->value,
-            ),
-        );
+        $this->assertSame($expected, $resolver->resolve('', '', $exitCode, $timedOut));
     }
 
-    /**
-     * @return array<key-of<self>, self>
-     */
-    public static function getIndexedCases(): array
+    public static function statusesProvider(): iterable
     {
-        $indexedCases = [];
+        yield 'timed out' => [0, true, DetectionStatus::TIMED_OUT];
 
-        foreach (self::cases() as $case) {
-            $indexedCases[$case->name] = $case;
-        }
+        yield 'process error' => [101, false, DetectionStatus::ERROR];
 
-        return $indexedCases;
+        yield 'escaped' => [0, false, DetectionStatus::ESCAPED];
+
+        yield 'killed by static analysis' => [1, false, DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
+
+        yield 'highest standard error code' => [100, false, DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
     }
 }

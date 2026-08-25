@@ -33,13 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process;
+namespace Infection\Tests\TestFramework\Common;
 
-use Infection\Mutant\DetectionStatus;
-use Infection\Process\CombinedMutantEvaluationPipe;
-use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
-use Infection\Tests\Mutant\MutantExecutionResultBuilder;
+use Infection\TestFramework\Common\CombinedMutantEvaluationPipe;
+use Infection\TestFramework\Common\MutantProcessContainer;
+use Infection\TestFramework\Contracts\DetectionStatus;
+use Infection\TestFramework\Contracts\MutantProcess;
+use Infection\TestFramework\Contracts\MutantProcessResult;
+use Infection\Tests\Mutant\MutantBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -54,15 +55,15 @@ final class CombinedMutantEvaluationPipeTest extends TestCase
 
         $firstProcess
             ->expects($this->once())
-            ->method('getMutantExecutionResult')
-            ->willReturn(MutantExecutionResultBuilder::withMinimalTestData()
-                ->withDetectionStatus(DetectionStatus::ESCAPED)
-                ->build())
+            ->method('getResult')
+            ->willReturn(new MutantProcessResult('', '', '', 0., 0., DetectionStatus::ESCAPED))
         ;
 
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+
         $pipe = CombinedMutantEvaluationPipe::from(
-            MutantProcessContainer::from(static fn (): MutantProcess => $firstProcess),
-            MutantProcessContainer::from(static fn (): MutantProcess => $secondProcess),
+            MutantProcessContainer::from($mutant, static fn (): MutantProcess => $firstProcess),
+            MutantProcessContainer::from($mutant, static fn (): MutantProcess => $secondProcess),
         );
 
         $this->assertTrue($pipe->isCold());
@@ -74,7 +75,9 @@ final class CombinedMutantEvaluationPipeTest extends TestCase
 
     public function test_it_cannot_merge_a_pipe_after_its_evaluation_has_started(): void
     {
+        $mutant = MutantBuilder::withMinimalTestData()->build();
         $startedPipe = MutantProcessContainer::from(
+            $mutant,
             fn (): MutantProcess => $this->createStub(MutantProcess::class),
         );
         $startedPipe->getCurrent();
@@ -84,7 +87,7 @@ final class CombinedMutantEvaluationPipeTest extends TestCase
 
         CombinedMutantEvaluationPipe::from(
             $startedPipe,
-            MutantProcessContainer::from(fn (): MutantProcess => $this->createStub(MutantProcess::class)),
+            MutantProcessContainer::from($mutant, fn (): MutantProcess => $this->createStub(MutantProcess::class)),
         );
     }
 }

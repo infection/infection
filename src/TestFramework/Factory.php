@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use Closure;
+use DuoClock\DuoClock;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
@@ -43,7 +44,6 @@ use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\ShellCommandLineExecutor;
@@ -55,10 +55,10 @@ use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
-use Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory;
+use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
 use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
 use Infection\TestFramework\PhpStan\Adapter\PHPStanAdapterFactory;
-use Infection\TestFramework\PhpStan\Mutant\PHPStanMutantExecutionResultFactory;
+use Infection\TestFramework\PhpStan\Mutant\PHPStanMutantDetectionStatusResolver;
 use Infection\TestFramework\PhpStan\Process\PHPStanMutantProcessFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
@@ -91,7 +91,6 @@ final readonly class Factory
         private ShellCommandLineExecutor $shellCommandLineExecutor,
         private ConsoleOutput $consoleOutput,
         private CoverageChecker $coverageChecker,
-        private MutantExecutionResultFactory $mutantExecutionResultFactory,
         /** @var Closure(): InitialTestsRunProcessFactory */
         private Closure $initialRunProcessFactory,
         /** @var Closure(): MutantProcessContainerFactory */
@@ -134,7 +133,8 @@ final readonly class Factory
                 $this->shellCommandLineExecutor,
                 new PHPStanMutantProcessFactory(
                     new Filesystem(),
-                    new PHPStanMutantExecutionResultFactory(),
+                    new PHPStanMutantDetectionStatusResolver(),
+                    new DuoClock(),
                     $configPath,
                     $executable,
                     $commandLineBuilder,
@@ -160,7 +160,8 @@ final readonly class Factory
                 $options,
                 $this->shellCommandLineExecutor,
                 new MagoMutantProcessFactory(
-                    new MagoMutantExecutionResultFactory(),
+                    new MagoMutantDetectionStatusResolver(),
+                    new DuoClock(),
                     $executable,
                     $commandLineBuilder,
                     $timeout,
@@ -218,7 +219,6 @@ final readonly class Factory
                         $this->consoleOutput,
                         $this->coverageChecker,
                         $configuration,
-                        $this->mutantExecutionResultFactory,
                         $this->extraOptionsFilter,
                     );
                 }

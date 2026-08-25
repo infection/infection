@@ -36,19 +36,16 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner;
 
 use function array_search;
-use function count;
 use DuoClock\TimeSpy;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessQueue;
+use Infection\TestFramework\Common\MutantProcessContainer;
+use Infection\TestFramework\Contracts\DetectionStatus;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\TestFramework\Contracts\MutantProcess;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Infection\Tests\Mutant\MutantBuilder;
-use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use function iterator_count;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -439,14 +436,14 @@ final class ParallelProcessRunnerTest extends TestCase
             $process->expects($this->once())->method('start');
             $process->method('isRunning')->willReturn(false);
 
+            $mutant = MutantBuilder::withMinimalTestData()->build();
             $mutantProcess = new DummyMutantProcess(
                 $process,
-                MutantBuilder::withMinimalTestData()->build(),
-                $this->createStub(MutantExecutionResultFactory::class),
                 false,
+                DetectionStatus::KILLED_BY_TESTS,
             );
 
-            $processes[] = MutantProcessContainer::from(static fn (): MutantProcess => $mutantProcess);
+            $processes[] = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $mutantProcess);
         }
 
         // Run the processes - the while loop should execute because hasProcessesThatCouldBeFreed returns true
@@ -500,14 +497,14 @@ final class ParallelProcessRunnerTest extends TestCase
             $process->method('start'); // May or may not be called depending on mock behavior
             $process->method('isRunning')->willReturn(false);
 
+            $mutant = MutantBuilder::withMinimalTestData()->build();
             $mutantProcess = new DummyMutantProcess(
                 $process,
-                MutantBuilder::withMinimalTestData()->build(),
-                $this->createStub(MutantExecutionResultFactory::class),
                 false,
+                DetectionStatus::KILLED_BY_TESTS,
             );
 
-            $processes[] = MutantProcessContainer::from(static fn (): MutantProcess => $mutantProcess);
+            $processes[] = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $mutantProcess);
         }
 
         // Setup queue mock to return the processes
@@ -560,12 +557,14 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturn(false)
         ;
 
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+
         return MutantProcessContainer::from(
-            fn (): MutantProcess => new DummyMutantProcess(
+            $mutant,
+            static fn (): MutantProcess => new DummyMutantProcess(
                 $processMock,
-                MutantBuilder::withMinimalTestData()->build(),
-                $this->createStub(MutantExecutionResultFactory::class),
                 false,
+                DetectionStatus::KILLED_BY_TESTS,
             ),
         );
     }
@@ -610,32 +609,22 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturn(false)
         ;
 
-        $mutantExecutionResult = MutantExecutionResultBuilder::withMinimalTestData()
-            ->withDetectionStatus(DetectionStatus::ESCAPED)
-            ->build();
-
-        $mutantExecutionResultFactoryMock = $this->createMock(MutantExecutionResultFactory::class);
-
-        $mutantExecutionResultFactoryMock
-            ->expects($this->once())
-            ->method('createFromProcess')
-            ->willReturn($mutantExecutionResult);
-
         $mutant = MutantBuilder::withMinimalTestData()->build();
         $container = MutantProcessContainer::from(
+            $mutant,
             static fn (): MutantProcess => new DummyMutantProcess(
                 $phpUnitProcessMock,
-                $mutant,
-                $mutantExecutionResultFactoryMock,
                 false,
+                DetectionStatus::ESCAPED,
             ),
         );
 
         return $container->merge(MutantProcessContainer::from(
-            fn (): MutantProcess => new MutantProcess(
+            $mutant,
+            static fn (): MutantProcess => new DummyMutantProcess(
                 $nextProcessMock,
-                $mutant,
-                $this->createStub(MutantExecutionResultFactory::class),
+                false,
+                DetectionStatus::KILLED_BY_TESTS,
             ),
         ));
     }
@@ -658,12 +647,14 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturn(false)
         ;
 
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+
         return MutantProcessContainer::from(
-            fn (): MutantProcess => new DummyMutantProcess(
+            $mutant,
+            static fn (): MutantProcess => new DummyMutantProcess(
                 $processMock,
-                MutantBuilder::withMinimalTestData()->build(),
-                $this->createStub(MutantExecutionResultFactory::class),
                 true,
+                DetectionStatus::TIMED_OUT,
             ),
         );
     }

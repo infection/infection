@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpStan\Process;
 
 use function array_merge;
-use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\MutantProcess;
+use DuoClock\DuoClock;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\MutantProcess;
 use Infection\TestFramework\Contracts\Mutant;
+use Infection\TestFramework\Contracts\MutantProcess as MutantProcessContract;
+use Infection\TestFramework\PhpStan\Mutant\PHPStanMutantDetectionStatusResolver;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
@@ -54,7 +56,8 @@ final readonly class PHPStanMutantProcessFactory
      */
     public function __construct(
         private Filesystem $fileSystem,
-        private MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private PHPStanMutantDetectionStatusResolver $detectionStatusResolver,
+        private DuoClock $clock,
         private string $staticAnalysisConfigPath,
         private string $staticAnalysisToolExecutable,
         private CommandLineBuilder $commandLineBuilder,
@@ -64,7 +67,7 @@ final readonly class PHPStanMutantProcessFactory
     ) {
     }
 
-    public function create(Mutant $mutant): MutantProcess
+    public function create(Mutant $mutant): MutantProcessContract
     {
         $process = new Process(
             command: $this->getMutantCommandLine(
@@ -79,8 +82,8 @@ final readonly class PHPStanMutantProcessFactory
 
         return new MutantProcess(
             $process,
-            $mutant,
-            $this->mutantExecutionResultFactory,
+            $this->detectionStatusResolver,
+            $this->clock,
         );
     }
 

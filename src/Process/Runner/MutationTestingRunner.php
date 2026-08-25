@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use function array_key_exists;
-use Generator;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
@@ -52,6 +51,7 @@ use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -96,7 +96,6 @@ class MutationTestingRunner
             ->filter($this->takingTooLong(...))
             ->tap($this->materializeMutant(...))
             ->cast($this->testFramework->test(...))
-            ->map($this->processEvaluatedMutants(...))
         ;
 
         take($this->processRunner->run($processContainers))
@@ -187,24 +186,13 @@ class MutationTestingRunner
         );
     }
 
-    /**
-     * @return Generator<int, MutantEvaluationPipe>
-     */
-    private function processEvaluatedMutants(MutantExecutionResult|MutantEvaluationPipe $resultCandidate): Generator
-    {
-        if ($resultCandidate instanceof MutantEvaluationPipe) {
-            yield $resultCandidate;
-
-            return;
-        }
-
-        $this->eventDispatcher->dispatch(
-            new MutantProcessWasFinished($resultCandidate),
-        );
-    }
-
     private static function containerToFinishedEvent(MutantEvaluationPipe $container): MutantProcessWasFinished
     {
-        return new MutantProcessWasFinished($container->getCurrent()->getMutantExecutionResult());
+        $mutant = $container->getMutant();
+        Assert::isInstanceOf($mutant, Mutant::class);
+
+        return new MutantProcessWasFinished(
+            MutantExecutionResult::createFromProcessResult($mutant, $container->getCurrent()->getResult()),
+        );
     }
 }

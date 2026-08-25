@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Mago\Process;
 
 use function array_merge;
-use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\MutantProcess;
+use DuoClock\DuoClock;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\MutantProcess;
 use Infection\TestFramework\Contracts\Mutant;
+use Infection\TestFramework\Contracts\MutantProcess as MutantProcessContract;
+use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
 use Symfony\Component\Process\Process;
 
 /**
@@ -51,7 +53,8 @@ final readonly class MagoMutantProcessFactory
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
-        private MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private MagoMutantDetectionStatusResolver $detectionStatusResolver,
+        private DuoClock $clock,
         private string $staticAnalysisToolExecutable,
         private CommandLineBuilder $commandLineBuilder,
         private float $timeout,
@@ -59,7 +62,7 @@ final readonly class MagoMutantProcessFactory
     ) {
     }
 
-    public function create(Mutant $mutant): MutantProcess
+    public function create(Mutant $mutant): MutantProcessContract
     {
         $process = new Process(
             command: $this->getMutantCommandLine(
@@ -71,8 +74,8 @@ final readonly class MagoMutantProcessFactory
 
         return new MutantProcess(
             $process,
-            $mutant,
-            $this->mutantExecutionResultFactory,
+            $this->detectionStatusResolver,
+            $this->clock,
         );
     }
 

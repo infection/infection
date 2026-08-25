@@ -33,14 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\TestFramework\Mago\Mutant;
 
-use Infection\Process\MutantProcess;
+use Infection\TestFramework\Common\MutantProcessDetectionStatusResolver;
+use Infection\TestFramework\Contracts\DetectionStatus;
 
 /**
  * @internal
  */
-interface MutantExecutionResultFactory
+final class MagoMutantDetectionStatusResolver implements MutantProcessDetectionStatusResolver
 {
-    public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult;
+    private const int PROCESS_MIN_ERROR_CODE = 100;
+
+    public function resolve(
+        string $stdout,
+        string $stderr,
+        int $exitCode,
+        bool $timedOut,
+    ): DetectionStatus {
+        if ($timedOut) {
+            return DetectionStatus::TIMED_OUT;
+        }
+
+        if ($exitCode > self::PROCESS_MIN_ERROR_CODE) {
+            // See \Symfony\Component\Process\Process::$exitCodes
+            return DetectionStatus::ERROR;
+        }
+
+        if ($exitCode === 0) {
+            return DetectionStatus::ESCAPED;
+        }
+
+        return DetectionStatus::KILLED_BY_STATIC_ANALYSIS;
+    }
 }

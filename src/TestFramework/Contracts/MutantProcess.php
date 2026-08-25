@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
 use Symfony\Component\Process\Process;
 
 /**
@@ -47,17 +45,11 @@ use Symfony\Component\Process\Process;
  */
 interface MutantProcess
 {
-    public function getMutant(): Mutant;
-
     public function getProcess(): Process;
 
     public function markAsTimedOut(): void;
 
-    public function isTimedOut(): bool;
-
     public function markAsFinished(): void;
 
-    public function getFinishedAt(): float;
-
-    public function getResult(): MutantExecutionResult;
+    public function getResult(): MutantProcessResult;
 }

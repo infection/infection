@@ -38,8 +38,8 @@ namespace Infection\Metrics;
 use Generator;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
-use Infection\Mutant\DetectionStatus;
 use Infection\Reporter\TextFileReporter;
+use Infection\TestFramework\Contracts\DetectionStatus;
 use function iterator_to_array;
 
 /**

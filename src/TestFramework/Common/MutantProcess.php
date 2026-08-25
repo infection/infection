@@ -33,28 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\TestFramework\Common;
 
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\TestFramework\Contracts\Mutant;
-use function microtime;
+use DuoClock\DuoClock;
+use Infection\TestFramework\Contracts\MutantProcess as MutantProcessContract;
+use Infection\TestFramework\Contracts\MutantProcessResult;
 use Symfony\Component\Process\Process;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
- * @final
  */
-class MutantProcess
+final class MutantProcess implements MutantProcessContract
 {
     private bool $timedOut = false;
 
-    private float $finishedAt = 0.0;
+    private ?float $finishedAt = null;
 
     public function __construct(
         private readonly Process $process,
-        private readonly Mutant $mutant,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly MutantProcessDetectionStatusResolver $detectionStatusResolver,
+        private readonly DuoClock $clock,
     ) {
     }
 
@@ -63,34 +62,35 @@ class MutantProcess
         return $this->process;
     }
 
-    public function getMutant(): Mutant
-    {
-        return $this->mutant;
-    }
-
     public function markAsTimedOut(): void
     {
         $this->timedOut = true;
     }
 
-    public function isTimedOut(): bool
-    {
-        return $this->timedOut;
-    }
-
     public function markAsFinished(): void
     {
-        $this->finishedAt = microtime(true);
+        $this->finishedAt = $this->clock->microtime();
     }
 
-    public function getFinishedAt(): float
+    public function getResult(): MutantProcessResult
     {
-        return $this->finishedAt;
-    }
+        $finishedAt = $this->finishedAt;
+        Assert::notNull($finishedAt, 'Should have been started.');
+        $exitCode = $this->process->getExitCode();
+        Assert::integer($exitCode, 'A finished mutant process must have an exit code.');
 
-    public function getMutantExecutionResult(): MutantExecutionResult
-    {
-        // todo [phpstan-integration] cache it
-        return $this->mutantExecutionResultFactory->createFromProcess($this);
+        return new MutantProcessResult(
+            commandLine: $this->process->getCommandLine(),
+            stdout: $this->process->getOutput(),
+            stderr: $this->process->getErrorOutput(),
+            startedAt: $this->process->getStartTime(),
+            finishedAt: $finishedAt,
+            detectionStatus: $this->detectionStatusResolver->resolve(
+                $this->process->getOutput(),
+                $this->process->getErrorOutput(),
+                $exitCode,
+                $this->timedOut,
+            ),
+        );
     }
 }

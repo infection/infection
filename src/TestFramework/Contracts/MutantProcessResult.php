@@ -35,43 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
-use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
-use Infection\Process\ShellCommandLineExecutor;
-use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use SplFileInfo;
-
-/**
- * @internal This is the upgraded version of TestFrameworkAdapterFactory.
- * @see TestFrameworkAdapterFactory
- */
-interface TestFrameworkFactory
+/** @internal */
+final readonly class MutantProcessResult
 {
-    /**
-     * @param list<string> $sourceDirectories
-     * @param SplFileInfo[] $filteredSourceFilesToMutate
-     */
-    public static function create(
-        string $testFrameworkExecutable,
-        string $tmpDir,
-        string $testFrameworkConfigPath,
-        ?string $testFrameworkConfigDir,
-        string $jUnitFilePath,
-        string $projectDir,
-        array $sourceDirectories,
-        bool $skipCoverage,
-        bool $executeOnlyCoveringTestCases,
-        array $filteredSourceFilesToMutate,
-        ?string $mapSourceClassToTestStrategy,
-        ShellCommandLineExecutor $shellCommandLineExecutor,
-        ConsoleOutput $consoleOutput,
-        CoverageChecker $coverageChecker,
-        Configuration $configuration,
-        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
-    ): TestFramework;
-
-    public static function getAdapterName(): string;
-
-    public static function getExecutableName(): string;
+    public function __construct(
+        public string $commandLine,
+        public string $stdout,
+        public string $stderr,
+        public float $startedAt,
+        public float $finishedAt,
+        public DetectionStatus $detectionStatus,
+    ) {
+    }
 }

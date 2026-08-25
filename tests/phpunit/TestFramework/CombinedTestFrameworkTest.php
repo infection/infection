@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
-use Infection\Mutant\DetectionStatus;
-use Infection\Process\CombinedMutantEvaluationPipe;
-use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\CombinedTestFramework;
+use Infection\TestFramework\Common\CombinedMutantEvaluationPipe;
+use Infection\TestFramework\Common\MutantProcessContainer;
+use Infection\TestFramework\Contracts\DetectionStatus;
 use Infection\TestFramework\Contracts\Mutant;
+use Infection\TestFramework\Contracts\MutantProcess;
+use Infection\TestFramework\Contracts\MutantProcessResult;
 use Infection\TestFramework\Contracts\TestFramework;
-use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -57,10 +57,8 @@ final class CombinedTestFrameworkTest extends TestCase
 
         $testFrameworkProcess
             ->expects($this->once())
-            ->method('getMutantExecutionResult')
-            ->willReturn(MutantExecutionResultBuilder::withMinimalTestData()
-                ->withDetectionStatus(DetectionStatus::ESCAPED)
-                ->build())
+            ->method('getResult')
+            ->willReturn(new MutantProcessResult('', '', '', 0., 0., DetectionStatus::ESCAPED))
         ;
 
         $testFramework = $this->createMock(TestFramework::class);
@@ -68,7 +66,7 @@ final class CombinedTestFrameworkTest extends TestCase
             ->expects($this->once())
             ->method('test')
             ->with($mutant)
-            ->willReturn(MutantProcessContainer::from(static fn (): MutantProcess => $testFrameworkProcess))
+            ->willReturn(MutantProcessContainer::from($mutant, static fn (): MutantProcess => $testFrameworkProcess))
         ;
 
         $staticAnalysis = $this->createMock(TestFramework::class);
@@ -76,7 +74,7 @@ final class CombinedTestFrameworkTest extends TestCase
             ->expects($this->once())
             ->method('test')
             ->with($mutant)
-            ->willReturn(MutantProcessContainer::from(static fn (): MutantProcess => $staticAnalysisProcess))
+            ->willReturn(MutantProcessContainer::from($mutant, static fn (): MutantProcess => $staticAnalysisProcess))
         ;
 
         $evaluation = (new CombinedTestFramework([$testFramework, $staticAnalysis]))->test($mutant);

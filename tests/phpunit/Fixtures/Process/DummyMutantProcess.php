@@ -4,31 +4,26 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\Process;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
-use Infection\Process\MutantProcess;
+use Infection\TestFramework\Contracts\MutantProcess;
+use Infection\TestFramework\Contracts\MutantProcessResult;
+use Infection\TestFramework\Contracts\DetectionStatus;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Process\Process;
 
-final class DummyMutantProcess extends MutantProcess
+final readonly class DummyMutantProcess implements MutantProcess
 {
     public function __construct(
         private readonly Process $process,
-        Mutant $mutant,
-        MutantExecutionResultFactory $mutantExecutionResultFactory,
-        private readonly bool $expectTimeOut
+        private readonly bool $expectTimeOut,
+        private readonly DetectionStatus $detectionStatus,
     ) {
-        parent::__construct($process, $mutant, $mutantExecutionResultFactory);
     }
 
-    #[\Override]
     public function getProcess(): Process
     {
         return $this->process;
     }
 
-    #[\Override]
     public function markAsTimedOut(): void
     {
         if (!$this->expectTimeOut) {
@@ -37,5 +32,14 @@ final class DummyMutantProcess extends MutantProcess
                 __FUNCTION__
             ));
         }
+    }
+
+    public function markAsFinished(): void
+    {
+    }
+
+    public function getResult(): MutantProcessResult
+    {
+        return new MutantProcessResult('', '', '', 0., 0., $this->detectionStatus);
     }
 }

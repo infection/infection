@@ -33,45 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Contracts;
+namespace Infection\Tests\TestFramework\PhpStan\Mutant;
 
-use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
-use Infection\Process\ShellCommandLineExecutor;
-use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use SplFileInfo;
+use Infection\TestFramework\Contracts\DetectionStatus;
+use Infection\TestFramework\PhpStan\Mutant\PHPStanMutantDetectionStatusResolver;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal This is the upgraded version of TestFrameworkAdapterFactory.
- * @see TestFrameworkAdapterFactory
- */
-interface TestFrameworkFactory
+#[CoversClass(PHPStanMutantDetectionStatusResolver::class)]
+final class PHPStanMutantDetectionStatusResolverTest extends TestCase
 {
-    /**
-     * @param list<string> $sourceDirectories
-     * @param SplFileInfo[] $filteredSourceFilesToMutate
-     */
-    public static function create(
-        string $testFrameworkExecutable,
-        string $tmpDir,
-        string $testFrameworkConfigPath,
-        ?string $testFrameworkConfigDir,
-        string $jUnitFilePath,
-        string $projectDir,
-        array $sourceDirectories,
-        bool $skipCoverage,
-        bool $executeOnlyCoveringTestCases,
-        array $filteredSourceFilesToMutate,
-        ?string $mapSourceClassToTestStrategy,
-        ShellCommandLineExecutor $shellCommandLineExecutor,
-        ConsoleOutput $consoleOutput,
-        CoverageChecker $coverageChecker,
-        Configuration $configuration,
-        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
-    ): TestFramework;
+    #[DataProvider('statusesProvider')]
+    public function test_it_resolves_the_detection_status(
+        int $exitCode,
+        bool $timedOut,
+        DetectionStatus $expected,
+    ): void {
+        $resolver = new PHPStanMutantDetectionStatusResolver();
 
-    public static function getAdapterName(): string;
+        $this->assertSame($expected, $resolver->resolve('', '', $exitCode, $timedOut));
+    }
 
-    public static function getExecutableName(): string;
+    public static function statusesProvider(): iterable
+    {
+        yield 'timed out' => [0, true, DetectionStatus::TIMED_OUT];
+
+        yield 'process error' => [101, false, DetectionStatus::ERROR];
+
+        yield 'escaped' => [0, false, DetectionStatus::ESCAPED];
+
+        yield 'killed by static analysis' => [1, false, DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
+
+        yield 'highest standard error code' => [100, false, DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
+    }
 }

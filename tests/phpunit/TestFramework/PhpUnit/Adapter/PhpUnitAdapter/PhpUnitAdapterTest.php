@@ -37,17 +37,18 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
 use function array_map;
 use function array_slice;
+use DuoClock\TimeSpy;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\DetectionStatus;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
@@ -157,6 +158,16 @@ final class PhpUnitAdapterTest extends TestCase
         $actual = $adapter->getVersion();
 
         $this->assertSame($expected, $actual);
+    }
+
+    #[DataProvider('detectionStatusProvider')]
+    public function test_it_resolves_the_mutant_detection_status(
+        string $stdout,
+        int $exitCode,
+        bool $timedOut,
+        DetectionStatus $expected,
+    ): void {
+        $this->assertSame($expected, $this->adapter->resolve($stdout, '', $exitCode, $timedOut));
     }
 
     #[DataProvider('passOutputProvider')]
@@ -315,6 +326,19 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['OK, but incomplete, skipped, or risky tests!', false];
 
         yield ['ParseError: syntax error, unexpected ">"', true];
+    }
+
+    public static function detectionStatusProvider(): iterable
+    {
+        yield 'timed out' => ['OK (1 test, 1 assertion)', 0, true, DetectionStatus::TIMED_OUT];
+
+        yield 'process error' => ['', 101, false, DetectionStatus::ERROR];
+
+        yield 'escaped' => ['OK (1 test, 1 assertion)', 0, false, DetectionStatus::ESCAPED];
+
+        yield 'syntax error' => ['ParseError: syntax error', 1, false, DetectionStatus::SYNTAX_ERROR];
+
+        yield 'killed by tests' => ['FAILURES!', 1, false, DetectionStatus::KILLED_BY_TESTS];
     }
 
     #[DataProvider('executionOrderProvider')]
@@ -1680,7 +1704,7 @@ final class PhpUnitAdapterTest extends TestCase
             ConfigurationBuilder::withMinimalTestData()->build(),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
             $this->memoryLimiter,
-            $this->createStub(MutantExecutionResultFactory::class),
+            new TimeSpy(),
             $version,
         );
     }

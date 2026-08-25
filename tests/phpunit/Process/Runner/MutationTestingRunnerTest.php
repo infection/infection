@@ -45,17 +45,18 @@ use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasF
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\TestFramework\CombinedTestFramework;
+use Infection\TestFramework\Common\MutantProcessContainer;
+use Infection\TestFramework\Contracts\DetectionStatus;
+use Infection\TestFramework\Contracts\MutantProcess;
+use Infection\TestFramework\Contracts\MutantProcessResult;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
@@ -626,14 +627,17 @@ final class MutationTestingRunnerTest extends TestCase
 
     public function test_container_to_finished_event(): void
     {
-        $result = $this->createStub(MutantExecutionResult::class);
+        $mutant = MutantBuilder::withMinimalTestData()->build();
 
         $process = $this->createMock(MutantProcess::class);
         $process->expects($this->once())
-            ->method('getMutantExecutionResult')
-            ->willReturn($result);
+            ->method('getResult')
+            ->willReturn(new MutantProcessResult('', '', '', 0., 0., DetectionStatus::ESCAPED));
 
         $container = $this->createMock(MutantProcessContainer::class);
+        $container->expects($this->once())
+            ->method('getMutant')
+            ->willReturn($mutant);
         $container->expects($this->once())
             ->method('getCurrent')
             ->willReturn($process);
@@ -757,7 +761,16 @@ final class MutationTestingRunnerTest extends TestCase
 
     private function buildCoveredMutantProcessContainer(): MutantProcessContainer
     {
-        return $this->createMock(MutantProcessContainer::class);
+        $process = $this->createStub(MutantProcess::class);
+        $process->method('getResult')->willReturn(
+            new MutantProcessResult('', '', '', 0., 0., DetectionStatus::ESCAPED),
+        );
+
+        $container = $this->createMock(MutantProcessContainer::class);
+        $container->method('getMutant')->willReturn(MutantBuilder::withMinimalTestData()->build());
+        $container->method('getCurrent')->willReturn($process);
+
+        return $container;
     }
 
     private function someIterable(?callable $callback = null): Callback

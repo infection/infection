@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Process\Factory;
 
+use DuoClock\DuoClock;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
-use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
+use Infection\TestFramework\Common\MutantProcess;
+use Infection\TestFramework\Common\MutantProcessContainer;
+use Infection\TestFramework\LegacyMutantDetectionStatusResolver;
 use function min;
 use Symfony\Component\Process\Process;
 
@@ -60,8 +61,8 @@ class MutantProcessContainerFactory
     public function __construct(
         private readonly TestFrameworkAdapter $testFrameworkAdapter,
         private readonly float $timeout,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly Configuration $configuration,
+        private readonly DuoClock $clock,
     ) {
     }
 
@@ -89,10 +90,14 @@ class MutantProcessContainerFactory
         }
 
         return MutantProcessContainer::from(
+            $mutant,
             fn (): MutantProcess => new MutantProcess(
                 $process,
-                $mutant,
-                $this->mutantExecutionResultFactory,
+                new LegacyMutantDetectionStatusResolver(
+                    $testFrameworkAdapter ?? $this->testFrameworkAdapter,
+                    $mutant->getTests() !== [],
+                ),
+                $this->clock,
             ),
         );
     }

@@ -39,7 +39,7 @@ use Infection\Metrics\Collector;
 use Infection\Metrics\FilteringResultsCollector;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\TargetDetectionStatusesProvider;
-use Infection\Mutant\DetectionStatus;
+use Infection\TestFramework\Contracts\DetectionStatus;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner;
 
 use DuoClock\TimeSpy;
-use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\ProcessQueue;
+use Infection\TestFramework\Common\MutantProcessContainer;
 use Iterator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

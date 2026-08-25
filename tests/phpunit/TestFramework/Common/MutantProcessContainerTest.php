@@ -33,17 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process;
+namespace Infection\Tests\TestFramework\Common;
 
-use Infection\Mutant\DetectionStatus;
-use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
-use Infection\Tests\Mutant\MutantExecutionResultBuilder;
+use Infection\Mutant\Mutant;
+use Infection\TestFramework\Common\MutantProcessContainer;
+use Infection\TestFramework\Contracts\DetectionStatus;
+use Infection\TestFramework\Contracts\MutantProcess;
+use Infection\TestFramework\Contracts\MutantProcessResult;
+use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(MutantProcessContainer::class)]
@@ -51,35 +52,35 @@ final class MutantProcessContainerTest extends TestCase
 {
     private MockObject&MutantProcess $phpUnitMutantProcess;
 
+    private Mutant $mutant;
+
     protected function setUp(): void
     {
         $this->phpUnitMutantProcess = $this->createMock(MutantProcess::class);
+        $this->mutant = MutantBuilder::withMinimalTestData()->build();
     }
 
     public function test_it_returns_false_when_there_is_no_next_process_to_kill_mutant(): void
     {
-        $container = MutantProcessContainer::from(fn (): MutantProcess => $this->phpUnitMutantProcess);
+        $container = MutantProcessContainer::from($this->mutant, fn (): MutantProcess => $this->phpUnitMutantProcess);
 
         $this->assertFalse($container->hasNext());
     }
 
     public function test_it_returns_true_when_there_is_next_process_to_kill_mutant(): void
     {
-        $container = MutantProcessContainer::from(fn (): MutantProcess => $this->phpUnitMutantProcess);
+        $container = MutantProcessContainer::from($this->mutant, fn (): MutantProcess => $this->phpUnitMutantProcess);
 
         // Build the first next process to advance the index
         $newMutantProcess = $this->createStub(MutantProcess::class);
 
-        $mutantExecutionResult = MutantExecutionResultBuilder::withMinimalTestData()
-            ->withDetectionStatus(DetectionStatus::ESCAPED)
-            ->build();
-
         $this->phpUnitMutantProcess
             ->expects($this->once())
-            ->method('getMutantExecutionResult')
-            ->willReturn($mutantExecutionResult);
+            ->method('getResult')
+            ->willReturn(new MutantProcessResult('', '', '', 0., 0., DetectionStatus::ESCAPED));
 
         $container = $container->merge(MutantProcessContainer::from(
+            $this->mutant,
             static fn (): MutantProcess => $newMutantProcess,
         ));
 
@@ -92,11 +93,12 @@ final class MutantProcessContainerTest extends TestCase
 
     public function test_it_builds_next_process_to_kill_mutant(): void
     {
-        $container = MutantProcessContainer::from(fn (): MutantProcess => $this->phpUnitMutantProcess);
+        $container = MutantProcessContainer::from($this->mutant, fn (): MutantProcess => $this->phpUnitMutantProcess);
 
         $newMutantProcess = $this->createStub(MutantProcess::class);
 
         $container = $container->merge(MutantProcessContainer::from(
+            $this->mutant,
             static fn (): MutantProcess => $newMutantProcess,
         ));
 
@@ -107,18 +109,19 @@ final class MutantProcessContainerTest extends TestCase
 
     public function test_it_returns_current_mutant_process(): void
     {
-        $container = MutantProcessContainer::from(fn (): MutantProcess => $this->phpUnitMutantProcess);
+        $container = MutantProcessContainer::from($this->mutant, fn (): MutantProcess => $this->phpUnitMutantProcess);
 
         $this->assertSame($this->phpUnitMutantProcess, $container->getCurrent());
     }
 
     public function test_it_returns_next_mutant_process_after_building_it(): void
     {
-        $container = MutantProcessContainer::from(fn (): MutantProcess => $this->phpUnitMutantProcess);
+        $container = MutantProcessContainer::from($this->mutant, fn (): MutantProcess => $this->phpUnitMutantProcess);
 
         $newMutantProcess = $this->createStub(MutantProcess::class);
 
         $container = $container->merge(MutantProcessContainer::from(
+            $this->mutant,
             static fn (): MutantProcess => $newMutantProcess,
         ));
 

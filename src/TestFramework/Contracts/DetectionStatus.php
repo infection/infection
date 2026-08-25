@@ -35,43 +35,49 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
-use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
-use Infection\Process\ShellCommandLineExecutor;
-use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use SplFileInfo;
+use function array_udiff;
+use function array_values;
 
 /**
- * @internal This is the upgraded version of TestFrameworkAdapterFactory.
- * @see TestFrameworkAdapterFactory
+ * @internal
  */
-interface TestFrameworkFactory
+enum DetectionStatus: string
 {
+    case KILLED_BY_TESTS = 'killed by tests';
+    case KILLED_BY_STATIC_ANALYSIS = 'killed by SA';
+    case ESCAPED = 'escaped';
+    case ERROR = 'error';
+    case TIMED_OUT = 'timed out';
+    case SKIPPED = 'skipped';
+    case SYNTAX_ERROR = 'syntax error';
+    case NOT_COVERED = 'not covered';
+    case IGNORED = 'ignored';
+
     /**
-     * @param list<string> $sourceDirectories
-     * @param SplFileInfo[] $filteredSourceFilesToMutate
+     * @return list<DetectionStatus>
      */
-    public static function create(
-        string $testFrameworkExecutable,
-        string $tmpDir,
-        string $testFrameworkConfigPath,
-        ?string $testFrameworkConfigDir,
-        string $jUnitFilePath,
-        string $projectDir,
-        array $sourceDirectories,
-        bool $skipCoverage,
-        bool $executeOnlyCoveringTestCases,
-        array $filteredSourceFilesToMutate,
-        ?string $mapSourceClassToTestStrategy,
-        ShellCommandLineExecutor $shellCommandLineExecutor,
-        ConsoleOutput $consoleOutput,
-        CoverageChecker $coverageChecker,
-        Configuration $configuration,
-        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
-    ): TestFramework;
+    public static function getCasesExcluding(DetectionStatus ...$excluded): array
+    {
+        return array_values(
+            array_udiff(
+                DetectionStatus::cases(),
+                $excluded,
+                static fn (DetectionStatus $left, DetectionStatus $right) => $left->value <=> $right->value,
+            ),
+        );
+    }
 
-    public static function getAdapterName(): string;
+    /**
+     * @return array<key-of<self>, self>
+     */
+    public static function getIndexedCases(): array
+    {
+        $indexedCases = [];
 
-    public static function getExecutableName(): string;
+        foreach (self::cases() as $case) {
+            $indexedCases[$case->name] = $case;
+        }
+
+        return $indexedCases;
+    }
 }

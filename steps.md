@@ -18,3 +18,6 @@
 18. Remove StaticAnalysisTestFramework
 19. Move the migrated PHPStan & Mago adapters under Test/Framework
 20. Introduce a Mutant contract.
+21. Fix MutantProcess; various stuff to break down here:
+    - Move the resolution of the detection status to the test framework
+    - microtime -> Clock

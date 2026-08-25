@@ -35,10 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Mago\Adapter;
 
-use Infection\Mutant\MutantExecutionResultFactory;
+use DuoClock\TimeSpy;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
+use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
 use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -55,7 +56,8 @@ final class MagoAdapterFactoryTest extends TestCase
             [],
             new ShellCommandLineExecutor(),
             new MagoMutantProcessFactory(
-                $this->createStub(MutantExecutionResultFactory::class),
+                new MagoMutantDetectionStatusResolver(),
+                new TimeSpy(),
                 '/path/to/mago',
                 new CommandLineBuilder(new PhpExecutableFinder()),
                 10.,

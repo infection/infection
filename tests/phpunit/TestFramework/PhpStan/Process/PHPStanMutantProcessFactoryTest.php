@@ -35,12 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpStan\Process;
 
+use DuoClock\TimeSpy;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\PhpStan\Mutant\PHPStanMutantDetectionStatusResolver;
 use Infection\TestFramework\PhpStan\Process\PHPStanMutantProcessFactory;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
@@ -95,7 +96,6 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -129,7 +129,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
         $factory = new PHPStanMutantProcessFactory(
             $filesystem,
-            $phpStanMutantExecutionResultFactory,
+            new PHPStanMutantDetectionStatusResolver(),
+            new TimeSpy(),
             '/path/to/phpstan-config-folder',
             '/path/to/phpstan',
             $commandLineBuilder,
@@ -144,9 +145,6 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
         $this->assertSame(100.0, $process->getTimeout());
         $this->assertFalse($process->isStarted());
-
-        $this->assertSame($mutant, $mutantProcess->getMutant());
-        $this->assertFalse($mutantProcess->isTimedOut());
     }
 
     public function test_it_creates_a_process_with_multiple_options(): void
@@ -192,7 +190,6 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -227,7 +224,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
         $factory = new PHPStanMutantProcessFactory(
             $filesystem,
-            $phpStanMutantExecutionResultFactory,
+            new PHPStanMutantDetectionStatusResolver(),
+            new TimeSpy(),
             '/path/to/phpstan-config-folder',
             '/path/to/phpstan',
             $commandLineBuilder,
@@ -242,9 +240,6 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
         $this->assertSame(100.0, $process->getTimeout());
         $this->assertFalse($process->isStarted());
-
-        $this->assertSame($mutant, $mutantProcess->getMutant());
-        $this->assertFalse($mutantProcess->isTimedOut());
     }
 
     public function test_it_creates_a_process_without_options(): void
@@ -290,7 +285,6 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -312,7 +306,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
         $factory = new PHPStanMutantProcessFactory(
             $filesystem,
-            $phpStanMutantExecutionResultFactory,
+            new PHPStanMutantDetectionStatusResolver(),
+            new TimeSpy(),
             '/path/to/phpstan-config-folder',
             '/path/to/phpstan',
             $commandLineBuilder,
@@ -327,8 +322,5 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
         $this->assertSame(100.0, $process->getTimeout());
         $this->assertFalse($process->isStarted());
-
-        $this->assertSame($mutant, $mutantProcess->getMutant());
-        $this->assertFalse($mutantProcess->isTimedOut());
     }
 }

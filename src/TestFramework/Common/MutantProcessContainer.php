@@ -33,29 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\TestFramework\Common;
 
 use function array_key_exists;
 use Closure;
 use function count;
-use Infection\Mutant\DetectionStatus;
+use Infection\TestFramework\Contracts\DetectionStatus;
+use Infection\TestFramework\Contracts\Mutant;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\TestFramework\Contracts\MutantProcess as MutantProcessContract;
 
 /**
- * @phpstan-type MutantProcessFactory = Closure(): MutantProcess
+ * @phpstan-type MutantProcessFactory = Closure(): MutantProcessContract
  *
  * @internal
  * @final
  */
 class MutantProcessContainer implements MutantEvaluationPipe
 {
-    /** @var array<int<0, max>, MutantProcess> */
+    /** @var array<int<0, max>, MutantProcessContract> */
     private array $processes = [];
 
     private function __construct(
-        /**
-         * @var non-empty-list<MutantProcessFactory>
-         */
+        private readonly Mutant $mutant,
+        /** @var array<int<0, max>, MutantProcessFactory> */
         private array $mutantProcessFactories,
         /**
          * @var int<0,max>
@@ -67,9 +68,14 @@ class MutantProcessContainer implements MutantEvaluationPipe
     /**
      * @param MutantProcessFactory $factory
      */
-    public static function from(Closure $factory): self
+    public static function from(Mutant $mutant, Closure $factory): self
     {
-        return new self([$factory]);
+        return new self($mutant, [$factory]);
+    }
+
+    public function getMutant(): Mutant
+    {
+        return $this->mutant;
     }
 
     public function isCold(): bool
@@ -83,17 +89,18 @@ class MutantProcessContainer implements MutantEvaluationPipe
     public function hasNext(): bool
     {
         return array_key_exists($this->currentProcessIndex + 1, $this->mutantProcessFactories)
+            // TODO: mutationEscaped()? we can move the comparison within the method and adapt the name.
             && $this->getCurrentMutantProcessDetectionStatus() === DetectionStatus::ESCAPED;
     }
 
-    public function createNext(): MutantProcess
+    public function createNext(): MutantProcessContract
     {
         ++$this->currentProcessIndex;
 
         return $this->getCurrent();
     }
 
-    public function getCurrent(): MutantProcess
+    public function getCurrent(): MutantProcessContract
     {
         return $this->processes[$this->currentProcessIndex] ??= ($this->mutantProcessFactories[$this->currentProcessIndex])();
     }
@@ -105,6 +112,6 @@ class MutantProcessContainer implements MutantEvaluationPipe
 
     private function getCurrentMutantProcessDetectionStatus(): DetectionStatus
     {
-        return $this->getCurrent()->getMutantExecutionResult()->getDetectionStatus();
+        return $this->getCurrent()->getResult()->detectionStatus;
     }
 }

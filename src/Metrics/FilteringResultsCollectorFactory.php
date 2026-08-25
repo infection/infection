@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Metrics;
 
 use function count;
-use Infection\Mutant\DetectionStatus;
+use Infection\TestFramework\Contracts\DetectionStatus;
 
 /**
  * @internal

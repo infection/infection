@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
+use DuoClock\DuoClock;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
@@ -89,7 +89,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         ConsoleOutput $consoleOutput,
         CoverageChecker $coverageChecker,
         Configuration $configuration,
-        MutantExecutionResultFactory $mutantExecutionResultFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
@@ -144,7 +143,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             configuration: $configuration,
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter,
             memoryLimiter: new MemoryLimiter(new MemoryLimiterEnvironment()),
-            mutantExecutionResultFactory: $mutantExecutionResultFactory,
+            clock: new DuoClock(),
         );
     }
 

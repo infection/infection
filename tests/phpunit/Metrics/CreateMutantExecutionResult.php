@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Metrics;
 
 use Infection\Metrics\Collector;
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
+use Infection\TestFramework\Contracts\DetectionStatus;
 use Infection\Testing\MutatorName;
 use function Later\now;
 use const PHP_EOL;

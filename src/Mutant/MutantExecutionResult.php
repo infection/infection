@@ -37,11 +37,14 @@ namespace Infection\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\MutatorResolver;
+use Infection\TestFramework\Contracts\DetectionStatus;
+use Infection\TestFramework\Contracts\MutantProcessResult;
 use Later\Interfaces\Deferred;
 use RuntimeException;
 use function sprintf;
 use function strlen;
 use function strrpos;
+use function trim;
 use Webmozart\Assert\Assert;
 
 /**
@@ -94,6 +97,30 @@ class MutantExecutionResult
     public static function createFromIgnoredMutant(Mutant $mutant): self
     {
         return self::createFromMutant($mutant, DetectionStatus::IGNORED);
+    }
+
+    public static function createFromProcessResult(Mutant $mutant, MutantProcessResult $processResult): self
+    {
+        $mutation = $mutant->getMutation();
+
+        return new self(
+            $processResult->commandLine,
+            trim($processResult->stdout . "\n\n" . $processResult->stderr),
+            $processResult->detectionStatus,
+            $mutant->getDiff(),
+            $mutation->getHash(),
+            $mutation->getMutatorClass(),
+            $mutation->getMutatorName(),
+            $mutation->getOriginalFilePath(),
+            $mutation->getOriginalStartingLine(),
+            $mutation->getOriginalEndingLine(),
+            $mutation->getOriginalStartFilePosition(),
+            $mutation->getOriginalEndFilePosition(),
+            $mutant->getPrettyPrintedOriginalCode(),
+            $mutant->getMutatedCode(),
+            $mutant->getTests(),
+            $processResult->finishedAt - $processResult->startedAt,
+        );
     }
 
     public function getProcessCommandLine(): string

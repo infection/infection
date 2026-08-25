@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Logger\MutationAnalysis;
 
 use Infection\Framework\Iterable\IterableCounter;
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
+use Infection\TestFramework\Contracts\DetectionStatus;
 use function is_int;
 use function max;
 use function min;

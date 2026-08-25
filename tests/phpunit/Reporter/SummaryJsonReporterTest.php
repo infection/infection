@@ -37,9 +37,9 @@ namespace Infection\Tests\Reporter;
 
 use Infection\Metrics\Collector;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
 use Infection\Reporter\SummaryJsonReporter;
+use Infection\TestFramework\Contracts\DetectionStatus;
 use const JSON_THROW_ON_ERROR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

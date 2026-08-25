@@ -33,45 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Contracts;
+namespace Infection\TestFramework;
 
-use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
-use Infection\Process\ShellCommandLineExecutor;
-use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use SplFileInfo;
+use Infection\AbstractTestFramework\SyntaxErrorAware;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\Common\MutantProcessDetectionStatusResolver;
+use Infection\TestFramework\Contracts\DetectionStatus;
 
 /**
- * @internal This is the upgraded version of TestFrameworkAdapterFactory.
- * @see TestFrameworkAdapterFactory
+ * @deprecated This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+ *
+ * @internal
  */
-interface TestFrameworkFactory
+final readonly class LegacyMutantDetectionStatusResolver implements MutantProcessDetectionStatusResolver
 {
-    /**
-     * @param list<string> $sourceDirectories
-     * @param SplFileInfo[] $filteredSourceFilesToMutate
-     */
-    public static function create(
-        string $testFrameworkExecutable,
-        string $tmpDir,
-        string $testFrameworkConfigPath,
-        ?string $testFrameworkConfigDir,
-        string $jUnitFilePath,
-        string $projectDir,
-        array $sourceDirectories,
-        bool $skipCoverage,
-        bool $executeOnlyCoveringTestCases,
-        array $filteredSourceFilesToMutate,
-        ?string $mapSourceClassToTestStrategy,
-        ShellCommandLineExecutor $shellCommandLineExecutor,
-        ConsoleOutput $consoleOutput,
-        CoverageChecker $coverageChecker,
-        Configuration $configuration,
-        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
-    ): TestFramework;
+    private const int PROCESS_MIN_ERROR_CODE = 100;
 
-    public static function getAdapterName(): string;
+    public function __construct(
+        private TestFrameworkAdapter $adapter,
+        private bool $hasTests,
+    ) {
+    }
 
-    public static function getExecutableName(): string;
+    public function resolve(string $stdout, string $stderr, int $exitCode, bool $timedOut): DetectionStatus
+    {
+        if (!$this->hasTests) {
+            return DetectionStatus::NOT_COVERED;
+        }
+
+        if ($timedOut) {
+            return DetectionStatus::TIMED_OUT;
+        }
+
+        if ($exitCode > self::PROCESS_MIN_ERROR_CODE) {
+            return DetectionStatus::ERROR;
+        }
+
+        if ($exitCode === 0 && $this->adapter->testsPass($stdout)) {
+            return DetectionStatus::ESCAPED;
+        }
+
+        if ($this->adapter instanceof SyntaxErrorAware && $this->adapter->isSyntaxError($stdout)) {
+            return DetectionStatus::SYNTAX_ERROR;
+        }
+
+        return DetectionStatus::KILLED_BY_TESTS;
+    }
 }

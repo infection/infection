@@ -8237,12 +8237,6 @@ message = "Type `iterable` in return type of `valuesProvider` is imprecise, equi
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Mutant/TestFrameworkMutantExecutionResultFactoryTest.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
-count = 6
-
-[[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorIntegrationTest::test_it_generates_mutations_for_a_given_file`.'

@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
+use Infection\TestFramework\Contracts\DetectionStatus;
 use Infection\Testing\MutatorName;
 use function is_string;
 use Later\Interfaces\Deferred;

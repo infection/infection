@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use Infection\Console\ConsoleOutput;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -69,7 +68,6 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
             ConfigurationBuilder::withMinimalTestData()->build(),
-            $this->createStub(MutantExecutionResultFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 

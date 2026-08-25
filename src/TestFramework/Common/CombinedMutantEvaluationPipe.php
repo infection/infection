@@ -33,11 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\TestFramework\Common;
 
 use function array_key_exists;
-use Infection\Mutant\DetectionStatus;
+use Infection\TestFramework\Contracts\DetectionStatus;
+use Infection\TestFramework\Contracts\Mutant;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\TestFramework\Contracts\MutantProcess;
 use Webmozart\Assert\Assert;
 
 /** @internal */
@@ -72,6 +74,11 @@ final class CombinedMutantEvaluationPipe implements MutantEvaluationPipe
         return true;
     }
 
+    public function getMutant(): Mutant
+    {
+        return $this->pipes[0]->getMutant();
+    }
+
     public function getCurrent(): MutantProcess
     {
         return $this->getCurrentPipe()->getCurrent();
@@ -86,7 +93,7 @@ final class CombinedMutantEvaluationPipe implements MutantEvaluationPipe
         }
 
         return array_key_exists($this->currentPipeIndex + 1, $this->pipes)
-            && $currentPipe->getCurrent()->getMutantExecutionResult()->getDetectionStatus() === DetectionStatus::ESCAPED;
+            && $currentPipe->getCurrent()->getResult()->detectionStatus === DetectionStatus::ESCAPED;
     }
 
     public function createNext(): MutantProcess

@@ -33,70 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process;
+namespace Infection\Tests\TestFramework\Common;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
-use Infection\Tests\Mutant\MutantBuilder;
+use DuoClock\TimeSpy;
+use Infection\TestFramework\Common\MutantProcess;
+use Infection\TestFramework\Common\MutantProcessDetectionStatusResolver;
+use Infection\TestFramework\Contracts\DetectionStatus;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-#[CoversClass(MutantProcessContainer::class)]
+#[CoversClass(MutantProcess::class)]
 final class MutantProcessTest extends TestCase
 {
-    private Stub&Process $processStub;
-
-    private Mutant $mutant;
-
-    private MutantProcess $mutantProcess;
-
-    protected function setUp(): void
+    public function test_it_exposes_the_finished_process_result(): void
     {
-        $this->processStub = $this->createStub(Process::class);
-        $this->mutant = MutantBuilder::withMinimalTestData()->build();
-        $mutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
+        $process = $this->createStub(Process::class);
+        $process->method('getCommandLine')->willReturn('mago analyze');
+        $process->method('getOutput')->willReturn('stdout');
+        $process->method('getErrorOutput')->willReturn('stderr');
+        $process->method('getExitCode')->willReturn(1);
+        $process->method('getStartTime')->willReturn(10.);
 
-        $this->mutantProcess = new MutantProcess(
-            $this->processStub,
-            $this->mutant,
-            $mutantExecutionResultFactory,
-        );
-    }
+        $resolver = $this->createMock(MutantProcessDetectionStatusResolver::class);
+        $resolver
+            ->expects($this->once())
+            ->method('resolve')
+            ->with('stdout', 'stderr', 1, true)
+            ->willReturn(DetectionStatus::KILLED_BY_STATIC_ANALYSIS)
+        ;
 
-    public function test_it_exposes_its_state(): void
-    {
-        $this->assertMutantProcessStateIs(
-            $this->mutantProcess,
-            $this->processStub,
-            $this->mutant,
-            false,
-        );
-    }
+        $clock = $this->createStub(TimeSpy::class);
+        $clock->method('microtime')->willReturn(12.);
 
-    public function test_it_can_be_marked_as_timed_out(): void
-    {
-        $this->mutantProcess->markAsTimedOut();
+        $mutantProcess = new MutantProcess($process, $resolver, $clock);
+        $mutantProcess->markAsTimedOut();
+        $mutantProcess->markAsFinished();
 
-        $this->assertMutantProcessStateIs(
-            $this->mutantProcess,
-            $this->processStub,
-            $this->mutant,
-            true,
-        );
-    }
+        $result = $mutantProcess->getResult();
 
-    private function assertMutantProcessStateIs(
-        MutantProcess $mutantProcess,
-        Process $expectedProcess,
-        Mutant $expectedMutant,
-        bool $expectedTimedOut,
-    ): void {
-        $this->assertSame($expectedProcess, $mutantProcess->getProcess());
-        $this->assertSame($expectedMutant, $mutantProcess->getMutant());
-        $this->assertSame($expectedTimedOut, $mutantProcess->isTimedOut());
+        $this->assertSame('mago analyze', $result->commandLine);
+        $this->assertSame('stdout', $result->stdout);
+        $this->assertSame('stderr', $result->stderr);
+        $this->assertSame(10., $result->startedAt);
+        $this->assertSame(12., $result->finishedAt);
+        $this->assertSame(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, $result->detectionStatus);
     }
 }

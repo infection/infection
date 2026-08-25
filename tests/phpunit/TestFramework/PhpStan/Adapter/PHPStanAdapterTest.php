@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpStan\Adapter;
 
-use Infection\Mutant\MutantExecutionResultFactory;
+use DuoClock\TimeSpy;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\PhpStan\Adapter\PHPStanAdapter;
+use Infection\TestFramework\PhpStan\Mutant\PHPStanMutantDetectionStatusResolver;
 use Infection\TestFramework\PhpStan\Process\PHPStanMutantProcessFactory;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -74,7 +75,8 @@ final class PHPStanAdapterTest extends TestCase
         $this->shellCommandLineExecutor = $this->createStub(ShellCommandLineExecutor::class);
         $this->mutantProcessFactory = new PHPStanMutantProcessFactory(
             new Filesystem(),
-            $this->createStub(MutantExecutionResultFactory::class),
+            new PHPStanMutantDetectionStatusResolver(),
+            new TimeSpy(),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,

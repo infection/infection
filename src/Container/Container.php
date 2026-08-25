@@ -38,6 +38,7 @@ namespace Infection\Container;
 use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
+use DuoClock\DuoClock;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
@@ -107,7 +108,6 @@ use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantCodePrinter;
 use Infection\Mutant\MutantFactory;
-use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
@@ -301,7 +301,6 @@ final class Container extends DIContainer
                     $container->getShellCommandLineExecutor(),
                     $container->get(ConsoleOutput::class),
                     $container->getCoverageChecker(),
-                    $container->getMutantExecutionResultFactory(),
                     static fn (): InitialTestsRunProcessFactory => $container->getInitialTestsRunProcessFactory(),
                     static fn (): MutantProcessContainerFactory => $container->getMutantProcessContainerFactory(),
                     $container->getTestFrameworkExtraOptionsFilter(),
@@ -321,7 +320,6 @@ final class Container extends DIContainer
                     GeneratedExtensionsConfig::EXTENSIONS,
                     $container->getShellCommandLineExecutor(),
                     $container->get(ConsoleOutput::class),
-                    $container->getMutantExecutionResultFactory(),
                     static fn (): CoverageChecker => $container->getCoverageChecker(),
                     static fn (): TestFrameworkExtraOptionsFilter => $container->getTestFrameworkExtraOptionsFilter(),
                 );
@@ -336,9 +334,6 @@ final class Container extends DIContainer
             ),
             MutantCodePrinter::class => static fn (self $container): MutantCodePrinter => new MutantCodePrinter(
                 $container->getPrinter(),
-            ),
-            TestFrameworkMutantExecutionResultFactory::class => static fn (self $container): TestFrameworkMutantExecutionResultFactory => new TestFrameworkMutantExecutionResultFactory(
-                static fn (): TestFrameworkAdapter => $container->getTestFrameworkAdapter(),
             ),
             Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder())),
             SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
@@ -540,8 +535,8 @@ final class Container extends DIContainer
                 return new MutantProcessContainerFactory(
                     $container->getTestFrameworkAdapter(),
                     $configuration->processTimeout,
-                    $container->getMutantExecutionResultFactory(),
                     $container->getConfiguration(),
+                    new DuoClock(),
                 );
             },
             MutationGenerator::class => static function (self $container): MutationGenerator {
@@ -992,11 +987,6 @@ final class Container extends DIContainer
     public function getAdapterInstaller(): AdapterInstaller
     {
         return $this->get(AdapterInstaller::class);
-    }
-
-    public function getMutantExecutionResultFactory(): TestFrameworkMutantExecutionResultFactory
-    {
-        return $this->get(TestFrameworkMutantExecutionResultFactory::class);
     }
 
     public function getCiDetector(): CiDetector

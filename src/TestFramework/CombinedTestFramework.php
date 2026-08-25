@@ -39,7 +39,6 @@ use function array_map;
 use function array_slice;
 use Closure;
 use function implode;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\Mutant;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
@@ -94,18 +93,12 @@ final readonly class CombinedTestFramework implements TestFramework
         return new InitialTestsResult('');
     }
 
-    public function test(Mutant $mutant): MutantExecutionResult|MutantEvaluationPipe
+    public function test(Mutant $mutant): MutantEvaluationPipe
     {
         $pipes = [];
 
         foreach ($this->testFrameworks as $testFramework) {
-            $result = $testFramework->test($mutant);
-
-            if ($result instanceof MutantExecutionResult) {
-                return $result;
-            }
-
-            $pipes[] = $result;
+            $pipes[] = $testFramework->test($mutant);
         }
 
         $pipe = $pipes[0];

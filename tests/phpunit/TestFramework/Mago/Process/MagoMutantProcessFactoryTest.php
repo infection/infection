@@ -35,19 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Mago\Process;
 
+use DuoClock\TimeSpy;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
 use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[CoversClass(MagoMutantProcessFactory::class)]
 final class MagoMutantProcessFactoryTest extends TestCase
@@ -95,7 +95,6 @@ final class MagoMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -110,12 +109,9 @@ final class MagoMutantProcessFactoryTest extends TestCase
             ->willReturn(['/path/to/mago'])
         ;
 
-        $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->never())
-            ->method('dumpFile');
-
         $factory = new MagoMutantProcessFactory(
-            $phpStanMutantExecutionResultFactory,
+            new MagoMutantDetectionStatusResolver(),
+            new TimeSpy(),
             '/path/to/mago',
             $commandLineBuilder,
             100.0,
@@ -128,9 +124,6 @@ final class MagoMutantProcessFactoryTest extends TestCase
 
         $this->assertSame(100.0, $process->getTimeout());
         $this->assertFalse($process->isStarted());
-
-        $this->assertSame($mutant, $mutantProcess->getMutant());
-        $this->assertFalse($mutantProcess->isTimedOut());
     }
 
     public function test_it_creates_a_process_with_multiple_options(): void
@@ -176,7 +169,6 @@ final class MagoMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -193,12 +185,9 @@ final class MagoMutantProcessFactoryTest extends TestCase
             ->willReturn(['/path/to/mago'])
         ;
 
-        $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->never())
-            ->method('dumpFile');
-
         $factory = new MagoMutantProcessFactory(
-            $phpStanMutantExecutionResultFactory,
+            new MagoMutantDetectionStatusResolver(),
+            new TimeSpy(),
             '/path/to/mago',
             $commandLineBuilder,
             100.0,
@@ -214,9 +203,6 @@ final class MagoMutantProcessFactoryTest extends TestCase
 
         $this->assertSame(100.0, $process->getTimeout());
         $this->assertFalse($process->isStarted());
-
-        $this->assertSame($mutant, $mutantProcess->getMutant());
-        $this->assertFalse($mutantProcess->isTimedOut());
     }
 
     public function test_it_creates_a_process_without_options(): void
@@ -262,7 +248,6 @@ final class MagoMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -277,12 +262,9 @@ final class MagoMutantProcessFactoryTest extends TestCase
             ->willReturn(['/path/to/mago'])
         ;
 
-        $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->never())
-            ->method('dumpFile');
-
         $factory = new MagoMutantProcessFactory(
-            $phpStanMutantExecutionResultFactory,
+            new MagoMutantDetectionStatusResolver(),
+            new TimeSpy(),
             '/path/to/mago',
             $commandLineBuilder,
             100.0,
@@ -295,8 +277,5 @@ final class MagoMutantProcessFactoryTest extends TestCase
 
         $this->assertSame(100.0, $process->getTimeout());
         $this->assertFalse($process->isStarted());
-
-        $this->assertSame($mutant, $mutantProcess->getMutant());
-        $this->assertFalse($mutantProcess->isTimedOut());
     }
 }

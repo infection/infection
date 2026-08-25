@@ -748,72 +748,6 @@ parameters:
 			path: ../src/TestFramework/Config/TestFrameworkConfigLocator.php
 
 		-
-			rawMessage: Infection\TestFramework\Contracts\MutantEvaluationPipe should not depend on Infection\Process\MutantProcess
-			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
-			count: 2
-			path: ../src/TestFramework/Contracts/MutantEvaluationPipe.php
-
-		-
-			rawMessage: Infection\TestFramework\Contracts\MutantProcess should not depend on Infection\Mutant\Mutant
-			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Contracts/MutantProcess.php
-
-		-
-			rawMessage: Infection\TestFramework\Contracts\MutantProcess should not depend on Infection\Mutant\MutantExecutionResult
-			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Contracts/MutantProcess.php
-
-		-
-			rawMessage: Unused Infection\TestFramework\Contracts\MutantProcess::getFinishedAt
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: ../src/TestFramework/Contracts/MutantProcess.php
-
-		-
-			rawMessage: Unused Infection\TestFramework\Contracts\MutantProcess::getMutant
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: ../src/TestFramework/Contracts/MutantProcess.php
-
-		-
-			rawMessage: Unused Infection\TestFramework\Contracts\MutantProcess::getProcess
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: ../src/TestFramework/Contracts/MutantProcess.php
-
-		-
-			rawMessage: Unused Infection\TestFramework\Contracts\MutantProcess::getResult
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: ../src/TestFramework/Contracts/MutantProcess.php
-
-		-
-			rawMessage: Unused Infection\TestFramework\Contracts\MutantProcess::isTimedOut
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: ../src/TestFramework/Contracts/MutantProcess.php
-
-		-
-			rawMessage: Unused Infection\TestFramework\Contracts\MutantProcess::markAsFinished
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: ../src/TestFramework/Contracts/MutantProcess.php
-
-		-
-			rawMessage: Unused Infection\TestFramework\Contracts\MutantProcess::markAsTimedOut
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: ../src/TestFramework/Contracts/MutantProcess.php
-
-		-
-			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\MutantExecutionResult
-			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Contracts/TestFramework.php
-
-		-
 			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\Configuration\Configuration
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1
@@ -821,12 +755,6 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\Console\ConsoleOutput
-			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
@@ -994,12 +922,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Mutant\MutantExecutionResultFactory
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\DryRunProcess
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -1009,18 +931,6 @@ parameters:
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\Factory\MutantProcessContainerFactory
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 2
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\MutantProcess
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 2
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\MutantProcessContainer
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
@@ -1079,12 +989,6 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Console\ConsoleOutput
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
@@ -1636,15 +1540,6 @@ parameters:
 			path: ../tests/phpunit/MockedContainer.php
 
 		-
-			rawMessage: '''
-				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
-				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
-			'''
-			identifier: staticMethod.deprecated
-			count: 6
-			path: ../tests/phpunit/Mutant/TestFrameworkMutantExecutionResultFactoryTest.php
-
-		-
 			rawMessage: 'Parameter #3 $mutators of method Infection\Mutation\FileMutationGenerator::generate() expects array<Infection\Mutator\Mutator<PhpParser\Node>>, array{Infection\Mutator\Arithmetic\Plus} given.'
 			identifier: argument.type
 			count: 1
@@ -2193,26 +2088,8 @@ parameters:
 				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
 			'''
 			identifier: staticMethod.deprecated
-			count: 5
-			path: ../tests/phpunit/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
-
-		-
-			rawMessage: '''
-				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
-				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
-			'''
-			identifier: staticMethod.deprecated
 			count: 3
 			path: ../tests/phpunit/TestFramework/Mago/Process/MagoMutantProcessFactoryTest.php
-
-		-
-			rawMessage: '''
-				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
-				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
-			'''
-			identifier: staticMethod.deprecated
-			count: 4
-			path: ../tests/phpunit/TestFramework/PhpStan/Mutant/PHPStanMutantExecutionResultFactoryTest.php
 
 		-
 			rawMessage: '''

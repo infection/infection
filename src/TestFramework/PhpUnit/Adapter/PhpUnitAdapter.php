@@ -36,28 +36,29 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use Closure;
+use DuoClock\DuoClock;
 use function escapeshellarg;
 use function explode;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\InitialTestsFailed;
+use Infection\TestFramework\Common\MutantProcess;
+use Infection\TestFramework\Common\MutantProcessContainer;
+use Infection\TestFramework\Common\MutantProcessDetectionStatusResolver;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
+use Infection\TestFramework\Contracts\DetectionStatus;
 use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\Mutant;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
@@ -75,11 +76,13 @@ use function version_compare;
 /**
  * @internal
  */
-final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrameworkAdapter
+final class PhpUnitAdapter implements MutantProcessDetectionStatusResolver, TestFramework, TestFrameworkAdapter
 {
     final public const string COVERAGE_DIR = 'coverage-xml';
 
     private const array INITIAL_RUN_ONLY_OPTIONS = ['--configuration', '--filter', '--testsuite'];
+
+    private const int PROCESS_MIN_ERROR_CODE = 100;
 
     private float $initialRunMemoryUsage = -1.;
 
@@ -100,7 +103,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         private readonly Configuration $configuration,
         private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private readonly MemoryLimiter $memoryLimiter,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly DuoClock $clock,
         private ?string $version = null,
     ) {
     }
@@ -283,6 +286,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
     public function test(Mutant $mutant): MutantEvaluationPipe
     {
         return MutantProcessContainer::from(
+            $mutant,
             fn (): MutantProcess => $this->createMutantProcess($mutant),
         );
     }
@@ -330,6 +334,32 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         ;
     }
 
+    public function resolve(
+        string $stdout,
+        string $stderr,
+        int $exitCode,
+        bool $timedOut,
+    ): DetectionStatus {
+        if ($timedOut) {
+            return DetectionStatus::TIMED_OUT;
+        }
+
+        if ($exitCode > self::PROCESS_MIN_ERROR_CODE) {
+            // See \Symfony\Component\Process\Process::$exitCodes
+            return DetectionStatus::ERROR;
+        }
+
+        if ($exitCode === 0 && $this->testsPass($stdout)) {
+            return DetectionStatus::ESCAPED;
+        }
+
+        if ($this->isSyntaxError($stdout)) {
+            return DetectionStatus::SYNTAX_ERROR;
+        }
+
+        return DetectionStatus::KILLED_BY_TESTS;
+    }
+
     private function createMutantProcess(Mutant $mutant): MutantProcess
     {
         // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
@@ -358,8 +388,8 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
 
         return new MutantProcess(
             $process,
-            $mutant,
-            $this->mutantExecutionResultFactory,
+            $this,
+            $this->clock,
         );
     }
 

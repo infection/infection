@@ -41,7 +41,6 @@ use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
@@ -66,7 +65,6 @@ final readonly class LegacyAdapterFactory
         private array $installedExtensions,
         private ShellCommandLineExecutor $shellCommandLineExecutor,
         private ConsoleOutput $consoleOutput,
-        private MutantExecutionResultFactory $mutantExecutionResultFactory,
         /** @var Closure(): CoverageChecker */
         private Closure $coverageChecker,
         /** @var Closure(): TestFrameworkExtraOptionsFilter */
@@ -93,7 +91,6 @@ final readonly class LegacyAdapterFactory
                 $this->consoleOutput,
                 ($this->coverageChecker)(),
                 $this->configuration,
-                $this->mutantExecutionResultFactory,
                 ($this->testFrameworkExtraOptionsFilter)(),
             );
 
