@@ -389,7 +389,7 @@ final class RunCommand extends BaseCommand
 
             $engine = new Engine(
                 $container->getConfiguration(),
-                $container->getCombinedTestFramework(),
+                $container->getTestFramework(),
                 $container->getEventDispatcher(),
                 $container->getMutationGenerator(),
                 $container->getMutationTestingRunner(),

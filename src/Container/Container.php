@@ -152,7 +152,6 @@ use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
@@ -574,7 +573,7 @@ final class Container extends DIContainer
                 $configuration = $container->getConfiguration();
 
                 return new MutationTestingRunner(
-                    $container->getCombinedTestFramework(),
+                    $container->getTestFramework(),
                     $container->getMutantFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
@@ -653,37 +652,29 @@ final class Container extends DIContainer
             TestFramework::class => static function (self $container): TestFramework {
                 $config = $container->getConfiguration();
 
-                return new EventDispatchingTestFramework(
-                    $container->getFactory()->create(
-                        $config->testFramework,
-                        $config->skipCoverage,
+                $testFrameworks = [
+                    new EventDispatchingTestFramework(
+                        $container->getFactory()->create(
+                            $config->testFramework,
+                            $config->skipCoverage,
+                        ),
+                        $container->getEventDispatcher(),
                     ),
-                    $container->getEventDispatcher(),
-                );
-            },
-            CombinedTestFramework::class => static function (self $container): CombinedTestFramework {
-                $testFrameworks = [$container->getTestFramework()];
+                ];
 
-                if ($container->getConfiguration()->isStaticAnalysisEnabled()) {
-                    $testFrameworks[] = $container->getStaticAnalysisTestFramework();
+                if ($config->isStaticAnalysisEnabled()) {
+                    Assert::notNull($config->staticAnalysisTool);
+
+                    $testFrameworks[] = new EventDispatchingStaticAnalysisTestFramework(
+                        $container->getFactory()->createStaticAnalysisTool(
+                            $config->staticAnalysisTool,
+                            $config->processTimeout,
+                        ),
+                        $container->getEventDispatcher(),
+                    );
                 }
 
                 return new CombinedTestFramework($testFrameworks);
-            },
-            StaticAnalysisTestFramework::class => static function (self $container): StaticAnalysisTestFramework {
-                $config = $container->getConfiguration();
-
-                Assert::notNull($config->staticAnalysisTool);
-
-                $testFramework = $container->getFactory()->createStaticAnalysisTool(
-                    $config->staticAnalysisTool,
-                    $config->processTimeout,
-                );
-
-                return new EventDispatchingStaticAnalysisTestFramework(
-                    $testFramework,
-                    $container->getEventDispatcher(),
-                );
             },
         ]);
 
@@ -936,16 +927,6 @@ final class Container extends DIContainer
     public function getTestFramework(): TestFramework
     {
         return $this->get(TestFramework::class);
-    }
-
-    public function getCombinedTestFramework(): CombinedTestFramework
-    {
-        return $this->get(CombinedTestFramework::class);
-    }
-
-    public function getStaticAnalysisTestFramework(): StaticAnalysisTestFramework
-    {
-        return $this->get(StaticAnalysisTestFramework::class);
     }
 
     public function getTestFrameworkAdapter(): TestFrameworkAdapter

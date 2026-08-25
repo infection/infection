@@ -48,8 +48,8 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
-use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\TestFramework\Contracts\TestFramework;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -63,7 +63,7 @@ class MutationTestingRunner
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function __construct(
-        private readonly CombinedTestFramework $testFramework,
+        private readonly TestFramework $testFramework,
         private readonly MutantFactory $mutantFactory,
         private readonly ProcessRunner $processRunner,
         private readonly EventDispatcher $eventDispatcher,
