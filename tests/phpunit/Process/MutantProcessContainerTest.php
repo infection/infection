@@ -79,7 +79,9 @@ final class MutantProcessContainerTest extends TestCase
             ->method('getMutantExecutionResult')
             ->willReturn($mutantExecutionResult);
 
-        $container->append(static fn (): MutantProcess => $newMutantProcess);
+        $container = $container->merge(MutantProcessContainer::from(
+            static fn (): MutantProcess => $newMutantProcess,
+        ));
 
         $this->assertTrue($container->hasNext());
 
@@ -94,7 +96,9 @@ final class MutantProcessContainerTest extends TestCase
 
         $newMutantProcess = $this->createStub(MutantProcess::class);
 
-        $container->append(static fn (): MutantProcess => $newMutantProcess);
+        $container = $container->merge(MutantProcessContainer::from(
+            static fn (): MutantProcess => $newMutantProcess,
+        ));
 
         $result = $container->createNext();
 
@@ -114,7 +118,9 @@ final class MutantProcessContainerTest extends TestCase
 
         $newMutantProcess = $this->createStub(MutantProcess::class);
 
-        $container->append(static fn (): MutantProcess => $newMutantProcess);
+        $container = $container->merge(MutantProcessContainer::from(
+            static fn (): MutantProcess => $newMutantProcess,
+        ));
 
         $container->createNext();
 

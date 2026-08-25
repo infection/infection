@@ -750,7 +750,7 @@ parameters:
 		-
 			rawMessage: Infection\TestFramework\Contracts\MutantEvaluationPipe should not depend on Infection\Process\MutantProcess
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
-			count: 3
+			count: 2
 			path: ../src/TestFramework/Contracts/MutantEvaluationPipe.php
 
 		-

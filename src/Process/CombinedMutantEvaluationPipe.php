@@ -36,75 +36,90 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use function array_key_exists;
-use Closure;
-use function count;
 use Infection\Mutant\DetectionStatus;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Webmozart\Assert\Assert;
 
-/**
- * @phpstan-type MutantProcessFactory = Closure(): MutantProcess
- *
- * @internal
- * @final
- */
-class MutantProcessContainer implements MutantEvaluationPipe
+/** @internal */
+final class CombinedMutantEvaluationPipe implements MutantEvaluationPipe
 {
-    /** @var array<int<0, max>, MutantProcess> */
-    private array $processes = [];
+    private int $currentPipeIndex = 0;
 
+    /**
+     * @param non-empty-list<MutantEvaluationPipe> $pipes
+     */
     private function __construct(
-        /**
-         * @var non-empty-list<MutantProcessFactory>
-         */
-        private array $mutantProcessFactories,
-        /**
-         * @var int<0,max>
-         */
-        private int $currentProcessIndex = 0,
+        private readonly array $pipes,
     ) {
     }
 
-    /**
-     * @param MutantProcessFactory $factory
-     */
-    public static function from(Closure $factory): self
+    public static function from(MutantEvaluationPipe $first, MutantEvaluationPipe $second): self
     {
-        return new self([$factory]);
+        self::assertIsCold($first);
+        self::assertIsCold($second);
+
+        return new self([$first, $second]);
     }
 
     public function isCold(): bool
     {
-        return count($this->processes) === 0;
-    }
+        foreach ($this->pipes as $pipe) {
+            if (!$pipe->isCold()) {
+                return false;
+            }
+        }
 
-    /**
-     * Container has a next process only if Mutant is Escaped
-     */
-    public function hasNext(): bool
-    {
-        return array_key_exists($this->currentProcessIndex + 1, $this->mutantProcessFactories)
-            && $this->getCurrentMutantProcessDetectionStatus() === DetectionStatus::ESCAPED;
-    }
-
-    public function createNext(): MutantProcess
-    {
-        ++$this->currentProcessIndex;
-
-        return $this->getCurrent();
+        return true;
     }
 
     public function getCurrent(): MutantProcess
     {
-        return $this->processes[$this->currentProcessIndex] ??= ($this->mutantProcessFactories[$this->currentProcessIndex])();
+        return $this->getCurrentPipe()->getCurrent();
+    }
+
+    public function hasNext(): bool
+    {
+        $currentPipe = $this->getCurrentPipe();
+
+        if ($currentPipe->hasNext()) {
+            return true;
+        }
+
+        return array_key_exists($this->currentPipeIndex + 1, $this->pipes)
+            && $currentPipe->getCurrent()->getMutantExecutionResult()->getDetectionStatus() === DetectionStatus::ESCAPED;
+    }
+
+    public function createNext(): MutantProcess
+    {
+        $currentPipe = $this->getCurrentPipe();
+
+        if ($currentPipe->hasNext()) {
+            return $currentPipe->createNext();
+        }
+
+        ++$this->currentPipeIndex;
+
+        return $this->getCurrent();
     }
 
     public function merge(MutantEvaluationPipe $other): MutantEvaluationPipe
     {
-        return CombinedMutantEvaluationPipe::from($this, $other);
+        self::assertIsCold($this);
+        self::assertIsCold($other);
+
+        return new self([$this, $other]);
     }
 
-    private function getCurrentMutantProcessDetectionStatus(): DetectionStatus
+    private static function assertIsCold(MutantEvaluationPipe $pipe): void
     {
-        return $this->getCurrent()->getMutantExecutionResult()->getDetectionStatus();
+        Assert::true(
+            $pipe->isCold(),
+            'Cannot merge a mutant evaluation pipe after evaluation has started.',
+        );
+    }
+
+    private function getCurrentPipe(): MutantEvaluationPipe
+    {
+        return $this->pipes[$this->currentPipeIndex];
     }
 }

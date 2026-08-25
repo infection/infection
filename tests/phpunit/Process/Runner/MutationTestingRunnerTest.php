@@ -97,7 +97,7 @@ final class MutationTestingRunnerTest extends TestCase
     protected function setUp(): void
     {
         $this->testFrameworkMock = $this->createMock(TestFramework::class);
-        $this->combinedTestFramework = new CombinedTestFramework($this->testFrameworkMock, null);
+        $this->combinedTestFramework = new CombinedTestFramework([$this->testFrameworkMock]);
         $this->mutantFactoryMock = $this->createMock(MutantFactory::class);
         $this->processRunnerMock = $this->createMock(ProcessRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();

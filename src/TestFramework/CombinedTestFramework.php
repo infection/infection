@@ -35,71 +35,85 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use BadMethodCallException;
+use function array_map;
+use function array_slice;
 use Closure;
+use function implode;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Process\MutantProcess;
 use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
+use Webmozart\Assert\Assert;
 
 /**
- * TODO: Note that its current shape is temporary. It will later be more of a test framework registry.
- *
  * @internal
  */
 final readonly class CombinedTestFramework implements TestFramework
 {
-    private const string UNSUPPORTED_OPERATION_MESSAGE = 'CombinedTestFramework only supports mutant evaluation.';
-
+    /**
+     * @param non-empty-list<TestFramework> $testFrameworks
+     */
     public function __construct(
-        private TestFramework $testFramework,
-        private ?StaticAnalysisTestFramework $staticAnalysis,
+        private array $testFrameworks,
     ) {
+        Assert::notEmpty($testFrameworks);
     }
 
     public function getName(): string
     {
-        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
+        return implode(', ', array_map(
+            static fn (TestFramework $testFramework): string => $testFramework->getName(),
+            $this->testFrameworks,
+        ));
     }
 
     public function getVersion(): string
     {
-        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
+        return implode(', ', array_map(
+            static fn (TestFramework $testFramework): string => $testFramework->getVersion(),
+            $this->testFrameworks,
+        ));
     }
 
     public function checkRequirements(): void
     {
-        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
+        foreach ($this->testFrameworks as $testFramework) {
+            $testFramework->checkRequirements();
+        }
     }
 
     public function executeInitialRun(?Closure $onProgress = null): InitialTestsResult
     {
-        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
+        foreach ($this->testFrameworks as $testFramework) {
+            $testFramework->executeInitialRun($onProgress);
+        }
+
+        // If the individual results become relevant, they should be collected and exposed
+        // explicitly instead of presenting one framework's result as the combined result.
+        return new InitialTestsResult('');
     }
 
     public function test(Mutant $mutant): MutantExecutionResult|MutantEvaluationPipe
     {
-        $testFrameworkResult = $this->testFramework->test($mutant);
+        $pipes = [];
 
-        if ($testFrameworkResult instanceof MutantExecutionResult) {
-            return $testFrameworkResult;
+        foreach ($this->testFrameworks as $testFramework) {
+            $result = $testFramework->test($mutant);
+
+            if ($result instanceof MutantExecutionResult) {
+                return $result;
+            }
+
+            $pipes[] = $result;
         }
 
-        if ($this->staticAnalysis === null) {
-            return $testFrameworkResult;
+        $pipe = $pipes[0];
+
+        foreach (array_slice($pipes, 1) as $nextPipe) {
+            $pipe = $pipe->merge($nextPipe);
         }
 
-        $staticAnalysisResult = $this->staticAnalysis->test($mutant);
-
-        if ($staticAnalysisResult instanceof MutantExecutionResult) {
-            return $staticAnalysisResult;
-        }
-
-        return $testFrameworkResult->append(
-            static fn (): MutantProcess => $staticAnalysisResult->getCurrent(),
-        );
+        return $pipe;
     }
 }

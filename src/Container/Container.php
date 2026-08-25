@@ -664,14 +664,13 @@ final class Container extends DIContainer
                 );
             },
             CombinedTestFramework::class => static function (self $container): CombinedTestFramework {
-                $staticAnalysis = $container->getConfiguration()->isStaticAnalysisEnabled()
-                    ? $container->getStaticAnalysisTestFramework()
-                    : null;
+                $testFrameworks = [$container->getTestFramework()];
 
-                return new CombinedTestFramework(
-                    $container->getTestFramework(),
-                    $staticAnalysis,
-                );
+                if ($container->getConfiguration()->isStaticAnalysisEnabled()) {
+                    $testFrameworks[] = $container->getStaticAnalysisTestFramework();
+                }
+
+                return new CombinedTestFramework($testFrameworks);
             },
             StaticAnalysisTestFramework::class => static function (self $container): StaticAnalysisTestFramework {
                 $config = $container->getConfiguration();

@@ -387,15 +387,9 @@ final class RunCommand extends BaseCommand
         try {
             $this->startUp($container, $configFile, $consoleOutput, $logger, $io);
 
-            $config = $container->getConfiguration();
-
             $engine = new Engine(
                 $container->getConfiguration(),
-                $container->getTestFramework(),
-                // TODO: eventually this should be hidden behind TestFramework instead.
-                $config->isStaticAnalysisEnabled()
-                    ? $container->getStaticAnalysisTestFramework()
-                    : null,
+                $container->getCombinedTestFramework(),
                 $container->getEventDispatcher(),
                 $container->getMutationGenerator(),
                 $container->getMutationTestingRunner(),

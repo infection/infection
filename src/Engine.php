@@ -64,7 +64,6 @@ final readonly class Engine
     public function __construct(
         private Configuration $config,
         private TestFramework $testFramework,
-        private ?TestFramework $staticAnalysisTestFramework,
         private EventDispatcher $eventDispatcher,
         private MutationGenerator $mutationGenerator,
         private MutationTestingRunner $mutationTestingRunner,
@@ -89,8 +88,7 @@ final readonly class Engine
      */
     public function execute(): void
     {
-        $this->runInitialTestSuite();
-        $this->runInitialStaticAnalysis();
+        $this->runInitialTests();
 
         $this->runMutationAnalysis();
 
@@ -110,7 +108,7 @@ final readonly class Engine
         }
     }
 
-    private function runInitialTestSuite(): void
+    private function runInitialTests(): void
     {
         $this->testFramework->checkRequirements();
 
@@ -119,17 +117,6 @@ final readonly class Engine
         }
 
         $this->testFramework->executeInitialRun();
-    }
-
-    private function runInitialStaticAnalysis(): void
-    {
-        $this->staticAnalysisTestFramework?->checkRequirements();
-
-        if ($this->config->skipInitialTests) {
-            return;
-        }
-
-        $this->staticAnalysisTestFramework?->executeInitialRun();
     }
 
     /**

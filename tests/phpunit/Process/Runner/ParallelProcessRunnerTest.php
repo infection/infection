@@ -45,6 +45,7 @@ use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessQueue;
+use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
@@ -569,7 +570,7 @@ final class ParallelProcessRunnerTest extends TestCase
         );
     }
 
-    private function createMutantProcessContainerWithNextMutantProcess(int $threadCount): MutantProcessContainer
+    private function createMutantProcessContainerWithNextMutantProcess(int $threadCount): MutantEvaluationPipe
     {
         $phpUnitProcessMock = $this->createMock(Process::class);
         $phpUnitProcessMock
@@ -630,13 +631,13 @@ final class ParallelProcessRunnerTest extends TestCase
             ),
         );
 
-        return $container->append(
+        return $container->merge(MutantProcessContainer::from(
             fn (): MutantProcess => new MutantProcess(
                 $nextProcessMock,
                 $mutant,
                 $this->createStub(MutantExecutionResultFactory::class),
             ),
-        );
+        ));
     }
 
     private function createTimeOutMutantProcessContainer(): MutantProcessContainer

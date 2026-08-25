@@ -33,30 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\Process;
 
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\Mutant;
 use Infection\Process\CombinedMutantEvaluationPipe;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
-use Infection\TestFramework\CombinedTestFramework;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
-use Infection\TestFramework\Contracts\TestFramework;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(CombinedTestFramework::class)]
-final class CombinedTestFrameworkTest extends TestCase
+#[CoversClass(CombinedMutantEvaluationPipe::class)]
+final class CombinedMutantEvaluationPipeTest extends TestCase
 {
-    public function test_it_combines_the_test_framework_and_static_analysis_evaluations(): void
+    public function test_it_evaluates_the_merged_pipes_in_order(): void
     {
-        $mutant = $this->createStub(Mutant::class);
-        $testFrameworkProcess = $this->createMock(MutantProcess::class);
-        $staticAnalysisProcess = $this->createStub(MutantProcess::class);
+        $firstProcess = $this->createMock(MutantProcess::class);
+        $secondProcess = $this->createStub(MutantProcess::class);
 
-        $testFrameworkProcess
+        $firstProcess
             ->expects($this->once())
             ->method('getMutantExecutionResult')
             ->willReturn(MutantExecutionResultBuilder::withMinimalTestData()
@@ -64,27 +60,31 @@ final class CombinedTestFrameworkTest extends TestCase
                 ->build())
         ;
 
-        $testFramework = $this->createMock(TestFramework::class);
-        $testFramework
-            ->expects($this->once())
-            ->method('test')
-            ->with($mutant)
-            ->willReturn(MutantProcessContainer::from(static fn (): MutantProcess => $testFrameworkProcess))
-        ;
+        $pipe = CombinedMutantEvaluationPipe::from(
+            MutantProcessContainer::from(static fn (): MutantProcess => $firstProcess),
+            MutantProcessContainer::from(static fn (): MutantProcess => $secondProcess),
+        );
 
-        $staticAnalysis = $this->createMock(StaticAnalysisTestFramework::class);
-        $staticAnalysis
-            ->expects($this->once())
-            ->method('test')
-            ->with($mutant)
-            ->willReturn(MutantProcessContainer::from(static fn (): MutantProcess => $staticAnalysisProcess))
-        ;
+        $this->assertTrue($pipe->isCold());
+        $this->assertSame($firstProcess, $pipe->getCurrent());
+        $this->assertFalse($pipe->isCold());
+        $this->assertTrue($pipe->hasNext());
+        $this->assertSame($secondProcess, $pipe->createNext());
+    }
 
-        $evaluation = (new CombinedTestFramework([$testFramework, $staticAnalysis]))->test($mutant);
+    public function test_it_cannot_merge_a_pipe_after_its_evaluation_has_started(): void
+    {
+        $startedPipe = MutantProcessContainer::from(
+            fn (): MutantProcess => $this->createStub(MutantProcess::class),
+        );
+        $startedPipe->getCurrent();
 
-        $this->assertInstanceOf(CombinedMutantEvaluationPipe::class, $evaluation);
-        $this->assertSame($testFrameworkProcess, $evaluation->getCurrent());
-        $this->assertTrue($evaluation->hasNext());
-        $this->assertSame($staticAnalysisProcess, $evaluation->createNext());
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot merge a mutant evaluation pipe after evaluation has started.');
+
+        CombinedMutantEvaluationPipe::from(
+            $startedPipe,
+            MutantProcessContainer::from(fn (): MutantProcess => $this->createStub(MutantProcess::class)),
+        );
     }
 }

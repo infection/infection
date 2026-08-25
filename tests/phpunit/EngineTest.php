@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use function array_filter;
+use function array_values;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Engine;
@@ -49,6 +51,7 @@ use Infection\Mutation\MutationGenerator;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -488,8 +491,10 @@ final class EngineTest extends TestCase
 
         return new Engine(
             config: $configuration,
-            testFramework: $this->testFramework,
-            staticAnalysisTestFramework: $staticAnalysisTestFramework,
+            testFramework: new CombinedTestFramework(array_values(array_filter([
+                $this->testFramework,
+                $staticAnalysisTestFramework,
+            ]))),
             eventDispatcher: $this->eventDispatcher,
             mutationGenerator: $this->mutationGenerator,
             mutationTestingRunner: $this->mutationTestingRunner,

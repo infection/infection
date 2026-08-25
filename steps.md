@@ -11,3 +11,4 @@
 - Migrate InitialTestsRunProcessFactory & InitialStaticAnalysisProcessFactory
 - Migrate InitialTestsFailed & InitialStaticAnalysisRunFailed
 - PRIORITY (parallel) Introduce a CombinedTestFramework to rework MutantProcessContainer.
+- Introduce a proper CombinedTestFramework (but still missing a proper wiring).

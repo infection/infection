@@ -35,28 +35,40 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
-use Closure;
-use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 
 /**
  * Represents a mutant evaluation as a chain of processes that may require follow-up stages.
  * It exposes the current process and controls whether the evaluation advances to the next one.
  *
- * @phpstan-type MutantProcessFactory = Closure(): MutantProcess
- *
  * @internal
  */
 interface MutantEvaluationPipe
 {
+    /**
+     * Whether evaluating the mutant has not started yet.
+     */
+    public function isCold(): bool;
+
+    /**
+     * Retrieving the current process may cause the pipe to no longer be cold.
+     */
     public function getCurrent(): MutantProcess;
 
+    /**
+     * Determining whether a next process exists may cause the pipe to no longer be cold.
+     */
     public function hasNext(): bool;
 
+    /**
+     * Creating the next process may cause the pipe to no longer be cold.
+     */
     public function createNext(): MutantProcess;
 
     /**
-     * @param MutantProcessFactory $factory
+     * Merges this pipe with the given pipe, preserving their evaluation order.
+     *
+     * Both pipes must be cold. The returned pipe is cold and neither input is mutated.
      */
-    public function append(Closure $factory): self;
+    public function merge(self $other): self;
 }
