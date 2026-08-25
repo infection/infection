@@ -179,6 +179,7 @@ use Psr\Log\NullLogger;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Webmozart\Assert\Assert;
 
 /**
@@ -304,6 +305,8 @@ final class Container extends DIContainer
                     static fn (): InitialTestsRunProcessFactory => $container->getInitialTestsRunProcessFactory(),
                     static fn (): MutantProcessContainerFactory => $container->getMutantProcessContainerFactory(),
                     $container->getTestFrameworkExtraOptionsFilter(),
+                    new SymfonyFilesystem(),
+                    new DuoClock(),
                 );
             },
             LegacyAdapterFactory::class => static function (self $container): LegacyAdapterFactory {
@@ -322,6 +325,8 @@ final class Container extends DIContainer
                     $container->get(ConsoleOutput::class),
                     static fn (): CoverageChecker => $container->getCoverageChecker(),
                     static fn (): TestFrameworkExtraOptionsFilter => $container->getTestFrameworkExtraOptionsFilter(),
+                    new SymfonyFilesystem(),
+                    new DuoClock(),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(

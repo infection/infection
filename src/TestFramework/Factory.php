@@ -96,6 +96,8 @@ final readonly class Factory
         /** @var Closure(): MutantProcessContainerFactory */
         private Closure $containerFactory,
         private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
+        private Filesystem $filesystem,
+        private DuoClock $clock,
     ) {
     }
 
@@ -217,6 +219,8 @@ final readonly class Factory
                         $configuration->testFrameworkExtraOptions,
                         $configuration->processTimeout,
                         $configuration->isDryRun,
+                        $this->filesystem,
+                        $this->clock,
                         $configuration->executeOnlyCoveringTestCases,
                         $this->getFilteredSourceFilesToMutate(),
                         $configuration->mapSourceClassToTestStrategy,

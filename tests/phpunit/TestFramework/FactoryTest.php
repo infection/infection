@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
+use DuoClock\DuoClock;
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
@@ -54,6 +55,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
 #[CoversClass(Factory::class)]
 #[Group('integration')]
@@ -78,6 +80,8 @@ final class FactoryTest extends TestCase
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            new Filesystem(),
+            new DuoClock(),
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -110,6 +114,8 @@ final class FactoryTest extends TestCase
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            new Filesystem(),
+            new DuoClock(),
         );
 
         $testFramework = $factory->create('dummy', false);
@@ -136,6 +142,8 @@ final class FactoryTest extends TestCase
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            new Filesystem(),
+            new DuoClock(),
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -163,6 +171,8 @@ final class FactoryTest extends TestCase
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            new Filesystem(),
+            new DuoClock(),
         );
 
         $this->assertInstanceOf(

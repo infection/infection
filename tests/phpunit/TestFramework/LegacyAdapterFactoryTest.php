@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
+use DuoClock\DuoClock;
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Process\ShellCommandLineExecutor;
@@ -48,6 +49,7 @@ use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
 #[CoversClass(LegacyAdapterFactory::class)]
 final class LegacyAdapterFactoryTest extends TestCase
@@ -71,6 +73,8 @@ final class LegacyAdapterFactoryTest extends TestCase
             $this->createStub(ConsoleOutput::class),
             fn (): CoverageChecker => $this->createStub(CoverageChecker::class),
             fn (): TestFrameworkExtraOptionsFilter => $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            $this->createStub(Filesystem::class),
+            new DuoClock(),
         );
 
         $adapter = $factory->create('dummy', false);

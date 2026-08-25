@@ -35,11 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
+use DuoClock\DuoClock;
 use Infection\Console\ConsoleOutput;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use SplFileInfo;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal This is the upgraded version of TestFrameworkAdapterFactory.
@@ -65,6 +67,8 @@ interface TestFrameworkFactory
         string $testFrameworkExtraOptions,
         float $processTimeout,
         bool $isDryRun,
+        Filesystem $filesystem,
+        DuoClock $clock,
         bool $executeOnlyCoveringTestCases,
         array $filteredSourceFilesToMutate,
         ?string $mapSourceClassToTestStrategy,

@@ -86,6 +86,8 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         string $testFrameworkExtraOptions,
         float $processTimeout,
         bool $isDryRun,
+        Filesystem $filesystem,
+        DuoClock $clock,
         bool $executeOnlyCoveringTestCases,
         array $filteredSourceFilesToMutate,
         ?string $mapSourceClassToTestStrategy,
@@ -99,7 +101,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
 
         $configManipulator = new XmlConfigurationManipulator(
             new PathReplacer(
-                new Filesystem(),
+                $filesystem,
                 $testFrameworkConfigDir,
             ),
             $testFrameworkConfigDir,
@@ -115,7 +117,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
                 $testFrameworkConfigContent,
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
-                new Filesystem(),
+                $filesystem,
                 $sourceDirectories,
                 array_map(
                     static fn (SplFileInfo $fileInfo): string => $fileInfo->getRealPath(),
@@ -128,7 +130,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
                 $configManipulator,
                 $projectDir,
                 new TestRunOrderResolver(),
-                new Filesystem(),
+                $filesystem,
             ),
             new ArgumentsAndOptionsBuilder(
                 $executeOnlyCoveringTestCases,
@@ -151,7 +153,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             isDryRun: $isDryRun,
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter,
             memoryLimiter: new MemoryLimiter(new MemoryLimiterEnvironment()),
-            clock: new DuoClock(),
+            clock: $clock,
         );
     }
 

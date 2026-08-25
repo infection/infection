@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use Closure;
+use DuoClock\DuoClock;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
@@ -48,6 +49,7 @@ use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
+use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
 /** @internal */
@@ -69,6 +71,8 @@ final readonly class LegacyAdapterFactory
         private Closure $coverageChecker,
         /** @var Closure(): TestFrameworkExtraOptionsFilter */
         private Closure $testFrameworkExtraOptionsFilter,
+        private Filesystem $filesystem,
+        private DuoClock $clock,
     ) {
     }
 
@@ -89,6 +93,8 @@ final readonly class LegacyAdapterFactory
                 $this->configuration->testFrameworkExtraOptions,
                 $this->configuration->processTimeout,
                 $this->configuration->isDryRun,
+                $this->filesystem,
+                $this->clock,
                 $this->configuration->executeOnlyCoveringTestCases,
                 $this->configuration->sourceFilter === null ? [] : $this->sourceCollector->collect(),
                 $this->configuration->mapSourceClassToTestStrategy,

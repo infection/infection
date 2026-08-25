@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
+use DuoClock\DuoClock;
 use Infection\Console\ConsoleOutput;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -44,6 +45,7 @@ use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
 #[CoversClass(PhpUnitAdapterFactory::class)]
@@ -65,6 +67,8 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             '',
             10.,
             false,
+            new Filesystem(),
+            new DuoClock(),
             false,
             [],
             null,
