@@ -103,6 +103,12 @@ final class MagoAdapter implements TestFramework
     public function checkRequirements(): void
     {
         $this->assertMinimumVersionSatisfied();
+
+        // TODO: shouldn't we have the same as PHPUnit here?
+        //        if ($this->skipInitialTests) {
+        //            $this->consoleOutput->logSkippingInitialTests();
+        //            $this->coverageChecker->checkCoverageExists();
+        //        }
     }
 
     public function executeInitialRun(?Closure $onProgress = null): InitialTestsResult
