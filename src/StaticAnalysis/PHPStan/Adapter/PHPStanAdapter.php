@@ -49,7 +49,7 @@ use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use Infection\TestFramework\Contracts\TestFramework;
 use RuntimeException;
 use function sprintf;
 use function str_starts_with;
@@ -58,7 +58,7 @@ use function version_compare;
 /**
  * @internal
  */
-final class PHPStanAdapter implements StaticAnalysisTestFramework
+final class PHPStanAdapter implements TestFramework
 {
     private const int VERSION_1 = 1;
 

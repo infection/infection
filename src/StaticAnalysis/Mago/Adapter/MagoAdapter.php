@@ -48,7 +48,7 @@ use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use Infection\TestFramework\Contracts\TestFramework;
 use RuntimeException;
 use Safe\Exceptions\PcreException;
 use function sprintf;
@@ -60,7 +60,7 @@ use function version_compare;
 /**
  * @internal
  */
-final class MagoAdapter implements StaticAnalysisTestFramework
+final class MagoAdapter implements TestFramework
 {
     /**
      * @param list<string> $staticAnalysisToolOptions

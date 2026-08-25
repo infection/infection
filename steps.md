@@ -15,3 +15,4 @@
 - (parallel) Solve the dependency of the initial tests & SA logger on TestFramework
 - Fixed the wiring of CombinedTestFramework.
 - Remove SA logger
+- Remove StaticAnalysisTestFramework

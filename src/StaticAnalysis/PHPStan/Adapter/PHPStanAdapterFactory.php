@@ -41,7 +41,7 @@ use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use Infection\TestFramework\Contracts\TestFramework;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
@@ -60,7 +60,7 @@ final class PHPStanAdapterFactory
         array $staticAnalysisToolOptions,
         ShellCommandLineExecutor $shellCommandLineExecutor,
         PHPStanMutantProcessFactory $mutantProcessFactory,
-    ): StaticAnalysisTestFramework {
+    ): TestFramework {
         return new PHPStanAdapter(
             $staticAnalysisConfigPath,
             $staticAnalysisToolExecutable,

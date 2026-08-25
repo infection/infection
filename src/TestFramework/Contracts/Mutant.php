@@ -35,11 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+
 /**
- * Temporary interface for the Container.
+ * The mutation data required by a test framework to evaluate a mutant.
  *
  * @internal
  */
-interface StaticAnalysisTestFramework extends TestFramework
+interface Mutant
 {
+    public function getId(): string;
+
+    public function getFilePath(): string;
+
+    public function getOriginalFilePath(): string;
+
+    public function getNominalTestExecutionTime(): float;
+
+    /**
+     * @return TestLocation[]
+     */
+    public function getTests(): array;
 }

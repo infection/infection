@@ -57,7 +57,6 @@ use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -117,7 +116,7 @@ final readonly class Factory
             );
     }
 
-    public function createStaticAnalysisTool(string $adapterName, float $timeout): StaticAnalysisTestFramework
+    public function createStaticAnalysisTool(string $adapterName, float $timeout): TestFramework
     {
         if ($adapterName === StaticAnalysisToolTypes::PHPSTAN) {
             $configPath = $this->staticAnalysisConfigLocator->locate($adapterName);

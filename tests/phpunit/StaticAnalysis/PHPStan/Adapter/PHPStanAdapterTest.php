@@ -42,7 +42,7 @@ use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use Infection\TestFramework\Contracts\TestFramework;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -257,10 +257,10 @@ final class PHPStanAdapterTest extends TestCase
         $this->assertSame('2.1.17', $adapter->getVersion());
     }
 
-    public function test_it_is_a_static_analysis_test_framework(): void
+    public function test_it_is_a_test_framework(): void
     {
         $this->assertInstanceOf(
-            StaticAnalysisTestFramework::class,
+            TestFramework::class,
             $this->adapter,
         );
     }

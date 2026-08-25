@@ -41,7 +41,7 @@ use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use Infection\TestFramework\Contracts\TestFramework;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
@@ -60,7 +60,7 @@ final class MagoAdapterFactory
         array $staticAnalysisToolOptions,
         ShellCommandLineExecutor $shellCommandLineExecutor,
         MagoMutantProcessFactory $mutantProcessFactory,
-    ): StaticAnalysisTestFramework {
+    ): TestFramework {
         return new MagoAdapter(
             $staticAnalysisConfigPath,
             $staticAnalysisToolExecutable,

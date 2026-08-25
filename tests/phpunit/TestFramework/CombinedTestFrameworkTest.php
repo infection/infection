@@ -41,7 +41,6 @@ use Infection\Process\CombinedMutantEvaluationPipe;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\CombinedTestFramework;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -72,7 +71,7 @@ final class CombinedTestFrameworkTest extends TestCase
             ->willReturn(MutantProcessContainer::from(static fn (): MutantProcess => $testFrameworkProcess))
         ;
 
-        $staticAnalysis = $this->createMock(StaticAnalysisTestFramework::class);
+        $staticAnalysis = $this->createMock(TestFramework::class);
         $staticAnalysis
             ->expects($this->once())
             ->method('test')
