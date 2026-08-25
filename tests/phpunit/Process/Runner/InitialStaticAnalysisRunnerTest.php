@@ -68,14 +68,18 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
     public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(): void
     {
-        $this->runner->run([
-            TestPhpExecutableFinder::find(),
-            '-r',
-            <<<'PHP'
-                echo 'ping';
-                echo 'pong';
-                PHP,
-        ]);
+        $this->runner->run(
+            [
+                TestPhpExecutableFinder::find(),
+                '-r',
+                <<<'PHP'
+                    echo 'ping';
+                    echo 'pong';
+                    PHP,
+            ],
+            'PHPStan',
+            '2.1.0',
+        );
 
         $this->assertSame(
             [

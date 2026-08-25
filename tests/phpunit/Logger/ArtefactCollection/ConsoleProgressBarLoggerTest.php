@@ -37,8 +37,6 @@ namespace Infection\Tests\Logger\ArtefactCollection;
 
 use Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
-use Infection\TestFramework\Contracts\TestFramework;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -51,50 +49,26 @@ final class ConsoleProgressBarLoggerTest extends TestCase
 {
     private OutputInterface&MockObject $outputMock;
 
-    private TestFramework&MockObject $testFrameworkMock;
-
     protected function setUp(): void
     {
         $this->outputMock = $this->createMock(OutputInterface::class);
-        $this->testFrameworkMock = $this->createMock(TestFramework::class);
     }
 
     public function test_it_logs_the_start(): void
-    {
-        $this->outputMock
-            ->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET);
-
-        $this->testFrameworkMock
-            ->expects($this->once())
-            ->method('getVersion');
-
-        $this->createLogger(debug: false)->start();
-    }
-
-    public function test_it_sets_test_framework_version_as_unknown_in_case_of_exception_on_start(): void
     {
         $this->outputMock
             ->expects($this->once())
             ->method('writeln')
             ->with([
                 '',
-                'Running initial tests with PHPUnit version unknown',
+                'Running initial tests with PHPUnit version 12.0.0',
                 '',
             ]);
         $this->outputMock
             ->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $this->testFrameworkMock
-            ->expects($this->once())
-            ->method('getName')
-            ->willReturn('PHPUnit');
-        $this->testFrameworkMock
-            ->method('getVersion')
-            ->willThrowException(new InvalidArgumentException());
-
-        $this->createLogger(debug: false)->start();
+        $this->createLogger(debug: false)->start('PHPUnit', '12.0.0');
     }
 
     public function test_it_does_not_output_the_initial_process_text_if_in_debug_mode_on_finish(): void
@@ -132,7 +106,6 @@ final class ConsoleProgressBarLoggerTest extends TestCase
     {
         return new ConsoleProgressBarLogger(
             $this->outputMock,
-            $this->testFrameworkMock,
             $debug,
         );
     }

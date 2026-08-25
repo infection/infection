@@ -40,7 +40,7 @@ namespace Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
  */
 interface InitialStaticAnalysisExecutionLogger
 {
-    public function start(): void;
+    public function start(string $testFrameworkName, string $testFrameworkVersion): void;
 
     public function advance(): void;
 

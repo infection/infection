@@ -38,9 +38,7 @@ namespace Infection\Tests\Logger\ArtefactCollection;
 use Infection\Framework\Str;
 use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
-use Infection\TestFramework\Contracts\TestFramework;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -49,40 +47,25 @@ final class ConsoleNoProgressLoggerTest extends TestCase
 {
     private BufferedOutput $output;
 
-    private MockObject&TestFramework $testFrameworkMock;
-
     private InitialTestsExecutionLogger $logger;
 
     protected function setUp(): void
     {
         $this->output = new BufferedOutput();
-        $this->testFrameworkMock = $this->createMock(TestFramework::class);
-
         $this->logger = new ConsoleNoProgressLogger(
-            $this->testFrameworkMock,
             $this->output,
         );
     }
 
     public function test_it_logs_on_start(): void
     {
-        $this->testFrameworkMock
-            ->expects($this->once())
-            ->method('getVersion')
-            ->willReturn('6.5.4');
-
-        $this->testFrameworkMock
-            ->expects($this->once())
-            ->method('getName')
-            ->willReturn('PHPUnit');
-
         $expected = <<<'EOF'
 
             Running initial tests with PHPUnit version 6.5.4
 
             EOF;
 
-        $this->logger->start();
+        $this->logger->start('PHPUnit', '6.5.4');
 
         $actual = Str::toUnixLineEndings($this->output->fetch());
 

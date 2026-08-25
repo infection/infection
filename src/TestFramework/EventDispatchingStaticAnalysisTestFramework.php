@@ -45,6 +45,7 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\TestFramework\Contracts\InitialTestsResult;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use InvalidArgumentException;
 
 /** @internal */
 final readonly class EventDispatchingStaticAnalysisTestFramework implements StaticAnalysisTestFramework
@@ -72,7 +73,10 @@ final readonly class EventDispatchingStaticAnalysisTestFramework implements Stat
 
     public function executeInitialRun(?Closure $onProgress = null): InitialTestsResult
     {
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
+        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted(
+            $this->decorated->getName(),
+            $this->retrieveVersion(),
+        ));
 
         $result = $this->decorated->executeInitialRun(
             function () use ($onProgress): void {
@@ -92,5 +96,14 @@ final readonly class EventDispatchingStaticAnalysisTestFramework implements Stat
     public function test(Mutant $mutant): MutantExecutionResult|MutantEvaluationPipe
     {
         return $this->decorated->test($mutant);
+    }
+
+    private function retrieveVersion(): string
+    {
+        try {
+            return $this->decorated->getVersion();
+        } catch (InvalidArgumentException) {
+            return 'unknown';
+        }
     }
 }

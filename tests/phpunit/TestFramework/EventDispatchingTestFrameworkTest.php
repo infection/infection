@@ -53,6 +53,12 @@ final class EventDispatchingTestFrameworkTest extends TestCase
         $result = new InitialTestsResult('framework output');
         $decorated = $this->createMock(TestFramework::class);
         $decorated
+            ->method('getName')
+            ->willReturn('PHPUnit');
+        $decorated
+            ->method('getVersion')
+            ->willReturn('12.0.0');
+        $decorated
             ->expects($this->once())
             ->method('executeInitialRun')
             ->willReturnCallback(static function (callable $onProgress) use ($result): InitialTestsResult {
@@ -79,6 +85,8 @@ final class EventDispatchingTestFrameworkTest extends TestCase
         $this->assertSame($result, $actual);
         $this->assertSame(1, $progressCalls);
         $this->assertInstanceOf(InitialTestSuiteWasStarted::class, $events[0]);
+        $this->assertSame('PHPUnit', $events[0]->testFrameworkName);
+        $this->assertSame('12.0.0', $events[0]->testFrameworkVersion);
         $this->assertInstanceOf(InitialTestCaseWasCompleted::class, $events[1]);
         $this->assertInstanceOf(InitialTestSuiteWasFinished::class, $events[2]);
         $this->assertSame('framework output', $events[2]->outputText);

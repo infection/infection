@@ -55,7 +55,10 @@ final readonly class InitialTestsExecutionLoggerSubscriber implements InitialTes
 
     public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
-        $this->logger->start();
+        $this->logger->start(
+            $event->testFrameworkName,
+            $event->testFrameworkVersion,
+        );
     }
 
     public function onInitialTestCaseWasCompleted(InitialTestCaseWasCompleted $event): void

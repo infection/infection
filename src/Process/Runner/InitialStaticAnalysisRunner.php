@@ -53,14 +53,20 @@ readonly class InitialStaticAnalysisRunner
     }
 
     /** @param array<string> $commandLine */
-    public function run(array $commandLine): Process
-    {
+    public function run(
+        array $commandLine,
+        string $testFrameworkName,
+        string $testFrameworkVersion,
+    ): Process {
         $process = new Process(
             command: $commandLine,
             timeout: null,
         );
 
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
+        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted(
+            $testFrameworkName,
+            $testFrameworkVersion,
+        ));
 
         $process->run(fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()));
 

@@ -53,6 +53,12 @@ final class EventDispatchingStaticAnalysisTestFrameworkTest extends TestCase
         $result = new InitialTestsResult('static-analysis output');
         $decorated = $this->createMock(StaticAnalysisTestFramework::class);
         $decorated
+            ->method('getName')
+            ->willReturn('PHPStan');
+        $decorated
+            ->method('getVersion')
+            ->willReturn('2.1.0');
+        $decorated
             ->expects($this->once())
             ->method('executeInitialRun')
             ->willReturnCallback(static function (callable $onProgress) use ($result): InitialTestsResult {
@@ -79,6 +85,8 @@ final class EventDispatchingStaticAnalysisTestFrameworkTest extends TestCase
         $this->assertSame($result, $actual);
         $this->assertSame(1, $progressCalls);
         $this->assertInstanceOf(InitialStaticAnalysisRunWasStarted::class, $events[0]);
+        $this->assertSame('PHPStan', $events[0]->testFrameworkName);
+        $this->assertSame('2.1.0', $events[0]->testFrameworkVersion);
         $this->assertInstanceOf(InitialStaticAnalysisSubStepWasCompleted::class, $events[1]);
         $this->assertInstanceOf(InitialStaticAnalysisRunWasFinished::class, $events[2]);
         $this->assertSame('static-analysis output', $events[2]->outputText);

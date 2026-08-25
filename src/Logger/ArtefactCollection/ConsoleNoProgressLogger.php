@@ -37,8 +37,6 @@ namespace Infection\Logger\ArtefactCollection;
 
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
-use Infection\TestFramework\Contracts\TestFramework;
-use InvalidArgumentException;
 use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -48,25 +46,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 final readonly class ConsoleNoProgressLogger implements InitialStaticAnalysisExecutionLogger, InitialTestsExecutionLogger
 {
     public function __construct(
-        private TestFramework $testFramework,
         private OutputInterface $output,
     ) {
     }
 
-    public function start(): void
+    public function start(string $testFrameworkName, string $testFrameworkVersion): void
     {
-        try {
-            $version = $this->testFramework->getVersion();
-        } catch (InvalidArgumentException) {
-            $version = 'unknown';
-        }
-
         $this->output->writeln([
             '',
             sprintf(
                 'Running initial tests with %s version %s',
-                $this->testFramework->getName(),
-                $version,
+                $testFrameworkName,
+                $testFrameworkVersion,
             ),
         ]);
     }

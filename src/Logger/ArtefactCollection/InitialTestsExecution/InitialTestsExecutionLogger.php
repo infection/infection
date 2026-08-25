@@ -43,7 +43,7 @@ namespace Infection\Logger\ArtefactCollection\InitialTestsExecution;
  */
 interface InitialTestsExecutionLogger
 {
-    public function start(): void;
+    public function start(string $testFrameworkName, string $testFrameworkVersion): void;
 
     public function advance(): void;
 

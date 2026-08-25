@@ -37,8 +37,6 @@ namespace Infection\Logger\ArtefactCollection;
 
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
-use Infection\TestFramework\Contracts\TestFramework;
-use InvalidArgumentException;
 use function sprintf;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -52,27 +50,20 @@ final readonly class ConsoleProgressBarLogger implements InitialStaticAnalysisEx
 
     public function __construct(
         private OutputInterface $output,
-        private TestFramework $testFramework,
         private bool $debug,
     ) {
         $this->progressBar = new ProgressBar($this->output);
         $this->progressBar->setFormat('verbose');
     }
 
-    public function start(): void
+    public function start(string $testFrameworkName, string $testFrameworkVersion): void
     {
-        try {
-            $version = $this->testFramework->getVersion();
-        } catch (InvalidArgumentException) {
-            $version = 'unknown';
-        }
-
         $this->output->writeln([
             '',
             sprintf(
                 'Running initial tests with %s version %s',
-                $this->testFramework->getName(),
-                $version,
+                $testFrameworkName,
+                $testFrameworkVersion,
             ),
             '',
         ]);
