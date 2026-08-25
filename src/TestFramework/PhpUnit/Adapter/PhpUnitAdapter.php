@@ -43,7 +43,6 @@ use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\Console\ConsoleOutput;
 use Infection\Process\DryRunProcess;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\ShellCommandLineExecutor;
@@ -66,6 +65,8 @@ use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use function min;
 use Override;
+use const PHP_EOL;
+use Psr\Log\LoggerInterface;
 use function Safe\preg_match;
 use function sprintf;
 use Symfony\Component\Process\Process;
@@ -96,7 +97,7 @@ final class PhpUnitAdapter implements MutantProcessDetectionStatusResolver, Test
         private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
         private readonly VersionParser $versionParser,
         private readonly CommandLineBuilder $commandLineBuilder,
-        private readonly ConsoleOutput $consoleOutput,
+        private readonly LoggerInterface $logger,
         private readonly CoverageChecker $coverageChecker,
         private readonly InitialRunProcessFactory $initialRunProcessFactory,
         private readonly bool $skipCoverage,
@@ -239,7 +240,14 @@ final class PhpUnitAdapter implements MutantProcessDetectionStatusResolver, Test
         // TODO: check supported version
 
         if ($this->skipInitialTests) {
-            $this->consoleOutput->logSkippingInitialTests();
+            $this->logger->warning(implode(
+                PHP_EOL,
+                [
+                    'Skipping the initial test run can be very dangerous.',
+                    'It is your responsibility to ensure the tests are in a passing state to begin.',
+                    'If this is not done then mutations may report as caught when they are not.',
+                ],
+            ));
             $this->coverageChecker->checkCoverageExists();
         }
     }

@@ -63,6 +63,7 @@ use Infection\TestFramework\PhpStan\Process\PHPStanMutantProcessFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
+use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
@@ -90,6 +91,7 @@ final readonly class Factory
         private array $installedExtensions,
         private ShellCommandLineExecutor $shellCommandLineExecutor,
         private ConsoleOutput $consoleOutput,
+        private LoggerInterface $logger,
         private CoverageChecker $coverageChecker,
         /** @var Closure(): InitialTestsRunProcessFactory */
         private Closure $initialRunProcessFactory,
@@ -225,7 +227,7 @@ final readonly class Factory
                         $this->getFilteredSourceFilesToMutate(),
                         $configuration->mapSourceClassToTestStrategy,
                         $this->shellCommandLineExecutor,
-                        $this->consoleOutput,
+                        $this->logger,
                         $this->coverageChecker,
                         $this->extraOptionsFilter,
                     );

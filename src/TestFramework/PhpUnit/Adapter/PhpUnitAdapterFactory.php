@@ -39,7 +39,6 @@ use function array_map;
 use DuoClock\DuoClock;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\Console\ConsoleOutput;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialRunProcessFactory;
@@ -55,6 +54,7 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
+use Psr\Log\LoggerInterface;
 use function Safe\file_get_contents;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
@@ -92,7 +92,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         array $filteredSourceFilesToMutate,
         ?string $mapSourceClassToTestStrategy,
         ShellCommandLineExecutor $shellCommandLineExecutor,
-        ConsoleOutput $consoleOutput,
+        LoggerInterface $logger,
         CoverageChecker $coverageChecker,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
@@ -142,7 +142,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
-            consoleOutput: $consoleOutput,
+            logger: $logger,
             coverageChecker: $coverageChecker,
             initialRunProcessFactory: new InitialRunProcessFactory(),
             skipCoverage: $skipCoverage,

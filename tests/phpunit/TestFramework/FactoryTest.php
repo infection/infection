@@ -55,6 +55,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[CoversClass(Factory::class)]
@@ -76,6 +77,7 @@ final class FactoryTest extends TestCase
             [],
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(ConsoleOutput::class),
+            $this->createStub(LoggerInterface::class),
             $this->createStub(CoverageChecker::class),
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
@@ -110,6 +112,7 @@ final class FactoryTest extends TestCase
             ],
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(ConsoleOutput::class),
+            $this->createStub(LoggerInterface::class),
             $this->createStub(CoverageChecker::class),
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
@@ -138,6 +141,7 @@ final class FactoryTest extends TestCase
             [],
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(ConsoleOutput::class),
+            $this->createStub(LoggerInterface::class),
             $this->createStub(CoverageChecker::class),
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
@@ -167,6 +171,7 @@ final class FactoryTest extends TestCase
             [],
             $this->createStub(ShellCommandLineExecutor::class),
             $this->createStub(ConsoleOutput::class),
+            $this->createStub(LoggerInterface::class),
             $this->createStub(CoverageChecker::class),
             fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
             fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),

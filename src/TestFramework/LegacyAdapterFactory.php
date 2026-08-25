@@ -40,7 +40,6 @@ use DuoClock\DuoClock;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\SourceCollector;
@@ -49,6 +48,7 @@ use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
@@ -66,7 +66,7 @@ final readonly class LegacyAdapterFactory
         private SourceCollector $sourceCollector,
         private array $installedExtensions,
         private ShellCommandLineExecutor $shellCommandLineExecutor,
-        private ConsoleOutput $consoleOutput,
+        private LoggerInterface $logger,
         /** @var Closure(): CoverageChecker */
         private Closure $coverageChecker,
         /** @var Closure(): TestFrameworkExtraOptionsFilter */
@@ -99,7 +99,7 @@ final readonly class LegacyAdapterFactory
                 $this->configuration->sourceFilter === null ? [] : $this->sourceCollector->collect(),
                 $this->configuration->mapSourceClassToTestStrategy,
                 $this->shellCommandLineExecutor,
-                $this->consoleOutput,
+                $this->logger,
                 ($this->coverageChecker)(),
                 ($this->testFrameworkExtraOptionsFilter)(),
             );

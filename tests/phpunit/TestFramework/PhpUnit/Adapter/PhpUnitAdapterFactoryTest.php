@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use DuoClock\DuoClock;
-use Infection\Console\ConsoleOutput;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -45,6 +44,7 @@ use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
@@ -73,7 +73,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             [],
             null,
             new ShellCommandLineExecutor(),
-            $this->createStub(ConsoleOutput::class),
+            $this->createStub(LoggerInterface::class),
             $this->createStub(CoverageChecker::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );

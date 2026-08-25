@@ -748,12 +748,6 @@ parameters:
 			path: ../src/TestFramework/Config/TestFrameworkConfigLocator.php
 
 		-
-			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\Console\ConsoleOutput
-			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
-
-		-
 			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\Process\ShellCommandLineExecutor
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1
@@ -904,12 +898,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Console\ConsoleOutput
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\DryRunProcess
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -965,12 +953,6 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Console\ConsoleOutput
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php

@@ -38,9 +38,9 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use function array_map;
 use function array_slice;
 use DuoClock\TimeSpy;
+use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
 use Infection\Mutant\Mutant;
@@ -62,11 +62,13 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
+use const PHP_EOL;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -120,6 +122,35 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('shallProvide');
 
         $this->assertSame('PHPUnit', $this->adapter->getName());
+    }
+
+    public function test_it_warns_when_the_initial_test_run_is_skipped(): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger
+            ->expects($this->once())
+            ->method('warning')
+            ->with(implode(
+                PHP_EOL,
+                [
+                    'Skipping the initial test run can be very dangerous.',
+                    'It is your responsibility to ensure the tests are in a passing state to begin.',
+                    'If this is not done then mutations may report as caught when they are not.',
+                ],
+            ));
+        $coverageChecker = $this->createMock(CoverageChecker::class);
+        $coverageChecker
+            ->expects($this->once())
+            ->method('checkCoverageExists');
+
+        $adapter = $this->createAdapter(
+            '<phpunit/>',
+            skipInitialTests: true,
+            logger: $logger,
+            coverageChecker: $coverageChecker,
+        );
+
+        $adapter->checkRequirements();
     }
 
     public function test_it_supports_junit_reports(): void
@@ -1650,6 +1681,9 @@ final class PhpUnitAdapterTest extends TestCase
         bool $executeOnlyCoveringTestCases = false,
         ?string $mapSourceClassToTestStrategy = null,
         ?ShellCommandLineExecutor $shellCommandLineExecutor = null,
+        bool $skipInitialTests = false,
+        ?LoggerInterface $logger = null,
+        ?CoverageChecker $coverageChecker = null,
     ): PhpUnitAdapter {
         $tmpDir = '/tmp';
         $projectDir = '/path/to/project';
@@ -1697,11 +1731,11 @@ final class PhpUnitAdapterTest extends TestCase
             $shellCommandLineExecutor ?? $this->createStub(ShellCommandLineExecutor::class),
             new VersionParser(),    // won't be used since we pass the version
             new CommandLineBuilder($this->phpExecutableFinderMock),
-            $this->createStub(ConsoleOutput::class),
-            $this->createStub(CoverageChecker::class),
+            $logger ?? $this->createStub(LoggerInterface::class),
+            $coverageChecker ?? $this->createStub(CoverageChecker::class),
             $this->initialRunProcessFactory,
             false,
-            false,
+            $skipInitialTests,
             null,
             '',
             10.,

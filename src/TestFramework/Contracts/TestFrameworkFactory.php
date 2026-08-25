@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Contracts;
 
 use DuoClock\DuoClock;
-use Infection\Console\ConsoleOutput;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -73,7 +73,7 @@ interface TestFrameworkFactory
         array $filteredSourceFilesToMutate,
         ?string $mapSourceClassToTestStrategy,
         ShellCommandLineExecutor $shellCommandLineExecutor,
-        ConsoleOutput $consoleOutput,
+        LoggerInterface $logger,
         CoverageChecker $coverageChecker,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework;
