@@ -39,19 +39,20 @@ use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Override;
 use function Safe\preg_match;
 use function sprintf;
 use function trim;
 use function version_compare;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -68,7 +69,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
-        ShellCommandLineExecutor $shellCommandLineExecutor,
+        ShellCommandRunner $shellCommandRunner,
         VersionParser $versionParser,
         CommandLineBuilder $commandLineBuilder,
         ?string $version = null,
@@ -78,7 +79,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
             $initialConfigBuilder,
             $mutationConfigBuilder,
             $argumentsAndOptionsBuilder,
-            $shellCommandLineExecutor,
+            $shellCommandRunner,
             $versionParser,
             $commandLineBuilder,
             $version,
@@ -168,6 +169,8 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
     public function getMemoryUsed(string $output): float
     {
         if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match) === 1) {
+            Assert::keyExists($match, 1);
+
             return (float) $match[1];
         }
 
@@ -216,7 +219,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
     public static function supportsExecutionOrderDefectsRandom(string $version): bool
     {
         // ordering by defects needs the test run history, which the initial run deactivates. PHPUnit ignored that combination silently until 13.3 turned it into a warning https://github.com/sebastianbergmann/phpunit/blob/13.3.0/src/TextUI/Application.php
-        if (version_compare($version, '13.3', '>=')) {
+        if (version_compare($version, '13.0', '>=')) {
             return false;
         }
 

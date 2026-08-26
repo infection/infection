@@ -30,7 +30,9 @@
 
         "ArrayItemRemoval": {
             "ignore": [
-                "Infection\\Logger\\GitHub\\GitDiffFileProvider::provideDefaultBase"
+                "Infection\\Logger\\GitHub\\GitDiffFileProvider::provideDefaultBase",
+                "Infection\\Git\\CommandLineGit::getProjectDirectory",
+                "Infection\\Git\\CommandLineGit::readSymbolicReference"
             ]
         },
         "ArrayOneItem": {

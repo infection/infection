@@ -37,6 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Config;
 
 use Infection\TestFramework\XML\SafeDOMXPath;
 use function Safe\preg_match;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -95,6 +96,8 @@ final class XmlConfigurationVersionProvider
         $match = [];
 
         if (preg_match('#(\d+\.\d)(/phpunit)?\.xsd$#', $schemaUri, $match) === 1) {
+            Assert::keyExists($match, 1);
+
             return $match[1];
         }
 

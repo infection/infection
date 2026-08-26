@@ -4,8 +4,8 @@ name: infection-codex-otel
 displayName: Infection Codex OTEL
 description: Merge Infection OpenTelemetry settings into the generated Codex user config.
 
-commands:
-  initFiles:
+setup:
+  files:
     - path: /home/agent/.config/infection-sbx/workdir
       content: "${WORKDIR}\n"
       mode: "0644"

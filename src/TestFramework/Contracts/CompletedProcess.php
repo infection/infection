@@ -33,24 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Factory;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-
-#[CoversClass(InitialStaticAnalysisProcessFactory::class)]
-final class InitialStaticAnalysisProcessFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class CompletedProcess
 {
-    public function test_it_creates_initial_process_without_timeout(): void
+    /**
+     * @param string[] $command
+     */
+    public function __construct(
+        // @phpstan-ignore shipmonk.deadProperty.neverRead
+        public array $command,
+        public int $exitCode,
+        public string $stdout,
+        public string $stderr,
+    ) {
+    }
+
+    public function isSuccessful(): bool
     {
-        $factory = new InitialStaticAnalysisProcessFactory(
-            $this->createStub(StaticAnalysisToolAdapter::class),
-        );
-
-        $process = $factory->createProcess();
-
-        $this->assertNull($process->getTimeout());
+        return $this->exitCode === 0;
     }
 }

@@ -43,6 +43,7 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\ProfileList;
 use Infection\Testing\SingletonContainer;
+use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -248,6 +249,9 @@ final class DefinitionTest extends TestCase
         ];
     }
 
+    /**
+     * @param Mutator<Node> $mutator
+     */
     #[DataProvider('mutatorsProvider')]
     public function test_it_must_define_remedies(Mutator $mutator): void
     {

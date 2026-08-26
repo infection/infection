@@ -33,27 +33,75 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Factory;
+namespace Infection\Tests\TestFramework\Contracts;
 
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Symfony\Component\Process\Process;
+use Infection\TestFramework\Contracts\CompletedProcess;
 
-/**
- * @internal
- * @final
- */
-readonly class InitialStaticAnalysisProcessFactory
+final class CompletedProcessBuilder
 {
-    public function __construct(
-        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
+    /**
+     * @param list<string> $command
+     */
+    private function __construct(
+        private array $command,
+        private int $exitCode,
+        private string $stdout,
+        private string $stderr,
     ) {
     }
 
-    public function createProcess(): Process
+    public static function withMinimalTestData(): self
     {
-        return new Process(
-            command: $this->staticAnalysisToolAdapter->getInitialRunCommandLine(),
-            timeout: null, // Ignore the default timeout of 60 seconds
+        return new self(
+            command: [],
+            exitCode: 0,
+            stdout: '',
+            stderr: '',
+        );
+    }
+
+    /**
+     * @param list<string> $command
+     */
+    public function withCommand(array $command): self
+    {
+        $clone = clone $this;
+        $clone->command = $command;
+
+        return $clone;
+    }
+
+    public function withExitCode(int $exitCode): self
+    {
+        $clone = clone $this;
+        $clone->exitCode = $exitCode;
+
+        return $clone;
+    }
+
+    public function withStdout(string $stdout): self
+    {
+        $clone = clone $this;
+        $clone->stdout = $stdout;
+
+        return $clone;
+    }
+
+    public function withStderr(string $stderr): self
+    {
+        $clone = clone $this;
+        $clone->stderr = $stderr;
+
+        return $clone;
+    }
+
+    public function build(): CompletedProcess
+    {
+        return new CompletedProcess(
+            $this->command,
+            $this->exitCode,
+            $this->stdout,
+            $this->stderr,
         );
     }
 }

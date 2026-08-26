@@ -101,6 +101,15 @@ final readonly class StrykerHtmlReportBuilder
     ) {
     }
 
+    /**
+     * @return array{
+     *     schemaVersion: string,
+     *     thresholds: array{high: int, low: int},
+     *     files: ArrayObject<string, array<mixed>|string>,
+     *     testFiles: ArrayObject<array-key, array{tests: non-empty-list<array{id: string, name: string}>}>,
+     *     framework: array{name: string, branding: array{homepageUrl: string, imageUrl: string}},
+     * }
+     */
     public function build(): array
     {
         return [
@@ -121,6 +130,9 @@ final readonly class StrykerHtmlReportBuilder
         ];
     }
 
+    /**
+     * @return ArrayObject<array-key, array{tests: non-empty-list<array{id: string, name: string}>}>
+     */
     private function getTestFiles(): ArrayObject
     {
         $testFiles = [];
@@ -156,9 +168,13 @@ final readonly class StrykerHtmlReportBuilder
             }
         }
 
+        /** @var array<array-key, array{tests: non-empty-list<array{id: string, name: string}>}> $testFiles */
         return new ArrayObject($testFiles);
     }
 
+    /**
+     * @return ArrayObject<string, array<mixed>|string>
+     */
     private function getFiles(): ArrayObject
     {
         $files = new ArrayObject();
@@ -179,7 +195,7 @@ final readonly class StrykerHtmlReportBuilder
     }
 
     /**
-     * @param array<string, MutantExecutionResult[]> $resultsByPath
+     * @param array<string, list<MutantExecutionResult>> $resultsByPath
      *
      * @return ArrayObject<string, array<mixed>|string>
      */
@@ -211,7 +227,7 @@ final readonly class StrykerHtmlReportBuilder
     }
 
     /**
-     * @return array<string, MutantExecutionResult[]>
+     * @return array<string, list<MutantExecutionResult>>
      */
     private function retrieveResultsByPath(): array
     {
@@ -225,7 +241,20 @@ final readonly class StrykerHtmlReportBuilder
     }
 
     /**
-     * @param MutantExecutionResult[] $results
+     * @param list<MutantExecutionResult> $results
+     *
+     * @return list<array{
+     *     id: string,
+     *     mutatorName: string,
+     *     replacement: string,
+     *     description: string,
+     *     location: array{start: array{line: int, column: int}, end: array{line: int, column: int}},
+     *     status: string,
+     *     statusReason: string,
+     *     coveredBy: array<array-key, string>,
+     *     killedBy: array<int, string>,
+     *     testsCompleted: int,
+     * }>
      */
     private function retrieveMutants(array $results, string $originalCode): array
     {
@@ -305,6 +334,8 @@ final readonly class StrykerHtmlReportBuilder
         $matches = [];
 
         if (preg_match('/(?<name>\S+::\S+)(?<dataname> with data set (?:#\d+|"[^"]+"))?/', $processOutput, $matches) === 1) {
+            Assert::keyExists($matches, 'name');
+
             return [$this->buildTestMethodId($matches['name'] . ($matches['dataname'] ?? ''))];
         }
 

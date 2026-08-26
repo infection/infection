@@ -36,8 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser;
 
 use Infection\PhpParser\MutatedNode;
-use PhpParser\Node;
-use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Scalar\Int_;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -46,10 +45,10 @@ use PHPUnit\Framework\TestCase;
 final class MutatedNodeTest extends TestCase
 {
     /**
-     * @param Node|Node[] $node
+     * @param Int_|Int_[] $node
      */
     #[DataProvider('nodeProvider')]
-    public function test_it_can_be_instantiated(LNumber|array $node): void
+    public function test_it_can_be_instantiated(Int_|array $node): void
     {
         $mutatedNode = MutatedNode::wrap($node);
 
@@ -58,12 +57,12 @@ final class MutatedNodeTest extends TestCase
 
     public static function nodeProvider(): iterable
     {
-        yield 'single node' => [new LNumber(1)];
+        yield 'single node' => [new Int_(1)];
 
         yield 'multiple nodes' => [
             [
-                new LNumber(1),
-                new LNumber(-1),
+                new Int_(1),
+                new Int_(-1),
             ],
         ];
     }

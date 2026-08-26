@@ -3,9 +3,13 @@
 The goal of this test is to ensure Infection works with PHPUnit 13.3+, which deprecated the
 `cacheResult` attribute in favour of `recordTestRunHistory`.
 
+Its `phpunit.xml` orders tests by `defects`, which PHPUnit 13.3 reports as a test runner warning
+when the recording of the test run history is disabled, as the initial run configuration does.
+
 See:
 
 - https://github.com/infection/infection/issues/3445
+- https://github.com/infection/infection/issues/3457
 
 This project test contains:
 

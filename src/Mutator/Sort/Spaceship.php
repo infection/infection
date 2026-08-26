@@ -107,11 +107,11 @@ final class Spaceship implements Mutator
             return false;
         }
 
-        if ($node->right instanceof Node\Scalar\LNumber && $node->right->value === 0) {
+        if ($node->right instanceof Node\Scalar\Int_ && $node->right->value === 0) {
             return true;
         }
 
-        return $node->left instanceof Node\Scalar\LNumber
+        return $node->left instanceof Node\Scalar\Int_
             && $node->left->value === 0;
     }
 

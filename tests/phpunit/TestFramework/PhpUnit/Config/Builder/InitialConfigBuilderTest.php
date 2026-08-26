@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
+use DOMNameSpaceNode;
+use DOMNode;
 use DOMNodeList;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\InMemoryFileSystem;
@@ -468,6 +470,35 @@ final class InitialConfigBuilderTest extends TestCase
         $this->assertSame(0, $resolveDependencies->length);
     }
 
+    public function test_it_removes_the_defects_order_already_set_for_phpunit_13_3(): void
+    {
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_defects_order_set.xml');
+
+        $xml = $this->filesystem->readFile($builder->build('13.3'));
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder');
+
+        $this->assertInstanceOf(DOMNodeList::class, $executionOrder);
+        $this->assertSame('depends', $executionOrder[0]->nodeValue);
+
+        $recordTestRunHistory = $this->queryXpath($xml, '/phpunit/@recordTestRunHistory');
+
+        $this->assertInstanceOf(DOMNodeList::class, $recordTestRunHistory);
+        $this->assertSame('false', $recordTestRunHistory[0]->nodeValue);
+    }
+
+    public function test_it_keeps_the_defects_order_already_set_for_phpunit_13_2(): void
+    {
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_defects_order_set.xml');
+
+        $xml = $this->filesystem->readFile($builder->build('13.2'));
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder');
+
+        $this->assertInstanceOf(DOMNodeList::class, $executionOrder);
+        $this->assertSame('depends,defects', $executionOrder[0]->nodeValue);
+    }
+
     #[DataProvider('failOnProvider')]
     public function test_it_adds_fail_on_risky_and_warning_for_proper_phpunit_versions(
         string $version,
@@ -643,6 +674,9 @@ final class InitialConfigBuilderTest extends TestCase
         ];
     }
 
+    /**
+     * @return DOMNodeList<DOMNameSpaceNode|DOMNode>
+     */
     private function queryXpath(string $xml, string $query): DOMNodeList
     {
         return SafeDOMXPath::fromString($xml)->queryList($query);

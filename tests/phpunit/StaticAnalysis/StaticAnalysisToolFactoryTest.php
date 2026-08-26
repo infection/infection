@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\StaticAnalysis;
 
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -54,7 +54,7 @@ final class StaticAnalysisToolFactoryTest extends TestCase
             ConfigurationBuilder::withMinimalTestData()->build(),
             $this->createStub(StaticAnalysisToolExecutableFinder::class),
             $this->createStub(TestFrameworkConfigLocatorInterface::class),
-            $this->createStub(ShellCommandLineExecutor::class),
+            $this->createStub(ShellCommandRunner::class),
             $this->createStub(PhpExecutableFinder::class),
         );
 

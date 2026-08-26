@@ -39,9 +39,9 @@ use function array_map;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\FileSystem\FileSystem;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
@@ -118,10 +118,10 @@ final class PhpUnitAdapterTest extends TestCase
 
     public function test_it_retrieves_version(): void
     {
-        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
-        $shellCommandLineExecutor
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
             ->expects($this->once())
-            ->method('execute')
+            ->method('mustRun')
             ->with([self::PHP_EXECUTABLE, '/path/to/phpunit', '--version'])
             ->willReturn('PHPUnit 10.5.1 by Sebastian Bergmann and contributors.');
 
@@ -133,7 +133,7 @@ final class PhpUnitAdapterTest extends TestCase
                 <phpunit/>
                 XML,
             version: null,
-            shellCommandLineExecutor: $shellCommandLineExecutor,
+            shellCommandRunner: $shellCommandRunner,
         );
 
         $actual = $adapter->getVersion();
@@ -346,9 +346,10 @@ final class PhpUnitAdapterTest extends TestCase
 
         yield [true, '12.2.99'];
 
-        yield [true, '13.0'];
+        // because it's silently ignored https://github.com/infection/infection/pull/3458#discussion_r3743322156
+        yield [false, '13.0'];
 
-        yield [true, '13.2.99'];
+        yield [false, '13.2.99'];
 
         yield [false, '13.3'];
 
@@ -1623,7 +1624,7 @@ final class PhpUnitAdapterTest extends TestCase
         array $filteredSourceFilesToMutate = [],
         bool $executeOnlyCoveringTestCases = false,
         ?string $mapSourceClassToTestStrategy = null,
-        ?ShellCommandLineExecutor $shellCommandLineExecutor = null,
+        ?ShellCommandRunner $shellCommandRunner = null,
     ): PhpUnitAdapter {
         $tmpDir = '/tmp';
         $projectDir = '/path/to/project';
@@ -1667,8 +1668,9 @@ final class PhpUnitAdapterTest extends TestCase
                 $executeOnlyCoveringTestCases,
                 $filteredSourceFilesToMutate,
                 $mapSourceClassToTestStrategy,
+                false,
             ),
-            $shellCommandLineExecutor ?? $this->createStub(ShellCommandLineExecutor::class),
+            $shellCommandRunner ?? $this->createStub(ShellCommandRunner::class),
             new VersionParser(),    // won't be used since we pass the version
             new CommandLineBuilder($this->phpExecutableFinderMock),
             $version,

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use Closure;
 use Infection\CannotBeInstantiated;
 use Infection\Container\Container;
 

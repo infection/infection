@@ -49,6 +49,7 @@ use stdClass;
 #[CoversClass(AbstractValueToNullReturnValue::class)]
 final class AbstractValueToNullReturnValueTest extends TestCase
 {
+    /** @var Stub&AbstractValueToNullReturnValue<Node> */
     private Stub&AbstractValueToNullReturnValue $testSubjectStub;
 
     protected function setUp(): void

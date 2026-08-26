@@ -89,7 +89,7 @@ final class SpreadOneItem implements Mutator
                     [$node],
                     NodeAttributes::getAllExceptOriginalNode($node) + ['kind' => Node\Expr\Array_::KIND_SHORT],
                 ),
-                new Node\Scalar\LNumber(0),
+                new Node\Scalar\Int_(0),
                 NodeAttributes::getAllExceptOriginalNode($node->value),
             ),
             null,

@@ -33,43 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\MutationGenerator;
+namespace Infection\Benchmark\ParseGitDiff;
 
 use Closure;
 use function count;
 use Infection\Git\CommandLineGit;
-use Infection\Process\ShellCommandLineExecutor;
 use function Safe\file_get_contents;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 $diff = file_get_contents(__DIR__ . '/diff');
 
-// @phpstan-ignore class.extendsFinalByPhpDoc
-$executorMock = new class($diff, __DIR__) extends ShellCommandLineExecutor {
-    public function __construct(
-        private readonly string $diff,
-        private readonly string $workingDirectory,
-    ) {
-    }
-
-    public function execute(array $command): string
-    {
-        $isFindRepositoryRootCommand = $command === [
-            'git',
-            '-C',
-            $this->workingDirectory,
-            'rev-parse',
-            '--show-toplevel',
-        ];
-
-        return $isFindRepositoryRootCommand
-            ? $this->workingDirectory
-            : $this->diff;
-    }
-};
-
-$git = new CommandLineGit($executorMock);
+$git = new CommandLineGit(
+    new DummyShellCommandRunner($diff, __DIR__),
+);
 
 // The values used for this method do not matter: we return the diff content.
 /**

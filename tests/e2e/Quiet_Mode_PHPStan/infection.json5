@@ -1,0 +1,18 @@
+{
+    "$schema": "../../../resources/schema.json",
+    "timeout": 25,
+    "threads": 4,
+    "staticAnalysisTool": "phpstan",
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "logs": {
+        "summary": "var/infection.log"
+    },
+    "mutators": {
+        "UnwrapArrayValues": true
+    },
+    "tmpDir": "var/infection-tmp"
+}
