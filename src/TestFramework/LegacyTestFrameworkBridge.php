@@ -72,6 +72,11 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         return $this->adapter->getName();
     }
 
+    public function getVersion(): string
+    {
+        return $this->adapter->getVersion();
+    }
+
     public function checkRequirements(): void
     {
         // TODO: check supported version

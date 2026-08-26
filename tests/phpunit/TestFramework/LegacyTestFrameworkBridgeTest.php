@@ -50,10 +50,12 @@ use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter;
 use Infection\Tests\Mutant\MutantBuilder;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(LegacyTestFrameworkBridge::class)]
 final class LegacyTestFrameworkBridgeTest extends TestCase
 {
@@ -66,6 +68,17 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $actual = $testFramework->getName();
 
         $this->assertSame('dummy', $actual);
+    }
+
+    public function test_it_exposes_the_adapter_version(): void
+    {
+        $testFramework = $this->createTestFramework(
+            adapter: new DummyTestFrameworkAdapter(),
+        );
+
+        $actual = $testFramework->getVersion();
+
+        $this->assertSame('1.0.0', $actual);
     }
 
     public function test_it_checks_existing_coverage_when_initial_tests_are_skipped(): void

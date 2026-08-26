@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
@@ -55,6 +56,11 @@ interface TestFramework
      * Name of the test framework, e.g. "PHPUnit" or "PHPStan".
      */
     public function getName(): string;
+
+    /**
+     * @throws InvalidVersion
+     */
+    public function getVersion(): string;
 
     /**
      * Checks that the version of the tool used is compatible with the adapter.
