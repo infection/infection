@@ -175,7 +175,7 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
-use Infection\TestFramework\LegacyTestFrameworkBridge;
+use Infection\TestFramework\LegacyAdapterFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
@@ -301,6 +301,26 @@ final class Container extends DIContainer
                 $config = $container->getConfiguration();
 
                 return new Factory(
+                    $config->tmpDir,
+                    $container->getProjectDir(),
+                    $container->getTestFrameworkConfigLocator(),
+                    $container->getTestFrameworkFinder(),
+                    $container->getJUnitReportLocator()->getDefaultLocation(),
+                    $config,
+                    $container->getSourceCollector(),
+                    GeneratedExtensionsConfig::EXTENSIONS,
+                    $container->getShellCommandRunner(),
+                    $container->get(ConsoleOutput::class),
+                    $container->getCoverageChecker(),
+                    $container->getInitialTestsRunner(),
+                    $container->getMutantProcessContainerFactory(),
+                    $container->getTestFrameworkExtraOptionsFilter(),
+                );
+            },
+            LegacyAdapterFactory::class => static function (self $container): LegacyAdapterFactory {
+                $config = $container->getConfiguration();
+
+                return new LegacyAdapterFactory(
                     $config->tmpDir,
                     $container->getProjectDir(),
                     $container->getTestFrameworkConfigLocator(),
@@ -533,7 +553,7 @@ final class Container extends DIContainer
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
                 $config = $container->getConfiguration();
 
-                return $container->getFactory()->create(
+                return $container->get(LegacyAdapterFactory::class)->create(
                     $config->testFramework,
                     $config->skipCoverage,
                 );
@@ -663,15 +683,14 @@ final class Container extends DIContainer
                 ),
                 new CurrentWorkingDirectoryProvider(),
             ),
-            TestFramework::class => static fn (self $container) => new LegacyTestFrameworkBridge(
-                $container->getTestFrameworkAdapter(),
-                $container->get(ConsoleOutput::class),
-                $container->getCoverageChecker(),
-                $container->getInitialTestsRunner(),
-                $container->getConfiguration(),
-                $container->getMutantProcessContainerFactory(),
-                $container->getTestFrameworkExtraOptionsFilter(),
-            ),
+            TestFramework::class => static function (self $container): TestFramework {
+                $config = $container->getConfiguration();
+
+                return $container->getFactory()->create(
+                    $config->testFramework,
+                    $config->skipCoverage,
+                );
+            },
         ]);
 
         return $container->withValues(
