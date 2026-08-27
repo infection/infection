@@ -210,7 +210,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $existingComposerBinDir = $this->tmp . '/existing-bin';
         $existingExecutable = $this->createPhpUnitExecutableFixture($existingComposerBinDir);
 
-        $expected = Path::canonicalize($expectedFallbackIsUsed ? $fallbackExecutable : $existingExecutable);
+        $expected = Path::canonicalize($expectedFallbackIsUsed ? (string) $fallbackExecutable : $existingExecutable);
 
         putenv(sprintf('%s=%s', self::PATH_NAME, $existingComposerBinDir));
         putenv('PATHEXT=');
