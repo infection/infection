@@ -50,6 +50,7 @@ use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\MockObject\Stub;
 use RuntimeException;
@@ -191,6 +192,85 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
             Path::canonicalize($this->tmp . '/vendor/bin'),
             Path::canonicalize($pathList[0]),
         );
+    }
+
+    #[DataProvider('provideEmptyComposerBinDirCases')]
+    public function test_it_resolves_the_test_framework_when_composer_bin_dir_output_is_empty(
+        bool $fallbackExists,
+        bool $expectedFallbackIsUsed,
+    ): void {
+        chdir($this->tmp);
+
+        $fallbackComposerBinDir = $this->tmp . '/vendor/bin';
+        $fallbackExecutable = $fallbackExists
+            ? $this->createPhpUnitExecutableFixture($fallbackComposerBinDir)
+            : null;
+
+        // The project configured a different composer bin directory for some reason.
+        $existingComposerBinDir = $this->tmp . '/existing-bin';
+        $existingExecutable = $this->createPhpUnitExecutableFixture($existingComposerBinDir);
+
+        $expected = Path::canonicalize($expectedFallbackIsUsed ? (string) $fallbackExecutable : $existingExecutable);
+
+        putenv(sprintf('%s=%s', self::PATH_NAME, $existingComposerBinDir));
+        putenv('PATHEXT=');
+
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->expects($this->once())
+            ->method('mustRun')
+            ->with(['/usr/bin/composer', 'config', 'bin-dir'])
+            ->willReturn('');
+
+        $frameworkFinder = new TestFrameworkFinder(
+            $this->composerFinder,
+            $shellCommandRunner,
+        );
+
+        $actual = Path::canonicalize($frameworkFinder->find(TestFrameworkTypes::PHPUNIT));
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function provideEmptyComposerBinDirCases(): iterable
+    {
+        yield 'fallback exists' => [
+            'fallbackExists' => true,
+            // TODO: this is a bug: the fallback exists, so it should be used
+            'expectedFallbackIsUsed' => false,
+        ];
+
+        yield 'fallback does not exist' => [
+            'fallbackExists' => false,
+            'expectedFallbackIsUsed' => false,
+        ];
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function test_it_cannot_find_the_test_framework_when_the_composer_executable_is_a_directory(): void
+    {
+        chdir($this->tmp);
+
+        $composerDirectory = $this->tmp . '/composer';
+        $this->fileSystem->mkdir($composerDirectory, 0644);
+
+        $fallbackComposerBinDir = $this->tmp . '/vendor/bin';
+        $this->createPhpUnitExecutableFixture($fallbackComposerBinDir);
+
+        putenv(sprintf('%s=%s', self::PATH_NAME, $this->tmp));
+        putenv('PATHEXT=');
+
+        $frameworkFinder = new TestFrameworkFinder(
+            new ConcreteComposerExecutableFinder(),
+            $this->shellCommandRunner,
+        );
+
+        // TODO: this is a bug. The PHPUnit executable does exist in the known fallback.
+        $this->expectExceptionObject(
+            new FinderException('Unable to locate a phpunit executable on local system. Ensure that phpunit is installed and available.'),
+        );
+
+        $frameworkFinder->find(TestFrameworkTypes::PHPUNIT);
     }
 
     public function test_it_adds_vendor_bin_to_path_with_a_local_composer_phar(): void
