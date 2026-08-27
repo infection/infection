@@ -35,14 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
+use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
-use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -66,6 +71,11 @@ final class FactoryTest extends TestCase
             [],
             $this->createStub(ShellCommandRunner::class),
             $this->createStub(FileSystem::class),
+            $this->createStub(ConsoleOutput::class),
+            $this->createStub(CoverageChecker::class),
+            $this->createStub(InitialTestsRunner::class),
+            $this->createStub(MutantProcessContainerFactory::class),
+            $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -91,10 +101,15 @@ final class FactoryTest extends TestCase
             ],
             $this->createStub(ShellCommandRunner::class),
             $this->createStub(FileSystem::class),
+            $this->createStub(ConsoleOutput::class),
+            $this->createStub(CoverageChecker::class),
+            $this->createStub(InitialTestsRunner::class),
+            $this->createStub(MutantProcessContainerFactory::class),
+            $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 
-        $adapter = $factory->create('dummy', false);
+        $testFramework = $factory->create('dummy', false);
 
-        $this->assertInstanceOf(DummyTestFrameworkAdapter::class, $adapter);
+        $this->assertInstanceOf(TestFramework::class, $testFramework);
     }
 }

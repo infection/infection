@@ -149,9 +149,9 @@ use Infection\Source\Collector\MemoizedSourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\Source\MatcherLine\GitDiffSourceLineMatcher;
-use Infection\Source\MatcherLine\NullSourceLineMatcher;
-use Infection\Source\MatcherLine\SourceLineMatcher;
+use Infection\Source\Matcher\GitDiffSourceLineMatcher;
+use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
@@ -161,7 +161,7 @@ use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
-use Infection\TestFramework\Coverage\CoverageCheckerFactory;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
@@ -173,7 +173,7 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
-use Infection\TestFramework\LegacyTestFrameworkBridge;
+use Infection\TestFramework\LegacyAdapterFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
@@ -295,15 +295,31 @@ final class Container extends DIContainer
                 [$container->getProjectDir()],
                 $container->getFileSystem(),
             ),
-            CoverageCheckerFactory::class => static fn (self $container): CoverageCheckerFactory => new CoverageCheckerFactory(
-                $container->getConfiguration(),
-                $container->getJUnitReportLocator(),
-                $container->getIndexXmlCoverageLocator(),
-            ),
             Factory::class => static function (self $container): Factory {
                 $config = $container->getConfiguration();
 
                 return new Factory(
+                    $config->tmpDir,
+                    $container->getProjectDir(),
+                    $container->getTestFrameworkConfigLocator(),
+                    $container->getTestFrameworkFinder(),
+                    $container->getJUnitReportLocator()->getDefaultLocation(),
+                    $config,
+                    $container->getSourceCollector(),
+                    GeneratedExtensionsConfig::EXTENSIONS,
+                    $container->getShellCommandRunner(),
+                    $container->getFileSystem(),
+                    $container->get(ConsoleOutput::class),
+                    $container->getCoverageChecker(),
+                    $container->getInitialTestsRunner(),
+                    $container->getMutantProcessContainerFactory(),
+                    $container->getTestFrameworkExtraOptionsFilter(),
+                );
+            },
+            LegacyAdapterFactory::class => static function (self $container): LegacyAdapterFactory {
+                $config = $container->getConfiguration();
+
+                return new LegacyAdapterFactory(
                     $config->tmpDir,
                     $container->getProjectDir(),
                     $container->getTestFrameworkConfigLocator(),
@@ -647,19 +663,9 @@ final class Container extends DIContainer
             ),
             TestFramework::class => static function (self $container): TestFramework {
                 $config = $container->getConfiguration();
-                $adapter = $container->getFactory()->create(
+                return $container->getFactory()->create(
                     $config->testFramework,
                     $config->skipCoverage,
-                );
-
-                return new LegacyTestFrameworkBridge(
-                    $adapter,
-                    $container->get(ConsoleOutput::class),
-                    $container->getCoverageCheckerFactory()->create($adapter),
-                    $container->getInitialTestsRunner(),
-                    $config,
-                    $container->getMutantProcessContainerFactory(),
-                    $container->getTestFrameworkExtraOptionsFilter(),
                 );
             },
         ]);
@@ -1085,11 +1091,6 @@ final class Container extends DIContainer
         return $this->get(RootsFileOrDirectoryLocator::class);
     }
 
-    public function getCoverageCheckerFactory(): CoverageCheckerFactory
-    {
-        return $this->get(CoverageCheckerFactory::class);
-    }
-
     public function getEventDispatcher(): EventDispatcher
     {
         return $this->get(EventDispatcher::class);
@@ -1190,7 +1191,8 @@ final class Container extends DIContainer
 
         return $config->isDryRun
             ? $this->get(DryProcessRunner::class)
-            : $this->get(ParallelProcessRunner::class);
+            : $this->get(ParallelProcessRunner::class)
+        ;
     }
 
     private function getMutantFactory(): MutantFactory
@@ -1198,7 +1200,6 @@ final class Container extends DIContainer
         return $this->get(MutantFactory::class);
     }
 
-    // TODO: maybe worth to rename to `::getTestFrameworkFactory()` to make it a bit less ambiguous.
     private function getFactory(): Factory
     {
         return $this->get(Factory::class);
