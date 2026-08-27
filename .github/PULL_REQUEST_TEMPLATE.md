@@ -9,10 +9,9 @@
 ## Checklist
 
 - [ ] Tests added/updated
-- [ ] Documentation updated (provide link to PR: https://github.com/infection/site/pull/XXX)
+- [ ] Documentation updated (provide link to PR: https://github.com/infection/infection.github.io/pull/XXX)
 - [ ] CHANGELOG.md updated (if deprecations/breaking changes)
 - [ ] Appropriate labels applied (e.g. `performance`, `feature`).
-
 
 ## Breaking Changes
 
@@ -25,16 +24,6 @@
 
 ## Related issues
 
+<!-- Remove if not relevant -->
+
 Fixes https://github.com/infection/infection/issues/XXX.
-
-This PR:
-
-- [ ] Adds new feature ...
-- [ ] Covered by tests
-- [ ] Doc PR: https://github.com/infection/site/pull/XXX
-
-<!--
-Remove if not relevant
--->
-
-Fixes https://github.com/infection/infection/issues/XXX
