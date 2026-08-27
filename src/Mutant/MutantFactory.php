@@ -39,7 +39,6 @@ use Infection\Differ\Differ;
 use Infection\Mutation\Mutation;
 use Later\Interfaces\Deferred;
 use function Later\lazy;
-use function Later\now;
 use function sprintf;
 
 /**
@@ -64,7 +63,7 @@ class MutantFactory
         );
 
         $mutatedCode = lazy($this->createMutatedCode($mutation));
-        $originalPrettyPrintedFile = now($mutation->getOriginalFileContent());
+        $originalPrettyPrintedFile = $mutation->getOriginalFileContent();
 
         return new Mutant(
             $mutantFilePath,
@@ -82,13 +81,12 @@ class MutantFactory
     }
 
     /**
-     * @param Deferred<string> $originalPrettyPrintedFile
      * @param Deferred<string> $mutantCode
      *
      * @return iterable<string>
      */
-    private function createMutantDiff(Deferred $originalPrettyPrintedFile, Deferred $mutantCode): iterable
+    private function createMutantDiff(string $originalPrettyPrintedFile, Deferred $mutantCode): iterable
     {
-        yield $this->differ->diff($originalPrettyPrintedFile->get(), $mutantCode->get());
+        yield $this->differ->diff($originalPrettyPrintedFile, $mutantCode->get());
     }
 }

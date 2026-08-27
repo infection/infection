@@ -209,7 +209,7 @@ trait CreateMetricsCalculator
             20 - $i,
             10 - $i,
             20 - $i,
-            now('<?php $a = 1;'),
+            '<?php $a = 1;',
             now('<?php $a = 2;'),
             [],
             0.0,

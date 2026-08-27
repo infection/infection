@@ -104,28 +104,11 @@ final class MutantFactoryTest extends TestCase
             $mutation,
             now('mutated code'),
             now('code diff'),
-            now('original code'),
+            'original code',
         );
 
         $mutant = $this->mutantFactory->create($mutation);
 
         $this->assertMutantEquals($expected, $mutant);
-    }
-
-    public function test_it_printing_the_original_file_is_memoized(): void
-    {
-        $mutation = MutationBuilder::withMinimalTestData()->build();
-
-        $this->differMock
-            ->expects($this->atLeastOnce())
-            ->method('diff')
-            ->willReturn('code diff')
-        ;
-
-        $this->mutantFactory->create($mutation)->getPrettyPrintedOriginalCode()->get();
-        $this->mutantFactory->create($mutation)->getDiff()->get();
-
-        $this->mutantFactory->create($mutation)->getPrettyPrintedOriginalCode()->get();
-        $this->mutantFactory->create($mutation)->getDiff()->get();
     }
 }

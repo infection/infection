@@ -54,7 +54,6 @@ class MutantExecutionResult
 
     /**
      * @param Deferred<string> $mutantDiff
-     * @param Deferred<string> $originalCode
      * @param Deferred<string> $mutatedCode
      * @param TestLocation[] $tests
      */
@@ -71,7 +70,7 @@ class MutantExecutionResult
         private readonly int $originalEndingLine,
         private readonly int $originalStartFilePosition,
         private readonly int $originalEndFilePosition,
-        private readonly Deferred $originalCode,
+        private readonly string $originalCode,
         private readonly Deferred $mutatedCode,
         private readonly array $tests,
         private readonly float $processRuntime,
@@ -158,7 +157,7 @@ class MutantExecutionResult
 
     public function getOriginalCode(): string
     {
-        return $this->originalCode->get();
+        return $this->originalCode;
     }
 
     public function getMutatedCode(): string
