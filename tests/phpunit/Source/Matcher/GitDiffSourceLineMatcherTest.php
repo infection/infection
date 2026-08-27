@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Source\Matcher;
 
+use const DIRECTORY_SEPARATOR;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Git\Git;
 use Infection\Source\Matcher\GitDiffSourceLineMatcher;
@@ -44,6 +45,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
+use function str_replace;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(GitDiffSourceLineMatcher::class)]
@@ -144,6 +146,16 @@ final class GitDiffSourceLineMatcherTest extends TestCase
             '/path/to/src/File1.php',
             4,
             12,
+            true,
+        ];
+
+        yield 'the Windows real path is normalized before looking up changed lines' => [
+            [
+                'C:/path/to/src/File.php' => [ChangedLinesRange::forLine(3)],
+            ],
+            str_replace('/', DIRECTORY_SEPARATOR, 'C:/path/to/src/File.php'),
+            3,
+            3,
             true,
         ];
 
