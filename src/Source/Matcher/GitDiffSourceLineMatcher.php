@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Source\Matcher;
 
 use Infection\Differ\ChangedLinesRange;
+use Infection\Framework\OperatingSystem;
 use Infection\Git\Git;
 use Infection\Source\Exception\NoSourceFound;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * @internal
@@ -86,6 +88,10 @@ final class GitDiffSourceLineMatcher implements SourceLineMatcher
             $this->sourceDirectories,
             $this->workingDirectory,
         );
+
+        if (OperatingSystem::isWindows()) {
+            $fileRealPath = Path::normalize($fileRealPath);
+        }
 
         return $this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [];
     }
