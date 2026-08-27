@@ -33,67 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Tests\TestFramework;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
-use Infection\CannotBeInstantiated;
-use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
-use Infection\TestFramework\Contracts\TestFrameworkFactory;
-use function is_a;
-use Webmozart\Assert\Assert;
+use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Source\Collector\FakeSourceCollector;
+use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\LegacyAdapterFactory;
+use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
+use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class TestFrameworkTypes
+#[CoversClass(LegacyAdapterFactory::class)]
+#[Group('integration')]
+final class LegacyAdapterFactoryTest extends TestCase
 {
-    use CannotBeInstantiated;
+    public function test_it_creates_an_installed_legacy_adapter(): void
+    {
+        $factory = new LegacyAdapterFactory(
+            '',
+            '',
+            $this->createStub(TestFrameworkConfigLocatorInterface::class),
+            $this->createStub(TestFrameworkFinder::class),
+            '',
+            ConfigurationBuilder::withMinimalTestData()->build(),
+            new FakeSourceCollector(),
+            [
+                'infection/codeception-adapter' => [
+                    'install_path' => '/path/to/dummy/adapter/factory.php',
+                    'extra' => ['class' => DummyTestFrameworkFactory::class],
+                    'version' => '1.0.0',
+                ],
+            ],
+            $this->createStub(ShellCommandRunner::class),
+        );
 
-    public const string PHPUNIT = 'phpunit';
+        $adapter = $factory->create('dummy', false);
 
-    public const string PHPSPEC = 'phpspec';
-
-    public const string CODECEPTION = 'codeception';
-
-    public const string TESTO = 'testo';
-
-    public const string DEBUG = 'debug';
-
-    /**
-     * @var string[]
-     */
-    private static array $defaultTypes = [
-        self::PHPUNIT,
-        self::PHPSPEC,
-        self::CODECEPTION,
-        self::TESTO,
-        self::DEBUG,
-    ];
-
-    /**
-     * @param mixed[] $installedExtensions
-     *
-     * @return string[]
-     */
-    public static function getTypes(
-        array $installedExtensions = GeneratedExtensionsConfig::EXTENSIONS,
-    ): array {
-        $types = self::$defaultTypes;
-
-        foreach ($installedExtensions as $installedExtension) {
-            $factory = $installedExtension['extra']['class'];
-
-            Assert::classExists($factory);
-
-            if (!is_a($factory, TestFrameworkFactory::class, true)
-                && !is_a($factory, TestFrameworkAdapterFactory::class, true)
-            ) {
-                continue;
-            }
-
-            $types[] = $factory::getAdapterName();
-        }
-
-        return $types;
+        $this->assertInstanceOf(DummyTestFrameworkAdapter::class, $adapter);
     }
 }

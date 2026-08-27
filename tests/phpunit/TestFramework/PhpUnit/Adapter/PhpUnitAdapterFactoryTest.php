@@ -35,8 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
+use Infection\Console\ConsoleOutput;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\SymfonyProcessShellCommandRunner;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -58,6 +64,12 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             true,
             shellCommandRunner: new SymfonyProcessShellCommandRunner(),
             sourceDirectoryBasePath: '/path/to/project',
+            consoleOutput: $this->createStub(ConsoleOutput::class),
+            coverageChecker: $this->createStub(CoverageChecker::class),
+            initialTestsRunner: $this->createStub(InitialTestsRunner::class),
+            configuration: ConfigurationBuilder::withMinimalTestData()->build(),
+            processFactory: $this->createStub(MutantProcessContainerFactory::class),
+            testFrameworkExtraOptionsFilter: $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 
         $this->assertSame('PHPUnit', $adapter->getName());
