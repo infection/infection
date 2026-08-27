@@ -162,6 +162,7 @@ use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
@@ -174,6 +175,7 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\LegacyTestFrameworkBridge;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
@@ -587,7 +589,7 @@ final class Container extends DIContainer
                 $configuration = $container->getConfiguration();
 
                 return new MutationTestingRunner(
-                    $container->getMutantProcessContainerFactory(),
+                    $container->getTestFramework(),
                     $container->getMutantFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
@@ -660,6 +662,15 @@ final class Container extends DIContainer
                     $container->getLogger(),
                 ),
                 new CurrentWorkingDirectoryProvider(),
+            ),
+            TestFramework::class => static fn (self $container) => new LegacyTestFrameworkBridge(
+                $container->getTestFrameworkAdapter(),
+                $container->get(ConsoleOutput::class),
+                $container->getCoverageChecker(),
+                $container->getInitialTestsRunner(),
+                $container->getConfiguration(),
+                $container->getMutantProcessContainerFactory(),
+                $container->getTestFrameworkExtraOptionsFilter(),
             ),
         ]);
 
@@ -912,6 +923,11 @@ final class Container extends DIContainer
     public function getFilteringResultsCollectorFactory(): FilteringResultsCollectorFactory
     {
         return $this->get(FilteringResultsCollectorFactory::class);
+    }
+
+    public function getTestFramework(): TestFramework
+    {
+        return $this->get(TestFramework::class);
     }
 
     public function getTestFrameworkAdapter(): TestFrameworkAdapter
