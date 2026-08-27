@@ -48,7 +48,6 @@ final class MutantExecutionResultBuilder
 {
     /**
      * @param Deferred<string> $mutantDiff
-     * @param Deferred<string> $originalCode
      * @param Deferred<string> $mutatedCode
      * @param TestLocation[] $tests
      */
@@ -63,7 +62,7 @@ final class MutantExecutionResultBuilder
         private string $originalFilePath,
         private int $originalStartingLine,
         private int $originalEndingLine,
-        private Deferred $originalCode,
+        private string $originalCode,
         private Deferred $mutatedCode,
         private array $tests,
         private float $processRuntime,
@@ -83,7 +82,7 @@ final class MutantExecutionResultBuilder
             $result->getOriginalFilePath(),
             $result->getOriginalStartingLine(),
             $result->getOriginalEndingLine(),
-            now($result->getOriginalCode()),
+            $result->getOriginalCode(),
             now($result->getMutatedCode()),
             $result->getTests(),
             $result->getProcessRuntime(),
@@ -111,11 +110,9 @@ final class MutantExecutionResultBuilder
             originalFilePath: 'src/Foo.php',
             originalStartingLine: 10,
             originalEndingLine: 15,
-            originalCode: now(
-                <<<'PHP'
-                    <?php $a = 1;
-                    PHP,
-            ),
+            originalCode: <<<'PHP'
+                <?php $a = 1;
+                PHP,
             mutatedCode: now(
                 <<<'PHP'
                     <?php $a = 2;
@@ -156,24 +153,22 @@ final class MutantExecutionResultBuilder
             originalFilePath: '/path/to/src/Foo.php',
             originalStartingLine: 10,
             originalEndingLine: 15,
-            originalCode: now(
-                <<<'PHP'
-                    <?php
+            originalCode: <<<'PHP'
+                <?php
 
-                    namespace Acme;
+                namespace Acme;
 
-                    class Foo
+                class Foo
+                {
+                    public function bar(): void
                     {
-                        public function bar(): void
-                        {
-                            for ($i = 0; $i < 10; $i++) {
-                                echo $i;
-                            }
+                        for ($i = 0; $i < 10; $i++) {
+                            echo $i;
                         }
                     }
+                }
 
-                    PHP,
-            ),
+                PHP,
             mutatedCode: now(
                 <<<'PHP'
                     <?php
@@ -291,10 +286,7 @@ final class MutantExecutionResultBuilder
         return $clone;
     }
 
-    /**
-     * @param Deferred<string> $originalCode
-     */
-    public function withOriginalCode(Deferred $originalCode): self
+    public function withOriginalCode(string $originalCode): self
     {
         $clone = clone $this;
         $clone->originalCode = $originalCode;

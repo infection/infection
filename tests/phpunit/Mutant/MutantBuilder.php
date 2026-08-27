@@ -59,7 +59,7 @@ final class MutantBuilder
             $mutant->getMutation(),
             $mutant->getMutatedCode()->get(),
             $mutant->getDiff()->get(),
-            $mutant->getPrettyPrintedOriginalCode()->get(),
+            $mutant->getPrettyPrintedOriginalCode(),
         );
     }
 
@@ -201,7 +201,7 @@ final class MutantBuilder
             $this->mutation,
             now($this->mutatedCode),
             now($this->diff),
-            now($this->prettyPrintedOriginalCode),
+            $this->prettyPrintedOriginalCode,
         );
     }
 }
