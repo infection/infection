@@ -236,8 +236,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     {
         yield 'fallback exists' => [
             'fallbackExists' => true,
-            // TODO: this is a bug: the fallback exists, so it should be used
-            'expectedFallbackIsUsed' => false,
+            'expectedFallbackIsUsed' => true,
         ];
 
         yield 'fallback does not exist' => [
@@ -247,7 +246,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     }
 
     #[RequiresOperatingSystem('Linux|Darwin')]
-    public function test_it_cannot_find_the_test_framework_when_the_composer_executable_is_a_directory(): void
+    public function test_it_falls_back_to_vendor_bin_when_the_composer_executable_is_a_directory(): void
     {
         chdir($this->tmp);
 
@@ -255,7 +254,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->fileSystem->mkdir($composerDirectory, 0644);
 
         $fallbackComposerBinDir = $this->tmp . '/vendor/bin';
-        $this->createPhpUnitExecutableFixture($fallbackComposerBinDir);
+        $fallbackExecutable = $this->createPhpUnitExecutableFixture($fallbackComposerBinDir);
 
         putenv(sprintf('%s=%s', self::PATH_NAME, $this->tmp));
         putenv('PATHEXT=');
@@ -265,12 +264,10 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
             $this->shellCommandRunner,
         );
 
-        // TODO: this is a bug. The PHPUnit executable does exist in the known fallback.
-        $this->expectExceptionObject(
-            new FinderException('Unable to locate a phpunit executable on local system. Ensure that phpunit is installed and available.'),
-        );
+        $expected = Path::canonicalize($fallbackExecutable);
+        $actual = Path::canonicalize($frameworkFinder->find(TestFrameworkTypes::PHPUNIT));
 
-        $frameworkFinder->find(TestFrameworkTypes::PHPUNIT);
+        $this->assertSame($expected, $actual);
     }
 
     public function test_it_adds_vendor_bin_to_path_with_a_local_composer_phar(): void

@@ -195,22 +195,26 @@ class TestFrameworkFinder
 
     private function getComposerBinDir(): ?string
     {
-        $binDir = null;
-
         try {
             $binDir = $this->shellCommandRunner->mustRun([
                 ...$this->findComposer(),
                 'config',
                 'bin-dir',
             ]);
-        } catch (RuntimeException) {
-            $candidate = getcwd() . '/vendor/bin';
 
-            if (file_exists($candidate)) {
-                $binDir = $candidate;
+            if ($binDir !== '') {
+                return $binDir;
             }
+        } catch (RuntimeException) {
+            // Continue
         }
 
-        return $binDir;
+        $candidate = getcwd() . '/vendor/bin';
+
+        if (file_exists($candidate)) {
+            return $candidate;
+        }
+
+        return null;
     }
 }
