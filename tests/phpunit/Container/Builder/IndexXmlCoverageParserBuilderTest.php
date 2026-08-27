@@ -38,7 +38,7 @@ namespace Infection\Tests\Container\Builder;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
 use Infection\FileSystem\FakeFileSystem;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageParser;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

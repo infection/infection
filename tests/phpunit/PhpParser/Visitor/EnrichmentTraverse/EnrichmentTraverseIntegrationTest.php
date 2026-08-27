@@ -42,7 +42,7 @@ use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\Source\Matcher\SimpleSourceLineMatcher;
 use Infection\Source\Matcher\SourceLineMatcher;
-use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Contracts\Tracing\Trace\Trace;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;

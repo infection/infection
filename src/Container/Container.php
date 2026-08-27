@@ -162,23 +162,25 @@ use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\Tracing\TestFrameworkTracerFactory;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\Coverage\CoveredTraceProvider;
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
-use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
-use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
-use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\PhpUnit\Tracing\CoveredTraceProvider;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitReportLocator;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitTestExecutionInfoAdder;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitTestFileDataProvider;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\MemoizedTestFileDataProvider;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\TestFileDataProvider;
+use Infection\TestFramework\PhpUnit\Tracing\PhpUnitTracer;
+use Infection\TestFramework\PhpUnit\Tracing\TraceProvider;
+use Infection\TestFramework\PhpUnit\Tracing\TraceProviderAdapterTracer;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageParser;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\PhpUnitXmlCoverageTraceProvider;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
-use Infection\TestFramework\Tracing\TraceProvider;
-use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
-use Infection\TestFramework\Tracing\Tracer;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
@@ -275,8 +277,18 @@ final class Container extends DIContainer
     {
         $container = new self([
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
-            Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
-                $container->getTraceProvider(),
+            Tracer::class => static fn (self $container): Tracer => $container->getTestFrameworkTracerFactory()->create(
+                $container->getTestFrameworkAdapter(),
+            ),
+            TestFrameworkTracerFactory::class => static fn (self $container): TestFrameworkTracerFactory => new TestFrameworkTracerFactory(
+                $container->getPhpUnitTracer(),
+                new TraceProviderAdapterTracer(
+                    $container->getTraceProvider(),
+                ),
+            ),
+            PhpUnitTracer::class => static fn (self $container): PhpUnitTracer => new PhpUnitTracer(
+                $container->getPhpUnitXmlCoverageTraceProvider(),
+                $container->getJUnitTestExecutionInfoAdder(),
             ),
             TraceProvider::class => static fn (self $container): TraceProvider => new CoveredTraceProvider(
                 $container->getPhpUnitXmlCoverageTraceProvider(),
@@ -812,6 +824,16 @@ final class Container extends DIContainer
     public function getTracer(): Tracer
     {
         return $this->get(Tracer::class);
+    }
+
+    public function getTestFrameworkTracerFactory(): TestFrameworkTracerFactory
+    {
+        return $this->get(TestFrameworkTracerFactory::class);
+    }
+
+    public function getPhpUnitTracer(): PhpUnitTracer
+    {
+        return $this->get(PhpUnitTracer::class);
     }
 
     public function getTraceProvider(): TraceProvider

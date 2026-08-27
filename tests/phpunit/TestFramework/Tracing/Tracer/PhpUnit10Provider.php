@@ -37,8 +37,8 @@ namespace Infection\Tests\TestFramework\Tracing\Tracer;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\CannotBeInstantiated;
-use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
-use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\Contracts\Tracing\Trace\SourceMethodLineRange;
+use Infection\TestFramework\Contracts\Tracing\Trace\TestLocations;
 use Infection\Tests\TestFramework\Tracing\Trace\SyntheticTrace;
 use Symfony\Component\Filesystem\Path;
 

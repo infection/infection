@@ -727,34 +727,34 @@ parameters:
 			path: ../src/TestFramework/Config/TestFrameworkConfigLocator.php
 
 		-
+			rawMessage: Infection\TestFramework\Contracts\Tracing\TestFrameworkTracerFactory should not depend on Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/Tracing/TestFrameworkTracerFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\Tracing\Trace\EmptyTrace should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/TestFramework/Contracts/Tracing/Trace/EmptyTrace.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\Tracing\Trace\NodeLineRangeData should not exist
+			identifier: phpat.testSourceClassesDoNotExposePublicProperties
+			count: 1
+			path: ../src/TestFramework/Contracts/Tracing/Trace/NodeLineRangeData.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\Tracing\Trace\ProxyTrace should not depend on Infection\TestFramework\PhpUnit\Tracing\XmlReport\TestLocator
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 3
+			path: ../src/TestFramework/Contracts/Tracing/Trace/ProxyTrace.php
+
+		-
 			rawMessage: Function ini_get is unsafe to use. It can return FALSE instead of throwing an exception. Please add 'use function Safe\ini_get;' at the beginning of the file to use the variant provided by the 'thecodingmachine/safe' library.
 			identifier: theCodingMachineSafe.function
 			count: 1
 			path: ../src/TestFramework/Coverage/CoverageChecker.php
-
-		-
-			rawMessage: Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/TestFramework/Coverage/Locator/Throwable/InvalidReportSource.php
-
-		-
-			rawMessage: Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/TestFramework/Coverage/Locator/Throwable/NoReportFound.php
-
-		-
-			rawMessage: Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/TestFramework/Coverage/Locator/Throwable/TooManyReportsFound.php
-
-		-
-			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
-			identifier: arrayFilter.strict
-			count: 1
-			path: ../src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
@@ -841,12 +841,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder should not depend on Infection\TestFramework\XML\SafeDOMXPath
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 4
-			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
-
-		-
 			rawMessage: 'Parameter #2 $content of method Symfony\Component\Filesystem\Filesystem::dumpFile() expects resource|string, string|false given.'
 			identifier: argument.type
 			count: 1
@@ -865,12 +859,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not depend on Infection\TestFramework\XML\SafeDOMXPath
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 8
-			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not exist
 			identifier: phpat.testSourceConcreteClassesAreFinals
 			count: 1
@@ -883,22 +871,94 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator should not depend on Infection\TestFramework\XML\SafeDOMXPath
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 22
-			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
-
-		-
 			rawMessage: 'Parameter #1 $filename of method DOMDocument::schemaValidate() expects non-empty-string, string given.'
 			identifier: argument.type
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider should not depend on Infection\TestFramework\XML\SafeDOMXPath
+			rawMessage: Infection\TestFramework\PhpUnit\Locator\BaseReportLocator should not depend on Infection\FileSystem\FileSystem
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 2
-			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Locator/BaseReportLocator.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Locator\Throwable\InvalidReportSource should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Locator/Throwable/InvalidReportSource.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Locator\Throwable\NoReportFound should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Locator/Throwable/NoReportFound.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Locator\Throwable\TooManyReportsFound should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Locator/Throwable/TooManyReportsFound.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitReportLocator should not depend on Infection\FileSystem\FileSystem
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Tracing/JUnit/JUnitReportLocator.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Tracing\TraceProvider should not depend on Infection\Source\Exception\NoSourceFound
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Tracing/TraceProvider.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Tracing\TraceProviderAdapterTracer should not depend on Infection\Framework\Iterable\GeneratorFactory
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Tracing/TraceProviderAdapterTracer.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageLocator should not depend on Infection\FileSystem\FileSystem
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Tracing/XmlReport/IndexXmlCoverageLocator.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageParser should not depend on Infection\FileSystem\FileSystem
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Tracing/XmlReport/IndexXmlCoverageParser.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageParser should not depend on Infection\Source\Exception\NoSourceFound
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 4
+			path: ../src/TestFramework/PhpUnit/Tracing/XmlReport/IndexXmlCoverageParser.php
+
+		-
+			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
+			identifier: arrayFilter.strict
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Tracing/XmlReport/SourceFileInfoProvider.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Tracing\XmlReport\SourceFileInfoProvider should not depend on Infection\FileSystem\FileSystem
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Tracing/XmlReport/SourceFileInfoProvider.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Tracing\XmlReport\XmlCoverageParser should not depend on Infection\FileSystem\FileSystem
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Tracing/XmlReport/XmlCoverageParser.php
+
+		-
+			rawMessage: 'Parameter #1 $filename of method DOMDocument::load() expects non-empty-string, string given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/TestFramework/PhpUnit/XML/SafeDOMXPath.php
 
 		-
 			rawMessage: Do not use magic number in arithmetic operations. Move to constant with a suitable name.
@@ -920,18 +980,6 @@ parameters:
 			identifier: generator.valueType
 			count: 1
 			path: ../src/TestFramework/Tracing/TestRunOrderResolver.php
-
-		-
-			rawMessage: Infection\TestFramework\Tracing\Trace\EmptyTrace should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/TestFramework/Tracing/Trace/EmptyTrace.php
-
-		-
-			rawMessage: 'Parameter #1 $filename of method DOMDocument::load() expects non-empty-string, string given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/TestFramework/XML/SafeDOMXPath.php
 
 		-
 			rawMessage: Infection\Testing\BaseMutatorTestCase should not exist
@@ -1489,12 +1537,6 @@ parameters:
 			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
 
 		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\Locator\BaseReportLocator\DemoReportLocator should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/Locator/BaseReportLocator/DemoReportLocator.php
-
-		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
 			identifier: ternary.shortNotAllowed
 			count: 1
@@ -1529,6 +1571,18 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php
+
+		-
+			rawMessage: Infection\Tests\TestFramework\PhpUnit\Locator\BaseReportLocator\DemoReportLocator should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Locator/BaseReportLocator/DemoReportLocator.php
+
+		-
+			rawMessage: Access to an undefined property DOMNameSpaceNode|DOMNode::$attributes.
+			identifier: property.notFound
+			count: 2
+			path: ../tests/phpunit/TestFramework/PhpUnit/XML/SafeDOMXPath/SafeDOMXPathTest.php
 
 		-
 			rawMessage: Infection\Tests\TestFramework\Tracing\DummyTracer should not exist
@@ -1571,12 +1625,6 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestFramework/Tracing/Trace/TraceAssertion.php
-
-		-
-			rawMessage: Access to an undefined property DOMNameSpaceNode|DOMNode::$attributes.
-			identifier: property.notFound
-			count: 2
-			path: ../tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php
 
 		-
 			rawMessage: Infection\Tests\TestingUtility\Console\Command\TestOptionCommand should not exist

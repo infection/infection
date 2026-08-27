@@ -159,7 +159,7 @@ parameters:
             message: "#queryCount#"
             identifier: return.type
             count: 1
-            path: ../src/TestFramework/XML/SafeDOMXPath.php
+            path: ../src/TestFramework/PhpUnit/XML/SafeDOMXPath.php
 
         # We are explicitly testing the guards here
         -
@@ -239,11 +239,11 @@ parameters:
         -
             message: '#getDefaultLocation#'
             identifier: shipmonk.deadMethod
-            path: ../src/TestFramework/Coverage/Locator/ReportLocator.php
+            path: ../src/TestFramework/PhpUnit/Locator/ReportLocator.php
         -
             message: '#getDefaultLocation#'
             identifier: shipmonk.deadMethod
-            path: ../src/TestFramework/Coverage/Locator/FakeLocator.php
+            path: ../src/TestFramework/PhpUnit/Locator/FakeLocator.php
 
         # PHPStan cannot really properly infer the types here
         -
@@ -296,16 +296,10 @@ parameters:
             path: ../src/Process/Runner/IndexedMutantProcessContainer.php
 
         -
-            rawMessage: 'Infection\TestFramework\Coverage\JUnit\TestFileTimeData should not exist'
+            rawMessage: 'Infection\TestFramework\PhpUnit\Tracing\JUnit\TestFileTimeData should not exist'
             identifier: phpat.testSourceClassesDoNotExposePublicProperties
             count: 1
-            path: ../src/TestFramework/Coverage/JUnit/TestFileTimeData.php
-
-        -
-            rawMessage: 'Infection\TestFramework\Tracing\Trace\NodeLineRangeData should not exist'
-            identifier: phpat.testSourceClassesDoNotExposePublicProperties
-            count: 1
-            path: ../src/TestFramework/Tracing/Trace/NodeLineRangeData.php
+            path: ../src/TestFramework/PhpUnit/Tracing/JUnit/TestFileTimeData.php
 
     level: 8
     paths:

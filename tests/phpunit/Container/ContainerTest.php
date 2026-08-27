@@ -38,7 +38,7 @@ namespace Infection\Tests\Container;
 use Error;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
-use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
+use Infection\TestFramework\PhpUnit\Locator\Throwable\ReportLocationThrowable;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Reflection\ContainerReflection;
 use InvalidArgumentException;

@@ -45,7 +45,7 @@ use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
-use Infection\TestFramework\XML\SafeDOMXPath;
+use Infection\TestFramework\PhpUnit\XML\SafeDOMXPath;
 use InvalidArgumentException;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;

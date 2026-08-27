@@ -65,9 +65,9 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
     ];
 
     private const array PHPUNIT_DATA_PROVIDER_NAMESPACES = [
-        'Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider',
-        'Infection\Tests\TestFramework\Coverage\XmlReport\SourceFileInfoProvider',
-        'Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser',
+        'Infection\Tests\TestFramework\PhpUnit\Tracing\JUnit\JUnitTestFileDataProvider',
+        'Infection\Tests\TestFramework\PhpUnit\Tracing\XmlReport\SourceFileInfoProvider',
+        'Infection\Tests\TestFramework\PhpUnit\Tracing\XmlReport\XmlCoverageParser',
         'Infection\Tests\TestFramework\Tracing\Tracer',
     ];
 
