@@ -33,43 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\TestFramework\Contracts\Throwable;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
-use PHPUnit\Framework\TestCase;
+use Throwable;
 
 /**
- * @phpstan-require-extends TestCase
+ * @internal
  */
-trait MutantAssertions
+interface RequirementChecksFailed extends Throwable
 {
-    public function assertMutantEquals(
-        Mutant $expected,
-        Mutant $actual,
-    ): void {
-        $this->assertMutantStateIs(
-            mutant: $actual,
-            expectedFilePath: $expected->getFilePath(),
-            expectedMutation: $expected->getMutation(),
-            expectedMutatedCode: $expected->getMutatedCode()->get(),
-            expectedDiff: $expected->getDiff()->get(),
-            expectedPrettyPrintedOriginalCode: $expected->getPrettyPrintedOriginalCode(),
-        );
-    }
-
-    public function assertMutantStateIs(
-        Mutant $mutant,
-        string $expectedFilePath,
-        Mutation $expectedMutation,
-        string $expectedMutatedCode,
-        string $expectedDiff,
-        string $expectedPrettyPrintedOriginalCode,
-    ): void {
-        $this->assertSame($expectedFilePath, $mutant->getFilePath());
-        $this->assertEquals($expectedMutation, $mutant->getMutation());
-        $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
-        $this->assertSame($expectedDiff, $mutant->getDiff()->get());
-        $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode());
-    }
 }

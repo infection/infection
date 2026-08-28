@@ -33,43 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
-use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
 
 /**
- * @phpstan-require-extends TestCase
+ * Carries the observable outcome of a test framework initial run for later orchestration steps.
+ *
+ * @internal
  */
-trait MutantAssertions
+final readonly class InitialRunResults
 {
-    public function assertMutantEquals(
-        Mutant $expected,
-        Mutant $actual,
-    ): void {
-        $this->assertMutantStateIs(
-            mutant: $actual,
-            expectedFilePath: $expected->getFilePath(),
-            expectedMutation: $expected->getMutation(),
-            expectedMutatedCode: $expected->getMutatedCode()->get(),
-            expectedDiff: $expected->getDiff()->get(),
-            expectedPrettyPrintedOriginalCode: $expected->getPrettyPrintedOriginalCode(),
-        );
-    }
-
-    public function assertMutantStateIs(
-        Mutant $mutant,
-        string $expectedFilePath,
-        Mutation $expectedMutation,
-        string $expectedMutatedCode,
-        string $expectedDiff,
-        string $expectedPrettyPrintedOriginalCode,
-    ): void {
-        $this->assertSame($expectedFilePath, $mutant->getFilePath());
-        $this->assertEquals($expectedMutation, $mutant->getMutation());
-        $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
-        $this->assertSame($expectedDiff, $mutant->getDiff()->get());
-        $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode());
+    /**
+     * @param float|null $memoryUsage Memory usage in megabytes. Null if it cannot be determined.
+     */
+    public function __construct(
+        public string $output,
+        public ?float $memoryUsage,
+        // If additional properties are added at any point, beware that they should be optional to
+        // avoid any BC break.
+    ) {
+        Assert::nullOrGreaterThan($memoryUsage, limit: 0);
     }
 }

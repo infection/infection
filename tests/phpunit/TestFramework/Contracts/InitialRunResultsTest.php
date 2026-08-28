@@ -33,43 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\TestFramework\Contracts;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
+use Infection\TestFramework\Contracts\InitialRunResults;
+use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @phpstan-require-extends TestCase
- */
-trait MutantAssertions
+#[CoversClass(InitialRunResults::class)]
+final class InitialRunResultsTest extends TestCase
 {
-    public function assertMutantEquals(
-        Mutant $expected,
-        Mutant $actual,
-    ): void {
-        $this->assertMutantStateIs(
-            mutant: $actual,
-            expectedFilePath: $expected->getFilePath(),
-            expectedMutation: $expected->getMutation(),
-            expectedMutatedCode: $expected->getMutatedCode()->get(),
-            expectedDiff: $expected->getDiff()->get(),
-            expectedPrettyPrintedOriginalCode: $expected->getPrettyPrintedOriginalCode(),
+    public function test_it_accepts_unknown_memory_usage(): void
+    {
+        $expected = new InitialRunResults(
+            output: 'output',
+            memoryUsage: null,
         );
+
+        $actual = new InitialRunResults('output', null);
+
+        $this->assertEquals($expected, $actual);
     }
 
-    public function assertMutantStateIs(
-        Mutant $mutant,
-        string $expectedFilePath,
-        Mutation $expectedMutation,
-        string $expectedMutatedCode,
-        string $expectedDiff,
-        string $expectedPrettyPrintedOriginalCode,
-    ): void {
-        $this->assertSame($expectedFilePath, $mutant->getFilePath());
-        $this->assertEquals($expectedMutation, $mutant->getMutation());
-        $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
-        $this->assertSame($expectedDiff, $mutant->getDiff()->get());
-        $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode());
+    public function test_it_accepts_positive_memory_usage(): void
+    {
+        $expected = new InitialRunResults(
+            output: 'output',
+            memoryUsage: 10.0,
+        );
+
+        $actual = new InitialRunResults('output', 10.0);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function test_it_rejects_negative_memory_usage(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new InitialRunResults('output', -1.0);
     }
 }

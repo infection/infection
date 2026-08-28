@@ -480,7 +480,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             $originalEndingLine,
             $originalStartFilePosition,
             $originalEndFilePosition,
-            now('<?php $a = 1;'),
+            '<?php $a = 1;',
             now('<?php $a = 2;'),
             $testLocations,
             0.0,

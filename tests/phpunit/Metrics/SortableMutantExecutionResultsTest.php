@@ -203,7 +203,7 @@ final class SortableMutantExecutionResultsTest extends TestCase
             $originalStartingLine + 10,
             1,
             5,
-            now('<?php $a = 1;'),
+            '<?php $a = 1;',
             now('<?php $a = 1;'),
             [],
             0.0,

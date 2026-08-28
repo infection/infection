@@ -152,7 +152,7 @@ phpstan-baseline: vendor $(PHPSTAN)
 
 .PHONY: mago
 mago: vendor $(MAGO)
-	$(MAGO) analyze
+	$(MAGO) analyze --fail-on-out-of-sync-baseline
 
 .PHONY: mago-baseline
 mago-baseline:		## Regenerates the Mago baseline
