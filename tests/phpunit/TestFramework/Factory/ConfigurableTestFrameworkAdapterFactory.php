@@ -44,6 +44,8 @@ final class ConfigurableTestFrameworkAdapterFactory implements TestFrameworkAdap
 {
     use CannotBeInstantiated;
 
+    private const string NOT_CONFIGURED_MESSAGE = 'TestFrameworkAdapterFactory is not configured. Call configure() before using it';
+
     private static bool $configured = false;
 
     private static ?TestFrameworkAdapter $adapter = null;
@@ -74,6 +76,9 @@ final class ConfigurableTestFrameworkAdapterFactory implements TestFrameworkAdap
         self::$executableName = null;
     }
 
+    /**
+     * @param array<array-key, mixed> $sourceDirectories
+     */
     public static function create(
         string $testFrameworkExecutable,
         string $tmpDir,
@@ -84,23 +89,26 @@ final class ConfigurableTestFrameworkAdapterFactory implements TestFrameworkAdap
         array $sourceDirectories,
         bool $skipCoverage,
     ): TestFrameworkAdapter {
-        self::assertConfigured();
+        $adapter = self::$adapter;
+        Assert::notNull($adapter, self::NOT_CONFIGURED_MESSAGE);
 
-        return self::$adapter;
+        return $adapter;
     }
 
     public static function getAdapterName(): string
     {
-        self::assertConfigured();
+        $name = self::$name;
+        Assert::notNull($name, self::NOT_CONFIGURED_MESSAGE);
 
-        return self::$name;
+        return $name;
     }
 
     public static function getExecutableName(): string
     {
-        self::assertConfigured();
+        $executableName = self::$executableName;
+        Assert::notNull($executableName, self::NOT_CONFIGURED_MESSAGE);
 
-        return self::$executableName;
+        return $executableName;
     }
 
     private static function assertNotConfigured(): void
@@ -108,14 +116,6 @@ final class ConfigurableTestFrameworkAdapterFactory implements TestFrameworkAdap
         Assert::false(
             self::$configured,
             'TestFrameworkAdapterFactory is already configured',
-        );
-    }
-
-    private static function assertConfigured(): void
-    {
-        Assert::true(
-            self::$configured,
-            'TestFrameworkAdapterFactory is not configured. Call configure() before using it',
         );
     }
 }
