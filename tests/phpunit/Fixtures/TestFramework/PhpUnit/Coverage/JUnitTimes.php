@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Factory\PhpUnit\Coverage;
+namespace Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage;
 
 final class JUnitTimes
 {
