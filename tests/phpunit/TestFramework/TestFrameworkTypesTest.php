@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Tests\TestFramework\Factory\ConfigurableTestFrameworkAdapterFactory;
+use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -65,7 +65,7 @@ final class TestFrameworkTypesTest extends TestCase
             [
                 'infection/codeception-adapter' => [
                     'install_path' => '/path/to/dummy/adapter/factory.php',
-                    'extra' => ['class' => ConfigurableTestFrameworkAdapterFactory::class],
+                    'extra' => ['class' => DummyTestFrameworkFactory::class],
                     'version' => '1.0.0',
                 ],
             ],
