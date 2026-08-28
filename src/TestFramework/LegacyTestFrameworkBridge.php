@@ -146,4 +146,9 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
 
         return $this->config->testFrameworkExtraOptions;
     }
+
+    public function hasJUnitReport(): bool
+    {
+        return $this->adapter->hasJUnitReport();
+    }
 }

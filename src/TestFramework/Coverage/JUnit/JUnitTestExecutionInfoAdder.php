@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
+use Infection\TestFramework\Contracts\TestFramework;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -54,7 +55,7 @@ class JUnitTestExecutionInfoAdder
     private const int MAX_EXPLODE_PARTS = 2;
 
     public function __construct(
-        private readonly TestFrameworkAdapter $adapter,
+        private readonly TestFramework        $testFramework,
         private readonly TestFileDataProvider $testFileDataProvider,
     ) {
     }
@@ -68,7 +69,7 @@ class JUnitTestExecutionInfoAdder
      */
     public function addTestExecutionInfo(iterable $traces): iterable
     {
-        if (!$this->adapter->hasJUnitReport()) {
+        if (!$this->testFramework->hasJUnitReport()) {
             return $traces;
         }
 
