@@ -38,7 +38,7 @@ namespace Infection\Tests\Logger\ArtefactCollection;
 use Infection\Framework\Str;
 use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\Contracts\TestFramework;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -49,14 +49,14 @@ final class ConsoleNoProgressLoggerTest extends TestCase
 {
     private BufferedOutput $output;
 
-    private MockObject&AbstractTestFrameworkAdapter $testFrameworkMock;
+    private MockObject&TestFramework $testFrameworkMock;
 
     private InitialTestsExecutionLogger $logger;
 
     protected function setUp(): void
     {
         $this->output = new BufferedOutput();
-        $this->testFrameworkMock = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $this->testFrameworkMock = $this->createMock(TestFramework::class);
 
         $this->logger = new ConsoleNoProgressLogger(
             $this->testFrameworkMock,
