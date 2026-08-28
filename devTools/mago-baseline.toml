@@ -211,6 +211,12 @@ message = "Assigning `mixed` type to a variable may lead to unexpected behavior.
 count = 1
 
 [[issues]]
+file = "src/Command/InitialTest/InitialTestRunCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\Contracts\Throwable\InitialTestsFailed` in `Infection\Command\InitialTest\InitialTestRunCommand::executeCommand`.'
+count = 1
+
+[[issues]]
 file = "src/Command/InitialTest/Option/InitialTestsPhpOptionsOption.php"
 code = "invalid-return-statement"
 message = '''Invalid return type for function `Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption::addOption`: expected `('T.infection\command\option\commandoption::addoption() extends Symfony\Component\Console\Command\Command)`, but found `$this(Symfony\Component\Console\Command\Command)`.'''
