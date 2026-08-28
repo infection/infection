@@ -46,7 +46,6 @@ use Infection\Command\Option\TestFrameworkOption;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
 use Infection\Logger\Console\ConsoleLogger;
-use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
 
 /**
  * @internal
@@ -73,9 +72,6 @@ final class InitialTestRunCommand extends BaseCommand
         DebugOption::addOption($this, default: true);
     }
 
-    /**
-     * @throws InitialTestsFailed
-     */
     protected function executeCommand(IO $io): bool
     {
         $logger = new ConsoleLogger($io);
