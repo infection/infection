@@ -58,17 +58,7 @@ final class FactoryTest extends TestCase
 
     public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
     {
-        $factory = new Factory(
-            '',
-            '',
-            $this->createStub(TestFrameworkConfigLocatorInterface::class),
-            $this->createStub(TestFrameworkFinder::class),
-            '',
-            ConfigurationBuilder::withMinimalTestData()->build(),
-            new FakeSourceCollector(),
-            [],
-            $this->createStub(ShellCommandRunner::class),
-        );
+        $factory = $this->createFactory();
 
         $this->expectExceptionObject(
             new InvalidArgumentException(
@@ -89,7 +79,25 @@ final class FactoryTest extends TestCase
             'dummy',
         );
 
-        $factory = new Factory(
+        $factory = $this->createFactory([
+            'infection/dummy-adapter' => [
+                'install_path' => '/path/to/dummy/adapter/factory.php',
+                'extra' => ['class' => ConfigurableTestFrameworkAdapterFactory::class],
+                'version' => '1.0.0',
+            ],
+        ]);
+
+        $actualAdapter = $factory->create('dummy', false);
+
+        $this->assertSame($expectedAdapter, $actualAdapter);
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $installedExtensions
+     */
+    private function createFactory(array $installedExtensions = []): Factory
+    {
+        return new Factory(
             '',
             '',
             $this->createStub(TestFrameworkConfigLocatorInterface::class),
@@ -97,18 +105,8 @@ final class FactoryTest extends TestCase
             '',
             ConfigurationBuilder::withMinimalTestData()->build(),
             new FakeSourceCollector(),
-            [
-                'infection/dummy-adapter' => [
-                    'install_path' => '/path/to/dummy/adapter/factory.php',
-                    'extra' => ['class' => ConfigurableTestFrameworkAdapterFactory::class],
-                    'version' => '1.0.0',
-                ],
-            ],
+            $installedExtensions,
             $this->createStub(ShellCommandRunner::class),
         );
-
-        $actualAdapter = $factory->create('dummy', false);
-
-        $this->assertSame($expectedAdapter, $actualAdapter);
     }
 }
