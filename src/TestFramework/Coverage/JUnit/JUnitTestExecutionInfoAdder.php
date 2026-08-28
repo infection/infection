@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
-use Infection\TestFramework\Contracts\TestFramework;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Tracing\Trace\ProxyTrace;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Tracing\Trace\Trace;
@@ -55,7 +54,7 @@ class JUnitTestExecutionInfoAdder
     private const int MAX_EXPLODE_PARTS = 2;
 
     public function __construct(
-        private readonly TestFramework        $testFramework,
+        private readonly TestFramework $testFramework,
         private readonly TestFileDataProvider $testFileDataProvider,
     ) {
     }

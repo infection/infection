@@ -42,6 +42,7 @@ use function array_values;
 use function count;
 use function end;
 use function extension_loaded;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
@@ -67,6 +68,8 @@ final class InitialTestsRunnerTest extends TestCase
 
     private InitialTestsRunner $runner;
 
+    private TestFrameworkAdapter $testFrameworkAdapter;
+
     protected function setUp(): void
     {
         if (PHP_SAPI === 'phpdbg') {
@@ -78,6 +81,7 @@ final class InitialTestsRunnerTest extends TestCase
         $this->eventDispatcher = new EventDispatcherCollector();
 
         $this->runner = new InitialTestsRunner($this->processFactoryMock, $this->eventDispatcher);
+        $this->testFrameworkAdapter = $this->createStub(TestFrameworkAdapter::class);
     }
 
     public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(): void
@@ -94,11 +98,11 @@ final class InitialTestsRunnerTest extends TestCase
 
         $this->processFactoryMock
             ->method('createProcess')
-            ->with($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage)
+            ->with($this->testFrameworkAdapter, $testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage)
             ->willReturn($process)
         ;
 
-        $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
+        $this->runner->run($this->testFrameworkAdapter, $testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
 
         $this->assertSame(
             [
@@ -129,12 +133,12 @@ final class InitialTestsRunnerTest extends TestCase
 
         $this->processFactoryMock
             ->method('createProcess')
-            ->with($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage)
+            ->with($this->testFrameworkAdapter, $testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage)
             ->willReturn($process)
         ;
 
         try {
-            $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
+            $this->runner->run($this->testFrameworkAdapter, $testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
         } catch (RuntimeException $e) {
             // Signal 11, AKA "segmentation fault", is not something we can do anything about
             if (extension_loaded('xdebug') && str_contains($e->getMessage(), 'The process has been signaled with signal "11"')) {

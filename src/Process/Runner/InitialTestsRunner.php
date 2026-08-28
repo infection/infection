@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
@@ -58,11 +59,13 @@ class InitialTestsRunner
      * @param string[] $phpExtraOptions
      */
     public function run(
+        TestFrameworkAdapter $testFrameworkAdapter,
         string $testFrameworkExtraOptions,
         array $phpExtraOptions,
         bool $skipCoverage,
     ): Process {
         $process = $this->processBuilder->createProcess(
+            $testFrameworkAdapter,
             $testFrameworkExtraOptions,
             $phpExtraOptions,
             $skipCoverage,

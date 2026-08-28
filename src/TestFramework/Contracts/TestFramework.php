@@ -89,8 +89,5 @@ interface TestFramework
      */
     public function test(Mutant $mutant): MutantProcessContainer;
 
-    /**
-     * @deprecated Should be removed as soon as it is unused.
-     */
     public function hasJUnitReport(): bool;
 }

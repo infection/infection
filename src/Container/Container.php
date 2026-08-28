@@ -39,7 +39,6 @@ use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
 use function dirname;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
@@ -111,7 +110,6 @@ use Infection\Metrics\ResultsCollector;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantFactory;
-use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
@@ -361,21 +359,6 @@ final class Container extends DIContainer
                 [$container->getProjectDir()],
                 $container->getFileSystem(),
             ),
-            CoverageChecker::class => static function (self $container): CoverageChecker {
-                $config = $container->getConfiguration();
-                $testFrameworkAdapter = $container->getTestFrameworkAdapter();
-
-                return new CoverageChecker(
-                    $config->skipCoverage,
-                    $config->skipInitialTests,
-                    $config->initialTestsPhpOptions ?? '',
-                    $config->coveragePath,
-                    $testFrameworkAdapter->hasJUnitReport(),
-                    $container->getJUnitReportLocator(),
-                    $testFrameworkAdapter->getName(),
-                    $container->getIndexXmlCoverageLocator(),
-                );
-            },
             JUnitReportLocator::class => static fn (self $container) => JUnitReportLocator::create(
                 $container->getFileSystem(),
                 $container->getConfiguration()->coveragePath,
@@ -530,14 +513,6 @@ final class Container extends DIContainer
                     $config->timeoutsAsEscaped,
                 );
             },
-            TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
-                $config = $container->getConfiguration();
-
-                return $container->getFactory()->create(
-                    $config->testFramework,
-                    $config->skipCoverage,
-                );
-            },
             StaticAnalysisToolAdapter::class => static function (self $container): StaticAnalysisToolAdapter {
                 $config = $container->getConfiguration();
 
@@ -568,9 +543,7 @@ final class Container extends DIContainer
                 $configuration = $container->getConfiguration();
 
                 return new MutantProcessContainerFactory(
-                    $container->getTestFrameworkAdapter(),
                     $configuration->processTimeout,
-                    $container->getMutantExecutionResultFactory(),
                     $mutantProcessKillerFactories,
                     $container->getConfiguration(),
                 );
@@ -663,15 +636,32 @@ final class Container extends DIContainer
                 ),
                 new CurrentWorkingDirectoryProvider(),
             ),
-            TestFramework::class => static fn (self $container) => new LegacyTestFrameworkBridge(
-                $container->getTestFrameworkAdapter(),
-                $container->get(ConsoleOutput::class),
-                $container->getCoverageChecker(),
-                $container->getInitialTestsRunner(),
-                $container->getConfiguration(),
-                $container->getMutantProcessContainerFactory(),
-                $container->getTestFrameworkExtraOptionsFilter(),
-            ),
+            TestFramework::class => static function (self $container): TestFramework {
+                $config = $container->getConfiguration();
+                $adapter = $container->getFactory()->create(
+                    $config->testFramework,
+                    $config->skipCoverage,
+                );
+
+                return new LegacyTestFrameworkBridge(
+                    $adapter,
+                    $container->get(ConsoleOutput::class),
+                    new CoverageChecker(
+                        $config->skipCoverage,
+                        $config->skipInitialTests,
+                        $config->initialTestsPhpOptions ?? '',
+                        $config->coveragePath,
+                        $adapter->hasJUnitReport(),
+                        $container->getJUnitReportLocator(),
+                        $adapter->getName(),
+                        $container->getIndexXmlCoverageLocator(),
+                    ),
+                    $container->getInitialTestsRunner(),
+                    $config,
+                    $container->getMutantProcessContainerFactory(),
+                    $container->getTestFrameworkExtraOptionsFilter(),
+                );
+            },
         ]);
 
         return $container->withValues(
@@ -930,11 +920,6 @@ final class Container extends DIContainer
         return $this->get(TestFramework::class);
     }
 
-    public function getTestFrameworkAdapter(): TestFrameworkAdapter
-    {
-        return $this->get(TestFrameworkAdapter::class);
-    }
-
     public function getStaticAnalysisToolAdapter(): StaticAnalysisToolAdapter
     {
         return $this->get(StaticAnalysisToolAdapter::class);
@@ -1040,11 +1025,6 @@ final class Container extends DIContainer
         return $this->get(AdapterInstaller::class);
     }
 
-    public function getMutantExecutionResultFactory(): TestFrameworkMutantExecutionResultFactory
-    {
-        return $this->get(TestFrameworkMutantExecutionResultFactory::class);
-    }
-
     public function getCiDetector(): CiDetector
     {
         return $this->get(CiDetector::class);
@@ -1103,11 +1083,6 @@ final class Container extends DIContainer
     public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
     {
         return $this->get(RootsFileOrDirectoryLocator::class);
-    }
-
-    public function getCoverageChecker(): CoverageChecker
-    {
-        return $this->get(CoverageChecker::class);
     }
 
     public function getEventDispatcher(): EventDispatcher

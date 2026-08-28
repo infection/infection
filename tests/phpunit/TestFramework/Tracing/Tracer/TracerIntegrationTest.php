@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing\Tracer;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\FileSystem;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
@@ -121,8 +121,8 @@ final class TracerIntegrationTest extends TestCase
         string $indexXmlPath,
         ?string $junitXmlPath,
     ): Tracer {
-        $testFrameworkAdapterStub = $this->createStub(TestFrameworkAdapter::class);
-        $testFrameworkAdapterStub
+        $testFrameworkStub = $this->createStub(TestFramework::class);
+        $testFrameworkStub
             ->method('hasJUnitReport')
             ->willReturn($junitXmlPath !== null);
 
@@ -149,7 +149,7 @@ final class TracerIntegrationTest extends TestCase
                     ),
                 ),
                 new JUnitTestExecutionInfoAdder(
-                    $testFrameworkAdapterStub,
+                    $testFrameworkStub,
                     $junitFileDataProvider,
                 ),
             ),
