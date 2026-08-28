@@ -33,54 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\TestFramework\Factory;
 
-use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Tests\TestFramework\Factory\ConfigurableTestFrameworkAdapterFactory;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(TestFrameworkTypes::class)]
-final class TestFrameworkTypesTest extends TestCase
+#[CoversClass(ConfigurableTestFrameworkAdapterFactory::class)]
+final class ConfigurableTestFrameworkAdapterFactoryTest extends TestCase
 {
-    public function test_it_returns_default_types_when_no_test_framework_adapters_are_installed(): void
+    protected function tearDown(): void
     {
-        $types = TestFrameworkTypes::getTypes([]);
-
-        $this->assertSame(
-            [
-                TestFrameworkTypes::PHPUNIT,
-                TestFrameworkTypes::PHPSPEC,
-                TestFrameworkTypes::CODECEPTION,
-                TestFrameworkTypes::TESTO,
-                TestFrameworkTypes::DEBUG,
-            ],
-            $types,
-        );
+        ConfigurableTestFrameworkAdapterFactory::reset();
     }
 
-    public function test_it_uses_installed_test_framework_adapters(): void
+    public function test_it_can_be_configured(): void
     {
-        $types = TestFrameworkTypes::getTypes(
-            [
-                'infection/codeception-adapter' => [
-                    'install_path' => '/path/to/dummy/adapter/factory.php',
-                    'extra' => ['class' => ConfigurableTestFrameworkAdapterFactory::class],
-                    'version' => '1.0.0',
-                ],
-            ],
-        );
+        $adapter = $this->createStub(TestFrameworkAdapter::class);
 
+        ConfigurableTestFrameworkAdapterFactory::configure($adapter, 'dummy', 'dummy-executable');
+
+        $this->assertTrue(ConfigurableTestFrameworkAdapterFactory::$configured);
         $this->assertSame(
-            [
-                TestFrameworkTypes::PHPUNIT,
-                TestFrameworkTypes::PHPSPEC,
-                TestFrameworkTypes::CODECEPTION,
-                TestFrameworkTypes::TESTO,
-                TestFrameworkTypes::DEBUG,
-                'dummy',
-            ],
-            $types,
+            $adapter,
+            ConfigurableTestFrameworkAdapterFactory::create('', '', '', null, '', '', [], false),
         );
+        $this->assertSame('dummy', ConfigurableTestFrameworkAdapterFactory::getAdapterName());
+        $this->assertSame('dummy-executable', ConfigurableTestFrameworkAdapterFactory::getExecutableName());
     }
 }
