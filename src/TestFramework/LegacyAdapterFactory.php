@@ -45,12 +45,15 @@ use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
 use Webmozart\Assert\Assert;
 
 /**
+ * Carbon copy of {@see Factory} before it was changed for {@see TestFramework}. Is expected to be short lived.
+ *
  * @internal
  *
  * @deprecated This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.

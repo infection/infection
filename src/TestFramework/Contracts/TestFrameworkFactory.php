@@ -42,7 +42,9 @@ namespace Infection\TestFramework\Contracts;
  */
 interface TestFrameworkFactory
 {
-    /** @param string[] $sourceDirectories */
+    /**
+     * @param string[] $sourceDirectories
+     */
     public static function create(
         string $testFrameworkExecutable,
         string $tmpDir,

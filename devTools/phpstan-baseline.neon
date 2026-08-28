@@ -1644,7 +1644,7 @@ parameters:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
 			identifier: method.deprecatedClass
-			count: 1
+			count: 2
 			path: ../tests/phpunit/TestFramework/LegacyAdapterFactoryTest.php
 
 		-
@@ -1653,7 +1653,7 @@ parameters:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
 			identifier: method.deprecatedClass
-			count: 1
+			count: 2
 			path: ../tests/phpunit/TestFramework/LegacyAdapterFactoryTest.php
 
 		-
@@ -1662,7 +1662,7 @@ parameters:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
 			identifier: new.deprecatedClass
-			count: 1
+			count: 2
 			path: ../tests/phpunit/TestFramework/LegacyAdapterFactoryTest.php
 
 		-
