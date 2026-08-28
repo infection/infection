@@ -38,7 +38,7 @@ namespace Infection\Process\Factory;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
@@ -57,9 +57,7 @@ class MutantProcessContainerFactory
     private const int TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
 
     public function __construct(
-        private readonly TestFrameworkAdapter $testFrameworkAdapter,
         private readonly float $timeout,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         /**
          * @var list<LazyMutantProcessFactory>
          */
@@ -68,13 +66,16 @@ class MutantProcessContainerFactory
     ) {
     }
 
-    public function create(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcessContainer
-    {
+    public function create(
+        TestFrameworkAdapter $testFrameworkAdapter,
+        Mutant $mutant,
+        string $testFrameworkExtraOptions = '',
+    ): MutantProcessContainer {
         // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
         $timeout = min(self::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (self::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime()), $this->timeout);
 
         $process = new Process(
-            command: $this->testFrameworkAdapter->getMutantCommandLine(
+            command: $testFrameworkAdapter->getMutantCommandLine(
                 $mutant->getTests(),
                 $mutant->getFilePath(),
                 $mutant->getMutation()->getHash(),
@@ -93,7 +94,7 @@ class MutantProcessContainerFactory
             new MutantProcess(
                 $process,
                 $mutant,
-                $this->mutantExecutionResultFactory,
+                new TestFrameworkMutantExecutionResultFactory($testFrameworkAdapter),
             ),
             $this->lazyMutantProcessCreators,
         );
