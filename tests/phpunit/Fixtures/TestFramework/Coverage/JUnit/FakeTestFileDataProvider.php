@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Factory\Coverage\JUnit;
+namespace Infection\Tests\Fixtures\TestFramework\Coverage\JUnit;
 
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
