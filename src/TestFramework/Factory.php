@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Closure;
 use function dirname;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -82,7 +83,8 @@ final readonly class Factory
         private array $installedExtensions,
         private ShellCommandRunner $shellCommandRunner,
         private ConsoleOutput $consoleOutput,
-        private CoverageChecker $coverageChecker,
+        /** @var Closure(TestFrameworkAdapter): CoverageChecker */
+        private Closure $coverageCheckerFactory,
         private InitialTestsRunner $initialTestsRunner,
         private MutantProcessContainerFactory $containerFactory,
         private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
@@ -98,7 +100,7 @@ final readonly class Factory
             : new LegacyTestFrameworkBridge(
                 $testFramework,
                 $this->consoleOutput,
-                $this->coverageChecker,
+                ($this->coverageCheckerFactory)($testFramework),
                 $this->initialTestsRunner,
                 $this->infectionConfig,
                 $this->containerFactory,
@@ -119,7 +121,7 @@ final readonly class Factory
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
-            return PhpUnitAdapterFactory::create(
+            return PhpUnitAdapterFactory::createLegacy(
                 $this->testFrameworkFinder->find(
                     TestFrameworkTypes::PHPUNIT,
                     (string) $this->infectionConfig->phpUnit->customPath,
@@ -137,12 +139,6 @@ final readonly class Factory
                 $this->shellCommandRunner,
                 sourceDirectoryBasePath: dirname($this->infectionConfig->configurationPathname),
                 useWindowsFilterLimit: OperatingSystem::isWindows(),
-                consoleOutput: $this->consoleOutput,
-                coverageChecker: $this->coverageChecker,
-                initialTestsRunner: $this->initialTestsRunner,
-                configuration: $this->infectionConfig,
-                processFactory: $this->containerFactory,
-                testFrameworkExtraOptionsFilter: $this->extraOptionsFilter,
             );
         }
 

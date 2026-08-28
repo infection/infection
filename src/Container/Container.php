@@ -39,6 +39,7 @@ use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
 use function dirname;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
@@ -173,7 +174,6 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
-use Infection\TestFramework\LegacyAdapterFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
@@ -309,25 +309,23 @@ final class Container extends DIContainer
                     GeneratedExtensionsConfig::EXTENSIONS,
                     $container->getShellCommandRunner(),
                     $container->get(ConsoleOutput::class),
-                    $container->getCoverageChecker(),
+                    static function (TestFrameworkAdapter $adapter) use ($container): CoverageChecker {
+                        $config = $container->getConfiguration();
+
+                        return new CoverageChecker(
+                            $config->skipCoverage,
+                            $config->skipInitialTests,
+                            $config->initialTestsPhpOptions ?? '',
+                            $config->coveragePath,
+                            $adapter->hasJUnitReport(),
+                            $container->getJUnitReportLocator(),
+                            $adapter->getName(),
+                            $container->getIndexXmlCoverageLocator(),
+                        );
+                    },
                     $container->getInitialTestsRunner(),
                     $container->getMutantProcessContainerFactory(),
                     $container->getTestFrameworkExtraOptionsFilter(),
-                );
-            },
-            LegacyAdapterFactory::class => static function (self $container): LegacyAdapterFactory {
-                $config = $container->getConfiguration();
-
-                return new LegacyAdapterFactory(
-                    $config->tmpDir,
-                    $container->getProjectDir(),
-                    $container->getTestFrameworkConfigLocator(),
-                    $container->getTestFrameworkFinder(),
-                    $container->getJUnitReportLocator()->getDefaultLocation(),
-                    $config,
-                    $container->getSourceCollector(),
-                    GeneratedExtensionsConfig::EXTENSIONS,
-                    $container->getShellCommandRunner(),
                 );
             },
             StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
