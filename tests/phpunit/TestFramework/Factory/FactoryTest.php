@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\TestFramework\Factory;
 
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
@@ -47,7 +47,7 @@ use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
-use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
+use Infection\Tests\TestFramework\Factory\ConfigurableTestFrameworkAdapterFactory;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -76,7 +76,12 @@ final class FactoryTest extends TestCase
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Invalid name of test framework "Fake Test Framework". Available names are: phpunit, debug'
+            )
+        );
+
         $factory->create('Fake Test Framework', false);
     }
 
@@ -91,9 +96,9 @@ final class FactoryTest extends TestCase
             ConfigurationBuilder::withMinimalTestData()->build(),
             new FakeSourceCollector(),
             [
-                'infection/codeception-adapter' => [
+                'infection/dummy-adapter' => [
                     'install_path' => '/path/to/dummy/adapter/factory.php',
-                    'extra' => ['class' => DummyTestFrameworkFactory::class],
+                    'extra' => ['class' => ConfigurableTestFrameworkAdapterFactory::class],
                     'version' => '1.0.0',
                 ],
             ],

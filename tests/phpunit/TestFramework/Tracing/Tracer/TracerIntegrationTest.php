@@ -48,7 +48,7 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
-use Infection\Tests\Fixtures\TestFramework\Coverage\JUnit\FakeTestFileDataProvider;
+use Infection\Tests\TestFramework\Factory\Coverage\JUnit\FakeTestFileDataProvider;
 use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversNothing;
