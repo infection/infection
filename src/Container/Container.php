@@ -553,6 +553,10 @@ final class Container extends DIContainer
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
                 $config = $container->getConfiguration();
 
+                // Note that this is not idea as it means we create _another_ instance of TestFrameworkAdapter, when
+                // we may already have a TestFramework instance elsewhere.
+                // This is "fine" because we expect it to be removed soon and test framework adapters are currently
+                // stateless.
                 return $container->get(LegacyAdapterFactory::class)->create(
                     $config->testFramework,
                     $config->skipCoverage,

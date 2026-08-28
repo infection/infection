@@ -171,7 +171,12 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $testFrameworkExecutable,
             $tmpDir,
             $jUnitFilePath,
-            new PCOVDirectoryProvider(self::makeSourcePathsAbsolute($sourceDirectoryBasePath, $sourceDirectories)),
+            new PCOVDirectoryProvider(
+                self::makeSourcePathsAbsolute(
+                    $sourceDirectoryBasePath,
+                    $sourceDirectories,
+                ),
+            ),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
@@ -206,7 +211,9 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             ),
             $shellCommandRunner,
             new VersionParser(),
-            new CommandLineBuilder(new PhpExecutableFinder()),
+            new CommandLineBuilder(
+                new PhpExecutableFinder(),
+            ),
         );
     }
 
