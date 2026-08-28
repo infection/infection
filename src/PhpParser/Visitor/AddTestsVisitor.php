@@ -96,9 +96,7 @@ final class AddTestsVisitor extends NodeVisitorAbstract
         return function () use ($node): array {
             static $tests;
 
-            if (!isset($tests)) {
-                $tests = $this->getAllTestsForNode($node);
-            }
+            $tests ??= $this->getAllTestsForNode($node);
 
             return $tests;
         };
