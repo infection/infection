@@ -41,8 +41,8 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\LegacyAdapterFactory;
 use Infection\Tests\Configuration\ConfigurationBuilder;
-use Infection\Tests\TestFramework\Factory\DummyTestFrameworkAdapter;
-use Infection\Tests\TestFramework\Factory\ConfigurableTestFrameworkAdapterFactory;
+use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
+use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -64,7 +64,7 @@ final class LegacyAdapterFactoryTest extends TestCase
             [
                 'infection/codeception-adapter' => [
                     'install_path' => '/path/to/dummy/adapter/factory.php',
-                    'extra' => ['class' => ConfigurableTestFrameworkAdapterFactory::class],
+                    'extra' => ['class' => DummyTestFrameworkFactory::class],
                     'version' => '1.0.0',
                 ],
             ],
