@@ -52,6 +52,8 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ *
+ * @deprecated This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
  */
 final readonly class LegacyAdapterFactory
 {

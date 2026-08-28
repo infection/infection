@@ -944,6 +944,12 @@ count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
+code = "deprecated-class"
+message = 'Class `Infection\TestFramework\LegacyAdapterFactory` is deprecated and should no longer be used.'
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
 code = "less-specific-nested-argument-type"
 message = '''Argument type mismatch for argument #2 of `Infection\Container\Container::offsetSet`: expected `(closure(Infection\Container\Container): ('T.infection\container\container::clonewithservice() extends object))`, but provided type `('T.infection\container\container::clonewithservice() extends Closure)|(closure(infection\container\container): ('T.infection\container\container::clonewithservice() extends object))` is less specific.'''
 count = 1
@@ -5225,6 +5231,12 @@ file = "tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php"
 code = "possibly-invalid-argument"
 message = 'Possible argument type mismatch for argument #1 of `Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer::normalize`: expected `array<array-key, Infection\AbstractTestFramework\Coverage\TestLocation|Infection\TestFramework\Tracing\Trace\TestLocations>`, but possibly received `iterable<mixed, Infection\AbstractTestFramework\Coverage\TestLocation>`.'
 count = 2
+
+[[issues]]
+file = "tests/phpunit/TestFramework/LegacyAdapterFactoryTest.php"
+code = "deprecated-class"
+message = 'Class `Infection\TestFramework\LegacyAdapterFactory` is deprecated and should no longer be used.'
+count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php"

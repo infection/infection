@@ -133,6 +133,15 @@ parameters:
 			path: ../src/Console/XdebugHandler.php
 
 		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\TestFramework\LegacyAdapterFactory:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 2
+			path: ../src/Container/Container.php
+
+		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 1
@@ -140,39 +149,39 @@ parameters:
 
 		-
 			rawMessage: '''
-				Call to method __construct() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				Call to method __construct() of deprecated class Infection\TestFramework\LegacyAdapterFactory:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
 			identifier: method.deprecatedClass
 			count: 1
-			path: ../src/TestFramework/Factory.php
+			path: ../src/Container/Container.php
 
 		-
 			rawMessage: '''
-				Call to method __construct() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				Call to method create() of deprecated class Infection\TestFramework\LegacyAdapterFactory:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
 			identifier: method.deprecatedClass
 			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+			path: ../src/Container/Container.php
 
 		-
 			rawMessage: '''
-				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				Instantiation of deprecated class Infection\TestFramework\LegacyAdapterFactory:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
 			identifier: new.deprecatedClass
 			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+			path: ../src/Container/Container.php
 
 		-
 			rawMessage: '''
-				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				Return type of anonymous function has typehint with deprecated class Infection\TestFramework\LegacyAdapterFactory:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
-			identifier: new.deprecatedClass
+			identifier: return.deprecatedClass
 			count: 1
-			path: ../src/TestFramework/Factory.php
+			path: ../src/Container/Container.php
 
 		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
@@ -817,6 +826,24 @@ parameters:
 			path: ../src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php
 
 		-
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../src/TestFramework/Factory.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../src/TestFramework/Factory.php
+
+		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -851,6 +878,15 @@ parameters:
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
@@ -903,6 +939,15 @@ parameters:
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\Tracing\TestRunOrderResolver
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: new.deprecatedClass
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
 
@@ -1589,6 +1634,42 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/Locator/BaseReportLocator/DemoReportLocator.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\TestFramework\LegacyAdapterFactory:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyAdapterFactoryTest.php
+
+		-
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\TestFramework\LegacyAdapterFactory:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyAdapterFactoryTest.php
+
+		-
+			rawMessage: '''
+				Call to method create() of deprecated class Infection\TestFramework\LegacyAdapterFactory:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyAdapterFactoryTest.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\LegacyAdapterFactory:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyAdapterFactoryTest.php
 
 		-
 			rawMessage: '''
