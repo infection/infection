@@ -131,7 +131,7 @@ final class FactoryTest extends TestCase
             $this->createStub(ShellCommandRunner::class),
             $this->createStub(FileSystem::class),
             $this->createStub(ConsoleOutput::class),
-            $this->createStub(CoverageChecker::class),
+            fn () => $this->createStub(CoverageChecker::class),
             $this->createStub(InitialTestsRunner::class),
             $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
