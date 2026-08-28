@@ -44,7 +44,7 @@ use function extension_loaded;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Tracing\TestLocationBucketSorter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
-use Infection\Tests\TestFramework\Factory\PhpUnit\Coverage\JUnitTimes;
+use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\JUnitTimes;
 use function iterator_to_array;
 use function microtime;
 use const PHP_SAPI;

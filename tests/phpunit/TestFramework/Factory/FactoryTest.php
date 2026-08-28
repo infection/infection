@@ -47,7 +47,7 @@ use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
-use Infection\Tests\TestFramework\Factory\ConfigurableTestFrameworkAdapterFactory;
+use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -57,29 +57,19 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Factory::class)]
 final class FactoryTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        ConfigurableTestFrameworkFactory::reset();
+    }
+
     public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
     {
-        $factory = new Factory(
-            '',
-            '',
-            $this->createStub(TestFrameworkConfigLocatorInterface::class),
-            $this->createStub(TestFrameworkFinder::class),
-            '',
-            ConfigurationBuilder::withMinimalTestData()->build(),
-            new FakeSourceCollector(),
-            [],
-            $this->createStub(ShellCommandRunner::class),
-            $this->createStub(ConsoleOutput::class),
-            $this->createStub(CoverageChecker::class),
-            $this->createStub(InitialTestsRunner::class),
-            $this->createStub(MutantProcessContainerFactory::class),
-            $this->createStub(TestFrameworkExtraOptionsFilter::class),
-        );
+        $factory = $this->createFactory();
 
         $this->expectExceptionObject(
             new InvalidArgumentException(
-                'Invalid name of test framework "Fake Test Framework". Available names are: phpunit, debug'
-            )
+                'Invalid name of test framework "Fake Test Framework". Available names are: phpunit, debug',
+            ),
         );
 
         $factory->create('Fake Test Framework', false);
@@ -87,7 +77,48 @@ final class FactoryTest extends TestCase
 
     public function test_it_uses_installed_test_framework_adapters(): void
     {
-        $factory = new Factory(
+        $factory = $this->createFactory([
+            'infection/dummy-adapter' => [
+                'install_path' => '/path/to/dummy/adapter/factory.php',
+                'extra' => ['class' => DummyTestFrameworkFactory::class],
+                'version' => '1.0.0',
+            ],
+        ]);
+
+        $adapter = $factory->create('dummy', false);
+
+        $this->assertInstanceOf(TestFramework::class, $adapter);
+    }
+
+    public function test_it_uses_installed_test_frameworks(): void
+    {
+        $expectedTestFramework = $this->createStub(TestFramework::class);
+
+        ConfigurableTestFrameworkFactory::configure(
+            $expectedTestFramework,
+            'dummy',
+            'dummy',
+        );
+
+        $factory = $this->createFactory([
+            'infection/dummy' => [
+                'install_path' => '/path/to/dummy/factory.php',
+                'extra' => ['class' => ConfigurableTestFrameworkFactory::class],
+                'version' => '1.0.0',
+            ],
+        ]);
+
+        $testFramework = $factory->create('dummy', false);
+
+        $this->assertSame($expectedTestFramework, $testFramework);
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $installedExtensions
+     */
+    private function createFactory(array $installedExtensions = []): Factory
+    {
+        return new Factory(
             '',
             '',
             $this->createStub(TestFrameworkConfigLocatorInterface::class),
@@ -95,13 +126,7 @@ final class FactoryTest extends TestCase
             '',
             ConfigurationBuilder::withMinimalTestData()->build(),
             new FakeSourceCollector(),
-            [
-                'infection/dummy-adapter' => [
-                    'install_path' => '/path/to/dummy/adapter/factory.php',
-                    'extra' => ['class' => ConfigurableTestFrameworkAdapterFactory::class],
-                    'version' => '1.0.0',
-                ],
-            ],
+            $installedExtensions,
             $this->createStub(ShellCommandRunner::class),
             $this->createStub(ConsoleOutput::class),
             $this->createStub(CoverageChecker::class),
@@ -109,9 +134,5 @@ final class FactoryTest extends TestCase
             $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
-
-        $testFramework = $factory->create('dummy', false);
-
-        $this->assertInstanceOf(TestFramework::class, $testFramework);
     }
 }
