@@ -43,6 +43,7 @@ use Infection\TestFramework\LegacyAdapterFactory;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -51,6 +52,24 @@ use PHPUnit\Framework\TestCase;
 #[Group('integration')]
 final class LegacyAdapterFactoryTest extends TestCase
 {
+    public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
+    {
+        $factory = new LegacyAdapterFactory(
+            '',
+            '',
+            $this->createStub(TestFrameworkConfigLocatorInterface::class),
+            $this->createStub(TestFrameworkFinder::class),
+            '',
+            ConfigurationBuilder::withMinimalTestData()->build(),
+            new FakeSourceCollector(),
+            [],
+            $this->createStub(ShellCommandRunner::class),
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+        $factory->create('Fake Test Framework', false);
+    }
+
     public function test_it_creates_an_installed_legacy_adapter(): void
     {
         $factory = new LegacyAdapterFactory(
