@@ -46,6 +46,7 @@ use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\PhpUnit\MemoryLimiter;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Override;
 use function Safe\preg_match;
@@ -72,6 +73,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         ShellCommandRunner $shellCommandRunner,
         VersionParser $versionParser,
         CommandLineBuilder $commandLineBuilder,
+        private readonly MemoryLimiter $memoryLimiter,
         ?string $version = null,
     ) {
         parent::__construct(
@@ -236,5 +238,12 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
     public function getInitialRunOnlyOptions(): array
     {
         return ['--configuration', '--filter', '--testsuite'];
+    }
+
+    /** @return list<string> */
+    #[Override]
+    protected function getMutantPhpExtraArguments(): array
+    {
+        return $this->memoryLimiter->getPhpExtraArguments();
     }
 }

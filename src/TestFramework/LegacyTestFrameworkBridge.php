@@ -48,6 +48,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\PhpUnit\MemoryLimiter;
 
 /**
  * @internal
@@ -64,6 +65,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         private Configuration $config,
         private MutantProcessContainerFactory $processFactory,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private ?MemoryLimiter $memoryLimiter,
     ) {
     }
 
@@ -113,10 +115,18 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
             ? $this->adapter->getMemoryUsed($output)
             : null;
 
-        return new InitialRunResults(
+        $results = new InitialRunResults(
             output: $output,
             memoryUsage: $memoryUsage === -1. ? null : $memoryUsage,
         );
+
+        // TODO: this can be removed once we migrated the PHPUnitAdapter to TestFramework.
+        //  Indeed, it is only used by PHPUnit and the counter part (setting the memory limit
+        //  of the mutant process) can only be done within the adapter.
+        //  Third-party test frameworks like PhpSpec cannot leverage this feature anymore.
+        $this->memoryLimiter?->recordInitialRunMemoryUsage($results->memoryUsage);
+
+        return $results;
     }
 
     public function test(Mutant $mutant): MutantProcessContainer

@@ -33,75 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Memory;
+namespace Infection\TestFramework\PhpUnit;
 
-use Infection\TestFramework\Contracts\InitialRunResults;
-use const PHP_EOL;
 use function sprintf;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
- * @final
  */
-class MemoryLimiter
+final class MemoryLimiter
 {
+    private const int MEMORY_LIMIT_MULTIPLIER = 2;
+
+    /**
+     * @var float|null Memory usage in megabytes.
+     */
+    private ?float $memoryUsage = null;
+
     public function __construct(
-        private readonly Filesystem $fileSystem,
-        private readonly string $phpIniPath,
         private readonly MemoryLimiterEnvironment $environment,
     ) {
     }
 
-    public function limitMemory(?InitialRunResults $initialRunResults): void
+    /**
+     * @param float|null $memoryUsage Memory usage in megabytes.
+     */
+    public function recordInitialRunMemoryUsage(?float $memoryUsage): void
     {
-        $memoryUsage = $initialRunResults?->memoryUsage;
+        $this->memoryUsage = $memoryUsage;
+    }
 
-        if ($memoryUsage === null
+    /**
+     * @return list<string>
+     */
+    public function getPhpExtraArguments(): array
+    {
+        if (
+            $this->memoryUsage === null
             || $this->environment->hasMemoryLimitSet()
             || $this->environment->isUsingSystemIni()
         ) {
-            return;
+            return [];
         }
 
-        $tmpConfigPath = $this->phpIniPath;
-
-        if ($tmpConfigPath === '') {
-            // Cannot add a memory limit: there is no php.ini file
-            return;
-        }
-
-        if (!$this->fileSystem->exists($tmpConfigPath)) {
-            // Cannot add a memory limit: there is no php.ini file
-            return;
-        }
-
-        $memoryLimit = $memoryUsage;
-
-        if ($memoryLimit === -1.) {
-            // Cannot detect memory used, not setting any limits
-            return;
-        }
-
-        /*
-         * Since we know how much memory the initial test suite used, and only if we know, we can
-         * enforce a memory limit upon all mutation processes. Limit is set to be twice the known
-         * amount, because if we know that a normal test suite used X megabytes, if a mutants uses a
-         * lot more, this is a definite error.
-         *
-         * By default we let a mutant process use twice as much more memory as an initial test suite
-         * consumed.
-         */
-        $memoryLimit *= 2;
-
-        try {
-            $this->fileSystem->appendToFile(
-                $tmpConfigPath,
-                PHP_EOL . sprintf('memory_limit = %dM', (int) $memoryLimit),
-            );
-        } catch (IOException) {
-            // Cannot add a memory limit: file is not writable
-        }
+        return [
+            '-d',
+            sprintf(
+                'memory_limit=%dM',
+                (int) ($this->memoryUsage * self::MEMORY_LIMIT_MULTIPLIER),
+            ),
+        ];
     }
 }

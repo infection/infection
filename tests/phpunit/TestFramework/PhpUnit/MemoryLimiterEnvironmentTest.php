@@ -33,12 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Resource\Memory;
+namespace Infection\Tests\TestFramework\PhpUnit;
 
 use Composer\XdebugHandler\XdebugHandler;
-use Infection\Resource\Memory\MemoryLimiterEnvironment;
+use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
 use const PHP_SAPI;
-use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -56,7 +55,6 @@ final class MemoryLimiterEnvironmentTest extends TestCase
     protected function setUp(): void
     {
         $this->originalMemoryLimit = ini_get('memory_limit');
-
         $this->environment = new MemoryLimiterEnvironment();
     }
 
@@ -88,8 +86,6 @@ final class MemoryLimiterEnvironmentTest extends TestCase
             $this->markTestSkipped('This test requires running without PHPDBG');
         }
 
-        // We don't expect the Xdebug handler to be executed for the tests hence
-        // there is no need to disable it here
         $this->assertTrue($this->environment->isUsingSystemIni());
     }
 
@@ -99,8 +95,6 @@ final class MemoryLimiterEnvironmentTest extends TestCase
             $this->markTestSkipped('This test requires PHPDBG');
         }
 
-        // We don't expect the Xdebug handler to be executed for the tests hence
-        // there is no need to disable it here
         $this->assertTrue($this->environment->isUsingSystemIni());
     }
 
@@ -112,44 +106,23 @@ final class MemoryLimiterEnvironmentTest extends TestCase
 
         $reflectionClass = new ReflectionClass(XdebugHandler::class);
 
-        if (PHP_VERSION_ID < 80300) {
-            $reflectionClass->getProperty('skipped')->setValue('infection-fake');
-        } else {
-            $reflectionClass->setStaticPropertyValue('skipped', 'infection-fake');
-        }
+        $reflectionClass->setStaticPropertyValue('skipped', 'infection-fake');
 
         try {
             $this->assertFalse($this->environment->isUsingSystemIni());
         } finally {
-            // Restore original value
-            if (PHP_VERSION_ID < 80300) {
-                $reflectionClass->getProperty('skipped')->setValue(null);
-            } else {
-                $reflectionClass->setStaticPropertyValue('skipped', null);
-            }
+            $reflectionClass->setStaticPropertyValue('skipped', null);
         }
     }
 
     public static function memoryLimitProvider(): iterable
     {
-        yield 'no limit' => [
-            '-1',
-            false,
-        ];
+        yield 'no limit' => ['-1', false];
 
-        yield 'limit' => [
-            '512M',
-            true,
-        ];
+        yield 'limit' => ['512M', true];
 
-        yield 'invalid limit' => [
-            '-512M',
-            true,
-        ];
+        yield 'invalid limit' => ['-512M', true];
 
-        yield 'limit without unit' => [
-            '1073741824',   // 1G
-            true,
-        ];
+        yield 'limit without unit' => ['1073741824', true];
     }
 }

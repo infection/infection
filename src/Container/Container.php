@@ -142,8 +142,6 @@ use Infection\Reporter\ShowMutationsReporter;
 use Infection\Reporter\StrykerReporterFactory;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
 use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Memory\MemoryLimiter;
-use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Collector\LazySourceCollector;
@@ -176,13 +174,15 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\TestFramework\PhpUnit\MemoryLimiter;
+use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
 use OndraM\CiDetector\CiDetector;
-use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinterAbstract;
@@ -310,6 +310,7 @@ final class Container extends DIContainer
                     $container->getSourceCollector(),
                     GeneratedExtensionsConfig::EXTENSIONS,
                     $container->getShellCommandRunner(),
+                    $container->getMemoryLimiter(),
                 );
             },
             StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
@@ -348,11 +349,7 @@ final class Container extends DIContainer
                 $container->getConfiguration()->msiPrecision,
                 $container->getConfiguration()->timeoutsAsEscaped,
             ),
-            MemoryLimiter::class => static fn (self $container): MemoryLimiter => new MemoryLimiter(
-                $container->getFileSystem(),
-                (string) php_ini_loaded_file(),
-                new MemoryLimiterEnvironment(),
-            ),
+            MemoryLimiter::class => static fn (): MemoryLimiter => new MemoryLimiter(new MemoryLimiterEnvironment()),
             SchemaConfigurationLoader::class => static fn (self $container): SchemaConfigurationLoader => new SchemaConfigurationLoader(
                 $container->getRootsFileLocator(),
                 $container->getSchemaConfigurationFileLoader(),
@@ -663,15 +660,20 @@ final class Container extends DIContainer
                 ),
                 new CurrentWorkingDirectoryProvider(),
             ),
-            TestFramework::class => static fn (self $container) => new LegacyTestFrameworkBridge(
-                $container->getTestFrameworkAdapter(),
-                $container->get(ConsoleOutput::class),
-                $container->getCoverageChecker(),
-                $container->getInitialTestsRunner(),
-                $container->getConfiguration(),
-                $container->getMutantProcessContainerFactory(),
-                $container->getTestFrameworkExtraOptionsFilter(),
-            ),
+            TestFramework::class => static function (self $container): TestFramework {
+                $adapter = $container->getTestFrameworkAdapter();
+
+                return new LegacyTestFrameworkBridge(
+                    $adapter,
+                    $container->get(ConsoleOutput::class),
+                    $container->getCoverageChecker(),
+                    $container->getInitialTestsRunner(),
+                    $container->getConfiguration(),
+                    $container->getMutantProcessContainerFactory(),
+                    $container->getTestFrameworkExtraOptionsFilter(),
+                    $adapter instanceof PhpUnitAdapter ? $container->getMemoryLimiter() : null,
+                );
+            },
         ]);
 
         return $container->withValues(

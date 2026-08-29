@@ -40,6 +40,8 @@ use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\PhpUnit\MemoryLimiter;
+use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
@@ -64,6 +66,7 @@ final class FactoryTest extends TestCase
             new FakeSourceCollector(),
             [],
             $this->createStub(ShellCommandRunner::class),
+            new MemoryLimiter($this->createStub(MemoryLimiterEnvironment::class)),
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -88,6 +91,7 @@ final class FactoryTest extends TestCase
                 ],
             ],
             $this->createStub(ShellCommandRunner::class),
+            new MemoryLimiter($this->createStub(MemoryLimiterEnvironment::class)),
         );
 
         $adapter = $factory->create('dummy', false);

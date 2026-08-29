@@ -44,6 +44,8 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
+use Infection\TestFramework\PhpUnit\MemoryLimiter;
+use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -141,10 +143,15 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             ->with('/tmp/phpunit', 'output')
         ;
 
+        $memoryLimiterEnvironment = $this->createMock(MemoryLimiterEnvironment::class);
+        $memoryLimiterEnvironment->expects($this->once())->method('hasMemoryLimitSet')->willReturn(false);
+        $memoryLimiterEnvironment->expects($this->once())->method('isUsingSystemIni')->willReturn(false);
+        $memoryLimiter = new MemoryLimiter($memoryLimiterEnvironment);
         $testFramework = $this->createTestFramework(
             adapter: new FakeAwareAdapter(42.0),
             coverageChecker: $coverageChecker,
             initialTestsRunner: $initialTestsRunner,
+            memoryLimiter: $memoryLimiter,
         );
 
         $expected = new InitialRunResults(
@@ -155,6 +162,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $actual = $testFramework->executeInitialRun();
 
         $this->assertEquals($expected, $actual);
+        $this->assertSame(['-d', 'memory_limit=84M'], $memoryLimiter->getPhpExtraArguments());
     }
 
     public function test_it_forwards_initial_run_options(): void
@@ -313,6 +321,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         ?string $initialTestsPhpOptions = null,
         string $testFrameworkExtraOptions = '',
         bool $skipCoverage = false,
+        ?MemoryLimiter $memoryLimiter = null,
     ): LegacyTestFrameworkBridge {
         return new LegacyTestFrameworkBridge(
             adapter: $adapter ?? new FakeAwareAdapter(1.0),
@@ -327,6 +336,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
                 ->build(),
             processFactory: $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter ?? $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            memoryLimiter: $memoryLimiter,
         );
     }
 

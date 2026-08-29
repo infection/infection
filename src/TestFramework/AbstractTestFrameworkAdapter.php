@@ -100,7 +100,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         string $extraOptions,
     ): array {
         return $this->getCommandLine(
-            [],
+            $this->getMutantPhpExtraArguments(),
             $this->argumentsAndOptionsBuilder->buildForMutant(
                 $this->buildMutationConfigFile(
                     $coverageTests,
@@ -123,6 +123,12 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     public function getInitialTestsFailRecommendations(string $commandLine): string
     {
         return sprintf('Check the executed command to identify the problem: %s', $commandLine);
+    }
+
+    /** @return list<string> */
+    protected function getMutantPhpExtraArguments(): array
+    {
+        return [];
     }
 
     protected function buildInitialConfigFile(): string
