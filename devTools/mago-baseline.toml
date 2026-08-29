@@ -3956,21 +3956,21 @@ count = 2
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/Generator.php"
-code = "duplicate-definition"
-message = 'Class `Infection\Benchmark\ParseGitDiff\Configuration` is already defined elsewhere.'
-count = 1
+code = "impossible-condition"
+message = "This condition (type `false`) will always evaluate to false."
+count = 11
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/Generator.php"
-code = "duplicate-definition"
-message = 'Class `Infection\Benchmark\ParseGitDiff\Generator` is already defined elsewhere.'
-count = 1
+code = "redundant-comparison"
+message = "Redundant `<=` comparison: left-hand side is never less than or equal to right-hand side."
+count = 8
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/Generator.php"
-code = "duplicate-definition"
-message = 'Class `Infection\Benchmark\ParseGitDiff\IO` is already defined elsewhere.'
-count = 1
+code = "redundant-comparison"
+message = "Redundant `===` comparison: left-hand side is never identical to right-hand side."
+count = 3
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/GitParseDiffBench.php"
@@ -3983,24 +3983,6 @@ file = "tests/benchmark/ParseGitDiff/GitParseDiffBench.php"
 code = "mixed-property-type-coercion"
 message = "A value with a less specific type `mixed` is being assigned to property `$main` ((closure(...mixed=): mixed))."
 count = 1
-
-[[issues]]
-file = "tests/benchmark/ParseGitDiff/generator.php"
-code = "impossible-condition"
-message = "This condition (type `false`) will always evaluate to false."
-count = 11
-
-[[issues]]
-file = "tests/benchmark/ParseGitDiff/generator.php"
-code = "redundant-comparison"
-message = "Redundant `<=` comparison: left-hand side is never less than or equal to right-hand side."
-count = 8
-
-[[issues]]
-file = "tests/benchmark/ParseGitDiff/generator.php"
-code = "redundant-comparison"
-message = "Redundant `===` comparison: left-hand side is never identical to right-hand side."
-count = 3
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/profile.php"
