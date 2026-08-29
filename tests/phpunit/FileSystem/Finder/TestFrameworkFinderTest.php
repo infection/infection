@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
-use function explode;
 use function getenv;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
@@ -46,7 +45,6 @@ use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -58,9 +56,7 @@ use function Safe\chdir;
 use function Safe\chmod;
 use function Safe\mkdir;
 use function Safe\putenv;
-use function Safe\realpath;
 use function sprintf;
-use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
@@ -123,33 +119,74 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $frameworkFinder->find('not-used', $filename);
     }
 
-    public function test_it_adds_vendor_bin_to_path_if_needed(): void
+    public function test_it_prioritizes_composer_bin_without_modifying_path(): void
     {
+        chdir($this->tmp);
+
+        $composerBinDir = $this->tmp . '/composer-bin';
+        mkdir($composerBinDir);
+        $composerBinExecutable = $this->createPhpUnitExecutableFixture($composerBinDir);
+
+        $pathBinDir = $this->tmp . '/path-bin';
+        mkdir($pathBinDir);
+        $this->createPhpUnitExecutableFixture($pathBinDir);
+
+        putenv(sprintf('%s=%s', self::PATH_NAME, $pathBinDir));
+        putenv('PATHEXT=');
+
         $path = self::getPath();
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandRunner);
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->expects($this->once())
+            ->method('mustRun')
+            ->with(['/usr/bin/composer', 'config', 'bin-dir'])
+            ->willReturn($composerBinDir);
 
-        $expected = realpath('vendor/bin/phpunit');
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $shellCommandRunner);
 
         $this->assertSame(
-            Path::normalize($expected),
+            Path::normalize($composerBinExecutable),
             Path::normalize($frameworkFinder->find(TestFrameworkTypes::PHPUNIT)),
             'Should return the phpunit path',
         );
 
-        $pathAfterTest = self::getPath();
+        $this->assertSame($path, self::getPath());
+    }
 
-        // Vendor bin should be the first item
-        $pathList = explode(PATH_SEPARATOR, $pathAfterTest);
-        $this->assertStringContainsString('vendor', $pathList[0]);
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function test_it_uses_path_when_the_composer_bin_candidate_is_not_executable(): void
+    {
+        chdir($this->tmp);
 
-        $this->assertNotSame($path, $pathAfterTest);
+        $composerBinDir = $this->tmp . '/composer-bin';
+        mkdir($composerBinDir);
+        chmod($this->createPhpUnitExecutableFixture($composerBinDir), 0644);
 
-        $this->assertGreaterThan(
-            strlen($path),
-            strlen($pathAfterTest),
-            'PATH with vendor added is shorter than without it added, make sure it isn\'t overwritten.',
+        $pathBinDir = $this->tmp . '/path-bin';
+        mkdir($pathBinDir);
+        $pathExecutable = $this->createPhpUnitExecutableFixture($pathBinDir);
+
+        putenv(sprintf('%s=%s', self::PATH_NAME, $pathBinDir));
+        putenv('PATHEXT=');
+
+        $path = self::getPath();
+
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->expects($this->once())
+            ->method('mustRun')
+            ->with(['/usr/bin/composer', 'config', 'bin-dir'])
+            ->willReturn($composerBinDir);
+
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $shellCommandRunner);
+
+        $this->assertSame(
+            Path::normalize($pathExecutable),
+            Path::normalize($frameworkFinder->find(TestFrameworkTypes::PHPUNIT)),
         );
+
+        $this->assertSame($path, self::getPath());
     }
 
     public function test_it_falls_back_to_local_vendor_bin_when_composer_command_fails(): void
@@ -187,13 +224,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
             Path::canonicalize($frameworkFinder->find($mock::PACKAGE)),
         );
 
-        $pathAfterTest = self::getPath();
-        $pathList = explode(PATH_SEPARATOR, $pathAfterTest);
-
-        $this->assertSame(
-            Path::canonicalize($this->tmp . '/vendor/bin'),
-            Path::canonicalize($pathList[0]),
-        );
+        $this->assertSame($this->tmp, self::getPath());
     }
 
     #[DataProvider('provideEmptyComposerBinDirCases')]
@@ -273,7 +304,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_adds_vendor_bin_to_path_with_a_local_composer_phar(): void
+    public function test_it_finds_vendor_bin_with_a_local_composer_phar_without_modifying_path(): void
     {
         chdir($this->tmp);
 
@@ -295,6 +326,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         );
 
         $this->assertSame($expected, $actual);
+        $this->assertSame($this->tmp, self::getPath());
     }
 
     public function test_it_finds_framework_executable(): void
