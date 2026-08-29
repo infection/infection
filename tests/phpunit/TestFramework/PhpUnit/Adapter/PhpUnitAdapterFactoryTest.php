@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use Infection\Console\ConsoleOutput;
-use Symfony\Component\Filesystem\Filesystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\SymfonyProcessShellCommandRunner;
@@ -47,6 +46,7 @@ use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
 #[CoversClass(PhpUnitAdapterFactory::class)]

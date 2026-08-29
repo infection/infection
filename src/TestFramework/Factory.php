@@ -72,6 +72,7 @@ final readonly class Factory
 
     /**
      * @param array<string, array<string, mixed>> $installedExtensions
+     * @param Closure(TestFrameworkAdapter):CoverageChecker $coverageCheckerFactory
      */
     public function __construct(
         private string $tmpDir,
@@ -85,7 +86,6 @@ final readonly class Factory
         private ShellCommandRunner $shellCommandRunner,
         private FileSystem $fileSystem,
         private ConsoleOutput $consoleOutput,
-        /** @var Closure(TestFrameworkAdapter): CoverageChecker */
         private Closure $coverageCheckerFactory,
         private InitialTestsRunner $initialTestsRunner,
         private MutantProcessContainerFactory $containerFactory,
