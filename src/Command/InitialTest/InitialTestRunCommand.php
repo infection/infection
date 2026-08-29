@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Command\InitialTest;
 
-use function explode;
 use Infection\Command\BaseCommand;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Git\Option\FilterOption;
@@ -44,11 +43,9 @@ use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\DebugOption;
 use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Command\Option\TestFrameworkOption;
-use Infection\Configuration\Configuration;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
 use Infection\Logger\Console\ConsoleLogger;
-use Infection\Process\Runner\InitialTestsFailed;
 
 /**
  * @internal
@@ -95,52 +92,11 @@ final class InitialTestRunCommand extends BaseCommand
 
         $container->getSubscriberRegisterer()->registerSubscribers();
 
-        $configuration = $container->getConfiguration();
-        $initialTestsPhpOptions = self::getInitialTestsPhpOptions($configuration);
-
-        $initialTestSuiteInnerProcess = $container
-            ->getInitialTestsRunProcessFactory()
-            ->createProcess(
-                $configuration->testFrameworkExtraOptions,
-                $initialTestsPhpOptions,
-                $configuration->skipCoverage,
-            );
-
-        $io->writeln([
-            'Command executed:',
-            $initialTestSuiteInnerProcess->getCommandLine(),
-        ]);
-
-        $initialTestSuiteProcess = $container
-            ->getInitialTestsRunner()
-            ->run(
-                $configuration->testFrameworkExtraOptions,
-                $initialTestsPhpOptions,
-                $configuration->skipCoverage,
-            );
-
-        if (!$initialTestSuiteProcess->isSuccessful()) {
-            throw InitialTestsFailed::fromProcessAndAdapter(
-                $initialTestSuiteProcess,
-                $container->getTestFrameworkAdapter(),
-            );
-        }
+        $container->getTestFramework()->executeInitialRun();
 
         $io->newLine();
         $io->success('Initial test run successfully executed.');
 
         return true;
-    }
-
-    /**
-     * @return string[]
-     */
-    private static function getInitialTestsPhpOptions(Configuration $configuration): array
-    {
-        // Copied from Engine::getInitialTestsPhpOptionsArray
-        // The implementation looks a bit weird (will return [''] for an empty string),
-        // and the engine may not be the place where this should be done either...
-        // But to address at a later stage.
-        return explode(' ', (string) $configuration->initialTestsPhpOptions);
     }
 }
