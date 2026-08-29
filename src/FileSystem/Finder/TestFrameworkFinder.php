@@ -36,15 +36,14 @@ declare(strict_types=1);
 namespace Infection\FileSystem\Finder;
 
 use function array_key_exists;
-use const DIRECTORY_SEPARATOR;
 use function dirname;
 use function file_exists;
+use function getenv as getenv_unsafe;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\TestFrameworkTypes;
-use function is_executable;
-use function is_file;
 use function ltrim;
+use const PHP_OS_FAMILY;
 use function rtrim;
 use RuntimeException;
 use function Safe\file_get_contents;
@@ -147,18 +146,20 @@ class TestFrameworkFinder
         $cwd = getcwd();
         $extraDirs = [$cwd, $cwd . '/bin'];
 
-        foreach ($candidates as $name) {
-            if ($composerBinDir !== null) {
-                $composerCandidate = $composerBinDir . '/' . $name;
+        if ($composerBinDir !== null) {
+            $composerExecutable = ComposerBinExecutableFinder::find(
+                $candidates,
+                $composerBinDir,
+                PHP_OS_FAMILY,
+                getenv_unsafe('PATHEXT'),
+            );
 
-                if (
-                    is_file($composerCandidate)
-                    && (DIRECTORY_SEPARATOR === '\\' || is_executable($composerCandidate))
-                ) {
-                    return $composerCandidate;
-                }
+            if ($composerExecutable !== null) {
+                return $composerExecutable;
             }
+        }
 
+        foreach ($candidates as $name) {
             $path = $finder->find($name, null, $extraDirs);
 
             if ($path !== null) {
