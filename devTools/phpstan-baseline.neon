@@ -148,6 +148,12 @@ parameters:
 			path: ../src/Container/Container.php
 
 		-
+			rawMessage: Infection\Container\Container should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 3
+			path: ../src/Container/Container.php
+
+		-
 			rawMessage: '''
 				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
@@ -265,10 +271,28 @@ parameters:
 			path: ../src/Logger/ArtefactCollection/ConsoleNoProgressLogger.php
 
 		-
+			rawMessage: Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/Logger/ArtefactCollection/ConsoleNoProgressLogger.php
+
+		-
 			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
 			identifier: catch.neverThrown
 			count: 1
 			path: ../src/Logger/ArtefactCollection/ConsoleProgressBarLogger.php
+
+		-
+			rawMessage: Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/Logger/ArtefactCollection/ConsoleProgressBarLogger.php
+
+		-
+			rawMessage: Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLoggerFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/Logger/ArtefactCollection/InitialTestsExecution/InitialTestsExecutionLoggerFactory.php
 
 		-
 			rawMessage: 'Parameter #1 $level (string) of method Infection\Logger\Console\ConsoleLogger::log() should be contravariant with parameter $level (mixed) of method Psr\Log\AbstractLogger::log()'
@@ -341,6 +365,12 @@ parameters:
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/Mutant/MutantExecutionResult.php
+
+		-
+			rawMessage: Infection\Mutant\TestFrameworkMutantExecutionResultFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/Mutant/TestFrameworkMutantExecutionResultFactory.php
 
 		-
 			rawMessage: Do not use magic number as a function argument. Move to constant with a suitable name.
@@ -487,10 +517,28 @@ parameters:
 			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
 
 		-
+			rawMessage: Infection\Process\Factory\InitialTestsRunProcessFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/Process/Factory/InitialTestsRunProcessFactory.php
+
+		-
+			rawMessage: Infection\Process\Factory\MutantProcessContainerFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/Process/Factory/MutantProcessContainerFactory.php
+
+		-
 			rawMessage: 'Parameter #2 $env (array<bool|string>|null) of method Infection\Process\OriginalPhpProcess::start() should be contravariant with parameter $env (array) of method Symfony\Component\Process\Process::start()'
 			identifier: method.childParameterType
 			count: 1
 			path: ../src/Process/OriginalPhpProcess.php
+
+		-
+			rawMessage: Infection\Process\Runner\InitialTestsFailed should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/Process/Runner/InitialTestsFailed.php
 
 		-
 			rawMessage: 'Method Infection\Reflection\AnonymousClassReflection::__construct() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
@@ -715,6 +763,12 @@ parameters:
 			path: ../src/StaticAnalysis/StaticAnalysisToolAdapterFactory.php
 
 		-
+			rawMessage: Infection\TestFramework\AbstractTestFrameworkAdapter should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/TestFramework/AbstractTestFrameworkAdapter.php
+
+		-
 			rawMessage: 'Parameter #2 $paths of method Composer\Autoload\ClassLoader::setPsr4() expects list<string>|string, array<string> given.'
 			identifier: argument.type
 			count: 1
@@ -775,6 +829,12 @@ parameters:
 			path: ../src/TestFramework/Coverage/CoverageChecker.php
 
 		-
+			rawMessage: Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdder.php
+
+		-
 			rawMessage: Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
@@ -797,6 +857,24 @@ parameters:
 			identifier: arrayFilter.strict
 			count: 1
 			path: ../src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php
+
+		-
+			rawMessage: Infection\TestFramework\Factory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/TestFramework/Factory.php
+
+		-
+			rawMessage: Infection\TestFramework\Factory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapterFactory
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/TestFramework/Factory.php
+
+		-
+			rawMessage: Infection\TestFramework\LegacyTestFrameworkBridge should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/TestFramework/LegacyTestFrameworkBridge.php
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
@@ -833,6 +911,18 @@ parameters:
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapterFactory
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
@@ -943,6 +1033,12 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
 
 		-
+			rawMessage: Infection\TestFramework\TestFrameworkTypes should not depend on Infection\AbstractTestFramework\TestFrameworkAdapterFactory
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/TestFramework/TestFrameworkTypes.php
+
+		-
 			rawMessage: Do not use magic number in arithmetic operations. Move to constant with a suitable name.
 			count: 1
 			path: ../src/TestFramework/Tracing/TestLocationBucketSorter.php
@@ -992,6 +1088,12 @@ parameters:
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/Testing/SingletonContainer.php
+
+		-
+			rawMessage: Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/Testing/TestFramework/Debug/DebugTestFrameworkAdapter.php
 
 		-
 			rawMessage: '''
