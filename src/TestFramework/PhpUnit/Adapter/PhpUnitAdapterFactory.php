@@ -38,18 +38,26 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 use function array_map;
 use function array_values;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Configuration\Configuration;
+use Infection\Console\ConsoleOutput;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\TestFrameworkFactory;
+use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\LegacyTestFrameworkBridge;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use function Safe\file_get_contents;
 use SplFileInfo;
@@ -61,7 +69,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
+final class PhpUnitAdapterFactory implements TestFrameworkFactory
 {
     use CannotBeInstantiated;
 
@@ -70,6 +78,65 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
      * @param SplFileInfo[] $filteredSourceFilesToMutate
      */
     public static function create(
+        string $testFrameworkExecutable,
+        string $tmpDir,
+        string $testFrameworkConfigPath,
+        ?string $testFrameworkConfigDir,
+        string $jUnitFilePath,
+        string $projectDir,
+        array $sourceDirectories,
+        bool $skipCoverage,
+        bool $executeOnlyCoveringTestCases = false,
+        array $filteredSourceFilesToMutate = [],
+        ?string $mapSourceClassToTestStrategy = null,
+        ?ShellCommandRunner $shellCommandRunner = null,
+        ?string $sourceDirectoryBasePath = null,
+        bool $useWindowsFilterLimit = false,
+        ?ConsoleOutput $consoleOutput = null,
+        ?CoverageChecker $coverageChecker = null,
+        ?InitialTestsRunner $initialTestsRunner = null,
+        ?Configuration $configuration = null,
+        ?MutantProcessContainerFactory $processFactory = null,
+        ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter = null,
+    ): TestFramework {
+        Assert::notNull($consoleOutput);
+        Assert::notNull($coverageChecker);
+        Assert::notNull($initialTestsRunner);
+        Assert::notNull($configuration);
+        Assert::notNull($processFactory);
+        Assert::notNull($testFrameworkExtraOptionsFilter);
+
+        return new LegacyTestFrameworkBridge(
+            self::createLegacy(
+                $testFrameworkExecutable,
+                $tmpDir,
+                $testFrameworkConfigPath,
+                $testFrameworkConfigDir,
+                $jUnitFilePath,
+                $projectDir,
+                $sourceDirectories,
+                $skipCoverage,
+                $executeOnlyCoveringTestCases,
+                $filteredSourceFilesToMutate,
+                $mapSourceClassToTestStrategy,
+                $shellCommandRunner,
+                $sourceDirectoryBasePath,
+                $useWindowsFilterLimit,
+            ),
+            consoleOutput: $consoleOutput,
+            coverageChecker: $coverageChecker,
+            initialTestsRunner: $initialTestsRunner,
+            config: $configuration,
+            processFactory: $processFactory,
+            testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter,
+        );
+    }
+
+    /**
+     * @param string[] $sourceDirectories
+     * @param SplFileInfo[] $filteredSourceFilesToMutate
+     */
+    public static function createLegacy(
         string $testFrameworkExecutable,
         string $tmpDir,
         string $testFrameworkConfigPath,
@@ -96,10 +163,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
 
         $configManipulator = new XmlConfigurationManipulator(
-            new PathReplacer(
-                new Filesystem(),
-                $testFrameworkConfigDir,
-            ),
+            new PathReplacer(new Filesystem(), $testFrameworkConfigDir),
             $testFrameworkConfigDir,
         );
 

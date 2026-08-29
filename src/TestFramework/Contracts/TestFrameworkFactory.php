@@ -33,67 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
-
-use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
-use Infection\CannotBeInstantiated;
-use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
-use Infection\TestFramework\Contracts\TestFrameworkFactory;
-use function is_a;
-use Webmozart\Assert\Assert;
+namespace Infection\TestFramework\Contracts;
 
 /**
+ * Defines how Infection discovers a test framework and creates it from the project's test-run configuration.
+ *
  * @internal
  */
-final class TestFrameworkTypes
+interface TestFrameworkFactory
 {
-    use CannotBeInstantiated;
-
-    public const string PHPUNIT = 'phpunit';
-
-    public const string PHPSPEC = 'phpspec';
-
-    public const string CODECEPTION = 'codeception';
-
-    public const string TESTO = 'testo';
-
-    public const string DEBUG = 'debug';
+    /**
+     * @param string[] $sourceDirectories
+     */
+    public static function create(
+        string $testFrameworkExecutable,
+        string $tmpDir,
+        string $testFrameworkConfigPath,
+        ?string $testFrameworkConfigDir,
+        string $jUnitFilePath,
+        string $projectDir,
+        array $sourceDirectories,
+        bool $skipCoverage,
+    ): TestFramework;
 
     /**
-     * @var string[]
+     * Returns the identifier Infection uses to discover and select this test framework.
      */
-    private static array $defaultTypes = [
-        self::PHPUNIT,
-        self::PHPSPEC,
-        self::CODECEPTION,
-        self::TESTO,
-        self::DEBUG,
-    ];
+    public static function getAdapterName(): string;
 
-    /**
-     * @param mixed[] $installedExtensions
-     *
-     * @return string[]
-     */
-    public static function getTypes(
-        array $installedExtensions = GeneratedExtensionsConfig::EXTENSIONS,
-    ): array {
-        $types = self::$defaultTypes;
-
-        foreach ($installedExtensions as $installedExtension) {
-            $factory = $installedExtension['extra']['class'];
-
-            Assert::classExists($factory);
-
-            if (!is_a($factory, TestFrameworkFactory::class, true)
-                && !is_a($factory, TestFrameworkAdapterFactory::class, true)
-            ) {
-                continue;
-            }
-
-            $types[] = $factory::getAdapterName();
-        }
-
-        return $types;
-    }
+    public static function getExecutableName(): string;
 }
