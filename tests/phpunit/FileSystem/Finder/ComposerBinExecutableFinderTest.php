@@ -40,6 +40,7 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use function Safe\chmod;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -93,6 +94,7 @@ final class ComposerBinExecutableFinderTest extends FileSystemTestCase
         );
     }
 
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function test_it_finds_an_executable_candidate_on_other_systems(): void
     {
         $candidate = $this->createCandidate('phpunit');

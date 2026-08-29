@@ -49,6 +49,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\MockObject\Stub;
 use RuntimeException;
@@ -175,7 +176,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->assertSame($path, self::getPath());
     }
 
-    #[RequiresOperatingSystem('Windows')]
+    #[RequiresOperatingSystemFamily('Windows')]
     #[DataProvider('provideWindowsPathExtensions')]
     public function test_it_applies_windows_path_extensions_in_composer_bin_without_modifying_path(
         string $extension,
@@ -210,7 +211,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         yield 'EXE executable' => ['extension' => '.exe'];
     }
 
-    #[RequiresOperatingSystem('Windows')]
+    #[RequiresOperatingSystemFamily('Windows')]
     public function test_it_prioritizes_an_extensionless_composer_proxy_over_a_path_batch_file(): void
     {
         chdir($this->tmp);
