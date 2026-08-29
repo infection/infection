@@ -49,7 +49,10 @@ final class LegacyTestFrameworkAdaptersShouldNotBeUsedTest
     {
         return PHPat::rule()
             ->classes(InfectionSelector::sourceCode())
-            ->excluding(Selector::withFilepath('#/src/TestFramework/PhpUnit/Legacy/#', true))
+            ->excluding(
+                Selector::withFilepath('#/src/TestFramework/LegacyTestFrameworkBridge\.php$#', true),
+                Selector::withFilepath('#/src/TestFramework/PhpUnit/Legacy/#', true),
+            )
             ->shouldNot()
             ->dependOn()
             ->classes(

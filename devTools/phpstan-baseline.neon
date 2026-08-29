@@ -871,12 +871,6 @@ parameters:
 			path: ../src/TestFramework/Factory.php
 
 		-
-			rawMessage: Infection\TestFramework\LegacyTestFrameworkBridge should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/TestFramework/LegacyTestFrameworkBridge.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
