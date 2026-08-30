@@ -36,7 +36,7 @@ PHPBENCH_REPORTS=--report=aggregate --report=bar_chart_iteration
 INFECTION=./dist/infection.phar
 
 DOCKER_RUN=docker compose run --rm
-DOCKER_RUN_82=$(DOCKER_RUN) php82 $(FLOCK) Makefile
+DOCKER_RUN_83=$(DOCKER_RUN) php83 $(FLOCK) Makefile
 DOCKER_FILE_IMAGE=devTools/Dockerfile.json
 
 FLOCK=./devTools/flock
@@ -67,7 +67,7 @@ compile:
 .PHONY: compile-docker
 compile-docker:	 	## Bundles Infection into a PHAR using docker
 compile-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_82) make compile
+	$(DOCKER_RUN_83) make compile
 
 .PHONY: sbx-create
 sbx-create:	## Drops the existing PHP sbx image and create it anew
@@ -130,7 +130,7 @@ cs: $(PHP_CS_FIXER)
 .PHONY: cs-docker
 cs-docker:		## Runs PHP-CS-Fixer in docker
 cs-docker: $(DOCKER_FILE_IMAGE) $(PHP_CS_FIXER)
-	$(DOCKER_RUN_82) $(PHP_CS_FIXER) fix -v --diff
+	$(DOCKER_RUN_83) $(PHP_CS_FIXER) fix -v --diff
 	LC_ALL=C sort -u .gitignore -o .gitignore
 	$(MAKE) check_trailing_whitespaces
 
@@ -287,10 +287,10 @@ test-unit-parallel: $(PARATEST) vendor
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
-test-unit-docker: test-unit-82-docker
+test-unit-docker: test-unit-83-docker
 
-test-unit-82-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT_BIN)
-	$(DOCKER_RUN_82) $(PHPUNIT) --group $(PHPUNIT_GROUP)
+test-unit-83-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT_BIN)
+	$(DOCKER_RUN_83) $(PHPUNIT) --group $(PHPUNIT_GROUP)
 
 .PHONY: test-benchmark
 test-benchmark:	 	## Runs the benchmark tests
@@ -320,12 +320,12 @@ test-e2e-docker: 	## Runs the end-to-end tests on the different Docker platforms
 test-e2e-docker: test-e2e-xdebug-docker
 
 .PHONY: test-e2e-xdebug-docker
-test-e2e-xdebug-docker: test-e2e-xdebug-82-docker
+test-e2e-xdebug-docker: test-e2e-xdebug-83-docker
 
-.PHONY: test-e2e-xdebug-82-docker
-test-e2e-xdebug-82-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_82) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
-	$(DOCKER_RUN_82) ./tests/e2e_tests $(INFECTION)
+.PHONY: test-e2e-xdebug-83-docker
+test-e2e-xdebug-83-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_83) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
+	$(DOCKER_RUN_83) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-infection
 test-infection:		## Runs Infection against itself
@@ -337,11 +337,11 @@ test-infection-docker:	## Runs Infection against itself on the different Docker 
 test-infection-docker: test-infection-xdebug-docker
 
 .PHONY: test-infection-xdebug-docker
-test-infection-xdebug-docker: test-infection-xdebug-82-docker
+test-infection-xdebug-docker: test-infection-xdebug-83-docker
 
-.PHONY: test-infection-xdebug-82-docker
-test-infection-xdebug-82-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_82) ./bin/infection --threads=max
+.PHONY: test-infection-xdebug-83-docker
+test-infection-xdebug-83-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_83) ./bin/infection --threads=max
 
 #
 # Rules from files (non-phony targets)
@@ -395,8 +395,8 @@ phpunit.xml.dist:
 	touch -c $@
 
 $(DOCKER_FILE_IMAGE): devTools/Dockerfile
-	docker compose build php82
-	docker image inspect infection-php82 >> $(DOCKER_FILE_IMAGE)
+	docker compose build php83
+	docker image inspect infection-php83 >> $(DOCKER_FILE_IMAGE)
 	touch -c $@
 
 $(BENCHMARK_MUTATION_GENERATOR_SOURCES): tests/benchmark/MutationGenerator/sources.tar.gz
