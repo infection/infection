@@ -93,6 +93,11 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         return true;
     }
 
+    public function recordInitialRunMemoryUsage(?float $memoryUsage): void
+    {
+        $this->memoryLimiter->recordInitialRunMemoryUsage($memoryUsage);
+    }
+
     /**
      * Returns array of arguments to pass them into the Initial Run Process
      *
@@ -240,7 +245,6 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         return ['--configuration', '--filter', '--testsuite'];
     }
 
-    /** @return list<string> */
     #[Override]
     protected function getMutantPhpExtraArguments(): array
     {

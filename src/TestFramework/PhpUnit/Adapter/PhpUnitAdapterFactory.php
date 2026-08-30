@@ -51,6 +51,7 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\PhpUnit\MemoryLimiter;
+use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use function Safe\file_get_contents;
 use SplFileInfo;
@@ -85,7 +86,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         ?ShellCommandRunner $shellCommandRunner = null,
         ?string $sourceDirectoryBasePath = null,
         bool $useWindowsFilterLimit = false,
-        ?MemoryLimiter $memoryLimiter = null,
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
         Assert::notEmpty(
@@ -94,7 +94,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         );
         Assert::notNull($shellCommandRunner);
         Assert::notNull($sourceDirectoryBasePath);
-        Assert::notNull($memoryLimiter);
 
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
 
@@ -153,7 +152,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
-            $memoryLimiter,
+            new MemoryLimiter(new MemoryLimiterEnvironment()),
         );
     }
 

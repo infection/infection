@@ -46,7 +46,6 @@ use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
-use Infection\TestFramework\PhpUnit\MemoryLimiter;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
 use InvalidArgumentException;
@@ -76,7 +75,6 @@ final readonly class Factory
         private SourceCollector $sourceCollector,
         private array $installedExtensions,
         private ShellCommandRunner $shellCommandRunner,
-        private MemoryLimiter $memoryLimiter,
     ) {
     }
 
@@ -111,7 +109,6 @@ final readonly class Factory
                 $this->shellCommandRunner,
                 sourceDirectoryBasePath: dirname($this->infectionConfig->configurationPathname),
                 useWindowsFilterLimit: OperatingSystem::isWindows(),
-                memoryLimiter: $this->memoryLimiter,
             );
         }
 

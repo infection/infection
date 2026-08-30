@@ -54,7 +54,6 @@ final class MemoryLimiterTest extends TestCase
     public function test_it_provides_twice_the_observed_memory_usage(): void
     {
         $this->environment->expects($this->once())->method('hasMemoryLimitSet')->willReturn(false);
-        $this->environment->expects($this->once())->method('isUsingSystemIni')->willReturn(false);
 
         $limiter = new MemoryLimiter($this->environment);
         $limiter->recordInitialRunMemoryUsage(20.);
@@ -74,18 +73,6 @@ final class MemoryLimiterTest extends TestCase
     public function test_it_does_nothing_when_a_memory_limit_is_already_set(): void
     {
         $this->environment->expects($this->once())->method('hasMemoryLimitSet')->willReturn(true);
-        $this->environment->expects($this->never())->method('isUsingSystemIni');
-
-        $limiter = new MemoryLimiter($this->environment);
-        $limiter->recordInitialRunMemoryUsage(20.);
-
-        $this->assertSame([], $limiter->getPhpExtraArguments());
-    }
-
-    public function test_it_does_nothing_when_using_the_system_ini(): void
-    {
-        $this->environment->expects($this->once())->method('hasMemoryLimitSet')->willReturn(false);
-        $this->environment->expects($this->once())->method('isUsingSystemIni')->willReturn(true);
 
         $limiter = new MemoryLimiter($this->environment);
         $limiter->recordInitialRunMemoryUsage(20.);

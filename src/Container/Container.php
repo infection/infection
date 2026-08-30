@@ -174,9 +174,6 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
-use Infection\TestFramework\PhpUnit\MemoryLimiter;
-use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
@@ -310,7 +307,6 @@ final class Container extends DIContainer
                     $container->getSourceCollector(),
                     GeneratedExtensionsConfig::EXTENSIONS,
                     $container->getShellCommandRunner(),
-                    $container->getMemoryLimiter(),
                 );
             },
             StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
@@ -349,7 +345,6 @@ final class Container extends DIContainer
                 $container->getConfiguration()->msiPrecision,
                 $container->getConfiguration()->timeoutsAsEscaped,
             ),
-            MemoryLimiter::class => static fn (): MemoryLimiter => new MemoryLimiter(new MemoryLimiterEnvironment()),
             SchemaConfigurationLoader::class => static fn (self $container): SchemaConfigurationLoader => new SchemaConfigurationLoader(
                 $container->getRootsFileLocator(),
                 $container->getSchemaConfigurationFileLoader(),
@@ -660,20 +655,15 @@ final class Container extends DIContainer
                 ),
                 new CurrentWorkingDirectoryProvider(),
             ),
-            TestFramework::class => static function (self $container): TestFramework {
-                $adapter = $container->getTestFrameworkAdapter();
-
-                return new LegacyTestFrameworkBridge(
-                    $adapter,
-                    $container->get(ConsoleOutput::class),
-                    $container->getCoverageChecker(),
-                    $container->getInitialTestsRunner(),
-                    $container->getConfiguration(),
-                    $container->getMutantProcessContainerFactory(),
-                    $container->getTestFrameworkExtraOptionsFilter(),
-                    $adapter instanceof PhpUnitAdapter ? $container->getMemoryLimiter() : null,
-                );
-            },
+            TestFramework::class => static fn (self $container): TestFramework => new LegacyTestFrameworkBridge(
+                $container->getTestFrameworkAdapter(),
+                $container->get(ConsoleOutput::class),
+                $container->getCoverageChecker(),
+                $container->getInitialTestsRunner(),
+                $container->getConfiguration(),
+                $container->getMutantProcessContainerFactory(),
+                $container->getTestFrameworkExtraOptionsFilter(),
+            ),
         ]);
 
         return $container->withValues(
@@ -855,11 +845,6 @@ final class Container extends DIContainer
     public function getResultsCollector(): ResultsCollector
     {
         return $this->get(ResultsCollector::class);
-    }
-
-    public function getMemoryLimiter(): MemoryLimiter
-    {
-        return $this->get(MemoryLimiter::class);
     }
 
     public function getMutatorResolver(): MutatorResolver

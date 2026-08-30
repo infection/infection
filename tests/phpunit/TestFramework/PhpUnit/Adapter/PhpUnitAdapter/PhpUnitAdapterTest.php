@@ -289,9 +289,7 @@ final class PhpUnitAdapterTest extends TestCase
         $this->fileSystemMock->expects($this->exactly(2))->method('dumpFile');
         $environment = $this->createMock(MemoryLimiterEnvironment::class);
         $environment->expects($this->once())->method('hasMemoryLimitSet')->willReturn(false);
-        $environment->expects($this->once())->method('isUsingSystemIni')->willReturn(false);
         $memoryLimiter = new MemoryLimiter($environment);
-        $memoryLimiter->recordInitialRunMemoryUsage(12.5);
         $adapter = $this->createAdapter(
             testFrameworkConfigContent: <<<'XML'
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -299,6 +297,7 @@ final class PhpUnitAdapterTest extends TestCase
                 XML,
             memoryLimiter: $memoryLimiter,
         );
+        $adapter->recordInitialRunMemoryUsage(12.5);
 
         $command = $adapter->getMutantCommandLine([], '/mutant.php', 'hash', '/original.php', '');
 

@@ -125,7 +125,9 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         return sprintf('Check the executed command to identify the problem: %s', $commandLine);
     }
 
-    /** @return list<string> */
+    /**
+     * @return list<string>
+     */
     protected function getMutantPhpExtraArguments(): array
     {
         return [];

@@ -38,6 +38,9 @@ namespace Infection\TestFramework\PhpUnit;
 use function sprintf;
 
 /**
+ * Derives PHP arguments limiting PHPUnit mutant processes to twice the memory used by the initial test suite.
+ * It preserves an existing memory limit and avoids changing the system PHP configuration.
+ *
  * @internal
  */
 final class MemoryLimiter
@@ -70,7 +73,6 @@ final class MemoryLimiter
         if (
             $this->memoryUsage === null
             || $this->environment->hasMemoryLimitSet()
-            || $this->environment->isUsingSystemIni()
         ) {
             return [];
         }
