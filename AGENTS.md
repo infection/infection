@@ -147,7 +147,6 @@ make help                 # the definitive list of targets
 make cs                   # PHP-CS-Fixer; ALWAYS this, never hand-format
 make autoreview           # cs-check + PHPStan(+PHPat) + Mago + composer validate
                           #   + AutoReview suite + Rector dry-run + collision detector
-                          #   + zizmor (locally only; CI skips it here)
 make test-unit            # default group, e2e excluded
 make test-unit-parallel   # paratest WrapperRunner
 make test-e2e             # PHPUnit-group e2e + scripted scenarios
