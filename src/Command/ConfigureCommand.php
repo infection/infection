@@ -37,7 +37,6 @@ namespace Infection\Command;
 
 use Composer\InstalledVersions;
 use function count;
-use function file_exists;
 use const GLOB_ONLYDIR;
 use function implode;
 use Infection\Config\ConsoleHelper;
@@ -49,6 +48,7 @@ use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\IO;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\InfectionVersion;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -67,7 +67,6 @@ use function str_starts_with;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -77,6 +76,12 @@ final class ConfigureCommand extends BaseCommand
     public const string NONINTERACTIVE_MODE_ERROR = 'Infection config generator requires an interactive mode.';
 
     private const string OPTION_TEST_FRAMEWORK = 'test-framework';
+
+    public function __construct(
+        private readonly FileSystem $fileSystem = new FileSystem(),
+    ) {
+        parent::__construct();
+    }
 
     protected function configure(): void
     {
@@ -122,7 +127,7 @@ final class ConfigureCommand extends BaseCommand
         /** @var QuestionHelper $questionHelper */
         $questionHelper = $this->getHelper('question');
 
-        if (file_exists('composer.json')) {
+        if ($this->fileSystem->exists('composer.json')) {
             $content = json_decode(file_get_contents('composer.json'));
 
             $sourceDirGuesser = new SourceDirGuesser($content);
@@ -139,13 +144,10 @@ final class ConfigureCommand extends BaseCommand
             $this->abort();
         }
 
-        $container = $this->getApplication()->getContainer();
-        $fileSystem = $container->getFileSystem();
-
         $excludeDirsProvider = new ExcludeDirsProvider(
             $consoleHelper,
             $questionHelper,
-            $fileSystem,
+            $this->fileSystem,
         );
 
         $excludedDirs = $excludeDirsProvider->get($io, $dirsInCurrentDir, $sourceDirs);
@@ -156,6 +158,8 @@ final class ConfigureCommand extends BaseCommand
             $dirsInCurrentDir,
             $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK),
         );
+
+        $container = $this->getApplication()->getContainer();
 
         $phpUnitExecutableFinder = new TestFrameworkFinder(
             $container->getComposerExecutableFinder(),
@@ -168,7 +172,6 @@ final class ConfigureCommand extends BaseCommand
         $textLogFilePath = $textLogFileProvider->get($io, $dirsInCurrentDir);
 
         $this->saveConfig(
-            $fileSystem,
             $sourceDirs,
             $excludedDirs,
             $phpUnitConfigPath,
@@ -191,7 +194,6 @@ final class ConfigureCommand extends BaseCommand
      * @param string[] $excludedDirs
      */
     private function saveConfig(
-        Filesystem $filesystem,
         array $sourceDirs,
         array $excludedDirs,
         ?string $phpUnitConfigPath = null,
@@ -239,7 +241,7 @@ final class ConfigureCommand extends BaseCommand
             '@default' => true,
         ];
 
-        $filesystem->dumpFile(
+        $this->fileSystem->dumpFile(
             SchemaConfigurationLoader::DEFAULT_JSON5_CONFIG_FILE,
             json_encode($configObject, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
         );
@@ -254,7 +256,7 @@ final class ConfigureCommand extends BaseCommand
     {
         $fileName = 'vendor/infection/infection/resources/schema.json';
 
-        if (file_exists($fileName)) {
+        if ($this->fileSystem->exists($fileName)) {
             return $fileName;
         }
 

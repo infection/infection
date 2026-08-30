@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\Config;
 
-use function file_exists;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use function Safe\realpath;
@@ -57,6 +57,7 @@ final readonly class StaticAnalysisConfigLocator implements TestFrameworkConfigL
 
     public function __construct(
         private string $configDir,
+        private FileSystem $fileSystem = new FileSystem(),
     ) {
     }
 
@@ -68,7 +69,7 @@ final readonly class StaticAnalysisConfigLocator implements TestFrameworkConfigL
         foreach (self::DEFAULT_EXTENSIONS as $extension) {
             $conf = sprintf('%s/%s.%s', $dir, $cliTool, $extension);
 
-            if (file_exists($conf)) {
+            if ($this->fileSystem->exists($conf)) {
                 return realpath($conf);
             }
 

@@ -37,10 +37,10 @@ namespace Infection\Config\ValueProvider;
 
 use Closure;
 use Exception;
-use function file_exists;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
 use Infection\Console\IO;
+use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_dir;
@@ -61,6 +61,7 @@ final readonly class TestFrameworkConfigPathProvider
         private TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator,
         private ConsoleHelper $consoleHelper,
         private QuestionHelper $questionHelper,
+        private FileSystem $fileSystem = new FileSystem(),
     ) {
     }
 
@@ -78,7 +79,7 @@ final readonly class TestFrameworkConfigPathProvider
                 return $this->askTestFrameworkConfigLocation($io, $dirsInCurrentDir, $testFramework, '');
             }
 
-            if (!file_exists('composer.json')) {
+            if (!$this->fileSystem->exists('composer.json')) {
                 return $this->askTestFrameworkConfigLocation($io, $dirsInCurrentDir, $testFramework, '');
             }
 

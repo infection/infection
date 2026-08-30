@@ -37,8 +37,8 @@ namespace Infection\FileSystem\Finder;
 
 use function array_key_exists;
 use function dirname;
-use function file_exists;
 use function getenv;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use function ltrim;
@@ -71,6 +71,7 @@ class StaticAnalysisToolExecutableFinder
     public function __construct(
         private readonly ComposerExecutableFinder $executableFinder,
         private readonly ShellCommandRunner $shellCommandRunner,
+        private readonly FileSystem $fileSystem = new FileSystem(),
     ) {
     }
 
@@ -99,7 +100,7 @@ class StaticAnalysisToolExecutableFinder
             return false;
         }
 
-        if (file_exists($customPath)) {
+        if ($this->fileSystem->exists($customPath)) {
             return true;
         }
 
@@ -119,7 +120,7 @@ class StaticAnalysisToolExecutableFinder
         } catch (RuntimeException) {
             $candidate = getcwd() . '/vendor/bin';
 
-            if (file_exists($candidate)) {
+            if ($this->fileSystem->exists($candidate)) {
                 $vendorPath = $candidate;
             }
         }
@@ -193,7 +194,7 @@ class StaticAnalysisToolExecutableFinder
             $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
             $script = realpath(dirname($path) . '/' . $target);
 
-            if (file_exists($script)) {
+            if ($this->fileSystem->exists($script)) {
                 $path = $script;
             }
         }

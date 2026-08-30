@@ -37,9 +37,9 @@ namespace Infection\Config\ValueProvider;
 
 use Closure;
 use const DIRECTORY_SEPARATOR;
-use function file_exists;
 use Infection\Config\ConsoleHelper;
 use Infection\Console\IO;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -59,6 +59,7 @@ final readonly class PhpUnitCustomExecutablePathProvider
         private TestFrameworkFinder $phpUnitExecutableFinder,
         private ConsoleHelper $consoleHelper,
         private QuestionHelper $questionHelper,
+        private FileSystem $fileSystem = new FileSystem(),
     ) {
     }
 
@@ -88,10 +89,10 @@ final readonly class PhpUnitCustomExecutablePathProvider
 
     private function getValidator(): Closure
     {
-        return static function ($answerPath): string {
+        return function ($answerPath): string {
             $answerPath = $answerPath !== '' ? trim($answerPath) : $answerPath;
 
-            if ($answerPath === '' || !file_exists($answerPath)) {
+            if ($answerPath === '' || !$this->fileSystem->exists($answerPath)) {
                 throw new RuntimeException(sprintf('Custom path "%s" is incorrect.', $answerPath));
             }
 

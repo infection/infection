@@ -627,7 +627,7 @@ count = 1
 [[issues]]
 file = "src/Config/ValueProvider/PhpUnitCustomExecutablePathProvider.php"
 code = "unhandled-thrown-type"
-message = "Potentially unhandled exception `RuntimeException` in `{closure:src/Config/ValueProvider/PhpUnitCustomExecutablePathProvider.php:91:16}`."
+message = "Potentially unhandled exception `RuntimeException` in `{closure:src/Config/ValueProvider/PhpUnitCustomExecutablePathProvider.php:92:16}`."
 count = 1
 
 [[issues]]
@@ -687,7 +687,7 @@ count = 1
 [[issues]]
 file = "src/Config/ValueProvider/TestFrameworkConfigPathProvider.php"
 code = "unhandled-thrown-type"
-message = "Potentially unhandled exception `RuntimeException` in `{closure:src/Config/ValueProvider/TestFrameworkConfigPathProvider.php:106:16}`."
+message = "Potentially unhandled exception `RuntimeException` in `{closure:src/Config/ValueProvider/TestFrameworkConfigPathProvider.php:107:16}`."
 count = 1
 
 [[issues]]
