@@ -163,7 +163,7 @@ final class EngineTest extends TestCase
         $this->createEngine()->execute();
     }
 
-    public function test_static_analysis_is_executed_before_mutation_generation(): void
+    public function test_it_executes_static_analysis_before_mutation_generation(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
             ->withSkipInitialTests(false)
@@ -225,7 +225,7 @@ final class EngineTest extends TestCase
         $this->assertSame(['staticAnalysis', 'generate'], $callOrder);
     }
 
-    public function test_mutation_testing_runs_when_initial_tests_are_skipped(): void
+    public function test_it_runs_mutation_testing_when_initial_tests_are_skipped(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
             ->withSkipInitialTests(true)
