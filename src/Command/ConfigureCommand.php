@@ -57,7 +57,6 @@ use const JSON_PRETTY_PRINT;
 use const JSON_UNESCAPED_SLASHES;
 use OutOfBoundsException;
 use RuntimeException;
-use function Safe\file_get_contents;
 use function Safe\glob;
 use function Safe\json_decode;
 use function Safe\json_encode;
@@ -67,6 +66,7 @@ use function str_starts_with;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
  * @internal
@@ -100,6 +100,9 @@ final class ConfigureCommand extends BaseCommand
             );
     }
 
+    /**
+     * @throws IOException
+     */
     protected function executeCommand(IO $io): bool
     {
         if (!$io->isInteractive()) {
@@ -128,7 +131,7 @@ final class ConfigureCommand extends BaseCommand
         $questionHelper = $this->getHelper('question');
 
         if ($this->fileSystem->exists('composer.json')) {
-            $content = json_decode(file_get_contents('composer.json'));
+            $content = json_decode($this->fileSystem->readFile('composer.json'));
 
             $sourceDirGuesser = new SourceDirGuesser($content);
         } else {

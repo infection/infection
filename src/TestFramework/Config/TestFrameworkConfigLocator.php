@@ -37,8 +37,8 @@ namespace Infection\TestFramework\Config;
 
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
 use function sprintf;
+use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
  * @internal
@@ -61,6 +61,9 @@ final readonly class TestFrameworkConfigLocator implements TestFrameworkConfigLo
     ) {
     }
 
+    /**
+     * @throws IOException
+     */
     public function locate(string $cliTool, ?string $customDir = null): string
     {
         $dir = $customDir ?: $this->configDir;
@@ -70,7 +73,7 @@ final readonly class TestFrameworkConfigLocator implements TestFrameworkConfigLo
             $conf = sprintf('%s/%s.%s', $dir, $cliTool, $extension);
 
             if ($this->fileSystem->exists($conf)) {
-                return realpath($conf);
+                return $this->fileSystem->realPath($conf);
             }
 
             $triedFiles[] = sprintf('%s.%s', $cliTool, $extension);

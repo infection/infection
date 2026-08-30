@@ -43,13 +43,12 @@ use Infection\Console\IO;
 use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\TestFrameworkTypes;
-use function is_dir;
 use RuntimeException;
-use function Safe\file_get_contents;
 use function Safe\json_decode;
 use function sprintf;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Filesystem\Exception\IOException;
 use function trim;
 
 /**
@@ -67,6 +66,8 @@ final readonly class TestFrameworkConfigPathProvider
 
     /**
      * @param string[] $dirsInCurrentDir
+     *
+     * @throws IOException
      */
     public function get(IO $io, array $dirsInCurrentDir, string $testFramework): ?string
     {
@@ -83,7 +84,7 @@ final readonly class TestFrameworkConfigPathProvider
                 return $this->askTestFrameworkConfigLocation($io, $dirsInCurrentDir, $testFramework, '');
             }
 
-            $composerJsonText = file_get_contents('composer.json');
+            $composerJsonText = $this->fileSystem->readFile('composer.json');
 
             $phpUnitPathGuesser = new PhpUnitPathGuesser(json_decode($composerJsonText));
             $defaultValue = $phpUnitPathGuesser->guess();
@@ -111,7 +112,7 @@ final readonly class TestFrameworkConfigPathProvider
                 return $answerDir;
             }
 
-            if (!is_dir($answerDir)) {
+            if (!$this->fileSystem->isReadableDirectory($answerDir)) {
                 throw new RuntimeException(sprintf('Could not find "%s" directory.', $answerDir));
             }
 
