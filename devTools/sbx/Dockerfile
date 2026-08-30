@@ -26,7 +26,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         php${PHP_VERSION}-mbstring \
         php${PHP_VERSION}-xml \
         php${PHP_VERSION}-zip \
-        # Coverage driver
+        # Coverage drivers
+        php${PHP_VERSION}-pcov \
         php${PHP_VERSION}-xdebug \
         # Build tools required by PIE to install PHP extensions that compile locally
         autoconf \
@@ -53,8 +54,7 @@ COPY --from=composer/composer:2-bin /composer /usr/local/bin/composer
 RUN set -o errexit -o nounset -o pipefail \
     && curl -fL --output /tmp/pie.phar https://github.com/php/pie/releases/latest/download/pie.phar \
     && mv /tmp/pie.phar /usr/local/bin/pie \
-    && chmod +x /usr/local/bin/pie \
-    && pie install pecl/pcov --no-interaction
+    && chmod +x /usr/local/bin/pie
 
 ARG CONTAINER_STRUCTURE_TEST_VERSION=1.22.1
 ARG TARGET_ARCH
