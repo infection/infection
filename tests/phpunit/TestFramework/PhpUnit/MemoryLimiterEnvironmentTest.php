@@ -52,6 +52,7 @@ final class MemoryLimiterEnvironmentTest extends TestCase
     protected function setUp(): void
     {
         $this->originalMemoryLimit = ini_get('memory_limit');
+
         $this->environment = new MemoryLimiterEnvironment();
     }
 
@@ -70,12 +71,24 @@ final class MemoryLimiterEnvironmentTest extends TestCase
 
     public static function memoryLimitProvider(): iterable
     {
-        yield 'no limit' => ['-1', false];
+        yield 'no limit' => [
+            '-1',
+            false,
+        ];
 
-        yield 'limit' => ['512M', true];
+        yield 'limit' => [
+            '512M',
+            true,
+        ];
 
-        yield 'invalid limit' => ['-512M', true];
+        yield 'invalid limit' => [
+            '-512M',
+            true,
+        ];
 
-        yield 'limit without unit' => ['1073741824', true];
+        yield 'limit without unit' => [
+            '1073741824',   // 1G
+            true,
+        ];
     }
 }

@@ -53,7 +53,10 @@ final class MemoryLimiterTest extends TestCase
 
     public function test_it_provides_twice_the_observed_memory_usage(): void
     {
-        $this->environment->expects($this->once())->method('hasMemoryLimitSet')->willReturn(false);
+        $this->environment
+            ->expects($this->once())
+            ->method('hasMemoryLimitSet')
+            ->willReturn(false);
 
         $limiter = new MemoryLimiter($this->environment);
         $limiter->recordInitialRunMemoryUsage(20.);
@@ -63,7 +66,9 @@ final class MemoryLimiterTest extends TestCase
 
     public function test_it_does_nothing_without_observed_memory_usage(): void
     {
-        $this->environment->expects($this->never())->method($this->anything());
+        $this->environment
+            ->expects($this->never())
+            ->method($this->anything());
 
         $limiter = new MemoryLimiter($this->environment);
 
@@ -72,7 +77,10 @@ final class MemoryLimiterTest extends TestCase
 
     public function test_it_does_nothing_when_a_memory_limit_is_already_set(): void
     {
-        $this->environment->expects($this->once())->method('hasMemoryLimitSet')->willReturn(true);
+        $this->environment
+            ->expects($this->once())
+            ->method('hasMemoryLimitSet')
+            ->willReturn(true);
 
         $limiter = new MemoryLimiter($this->environment);
         $limiter->recordInitialRunMemoryUsage(20.);
