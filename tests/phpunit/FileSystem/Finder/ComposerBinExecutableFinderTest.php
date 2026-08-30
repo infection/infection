@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
+use function getenv;
 use Infection\FileSystem\Finder\ComposerBinExecutableFinder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -48,22 +49,45 @@ use Symfony\Component\Filesystem\Filesystem;
 #[CoversClass(ComposerBinExecutableFinder::class)]
 final class ComposerBinExecutableFinderTest extends FileSystemTestCase
 {
+    private ComposerBinExecutableFinder $finder;
+
     private Filesystem $fileSystem;
 
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->finder = new ComposerBinExecutableFinder();
         $this->fileSystem = new Filesystem();
     }
 
-    public function test_it_finds_a_windows_path_extension_candidate(): void
+    #[DataProvider('provideWindowsPathExtensionCandidate')]
+    public function test_it_finds_a_windows_path_extension_candidate(string $name): void
     {
-        $candidate = $this->createCandidate('phpunit.cmd');
+        $candidate = $this->createCandidate($name);
+        $path = getenv('PATH');
 
         $this->assertSame(
             $candidate,
-            ComposerBinExecutableFinder::find(['phpunit'], $this->tmp, 'Windows', '.cmd;.exe'),
+            $this->finder->find(['phpunit'], $this->tmp, 'Windows', '.cmd;.exe'),
+        );
+        $this->assertSame($path, getenv('PATH'));
+    }
+
+    public static function provideWindowsPathExtensionCandidate(): iterable
+    {
+        yield 'CMD executable' => ['name' => 'phpunit.cmd'];
+
+        yield 'EXE executable after CMD' => ['name' => 'phpunit.exe'];
+    }
+
+    public function test_it_prioritizes_an_extensionless_windows_candidate(): void
+    {
+        $candidate = $this->createCandidate('phpunit', 0644);
+
+        $this->assertSame(
+            $candidate,
+            $this->finder->find(['phpunit'], $this->tmp, 'Windows', '.cmd'),
         );
     }
 
@@ -74,7 +98,7 @@ final class ComposerBinExecutableFinderTest extends FileSystemTestCase
 
         $this->assertSame(
             $candidate,
-            ComposerBinExecutableFinder::find(['phpunit'], $this->tmp, 'Windows', $pathExtension),
+            $this->finder->find(['phpunit'], $this->tmp, 'Windows', $pathExtension),
         );
     }
 
@@ -90,7 +114,7 @@ final class ComposerBinExecutableFinderTest extends FileSystemTestCase
         $this->createCandidate('phpunit.cmd');
 
         $this->assertNull(
-            ComposerBinExecutableFinder::find(['phpunit'], $this->tmp, 'Darwin', '.cmd'),
+            $this->finder->find(['phpunit'], $this->tmp, 'Darwin', '.cmd'),
         );
     }
 
@@ -101,7 +125,7 @@ final class ComposerBinExecutableFinderTest extends FileSystemTestCase
 
         $this->assertSame(
             $candidate,
-            ComposerBinExecutableFinder::find(['phpunit'], $this->tmp, 'Linux', false),
+            $this->finder->find(['phpunit'], $this->tmp, 'Linux', false),
         );
     }
 

@@ -36,17 +36,15 @@ declare(strict_types=1);
 namespace Infection\FileSystem\Finder;
 
 use function explode;
-use Infection\CannotBeInstantiated;
 use function is_executable;
 use function is_file;
 
 /**
  * @internal
+ * @final
  */
-final class ComposerBinExecutableFinder
+class ComposerBinExecutableFinder
 {
-    use CannotBeInstantiated;
-
     private const string WINDOWS = 'Windows';
 
     private const string WINDOWS_PATH_SEPARATOR = ';';
@@ -56,21 +54,24 @@ final class ComposerBinExecutableFinder
     /**
      * @param list<string> $candidates
      */
-    public static function find(
+    public function find(
         array $candidates,
         string $composerBinDir,
         string $operatingSystemFamily,
         string|false $pathExtension,
     ): ?string {
-        $windowsSuffixes = $pathExtension === false || $pathExtension === ''
-            ? self::DEFAULT_WINDOWS_EXECUTABLE_SUFFIXES
-            : explode(self::WINDOWS_PATH_SEPARATOR, $pathExtension);
-        $suffixes = $operatingSystemFamily === self::WINDOWS ? $windowsSuffixes : [];
+        $suffixes = [''];
 
-        // The caller searches PATH only after this directory. Checking every local candidate
-        // here prevents a PATH .bat from outranking an extensionless Composer proxy.
+        if ($operatingSystemFamily === self::WINDOWS) {
+            $windowsSuffixes = $pathExtension === false || $pathExtension === ''
+                ? self::DEFAULT_WINDOWS_EXECUTABLE_SUFFIXES
+                : explode(self::WINDOWS_PATH_SEPARATOR, $pathExtension);
+
+            $suffixes = ['', ...$windowsSuffixes];
+        }
+
         foreach ($candidates as $name) {
-            foreach (['', ...$suffixes] as $suffix) {
+            foreach ($suffixes as $suffix) {
                 $composerCandidate = $composerBinDir . '/' . $name . $suffix;
 
                 if (

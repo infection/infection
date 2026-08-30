@@ -37,8 +37,8 @@ namespace Infection\FileSystem\Finder;
 
 use function array_key_exists;
 use function dirname;
-use function file_exists;
 use function getenv as getenv_unsafe;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -70,6 +70,8 @@ class TestFrameworkFinder
     public function __construct(
         private readonly ComposerExecutableFinder $executableFinder,
         private readonly ShellCommandRunner $shellCommandRunner,
+        private readonly ComposerBinExecutableFinder $composerBinExecutableFinder,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
@@ -100,7 +102,7 @@ class TestFrameworkFinder
             return false;
         }
 
-        if (file_exists($customPath)) {
+        if ($this->fileSystem->exists($customPath)) {
             return true;
         }
 
@@ -147,7 +149,7 @@ class TestFrameworkFinder
         $extraDirs = [$cwd, $cwd . '/bin'];
 
         if ($composerBinDir !== null) {
-            $composerExecutable = ComposerBinExecutableFinder::find(
+            $composerExecutable = $this->composerBinExecutableFinder->find(
                 $candidates,
                 $composerBinDir,
                 PHP_OS_FAMILY,
@@ -171,7 +173,7 @@ class TestFrameworkFinder
             foreach ($candidates as $name) {
                 $composerCandidate = $composerBinDir . '/' . $name;
 
-                if (file_exists($composerCandidate)) {
+                if ($this->fileSystem->exists($composerCandidate)) {
                     return $composerCandidate;
                 }
             }
@@ -202,7 +204,7 @@ class TestFrameworkFinder
             $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
             $script = realpath(dirname($path) . '/' . $target);
 
-            if (file_exists($script)) {
+            if ($this->fileSystem->exists($script)) {
                 $path = $script;
             }
         }
@@ -228,7 +230,7 @@ class TestFrameworkFinder
 
         $candidate = getcwd() . '/vendor/bin';
 
-        if (file_exists($candidate)) {
+        if ($this->fileSystem->exists($candidate)) {
             return $candidate;
         }
 
