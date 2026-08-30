@@ -26,7 +26,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         php${PHP_VERSION}-mbstring \
         php${PHP_VERSION}-xml \
         php${PHP_VERSION}-zip \
-        # Coverage driver
+        # Coverage drivers
+        php${PHP_VERSION}-pcov \
         php${PHP_VERSION}-xdebug \
         # Build tools required by PIE to install PHP extensions that compile locally
         autoconf \
