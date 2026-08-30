@@ -109,8 +109,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 '-vv',
                 '--memory-limit=-1',
             ])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
-        ;
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan']);
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->once())
@@ -208,8 +207,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 '--memory-limit=-1',
                 '--level=max',
             ])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
-        ;
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan']);
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->once())
@@ -304,8 +302,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 '--no-progress',
                 '-vv',
             ])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
-        ;
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan']);
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->once())

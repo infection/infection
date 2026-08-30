@@ -162,8 +162,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
             ->expects($this->once())
             ->method('mustRun')
             ->with(['/usr/bin/composer', 'config', 'bin-dir'])
-            ->willThrowException(new RuntimeException())
-        ;
+            ->willThrowException(new RuntimeException());
 
         $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $shellCommandRunner);
 

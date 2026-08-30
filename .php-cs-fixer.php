@@ -74,8 +74,7 @@ $finder = Finder::create()
         __DIR__ . '/bin/infection',
         __DIR__ . '/bin/infection-debug',
         __FILE__,
-    ])
-;
+    ]);
 
 return (new Config())
     ->setParallelConfig(ParallelConfigFactory::detect())
@@ -136,6 +135,9 @@ return (new Config())
         ],
         'logical_operators' => true,
         'modernize_strpos' => true,
+        'multiline_whitespace_before_semicolons' => [
+            'strategy' => 'no_multi_line',
+        ],
         'native_constant_invocation' => true,
         'native_function_invocation' => [
             'include' => ['@internal'],
@@ -195,5 +197,4 @@ return (new Config())
         'blank_line_after_opening_tag' => false,
     ])
     ->setFinder($finder)
-    ->setCacheFile(__DIR__ . '/var/cache/php-cs-fixer')
-;
+    ->setCacheFile(__DIR__ . '/var/cache/php-cs-fixer');

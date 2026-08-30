@@ -96,8 +96,7 @@ final class StrykerReporterTest extends TestCase
 
         $this->strykerDashboardClient
             ->expects($this->never())
-            ->method('sendReport')
-        ;
+            ->method('sendReport');
 
         $this->reporter->report();
 
@@ -122,8 +121,7 @@ final class StrykerReporterTest extends TestCase
 
         $this->strykerDashboardClient
             ->expects($this->never())
-            ->method('sendReport')
-        ;
+            ->method('sendReport');
 
         $this->reporter->report();
 
@@ -177,8 +175,7 @@ final class StrykerReporterTest extends TestCase
 
         $this->strykerDashboardClient
             ->expects($this->never())
-            ->method('sendReport')
-        ;
+            ->method('sendReport');
 
         $this->reporter->report();
 
@@ -205,8 +202,7 @@ final class StrykerReporterTest extends TestCase
 
         $this->strykerDashboardClient
             ->expects($this->never())
-            ->method('sendReport')
-        ;
+            ->method('sendReport');
 
         $this->reporter->report();
 
@@ -233,8 +229,7 @@ final class StrykerReporterTest extends TestCase
 
         $this->strykerDashboardClient
             ->expects($this->never())
-            ->method('sendReport')
-        ;
+            ->method('sendReport');
 
         $strykerLogger = new StrykerReporter(
             new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
@@ -274,8 +269,7 @@ final class StrykerReporterTest extends TestCase
 
         $this->strykerDashboardClient
             ->expects($this->never())
-            ->method('sendReport')
-        ;
+            ->method('sendReport');
 
         $this->reporter->report();
 
@@ -305,13 +299,11 @@ final class StrykerReporterTest extends TestCase
         $this->strykerDashboardClient
             ->expects($this->once())
             ->method('sendReport')
-            ->with('github.com/a/b', 'master', 'abc', '{"mutationScore":33.3}')
-        ;
+            ->with('github.com/a/b', 'master', 'abc', '{"mutationScore":33.3}');
 
         $this->metricsCalculatorMock
             ->method('getMutationScoreIndicator')
-            ->willReturn(33.3)
-        ;
+            ->willReturn(33.3);
 
         $this->reporter->report();
 
@@ -341,13 +333,11 @@ final class StrykerReporterTest extends TestCase
         $this->strykerDashboardClient
             ->expects($this->once())
             ->method('sendReport')
-            ->with('github.com/a/b', '7.x', 'abc', '{"mutationScore":33.3}')
-        ;
+            ->with('github.com/a/b', '7.x', 'abc', '{"mutationScore":33.3}');
 
         $this->metricsCalculatorMock
             ->method('getMutationScoreIndicator')
-            ->willReturn(33.3)
-        ;
+            ->willReturn(33.3);
 
         $strykerLogger = new StrykerReporter(
             new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
@@ -387,13 +377,11 @@ final class StrykerReporterTest extends TestCase
         $this->strykerDashboardClient
             ->expects($this->once())
             ->method('sendReport')
-            ->with('github.com/a/b', 'master', 'abc', '{"mutationScore":33.3}')
-        ;
+            ->with('github.com/a/b', 'master', 'abc', '{"mutationScore":33.3}');
 
         $this->metricsCalculatorMock
             ->method('getMutationScoreIndicator')
-            ->willReturn(33.3)
-        ;
+            ->willReturn(33.3);
 
         $this->reporter->report();
 
@@ -433,13 +421,11 @@ final class StrykerReporterTest extends TestCase
         $this->strykerDashboardClient
             ->expects($this->once())
             ->method('sendReport')
-            ->with('github.com/a/b', 'master', 'abc', '{"schemaVersion":"1","thresholds":{"high":90,"low":50},"files":{},"testFiles":{},"framework":{"name":"Infection","branding":{"homepageUrl":"https:\/\/infection.github.io\/","imageUrl":"https:\/\/infection.github.io\/images\/logo.png"}}}')
-        ;
+            ->with('github.com/a/b', 'master', 'abc', '{"schemaVersion":"1","thresholds":{"high":90,"low":50},"files":{},"testFiles":{},"framework":{"name":"Infection","branding":{"homepageUrl":"https:\/\/infection.github.io\/","imageUrl":"https:\/\/infection.github.io\/images\/logo.png"}}}');
 
         $this->metricsCalculatorMock
             ->method('getMutationScoreIndicator')
-            ->willReturn(33.3)
-        ;
+            ->willReturn(33.3);
 
         $this->reporter->report();
 

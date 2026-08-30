@@ -108,8 +108,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
                 '--substitute',
                 "$originalFilePath=$mutantFilePath",
             ])
-            ->willReturn(['/path/to/mago'])
-        ;
+            ->willReturn(['/path/to/mago']);
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->never())
@@ -193,8 +192,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
                 '--no-stubs',
                 '--baseline /path/to/baseline.toml',
             ])
-            ->willReturn(['/path/to/mago'])
-        ;
+            ->willReturn(['/path/to/mago']);
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->never())
@@ -278,8 +276,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
                 '--substitute',
                 "$originalFilePath=$mutantFilePath",
             ])
-            ->willReturn(['/path/to/mago'])
-        ;
+            ->willReturn(['/path/to/mago']);
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->never())

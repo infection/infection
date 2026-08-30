@@ -89,15 +89,13 @@ final class MutantFactoryTest extends TestCase
             ->expects($this->once())
             ->method('createCode')
             ->with($mutation)
-            ->willReturn('mutated code')
-        ;
+            ->willReturn('mutated code');
 
         $this->differMock
             ->expects($this->once())
             ->method('diff')
             ->with('original code', 'mutated code')
-            ->willReturn('code diff')
-        ;
+            ->willReturn('code diff');
 
         $expected = new Mutant(
             $expectedMutantFilePath,

@@ -98,8 +98,7 @@ final class ProfileListProvider
             ->files()
             ->name('*.php')
             ->in(__DIR__ . '/../../../src/Mutator')
-            ->exclude('Util')
-        ;
+            ->exclude('Util');
 
         $mutators = [];
 

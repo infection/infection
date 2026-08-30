@@ -53,8 +53,7 @@ final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends Tes
         $this->fileSystemMock = $this->createMock(Filesystem::class);
         $this->fileSystemMock
             ->expects($this->never())
-            ->method($this->anything())
-        ;
+            ->method($this->anything());
     }
 
     public function test_it_creates_a_cleanup_subscriber_if_debug_is_disabled(): void

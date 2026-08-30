@@ -129,14 +129,12 @@ final class MutationGeneratorTest extends TestCase
                     [],
                 )],
                 [new MutationGenerationWasFinished()],
-            ))
-        ;
+            ));
 
         $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
         $fileMutationGeneratorMock
             ->expects($this->exactly(2))
-            ->method('generate')->willReturn([])
-        ;
+            ->method('generate')->willReturn([]);
 
         $sourceCollector = new FixedSourceCollector(
             [

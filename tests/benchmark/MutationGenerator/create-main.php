@@ -62,8 +62,7 @@ if (!function_exists('Infection\Benchmark\MutationGenerator\collectSources')) {
         return Finder::create()
             ->files()
             ->in(__DIR__ . '/sources')
-            ->name('*.php')
-        ;
+            ->name('*.php');
     }
 }
 

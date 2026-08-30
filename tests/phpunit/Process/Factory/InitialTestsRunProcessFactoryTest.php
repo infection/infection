@@ -64,8 +64,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
         $this->testFrameworkAdapterMock
             ->method('getInitialTestRunCommandLine')
             ->with($testFrameworkExtraOptions, $phpExtraOptions, true)
-            ->willReturn(['/usr/bin/php'])
-        ;
+            ->willReturn(['/usr/bin/php']);
 
         $process = $this->factory->createProcess(
             $testFrameworkExtraOptions,
@@ -93,8 +92,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
         $this->testFrameworkAdapterMock
             ->method('getInitialTestRunCommandLine')
             ->with($testFrameworkExtraOptions, $phpExtraOptions, false)
-            ->willReturn(['/usr/bin/php'])
-        ;
+            ->willReturn(['/usr/bin/php']);
 
         $process = $this->factory->createProcess(
             $testFrameworkExtraOptions,

@@ -64,21 +64,18 @@ final class PhpUnitXmlCoverageTraceProviderTest extends FileSystemTestCase
         $indexXmlParserMock
             ->method('parse')
             ->with($indexPath, $this->tmp)
-            ->willReturn([$sourceFileInfoProviderMock])
-        ;
+            ->willReturn([$sourceFileInfoProviderMock]);
 
         $traceMock = $this->createMock(Trace::class);
         $traceMock
             ->expects($this->never())
-            ->method($this->anything())
-        ;
+            ->method($this->anything());
 
         $coverageXmlParserMock = $this->createMock(XmlCoverageParser::class);
         $coverageXmlParserMock
             ->method('parse')
             ->with($sourceFileInfoProviderMock)
-            ->willReturn($traceMock)
-        ;
+            ->willReturn($traceMock);
 
         $provider = new PhpUnitXmlCoverageTraceProvider(
             new FixedLocator($indexPath),

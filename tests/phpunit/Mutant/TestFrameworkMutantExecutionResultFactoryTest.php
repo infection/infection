@@ -76,21 +76,17 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-            )
-        ;
+            );
         $processMock
             ->method('isTerminated')
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
         $processMock
             ->method('getOutput')
-            ->willReturn($processOutput = 'Passed!')
-        ;
+            ->willReturn($processOutput = 'Passed!');
 
         $this->testFrameworkAdapterMock
             ->expects($this->never())
-            ->method($this->anything())
-        ;
+            ->method($this->anything());
 
         $mutantProcess = new MutantProcess(
             $processMock,
@@ -150,21 +146,17 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-            )
-        ;
+            );
         $processMock
             ->method('isTerminated')
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
         $processMock
             ->method('getOutput')
-            ->willReturn($processOutput = '')
-        ;
+            ->willReturn($processOutput = '');
 
         $this->testFrameworkAdapterMock
             ->expects($this->never())
-            ->method($this->anything())
-        ;
+            ->method($this->anything());
 
         $mutantProcess = new MutantProcess(
             $processMock,
@@ -231,26 +223,21 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-            )
-        ;
+            );
         $processMock
             ->method('isTerminated')
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
         $processMock
             ->method('getOutput')
-            ->willReturn($processOutput = 'Fatal Error')
-        ;
+            ->willReturn($processOutput = 'Fatal Error');
         $processMock
             ->expects($this->once())
             ->method('getExitCode')
-            ->willReturn(152)
-        ;
+            ->willReturn(152);
 
         $this->testFrameworkAdapterMock
             ->expects($this->never())
-            ->method($this->anything())
-        ;
+            ->method($this->anything());
 
         $mutantProcess = new MutantProcess(
             $processMock,
@@ -316,28 +303,23 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-            )
-        ;
+            );
         $processMock
             ->method('isTerminated')
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
         $processMock
             ->method('getOutput')
-            ->willReturn(DryRunProcess::PASSING_TEST_OUTPUT)
-        ;
+            ->willReturn(DryRunProcess::PASSING_TEST_OUTPUT);
         $processMock
             ->expects($this->exactly(2))
             ->method('getExitCode')
-            ->willReturn(0)
-        ;
+            ->willReturn(0);
 
         $this->testFrameworkAdapterMock
             ->expects($this->once())
             ->method('testsPass')
             ->with(DryRunProcess::PASSING_TEST_OUTPUT)
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $mutantProcess = new MutantProcess(
             $processMock,
@@ -403,28 +385,23 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-            )
-        ;
+            );
         $processMock
             ->method('isTerminated')
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
         $processMock
             ->method('getOutput')
-            ->willReturn('Tests failed!')
-        ;
+            ->willReturn('Tests failed!');
         $processMock
             ->expects($this->exactly(2))
             ->method('getExitCode')
-            ->willReturn(0)
-        ;
+            ->willReturn(0);
 
         $this->testFrameworkAdapterMock
             ->expects($this->once())
             ->method('testsPass')
             ->with('Tests failed!')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $mutantProcess = new MutantProcess(
             $processMock,
@@ -499,28 +476,23 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-            )
-        ;
+            );
         $processMock
             ->method('isTerminated')
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
         $processMock
             ->method('getOutput')
-            ->willReturn('Tests passed! OK (10 tests, 32 assertions)')
-        ;
+            ->willReturn('Tests passed! OK (10 tests, 32 assertions)');
         $processMock
             ->expects($this->exactly(2))
             ->method('getExitCode')
-            ->willReturn(1) // PHPUnit says tests passed, but return code is non-zero
-        ;
+            ->willReturn(1); // PHPUnit says tests passed, but return code is non-zero
 
         $this->testFrameworkAdapterMock
             ->expects($this->never())
             ->method('testsPass')
             ->with('Tests passed! OK (10 tests, 32 assertions)')
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $mutantProcess = new MutantProcess(
             $processMock,

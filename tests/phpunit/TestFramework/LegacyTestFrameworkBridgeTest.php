@@ -131,15 +131,13 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             ->expects($this->once())
             ->method('run')
             ->with('', [''], false)
-            ->willReturn($process)
-        ;
+            ->willReturn($process);
 
         $coverageChecker = $this->createMock(CoverageChecker::class);
         $coverageChecker
             ->expects($this->once())
             ->method('checkCoverageHasBeenGenerated')
-            ->with('/tmp/phpunit', 'output')
-        ;
+            ->with('/tmp/phpunit', 'output');
 
         $testFramework = $this->createTestFramework(
             adapter: new FakeAwareAdapter(42.0),
@@ -166,8 +164,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             ->expects($this->once())
             ->method('run')
             ->with('--verbose', ['-d', 'memory_limit=1G'], true)
-            ->willReturn($process)
-        ;
+            ->willReturn($process);
 
         $testFramework = $this->createTestFramework(
             initialTestsRunner: $initialTestsRunner,
@@ -185,14 +182,12 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->willReturn($this->createFailedInitialRunProcess())
-        ;
+            ->willReturn($this->createFailedInitialRunProcess());
 
         $coverageChecker = $this->createMock(CoverageChecker::class);
         $coverageChecker
             ->expects($this->never())
-            ->method('checkCoverageHasBeenGenerated')
-        ;
+            ->method('checkCoverageHasBeenGenerated');
 
         $testFramework = $this->createTestFramework(
             adapter: new DummyTestFrameworkAdapter(),
@@ -210,8 +205,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $initialTestsRunner
             ->method('run')
-            ->willReturn($this->createSuccessfulInitialRunProcess('output'))
-        ;
+            ->willReturn($this->createSuccessfulInitialRunProcess('output'));
 
         $testFramework = $this->createTestFramework(
             adapter: new DummyTestFrameworkAdapter(),
@@ -233,8 +227,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $initialTestsRunner
             ->method('run')
-            ->willReturn($this->createSuccessfulInitialRunProcess('output'))
-        ;
+            ->willReturn($this->createSuccessfulInitialRunProcess('output'));
 
         $testFramework = $this->createTestFramework(
             adapter: new FakeAwareAdapter(-1.0),
@@ -287,8 +280,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             ->expects($this->once())
             ->method('filterForMutantProcess')
             ->with('--configuration phpunit.xml --filter FooTest', ['--configuration'])
-            ->willReturn('--filter FooTest')
-        ;
+            ->willReturn('--filter FooTest');
 
         $testFramework = $this->createTestFramework(
             adapter: $this->createInitialRunOnlyOptionsAdapter(),

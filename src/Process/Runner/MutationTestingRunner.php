@@ -94,13 +94,11 @@ class MutationTestingRunner
             ->filter($this->uncoveredByTest(...))
             ->filter($this->takingTooLong(...))
             ->tap($this->materializeMutant(...))
-            ->cast($this->testFramework->test(...))
-        ;
+            ->cast($this->testFramework->test(...));
 
         take($this->processRunner->run($processContainers))
             ->cast(self::containerToFinishedEvent(...))
-            ->each($this->eventDispatcher->dispatch(...))
-        ;
+            ->each($this->eventDispatcher->dispatch(...));
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
     }

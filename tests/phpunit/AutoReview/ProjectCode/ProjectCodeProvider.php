@@ -91,8 +91,7 @@ final class ProjectCodeProvider
             ->notName('DummySymfony6FileSystem.php')
             ->notName('__Name__.php')
             ->notName('__Name__Test.php')
-            ->in(__DIR__ . '/../../../../src')
-        ;
+            ->in(__DIR__ . '/../../../../src');
 
         self::$sourceClasses = take($finder)
             ->cast(self::castSplFileInfoToFQCN(...))

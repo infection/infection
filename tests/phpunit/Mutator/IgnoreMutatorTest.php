@@ -88,8 +88,7 @@ final class IgnoreMutatorTest extends TestCase
             ->expects($this->once())
             ->method('canMutate')
             ->with($this->nodeMock)
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $mutate = $ignoreMutator->canMutate($this->nodeMock);
 
@@ -104,15 +103,13 @@ final class IgnoreMutatorTest extends TestCase
             ->expects($this->once())
             ->method('canMutate')
             ->with($this->nodeMock)
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $this->nodeMock
             ->expects($this->once())
             ->method('getAttribute')
             ->with(ReflectionVisitor::REFLECTION_CLASS_KEY)
-            ->willReturn(null)
-        ;
+            ->willReturn(null);
 
         $mutate = $ignoreMutator->canMutate($this->nodeMock);
 
@@ -125,8 +122,7 @@ final class IgnoreMutatorTest extends TestCase
             ->expects($this->once())
             ->method('canMutate')
             ->with($this->nodeMock)
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $this->nodeMock
             ->expects($this->exactly(2))
@@ -140,14 +136,12 @@ final class IgnoreMutatorTest extends TestCase
             ->willReturnOnConsecutiveCalls(
                 CoreClassReflection::fromClassName(self::class),
                 'foo',
-            )
-        ;
+            );
 
         $this->nodeMock
             ->expects($this->once())
             ->method('getStartLine')
-            ->willReturn(10)
-        ;
+            ->willReturn(10);
 
         $ignoreConfigMock = $this->createMock(IgnoreConfig::class);
 
@@ -155,8 +149,7 @@ final class IgnoreMutatorTest extends TestCase
             ->expects($this->once())
             ->method('isIgnored')
             ->with(self::class, 'foo', 10)
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $ignoreMutator = new IgnoreMutator($ignoreConfigMock, $this->mutatorMock);
 
@@ -177,8 +170,7 @@ final class IgnoreMutatorTest extends TestCase
             ->with($this->nodeMock)
             ->willReturnCallback(static function () use ($mutatedNodeMock): iterable {
                 yield $mutatedNodeMock;
-            })
-        ;
+            });
 
         $mutatedNode = $ignoreMutator->mutate($this->nodeMock);
 

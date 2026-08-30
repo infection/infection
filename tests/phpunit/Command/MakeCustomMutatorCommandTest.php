@@ -171,8 +171,7 @@ final class MakeCustomMutatorCommandTest extends TestCase
 
         $fileSystemMock
             ->expects($this->exactly(2))
-            ->method('dumpFile')
-        ;
+            ->method('dumpFile');
 
         return $fileSystemMock;
     }

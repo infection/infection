@@ -82,8 +82,7 @@ final class FileReporterTest extends FileSystemTestCase
         $this->fileSystemMock
             ->expects($this->once())
             ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $expectedContent)
-        ;
+            ->with(self::LOG_FILE_PATH, $expectedContent);
 
         $reporter = new FileReporter(
             self::LOG_FILE_PATH,

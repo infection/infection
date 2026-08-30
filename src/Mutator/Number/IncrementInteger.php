@@ -145,8 +145,7 @@ final class IncrementInteger extends AbstractNumberMutator
 
         return $parentNode instanceof Node\Expr\FuncCall
             && $parentNode->name instanceof Node\Name
-            && $parentNode->name->toLowerString() === 'preg_split'
-        ;
+            && $parentNode->name->toLowerString() === 'preg_split';
     }
 
     private function isAllowedComparison(Node\Scalar\Int_ $node): bool

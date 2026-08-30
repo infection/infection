@@ -51,14 +51,12 @@ final class MutationTestingResultsCollectorSubscriberTest extends TestCase
         $collectorA = $this->createMock(Collector::class);
         $collectorA
             ->expects($this->once())
-            ->method('collect')
-        ;
+            ->method('collect');
 
         $collectorB = $this->createMock(Collector::class);
         $collectorB
             ->expects($this->once())
-            ->method('collect')
-        ;
+            ->method('collect');
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingResultsCollectorSubscriber(

@@ -549,17 +549,14 @@ final class ParallelProcessRunnerTest extends TestCase
             ->with(null, [
                 'INFECTION' => '1',
                 'TEST_TOKEN' => $threadIndex,
-            ])
-        ;
+            ]);
         $processMock
             ->expects($this->once())
-            ->method('checkTimeout')
-        ;
+            ->method('checkTimeout');
         $processMock
             ->expects($this->once())
             ->method('isRunning')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         return new MutantProcessContainer(
             new DummyMutantProcess(
@@ -581,17 +578,14 @@ final class ParallelProcessRunnerTest extends TestCase
             ->with(null, [
                 'INFECTION' => '1',
                 'TEST_TOKEN' => 1,
-            ])
-        ;
+            ]);
         $phpUnitProcessMock
             ->expects($this->once())
-            ->method('checkTimeout')
-        ;
+            ->method('checkTimeout');
         $phpUnitProcessMock
             ->expects($this->once())
             ->method('isRunning')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $nextProcessMock = $this->createMock(Process::class);
         $nextProcessMock
@@ -600,17 +594,14 @@ final class ParallelProcessRunnerTest extends TestCase
             ->with(null, [
                 'INFECTION' => '1',
                 'TEST_TOKEN' => $threadCount === 0 ? 1 : (1 % $threadCount) + 1,
-            ])
-        ;
+            ]);
         $nextProcessMock
             ->expects($this->once())
-            ->method('checkTimeout')
-        ;
+            ->method('checkTimeout');
         $nextProcessMock
             ->expects($this->once())
             ->method('isRunning')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $mutantExecutionResult = MutantExecutionResultBuilder::withMinimalTestData()
             ->withDetectionStatus(DetectionStatus::ESCAPED)
@@ -656,18 +647,15 @@ final class ParallelProcessRunnerTest extends TestCase
         $processMock = $this->createMock(Process::class);
         $processMock
             ->expects($this->once())
-            ->method('start')
-        ;
+            ->method('start');
         $processMock
             ->expects($this->once())
             ->method('checkTimeout')
-            ->willThrowException(new ProcessTimedOutException($processMock, 1))
-        ;
+            ->willThrowException(new ProcessTimedOutException($processMock, 1));
         $processMock
             ->expects($this->once())
             ->method('isRunning')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         return new MutantProcessContainer(
             new DummyMutantProcess(

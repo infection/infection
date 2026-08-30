@@ -51,8 +51,7 @@ final class FilteringResultsCollectorTest extends TestCase
         $targetCollector = $this->createMock(Collector::class);
         $targetCollector
             ->expects($this->never())
-            ->method('collect')
-        ;
+            ->method('collect');
 
         $collector = new FilteringResultsCollector($targetCollector, []);
 
@@ -68,8 +67,7 @@ final class FilteringResultsCollectorTest extends TestCase
         $targetCollector = $this->createMock(Collector::class);
         $targetCollector
             ->expects($this->exactly(5))
-            ->method('collect')
-        ;
+            ->method('collect');
 
         $targetDetectionStatuses = DetectionStatus::cases();
 
@@ -83,8 +81,7 @@ final class FilteringResultsCollectorTest extends TestCase
         $targetCollector = $this->createMock(Collector::class);
         $targetCollector
             ->expects($this->exactly(4))
-            ->method('collect')
-        ;
+            ->method('collect');
 
         $targetDetectionStatuses = DetectionStatus::getCasesExcluding(
             DetectionStatus::KILLED_BY_TESTS,

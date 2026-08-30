@@ -202,8 +202,7 @@ final class ConfigurationFactoryTest extends TestCase
                 projectDirectory: null,
                 staticAnalysisTool: 'non-supported-static-analysis-tool',
                 mutantId: null,
-            )
-        ;
+            );
     }
 
     public static function valueProvider(): iterable
@@ -1664,8 +1663,7 @@ final class ConfigurationFactoryTest extends TestCase
                         ->getMutatorResolver()
                         ->resolve(['@default' => true]),
                     false,
-                )
-            ;
+                );
         }
 
         return self::$mutators;

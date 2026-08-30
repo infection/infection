@@ -95,8 +95,7 @@ final class InitialTestsRunnerTest extends TestCase
         $this->processFactoryMock
             ->method('createProcess')
             ->with($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage)
-            ->willReturn($process)
-        ;
+            ->willReturn($process);
 
         $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
 
@@ -130,8 +129,7 @@ final class InitialTestsRunnerTest extends TestCase
         $this->processFactoryMock
             ->method('createProcess')
             ->with($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage)
-            ->willReturn($process)
-        ;
+            ->willReturn($process);
 
         try {
             $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);

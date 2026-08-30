@@ -511,8 +511,7 @@ final class CoverageCheckerTest extends TestCase
         $indexLocatorStub = $this->createStub(ReportLocator::class);
         $indexLocatorStub
             ->method('locate')
-            ->willThrowException(UnknownReportLocatorException::create('index.xml'))
-        ;
+            ->willThrowException(UnknownReportLocatorException::create('index.xml'));
 
         return $indexLocatorStub;
     }
@@ -522,8 +521,7 @@ final class CoverageCheckerTest extends TestCase
         $jUnitLocatorStub = $this->createStub(ReportLocator::class);
         $jUnitLocatorStub
             ->method('locate')
-            ->willThrowException(UnknownReportLocatorException::create('JUnit'))
-        ;
+            ->willThrowException(UnknownReportLocatorException::create('JUnit'));
 
         return $jUnitLocatorStub;
     }

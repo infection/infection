@@ -137,8 +137,7 @@ final class MutatorRobustnessTest extends TestCase
         $finder = Finder::create()
             ->in(self::FIXTURES_DIR)
             ->name('*.php')
-            ->files()
-        ;
+            ->files();
 
         $files = take($finder)->toAssoc();
         ksort($files, SORT_STRING);
