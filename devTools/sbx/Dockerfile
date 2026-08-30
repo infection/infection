@@ -53,7 +53,8 @@ COPY --from=composer/composer:2-bin /composer /usr/local/bin/composer
 RUN set -o errexit -o nounset -o pipefail \
     && curl -fL --output /tmp/pie.phar https://github.com/php/pie/releases/latest/download/pie.phar \
     && mv /tmp/pie.phar /usr/local/bin/pie \
-    && chmod +x /usr/local/bin/pie
+    && chmod +x /usr/local/bin/pie \
+    && pie install pecl/pcov --no-interaction
 
 ARG CONTAINER_STRUCTURE_TEST_VERSION=1.22.1
 ARG TARGET_ARCH
