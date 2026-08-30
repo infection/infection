@@ -10,5 +10,6 @@
     "logs": {
         "summary": "var/infection.log"
     },
+    "bootstrap": "vendor/autoload.php",
     "tmpDir": "var/infection-tmp"
 }
