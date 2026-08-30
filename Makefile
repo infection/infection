@@ -259,12 +259,17 @@ benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COV
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions check-agents-adr-list
+autoreview: _autoreview $(if $(CI),,zizmor)
+
+.PHONY: _autoreview
+_autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions check-agents-adr-list
 
 .PHONY: autoreview-docker
 autoreview-docker:	## Runs various checks in docker (static analysis & AutoReview test suite)
 autoreview-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_83) make autoreview
+	$(DOCKER_RUN_83) make _autoreview
+	# Zizmor is already executed via a docker image.
+	$(MAKE) zizmor
 
 .PHONY: test
 test:		 	## Runs all the tests
