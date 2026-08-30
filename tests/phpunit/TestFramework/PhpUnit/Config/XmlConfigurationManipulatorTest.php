@@ -108,6 +108,39 @@ final class XmlConfigurationManipulatorTest extends TestCase
         );
     }
 
+    public function test_it_replaces_testsuite_bootstrap_paths_with_absolute_paths(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+                <phpunit bootstrap="src/autoload.php">
+                    <testsuites>
+                        <testsuite name="unit" bootstrap="tests/src/unit/autoload.php">
+                            <directory>tests/unit</directory>
+                        </testsuite>
+                        <testsuite name="integration" bootstrap="tests/src/integration/autoload.php">
+                            <directory>tests/integration</directory>
+                        </testsuite>
+                    </testsuites>
+                </phpunit>
+                XML,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->replaceWithAbsolutePaths($xPath);
+            },
+            <<<'XML'
+                <phpunit bootstrap="/src/autoload.php">
+                  <testsuites>
+                    <testsuite name="unit" bootstrap="/tests/src/unit/autoload.php">
+                      <directory>/tests/unit</directory>
+                    </testsuite>
+                    <testsuite name="integration" bootstrap="/tests/src/integration/autoload.php">
+                      <directory>/tests/integration</directory>
+                    </testsuite>
+                  </testsuites>
+                </phpunit>
+                XML,
+        );
+    }
+
     public function test_it_replaces_with_absolute_paths_xml_file_with_tabs(): void
     {
         $this->assertItChangesXML(

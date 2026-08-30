@@ -71,6 +71,8 @@ final readonly class XmlConfigurationManipulator
     {
         $queries = [
             '/phpunit/@bootstrap',
+            '/phpunit/testsuites/testsuite/@bootstrap',
+            '/phpunit/testsuite/@bootstrap',
             '/phpunit/testsuites/testsuite/exclude',
             '//directory',
             '//file',
