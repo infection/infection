@@ -129,10 +129,8 @@ cs: $(PHP_CS_FIXER)
 
 .PHONY: cs-docker
 cs-docker:		## Runs PHP-CS-Fixer in docker
-cs-docker: $(DOCKER_FILE_IMAGE) $(PHP_CS_FIXER)
-	$(DOCKER_RUN_83) $(PHP_CS_FIXER) fix -v --diff
-	LC_ALL=C sort -u .gitignore -o .gitignore
-	$(MAKE) check_trailing_whitespaces
+cs-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_83) make cs
 
 .PHONY: cs-check
 cs-check:		## Runs PHP-CS-Fixer in dry-run mode
@@ -261,7 +259,17 @@ benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COV
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions check-agents-adr-list $(if $(CI),,zizmor)
+autoreview: _autoreview $(if $(CI),,zizmor)
+
+.PHONY: _autoreview
+_autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions check-agents-adr-list
+
+.PHONY: autoreview-docker
+autoreview-docker:	## Runs various checks in docker (static analysis & AutoReview test suite)
+autoreview-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_83) make _autoreview
+	# Zizmor is already executed via a docker image.
+	$(MAKE) zizmor
 
 .PHONY: test
 test:		 	## Runs all the tests
@@ -269,7 +277,7 @@ test: autoreview test-unit test-benchmark test-e2e test-infection
 
 .PHONY: test-docker
 test-docker:		## Runs all the tests on the different Docker platforms
-test-docker: autoreview test-unit-docker test-e2e-docker test-infection-docker
+test-docker: autoreview-docker test-unit-docker test-e2e-docker test-infection-docker
 
 .PHONY: test-autoreview
 test-autoreview: $(PHPUNIT_BIN) vendor
@@ -287,10 +295,8 @@ test-unit-parallel: $(PARATEST) vendor
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
-test-unit-docker: test-unit-83-docker
-
-test-unit-83-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT_BIN)
-	$(DOCKER_RUN_83) $(PHPUNIT) --group $(PHPUNIT_GROUP)
+test-unit-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_83) make test-unit
 
 .PHONY: test-benchmark
 test-benchmark:	 	## Runs the benchmark tests
