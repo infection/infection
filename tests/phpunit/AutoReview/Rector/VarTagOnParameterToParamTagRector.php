@@ -43,8 +43,6 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
 use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\Comments\NodeDocBlock\DocBlockUpdater;
 use Rector\Rector\AbstractRector;
-use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
-use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
 final class VarTagOnParameterToParamTagRector extends AbstractRector
 {
@@ -52,40 +50,6 @@ final class VarTagOnParameterToParamTagRector extends AbstractRector
         private readonly PhpDocInfoFactory $phpDocInfoFactory,
         private readonly DocBlockUpdater $docBlockUpdater,
     ) {
-    }
-
-    #[Override]
-    public function getRuleDefinition(): RuleDefinition
-    {
-        return new RuleDefinition(
-            'Move a parameter @var annotation to the method PHPDoc as @param',
-            [
-                new CodeSample(
-                    <<<'CODE_SAMPLE'
-                        final class Paths
-                        {
-                            public function __construct(
-                                /** @var list<string> */
-                                public array $paths,
-                            ) {
-                            }
-                        }
-                        CODE_SAMPLE,
-                    <<<'CODE_SAMPLE'
-                        final class Paths
-                        {
-                            /**
-                             * @param list<string> $paths
-                             */
-                            public function __construct(
-                                public array $paths,
-                            ) {
-                            }
-                        }
-                        CODE_SAMPLE,
-                ),
-            ],
-        );
     }
 
     /**
