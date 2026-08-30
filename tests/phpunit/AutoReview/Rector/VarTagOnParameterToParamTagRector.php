@@ -1,0 +1,152 @@
+<?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
+
+namespace Infection\Tests\AutoReview\Rector;
+
+use Override;
+use PhpParser\Node;
+use PhpParser\Node\Stmt\ClassMethod;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
+use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
+use Rector\Comments\NodeDocBlock\DocBlockUpdater;
+use Rector\Rector\AbstractRector;
+use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
+use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
+
+final class VarTagOnParameterToParamTagRector extends AbstractRector
+{
+    public function __construct(
+        private readonly PhpDocInfoFactory $phpDocInfoFactory,
+        private readonly DocBlockUpdater $docBlockUpdater,
+    ) {
+    }
+
+    #[Override]
+    public function getRuleDefinition(): RuleDefinition
+    {
+        return new RuleDefinition(
+            'Move a parameter @var annotation to the method PHPDoc as @param',
+            [
+                new CodeSample(
+                    <<<'CODE_SAMPLE'
+                        final class Paths
+                        {
+                            public function __construct(
+                                /** @var list<string> */
+                                public array $paths,
+                            ) {
+                            }
+                        }
+                        CODE_SAMPLE,
+                    <<<'CODE_SAMPLE'
+                        final class Paths
+                        {
+                            /**
+                             * @param list<string> $paths
+                             */
+                            public function __construct(
+                                public array $paths,
+                            ) {
+                            }
+                        }
+                        CODE_SAMPLE,
+                ),
+            ],
+        );
+    }
+
+    /**
+     * @return array<class-string<Node>>
+     */
+    #[Override]
+    public function getNodeTypes(): array
+    {
+        return [ClassMethod::class];
+    }
+
+    #[Override]
+    public function refactor(Node $node): ?Node
+    {
+        if (!$node instanceof ClassMethod) {
+            return null;
+        }
+
+        $methodPhpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
+        $hasChanged = false;
+
+        foreach ($node->params as $param) {
+            $paramPhpDocInfo = $this->phpDocInfoFactory->createFromNode($param);
+
+            if ($paramPhpDocInfo === null) {
+                continue;
+            }
+
+            $varTag = $paramPhpDocInfo->getVarTagValueNode();
+
+            if (!$varTag instanceof VarTagValueNode) {
+                continue;
+            }
+
+            $parameterName = $this->getName($param);
+
+            if ($parameterName === null) {
+                continue;
+            }
+
+            if ($methodPhpDocInfo->getParamTagValueByName($parameterName) === null) {
+                $methodPhpDocInfo->addTagValueNode(new ParamTagValueNode(
+                    clone $varTag->type,
+                    $param->variadic,
+                    '$' . $parameterName,
+                    $varTag->description,
+                    $param->byRef,
+                ));
+            }
+
+            $paramPhpDocInfo->removeByType(VarTagValueNode::class);
+            $this->docBlockUpdater->updateRefactoredNodeWithPhpDocInfo($param);
+            $hasChanged = true;
+        }
+
+        if (!$hasChanged) {
+            return null;
+        }
+
+        $this->docBlockUpdater->updateRefactoredNodeWithPhpDocInfo($node);
+
+        return $node;
+    }
+}

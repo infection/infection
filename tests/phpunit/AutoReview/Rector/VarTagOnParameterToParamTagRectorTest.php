@@ -33,44 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\Locator\Throwable;
+namespace Infection\Tests\AutoReview\Rector;
 
-use function implode;
-use RuntimeException;
-use function sprintf;
-use Throwable;
+use Iterator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
-/**
- * @internal
- */
-final class TooManyReportsFound extends RuntimeException implements ReportLocationThrowable
+#[CoversClass(VarTagOnParameterToParamTagRector::class)]
+#[Group('integration')]
+final class VarTagOnParameterToParamTagRectorTest extends AbstractRectorTestCase
 {
-    /**
-     * @param list<string>|null $reportPathnames
-     */
-    public function __construct(
-        string $message = '',
-        int $code = 0,
-        ?Throwable $previous = null,
-        public readonly ?array $reportPathnames = null,
-    ) {
-        parent::__construct($message, $code, $previous);
+    #[DataProvider('provideFixtures')]
+    public function test_it_moves_var_tags_to_the_method(string $fixture): void
+    {
+        $this->doTestFile($fixture);
     }
 
-    /**
-     * @param list<string> $reportPathnames
-     */
-    public static function create(array $reportPathnames): self
+    public static function provideFixtures(): Iterator
     {
-        return new self(
-            sprintf(
-                'Found "%s".',
-                implode(
-                    '", "',
-                    $reportPathnames,
-                ),
-            ),
-            reportPathnames: $reportPathnames,
-        );
+        return self::yieldFilesFromDirectory(__DIR__ . '/Fixture');
+    }
+
+    public function provideConfigFilePath(): string
+    {
+        return __DIR__ . '/config/configured_rule.php';
     }
 }
