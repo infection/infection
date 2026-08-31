@@ -117,10 +117,11 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $path = $this->buildPath($mutationHash);
 
-        $this->filesystem->dumpFile(
-            $path,
-            $xPath->document->saveXML(),
-        );
+        $xml = $xPath->document->saveXML();
+
+        Assert::notFalse($xml, 'Failed to serialize the per-mutant PHPUnit XML configuration. This indicates a bug - the DOM document built from the original config is malformed.');
+
+        $this->filesystem->dumpFile($path, $xml);
 
         return $path;
     }

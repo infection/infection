@@ -44,7 +44,9 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use ReflectionClassConstant;
 use function sprintf;
+use Webmozart\Assert\Assert;
 
 #[Group('integration')]
 #[CoversNothing]
@@ -64,6 +66,7 @@ final class MutatorCategoryTest extends TestCase
 
     public function test_it_lists_all_its_exposed_constants(): void
     {
+        /** @var class-string $enumClass */
         $enumClass = MutatorCategory::class;
 
         $categoryReflection = new ReflectionClass($enumClass);
@@ -83,9 +86,18 @@ final class MutatorCategoryTest extends TestCase
         $this->assertExposedConstantsArePublic($enumClass, $categoryReflection, $constants);
     }
 
+    /**
+     * @param ReflectionClass<object> $classReflection
+     */
     private function assertAllIsPublic(string $enumClass, ReflectionClass $classReflection): void
     {
         $allConstantReflection = $classReflection->getReflectionConstant(self::ALL_CONSTANT_KEY);
+
+        Assert::isInstanceOf(
+            $allConstantReflection,
+            ReflectionClassConstant::class,
+            sprintf('Expected enum "%s" to declare the constant "%s".', $enumClass, self::ALL_CONSTANT_KEY),
+        );
 
         $this->assertTrue(
             $allConstantReflection->isPublic(),
@@ -136,6 +148,7 @@ final class MutatorCategoryTest extends TestCase
     }
 
     /**
+     * @param ReflectionClass<object> $classReflection
      * @param array<string, mixed> $constants
      */
     private function assertExposedConstantsArePublic(
@@ -151,6 +164,12 @@ final class MutatorCategoryTest extends TestCase
             }
 
             $constantReflection = $classReflection->getReflectionConstant($constantName);
+
+            Assert::isInstanceOf(
+                $constantReflection,
+                ReflectionClassConstant::class,
+                sprintf('Expected "%s" to declare the constant "%s".', $enumClass, $constantName),
+            );
 
             $this->assertTrue(
                 $constantReflection->isPublic(),

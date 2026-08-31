@@ -106,7 +106,7 @@ final class ConsoleLoggerTest extends TestCase
     }
 
     #[DataProvider('valueToCastProvider')]
-    public function test_it_casts_the_context_values_into_strings($value, string $expected): void
+    public function test_it_casts_the_context_values_into_strings(mixed $value, string $expected): void
     {
         $output = new BufferedOutput();
 

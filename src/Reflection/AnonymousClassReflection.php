@@ -42,6 +42,9 @@ use ReflectionClass;
  */
 final readonly class AnonymousClassReflection implements ClassReflection
 {
+    /**
+     * @param ReflectionClass<object> $reflectionClass
+     */
     private function __construct(
         private ReflectionClass $reflectionClass,
     ) {
@@ -84,6 +87,9 @@ final readonly class AnonymousClassReflection implements ClassReflection
         return $this->reflectionClass->isFinal();
     }
 
+    /**
+     * @param ReflectionClass<object> $reflectionClass
+     */
     private static function hasMethodRecursively(
         ReflectionClass $reflectionClass,
         string $methodName,
@@ -101,6 +107,9 @@ final readonly class AnonymousClassReflection implements ClassReflection
         return self::hasMethodRecursively($parent, $methodName, $visibility);
     }
 
+    /**
+     * @param ReflectionClass<object> $reflectionClass
+     */
     private static function hasMethod(
         ReflectionClass $reflectionClass,
         string $methodName,

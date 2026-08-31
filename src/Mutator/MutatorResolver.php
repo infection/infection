@@ -141,6 +141,7 @@ final class MutatorResolver
     }
 
     /**
+     * @param array<string, mixed>|bool|stdClass $settings
      * @param array<string, string[]> $globalSettings
      *
      * @return array<string, mixed[]>|bool

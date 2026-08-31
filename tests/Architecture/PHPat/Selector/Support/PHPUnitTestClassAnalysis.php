@@ -64,7 +64,7 @@ final class PHPUnitTestClassAnalysis
     {
         return str_ends_with($classReflection->getName(), 'Test')
             && ClassReflectionPredicates::isConcreteClass($classReflection)
-            && $classReflection->isSubclassOf(TestCase::class);
+            && $classReflection->getNativeReflection()->isSubclassOf(TestCase::class);
     }
 
     public static function hasCoversNothing(ClassReflection $classReflection): bool

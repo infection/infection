@@ -33,54 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Reflection;
+namespace Infection\Tests\TestFramework\Tracing\Trace;
 
-use ReflectionClass;
-use ReflectionException;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Override;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
+ * Records the line range calculated for the last visited node of interest. Exposing
+ * `$range` as a declared property (rather than an anonymous class) lets
+ * LineRangeCalculatorTest read it back without going through the NodeVisitor
+ * interface, which does not declare it.
+ *
  * @internal
  */
-final readonly class CoreClassReflection implements ClassReflection
+final class RangeSpyVisitor extends NodeVisitorAbstract
 {
     /**
-     * @param ReflectionClass<object> $reflectionClass
+     * @var int[]
      */
-    private function __construct(
-        private ReflectionClass $reflectionClass,
-    ) {
-    }
+    public array $range = [];
 
-    /**
-     * @param class-string $className
-     */
-    public static function fromClassName(string $className): self
+    #[Override]
+    public function leaveNode(Node $node)
     {
-        return new self(new ReflectionClass($className));
-    }
+        if ($node instanceof Node\Stmt\ClassMethod && $node->name->name === 'findMe') {
+            $node->setAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, true);
 
-    public function hasParentMethodWithVisibility(string $methodName, Visibility $visibility): bool
-    {
-        try {
-            $method = $this->reflectionClass->getMethod($methodName)->getPrototype();
-        } catch (ReflectionException) {
-            return false;
+            $this->range = (new LineRangeCalculator())->calculateRange($node)->range;
         }
 
-        if ($visibility->isPublic()) {
-            return $method->isPublic();
+        if ($node instanceof Node\Expr\Variable && $node->name === 'findMe') {
+            $this->range = (new LineRangeCalculator())->calculateRange($node)->range;
         }
 
-        return $method->isProtected();
-    }
-
-    public function getName(): string
-    {
-        return $this->reflectionClass->getName();
-    }
-
-    public function isFinal(): bool
-    {
-        return $this->reflectionClass->isFinal();
+        return null;
     }
 }

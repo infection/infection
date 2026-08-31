@@ -51,7 +51,17 @@ final class FullyQualifiedClassNameManipulator
 
     public static function getFqcn(Node $node): ?Node\Name
     {
-        return $node->namespacedName
+        // NameResolver sets `namespacedName` as a declared property only on these
+        // node types (see NameResolver::addNamespacedName()); every other node
+        // exposes it, if at all, as an attribute instead.
+        $namespacedName = match (true) {
+            $node instanceof Node\Stmt\ClassLike,
+            $node instanceof Node\Stmt\Function_,
+            $node instanceof Node\Const_ => $node->namespacedName,
+            default => null,
+        };
+
+        return $namespacedName
             ?? $node->getAttribute('resolvedName')
             ?? $node->getAttribute('namespacedName');
     }

@@ -781,6 +781,9 @@ final class MutationConfigBuilderTest extends TestCase
         ];
     }
 
+    /**
+     * @return DOMNodeList<DOMNameSpaceNode|DOMNode>
+     */
     private function queryXpath(string $xml, string $query): DOMNodeList
     {
         return SafeDOMXPath::fromString($xml)->queryList($query);

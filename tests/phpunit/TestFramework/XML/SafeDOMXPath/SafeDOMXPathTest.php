@@ -575,11 +575,11 @@ final class SafeDOMXPathTest extends TestCase
     {
         $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
 
-        $expected = $xPath
-            ->queryList('//book')
-            ->item(0)
-            ?->attributes
-            ?->getNamedItem('category');
+        $book = $xPath->queryList('//book')->item(0);
+        // Sanity check
+        $this->assertInstanceOf(DOMNode::class, $book);
+
+        $expected = $book->attributes?->getNamedItem('category');
         // Sanity check
         $this->assertNotNull($expected);
 
@@ -596,11 +596,11 @@ final class SafeDOMXPathTest extends TestCase
         // Sanity check
         $this->assertInstanceOf(DOMNode::class, $firstBook);
 
-        $expected = $xPath
-            ->queryList('//book/title[1]')
-            ->item(0)
-            ?->attributes
-            ?->getNamedItem('lang');
+        $title = $xPath->queryList('//book/title[1]')->item(0);
+        // Sanity check
+        $this->assertInstanceOf(DOMNode::class, $title);
+
+        $expected = $title->attributes?->getNamedItem('lang');
         // Sanity check
         $this->assertNotNull($expected);
 
