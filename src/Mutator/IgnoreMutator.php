@@ -63,7 +63,7 @@ final readonly class IgnoreMutator implements Mutator
      */
     public function __construct(
         private IgnoreConfig $config,
-        private Mutator      $decoratedMutator,
+        private Mutator $decoratedMutator,
     ) {
     }
 

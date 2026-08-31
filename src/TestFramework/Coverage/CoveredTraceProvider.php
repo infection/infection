@@ -46,7 +46,7 @@ use Infection\TestFramework\Tracing\TraceProvider;
 final readonly class CoveredTraceProvider implements TraceProvider
 {
     public function __construct(
-        private TraceProvider               $decoratedTraceProvider,
+        private TraceProvider $decoratedTraceProvider,
         private JUnitTestExecutionInfoAdder $testFileDataAdder,
     ) {
     }

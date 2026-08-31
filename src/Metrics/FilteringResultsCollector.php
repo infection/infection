@@ -50,7 +50,7 @@ final readonly class FilteringResultsCollector implements Collector
      */
     public function __construct(
         private Collector $decoratedCollector,
-        private array     $targetDetectionStatuses,
+        private array $targetDetectionStatuses,
     ) {
     }
 
