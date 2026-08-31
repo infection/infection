@@ -35,8 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
+use function dirname;
 use function explode;
 use function getenv;
+use function in_array;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
@@ -151,6 +153,46 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         );
     }
 
+    public function test_it_resolves_composer_bin_dir_relative_to_the_composer_configuration(): void
+    {
+        // Setup:
+        //
+        // $tmp/ ← current location
+        // ├── custom-bin/phpunit ← wrong executable
+        // └── configured-project/
+        //     └── custom-bin/phpunit ← executable Composer
+        //
+        chdir($this->tmp);
+
+        $relativeComposerBinDir = 'custom-bin';
+        $this->createPhpUnitExecutableFixture($relativeComposerBinDir);
+
+        $expectedPhpUnitPath = $this->createPhpUnitExecutableFixture(
+            $this->tmp . '/configured-project/' . $relativeComposerBinDir,
+        );
+
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->expects($this->once())
+            ->method('mustRun')
+            ->willReturnCallback(
+                static fn (array $command): string => in_array('--absolute', $command, true)
+                    ? dirname($expectedPhpUnitPath)
+                    : $relativeComposerBinDir,
+            );
+
+        $expected = realpath($expectedPhpUnitPath);
+
+        $frameworkFinder = new TestFrameworkFinder(
+            $this->composerFinder,
+            $shellCommandRunner,
+        );
+
+        $actual = $frameworkFinder->find(TestFrameworkTypes::PHPUNIT);
+
+        $this->assertSame($expected, $actual);
+    }
+
     public function test_it_falls_back_to_local_vendor_bin_when_composer_command_fails(): void
     {
         chdir($this->tmp);
@@ -165,7 +207,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $shellCommandRunner
             ->expects($this->once())
             ->method('mustRun')
-            ->with(['/usr/bin/composer', 'config', 'bin-dir'])
+            ->with(['/usr/bin/composer', 'config', 'bin-dir', '--absolute'])
             ->willThrowException(new RuntimeException());
 
         $frameworkFinder = new TestFrameworkFinder(
@@ -219,7 +261,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $shellCommandRunner
             ->expects($this->once())
             ->method('mustRun')
-            ->with(['/usr/bin/composer', 'config', 'bin-dir'])
+            ->with(['/usr/bin/composer', 'config', 'bin-dir', '--absolute'])
             ->willReturn('');
 
         $frameworkFinder = new TestFrameworkFinder(
