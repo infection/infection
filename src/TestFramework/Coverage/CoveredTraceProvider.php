@@ -46,7 +46,7 @@ use Infection\TestFramework\Tracing\TraceProvider;
 final readonly class CoveredTraceProvider implements TraceProvider
 {
     public function __construct(
-        private TraceProvider $primaryTraceProvider,
+        private TraceProvider               $decoratedTraceProvider,
         private JUnitTestExecutionInfoAdder $testFileDataAdder,
     ) {
     }
@@ -59,7 +59,7 @@ final readonly class CoveredTraceProvider implements TraceProvider
          * filter will negatively affect performance. The greater the junit.xml report size, the more.
          */
         return $this->testFileDataAdder->addTestExecutionInfo(
-            $this->primaryTraceProvider->provideTraces(),
+            $this->decoratedTraceProvider->provideTraces(),
         );
     }
 }
