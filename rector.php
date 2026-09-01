@@ -52,7 +52,6 @@ use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector;
 use Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector;
 use Rector\EarlyReturn\Rector\StmtsAwareInterface\ReturnEarlyIfVariableRector;
-use Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector;
 use Rector\Php73\Rector\String_\SensitiveHereNowDocRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
@@ -121,7 +120,6 @@ $config = RectorConfig::configure()
         DocblockVarArrayFromGetterReturnRector::class,
         DocblockVarArrayFromPropertyDefaultsRector::class,
         DocblockVarFromParamDocblockInConstructorRector::class,
-        FlipNegatedTernaryInstanceofRector::class,
         PrivatizeFinalClassMethodRector::class,
         PrivatizeFinalClassPropertyRector::class,
         TypedPropertyFromAssignsRector::class,
