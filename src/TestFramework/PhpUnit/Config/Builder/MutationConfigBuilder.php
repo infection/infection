@@ -226,6 +226,7 @@ class MutationConfigBuilder extends ConfigBuilder
     ): void {
         $nodeToAppendTestSuite = $xPath->queryElement('/phpunit/testsuites');
 
+        // If there is no `testsuites` node, append to root
         $nodeToAppendTestSuite ??= $xPath->queryElement('/phpunit');
 
         $testSuite = $xPath->document->createElement('testsuite');
