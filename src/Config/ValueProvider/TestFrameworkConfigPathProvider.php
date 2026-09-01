@@ -113,7 +113,7 @@ final readonly class TestFrameworkConfigPathProvider
             }
 
             if (!$this->fileSystem->isReadableDirectory($answerDir)) {
-                throw new RuntimeException(sprintf('Could not find "%s" directory.', $answerDir));
+                throw new RuntimeException(sprintf('Directory "%s" does not exist or is not readable.', $answerDir));
             }
 
             $this->testFrameworkConfigLocator->locate($testFramework, $answerDir);
