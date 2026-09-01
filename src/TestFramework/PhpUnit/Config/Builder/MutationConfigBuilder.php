@@ -83,9 +83,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $originalBootstrapFile = $this->originalBootstrapFile;
 
-        if ($originalBootstrapFile === null) {
-            $originalBootstrapFile = $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
-        }
+        $originalBootstrapFile ??= $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
 
         // activate PHPUnit's result cache and order tests by running defects first, then sorted by fastest first
         $this->configManipulator->handleResultCacheAndExecutionOrder($version, $xPath, $mutationHash, $this->tmpDir);
@@ -127,13 +125,11 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function getXPath(): SafeDOMXPath
     {
-        if ($this->xPath === null) {
-            $this->xPath = SafeDOMXPath::fromString(
-                $this->originalXmlConfigContent,
-                preserveWhiteSpace: false,
-                formatOutput: true,
-            );
-        }
+        $this->xPath ??= SafeDOMXPath::fromString(
+            $this->originalXmlConfigContent,
+            preserveWhiteSpace: false,
+            formatOutput: true,
+        );
 
         return $this->xPath;
     }
@@ -231,9 +227,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $nodeToAppendTestSuite = $xPath->queryElement('/phpunit/testsuites');
 
         // If there is no `testsuites` node, append to root
-        if ($nodeToAppendTestSuite === null) {
-            $nodeToAppendTestSuite = $xPath->queryElement('/phpunit');
-        }
+        $nodeToAppendTestSuite ??= $xPath->queryElement('/phpunit');
 
         $testSuite = $xPath->document->createElement('testsuite');
         $testSuite->setAttribute('name', 'Infection testsuite with filtered tests');
