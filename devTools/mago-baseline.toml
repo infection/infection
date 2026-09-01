@@ -5199,7 +5199,7 @@ count = 2
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
 code = "invalid-return-statement"
-message = "Invalid return type for function `{closure:tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php:569:13}`: expected `string`, but found `null|string`."
+message = "Invalid return type for function `{closure:tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php:585:13}`: expected `string`, but found `null|string`."
 count = 1
 
 [[issues]]
@@ -5229,7 +5229,7 @@ count = 2
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
 code = "nullable-return-statement"
-message = "Function `{closure:tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php:569:13}` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`)."
+message = "Function `{closure:tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php:585:13}` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`)."
 count = 1
 
 [[issues]]
