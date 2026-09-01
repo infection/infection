@@ -53,7 +53,6 @@ use Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector;
 use Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector;
 use Rector\EarlyReturn\Rector\StmtsAwareInterface\ReturnEarlyIfVariableRector;
 use Rector\Php73\Rector\String_\SensitiveHereNowDocRector;
-use Rector\Php74\Rector\If_\IfToNullCoalescingAssignRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AddInstanceofAssertForNullableInstanceRector;
@@ -147,10 +146,6 @@ $config = RectorConfig::configure()
         ClosureReturnTypeRector::class,
         DataProviderArrayItemsNewLinedRector::class,
         FlipTypeControlToUseExclusiveTypeRector::class,
-        IfToNullCoalescingAssignRector::class => [
-            // static variable without explicit null initializer is `nonnull` from Mago's perspective
-            __DIR__ . '/src/PhpParser/Visitor/AddTestsVisitor.php',
-        ],
         LocallyCalledStaticMethodToNonStaticRector::class,
         MergeWithCallableAndWillReturnRector::class => [
             __DIR__ . '/tests/phpunit/Mutation/FileMutationGeneratorTest.php',
