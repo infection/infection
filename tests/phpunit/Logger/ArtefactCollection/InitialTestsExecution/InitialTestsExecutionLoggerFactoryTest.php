@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\ArtefactCollection\InitialTestsExecution;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
 use Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLoggerFactory;
+use Infection\TestFramework\Contracts\TestFramework;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -50,14 +50,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[CoversClass(InitialTestsExecutionLoggerFactory::class)]
 final class InitialTestsExecutionLoggerFactoryTest extends TestCase
 {
-    private TestFrameworkAdapter&MockObject $testFrameworkAdapterMock;
+    private TestFramework&MockObject $testFrameworkMock;
 
     private OutputInterface&MockObject $outputMock;
 
     protected function setUp(): void
     {
-        $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
-        $this->testFrameworkAdapterMock
+        $this->testFrameworkMock = $this->createMock(TestFramework::class);
+        $this->testFrameworkMock
             ->expects($this->never())
             ->method($this->anything());
 
@@ -108,7 +108,7 @@ final class InitialTestsExecutionLoggerFactoryTest extends TestCase
     ): InitialTestsExecutionLoggerFactory {
         return new InitialTestsExecutionLoggerFactory(
             $skipProgressBar,
-            $this->testFrameworkAdapterMock,
+            $this->testFrameworkMock,
             $debug,
             $this->outputMock,
         );

@@ -763,12 +763,6 @@ parameters:
 			path: ../src/TestFramework/Contracts/TestFramework.php
 
 		-
-			rawMessage: Unused Infection\TestFramework\Contracts\TestFramework::getVersion
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: ../src/TestFramework/Contracts/TestFramework.php
-
-		-
 			rawMessage: Function ini_get is unsafe to use. It can return FALSE instead of throwing an exception. Please add 'use function Safe\ini_get;' at the beginning of the file to use the variant provided by the 'thecodingmachine/safe' library.
 			identifier: theCodingMachineSafe.function
 			count: 1

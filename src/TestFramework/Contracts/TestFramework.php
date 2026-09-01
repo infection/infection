@@ -88,4 +88,6 @@ interface TestFramework
      * is interpreted.
      */
     public function test(Mutant $mutant): MutantProcessContainer;
+
+    public function hasJUnitReport(): bool;
 }

@@ -37,7 +37,7 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use Exception;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
@@ -59,7 +59,7 @@ use SplFileInfo;
 #[CoversClass(JUnitTestExecutionInfoAdder::class)]
 final class JUnitTestExecutionInfoAdderTest extends TestCase
 {
-    private TestFrameworkAdapter&MockObject $testFrameworkAdapterMock;
+    private TestFramework&MockObject $testFrameworkMock;
 
     private TestFileDataProvider&MockObject $testFileDataProviderMock;
 
@@ -67,18 +67,18 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
+        $this->testFrameworkMock = $this->createMock(TestFramework::class);
         $this->testFileDataProviderMock = $this->createMock(TestFileDataProvider::class);
 
         $this->infoAdder = new JUnitTestExecutionInfoAdder(
-            $this->testFrameworkAdapterMock,
+            $this->testFrameworkMock,
             $this->testFileDataProviderMock,
         );
     }
 
     public function test_it_does_not_add_if_junit_is_not_provided(): void
     {
-        $this->testFrameworkAdapterMock
+        $this->testFrameworkMock
             ->expects($this->once())
             ->method('hasJUnitReport')
             ->willReturn(false)
@@ -94,7 +94,7 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
 
     public function test_it_adds_if_junit_is_provided(): void
     {
-        $this->testFrameworkAdapterMock
+        $this->testFrameworkMock
             ->expects($this->once())
             ->method('hasJUnitReport')
             ->willReturn(true)
@@ -158,7 +158,7 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
 
     public function test_it_does_not_load_the_trace_tests_until_necessary(): void
     {
-        $this->testFrameworkAdapterMock
+        $this->testFrameworkMock
             ->expects($this->once())
             ->method('hasJUnitReport')
             ->willReturn(true)
