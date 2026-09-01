@@ -2696,20 +2696,8 @@ count = 1
 
 [[issues]]
 file = "src/PhpParser/Visitor/AddTestsVisitor.php"
-code = "less-specific-nested-return-statement"
-message = '''Returned type `(closure(): nonnull)` is less specific than the declared return type `(closure(): list<Infection\AbstractTestFramework\Coverage\TestLocation>)` for function `Infection\PhpParser\Visitor\AddTestsVisitor::createAllTestsForNodeLocator` due to nested 'mixed'.'''
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/AddTestsVisitor.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `Infection\PhpParser\Visitor\AddTestsVisitor::isOnFunctionSignature`. Saw type `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/AddTestsVisitor.php"
-code = "mixed-return-statement"
-message = "Could not infer a precise return type for function `{closure:src/PhpParser/Visitor/AddTestsVisitor.php:96:16}`. Saw type `nonnull`."
 count = 1
 
 [[issues]]
