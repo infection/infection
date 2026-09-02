@@ -305,7 +305,8 @@ final class ProcessQueueTest extends TestCase
         // Second call should respect capacity
         $iterator2 = $this->createMock(Iterator::class);
         $iterator2->expects($this->never())
-            ->method('valid');
+            ->method('valid')
+        ;
 
         $result = $queue->enqueueFrom($iterator2); // Default maxQueueDepth = 1, queue has 1 item
 

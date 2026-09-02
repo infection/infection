@@ -397,10 +397,12 @@ final class ShowMetricsReporterTest extends TestCase
         ;
         $metricsCalculatorStub
             ->method('getCoverageRate')
-            ->willReturn($scenario->coverageRate);
+            ->willReturn($scenario->coverageRate)
+        ;
         $metricsCalculatorStub
             ->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn($scenario->coveredCodeMutationScoreIndicator);
+            ->willReturn($scenario->coveredCodeMutationScoreIndicator)
+        ;
 
         return $metricsCalculatorStub;
     }

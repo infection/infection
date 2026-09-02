@@ -190,6 +190,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
         $this->environmentMock
             ->expects($this->once())
             ->method('isUsingSystemIni')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
     }
 }

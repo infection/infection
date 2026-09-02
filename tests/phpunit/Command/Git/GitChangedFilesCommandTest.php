@@ -355,6 +355,7 @@ final class GitChangedFilesCommandTest extends TestCase
                     ['tests'],
                 ),
             )
-            ->build();
+            ->build()
+        ;
     }
 }

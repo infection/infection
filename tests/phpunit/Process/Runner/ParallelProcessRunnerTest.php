@@ -693,7 +693,8 @@ final class ParallelProcessRunnerTest extends TestCase
         $processMock
             ->expects($this->once())
             ->method('isRunning')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         return new MutantProcessContainer(
             new DummyMutantProcess(

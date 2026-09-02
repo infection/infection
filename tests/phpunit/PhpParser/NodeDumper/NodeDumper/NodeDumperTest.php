@@ -1012,7 +1012,8 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'line numbers with multi-line code' => NodeDumperScenario::forCode(
             <<<'PHP'
@@ -1067,6 +1068,7 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
     }
 }

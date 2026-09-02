@@ -90,6 +90,7 @@ final class EventClassesShouldFollowConventionsTest
             ->classes(InfectionSelector::eventDirectoryClassWithoutExpectedShape())
             ->shouldNot()
             ->exist()
-            ->because('src/Event/Events should only contain events and their single-event subscribers.');
+            ->because('src/Event/Events should only contain events and their single-event subscribers.')
+        ;
     }
 }

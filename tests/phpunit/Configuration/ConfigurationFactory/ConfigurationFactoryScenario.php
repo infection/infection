@@ -861,6 +861,7 @@ final class ConfigurationFactoryScenario
                 ConfigurationBuilder::from($previousExpected)
                     ->withMaxTimeouts($expectedMaxTimeouts)
                     ->build(),
-            );
+            )
+        ;
     }
 }

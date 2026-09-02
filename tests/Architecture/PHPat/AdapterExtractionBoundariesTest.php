@@ -124,6 +124,7 @@ final class AdapterExtractionBoundariesTest
                 // here, otherwise we would need to be stricter.
                 InfectionSelector::nonSourceCode(),
             )
-            ->because('A future test framework common package should stay within its package boundary: the common utilities themselves, the test framework contracts, and external packages.');
+            ->because('A future test framework common package should stay within its package boundary: the common utilities themselves, the test framework contracts, and external packages.')
+        ;
     }
 }

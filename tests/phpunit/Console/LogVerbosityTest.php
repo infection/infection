@@ -137,6 +137,7 @@ final class LogVerbosityTest extends TestCase
         $this->inputMock
             ->expects($this->once())
             ->method('setOption')
-            ->with('log-verbosity', $output);
+            ->with('log-verbosity', $output)
+        ;
     }
 }
