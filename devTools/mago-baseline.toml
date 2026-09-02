@@ -61,15 +61,15 @@ message = 'Potentially unhandled exception `RuntimeException` in `Infection\Comm
 count = 1
 
 [[issues]]
-file = "src/Command/ConfigureCommand.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Command\ConfigureCommand::saveConfig`.'
+file = "src/Command/Debug/DumpAstCommand.php"
+code = "mixed-operand"
+message = "Casting `mixed` to `bool`."
 count = 1
 
 [[issues]]
 file = "src/Command/Debug/DumpAstCommand.php"
-code = "mixed-operand"
-message = "Casting `mixed` to `bool`."
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Command\Debug\DumpAstCommand::executeCommand`.'
 count = 1
 
 [[issues]]
@@ -94,12 +94,6 @@ count = 1
 file = "src/Command/Debug/MockTeamCityCommand.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 1
-
-[[issues]]
-file = "src/Command/Debug/MockTeamCityCommand.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Command\Debug\MockTeamCityCommand::getLogLines`.'
 count = 1
 
 [[issues]]
@@ -153,7 +147,31 @@ count = 1
 [[issues]]
 file = "src/Command/Git/GitChangedFilesCommand.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Command\Git\GitChangedFilesCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/Git/GitChangedFilesCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\Git\GitChangedFilesCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/Git/GitChangedFilesCommand.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\Git\GitChangedFilesCommand::getFiles`.'
+count = 1
+
+[[issues]]
+file = "src/Command/Git/GitChangedLinesCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Command\Git\GitChangedLinesCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/Git/GitChangedLinesCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\Git\GitChangedLinesCommand::executeCommand`.'
 count = 1
 
 [[issues]]
@@ -178,6 +196,24 @@ count = 1
 file = "src/Command/Git/Option/FilterOption.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "src/Command/InitialTest/InitialTestRunCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Command\InitialTest\InitialTestRunCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/InitialTest/InitialTestRunCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Process\Runner\InitialTestsFailed` in `Infection\Command\InitialTest\InitialTestRunCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/InitialTest/InitialTestRunCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\InitialTest\InitialTestRunCommand::executeCommand`.'
 count = 1
 
 [[issues]]
@@ -238,12 +274,6 @@ count = 1
 file = "src/Command/MakeCustomMutatorCommand.php"
 code = "unhandled-thrown-type"
 message = "Potentially unhandled exception `RuntimeException` in `{closure:src/Command/MakeCustomMutatorCommand.php:107:33}`."
-count = 1
-
-[[issues]]
-file = "src/Command/MakeCustomMutatorCommand.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Command\MakeCustomMutatorCommand::createProjectFilesFromTemplates`.'
 count = 1
 
 [[issues]]
@@ -375,6 +405,24 @@ count = 1
 [[issues]]
 file = "src/Command/RunCommand.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Command\RunCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Process\Runner\InitialStaticAnalysisRunFailed` in `Infection\Command\RunCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\RunCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\RunCommand::installTestFrameworkIfNeeded`.'
 count = 1
 
@@ -387,13 +435,43 @@ count = 1
 [[issues]]
 file = "src/Command/RunCommand.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Command\RunCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound` in `Infection\Command\RunCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable` in `Infection\Command\RunCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound` in `Infection\Command\RunCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Console\Exception\ExceptionInterface` in `Infection\Command\RunCommand::runConfigurationCommand`.'
 count = 1
 
 [[issues]]
 file = "src/Command/RunCommand.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Command\RunCommand::startUp`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Command\RunCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Command\RunCommand::executeCommand`.'
 count = 1
 
 [[issues]]
@@ -585,7 +663,7 @@ count = 1
 [[issues]]
 file = "src/Config/ValueProvider/TestFrameworkConfigPathProvider.php"
 code = "unhandled-thrown-type"
-message = "Potentially unhandled exception `RuntimeException` in `{closure:src/Config/ValueProvider/TestFrameworkConfigPathProvider.php:108:16}`."
+message = "Potentially unhandled exception `RuntimeException` in `{closure:src/Config/ValueProvider/TestFrameworkConfigPathProvider.php:105:16}`."
 count = 1
 
 [[issues]]
@@ -1417,12 +1495,6 @@ message = 'Potentially unhandled exception `ReflectionException` in `Infection\E
 count = 1
 
 [[issues]]
-file = "src/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriber.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber::onMutationTestingWasFinished`.'
-count = 1
-
-[[issues]]
 file = "src/FileSystem/FakeFileSystem.php"
 code = "imprecise-type"
 message = "Type `iterable` in parameter `$dirs` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -1894,12 +1966,6 @@ count = 1
 file = "src/Mutation/FileMutationGenerator.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Mutation\FileMutationGenerator::generateMutations`.'
-count = 1
-
-[[issues]]
-file = "src/Mutation/FileMutationGenerator.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Mutation\FileMutationGenerator::generateMutations`.'
 count = 1
 
 [[issues]]
@@ -2737,12 +2803,6 @@ message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\
 count = 1
 
 [[issues]]
-file = "src/Process/Runner/MutationTestingRunner.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Process\Runner\MutationTestingRunner::materializeMutant`.'
-count = 1
-
-[[issues]]
 file = "src/Process/Runner/ParallelProcessRunner.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessStartFailedException` in `Infection\Process\Runner\ParallelProcessRunner::startProcess`.'
@@ -2944,12 +3004,6 @@ count = 1
 file = "src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php"
 code = "possibly-null-operand"
 message = "Left operand in `>` comparison might be `null` (type `int|null`)."
-count = 1
-
-[[issues]]
-file = "src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory::buildMutationConfigFile`.'
 count = 1
 
 [[issues]]
@@ -3217,12 +3271,6 @@ message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidX
 count = 1
 
 [[issues]]
-file = "src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider::provideXPath`.'
-count = 1
-
-[[issues]]
 file = "src/TestFramework/Coverage/XmlReport/TestLocator.php"
 code = "redundant-docblock-type"
 message = "Redundant docblock type for variable `$methodRange`."
@@ -3238,12 +3286,6 @@ count = 1
 file = "src/TestFramework/Coverage/XmlReport/XmlCoverageParser.php"
 code = "less-specific-argument"
 message = 'Argument type mismatch for argument #2 of `Infection\TestFramework\Tracing\Trace\TestLocations::__construct`: expected `array<string, Infection\TestFramework\Tracing\Trace\SourceMethodLineRange>`, but provided type `array<array-key, Infection\TestFramework\Tracing\Trace\SourceMethodLineRange>` is less specific.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/Coverage/XmlReport/XmlCoverageParser.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser::parse`.'
 count = 1
 
 [[issues]]
@@ -3421,12 +3463,6 @@ message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidX
 count = 1
 
 [[issues]]
-file = "src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder::build`.'
-count = 1
-
-[[issues]]
 file = "src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php"
 code = "invalid-method-access"
 message = "Attempting to access a method on a non-object type (`false`)."
@@ -3448,12 +3484,6 @@ count = 1
 file = "src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder::getXPath`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder::build`.'
 count = 1
 
 [[issues]]

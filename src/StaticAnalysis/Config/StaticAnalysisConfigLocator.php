@@ -39,7 +39,6 @@ use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use function sprintf;
-use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
  * @internal
@@ -61,9 +60,6 @@ final readonly class StaticAnalysisConfigLocator implements TestFrameworkConfigL
     ) {
     }
 
-    /**
-     * @throws IOException
-     */
     public function locate(string $cliTool, ?string $customDir = null): string
     {
         $dir = $customDir ?: $this->configDir;

@@ -41,7 +41,6 @@ use Override;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Throwable;
 use Webmozart\Assert\Assert;
 
 /**
@@ -73,9 +72,6 @@ abstract class BaseCommand extends Command
         $this->io = new IO($input, $output);
     }
 
-    /**
-     * @throws Throwable
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         return $this->executeCommand($this->getIO())
@@ -83,9 +79,6 @@ abstract class BaseCommand extends Command
             : self::FAILURE;
     }
 
-    /**
-     * @throws Throwable
-     */
     abstract protected function executeCommand(IO $io): bool;
 
     final protected function getIO(): IO

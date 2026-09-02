@@ -48,7 +48,6 @@ use function Safe\json_decode;
 use function sprintf;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Filesystem\Exception\IOException;
 use function trim;
 
 /**
@@ -66,8 +65,6 @@ final readonly class TestFrameworkConfigPathProvider
 
     /**
      * @param string[] $dirsInCurrentDir
-     *
-     * @throws IOException
      */
     public function get(IO $io, array $dirsInCurrentDir, string $testFramework): ?string
     {
