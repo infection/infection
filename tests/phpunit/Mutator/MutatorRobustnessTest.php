@@ -38,8 +38,8 @@ namespace Infection\Tests\Mutator;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
-use Infection\Source\MatcherLine\NullSourceLineMatcher;
-use Infection\Source\MatcherLine\SourceLineMatcher;
+use Infection\Source\LineMatcher\NullSourceLineMatcher;
+use Infection\Source\LineMatcher\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Tracer;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
@@ -76,7 +76,8 @@ final class MutatorRobustnessTest extends TestCase
         $this->fileMutationGenerator = SingletonContainer::getContainer()
             ->cloneWithService(SourceLineMatcher::class, new NullSourceLineMatcher())
             ->cloneWithService(Tracer::class, new DummyTracer())
-            ->getFileMutationGenerator();
+            ->getFileMutationGenerator()
+        ;
     }
 
     /**

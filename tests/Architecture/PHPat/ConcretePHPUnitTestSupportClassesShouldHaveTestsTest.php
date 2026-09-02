@@ -47,6 +47,7 @@ final class ConcretePHPUnitTestSupportClassesShouldHaveTestsTest
             ->classes(InfectionSelector::phpunitTestSupportConcreteClassWithoutCanonicalTest())
             ->shouldNot()
             ->exist()
-            ->because('Concrete PHPUnit test support classes should have a canonical test.');
+            ->because('Concrete PHPUnit test support classes should have a canonical test.')
+        ;
     }
 }

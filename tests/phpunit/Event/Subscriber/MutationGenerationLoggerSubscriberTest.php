@@ -70,7 +70,8 @@ final class MutationGenerationLoggerSubscriberTest extends TestCase
         $this->loggerMock
             ->expects($this->once())
             ->method('start')
-            ->with(10);
+            ->with(10)
+        ;
 
         $this->dispatcher->dispatch(
             new MutationGenerationWasStarted(10),
@@ -81,7 +82,8 @@ final class MutationGenerationLoggerSubscriberTest extends TestCase
     {
         $this->loggerMock
             ->expects($this->once())
-            ->method('advance');
+            ->method('advance')
+        ;
 
         $this->dispatcher->dispatch(
             new MutableFileWasProcessed(
@@ -95,7 +97,8 @@ final class MutationGenerationLoggerSubscriberTest extends TestCase
     {
         $this->loggerMock
             ->expects($this->once())
-            ->method('finish');
+            ->method('finish')
+        ;
 
         $this->dispatcher->dispatch(
             new MutationGenerationWasFinished(),

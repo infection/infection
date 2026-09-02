@@ -42,8 +42,8 @@ use Infection\Differ\ChangedLinesRange;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
-use Infection\Source\MatcherLine\FakeSourceLineMatcher;
-use Infection\Source\MatcherLine\SimpleSourceLineMatcher;
+use Infection\Source\LineMatcher\FakeSourceLineMatcher;
+use Infection\Source\LineMatcher\SimpleSourceLineMatcher;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\Node;
 use PhpParser\Node\Name;
@@ -111,7 +111,8 @@ final class ExcludeUnchangedLinesVisitorTest extends VisitorTestCase
                     }
 
                     PHP,
-            );
+            )
+        ;
 
         yield 'no eligible nodes and no changed lines' => [
             $scenario->withExpected(

@@ -48,8 +48,8 @@ use Infection\FileSystem\FileSystem;
 use Infection\Logger\Console\ConsoleLogger;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
-use Infection\Source\MatcherLine\SimpleSourceLineMatcher;
-use Infection\Source\MatcherLine\SourceLineMatcher;
+use Infection\Source\LineMatcher\SimpleSourceLineMatcher;
+use Infection\Source\LineMatcher\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -170,13 +170,15 @@ final class DumpAstCommand extends BaseCommand
                 $file,
                 new EmptyTrace($file),
             )
-            ->traverse($initialStatements);
+            ->traverse($initialStatements)
+        ;
 
         return $traverserFactory
             ->createMutationTraverser(
                 new MarkTraversedNodesAsVisitedVisitor(),
             )
-            ->traverse($initialStatements);
+            ->traverse($initialStatements)
+        ;
     }
 
     private function getFile(IO $io): SplFileObject
@@ -286,7 +288,8 @@ final class DumpAstCommand extends BaseCommand
                 configFile: $configFile,
                 withUncovered: true,
                 sourceFilter: SourceFilterOptions::get($io),
-            );
+            )
+        ;
 
         if ($changedLinesRanges !== null) {
             $container = $container->cloneWithService(

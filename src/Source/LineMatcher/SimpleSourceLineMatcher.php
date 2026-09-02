@@ -33,26 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\MatcherLine;
+namespace Infection\Source\LineMatcher;
 
-use Infection\Source\Exception\NoSourceFound;
+use Infection\Differ\ChangedLinesRange;
 
 /**
- * Determines whether a specific line range in a file matches certain criteria.
+ * Simple implementation that will tell if any configured line ranges matches
+ * the given criteria.
+ *
+ * This can be useful for testing purposes.
  *
  * @internal
  */
-interface SourceLineMatcher
+final readonly class SimpleSourceLineMatcher implements SourceLineMatcher
 {
     /**
-     * Checks whether the specified line range in the given file matches the
-     * criteria defined by this matcher.
-     *
-     * @param string $fileRealPath Absolute path to the file to check.
-     * @param positive-int $startLine Starting line number of the range (inclusive).
-     * @param positive-int $endLine Ending line number of the range (inclusive).
-     *
-     * @throws NoSourceFound
+     * @param list<ChangedLinesRange> $changedLinesRanges
      */
-    public function touches(string $fileRealPath, int $startLine, int $endLine): bool;
+    public function __construct(
+        private array $changedLinesRanges,
+    ) {
+    }
+
+    public function touches(string $fileRealPath, int $startLine, int $endLine): bool
+    {
+        foreach ($this->changedLinesRanges as $changedLinesRange) {
+            if ($changedLinesRange->touches($startLine, $endLine)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

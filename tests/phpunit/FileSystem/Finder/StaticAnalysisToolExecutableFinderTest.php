@@ -90,7 +90,8 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
 
         $this->composerFinder = $this->createStub(ComposerExecutableFinder::class);
         $this->composerFinder->method('find')
-            ->willReturn(['/usr/bin/composer']);
+            ->willReturn(['/usr/bin/composer'])
+        ;
 
         $this->shellCommandRunner = new SymfonyProcessShellCommandRunner();
     }

@@ -33,66 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\MatcherLine;
-
-use Infection\Differ\ChangedLinesRange;
-use Infection\Framework\OperatingSystem;
-use Infection\Git\Git;
-use Infection\Source\Exception\NoSourceFound;
-use Symfony\Component\Filesystem\Path;
+namespace Infection\Source\LineMatcher;
 
 /**
+ * Default implementation that corresponds to "matches everything".
+ *
+ * This is typically used if there is no filtering done on the source, or if
+ * that filter filters files but does not apply to lines.
+ *
  * @internal
  */
-final class GitDiffSourceLineMatcher implements SourceLineMatcher
+final class NullSourceLineMatcher implements SourceLineMatcher
 {
-    /** @var array<string, list<ChangedLinesRange>> */
-    private ?array $memoizedFilesChangedLinesMap = null;
-
-    /**
-     * @param non-empty-string $gitDiffBase
-     * @param non-empty-string $gitDiffFilter
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string $workingDirectory
-     */
-    public function __construct(
-        private readonly Git $git,
-        private readonly string $gitDiffBase,
-        private readonly string $gitDiffFilter,
-        private readonly array $sourceDirectories,
-        private readonly string $workingDirectory,
-    ) {
-    }
-
     public function touches(string $fileRealPath, int $startLine, int $endLine): bool
     {
-        foreach ($this->getChangedLinesRanges($fileRealPath) as $changedLinesRange) {
-            if ($changedLinesRange->touches($startLine, $endLine)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @throws NoSourceFound
-     *
-     * @return list<ChangedLinesRange>
-     */
-    private function getChangedLinesRanges(string $fileRealPath): array
-    {
-        $this->memoizedFilesChangedLinesMap ??= $this->git->getChangedLinesRangesByFilePaths(
-            $this->gitDiffFilter,
-            $this->gitDiffBase,
-            $this->sourceDirectories,
-            $this->workingDirectory,
-        );
-
-        if (OperatingSystem::isWindows()) {
-            $fileRealPath = Path::normalize($fileRealPath);
-        }
-
-        return $this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [];
+        return true;
     }
 }

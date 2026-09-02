@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Source\MatcherLine;
+namespace Infection\Tests\Source\LineMatcher;
 
 use Infection\Differ\ChangedLinesRange;
-use Infection\Source\MatcherLine\SimpleSourceLineMatcher;
+use Infection\Source\LineMatcher\SimpleSourceLineMatcher;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

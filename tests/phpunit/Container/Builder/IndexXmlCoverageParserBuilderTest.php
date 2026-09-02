@@ -51,7 +51,8 @@ final class IndexXmlCoverageParserBuilderTest extends TestCase
     {
         $configuration = ConfigurationBuilder::withMinimalTestData()
             ->withSourceFilter(null)
-            ->build();
+            ->build()
+        ;
 
         $parser = (new IndexXmlCoverageParserBuilder(
             $configuration,
@@ -65,7 +66,8 @@ final class IndexXmlCoverageParserBuilderTest extends TestCase
     {
         $configuration = ConfigurationBuilder::withMinimalTestData()
             ->withSourceFilter(new PlainFilter(['src/']))
-            ->build();
+            ->build()
+        ;
 
         $parser = (new IndexXmlCoverageParserBuilder(
             $configuration,

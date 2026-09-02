@@ -33,20 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\MatcherLine;
+namespace Infection\Tests\Architecture\PHPat;
 
-/**
- * Default implementation that corresponds to "matches everything".
- *
- * This is typically used if there is no filtering done on the source, or if
- * that filter filters files but does not apply to lines.
- *
- * @internal
- */
-final class NullSourceLineMatcher implements SourceLineMatcher
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\Tests\Architecture\PHPat\Selector\ClassNamedAny;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
+
+final class LegacyTestFrameworkAdaptersShouldNotBeUsedTest
 {
-    public function touches(string $fileRealPath, int $startLine, int $endLine): bool
+    public function testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory(): Rule
     {
-        return true;
+        return PHPat::rule()
+            ->classes(InfectionSelector::sourceCode())
+            ->excluding(
+                Selector::withFilepath('#/src/TestFramework/LegacyTestFrameworkBridge\.php$#', true),
+                Selector::withFilepath('#/src/TestFramework/PhpUnit/Legacy/#', true),
+            )
+            ->shouldNot()
+            ->dependOn()
+            ->classes(
+                new ClassNamedAny([
+                    TestFrameworkAdapter::class,
+                    TestFrameworkAdapterFactory::class,
+                ]))
+            ->because('TestFrameworkAdapter and TestFrameworkAdapterFactory are deprecated outside the PHPUnit legacy compatibility layer.')
+        ;
     }
 }

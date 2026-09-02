@@ -203,29 +203,36 @@ final class InitialTestRunCommandTest extends TestCase
         $gitMock = $this->createMock(Git::class);
         $gitMock
             ->method('getBaseReference')
-            ->willReturn('<refinedGitReference>');
+            ->willReturn('<refinedGitReference>')
+        ;
 
         $testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
         $testFrameworkAdapterMock
             ->method('getName')
-            ->willReturn('DemoTestFramework');
+            ->willReturn('DemoTestFramework')
+        ;
 
         $initialTestsProcessMock = $this->createMock(Process::class);
         $initialTestsProcessMock
             ->method('getCommandLine')
-            ->willReturn('test-framework initialConfig');
+            ->willReturn('test-framework initialConfig')
+        ;
         $initialTestsProcessMock
             ->method('isSuccessful')
-            ->willReturn($successfulInitialTests);
+            ->willReturn($successfulInitialTests)
+        ;
         $initialTestsProcessMock
             ->method('getExitCode')
-            ->willReturn(123);
+            ->willReturn(123)
+        ;
         $initialTestsProcessMock
             ->method('getOutput')
-            ->willReturn('<processOutput>');
+            ->willReturn('<processOutput>')
+        ;
         $initialTestsProcessMock
             ->method('getErrorOutput')
-            ->willReturn('<processErrorOutput>');
+            ->willReturn('<processErrorOutput>')
+        ;
 
         $initialTestsRunnerMock = $this->createMock(InitialTestsRunner::class);
         $initialTestsRunnerMock
@@ -235,12 +242,14 @@ final class InitialTestRunCommandTest extends TestCase
                 $expectedInitialTestsPhpOptions,
                 $expectedSkipCoverage,
             )
-            ->willReturn($initialTestsProcessMock);
+            ->willReturn($initialTestsProcessMock)
+        ;
 
         $container = Container::create()
             ->cloneWithService(Git::class, $gitMock)
             ->cloneWithService(TestFrameworkAdapter::class, $testFrameworkAdapterMock)
-            ->cloneWithService(InitialTestsRunner::class, $initialTestsRunnerMock);
+            ->cloneWithService(InitialTestsRunner::class, $initialTestsRunnerMock)
+        ;
 
         $application = new Application($container);
 

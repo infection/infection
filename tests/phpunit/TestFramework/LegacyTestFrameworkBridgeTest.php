@@ -86,12 +86,14 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $consoleOutput = $this->createMock(ConsoleOutput::class);
         $consoleOutput
             ->expects($this->once())
-            ->method('logSkippingInitialTests');
+            ->method('logSkippingInitialTests')
+        ;
 
         $coverageChecker = $this->createMock(CoverageChecker::class);
         $coverageChecker
             ->expects($this->once())
-            ->method('checkCoverageExists');
+            ->method('checkCoverageExists')
+        ;
 
         $testFramework = $this->createTestFramework(
             consoleOutput: $consoleOutput,
@@ -107,12 +109,14 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $consoleOutput = $this->createMock(ConsoleOutput::class);
         $consoleOutput
             ->expects($this->never())
-            ->method('logSkippingInitialTests');
+            ->method('logSkippingInitialTests')
+        ;
 
         $coverageChecker = $this->createMock(CoverageChecker::class);
         $coverageChecker
             ->expects($this->never())
-            ->method('checkCoverageExists');
+            ->method('checkCoverageExists')
+        ;
 
         $testFramework = $this->createTestFramework(
             consoleOutput: $consoleOutput,
@@ -261,7 +265,8 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             ->expects($this->once())
             ->method('create')
             ->with($mutant, '')
-            ->willReturn($processContainer);
+            ->willReturn($processContainer)
+        ;
 
         $testFramework = $this->createTestFramework(processFactory: $processFactoryMock);
 
@@ -280,7 +285,8 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             ->expects($this->once())
             ->method('create')
             ->with($mutant, '--filter FooTest')
-            ->willReturn($processContainer);
+            ->willReturn($processContainer)
+        ;
 
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
         $testFrameworkExtraOptionsFilter
@@ -336,13 +342,16 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $process
             ->expects($this->once())
             ->method('isSuccessful')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $process
             ->method('getOutput')
-            ->willReturn($output);
+            ->willReturn($output)
+        ;
         $process
             ->method('getCommandLine')
-            ->willReturn('/tmp/phpunit');
+            ->willReturn('/tmp/phpunit')
+        ;
 
         return $process;
     }
@@ -353,19 +362,24 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $process
             ->expects($this->once())
             ->method('isSuccessful')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
         $process
             ->method('getExitCode')
-            ->willReturn(1);
+            ->willReturn(1)
+        ;
         $process
             ->method('getCommandLine')
-            ->willReturn('/tmp/phpunit');
+            ->willReturn('/tmp/phpunit')
+        ;
         $process
             ->method('getOutput')
-            ->willReturn('output');
+            ->willReturn('output')
+        ;
         $process
             ->method('getErrorOutput')
-            ->willReturn('error');
+            ->willReturn('error')
+        ;
 
         return $process;
     }
@@ -378,7 +392,8 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         ]);
         $adapter
             ->method('getInitialRunOnlyOptions')
-            ->willReturn(['--configuration']);
+            ->willReturn(['--configuration'])
+        ;
 
         return $adapter;
     }

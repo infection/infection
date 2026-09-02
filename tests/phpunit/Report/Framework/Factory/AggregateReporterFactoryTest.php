@@ -60,14 +60,16 @@ final class AggregateReporterFactoryTest extends TestCase
             ->expects($this->once())
             ->method('create')
             ->with($this->identicalTo($config))
-            ->willReturn($reporter1);
+            ->willReturn($reporter1)
+        ;
 
         $factoryMock2 = $this->createMock(ReporterFactory::class);
         $factoryMock2
             ->expects($this->once())
             ->method('create')
             ->with($this->identicalTo($config))
-            ->willReturn($reporter2);
+            ->willReturn($reporter2)
+        ;
 
         $factory = new AggregateReporterFactory([$factoryMock1, $factoryMock2]);
         $actual = $factory->create($config);

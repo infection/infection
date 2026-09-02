@@ -82,7 +82,8 @@ final class TraceProviderAdapterTracerTest extends TestCase
 
         $this->traceProviderMock
             ->method('provideTraces')
-            ->willReturn($traces);
+            ->willReturn($traces)
+        ;
 
         $this->assertSame($trace1, $this->tracer->trace($fileInfo1));
         $this->assertSame($trace2, $this->tracer->trace($fileInfo2));
@@ -124,7 +125,8 @@ final class TraceProviderAdapterTracerTest extends TestCase
         $this->traceProviderMock
             ->expects($this->once())
             ->method('provideTraces')
-            ->willReturn($tracesIterator);
+            ->willReturn($tracesIterator)
+        ;
 
         // Sanity check
         $this->assertSame(0, $tracesIterator->getIndex());
@@ -172,7 +174,8 @@ final class TraceProviderAdapterTracerTest extends TestCase
         $this->traceProviderMock
             ->expects($this->once())
             ->method('provideTraces')
-            ->willReturn($tracesIterator);
+            ->willReturn($tracesIterator)
+        ;
 
         $this->assertSame($trace, $this->tracer->trace($sourceFileInfo));
     }
@@ -183,7 +186,8 @@ final class TraceProviderAdapterTracerTest extends TestCase
 
         $this->traceProviderMock
             ->method('provideTraces')
-            ->willReturn([]);
+            ->willReturn([])
+        ;
 
         $this->expectExceptionObject(
             new NoTraceFound(
@@ -214,10 +218,12 @@ final class TraceProviderAdapterTracerTest extends TestCase
         $traceStub = $this->createStub(Trace::class);
         $traceStub
             ->method('getSourceFileInfo')
-            ->willReturn($fileInfo);
+            ->willReturn($fileInfo)
+        ;
         $traceStub
             ->method('getRealPath')
-            ->willReturn($fileInfo->getRealPath());
+            ->willReturn($fileInfo->getRealPath())
+        ;
 
         return $traceStub;
     }

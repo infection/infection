@@ -391,7 +391,8 @@ final class MutationTestingRunnerTest extends TestCase
             ->withMutation($mutation0)
             ->withMutatedCode('mutated code 0')
             ->withDiff('- Assert::integer(1)')
-            ->build();
+            ->build()
+        ;
 
         $this->mutantFactoryMock
             ->method('create')
@@ -455,7 +456,8 @@ final class MutationTestingRunnerTest extends TestCase
             ->withMutation($mutation0)
             ->withMutatedCode('mutated code 0')
             ->withDiff('- Assert::integer(1)')
-            ->build();
+            ->build()
+        ;
 
         $this->mutantFactoryMock
             ->method('create')
@@ -512,7 +514,8 @@ final class MutationTestingRunnerTest extends TestCase
         $this->diffSourceCodeMatcher
             ->expects($this->once())
             ->method('matches')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $this->runner = new MutationTestingRunner(
             $this->testFrameworkMock,
@@ -533,7 +536,8 @@ final class MutationTestingRunnerTest extends TestCase
         $mutant = MutantBuilder::withMinimalTestData()
             ->withMutation($mutation)
             ->withMutatedCode('mutated code 0')
-            ->build();
+            ->build()
+        ;
 
         $result = $this->invokeMethod('ignoredByRegex', $mutant);
 
@@ -625,12 +629,14 @@ final class MutationTestingRunnerTest extends TestCase
         $process = $this->createMock(MutantProcess::class);
         $process->expects($this->once())
             ->method('getMutantExecutionResult')
-            ->willReturn($result);
+            ->willReturn($result)
+        ;
 
         $container = $this->createMock(MutantProcessContainer::class);
         $container->expects($this->once())
             ->method('getCurrent')
-            ->willReturn($process);
+            ->willReturn($process)
+        ;
 
         $result = $this->invokeMethod('containerToFinishedEvent', $container);
         $this->assertInstanceOf(MutantProcessWasFinished::class, $result);

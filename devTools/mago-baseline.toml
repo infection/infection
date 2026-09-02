@@ -255,7 +255,7 @@ count = 1
 [[issues]]
 file = "src/Command/MakeCustomMutatorCommand.php"
 code = "invalid-return-statement"
-message = "Invalid return type for function `{closure:src/Command/MakeCustomMutatorCommand.php:107:33}`: expected `string`, but found `null|string`."
+message = "Invalid return type for function `{closure:src/Command/MakeCustomMutatorCommand.php:108:33}`: expected `string`, but found `null|string`."
 count = 1
 
 [[issues]]
@@ -273,7 +273,7 @@ count = 2
 [[issues]]
 file = "src/Command/MakeCustomMutatorCommand.php"
 code = "nullable-return-statement"
-message = "Function `{closure:src/Command/MakeCustomMutatorCommand.php:107:33}` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`)."
+message = "Function `{closure:src/Command/MakeCustomMutatorCommand.php:108:33}` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`)."
 count = 1
 
 [[issues]]
@@ -285,7 +285,7 @@ count = 1
 [[issues]]
 file = "src/Command/MakeCustomMutatorCommand.php"
 code = "unhandled-thrown-type"
-message = "Potentially unhandled exception `RuntimeException` in `{closure:src/Command/MakeCustomMutatorCommand.php:107:33}`."
+message = "Potentially unhandled exception `RuntimeException` in `{closure:src/Command/MakeCustomMutatorCommand.php:108:33}`."
 count = 1
 
 [[issues]]
@@ -2715,13 +2715,13 @@ count = 1
 [[issues]]
 file = "src/PhpParser/Visitor/ExcludeUnchangedLinesVisitor.php"
 code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Infection\Source\MatcherLine\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
+message = 'Possible argument type mismatch for argument #2 of `Infection\Source\LineMatcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
 count = 1
 
 [[issues]]
 file = "src/PhpParser/Visitor/ExcludeUnchangedLinesVisitor.php"
 code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #3 of `Infection\Source\MatcherLine\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
+message = 'Possible argument type mismatch for argument #3 of `Infection\Source\LineMatcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
 count = 1
 
 [[issues]]
@@ -5131,7 +5131,7 @@ message = 'Possible argument type mismatch for argument #2 of `Infection\Source\
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Source/MatcherLine/GitDiffSourceLineMatcherTest.php"
+file = "tests/phpunit/Source/LineMatcher/GitDiffSourceLineMatcherTest.php"
 code = "redundant-docblock-type"
 message = "Redundant docblock type for variable `$git`."
 count = 1

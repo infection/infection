@@ -49,7 +49,8 @@ final class CleanUpAfterMutationTestingFinishedSubscriberTest extends TestCase
     {
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->exactly(2))
-            ->method('remove');
+            ->method('remove')
+        ;
 
         $subscriber = new CleanUpAfterMutationTestingFinishedSubscriber($filesystem, sys_get_temp_dir());
 

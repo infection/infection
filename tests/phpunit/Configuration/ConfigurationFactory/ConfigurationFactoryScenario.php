@@ -173,7 +173,8 @@ final class ConfigurationFactoryScenario
                             ->build(),
                     )
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForHtmlLogFilePath(
@@ -205,7 +206,8 @@ final class ConfigurationFactoryScenario
                             ->build(),
                     )
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForGitlabLogger(
@@ -237,7 +239,8 @@ final class ConfigurationFactoryScenario
                             ->build(),
                     )
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForTimeout(
@@ -256,7 +259,8 @@ final class ConfigurationFactoryScenario
                 ConfigurationBuilder::from($previousExpected)
                     ->withTimeout($expectedTimeout)
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForTmpDir(
@@ -277,7 +281,8 @@ final class ConfigurationFactoryScenario
                     ->withDebugTestFrameworkLogFile($expectedTmpDir . '.debug.jsonl')
                     ->withCoveragePath($expectedTmpDir)
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForCoveragePath(
@@ -298,7 +303,8 @@ final class ConfigurationFactoryScenario
                     ->withCoveragePath($expectedCoveragePath)
                     ->withSkipCoverage($expectedSkipCoverage)
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForPhpUnitConfigDir(
@@ -317,7 +323,8 @@ final class ConfigurationFactoryScenario
                 ConfigurationBuilder::from($previousExpected)
                     ->withPhpUnit(new PhpUnit($expectedPhpUnitConfigDir, null))
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForNoProgress(
@@ -338,7 +345,8 @@ final class ConfigurationFactoryScenario
                 ConfigurationBuilder::from($previousExpected)
                     ->withNoProgress($expectedNoProgress)
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForGithubActionsDetected(
@@ -367,7 +375,8 @@ final class ConfigurationFactoryScenario
                             ->build(),
                     )
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForIgnoreMsiWithNoMutations(
@@ -395,7 +404,8 @@ final class ConfigurationFactoryScenario
                     ->withPhpStan(new PhpStan('/path/to', null))
                     ->withIgnoreMsiWithNoMutations($expectedIgnoreMsiWithNoMutations)
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForMinMsi(
@@ -423,7 +433,8 @@ final class ConfigurationFactoryScenario
                     ->withPhpStan(new PhpStan('/path/to', null))
                     ->withMinMsi($expectedMinMsi)
                     ->build(),
-            );
+            )
+        ;
     }
 
     /**
@@ -452,7 +463,8 @@ final class ConfigurationFactoryScenario
                 ConfigurationBuilder::from($previousExpected)
                     ->withDotsPerRow($expectedDotsPerRow)
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForMinCoveredMsi(
@@ -480,7 +492,8 @@ final class ConfigurationFactoryScenario
                     ->withPhpStan(new PhpStan('/path/to', null))
                     ->withMinCoveredMsi($expectedMinCoveredMsi)
                     ->build(),
-            );
+            )
+        ;
     }
 
     /**
@@ -511,7 +524,8 @@ final class ConfigurationFactoryScenario
                     ->withTestFramework($expectedTestFramework)
                     ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
                     ->build(),
-            );
+            )
+        ;
     }
 
     /**
@@ -541,7 +555,8 @@ final class ConfigurationFactoryScenario
                 ConfigurationBuilder::from($previousExpected)
                     ->withStaticAnalysisTool($expectedStaticAnalysisTool)
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForInitialTestsPhpOptions(
@@ -565,7 +580,8 @@ final class ConfigurationFactoryScenario
                 ConfigurationBuilder::from($previousExpected)
                     ->withInitialTestsPhpOptions($expectedInitialTestPhpOptions)
                     ->build(),
-            );
+            )
+        ;
     }
 
     /**
@@ -595,7 +611,8 @@ final class ConfigurationFactoryScenario
                     ->withTestFramework($configTestFramework)
                     ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForStaticAnalysisToolOptions(
@@ -619,7 +636,8 @@ final class ConfigurationFactoryScenario
                 ConfigurationBuilder::from($previousExpected)
                     ->withStaticAnalysisToolOptions($expectedStaticAnalysisToolOptions)
                     ->build(),
-            );
+            )
+        ;
     }
 
     /**
@@ -647,7 +665,8 @@ final class ConfigurationFactoryScenario
                     ->withTestFramework($configTestFramework)
                     ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
                     ->build(),
-            );
+            )
+        ;
     }
 
     /**
@@ -680,7 +699,8 @@ final class ConfigurationFactoryScenario
                     ->withMutators($expectedMutators)
                     ->withIgnoreSourceCodeMutatorsMap($expectedIgnoreSourceCodeMutatorsMap)
                     ->build(),
-            );
+            )
+        ;
     }
 
     /**
@@ -706,7 +726,8 @@ final class ConfigurationFactoryScenario
                     ])
                     ->withIgnoreSourceCodeMutatorsMap($expectedIgnoreSourceCodeMutatorsMap)
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forSourceFilter(
@@ -725,7 +746,8 @@ final class ConfigurationFactoryScenario
                 ConfigurationBuilder::from($previousExpected)
                     ->withSourceFilter($expectedSourceFilter)
                     ->build(),
-            );
+            )
+        ;
     }
 
     /**
@@ -743,7 +765,8 @@ final class ConfigurationFactoryScenario
                 $this->inputBuilder
                     ->withProjectDirectory($projectDirectoryInput),
             )
-            ->withCiProjectDirectory($resolvedProjectDirectory);
+            ->withCiProjectDirectory($resolvedProjectDirectory)
+        ;
 
         $previousExpected = $this->expected;
         Assert::isInstanceOf($previousExpected, Configuration::class);
@@ -755,7 +778,8 @@ final class ConfigurationFactoryScenario
                     ConfigurationBuilder::from($previousExpected)
                         ->withProjectDirectory($expected)
                         ->build(),
-                );
+                )
+        ;
     }
 
     public function withCpuCoresCountProvider(CpuCoresCountProvider $cpuCoresCountProvider): self
@@ -787,7 +811,8 @@ final class ConfigurationFactoryScenario
                 ConfigurationBuilder::from($previousExpected)
                     ->withThreadCount($expectedThreadCount)
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForTimeoutsAsEscaped(
@@ -811,7 +836,8 @@ final class ConfigurationFactoryScenario
                 ConfigurationBuilder::from($previousExpected)
                     ->withTimeoutsAsEscaped($expectedTimeoutsAsEscaped)
                     ->build(),
-            );
+            )
+        ;
     }
 
     public function forValueForMaxTimeouts(
@@ -835,6 +861,7 @@ final class ConfigurationFactoryScenario
                 ConfigurationBuilder::from($previousExpected)
                     ->withMaxTimeouts($expectedMaxTimeouts)
                     ->build(),
-            );
+            )
+        ;
     }
 }

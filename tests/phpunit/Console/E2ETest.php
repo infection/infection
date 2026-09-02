@@ -179,7 +179,8 @@ final class E2ETest extends TestCase
         $directories = Finder::create()
             ->depth('== 0')
             ->in(__DIR__ . '/../../e2e/')
-            ->directories();
+            ->directories()
+        ;
 
         foreach ($directories as $dirName) {
             if (file_exists($dirName . '/run_tests.bash')) {

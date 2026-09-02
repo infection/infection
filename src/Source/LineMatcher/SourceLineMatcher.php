@@ -33,53 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Report;
+namespace Infection\Source\LineMatcher;
 
-use Infection\Report\ComposableReporter;
-use Infection\Report\Framework\DataProducer;
-use Infection\Report\Framework\Writer\ReportWriter;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
+use Infection\Source\Exception\NoSourceFound;
 
-#[CoversClass(ComposableReporter::class)]
-final class ComposableReporterTest extends TestCase
+/**
+ * Determines whether a specific line range in a file matches certain criteria.
+ *
+ * @internal
+ */
+interface SourceLineMatcher
 {
     /**
-     * @param iterable<string>|string $contentOrLines
+     * Checks whether the specified line range in the given file matches the
+     * criteria defined by this matcher.
+     *
+     * @param string $fileRealPath Absolute path to the file to check.
+     * @param positive-int $startLine Starting line number of the range (inclusive).
+     * @param positive-int $endLine Ending line number of the range (inclusive).
+     *
+     * @throws NoSourceFound
      */
-    #[DataProvider('contentsOrLinesProvider')]
-    public function test_it_writes_the_content_produced(iterable|string $contentOrLines): void
-    {
-        $dataProducerMock = $this->createMock(DataProducer::class);
-        $dataProducerMock
-            ->expects($this->once())
-            ->method('produce')
-            ->willReturn($contentOrLines)
-        ;
-
-        $writerMock = $this->createMock(ReportWriter::class);
-        $writerMock
-            ->expects($this->once())
-            ->method('write')
-            ->with($contentOrLines)
-        ;
-
-        $reporter = new ComposableReporter($dataProducerMock, $writerMock);
-        $reporter->report();
-    }
-
-    public static function contentsOrLinesProvider(): iterable
-    {
-        yield 'contents' => [
-            'Hello World!',
-        ];
-
-        yield 'lines' => [
-            [
-                'First line',
-                'Second line',
-            ],
-        ];
-    }
+    public function touches(string $fileRealPath, int $startLine, int $endLine): bool;
 }

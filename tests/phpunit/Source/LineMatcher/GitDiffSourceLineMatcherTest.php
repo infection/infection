@@ -33,12 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Source\MatcherLine;
+namespace Infection\Tests\Source\LineMatcher;
 
 use const DIRECTORY_SEPARATOR;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Git\Git;
-use Infection\Source\MatcherLine\GitDiffSourceLineMatcher;
+use Infection\Source\LineMatcher\GitDiffSourceLineMatcher;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -188,7 +188,8 @@ final class GitDiffSourceLineMatcherTest extends TestCase
             ->expects($this->once())
             ->method('getChangedLinesRangesByFilePaths')
             ->with('AM', 'main', ['src', 'lib'], '/path/to')
-            ->willReturn($changedLinesRangesByFilePathname);
+            ->willReturn($changedLinesRangesByFilePathname)
+        ;
 
         return $git;
     }

@@ -193,7 +193,8 @@ $config = RectorConfig::configure()
         ],
         VariableConstFetchToClassConstFetchRector::class,
         WhileNullableToInstanceofRector::class,
-    ]);
+    ])
+;
 
 foreach ($skippedPaths as $skippedPath) {
     if (\file_exists($skippedPath)) {

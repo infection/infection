@@ -33,36 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\MatcherLine;
+namespace Infection\Source\LineMatcher;
 
-use Infection\Differ\ChangedLinesRange;
+use DomainException;
 
 /**
- * Simple implementation that will tell if any configured line ranges matches
- * the given criteria.
- *
- * This can be useful for testing purposes.
- *
  * @internal
  */
-final readonly class SimpleSourceLineMatcher implements SourceLineMatcher
+final readonly class FakeSourceLineMatcher implements SourceLineMatcher
 {
-    /**
-     * @param list<ChangedLinesRange> $changedLinesRanges
-     */
-    public function __construct(
-        private array $changedLinesRanges,
-    ) {
-    }
-
     public function touches(string $fileRealPath, int $startLine, int $endLine): bool
     {
-        foreach ($this->changedLinesRanges as $changedLinesRange) {
-            if ($changedLinesRange->touches($startLine, $endLine)) {
-                return true;
-            }
-        }
-
-        return false;
+        throw new DomainException('Not implemented');
     }
 }

@@ -151,9 +151,9 @@ use Infection\Source\Collector\MemoizedSourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\Source\MatcherLine\GitDiffSourceLineMatcher;
-use Infection\Source\MatcherLine\NullSourceLineMatcher;
-use Infection\Source\MatcherLine\SourceLineMatcher;
+use Infection\Source\LineMatcher\GitDiffSourceLineMatcher;
+use Infection\Source\LineMatcher\NullSourceLineMatcher;
+use Infection\Source\LineMatcher\SourceLineMatcher;
 use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
@@ -1210,8 +1210,7 @@ final class Container extends DIContainer
 
         return $config->isDryRun
             ? $this->get(DryProcessRunner::class)
-            : $this->get(ParallelProcessRunner::class)
-        ;
+            : $this->get(ParallelProcessRunner::class);
     }
 
     private function getMutantFactory(): MutantFactory

@@ -52,7 +52,6 @@ final readonly class MutationGenerationLoggerFactory
     {
         return $this->skipProgressBar
             ? new ConsoleNoProgressLogger($this->output)
-            : new ConsoleProgressBarLogger($this->output)
-        ;
+            : new ConsoleProgressBarLogger($this->output);
     }
 }
