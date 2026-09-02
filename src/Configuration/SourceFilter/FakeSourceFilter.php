@@ -38,6 +38,6 @@ namespace Infection\Configuration\SourceFilter;
 /**
  * @internal
  */
-final class FakeSourceFilter implements SourceFilter
+final class FakeSourceFilter implements SourceFileFilter
 {
 }

@@ -55,7 +55,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalPathsFilter;
-use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\Configuration\SourceFilter\SourceFileFilter;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
@@ -457,7 +457,7 @@ class ConfigurationFactory
     }
 
     /**
-     * @return array{0: SourceFilter|null, 1: string|null}
+     * @return array{0: SourceFileFilter|null, 1: string|null}
      */
     private function refineFilterIfNecessary(
         PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,

@@ -44,7 +44,7 @@ use function implode;
 /**
  * @internal
  */
-final readonly class PlainFilter implements SourceFilter
+final readonly class PlainFilter implements SourceFileFilter
 {
     /**
      * @param non-empty-array<non-empty-string> $values
