@@ -32,6 +32,7 @@ excludes = [
     "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/Fixtures",
     # Rector or PHPStan stubs can pollute Mago's Reflection inference
     # https://github.com/carthage-software/mago/issues/1676
+    "tests/phpunit/AutoReview/Rector",
     "vendor/rector/rector",
     "vendor/phpstan",
 ]
