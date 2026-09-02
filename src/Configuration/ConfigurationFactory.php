@@ -485,9 +485,7 @@ class ConfigurationFactory
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath, ?string $summaryJsonLogFilePath): Logs
     {
-        if ($useGitHubLogger === null) {
-            $useGitHubLogger = $this->detectCiGithubActions();
-        }
+        $useGitHubLogger ??= $this->detectCiGithubActions();
 
         if ($useGitHubLogger) {
             $logs->setUseGitHubAnnotationsLogger($useGitHubLogger);

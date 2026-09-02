@@ -223,9 +223,7 @@ final class ConfigureCommand extends BaseCommand
         }
 
         if ($phpUnitCustomExecutablePath !== null) {
-            if (!isset($configObject->phpUnit)) {
-                $configObject->phpUnit = new stdClass();
-            }
+            $configObject->phpUnit ??= new stdClass();
 
             $configObject->phpUnit->customPath = $phpUnitCustomExecutablePath;
         }
