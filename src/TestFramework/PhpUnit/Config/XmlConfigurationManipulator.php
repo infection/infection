@@ -123,7 +123,6 @@ final readonly class XmlConfigurationManipulator
 
         $this->setAttributeValue($xPath, 'recordTestRunHistory', 'false');
 
-        // Ordering tests by defects or by duration requires the test run history which is deactivated right above. PHPUnit ignored that combination silently until 13.3 turned it into a test runner warning, which aborts the initial run because of failOnWarning https://github.com/sebastianbergmann/phpunit/blob/13.3.0/src/TextUI/Application.php
         $this->removeExecutionOrdersRequiringTestRunHistory($xPath);
     }
 
@@ -360,10 +359,16 @@ final readonly class XmlConfigurationManipulator
     }
 
     /**
-     * PHPUnit parses the components of `executionOrder` independently from each other: `defects` only
-     * sets the defects-first flag, `depends`/`no-depends` only set the dependency resolution and the
-     * remaining ones set the order itself. Dropping a component hence leaves the meaning of the other
-     * ones untouched; without an order component PHPUnit falls back to its default order.
+     * Ordering tests by defects or by duration requires the test run history, which the initial run
+     * configuration disables since there is nothing to order by before the first run. PHPUnit ignored
+     * that combination silently until 13.3 turned it into a test runner warning, which aborts the
+     * initial run because of failOnWarning https://github.com/sebastianbergmann/phpunit/blob/13.3.0/src/TextUI/Application.php
+     *
+     * Dropping these components is safe because PHPUnit parses the components of `executionOrder`
+     * independently from each other: `defects` only sets the defects-first flag, `depends`/`no-depends`
+     * only set the dependency resolution and the remaining ones set the order itself. The meaning of
+     * the other components is hence untouched; without an order component PHPUnit falls back to its
+     * default order.
      */
     private function removeExecutionOrdersRequiringTestRunHistory(SafeDOMXPath $xPath): void
     {
