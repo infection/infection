@@ -1084,21 +1084,6 @@ parameters:
 			path: ../src/Testing/SingletonContainer.php
 
 		-
-			rawMessage: Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Testing/TestFramework/Debug/DebugTestFrameworkAdapter.php
-
-		-
-			rawMessage: '''
-				Call to deprecated method isSubclassOf() of class PHPStan\Reflection\ClassReflection:
-				Use isSubclassOfClass instead.
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: ../tests/Architecture/PHPat/Selector/Support/PHPUnitTestClassAnalysis.php
-
-		-
 			rawMessage: Infection\Tests\AutoReview\ConcreteClassReflector should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1

@@ -695,7 +695,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
      * @param non-empty-string $expectedExecutionOrder
      */
     #[DataProvider('executionOrderProvider')]
-    public function test_it_removes_defects_from_the_execution_order_for_phpunit_13_3(string $executionOrder, string $expectedExecutionOrder): void
+    public function test_it_removes_the_execution_orders_requiring_the_test_run_history_for_phpunit_13_3(string $executionOrder, string $expectedExecutionOrder): void
     {
         $this->assertItChangesXML(<<<XML
             <?xml version="1.0" encoding="UTF-8"?>
@@ -726,7 +726,15 @@ final class XmlConfigurationManipulatorTest extends TestCase
 
         yield 'defects last' => ['depends,defects', 'depends'];
 
-        yield 'no defects' => ['depends,random', 'depends,random'];
+        yield 'duration ascending only' => ['duration-ascending', 'default'];
+
+        yield 'duration descending only' => ['duration-descending', 'default'];
+
+        yield 'deprecated duration alias' => ['duration', 'default'];
+
+        yield 'defects and duration' => ['depends,defects,duration-ascending', 'depends'];
+
+        yield 'no order requiring the test run history' => ['depends,random', 'depends,random'];
     }
 
     public function test_it_keeps_the_execution_order_untouched_for_phpunit_13_2(): void
