@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\Config;
 
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -48,6 +49,31 @@ use Symfony\Component\Filesystem\Path;
 final class StaticAnalysisConfigLocatorTest extends TestCase
 {
     private string $baseDir = __DIR__ . '/../../Fixtures/ConfigLocator/';
+
+    public function test_it_looks_up_and_resolves_the_config_file_via_the_injected_file_system(): void
+    {
+        $fileSystemMock = $this->createMock(FileSystem::class);
+        $fileSystemMock
+            ->expects($this->exactly(2))
+            ->method('exists')
+            ->willReturnMap([
+                ['/custom-dir/phpstan.neon', false],
+                ['/custom-dir/phpstan.neon.dist', true],
+            ])
+        ;
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('realPath')
+            ->with('/custom-dir/phpstan.neon.dist')
+            ->willReturn('/resolved/phpstan.neon.dist')
+        ;
+
+        $locator = new StaticAnalysisConfigLocator('/config-dir', $fileSystemMock);
+
+        $actual = $locator->locate('phpstan', '/custom-dir');
+
+        $this->assertSame('/resolved/phpstan.neon.dist', $actual);
+    }
 
     public function test_it_throws_an_error_if_no_config_file_found(): void
     {

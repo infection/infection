@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Config;
 
-use function file_exists;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
 use function sprintf;
 
 /**
@@ -57,6 +56,7 @@ final readonly class TestFrameworkConfigLocator implements TestFrameworkConfigLo
 
     public function __construct(
         private string $configDir,
+        private FileSystem $fileSystem = new FileSystem(),
     ) {
     }
 
@@ -68,8 +68,8 @@ final readonly class TestFrameworkConfigLocator implements TestFrameworkConfigLo
         foreach (self::DEFAULT_EXTENSIONS as $extension) {
             $conf = sprintf('%s/%s.%s', $dir, $cliTool, $extension);
 
-            if (file_exists($conf)) {
-                return realpath($conf);
+            if ($this->fileSystem->exists($conf)) {
+                return $this->fileSystem->realPath($conf);
             }
 
             $triedFiles[] = sprintf('%s.%s', $cliTool, $extension);

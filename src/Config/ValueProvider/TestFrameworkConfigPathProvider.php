@@ -37,15 +37,13 @@ namespace Infection\Config\ValueProvider;
 
 use Closure;
 use Exception;
-use function file_exists;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
 use Infection\Console\IO;
+use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\TestFrameworkTypes;
-use function is_dir;
 use RuntimeException;
-use function Safe\file_get_contents;
 use function Safe\json_decode;
 use function sprintf;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -61,6 +59,7 @@ final readonly class TestFrameworkConfigPathProvider
         private TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator,
         private ConsoleHelper $consoleHelper,
         private QuestionHelper $questionHelper,
+        private FileSystem $fileSystem = new FileSystem(),
     ) {
     }
 
@@ -78,11 +77,11 @@ final readonly class TestFrameworkConfigPathProvider
                 return $this->askTestFrameworkConfigLocation($io, $dirsInCurrentDir, $testFramework, '');
             }
 
-            if (!file_exists('composer.json')) {
+            if (!$this->fileSystem->exists('composer.json')) {
                 return $this->askTestFrameworkConfigLocation($io, $dirsInCurrentDir, $testFramework, '');
             }
 
-            $composerJsonText = file_get_contents('composer.json');
+            $composerJsonText = $this->fileSystem->readFile('composer.json');
 
             $phpUnitPathGuesser = new PhpUnitPathGuesser(json_decode($composerJsonText));
             $defaultValue = $phpUnitPathGuesser->guess();
@@ -110,8 +109,8 @@ final readonly class TestFrameworkConfigPathProvider
                 return $answerDir;
             }
 
-            if (!is_dir($answerDir)) {
-                throw new RuntimeException(sprintf('Could not find "%s" directory.', $answerDir));
+            if (!$this->fileSystem->isReadableDirectory($answerDir)) {
+                throw new RuntimeException(sprintf('Directory "%s" does not exist or is not readable.', $answerDir));
             }
 
             $this->testFrameworkConfigLocator->locate($testFramework, $answerDir);

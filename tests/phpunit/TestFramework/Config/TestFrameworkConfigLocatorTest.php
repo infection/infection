@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Config;
 
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -48,6 +49,32 @@ use Symfony\Component\Filesystem\Path;
 final class TestFrameworkConfigLocatorTest extends TestCase
 {
     private string $baseDir = __DIR__ . '/../../Fixtures/ConfigLocator/';
+
+    public function test_it_looks_up_and_resolves_the_config_file_via_the_injected_file_system(): void
+    {
+        $fileSystemMock = $this->createMock(FileSystem::class);
+        $fileSystemMock
+            ->expects($this->exactly(3))
+            ->method('exists')
+            ->willReturnMap([
+                ['/config-dir/phpunit.xml', false],
+                ['/config-dir/phpunit.yml', false],
+                ['/config-dir/phpunit.xml.dist', true],
+            ])
+        ;
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('realPath')
+            ->with('/config-dir/phpunit.xml.dist')
+            ->willReturn('/resolved/phpunit.xml.dist')
+        ;
+
+        $locator = new TestFrameworkConfigLocator('/config-dir', $fileSystemMock);
+
+        $actual = $locator->locate('phpunit');
+
+        $this->assertSame('/resolved/phpunit.xml.dist', $actual);
+    }
 
     public function test_it_throws_an_error_if_no_config_file_found(): void
     {
