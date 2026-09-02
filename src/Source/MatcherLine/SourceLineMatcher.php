@@ -33,20 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\Matcher\Line;
+namespace Infection\Source\MatcherLine;
+
+use Infection\Source\Exception\NoSourceFound;
 
 /**
- * Default implementation that corresponds to "matches everything".
- *
- * This is typically used if there is no filtering done on the source, or if
- * that filter filters files but does not apply to lines.
+ * Determines whether a specific line range in a file matches certain criteria.
  *
  * @internal
  */
-final class NullSourceLineMatcher implements SourceLineMatcher
+interface SourceLineMatcher
 {
-    public function touches(string $fileRealPath, int $startLine, int $endLine): bool
-    {
-        return true;
-    }
+    /**
+     * Checks whether the specified line range in the given file matches the
+     * criteria defined by this matcher.
+     *
+     * @param string $fileRealPath Absolute path to the file to check.
+     * @param positive-int $startLine Starting line number of the range (inclusive).
+     * @param positive-int $endLine Ending line number of the range (inclusive).
+     *
+     * @throws NoSourceFound
+     */
+    public function touches(string $fileRealPath, int $startLine, int $endLine): bool;
 }
