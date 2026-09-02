@@ -60,6 +60,7 @@ final class LegacyTestFrameworkAdaptersShouldNotBeUsedTest
                     TestFrameworkAdapter::class,
                     TestFrameworkAdapterFactory::class,
                 ]))
-            ->because('TestFrameworkAdapter and TestFrameworkAdapterFactory are deprecated outside the PHPUnit legacy compatibility layer.');
+            ->because('TestFrameworkAdapter and TestFrameworkAdapterFactory are deprecated outside the PHPUnit legacy compatibility layer.')
+        ;
     }
 }

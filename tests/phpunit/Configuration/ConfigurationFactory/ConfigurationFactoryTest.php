@@ -1664,7 +1664,8 @@ final class ConfigurationFactoryTest extends TestCase
                     ->getMutatorResolver()
                     ->resolve(['@default' => true]),
                 false,
-            );
+            )
+        ;
 
         return self::$mutators;
     }
