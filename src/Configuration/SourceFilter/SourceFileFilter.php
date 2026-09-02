@@ -41,6 +41,6 @@ namespace Infection\Configuration\SourceFilter;
  * Represents a filter to apply to the configured source to reduce the scope of the eligible files and/or code
  * to mutate.
  */
-interface SourceFilter
+interface SourceFileFilter
 {
 }

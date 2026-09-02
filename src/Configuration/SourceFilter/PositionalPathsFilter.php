@@ -42,7 +42,7 @@ namespace Infection\Configuration\SourceFilter;
  *
  * @internal
  */
-final readonly class PositionalPathsFilter implements SourceFilter
+final readonly class PositionalPathsFilter implements SourceFileFilter
 {
     /**
      * @param list<non-empty-string> $paths
