@@ -198,4 +198,5 @@ return (new Config())
         'blank_line_after_opening_tag' => false,
     ])
     ->setFinder($finder)
-    ->setCacheFile(__DIR__ . '/var/cache/php-cs-fixer');
+    ->setCacheFile(__DIR__ . '/var/cache/php-cs-fixer')
+;
