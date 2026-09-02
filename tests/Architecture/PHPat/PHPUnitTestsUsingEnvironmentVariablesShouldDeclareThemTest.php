@@ -56,6 +56,7 @@ final readonly class PHPUnitTestsUsingEnvironmentVariablesShouldDeclareThemTest
             ->excluding(InfectionSelector::selectorFixtures())
             ->shouldNot()
             ->exist()
-            ->because('PHPUnit tests exercising code that uses environment variables should declare them with WithEnvironmentVariable.');
+            ->because('PHPUnit tests exercising code that uses environment variables should declare them with WithEnvironmentVariable.')
+        ;
     }
 }

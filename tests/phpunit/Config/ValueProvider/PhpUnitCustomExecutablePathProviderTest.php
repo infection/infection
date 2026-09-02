@@ -78,7 +78,8 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
         $this->finderMock
             ->expects($this->once())
             ->method('find')
-            ->with(TestFrameworkTypes::PHPUNIT);
+            ->with(TestFrameworkTypes::PHPUNIT)
+        ;
 
         $this->fileSystemMock
             ->expects($this->never())
@@ -98,7 +99,8 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
             ->expects($this->once())
             ->method('find')
             ->with(TestFrameworkTypes::PHPUNIT)
-            ->willThrowException(new FinderException());
+            ->willThrowException(new FinderException())
+        ;
 
         $this->fileSystemMock
             ->expects($this->once())
@@ -124,7 +126,8 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
             ->expects($this->once())
             ->method('find')
             ->with(TestFrameworkTypes::PHPUNIT)
-            ->willThrowException(new FinderException());
+            ->willThrowException(new FinderException())
+        ;
 
         $this->fileSystemMock
             ->expects($this->once())

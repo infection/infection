@@ -116,7 +116,8 @@ final class NodeDumperTest extends TestCase
                 PHP,
         )
             ->withShowAllNodes()
-            ->withDumpProperties();
+            ->withDumpProperties()
+        ;
 
         yield 'variable' => $variableAssignment
             ->withExpected(
@@ -143,7 +144,8 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'variable with comments' => $variableAssignment
             ->withDumpComments()
@@ -178,7 +180,8 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'variable with positions' => $variableAssignment
             ->withDumpPositions()
@@ -206,7 +209,8 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'tree with only some nodes marked as visited' => NodeDumperScenario::forNode(
             [
@@ -258,7 +262,8 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'variable other attributes' => NodeDumperScenario::forNode(
             [
@@ -291,7 +296,8 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'empty array' => NodeDumperScenario::forNode([])
             ->withShowAllNodes()
@@ -301,7 +307,8 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'array with values' => NodeDumperScenario::forNode(
             // @phpstan-ignore argument.type
@@ -317,7 +324,8 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'name' => NodeDumperScenario::forNode(
             new Name(['Hallo', 'World']),
@@ -328,7 +336,8 @@ final class NodeDumperTest extends TestCase
                     Name
                     AST,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'name with extra properties' => NodeDumperScenario::forNode(
             new Name(['Hallo', 'World']),
@@ -342,7 +351,8 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'array expression' => NodeDumperScenario::forNode(
             new Array_([
@@ -361,7 +371,8 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'array expression with extra properties' => NodeDumperScenario::forNode(
             new Array_([
@@ -387,7 +398,8 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'empty method' => NodeDumperScenario::forNode(
             new Node\Stmt\ClassMethod(
@@ -402,7 +414,8 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
     }
 
     public static function decoratedNodesProvider(): iterable
@@ -426,7 +439,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'eligible nodes can be decorated' => (static function () {
@@ -458,7 +472,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
     }
 
@@ -496,7 +511,8 @@ final class NodeDumperTest extends TestCase
                         $node2,
                     ),
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'next attribute with ID' => (static function () {
@@ -554,7 +570,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'parent attribute' => (static function () {
@@ -583,7 +600,8 @@ final class NodeDumperTest extends TestCase
                 ->withExpected(
                     PotentialCircularDependencyDetected::forAttribute('parent', $parent),
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'parent attribute with ID' => (static function () {
@@ -638,7 +656,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'functionScope' => (static function () {
@@ -664,7 +683,8 @@ final class NodeDumperTest extends TestCase
                         $node,
                     ),
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'functionScope with ID' => (static function () {
@@ -706,7 +726,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
     }
 
@@ -728,7 +749,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'resolvedName with identified FullyQualified name' => (static function () {
@@ -749,7 +771,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'resolvedName with plain Name' => (static function () {
@@ -768,7 +791,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'resolvedName with plain identified Name' => (static function () {
@@ -789,7 +813,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'resolvedName is not shown without dumpOtherAttributes' => (static function () {
@@ -805,7 +830,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'namespacedName with FullyQualified name' => (static function () {
@@ -825,7 +851,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'namespacedName with identified FullyQualified name' => (static function () {
@@ -847,7 +874,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'namespacedName with plain Name' => (static function () {
@@ -867,7 +895,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'namespacedName with plain identified Name' => (static function () {
@@ -889,7 +918,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
 
         yield 'namespacedName is not shown without dumpOtherAttributes' => (static function () {
@@ -907,7 +937,8 @@ final class NodeDumperTest extends TestCase
                         )
                         AST,
                 )
-                ->build();
+                ->build()
+            ;
         })();
     }
 
@@ -950,7 +981,8 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'line numbers are hidden by default' => NodeDumperScenario::forCode(
             <<<'PHP'
@@ -980,7 +1012,8 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'line numbers with multi-line code' => NodeDumperScenario::forCode(
             <<<'PHP'
@@ -1035,6 +1068,7 @@ final class NodeDumperTest extends TestCase
                     )
                     AST,
             )
-            ->build();
+            ->build()
+        ;
     }
 }

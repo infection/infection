@@ -174,7 +174,8 @@ final readonly class InitialConfigBuilder implements ConfigBuilder
         if ($count === 0) {
             $xPath
                 ->getElement('/phpunit')
-                ->setAttribute($attribute, $value);
+                ->setAttribute($attribute, $value)
+            ;
 
             return true;
         }

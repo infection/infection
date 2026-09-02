@@ -124,7 +124,8 @@ final class TracerIntegrationTest extends TestCase
         $testFrameworkAdapterStub = $this->createStub(TestFrameworkAdapter::class);
         $testFrameworkAdapterStub
             ->method('hasJUnitReport')
-            ->willReturn($junitXmlPath !== null);
+            ->willReturn($junitXmlPath !== null)
+        ;
 
         $junitFileDataProvider = $junitXmlPath === null
             ? new FakeTestFileDataProvider()
@@ -163,10 +164,12 @@ final class TracerIntegrationTest extends TestCase
         $fileSystemStub = $this->createStub(FileSystem::class);
         $fileSystemStub
             ->method('isReadableFile')
-            ->willReturnCallback($fileSystem->isReadableFile(...));
+            ->willReturnCallback($fileSystem->isReadableFile(...))
+        ;
         $fileSystemStub
             ->method('readFile')
-            ->willReturnCallback($fileSystem->readFile(...));
+            ->willReturnCallback($fileSystem->readFile(...))
+        ;
 
         // We are only interested in mocking the realPath check!
         // In this test, we do not ~~need~~ want to check that the source file exists as this
@@ -176,7 +179,8 @@ final class TracerIntegrationTest extends TestCase
         // source file is the one we expect.
         $fileSystemStub
             ->method('realPath')
-            ->willReturnCallback(static fn (string $path): string => $path);
+            ->willReturnCallback(static fn (string $path): string => $path)
+        ;
 
         return $fileSystemStub;
     }

@@ -161,7 +161,8 @@ abstract class BaseMutatorTestCase extends TestCase
             ->getMutatorFactory()
             ->create([
                 $mutatorClassName => ['settings' => $settings],
-            ], false);
+            ], false)
+        ;
 
         $mutator = array_shift($mutators);
         Assert::isInstanceOf($mutator, Mutator::class);
@@ -263,7 +264,8 @@ abstract class BaseMutatorTestCase extends TestCase
                 output: new NullOutput(),
                 withUncovered: true,
             )
-            ->getNodeTraverserFactory();
+            ->getNodeTraverserFactory()
+        ;
 
         $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
 
@@ -272,11 +274,13 @@ abstract class BaseMutatorTestCase extends TestCase
                 $sourceFile,
                 new EmptyTrace($sourceFile),
             )
-            ->traverse($nodes);
+            ->traverse($nodes)
+        ;
 
         $factory
             ->createMutationTraverser($mutationsCollectorVisitor)
-            ->traverse($nodes);
+            ->traverse($nodes)
+        ;
 
         return take($mutationsCollectorVisitor->getMutations())->toList();
     }

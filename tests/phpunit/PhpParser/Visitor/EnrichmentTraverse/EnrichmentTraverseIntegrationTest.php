@@ -71,7 +71,8 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
     ): void {
         $traverserFactory = $this
             ->createContainer($changedLinesRange)
-            ->getNodeTraverserFactory();
+            ->getNodeTraverserFactory()
+        ;
 
         $nodes = $this->parse($code);
 
@@ -81,12 +82,14 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                 new MockSplFileInfo(realPath: '/path/to/source.php'),
                 $this->createTraceStub(),
             )
-            ->traverse($nodes);
+            ->traverse($nodes)
+        ;
         $traversedNodes = $traverserFactory
             ->createMutationTraverser(
                 new MarkTraversedNodesAsVisitedVisitor(),
             )
-            ->traverse($nodes);
+            ->traverse($nodes)
+        ;
 
         $actual = $this->dumper->dump(
             $traversedNodes,
@@ -2184,7 +2187,8 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
             ->cloneWithService(
                 SourceLineMatcher::class,
                 $sourceLineMatcher,
-            );
+            )
+        ;
     }
 
     private function createTraceStub(): Trace
@@ -2198,7 +2202,8 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                     '/path/to/test.php',
                     0.23,
                 ),
-            ]);
+            ])
+        ;
 
         return $traceStub;
     }

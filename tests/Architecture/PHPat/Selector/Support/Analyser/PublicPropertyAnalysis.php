@@ -48,7 +48,8 @@ final class PublicPropertyAnalysis
     {
         $publicProperties = $classReflection
             ->getNativeReflection()
-            ->getProperties(ReflectionProperty::IS_PUBLIC);
+            ->getProperties(ReflectionProperty::IS_PUBLIC)
+        ;
 
         foreach ($publicProperties as $property) {
             if (

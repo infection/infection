@@ -151,7 +151,8 @@ final class ShowMetricsReporterTest extends TestCase
 
                     DISPLAY,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'all metrics' => $completeScenario->build();
 
@@ -179,7 +180,8 @@ final class ShowMetricsReporterTest extends TestCase
 
                     DISPLAY,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'it marks all percentages as low if bellow the low threshold' => $emptyScenario
             ->withUncovered(true)
@@ -200,7 +202,8 @@ final class ShowMetricsReporterTest extends TestCase
 
                     DISPLAY,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'it marks all percentages as meidum if above the low threshold' => $emptyScenario
             ->withUncovered(true)
@@ -221,7 +224,8 @@ final class ShowMetricsReporterTest extends TestCase
 
                     DISPLAY,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'it marks all percentages as medium if bellow the high threshold' => $emptyScenario
             ->withUncovered(true)
@@ -242,7 +246,8 @@ final class ShowMetricsReporterTest extends TestCase
 
                     DISPLAY,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'it marks all percentages as high if above the high threshold' => $emptyScenario
             ->withUncovered(true)
@@ -263,7 +268,8 @@ final class ShowMetricsReporterTest extends TestCase
 
                     DISPLAY,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'it marks all percentages based on their respective values' => $emptyScenario
             ->withUncovered(true)
@@ -284,7 +290,8 @@ final class ShowMetricsReporterTest extends TestCase
 
                     DISPLAY,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'it rounds all percentages to the next lowest integer' => $emptyScenario
             ->withUncovered(true)
@@ -305,7 +312,8 @@ final class ShowMetricsReporterTest extends TestCase
 
                     DISPLAY,
             )
-            ->build();
+            ->build()
+        ;
 
         yield 'it pads the counts values' => $emptyScenario
             ->withTotalMutantsCount(10_000)
@@ -325,7 +333,8 @@ final class ShowMetricsReporterTest extends TestCase
 
                     DISPLAY,
             )
-            ->build();
+            ->build()
+        ;
     }
 
     private function createReporter(
@@ -344,43 +353,56 @@ final class ShowMetricsReporterTest extends TestCase
 
         $metricsCalculatorStub
             ->method('getKilledByTestsCount')
-            ->willReturn($scenario->killedByTestsCount);
+            ->willReturn($scenario->killedByTestsCount)
+        ;
         $metricsCalculatorStub
             ->method('getKilledByStaticAnalysisCount')
-            ->willReturn($scenario->killedByStaticAnalysisCount);
+            ->willReturn($scenario->killedByStaticAnalysisCount)
+        ;
         $metricsCalculatorStub
             ->method('getIgnoredCount')
-            ->willReturn($scenario->ignoredCount);
+            ->willReturn($scenario->ignoredCount)
+        ;
         $metricsCalculatorStub
             ->method('getNotTestedCount')
-            ->willReturn($scenario->notTestedCount);
+            ->willReturn($scenario->notTestedCount)
+        ;
         $metricsCalculatorStub
             ->method('getEscapedCount')
-            ->willReturn($scenario->escapedCount);
+            ->willReturn($scenario->escapedCount)
+        ;
         $metricsCalculatorStub
             ->method('getErrorCount')
-            ->willReturn($scenario->errorCount);
+            ->willReturn($scenario->errorCount)
+        ;
         $metricsCalculatorStub
             ->method('getSyntaxErrorCount')
-            ->willReturn($scenario->syntaxErrorCount);
+            ->willReturn($scenario->syntaxErrorCount)
+        ;
         $metricsCalculatorStub
             ->method('getTimedOutCount')
-            ->willReturn($scenario->timedOutCount);
+            ->willReturn($scenario->timedOutCount)
+        ;
         $metricsCalculatorStub
             ->method('getSkippedCount')
-            ->willReturn($scenario->skippedCount);
+            ->willReturn($scenario->skippedCount)
+        ;
         $metricsCalculatorStub
             ->method('getTotalMutantsCount')
-            ->willReturn($scenario->totalMutantsCount);
+            ->willReturn($scenario->totalMutantsCount)
+        ;
         $metricsCalculatorStub
             ->method('getMutationScoreIndicator')
-            ->willReturn($scenario->mutationScoreIndicator);
+            ->willReturn($scenario->mutationScoreIndicator)
+        ;
         $metricsCalculatorStub
             ->method('getCoverageRate')
-            ->willReturn($scenario->coverageRate);
+            ->willReturn($scenario->coverageRate)
+        ;
         $metricsCalculatorStub
             ->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn($scenario->coveredCodeMutationScoreIndicator);
+            ->willReturn($scenario->coveredCodeMutationScoreIndicator)
+        ;
 
         return $metricsCalculatorStub;
     }

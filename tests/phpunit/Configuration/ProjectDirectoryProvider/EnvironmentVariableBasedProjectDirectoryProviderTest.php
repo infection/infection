@@ -65,10 +65,12 @@ final class EnvironmentVariableBasedProjectDirectoryProviderTest extends TestCas
         $fileSystemStub = $this->createStub(FileSystem::class);
         $fileSystemStub
             ->method('isAbsolutePath')
-            ->willReturn($absolute);
+            ->willReturn($absolute)
+        ;
         $fileSystemStub
             ->method('isReadableDirectory')
-            ->willReturn($readableDirectory);
+            ->willReturn($readableDirectory)
+        ;
 
         $provider = new EnvironmentVariableBasedProjectDirectoryProvider(
             $fileSystemStub,

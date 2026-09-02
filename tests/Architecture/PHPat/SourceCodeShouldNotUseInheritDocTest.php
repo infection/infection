@@ -53,6 +53,7 @@ final class SourceCodeShouldNotUseInheritDocTest
             )
             ->shouldNot()
             ->exist()
-            ->because('PHPDoc is inherited implicitly therefore add no information. See ADR-0001.');
+            ->because('PHPDoc is inherited implicitly therefore add no information. See ADR-0001.')
+        ;
     }
 }

@@ -104,7 +104,8 @@ final class InitialTestRunCommand extends BaseCommand
                 $configuration->testFrameworkExtraOptions,
                 $initialTestsPhpOptions,
                 $configuration->skipCoverage,
-            );
+            )
+        ;
 
         $io->writeln([
             'Command executed:',
@@ -117,7 +118,8 @@ final class InitialTestRunCommand extends BaseCommand
                 $configuration->testFrameworkExtraOptions,
                 $initialTestsPhpOptions,
                 $configuration->skipCoverage,
-            );
+            )
+        ;
 
         if (!$initialTestSuiteProcess->isSuccessful()) {
             throw InitialTestsFailed::fromProcessAndAdapter(

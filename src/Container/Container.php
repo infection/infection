@@ -1210,8 +1210,7 @@ final class Container extends DIContainer
 
         return $config->isDryRun
             ? $this->get(DryProcessRunner::class)
-            : $this->get(ParallelProcessRunner::class)
-        ;
+            : $this->get(ParallelProcessRunner::class);
     }
 
     private function getMutantFactory(): MutantFactory
