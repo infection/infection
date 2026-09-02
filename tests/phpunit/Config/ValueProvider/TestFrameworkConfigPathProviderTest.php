@@ -83,7 +83,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
 
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('exists');
+            ->method('exists')
+        ;
 
         $result = $this->provider->get(
             new IO(
@@ -123,7 +124,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
             ->expects($this->once())
             ->method('isReadableDirectory')
             ->with($inputPhpUnitPath)
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
 
         $path = $this->provider->get(
             new IO(
@@ -142,7 +144,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
         $this->consoleMock
             ->expects($this->once())
             ->method('getQuestion')
-            ->willReturn('foobar');
+            ->willReturn('foobar')
+        ;
 
         $this->locatorMock
             ->expects($this->exactly(2))
@@ -150,17 +153,20 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
             ->willReturnOnConsecutiveCalls(
                 $this->throwException(new Exception()),
                 '',
-            );
+            )
+        ;
 
         $this->fileSystemMock
             ->expects($this->once())
             ->method('exists')
             ->with('composer.json')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('readFile');
+            ->method('readFile')
+        ;
 
         $inputPhpUnitPath = '/path/to/phpunit/config';
 
@@ -168,7 +174,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
             ->expects($this->once())
             ->method('isReadableDirectory')
             ->with($inputPhpUnitPath)
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
 
         $path = $this->provider->get(
             new IO(
@@ -233,7 +240,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
             ->willReturnMap([
                 ['abc', false],
                 ['.', true],
-            ]);
+            ])
+        ;
 
         $path = $this->provider->get(
             new IO(
@@ -253,7 +261,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
             ->expects($this->once())
             ->method('exists')
             ->with('composer.json')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
 
         $this->fileSystemMock
             ->expects($this->once())

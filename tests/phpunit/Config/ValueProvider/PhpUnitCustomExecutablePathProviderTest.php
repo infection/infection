@@ -83,7 +83,8 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
 
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('exists');
+            ->method('exists')
+        ;
 
         $this->assertNull(
             $this->provider->get(new IO(
@@ -106,7 +107,8 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
             ->expects($this->once())
             ->method('exists')
             ->with(self::CUSTOM_PHPUNIT_EXECUTABLE)
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
 
         $path = $this->provider->get(new IO(
             $this->createStreamableInput($this->getInputStream(self::CUSTOM_PHPUNIT_EXECUTABLE . "\n")),
@@ -133,7 +135,8 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
             ->expects($this->once())
             ->method('exists')
             ->with('abc')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $this->expectException(SymfonyRuntimeException::class);
 

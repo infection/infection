@@ -59,12 +59,14 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
             ->willReturnMap([
                 ['/custom-dir/phpstan.neon', false],
                 ['/custom-dir/phpstan.neon.dist', true],
-            ]);
+            ])
+        ;
         $fileSystemMock
             ->expects($this->once())
             ->method('realPath')
             ->with('/custom-dir/phpstan.neon.dist')
-            ->willReturn('/resolved/phpstan.neon.dist');
+            ->willReturn('/resolved/phpstan.neon.dist')
+        ;
 
         $locator = new StaticAnalysisConfigLocator('/config-dir', $fileSystemMock);
 

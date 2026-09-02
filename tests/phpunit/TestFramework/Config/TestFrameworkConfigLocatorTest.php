@@ -60,12 +60,14 @@ final class TestFrameworkConfigLocatorTest extends TestCase
                 ['/config-dir/phpunit.xml', false],
                 ['/config-dir/phpunit.yml', false],
                 ['/config-dir/phpunit.xml.dist', true],
-            ]);
+            ])
+        ;
         $fileSystemMock
             ->expects($this->once())
             ->method('realPath')
             ->with('/config-dir/phpunit.xml.dist')
-            ->willReturn('/resolved/phpunit.xml.dist');
+            ->willReturn('/resolved/phpunit.xml.dist')
+        ;
 
         $locator = new TestFrameworkConfigLocator('/config-dir', $fileSystemMock);
 
