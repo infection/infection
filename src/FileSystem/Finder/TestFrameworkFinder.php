@@ -200,6 +200,7 @@ class TestFrameworkFinder
                 ...$this->findComposer(),
                 'config',
                 'bin-dir',
+                '--absolute',
             ]);
 
             if ($binDir !== '') {
