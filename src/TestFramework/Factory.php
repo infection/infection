@@ -157,7 +157,7 @@ final readonly class Factory
      */
     private function getFilteredSourceFilesToMutate(): array
     {
-        return $this->infectionConfig->sourceFilter === null
+        return !$this->infectionConfig->sourceFilter->filtersFiles()
             ? []
             : $this->sourceCollector->collect();
     }

@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\PositionalPathsClassifier;
+namespace Infection\Tests\Configuration\PositionalArgumentsClassifier;
 
 use Exception;
-use Infection\Configuration\ClassifiedPaths;
+use Infection\Configuration\ClassifiedPositionalArguments;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
@@ -58,7 +58,7 @@ final class Scenario
         array $sourceDirectories,
         public array $existingFiles,
         public array $existingDirectories,
-        public ClassifiedPaths|Exception $expected,
+        public ClassifiedPositionalArguments|Exception $expected,
     ) {
         $this->schema = self::createSchema($sourceDirectories);
     }
@@ -70,9 +70,10 @@ final class Scenario
             sourceDirectories: [],
             existingFiles: [],
             existingDirectories: [],
-            expected: new ClassifiedPaths(
+            expected: new ClassifiedPositionalArguments(
                 sourcePaths: [],
                 testPaths: [],
+                sourceSelectors: [],
             ),
         );
     }
@@ -121,7 +122,7 @@ final class Scenario
         return $clone;
     }
 
-    public function withExpected(ClassifiedPaths|Exception $expected): self
+    public function withExpected(ClassifiedPositionalArguments|Exception $expected): self
     {
         $clone = clone $this;
         $clone->expected = $expected;
@@ -129,11 +130,11 @@ final class Scenario
         return $clone;
     }
 
-    public function expectedClassifiedPaths(): ClassifiedPaths
+    public function expectedClassifiedPositionalArguments(): ClassifiedPositionalArguments
     {
         $expected = $this->expected;
 
-        if (!$expected instanceof ClassifiedPaths) {
+        if (!$expected instanceof ClassifiedPositionalArguments) {
             throw new LogicException('Expected classified paths.');
         }
 

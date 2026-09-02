@@ -33,21 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
+namespace Infection\Tests\Configuration\SourceFilter;
 
-/**
- * Wraps raw positional CLI path arguments before they are classified into source
- * and test paths. ConfigurationFactory resolves this into a PlainFilter (source
- * paths) and forwards test paths to testFrameworkExtraArgs.
- *
- * @internal
- */
-final readonly class PositionalPathsFilter
+use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\SourceFileFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(SourceFilter::class)]
+final class SourceFilterTest extends TestCase
 {
-    /**
-     * @param list<non-empty-string> $paths
-     */
-    public function __construct(public array $paths)
+    #[DataProvider('fileFilterProvider')]
+    public function test_it_knows_whether_files_are_filtered(
+        ?SourceFileFilter $fileFilter,
+        bool $expected,
+    ): void {
+        $sourceFilter = new SourceFilter($fileFilter, []);
+
+        $this->assertSame($expected, $sourceFilter->filtersFiles());
+    }
+
+    public static function fileFilterProvider(): iterable
     {
+        yield 'unfiltered' => [
+            null,
+            false,
+        ];
+
+        yield 'filtered' => [
+            new PlainFilter(['src/']),
+            true,
+        ];
     }
 }

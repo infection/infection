@@ -33,21 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
+namespace Infection\Tests\Configuration\SourceSymbol;
 
-/**
- * Wraps raw positional CLI path arguments before they are classified into source
- * and test paths. ConfigurationFactory resolves this into a PlainFilter (source
- * paths) and forwards test paths to testFrameworkExtraArgs.
- *
- * @internal
- */
-final readonly class PositionalPathsFilter
+use Infection\Configuration\SourceSymbol\InvalidSourceSymbolSelector;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(InvalidSourceSymbolSelector::class)]
+final class InvalidSourceSymbolSelectorTest extends TestCase
 {
-    /**
-     * @param list<non-empty-string> $paths
-     */
-    public function __construct(public array $paths)
+    public function test_it_creates_an_exception_for_the_value(): void
     {
+        $exception = InvalidSourceSymbolSelector::create('App\Mailer::send:32');
+
+        $this->assertSame(
+            <<<'MESSAGE'
+                Invalid source selector "App\Mailer::send:32". Expected one of:
+                - Class
+                - Class::method
+                - Class::line
+                - Class::method::line
+                MESSAGE,
+            $exception->getMessage(),
+        );
     }
 }

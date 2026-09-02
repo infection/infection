@@ -33,21 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
+namespace Infection\Tests\Source\Exception;
 
-/**
- * Wraps raw positional CLI path arguments before they are classified into source
- * and test paths. ConfigurationFactory resolves this into a PlainFilter (source
- * paths) and forwards test paths to testFrameworkExtraArgs.
- *
- * @internal
- */
-final readonly class PositionalPathsFilter
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
+use Infection\Source\Exception\SourceSymbolNotFound;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(SourceSymbolNotFound::class)]
+final class SourceSymbolNotFoundTest extends TestCase
 {
-    /**
-     * @param list<non-empty-string> $paths
-     */
-    public function __construct(public array $paths)
+    public function test_it_lists_every_unmatched_selector(): void
     {
+        $throwable = SourceSymbolNotFound::forSelectors([
+            new SourceSymbolSelector('Differ', null, null),
+            new SourceSymbolSelector('App\\Mailer', 'send', 42),
+        ]);
+
+        $this->assertSame(
+            'The following source selectors did not match any source symbol: "Differ", "App\\Mailer::send::42".',
+            $throwable->getMessage(),
+        );
     }
 }
