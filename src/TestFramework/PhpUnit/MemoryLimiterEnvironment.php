@@ -33,10 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Memory;
+namespace Infection\TestFramework\PhpUnit;
 
-use Composer\XdebugHandler\XdebugHandler;
-use const PHP_SAPI;
 use function Safe\ini_get;
 
 /**
@@ -50,12 +48,5 @@ class MemoryLimiterEnvironment
         // -1 means no memory limit. Anything else means the user has set their own limits, which we
         // don't want to mess with
         return ini_get('memory_limit') !== '-1';
-    }
-
-    public function isUsingSystemIni(): bool
-    {
-        // Under phpdbg we're using a system php.ini and we can't add a memory limit there. If there
-        // is no skipped version of xdebug handler we are also using the system php ini
-        return PHP_SAPI === 'phpdbg' || XdebugHandler::getSkippedVersion() === '';
     }
 }

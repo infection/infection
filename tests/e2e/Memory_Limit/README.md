@@ -10,8 +10,8 @@ Mutant processes are only limited by the time they could take before timing out.
 
 ## Resolution
 
-Since we know how much memory the initial test suite used, and only if we know, we can enforce a memory limit upon all mutation processes. Limit is set to be twice the known amount, because if we know that a normal test suite used X megabytes, if a mutant uses a lot more, this is a definite error.
+Since PHPUnit reports how much memory the initial test suite used, its adapter can enforce a limit on its own mutant processes. The limit is set to twice the known amount, because if a normal test suite used X megabytes, a PHPUnit mutant using much more indicates an error.
 
-Memory limit is introduced by altering a known temporary php.ini to include a directive to enable the limit as the very last line. We only apply a memory limit if there isn't one set.
+The PHPUnit adapter adds the limit as a PHP `-d memory_limit=...` argument to each PHPUnit mutant command. The shared `php.ini` remains untouched, so follow-up processes from other adapters are unaffected. We only apply a limit if there isn't one set.
 
 So far this fix can only be applied to PHPUnit. Other testing suites are not reporting memory usage.

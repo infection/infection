@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
 use function array_map;
+use function array_slice;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\FileSystem\FileSystem;
@@ -50,6 +51,8 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\PhpUnit\MemoryLimiter;
+use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -279,6 +282,26 @@ final class PhpUnitAdapterTest extends TestCase
             $scenario->expected,
             $actual,
         );
+    }
+
+    public function test_it_applies_the_initial_run_memory_usage_to_mutant_commands(): void
+    {
+        $this->fileSystemMock->expects($this->exactly(2))->method('dumpFile');
+        $environment = $this->createMock(MemoryLimiterEnvironment::class);
+        $environment->expects($this->once())->method('hasMemoryLimitSet')->willReturn(false);
+        $memoryLimiter = new MemoryLimiter($environment);
+        $adapter = $this->createAdapter(
+            testFrameworkConfigContent: <<<'XML'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <phpunit/>
+                XML,
+            memoryLimiter: $memoryLimiter,
+        );
+        $adapter->recordInitialRunMemoryUsage(12.5);
+
+        $command = $adapter->getMutantCommandLine([], '/mutant.php', 'hash', '/original.php', '');
+
+        $this->assertSame(['-d', 'memory_limit=25M'], array_slice($command, 1, 2));
     }
 
     public static function passOutputProvider(): iterable
@@ -1625,6 +1648,7 @@ final class PhpUnitAdapterTest extends TestCase
         bool $executeOnlyCoveringTestCases = false,
         ?string $mapSourceClassToTestStrategy = null,
         ?ShellCommandRunner $shellCommandRunner = null,
+        ?MemoryLimiter $memoryLimiter = null,
     ): PhpUnitAdapter {
         $tmpDir = '/tmp';
         $projectDir = '/path/to/project';
@@ -1673,6 +1697,7 @@ final class PhpUnitAdapterTest extends TestCase
             $shellCommandRunner ?? $this->createStub(ShellCommandRunner::class),
             new VersionParser(),    // won't be used since we pass the version
             new CommandLineBuilder($this->phpExecutableFinderMock),
+            $memoryLimiter ?? new MemoryLimiter($this->createStub(MemoryLimiterEnvironment::class)),
             $version,
         );
     }

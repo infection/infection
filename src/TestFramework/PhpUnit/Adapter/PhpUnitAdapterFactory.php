@@ -50,6 +50,8 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\PhpUnit\MemoryLimiter;
+use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use function Safe\file_get_contents;
 use SplFileInfo;
@@ -150,6 +152,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
+            new MemoryLimiter(new MemoryLimiterEnvironment()),
         );
     }
 

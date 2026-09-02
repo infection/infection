@@ -49,10 +49,8 @@ use Infection\Process\Runner\InitialStaticAnalysis;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\PreloadedSourceChecker;
-use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\JUnit\TestNotFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
@@ -69,7 +67,6 @@ final readonly class Engine
         private Configuration $config,
         private TestFramework $testFramework,
         private EventDispatcher $eventDispatcher,
-        private MemoryLimiter $memoryLimiter,
         private MutationGenerator $mutationGenerator,
         private MutationTestingRunner $mutationTestingRunner,
         private MinMsiChecker $minMsiChecker,
@@ -97,15 +94,8 @@ final readonly class Engine
     {
         $this->preloadedSourceChecker->check();
 
-        $initialRunResults = $this->runInitialTestSuite();
+        $this->runInitialTestSuite();
         $this->initialStaticAnalysis->run();
-
-        /*
-         * Limit the memory used for the mutation processes based on the memory
-         * used for the initial test run.
-         * This is done AFTER static analysis to avoid restricting PHPStan's memory.
-         */
-        $this->memoryLimiter->limitMemory($initialRunResults);
 
         $this->runMutationAnalysis();
 
@@ -124,15 +114,15 @@ final readonly class Engine
         }
     }
 
-    private function runInitialTestSuite(): ?InitialRunResults
+    private function runInitialTestSuite(): void
     {
         $this->testFramework->checkRequirements();
 
         if ($this->config->skipInitialTests) {
-            return null;
+            return;
         }
 
-        return $this->testFramework->executeInitialRun();
+        $this->testFramework->executeInitialRun();
     }
 
     /**
