@@ -33,55 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Operator;
+namespace Infection\Tests\AutoReview\Rector;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\NodeAttributes;
-use PhpParser\Node;
+use Iterator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
-/**
- * @internal
- *
- * @implements Mutator<Node\Expr\Ternary>
- */
-final class Ternary implements Mutator
+#[CoversClass(VarTagOnParameterToParamTagRector::class)]
+#[Group('integration')]
+final class VarTagOnParameterToParamTagRectorTest extends AbstractRectorTestCase
 {
-    use GetMutatorName;
-
-    public static function getDefinition(): Definition
+    #[DataProvider('provideFixtures')]
+    public function test_it_moves_var_tags_to_the_method(string $fixture): void
     {
-        return new Definition(
-            <<<'TXT'
-                Swaps the ternary operator operands, e.g. replaces `true ? true : false` with `true ? false : true`.
-                TXT,
-            MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null,
-            <<<'DIFF'
-                - $x = true ? true : false;
-                + $x = true ? false : true;
-                DIFF,
-        );
+        $this->doTestFile($fixture);
     }
 
-    public function canMutate(Node $node): bool
+    public static function provideFixtures(): Iterator
     {
-        return $node instanceof Node\Expr\Ternary;
+        return self::yieldFilesFromDirectory(__DIR__ . '/Fixture');
     }
 
-    /**
-     * @psalm-mutation-free
-     *
-     * @return iterable<Node\Expr>
-     */
-    public function mutate(Node $node): iterable
+    public function provideConfigFilePath(): string
     {
-        $if = $node->if;
-
-        $if ??= $node->cond;
-
-        yield new Node\Expr\Ternary($node->cond, $node->else, $if, NodeAttributes::getAllExceptOriginalNode($node));
+        return __DIR__ . '/config/configured_rule.php';
     }
 }

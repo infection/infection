@@ -33,55 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Operator;
+use Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector;
+use Rector\Config\RectorConfig;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\NodeAttributes;
-use PhpParser\Node;
-
-/**
- * @internal
- *
- * @implements Mutator<Node\Expr\Ternary>
- */
-final class Ternary implements Mutator
-{
-    use GetMutatorName;
-
-    public static function getDefinition(): Definition
-    {
-        return new Definition(
-            <<<'TXT'
-                Swaps the ternary operator operands, e.g. replaces `true ? true : false` with `true ? false : true`.
-                TXT,
-            MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null,
-            <<<'DIFF'
-                - $x = true ? true : false;
-                + $x = true ? false : true;
-                DIFF,
-        );
-    }
-
-    public function canMutate(Node $node): bool
-    {
-        return $node instanceof Node\Expr\Ternary;
-    }
-
-    /**
-     * @psalm-mutation-free
-     *
-     * @return iterable<Node\Expr>
-     */
-    public function mutate(Node $node): iterable
-    {
-        $if = $node->if;
-
-        $if ??= $node->cond;
-
-        yield new Node\Expr\Ternary($node->cond, $node->else, $if, NodeAttributes::getAllExceptOriginalNode($node));
-    }
-}
+return RectorConfig::configure()
+    ->withRules([VarTagOnParameterToParamTagRector::class]);

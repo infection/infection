@@ -1657,17 +1657,14 @@ final class ConfigurationFactoryTest extends TestCase
      */
     private static function getDefaultMutators(): array
     {
-        if (self::$mutators === null) {
-            self::$mutators = SingletonContainer::getContainer()
-                ->getMutatorFactory()
-                ->create(
-                    SingletonContainer::getContainer()
-                        ->getMutatorResolver()
-                        ->resolve(['@default' => true]),
-                    false,
-                )
-            ;
-        }
+        self::$mutators ??= SingletonContainer::getContainer()
+            ->getMutatorFactory()
+            ->create(
+                SingletonContainer::getContainer()
+                    ->getMutatorResolver()
+                    ->resolve(['@default' => true]),
+                false,
+            );
 
         return self::$mutators;
     }
