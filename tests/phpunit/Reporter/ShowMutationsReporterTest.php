@@ -568,7 +568,8 @@ final class ShowMutationsReporterTest extends TestCase
             ->withMutatorName('CustomMutator')
             ->withMutantHash($mutationHash)
             ->withDetectionStatus($status)
-            ->build();
+            ->build()
+        ;
     }
 
     /**
@@ -643,7 +644,8 @@ final class ShowMutationsReporterTest extends TestCase
                     Str::indent($diff, '    '),
                     "\n",
                 ),
-            );
+            )
+        ;
 
         return $diffColorizerStub;
     }

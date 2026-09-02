@@ -111,7 +111,8 @@ final class ExcludeUnchangedLinesVisitorTest extends VisitorTestCase
                     }
 
                     PHP,
-            );
+            )
+        ;
 
         yield 'no eligible nodes and no changed lines' => [
             $scenario->withExpected(

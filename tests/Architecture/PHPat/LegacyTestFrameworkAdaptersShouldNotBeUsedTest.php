@@ -33,61 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\ArtefactCollection;
+namespace Infection\Tests\Architecture\PHPat;
 
-use Infection\Framework\Str;
-use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
-use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\BufferedOutput;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\Tests\Architecture\PHPat\Selector\ClassNamedAny;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-#[CoversClass(ConsoleNoProgressLogger::class)]
-final class ConsoleNoProgressLoggerTest extends TestCase
+final class LegacyTestFrameworkAdaptersShouldNotBeUsedTest
 {
-    private BufferedOutput $output;
-
-    private MockObject&AbstractTestFrameworkAdapter $testFrameworkMock;
-
-    private InitialTestsExecutionLogger $logger;
-
-    protected function setUp(): void
+    public function testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory(): Rule
     {
-        $this->output = new BufferedOutput();
-        $this->testFrameworkMock = $this->createMock(AbstractTestFrameworkAdapter::class);
-
-        $this->logger = new ConsoleNoProgressLogger(
-            $this->testFrameworkMock,
-            $this->output,
-        );
-    }
-
-    public function test_it_logs_on_start(): void
-    {
-        $this->testFrameworkMock
-            ->expects($this->once())
-            ->method('getVersion')
-            ->willReturn('6.5.4')
+        return PHPat::rule()
+            ->classes(InfectionSelector::sourceCode())
+            ->excluding(
+                Selector::withFilepath('#/src/TestFramework/LegacyTestFrameworkBridge\.php$#', true),
+                Selector::withFilepath('#/src/TestFramework/PhpUnit/Legacy/#', true),
+            )
+            ->shouldNot()
+            ->dependOn()
+            ->classes(
+                new ClassNamedAny([
+                    TestFrameworkAdapter::class,
+                    TestFrameworkAdapterFactory::class,
+                ]))
+            ->because('TestFrameworkAdapter and TestFrameworkAdapterFactory are deprecated outside the PHPUnit legacy compatibility layer.')
         ;
-
-        $this->testFrameworkMock
-            ->expects($this->once())
-            ->method('getName')
-            ->willReturn('PHPUnit')
-        ;
-
-        $expected = <<<'EOF'
-
-            Running initial tests with PHPUnit version 6.5.4
-
-            EOF;
-
-        $this->logger->start();
-
-        $actual = Str::toUnixLineEndings($this->output->fetch());
-
-        $this->assertSame($expected, $actual);
     }
 }

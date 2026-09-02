@@ -51,7 +51,8 @@ final class MemoizedComposerExecutableFinderTest extends TestCase
         $mockFinder = $this->createMock(ComposerExecutableFinder::class);
         $mockFinder->expects($this->once())
             ->method('find')
-            ->willReturn($pathToComposer);
+            ->willReturn($pathToComposer)
+        ;
 
         $finder = new MemoizedComposerExecutableFinder($mockFinder);
 
@@ -66,7 +67,8 @@ final class MemoizedComposerExecutableFinderTest extends TestCase
         $mockFinder = $this->createMock(ComposerExecutableFinder::class);
         $mockFinder->expects($this->once())
             ->method('find')
-            ->willThrowException($exception);
+            ->willThrowException($exception)
+        ;
 
         $finder = new MemoizedComposerExecutableFinder($mockFinder);
 

@@ -55,7 +55,8 @@ final class DebugCommandLineTest extends TestCase
         $phpExecutableFinder = $this->createStub(PhpExecutableFinder::class);
         $phpExecutableFinder
             ->method('find')
-            ->willReturn('/php');
+            ->willReturn('/php')
+        ;
 
         $this->commandLine = new DebugCommandLine($phpExecutableFinder);
     }
@@ -118,7 +119,8 @@ final class DebugCommandLineTest extends TestCase
             ->expects($this->once())
             ->method('find')
             ->with(false)
-            ->willReturn('/php');
+            ->willReturn('/php')
+        ;
 
         $commandLine = new DebugCommandLine($phpExecutableFinder);
 
@@ -131,7 +133,8 @@ final class DebugCommandLineTest extends TestCase
         $phpExecutableFinder = $this->createStub(PhpExecutableFinder::class);
         $phpExecutableFinder
             ->method('find')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $commandLine = new DebugCommandLine($phpExecutableFinder);
 

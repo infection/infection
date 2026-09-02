@@ -48,12 +48,14 @@ final class AggregateReporterTest extends TestCase
         $reporterMock1 = $this->createMock(Reporter::class);
         $reporterMock1
             ->expects($this->once())
-            ->method('report');
+            ->method('report')
+        ;
 
         $reporterMock2 = $this->createMock(Reporter::class);
         $reporterMock2
             ->expects($this->once())
-            ->method('report');
+            ->method('report')
+        ;
 
         $reporter = new AggregateReporter([$reporterMock1, $reporterMock2]);
         $reporter->report();

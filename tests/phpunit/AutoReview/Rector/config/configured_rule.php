@@ -37,4 +37,5 @@ use Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector;
 use Rector\Config\RectorConfig;
 
 return RectorConfig::configure()
-    ->withRules([VarTagOnParameterToParamTagRector::class]);
+    ->withRules([VarTagOnParameterToParamTagRector::class])
+;

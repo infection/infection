@@ -124,7 +124,8 @@ final class JUnitReportLocator extends BaseReportLocator implements ReportLocato
             // In the other scenario, this gives a more consistent result to the
             // user for a failing scenario.
             // This also makes testing easier.
-            ->sortByName();
+            ->sortByName()
+        ;
     }
 
     private static function createPHPUnitDefaultJUnitPathname(string $coverageDirectory): string

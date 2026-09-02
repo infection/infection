@@ -57,8 +57,7 @@ final class ConcreteClassReflector
 
                 return !$reflectionClass->isInterface()
                     && !$reflectionClass->isAbstract()
-                    && !$reflectionClass->isTrait()
-                ;
+                    && !$reflectionClass->isTrait();
             },
         );
     }

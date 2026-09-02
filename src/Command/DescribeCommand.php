@@ -57,7 +57,8 @@ final class DescribeCommand extends BaseCommand
         $this
             ->setName('describe')
             ->setDescription('Describes a mutator')
-            ->addArgument('Mutator name', InputArgument::OPTIONAL);
+            ->addArgument('Mutator name', InputArgument::OPTIONAL)
+        ;
     }
 
     protected function executeCommand(IO $io): bool

@@ -157,7 +157,8 @@ final class FileReporterTest extends FileSystemTestCase
             ->expects($this->once())
             ->method('dumpFile')
             ->with(self::LOG_FILE_PATH, $this->anything())
-            ->willThrowException(new IOException('Cannot write in directory X'));
+            ->willThrowException(new IOException('Cannot write in directory X'))
+        ;
 
         $reporter = new FileReporter(
             self::LOG_FILE_PATH,
