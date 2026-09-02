@@ -33,21 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
+namespace Infection\Configuration\SourceSymbol;
 
 /**
- * Wraps raw positional CLI path arguments before they are classified into source
- * and test paths. ConfigurationFactory resolves this into a PlainFilter (source
- * paths) and forwards test paths to testFrameworkExtraArgs.
+ * A positional source selector. Line numbers are absolute source-file lines.
  *
  * @internal
  */
-final readonly class PositionalPathsFilter
+final readonly class SourceSymbolSelector
 {
     /**
-     * @param list<non-empty-string> $paths
+     * @param positive-int|null $line
      */
-    public function __construct(public array $paths)
-    {
+    public function __construct(
+        public string $className,
+        public ?string $methodName,
+        public ?int $line,
+    ) {
     }
 }

@@ -33,21 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
+namespace Infection\Configuration;
+
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 
 /**
- * Wraps raw positional CLI path arguments before they are classified into source
- * and test paths. ConfigurationFactory resolves this into a PlainFilter (source
- * paths) and forwards test paths to testFrameworkExtraArgs.
+ * Result of positional path classification: source paths (equivalent to --filter)
+ * and test paths (equivalent to --test-framework-extra-args, space-joined).
  *
  * @internal
  */
-final readonly class PositionalPathsFilter
+final readonly class ClassifiedPositionalArguments
 {
     /**
-     * @param list<non-empty-string> $paths
+     * @param list<non-empty-string> $sourcePaths
+     * @param list<non-empty-string> $testPaths
+     * @param list<SourceSymbolSelector> $sourceSelectors
      */
-    public function __construct(public array $paths)
-    {
+    public function __construct(
+        public array $sourcePaths,
+        public array $testPaths,
+        public array $sourceSelectors,
+    ) {
     }
 }

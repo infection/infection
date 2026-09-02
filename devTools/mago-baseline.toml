@@ -733,7 +733,7 @@ message = 'Potentially unhandled exception `UnexpectedValueException` in `Infect
 count = 1
 
 [[issues]]
-file = "src/Configuration/PositionalPathsClassifier.php"
+file = "src/Configuration/PositionalArgumentsClassifier.php"
 code = "redundant-logical-operation"
 message = "Redundant `&&` operation: left operand is evaluated and right operand is always truthy."
 count = 1

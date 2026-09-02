@@ -64,6 +64,7 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
+use Infection\Source\Exception\SourceSymbolNotFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -155,7 +156,7 @@ final class RunCommand extends BaseCommand
             ->setName('run')
             ->setDescription('Runs the mutation testing.');
 
-        PathsArgument::addArgument($this);
+        PathsArgument::addRunArgument($this);
 
         TestFrameworkOption::addOption($this)
             ->addOption(
@@ -372,6 +373,9 @@ final class RunCommand extends BaseCommand
             );
     }
 
+    /**
+     * @throws SourceSymbolNotFound
+     */
     protected function executeCommand(IO $io): bool
     {
         $logger = new ConsoleLogger($io);

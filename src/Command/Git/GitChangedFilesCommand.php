@@ -97,7 +97,7 @@ final class GitChangedFilesCommand extends BaseCommand
             );
         }
 
-        $sourceFilter = $container->getConfiguration()->sourceFilter;
+        $sourceFilter = $container->getConfiguration()->sourceFilter->fileFilter;
         Assert::isInstanceOf($sourceFilter, GitDiffFilter::class);
 
         $logger->notice(

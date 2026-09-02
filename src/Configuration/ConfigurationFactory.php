@@ -55,7 +55,8 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalPathsFilter;
-use Infection\Configuration\SourceFilter\SourceFileFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
@@ -103,7 +104,7 @@ class ConfigurationFactory
         private readonly Git $git,
         private readonly ProjectDirectoryProvider $projectDirectoryProvider,
         private readonly CpuCoresCountProvider $cpuCoresCountProvider,
-        private readonly PositionalPathsClassifier $positionalPathsClassifier,
+        private readonly PositionalArgumentsClassifier $positionalArgumentsClassifier,
     ) {
     }
 
@@ -427,14 +428,14 @@ class ConfigurationFactory
     }
 
     /**
-     * @return array{0: PlainFilter|null, 1: string|null}
+     * @return array{0: PlainFilter|null, 1: string|null, 2: list<SourceSymbolSelector>}
      */
     private function resolvePositionalPathsFilter(
         PositionalPathsFilter $sourceFilter,
         SchemaConfiguration $schema,
         ?string $testFrameworkExtraArgs,
     ): array {
-        $classified = $this->positionalPathsClassifier->classify(
+        $classified = $this->positionalArgumentsClassifier->classify(
             $sourceFilter->paths,
             $schema,
         );
@@ -453,19 +454,21 @@ class ConfigurationFactory
             $testFrameworkExtraArgs = implode(' ', $classified->testPaths);
         }
 
-        return [$resolvedFilter, $testFrameworkExtraArgs];
+        return [$resolvedFilter, $testFrameworkExtraArgs, $classified->sourceSelectors];
     }
 
     /**
-     * @return array{0: SourceFileFilter|null, 1: string|null}
+     * @return array{0: SourceFilter, 1: string|null}
      */
     private function refineFilterIfNecessary(
         PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
         SchemaConfiguration $schema,
         ?string $testFrameworkExtraArgs,
     ): array {
+        $sourceSymbolSelectors = [];
+
         if ($sourceFilter instanceof PositionalPathsFilter) {
-            [$sourceFilter, $testFrameworkExtraArgs] = $this->resolvePositionalPathsFilter(
+            [$sourceFilter, $testFrameworkExtraArgs, $sourceSymbolSelectors] = $this->resolvePositionalPathsFilter(
                 $sourceFilter,
                 $schema,
                 $testFrameworkExtraArgs,
@@ -479,7 +482,7 @@ class ConfigurationFactory
             );
         }
 
-        return [$sourceFilter, $testFrameworkExtraArgs];
+        return [new SourceFilter($sourceFilter, $sourceSymbolSelectors), $testFrameworkExtraArgs];
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath, ?string $summaryJsonLogFilePath): Logs

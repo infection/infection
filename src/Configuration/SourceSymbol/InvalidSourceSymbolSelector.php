@@ -33,21 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
+namespace Infection\Configuration\SourceSymbol;
+
+use InvalidArgumentException;
+use function sprintf;
 
 /**
- * Wraps raw positional CLI path arguments before they are classified into source
- * and test paths. ConfigurationFactory resolves this into a PlainFilter (source
- * paths) and forwards test paths to testFrameworkExtraArgs.
- *
  * @internal
  */
-final readonly class PositionalPathsFilter
+final class InvalidSourceSymbolSelector extends InvalidArgumentException
 {
-    /**
-     * @param list<non-empty-string> $paths
-     */
-    public function __construct(public array $paths)
+    public static function create(string $value): self
     {
+        return new self(
+            sprintf(
+                <<<'MESSAGE'
+                    Invalid source selector "%s". Expected one of:
+                    - Class
+                    - Class::method
+                    - Class::line
+                    - Class::method::line
+                    MESSAGE,
+                $value,
+            ),
+        );
     }
 }

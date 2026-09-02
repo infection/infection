@@ -43,6 +43,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use function substr_count;
 use Symfony\Component\Console\Tester\CommandTester;
 
 #[Group('integration')]
@@ -620,6 +621,23 @@ final class DumpAstCommandTest extends FileSystemTestCase
                 )
                 AST,
         ];
+    }
+
+    public function test_it_can_preview_source_symbol_selection(): void
+    {
+        $tester = $this->createCommandTester();
+
+        $tester->execute([
+            'file' => __DIR__ . '/EchoGreeter.php',
+            '--configuration' => __DIR__ . '/infection.json5',
+            '--source-selector' => __NAMESPACE__ . '\\EchoGreeter::greet::42',
+        ]);
+
+        $actual = $tester->getDisplay();
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame(3, substr_count($actual, 'eligible: true'));
+        $this->assertSame(11, substr_count($actual, 'eligible: false'));
     }
 
     /**

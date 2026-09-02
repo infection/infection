@@ -35,19 +35,27 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\SourceFilter;
 
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
+
 /**
- * Wraps raw positional CLI path arguments before they are classified into source
- * and test paths. ConfigurationFactory resolves this into a PlainFilter (source
- * paths) and forwards test paths to testFrameworkExtraArgs.
- *
  * @internal
+ *
+ * Represents filters to apply to the configured source to reduce the scope of the eligible files and/or code
+ * to mutate.
  */
-final readonly class PositionalPathsFilter
+final readonly class SourceFilter
 {
     /**
-     * @param list<non-empty-string> $paths
+     * @param list<SourceSymbolSelector> $symbolSelectors
      */
-    public function __construct(public array $paths)
+    public function __construct(
+        public ?SourceFileFilter $fileFilter,
+        public array $symbolSelectors,
+    ) {
+    }
+
+    public function filtersFiles(): bool
     {
+        return $this->fileFilter !== null;
     }
 }
