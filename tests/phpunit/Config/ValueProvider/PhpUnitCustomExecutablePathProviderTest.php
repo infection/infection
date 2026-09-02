@@ -74,7 +74,8 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
         $this->finderMock
             ->expects($this->once())
             ->method('find')
-            ->with(TestFrameworkTypes::PHPUNIT);
+            ->with(TestFrameworkTypes::PHPUNIT)
+        ;
 
         $this->assertNull(
             $this->provider->get(new IO(
@@ -90,7 +91,8 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
             ->expects($this->once())
             ->method('find')
             ->with(TestFrameworkTypes::PHPUNIT)
-            ->willThrowException(new FinderException());
+            ->willThrowException(new FinderException())
+        ;
 
         $customExecutable = Path::canonicalize(self::VALID_PHPUNIT_EXECUTABLE);
 
@@ -112,7 +114,8 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
             ->expects($this->once())
             ->method('find')
             ->with(TestFrameworkTypes::PHPUNIT)
-            ->willThrowException(new FinderException());
+            ->willThrowException(new FinderException())
+        ;
 
         $this->expectException(SymfonyRuntimeException::class);
 

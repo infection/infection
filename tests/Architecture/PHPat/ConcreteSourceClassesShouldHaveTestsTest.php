@@ -47,6 +47,7 @@ final class ConcreteSourceClassesShouldHaveTestsTest
             ->classes(InfectionSelector::sourceConcreteClassWithoutCanonicalTest())
             ->shouldNot()
             ->exist()
-            ->because('Concrete source classes should have a canonical test.');
+            ->because('Concrete source classes should have a canonical test.')
+        ;
     }
 }

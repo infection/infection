@@ -55,6 +55,7 @@ final class PrivateConstructorsShouldUseCannotBeInstantiatedTest
             ->should()
             ->include()
             ->classes(Selector::classname(CannotBeInstantiated::class))
-            ->because('No-argument private constructors should be expressed through the CannotBeInstantiated trait.');
+            ->because('No-argument private constructors should be expressed through the CannotBeInstantiated trait.')
+        ;
     }
 }

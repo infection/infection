@@ -68,7 +68,8 @@ final class CachedSourceCollectorTest extends TestCase
         $this->decoratedCollectorMock
             ->expects($this->once())
             ->method('collect')
-            ->willReturn($expected);
+            ->willReturn($expected)
+        ;
 
         $actual1 = $this->collector->collect();
         $actual2 = $this->collector->collect();

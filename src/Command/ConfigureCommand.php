@@ -92,7 +92,8 @@ final class ConfigureCommand extends BaseCommand
                     implode('", "', TestFrameworkTypes::getTypes()),
                 ),
                 TestFrameworkTypes::PHPUNIT,
-            );
+            )
+        ;
     }
 
     protected function executeCommand(IO $io): bool

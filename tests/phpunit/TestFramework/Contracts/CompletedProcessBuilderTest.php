@@ -70,7 +70,8 @@ final class CompletedProcessBuilderTest extends TestCase
             ->withExitCode(1)
             ->withStdout('stdout')
             ->withStderr('stderr')
-            ->build();
+            ->build()
+        ;
 
         $expectedOriginalCompletedProcess = new CompletedProcess(
             command: [],

@@ -59,7 +59,8 @@ final class GitDefaultBaseCommandTest extends TestCase
         $this->git
             ->expects($this->once())
             ->method('getDefaultBase')
-            ->willReturn('origin/main');
+            ->willReturn('origin/main')
+        ;
 
         $expectedDisplay = <<<DISPLAY
             origin/main\n

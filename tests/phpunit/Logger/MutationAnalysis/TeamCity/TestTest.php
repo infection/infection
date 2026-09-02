@@ -88,6 +88,7 @@ final class TestTest extends TestCase
             ->withHash($hash)
             ->withAttribute('startFilePos', 7)
             ->withAttribute('endFilePos', 42)
-            ->build();
+            ->build()
+        ;
     }
 }

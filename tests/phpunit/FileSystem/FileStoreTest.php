@@ -69,7 +69,8 @@ final class FileStoreTest extends TestCase
             ->willReturnOnConsecutiveCalls(
                 $fileContent1,
                 $fileContent2,
-            );
+            )
+        ;
 
         $actual1 = $this->fileStore->getContents($filePath1);
         $actual2 = $this->fileStore->getContents($filePath1);
@@ -92,7 +93,8 @@ final class FileStoreTest extends TestCase
         $fileInfoStub1 = $this->createStub(SplFileInfo::class);
         $fileInfoStub1
             ->method('getRealPath')
-            ->willReturn($filePath1);
+            ->willReturn($filePath1)
+        ;
 
         $filePath2 = '/path/to/file2.php';
         $fileContent2 = '<?php echo "Secundo";';
@@ -100,7 +102,8 @@ final class FileStoreTest extends TestCase
         $fileInfoStub2 = $this->createStub(SplFileInfo::class);
         $fileInfoStub2
             ->method('getRealPath')
-            ->willReturn($filePath2);
+            ->willReturn($filePath2)
+        ;
 
         $this->fileSystemMock
             ->expects($this->exactly(2))
@@ -108,7 +111,8 @@ final class FileStoreTest extends TestCase
             ->willReturnOnConsecutiveCalls(
                 $fileContent1,
                 $fileContent2,
-            );
+            )
+        ;
 
         $actual1 = $this->fileStore->getContents($fileInfoStub1);
         $actual2 = $this->fileStore->getContents($fileInfoStub1);

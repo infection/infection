@@ -78,7 +78,8 @@ final class CommandLineGitTest extends TestCase
         $this->commandLineMock
             ->expects($this->exactly(2))
             ->method('mustRun')
-            ->willReturnOnConsecutiveCalls('/repository', '');
+            ->willReturnOnConsecutiveCalls('/repository', '')
+        ;
 
         $this->expectException(NoSourceFound::class);
 
@@ -92,7 +93,8 @@ final class CommandLineGitTest extends TestCase
         $this->commandLineMock
             ->method('mustRun')
             ->with(['git', 'merge-base', 'main', 'HEAD'])
-            ->willReturn($expected);
+            ->willReturn($expected)
+        ;
 
         $actual = $this->git->getBaseReference('main');
 
@@ -114,7 +116,8 @@ final class CommandLineGitTest extends TestCase
         $this->commandLineMock
             ->method('mustRun')
             ->with(['git', 'merge-base', 'main', 'HEAD'])
-            ->willThrowException($exception);
+            ->willThrowException($exception)
+        ;
 
         $actual = $this->git->getBaseReference('main');
 
@@ -153,7 +156,8 @@ final class CommandLineGitTest extends TestCase
                         project/my lib/B.php
                         EOF,
                 ),
-            );
+            )
+        ;
 
         $expected = [
             '/repository/project/app/A.php',
@@ -200,7 +204,8 @@ final class CommandLineGitTest extends TestCase
                     ],
                 ),
             )
-            ->willReturnOnConsecutiveCalls('/', $diff);
+            ->willReturnOnConsecutiveCalls('/', $diff)
+        ;
 
         $actual = $this->git->getChangedLinesRangesByFilePaths(
             'AM',
@@ -645,7 +650,8 @@ final class CommandLineGitTest extends TestCase
         if (is_string($shellOutputOrException)) {
             $this->commandLineMock
                 ->method('mustRun')
-                ->willReturn($shellOutputOrException);
+                ->willReturn($shellOutputOrException)
+            ;
         } else {
             $expectedRecords[] = [
                 'level' => LogLevel::INFO,
@@ -655,7 +661,8 @@ final class CommandLineGitTest extends TestCase
 
             $this->commandLineMock
                 ->method('mustRun')
-                ->willThrowException($shellOutputOrException);
+                ->willThrowException($shellOutputOrException)
+            ;
         }
 
         $actual = $this->git->getDefaultBase();
@@ -694,7 +701,8 @@ final class CommandLineGitTest extends TestCase
         $this->commandLineMock
             ->expects($this->once())
             ->method('mustRun')
-            ->willReturn($expected);
+            ->willReturn($expected)
+        ;
 
         $actual = $this->git->getProjectDirectory();
 

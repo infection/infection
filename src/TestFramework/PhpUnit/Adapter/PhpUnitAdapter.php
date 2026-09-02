@@ -226,8 +226,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         return
             version_compare($version, '10.5.48', '>=') && version_compare($version, '11.0', '<')
             || version_compare($version, '11.5.27', '>=') && version_compare($version, '12.0', '<')
-            || version_compare($version, '12.2.7', '>=')
-        ;
+            || version_compare($version, '12.2.7', '>=');
     }
 
     /**

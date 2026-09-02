@@ -219,7 +219,8 @@ final class TeamCityTest extends TestCase
             ->withMutantHash('mutantHash')
             ->withDetectionStatus(DetectionStatus::KILLED_BY_TESTS)
             ->withMutantDiff($mutationDiff)
-            ->withProcessRuntime(3.);
+            ->withProcessRuntime(3.)
+        ;
 
         $expectedMessage = 'Mutator: LogicalAnd|nMutation ID: mutantHash|nMutation result: killed by tests';
 

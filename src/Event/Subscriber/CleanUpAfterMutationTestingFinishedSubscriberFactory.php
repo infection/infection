@@ -56,7 +56,6 @@ final readonly class CleanUpAfterMutationTestingFinishedSubscriberFactory implem
             : new CleanUpAfterMutationTestingFinishedSubscriber(
                 $this->fileSystem,
                 $this->tmpDir,
-            )
-        ;
+            );
     }
 }

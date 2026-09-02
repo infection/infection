@@ -99,7 +99,8 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
                 DIFF)
             ->withPrettyPrintedOriginalCode('<?php $a = 1;')
-            ->build();
+            ->build()
+        ;
 
         $testFrameworkExtraOptions = '--verbose';
 
@@ -128,7 +129,8 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
         $configuration = ConfigurationBuilder::withMinimalTestData()
             ->withDryRun(false)
-            ->build();
+            ->build()
+        ;
 
         $factory = new MutantProcessContainerFactory(
             $testFrameworkAdapterMock,

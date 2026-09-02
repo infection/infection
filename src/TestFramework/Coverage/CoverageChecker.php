@@ -193,8 +193,7 @@ class CoverageChecker
         }
 
         $message = 'Could not find the "index.xml" file. Please ensure that the XML coverage '
-            . 'report has been properly generated at the right place.'
-        ;
+            . 'report has been properly generated at the right place.';
 
         if ($this->frameworkAdapterName === self::PHPUNIT) {
             $message .= sprintf(
