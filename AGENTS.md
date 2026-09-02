@@ -330,7 +330,9 @@ visitor owns its `public const string` key plus static typed accessors
 NEVER removes nodes. It flips the `eligible` flag only. Removing nodes corrupts name
 resolution and format-preserving printing (learned the hard way, PR #3039). `beforeTraverse`
 must reset all visitor state because instances are reused across files. Coverage lookups
-attach as memoizing closures, only to eligible nodes. `NextConnectingVisitor` is deliberately NOT nikic's
+attach as memoizing closures, only to eligible nodes. Source-symbol selection is lexical:
+function-like nodes inside a selected method inherit its selection, while functions outside
+a class do not. `NextConnectingVisitor` is deliberately NOT nikic's
 NodeConnectingVisitor: "next" means next executable statement in the same function scope
 (statement-functions break the chain; expression closures restore it).
 
