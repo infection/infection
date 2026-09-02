@@ -65,6 +65,7 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
         $this->locatorMock = $this->createMock(TestFrameworkConfigLocatorInterface::class);
         $this->consoleMock = $this->createMock(ConsoleHelper::class);
         $this->fileSystemMock = $this->createMock(FileSystem::class);
+
         $this->provider = new TestFrameworkConfigPathProvider(
             $this->locatorMock,
             $this->consoleMock,
