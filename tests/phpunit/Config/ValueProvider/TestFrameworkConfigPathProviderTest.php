@@ -268,6 +268,7 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
             ->expects($this->once())
             ->method('readFile')
             ->with('composer.json')
-            ->willReturn('{}');
+            ->willReturn('{}')
+        ;
     }
 }
