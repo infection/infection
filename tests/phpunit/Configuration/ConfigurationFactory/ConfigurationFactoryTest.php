@@ -202,13 +202,15 @@ final class ConfigurationFactoryTest extends TestCase
                 projectDirectory: null,
                 staticAnalysisTool: 'non-supported-static-analysis-tool',
                 mutantId: null,
-            );
+            )
+        ;
     }
 
     public static function valueProvider(): iterable
     {
         $defaultLogsBuilder = LogsBuilder::withMinimalTestData()
-            ->withUseGitHubAnnotationsLogger(true);
+            ->withUseGitHubAnnotationsLogger(true)
+        ;
         $defaultLogs = $defaultLogsBuilder->build();
 
         $defaultSchema = new SchemaConfiguration(
@@ -1663,7 +1665,8 @@ final class ConfigurationFactoryTest extends TestCase
                         ->getMutatorResolver()
                         ->resolve(['@default' => true]),
                     false,
-                );
+                )
+            ;
         }
 
         return self::$mutators;
@@ -1681,7 +1684,8 @@ final class ConfigurationFactoryTest extends TestCase
         $projectDirectoryProviderStub = $this->createStub(ProjectDirectoryProvider::class);
         $projectDirectoryProviderStub
             ->method('provide')
-            ->willReturn($projectDirectory);
+            ->willReturn($projectDirectory)
+        ;
 
         // Report paths living under a "tests" directory as existing on disk so that the
         // positional-paths scenarios can classify them as test paths, while bare values

@@ -91,7 +91,8 @@ final class PHPStanAdapterTest extends TestCase
             ->expects($this->once())
             ->method('build')
             ->with('/path/to/phpstan', ['-d memory_limit=-1'], ['--configuration=/path/to/phpstan-config-path'])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path']);
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path'])
+        ;
 
         $this->assertSame([
             '/usr/bin/php',
@@ -123,7 +124,8 @@ final class PHPStanAdapterTest extends TestCase
                 '--configuration=/path/to/phpstan-config-path',
                 '--memory-limit=1G',
             ])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=1G']);
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=1G'])
+        ;
 
         $this->assertSame([
             '/usr/bin/php',
@@ -157,7 +159,8 @@ final class PHPStanAdapterTest extends TestCase
                 '--memory-limit=-1',
                 '--no-progress',
             ])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=-1', '--no-progress']);
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=-1', '--no-progress'])
+        ;
 
         $this->assertSame([
             '/usr/bin/php',
@@ -193,7 +196,8 @@ final class PHPStanAdapterTest extends TestCase
                 '--level=max',
                 '--no-progress',
             ])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=2G', '--level=max', '--no-progress']);
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=2G', '--level=max', '--no-progress'])
+        ;
 
         $this->assertSame([
             '/usr/bin/php',
@@ -218,13 +222,15 @@ final class PHPStanAdapterTest extends TestCase
             ->expects($this->once())
             ->method('build')
             ->with('/path/to/phpstan', ['-d memory_limit=-1'], ['--version'])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--version']);
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--version'])
+        ;
 
         $shellCommandRunner
             ->expects($this->once())
             ->method('mustRun')
             ->with(['/usr/bin/php', '/path/to/phpstan', '--version'])
-            ->willReturn('PHPStan 2.1.17');
+            ->willReturn('PHPStan 2.1.17')
+        ;
 
         $adapter = new PHPStanAdapter(
             $this->createStub(Filesystem::class),

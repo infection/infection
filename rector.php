@@ -191,7 +191,8 @@ $config = RectorConfig::configure()
             __DIR__ . '/src/StaticAnalysis/StaticAnalysisToolTypes.php',
         ],
         VariableConstFetchToClassConstFetchRector::class,
-    ]);
+    ])
+;
 
 foreach ($skippedPaths as $skippedPath) {
     if (\file_exists($skippedPath)) {

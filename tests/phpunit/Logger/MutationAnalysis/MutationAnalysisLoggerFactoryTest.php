@@ -61,7 +61,8 @@ final class MutationAnalysisLoggerFactoryTest extends TestCase
         $outputStub = $this->createStub(OutputInterface::class);
         $outputStub
             ->method('isDecorated')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $factory = new MutationAnalysisLoggerFactory(
             $outputStub,

@@ -54,7 +54,8 @@ final class FilteringResultsCollectorFactoryTest extends TestCase
         $statusesProvider
             ->expects($this->once())
             ->method('get')
-            ->willReturn(DetectionStatus::cases());
+            ->willReturn(DetectionStatus::cases())
+        ;
 
         $factory = new FilteringResultsCollectorFactory($statusesProvider);
 
@@ -71,7 +72,8 @@ final class FilteringResultsCollectorFactoryTest extends TestCase
         $statusesProvider
             ->expects($this->once())
             ->method('get')
-            ->willReturn([]);
+            ->willReturn([])
+        ;
 
         $factory = new FilteringResultsCollectorFactory($statusesProvider);
 
@@ -90,7 +92,8 @@ final class FilteringResultsCollectorFactoryTest extends TestCase
             ->method('get')
             ->willReturn([
                 DetectionStatus::ESCAPED,
-            ]);
+            ])
+        ;
 
         $factory = new FilteringResultsCollectorFactory($statusesProvider);
 
@@ -102,7 +105,8 @@ final class FilteringResultsCollectorFactoryTest extends TestCase
 
         $targetCollector
             ->expects($this->once())
-            ->method('collect');
+            ->method('collect')
+        ;
 
         $this->addMutantExecutionResult(
             $filteringCollector,

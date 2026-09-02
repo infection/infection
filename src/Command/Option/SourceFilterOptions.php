@@ -104,7 +104,8 @@ final class SourceFilterOptions
                 InputOption::VALUE_REQUIRED,
                 sprintf('Base for <comment>"--%1$s"</comment> option. Can be the git branch short name, full name or a commit hash. Must be used only together with <comment>"--%1$s"</comment>.', self::GIT_DIFF_FILTER_NAME),
                 Container::DEFAULT_GIT_DIFF_BASE,
-            );
+            )
+        ;
     }
 
     /**

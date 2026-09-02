@@ -74,13 +74,16 @@ final class MagoMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/mago --tmp-file="Source.h4sz.php" --instead-of="Source.php"',
-            );
+            )
+        ;
         $processMock
             ->method('isTerminated')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $processMock
             ->method('getOutput')
-            ->willReturn($processOutput = 'OK');
+            ->willReturn($processOutput = 'OK')
+        ;
 
         $mutantProcess = new MutantProcess(
             $processMock,
@@ -142,17 +145,21 @@ final class MagoMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/mago --tmp-file="Source.h4sz.php" --instead-of="Source.php"',
-            );
+            )
+        ;
         $processMock
             ->method('isTerminated')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $processMock
             ->method('getOutput')
-            ->willReturn($processOutput = 'Fatal Error');
+            ->willReturn($processOutput = 'Fatal Error')
+        ;
         $processMock
             ->expects($this->once())
             ->method('getExitCode')
-            ->willReturn(152);
+            ->willReturn(152)
+        ;
 
         $mutantProcess = new MutantProcess(
             $processMock,
@@ -218,20 +225,25 @@ final class MagoMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/mago --tmp-file="Source.h4sz.php" --instead-of="Source.php"',
-            );
+            )
+        ;
         $processMock
             ->method('isTerminated')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $processMock
             ->method('getOutput')
-            ->willReturn('OK');
+            ->willReturn('OK')
+        ;
         $processMock
             ->method('getErrorOutput')
-            ->willReturn('empty');
+            ->willReturn('empty')
+        ;
         $processMock
             ->expects($this->exactly(1))
             ->method('getExitCode')
-            ->willReturn(0);
+            ->willReturn(0)
+        ;
 
         $mutantProcess = new MutantProcess(
             $processMock,
@@ -297,24 +309,30 @@ final class MagoMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/mago --tmp-file="Source.h4sz.php" --instead-of="Source.php"',
-            );
+            )
+        ;
         $processMock
             ->method('isTerminated')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         // now at the time of creating the test, some time should have passed since now
         $processMock
             ->method('getStartTime')
-            ->willReturn(1776284617.597);
+            ->willReturn(1776284617.597)
+        ;
         $processMock
             ->method('getOutput')
-            ->willReturn('OK');
+            ->willReturn('OK')
+        ;
         $processMock
             ->method('getErrorOutput')
-            ->willReturn('empty');
+            ->willReturn('empty')
+        ;
         $processMock
             ->expects($this->exactly(1))
             ->method('getExitCode')
-            ->willReturn(0);
+            ->willReturn(0)
+        ;
 
         $mutantProcess = new MutantProcess(
             $processMock,
@@ -375,17 +393,21 @@ final class MagoMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/mago --tmp-file="Source.h4sz.php" --instead-of="Source.php"',
-            );
+            )
+        ;
         $processMock
             ->method('isTerminated')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $processMock
             ->method('getOutput')
-            ->willReturn('failed');
+            ->willReturn('failed')
+        ;
         $processMock
             ->expects($this->exactly(1))
             ->method('getExitCode')
-            ->willReturn($errorCode);
+            ->willReturn($errorCode)
+        ;
 
         $mutantProcess = new MutantProcess(
             $processMock,

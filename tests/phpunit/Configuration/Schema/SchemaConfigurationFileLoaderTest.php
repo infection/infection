@@ -78,13 +78,15 @@ final class SchemaConfigurationFileLoaderTest extends TestCase
         $this->schemaValidatorStub
             ->expects($this->once())
             ->method('validate')
-            ->with(self::createRawConfigWithPathArgument($path));
+            ->with(self::createRawConfigWithPathArgument($path))
+        ;
 
         $this->configFactoryStub
             ->expects($this->once())
             ->method('create')
             ->with($path, $decodedContents)
-            ->willReturn($expectedConfig);
+            ->willReturn($expectedConfig)
+        ;
 
         $actual = $this->loader->loadFile($path);
 

@@ -104,7 +104,8 @@ final class MutatorFactoryTest extends TestCase
         $reflectionMock
             ->expects($this->once())
             ->method('getName')
-            ->willReturn('A');
+            ->willReturn('A')
+        ;
 
         $trueNode = $this->createBoolNode(
             'true',

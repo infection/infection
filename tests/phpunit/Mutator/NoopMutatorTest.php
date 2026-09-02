@@ -85,7 +85,8 @@ final class NoopMutatorTest extends TestCase
             ->expects($this->once())
             ->method('canMutate')
             ->with($this->nodeStub)
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $mutate = $ignoreMutator->canMutate($this->nodeStub);
 
@@ -100,7 +101,8 @@ final class NoopMutatorTest extends TestCase
             ->expects($this->once())
             ->method('canMutate')
             ->with($this->nodeStub)
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
 
         $mutate = $ignoreMutator->canMutate($this->nodeStub);
 

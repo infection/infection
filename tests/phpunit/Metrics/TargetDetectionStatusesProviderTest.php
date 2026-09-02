@@ -53,7 +53,8 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $logs
             ->expects($this->once())
             ->method('getDebugLogFilePath')
-            ->willReturn('debug.log');
+            ->willReturn('debug.log')
+        ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, 0);
 
@@ -66,7 +67,8 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $logs
             ->expects($this->once())
             ->method('getPerMutatorFilePath')
-            ->willReturn('per_mutator.md');
+            ->willReturn('per_mutator.md')
+        ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, 0);
 
@@ -79,7 +81,8 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $logs
             ->expects($this->once())
             ->method('getTextLogFilePath')
-            ->willReturn('infection.log');
+            ->willReturn('infection.log')
+        ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::DEBUG, false, 0);
 
@@ -92,7 +95,8 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $logs
             ->expects($this->once())
             ->method('getTextLogFilePath')
-            ->willReturn('infection.log');
+            ->willReturn('infection.log')
+        ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, 0);
 
@@ -112,7 +116,8 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $logs
             ->expects($this->once())
             ->method('getTextLogFilePath')
-            ->willReturn('infection.log');
+            ->willReturn('infection.log')
+        ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
@@ -172,7 +177,8 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $logs
             ->expects($this->once())
             ->method('getUseGitHubAnnotationsLogger')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
@@ -187,7 +193,8 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $logs
             ->expects($this->once())
             ->method('getGitlabLogFilePath')
-            ->willReturn('gitlab.json');
+            ->willReturn('gitlab.json')
+        ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
@@ -202,7 +209,8 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $logs
             ->expects($this->once())
             ->method('getJsonLogFilePath')
-            ->willReturn('infection.json');
+            ->willReturn('infection.json')
+        ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
@@ -218,7 +226,8 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $logs
             ->expects($this->once())
             ->method('getJsonLogFilePath')
-            ->willReturn('infection.json');
+            ->willReturn('infection.json')
+        ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, 0);
 
@@ -233,7 +242,8 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $logs
             ->expects($this->once())
             ->method('getHtmlLogFilePath')
-            ->willReturn('infection.html');
+            ->willReturn('infection.html')
+        ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
@@ -246,11 +256,13 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $logs
             ->expects($this->never())
             ->method('getHtmlLogFilePath')
-            ->willReturn(null);
+            ->willReturn(null)
+        ;
         $logs
             ->expects($this->once())
             ->method('getStrykerConfig')
-            ->willReturn(StrykerConfig::forFullReport('master'));
+            ->willReturn(StrykerConfig::forFullReport('master'))
+        ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
@@ -263,11 +275,13 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $logs
             ->expects($this->never())
             ->method('getHtmlLogFilePath')
-            ->willReturn(null);
+            ->willReturn(null)
+        ;
         $logs
             ->expects($this->once())
             ->method('getStrykerConfig')
-            ->willReturn(StrykerConfig::forFullReport('master'));
+            ->willReturn(StrykerConfig::forFullReport('master'))
+        ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, 0);
 
@@ -280,11 +294,13 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $logs
             ->expects($this->once())
             ->method('getHtmlLogFilePath')
-            ->willReturn(null);
+            ->willReturn(null)
+        ;
         $logs
             ->expects($this->once())
             ->method('getStrykerConfig')
-            ->willReturn(StrykerConfig::forBadge('master'));
+            ->willReturn(StrykerConfig::forBadge('master'))
+        ;
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 

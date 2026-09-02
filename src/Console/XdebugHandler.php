@@ -53,6 +53,7 @@ final class XdebugHandler
         (new ComposerXdebugHandler(self::PREFIX))
             ->setLogger($logger)
             ->setPersistent()
-            ->check();
+            ->check()
+        ;
     }
 }

@@ -164,7 +164,8 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
             // Selector analysis + I/O analysis for 3 test cases and their covered classes.
             ->expects($this->exactly(7))
             ->method('readFile')
-            ->willReturn('contents');
+            ->willReturn('contents')
+        ;
         $analyser = new Analyser(
             SingletonContainer::getContainer()->getParser(),
             $fileSystemMock,

@@ -88,7 +88,8 @@ final class MutationGeneratorTest extends TestCase
             ->willReturnOnConsecutiveCalls(
                 [$mutation0, $mutation1],
                 [$mutation1, $mutation2],
-            );
+            )
+        ;
 
         $expectedMutations = [
             $mutation0,
@@ -129,12 +130,14 @@ final class MutationGeneratorTest extends TestCase
                     [],
                 )],
                 [new MutationGenerationWasFinished()],
-            ));
+            ))
+        ;
 
         $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
         $fileMutationGeneratorMock
             ->expects($this->exactly(2))
-            ->method('generate')->willReturn([]);
+            ->method('generate')->willReturn([])
+        ;
 
         $sourceCollector = new FixedSourceCollector(
             [

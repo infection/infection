@@ -62,7 +62,8 @@ final class LogVerbosityTest extends TestCase
 
         $this->consoleOutputMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         LogVerbosity::convertVerbosityLevel($this->inputMock, $this->consoleOutputMock);
     }
@@ -77,7 +78,8 @@ final class LogVerbosityTest extends TestCase
         $this->consoleOutputMock
             ->expects($this->once())
             ->method('logVerbosityDeprecationNotice')
-            ->with($output);
+            ->with($output)
+        ;
 
         LogVerbosity::convertVerbosityLevel($this->inputMock, $this->consoleOutputMock);
     }
@@ -89,7 +91,8 @@ final class LogVerbosityTest extends TestCase
         $this->consoleOutputMock
             ->expects($this->once())
             ->method('logUnknownVerbosityOption')
-            ->with('default');
+            ->with('default')
+        ;
 
         LogVerbosity::convertVerbosityLevel($this->inputMock, $this->consoleOutputMock);
     }
@@ -123,7 +126,8 @@ final class LogVerbosityTest extends TestCase
             ->expects($this->once())
             ->method('getOption')
             ->with('log-verbosity')
-            ->willReturn($inputVerbosity);
+            ->willReturn($inputVerbosity)
+        ;
     }
 
     private function setInputExpectationsWhenItDoesChange(int|string $inputVerbosity, string $output): void

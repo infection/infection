@@ -386,14 +386,16 @@ final readonly class XmlConfigurationManipulator
                     '/phpunit/@%s',
                     $name,
                 ),
-            );
+            )
+        ;
 
         if ($node !== null) {
             $node->nodeValue = $value;
         } else {
             $xPath
                 ->getElement('/phpunit')
-                ->setAttribute($name, $value);
+                ->setAttribute($name, $value)
+            ;
         }
     }
 
@@ -443,7 +445,8 @@ final readonly class XmlConfigurationManipulator
 
         $xPath
             ->getElement('/phpunit')
-            ->setAttribute($attribute, $value);
+            ->setAttribute($attribute, $value)
+        ;
 
         return true;
     }

@@ -73,13 +73,16 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/phpstan --tmp-file="Source.h4sz.php" --instead-of="Source.php"',
-            );
+            )
+        ;
         $processMock
             ->method('isTerminated')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $processMock
             ->method('getOutput')
-            ->willReturn($processOutput = 'OK');
+            ->willReturn($processOutput = 'OK')
+        ;
 
         $mutantProcess = new MutantProcess(
             $processMock,
@@ -141,17 +144,21 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/phpstan --tmp-file="Source.h4sz.php" --instead-of="Source.php"',
-            );
+            )
+        ;
         $processMock
             ->method('isTerminated')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $processMock
             ->method('getOutput')
-            ->willReturn($processOutput = 'Fatal Error');
+            ->willReturn($processOutput = 'Fatal Error')
+        ;
         $processMock
             ->expects($this->once())
             ->method('getExitCode')
-            ->willReturn(152);
+            ->willReturn(152)
+        ;
 
         $mutantProcess = new MutantProcess(
             $processMock,
@@ -217,17 +224,21 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/phpstan --tmp-file="Source.h4sz.php" --instead-of="Source.php"',
-            );
+            )
+        ;
         $processMock
             ->method('isTerminated')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $processMock
             ->method('getOutput')
-            ->willReturn('OK');
+            ->willReturn('OK')
+        ;
         $processMock
             ->expects($this->exactly(2))
             ->method('getExitCode')
-            ->willReturn(0);
+            ->willReturn(0)
+        ;
 
         $mutantProcess = new MutantProcess(
             $processMock,
@@ -294,17 +305,21 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
             ->method('getCommandLine')
             ->willReturn(
                 $processCommandLine = 'bin/phpstan --tmp-file="Source.h4sz.php" --instead-of="Source.php"',
-            );
+            )
+        ;
         $processMock
             ->method('isTerminated')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $processMock
             ->method('getOutput')
-            ->willReturn('failed');
+            ->willReturn('failed')
+        ;
         $processMock
             ->expects($this->exactly(2))
             ->method('getExitCode')
-            ->willReturn($errorCode);
+            ->willReturn($errorCode)
+        ;
 
         $mutantProcess = new MutantProcess(
             $processMock,

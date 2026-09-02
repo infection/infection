@@ -99,7 +99,8 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
                 DIFF)
             ->withPrettyPrintedOriginalCode('<?php $a = 1;')
-            ->build();
+            ->build()
+        ;
 
         $testFrameworkExtraOptions = '--verbose';
 
@@ -113,7 +114,8 @@ final class MutantProcessContainerFactoryTest extends TestCase
                 $originalFilePath,
                 $testFrameworkExtraOptions,
             )
-            ->willReturn(['/usr/bin/php', 'bin/phpunit', '--filter', '/path/to/acme/FooTest.php']);
+            ->willReturn(['/usr/bin/php', 'bin/phpunit', '--filter', '/path/to/acme/FooTest.php'])
+        ;
 
         $eventDispatcher = new EventDispatcherCollector();
 
@@ -122,11 +124,13 @@ final class MutantProcessContainerFactoryTest extends TestCase
         $resultFactoryStub = $this->createStub(MutantExecutionResultFactory::class);
         $resultFactoryStub
             ->method('createFromProcess')
-            ->willReturn($executionResult);
+            ->willReturn($executionResult)
+        ;
 
         $configuration = ConfigurationBuilder::withMinimalTestData()
             ->withDryRun(false)
-            ->build();
+            ->build()
+        ;
 
         $factory = new MutantProcessContainerFactory(
             $testFrameworkAdapterMock,

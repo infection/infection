@@ -53,14 +53,16 @@ final class CoveredTraceProviderTest extends TestCase
         $traceProviderMock
             ->expects($this->once())
             ->method('provideTraces')
-            ->willReturn($canary);
+            ->willReturn($canary)
+        ;
 
         $testFileDataAdder = $this->createMock(JUnitTestExecutionInfoAdder::class);
         $testFileDataAdder
             ->expects($this->once())
             ->method('addTestExecutionInfo')
             ->with($canary)
-            ->willReturn($canary);
+            ->willReturn($canary)
+        ;
 
         $provider = new CoveredTraceProvider($traceProviderMock, $testFileDataAdder);
 

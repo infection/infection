@@ -48,12 +48,14 @@ final class FederatedReporterTest extends TestCase
         $reporter1 = $this->createMock(Reporter::class);
         $reporter1
             ->expects($this->once())
-            ->method('report');
+            ->method('report')
+        ;
 
         $reporter2 = $this->createMock(Reporter::class);
         $reporter2
             ->expects($this->once())
-            ->method('report');
+            ->method('report')
+        ;
 
         (new FederatedReporter($reporter1, $reporter2))->report();
     }

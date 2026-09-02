@@ -58,7 +58,8 @@ final readonly class CleanUpAfterMutationTestingFinishedSubscriber implements Mu
         $finder = Finder::create()
             ->in($this->tmpDir)
             // leave PHPUnit's result cache files so that subsequent Infection runs are faster because of `executionOrder=defects`
-            ->notName(self::PHPUNIT_RESULT_CACHE_PATTERN);
+            ->notName(self::PHPUNIT_RESULT_CACHE_PATTERN)
+        ;
 
         $this->filesystem->remove($finder);
 
@@ -66,7 +67,8 @@ final readonly class CleanUpAfterMutationTestingFinishedSubscriber implements Mu
         $finder = Finder::create()
             ->in($this->tmpDir)
             ->date('before 30 days ago')
-            ->name(self::PHPUNIT_RESULT_CACHE_PATTERN);
+            ->name(self::PHPUNIT_RESULT_CACHE_PATTERN)
+        ;
 
         $this->filesystem->remove($finder);
     }

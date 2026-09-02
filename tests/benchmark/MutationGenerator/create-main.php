@@ -62,7 +62,8 @@ if (!function_exists('Infection\Benchmark\MutationGenerator\collectSources')) {
         return Finder::create()
             ->files()
             ->in(__DIR__ . '/sources')
-            ->name('*.php');
+            ->name('*.php')
+        ;
     }
 }
 
@@ -93,7 +94,8 @@ return static function (int $maxCount): Closure {
         ->cloneWithService(
             Tracer::class,
             new EmptyTraceTracer(),
-        );
+        )
+    ;
 
     $sources = iterator_to_array(
         collectSources(),

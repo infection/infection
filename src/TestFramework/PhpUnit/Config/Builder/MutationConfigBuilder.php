@@ -179,7 +179,8 @@ class MutationConfigBuilder extends ConfigBuilder
         } else {
             $xPath
                 ->getElement('/phpunit')
-                ->setAttribute('bootstrap', $customAutoloadFilePath);
+                ->setAttribute('bootstrap', $customAutoloadFilePath)
+            ;
         }
     }
 

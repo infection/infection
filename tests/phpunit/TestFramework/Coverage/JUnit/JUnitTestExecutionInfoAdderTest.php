@@ -81,11 +81,13 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
         $this->testFrameworkAdapterMock
             ->expects($this->once())
             ->method('hasJUnitReport')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $this->testFileDataProviderMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $this->infoAdder->addTestExecutionInfo([new FakeTrace()]);
     }
@@ -95,7 +97,8 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
         $this->testFrameworkAdapterMock
             ->expects($this->once())
             ->method('hasJUnitReport')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
 
         $this->testFileDataProviderMock
             ->expects($this->once())
@@ -104,7 +107,8 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
             ->willReturn(new TestFileTimeData(
                 '/path/to/acme/FooTest.php',
                 0.000234,
-            ));
+            ))
+        ;
 
         $tests = new TestLocations(
             [
@@ -157,7 +161,8 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
         $this->testFrameworkAdapterMock
             ->expects($this->once())
             ->method('hasJUnitReport')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
 
         $sourceFile = new SplFileInfo(__FILE__);
 

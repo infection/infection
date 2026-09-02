@@ -88,7 +88,8 @@ final class AnalyserTest extends SelectorTestCase
             ->expects($this->once())
             ->method('readFile')
             ->with(__FILE__)
-            ->willReturn($fileContents);
+            ->willReturn($fileContents)
+        ;
 
         $this->parserMock
             ->expects($this->once())
@@ -97,7 +98,8 @@ final class AnalyserTest extends SelectorTestCase
                 $fileContents,
                 $this->isInstanceOf(Throwing::class),
             )
-            ->willReturn($nodes);
+            ->willReturn($nodes)
+        ;
 
         $actual = $this->analyser->analyse($this->classReflection);
 
@@ -117,7 +119,8 @@ final class AnalyserTest extends SelectorTestCase
             ->expects($this->once())
             ->method('readFile')
             ->with(__FILE__)
-            ->willReturn($fileContents);
+            ->willReturn($fileContents)
+        ;
 
         $this->parserMock
             ->expects($this->once())
@@ -126,7 +129,8 @@ final class AnalyserTest extends SelectorTestCase
                 $fileContents,
                 $this->isInstanceOf(Throwing::class),
             )
-            ->willReturn($nodes);
+            ->willReturn($nodes)
+        ;
 
         $firstAnalysis = $this->analyser->analyse($this->classReflection);
         $secondAnalysis = $this->analyser->analyse($this->classReflection);
@@ -142,11 +146,13 @@ final class AnalyserTest extends SelectorTestCase
     {
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('readFile');
+            ->method('readFile')
+        ;
 
         $this->parserMock
             ->expects($this->never())
-            ->method('parse');
+            ->method('parse')
+        ;
 
         $actual = $this->analyser->analyse(
             $this->createClassReflection($className),
@@ -167,7 +173,8 @@ final class AnalyserTest extends SelectorTestCase
         $this->fileSystemMock
             ->expects($this->once())
             ->method('readFile')
-            ->willReturn($fileContents);
+            ->willReturn($fileContents)
+        ;
 
         $this->parserMock
             ->expects($this->once())
@@ -179,7 +186,8 @@ final class AnalyserTest extends SelectorTestCase
             ->willReturn([
                 new Class_('CannotBeInstantiated'),
                 new Expression(new FuncCall(new Name\FullyQualified('file_get_contents'))),
-            ]);
+            ])
+        ;
 
         $actual = $this->analyser->analyse(
             $this->createClassReflection(CannotBeInstantiated::class),

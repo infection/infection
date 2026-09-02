@@ -153,7 +153,8 @@ final class RunCommand extends BaseCommand
     {
         $this
             ->setName('run')
-            ->setDescription('Runs the mutation testing.');
+            ->setDescription('Runs the mutation testing.')
+        ;
 
         PathsArgument::addArgument($this);
 
@@ -167,7 +168,8 @@ final class RunCommand extends BaseCommand
                     implode('", "', StaticAnalysisToolTypes::getTypes()),
                 ),
                 Container::DEFAULT_STATIC_ANALYSIS_TOOL,
-            );
+            )
+        ;
 
         TestFrameworkExtraArgsOption::addOption($this);
         TestFrameworkOptionsOption::addOption($this);
@@ -218,7 +220,8 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Output progress bars and mutation count during progress even if a CI is detected',
-            );
+            )
+        ;
 
         ConfigurationOption::addOption($this)
             ->addOption(
@@ -234,7 +237,8 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf('Specify particular mutators, e.g. <comment>"--%s=Plus,PublicVisibility"</comment>', self::OPTION_MUTATORS),
                 Container::DEFAULT_MUTATORS_INPUT,
-            );
+            )
+        ;
 
         SourceFilterOptions::addOption($this)
             ->addOption(
@@ -260,7 +264,8 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 'Run only one Mutant by its ID. Can be used multiple times. If source code is changed, can be invalidated. Pass all previous options with this one.',
                 Container::DEFAULT_MUTANT_ID,
-            );
+            )
+        ;
 
         MapSourceClassToTestOption::addOption($this)
             ->addOption(
@@ -338,7 +343,8 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 '"all" - full logs format, "default" - short logs format, "none" - no logs',
                 Container::DEFAULT_LOG_VERBOSITY,
-            );
+            )
+        ;
 
         InitialTestsPhpOptionsOption::addOption($this)
             ->addOption(
@@ -353,7 +359,8 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_OPTIONAL,
                 'Ignore MSI violations with zero mutations',
                 self::OPTION_VALUE_NOT_PROVIDED,
-            );
+            )
+        ;
 
         DebugOption::addOption($this);
 
@@ -369,7 +376,8 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Changes the progress output to Teamcity.',
-            );
+            )
+        ;
     }
 
     protected function executeCommand(IO $io): bool

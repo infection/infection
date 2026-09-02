@@ -79,13 +79,15 @@ final class SchemaConfigurationLoaderTest extends TestCase
             ->expects($this->once())
             ->method('locateOneOf')
             ->with($potentialFileNames)
-            ->willReturn($expectedPathname);
+            ->willReturn($expectedPathname)
+        ;
 
         $this->configFileLoaderStub
             ->expects($this->once())
             ->method('loadFile')
             ->with($expectedPathname)
-            ->willReturn($expectedConfig);
+            ->willReturn($expectedConfig)
+        ;
 
         $actualConfig = $this->loader->loadConfiguration($potentialFileNames);
 

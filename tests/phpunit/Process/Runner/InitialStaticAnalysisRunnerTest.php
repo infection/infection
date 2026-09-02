@@ -86,7 +86,8 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
         $this->staticAnalysisToolAdapter
             ->expects($this->once())
             ->method('getInitialRunCommandLine')
-            ->willReturn($command);
+            ->willReturn($command)
+        ;
 
         $this->shellCommandRunner
             ->expects($this->once())
@@ -98,8 +99,10 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
                 return CompletedProcessBuilder::withMinimalTestData()
                     ->withCommand(['phpstan', 'analyse'])
                     ->withStdout('pingpong')
-                    ->build();
-            });
+                    ->build()
+                ;
+            })
+        ;
 
         $this->runner->run();
 
@@ -120,11 +123,13 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
         $this->staticAnalysisToolAdapter
             ->expects($this->once())
             ->method('getInitialRunCommandLine')
-            ->willReturn($command);
+            ->willReturn($command)
+        ;
         $this->staticAnalysisToolAdapter
             ->expects($this->once())
             ->method('getName')
-            ->willReturn('phpstan');
+            ->willReturn('phpstan')
+        ;
         $this->shellCommandRunner
             ->expects($this->once())
             ->method('run')
@@ -141,7 +146,8 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
                     ->withCommand($command)
                     ->withExitCode(3)
                     ->build(),
-            );
+            )
+        ;
 
         $this->expectException(InitialStaticAnalysisRunFailed::class);
         $this->expectExceptionMessageMatches('/phpstan reported an exit code of 3\\./');

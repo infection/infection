@@ -55,13 +55,15 @@ final class ComposableReporterTest extends TestCase
         $dataProducerMock
             ->expects($this->once())
             ->method('produce')
-            ->willReturn($contentOrLines);
+            ->willReturn($contentOrLines)
+        ;
 
         $writerMock = $this->createMock(ReportWriter::class);
         $writerMock
             ->expects($this->once())
             ->method('write')
-            ->with($contentOrLines);
+            ->with($contentOrLines)
+        ;
 
         $reporter = new ComposableReporter($dataProducerMock, $writerMock);
         $reporter->report();

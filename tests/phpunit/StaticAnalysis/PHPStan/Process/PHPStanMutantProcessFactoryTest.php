@@ -93,7 +93,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
                 DIFF)
             ->withPrettyPrintedOriginalCode('<?php $a = 1;')
-            ->build();
+            ->build()
+        ;
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
@@ -109,7 +110,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 '-vv',
                 '--memory-limit=-1',
             ])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan']);
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
+        ;
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->once())
@@ -124,7 +126,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                             parallel:
                                 maximumNumberOfProcesses: 1
                     NEON,
-            );
+            )
+        ;
 
         $factory = new PHPStanMutantProcessFactory(
             $filesystem,
@@ -190,7 +193,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
                 DIFF)
             ->withPrettyPrintedOriginalCode('<?php $a = 1;')
-            ->build();
+            ->build()
+        ;
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
@@ -207,7 +211,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 '--memory-limit=-1',
                 '--level=max',
             ])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan']);
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
+        ;
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->once())
@@ -222,7 +227,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                             parallel:
                                 maximumNumberOfProcesses: 1
                     NEON,
-            );
+            )
+        ;
 
         $factory = new PHPStanMutantProcessFactory(
             $filesystem,
@@ -287,7 +293,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
                 DIFF)
             ->withPrettyPrintedOriginalCode('<?php $a = 1;')
-            ->build();
+            ->build()
+        ;
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
@@ -302,11 +309,13 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 '--no-progress',
                 '-vv',
             ])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan']);
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
+        ;
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->once())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
 
         $factory = new PHPStanMutantProcessFactory(
             $filesystem,

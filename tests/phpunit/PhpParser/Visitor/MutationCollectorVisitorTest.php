@@ -66,7 +66,8 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
                 [$mutation0, $mutation1],
                 [$mutation2],
                 [$mutation3, $mutation4],
-            );
+            )
+        ;
 
         $visitor = new MutationCollectorVisitor($nodeMutationGeneratorStub);
 
@@ -104,7 +105,8 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
                 [$mutation2],
                 [$mutation3, $mutation4],
                 [],
-            );
+            )
+        ;
 
         $visitor = new MutationCollectorVisitor($nodeMutationGeneratorStub);
 

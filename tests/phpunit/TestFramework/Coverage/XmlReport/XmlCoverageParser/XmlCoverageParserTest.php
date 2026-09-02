@@ -70,7 +70,8 @@ final class XmlCoverageParserTest extends TestCase
 
         $actual = $this->parser
             ->parse($sourceFileInfoProviderStub)
-            ->getTests();
+            ->getTests()
+        ;
 
         $this->assertEquals($expected, $actual);
     }
@@ -190,10 +191,12 @@ final class XmlCoverageParserTest extends TestCase
         $sourceFileInfoProviderStub = $this->createStub(SourceFileInfoProvider::class);
         $sourceFileInfoProviderStub
             ->method('provideFileInfo')
-            ->willReturn(new MockSplFileInfo(''));
+            ->willReturn(new MockSplFileInfo(''))
+        ;
         $sourceFileInfoProviderStub
             ->method('provideXPath')
-            ->willReturn($xPath);
+            ->willReturn($xPath)
+        ;
 
         return $sourceFileInfoProviderStub;
     }

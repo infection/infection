@@ -80,7 +80,8 @@ final class StrykerDashboardClientTest extends TestCase
                 self::API_KEY,
                 '{"mutationScore": 80.31}',
             )
-            ->willReturn(new Response($statusCode, 'Report received!'));
+            ->willReturn(new Response($statusCode, 'Report received!'))
+        ;
 
         $this->dashboardClient->sendReport(
             'infection/infection',
@@ -124,7 +125,8 @@ final class StrykerDashboardClientTest extends TestCase
                 self::API_KEY,
                 '{"mutationScore": 80.31}',
             )
-            ->willReturn(new Response(400, 'Report invalid!'));
+            ->willReturn(new Response(400, 'Report invalid!'))
+        ;
 
         $this->dashboardClient->sendReport(
             'infection/infection',

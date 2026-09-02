@@ -88,7 +88,8 @@ final class MagoAdapterTest extends TestCase
             ->expects($this->once())
             ->method('build')
             ->with('/path/to/mago', [], ['--config=/path/to/mago-config-path', 'analyze'])
-            ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze']);
+            ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze'])
+        ;
 
         $this->assertSame([
             '/path/to/mago',
@@ -119,7 +120,8 @@ final class MagoAdapterTest extends TestCase
                 'analyze',
                 '--sort',
             ])
-            ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', '--sort']);
+            ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', '--sort'])
+        ;
 
         $this->assertSame([
             '/path/to/mago',
@@ -150,7 +152,8 @@ final class MagoAdapterTest extends TestCase
                 'analyze',
                 '--no-progress',
             ])
-            ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze', '--no-progress']);
+            ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze', '--no-progress'])
+        ;
 
         $this->assertSame([
             '/path/to/mago',
@@ -183,7 +186,8 @@ final class MagoAdapterTest extends TestCase
                 '--no-stubs',
                 '--baseline /path/to/baseline.toml',
             ])
-            ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze', '--no-stubs', '--baseline /path/to/baseline.toml']);
+            ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze', '--no-stubs', '--baseline /path/to/baseline.toml'])
+        ;
 
         $this->assertSame([
             '/path/to/mago',
@@ -207,13 +211,15 @@ final class MagoAdapterTest extends TestCase
             ->expects($this->once())
             ->method('build')
             ->with('/path/to/mago', [], ['--version'])
-            ->willReturn(['/path/to/mago', '--version']);
+            ->willReturn(['/path/to/mago', '--version'])
+        ;
 
         $shellCommandRunner
             ->expects($this->once())
             ->method('mustRun')
             ->with(['/path/to/mago', '--version'])
-            ->willReturn('mago 1.23.0');
+            ->willReturn('mago 1.23.0')
+        ;
 
         $adapter = new MagoAdapter(
             $this->createStub(MutantExecutionResultFactory::class),

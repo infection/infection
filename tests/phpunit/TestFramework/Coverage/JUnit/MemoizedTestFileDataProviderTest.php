@@ -54,7 +54,8 @@ final class MemoizedTestFileDataProviderTest extends TestCase
             ->expects($this->once())
             ->method('getTestFileInfo')
             ->with($class)
-            ->willReturn($expectedTestInfo);
+            ->willReturn($expectedTestInfo)
+        ;
 
         $infoProvider = new MemoizedTestFileDataProvider($providerMock);
 

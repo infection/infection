@@ -72,7 +72,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
     {
         $this->locatorMock
             ->expects($this->once())
-            ->method('locate');
+            ->method('locate')
+        ;
 
         $result = $this->provider->get(
             new IO(
@@ -91,7 +92,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
         $this->consoleMock
             ->expects($this->once())
             ->method('getQuestion')
-            ->willReturn('foobar');
+            ->willReturn('foobar')
+        ;
 
         $this->locatorMock
             ->expects($this->exactly(3))
@@ -100,7 +102,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
                 $this->throwException(new Exception()),
                 $this->throwException(new Exception()),
                 '',
-            );
+            )
+        ;
 
         // TODO: it would be better to inject the FS to be able to mock rather than relying on such a value
         $inputPhpUnitPath = __DIR__;
@@ -126,11 +129,13 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
             ->willReturnOnConsecutiveCalls(
                 $this->throwException(new Exception()),
                 '',
-            );
+            )
+        ;
 
         $this->consoleMock
             ->expects($this->never())
-            ->method('getQuestion');
+            ->method('getQuestion')
+        ;
 
         $path = $this->provider->get(
             IO::createNull(),
@@ -154,7 +159,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
                 $this->throwException(new Exception()),
                 $this->throwException(new Exception()),
                 '',
-            );
+            )
+        ;
 
         $path = $this->provider->get(
             new IO(

@@ -76,7 +76,8 @@ final class MutatorRobustnessTest extends TestCase
         $this->fileMutationGenerator = SingletonContainer::getContainer()
             ->cloneWithService(SourceLineMatcher::class, new NullSourceLineMatcher())
             ->cloneWithService(Tracer::class, new DummyTracer())
-            ->getFileMutationGenerator();
+            ->getFileMutationGenerator()
+        ;
     }
 
     /**
@@ -137,7 +138,8 @@ final class MutatorRobustnessTest extends TestCase
         $finder = Finder::create()
             ->in(self::FIXTURES_DIR)
             ->name('*.php')
-            ->files();
+            ->files()
+        ;
 
         $files = take($finder)->toAssoc();
         ksort($files, SORT_STRING);

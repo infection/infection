@@ -119,7 +119,8 @@ final class MutationTestingRunnerTest extends TestCase
         $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($this->emptyIterable());
+            ->with($this->emptyIterable())
+        ;
 
         $this->runner->run($mutations);
 
@@ -165,7 +166,8 @@ final class MutationTestingRunnerTest extends TestCase
                 MutantBuilder::withMinimalTestData()
                     ->withMutation($mutation3)
                     ->build(),
-            );
+            )
+        ;
 
         $this->fileSystemMock
             ->expects($this->exactly(2))
@@ -173,7 +175,8 @@ final class MutationTestingRunnerTest extends TestCase
             ->with(...WithConsecutive::create(
                 ['/path/to/mutant0', 'mutated code 0'],
                 ['/path/to/mutant1', 'mutated code 1'],
-            ));
+            ))
+        ;
 
         $this->testFrameworkMock
             ->method('test')
@@ -184,12 +187,14 @@ final class MutationTestingRunnerTest extends TestCase
             ->willReturnOnConsecutiveCalls(
                 $process0 = $this->buildCoveredMutantProcessContainer(),
                 $process1 = $this->buildCoveredMutantProcessContainer(),
-            );
+            )
+        ;
 
         $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($this->iterableContaining([$process0, $process1]));
+            ->with($this->iterableContaining([$process0, $process1]))
+        ;
 
         $this->runner->run($mutations);
 
@@ -240,14 +245,16 @@ final class MutationTestingRunnerTest extends TestCase
                     ->withMutation($mutation0)
                     ->withMutatedCode('mutated code 0')
                     ->build(),
-            );
+            )
+        ;
 
         $this->fileSystemMock
             ->expects($this->exactly(1))
             ->method('dumpFile')
             ->with(...WithConsecutive::create(
                 ['/path/to/mutant0', 'mutated code 0'],
-            ));
+            ))
+        ;
 
         $this->testFrameworkMock
             ->method('test')
@@ -256,13 +263,15 @@ final class MutationTestingRunnerTest extends TestCase
             ))
             ->willReturn(
                 $process0 = $this->buildCoveredMutantProcessContainer(),
-            );
+            )
+        ;
 
         $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
             ->with($this->iterableContaining([$process0]))
-            ->willReturn([$process0]);
+            ->willReturn([$process0])
+        ;
 
         $this->runner = new MutationTestingRunner(
             $this->testFrameworkMock,
@@ -316,7 +325,8 @@ final class MutationTestingRunnerTest extends TestCase
                     ->withMutation($mutation1)
                     ->withMutatedCode('mutated code 1')
                     ->build(),
-            );
+            )
+        ;
 
         $this->fileSystemMock
             ->expects($this->exactly(2))
@@ -324,7 +334,8 @@ final class MutationTestingRunnerTest extends TestCase
             ->with(...WithConsecutive::create(
                 ['/path/to/mutant0', 'mutated code 0'],
                 ['/path/to/mutant1', 'mutated code 1'],
-            ));
+            ))
+        ;
 
         $this->testFrameworkMock
             ->method('test')
@@ -335,12 +346,14 @@ final class MutationTestingRunnerTest extends TestCase
             ->willReturnOnConsecutiveCalls(
                 $process0 = $this->buildCoveredMutantProcessContainer(),
                 $process1 = $this->buildCoveredMutantProcessContainer(),
-            );
+            )
+        ;
 
         $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($this->iterableContaining([$process0, $process1]));
+            ->with($this->iterableContaining([$process0, $process1]))
+        ;
 
         $this->runner = new MutationTestingRunner(
             $this->testFrameworkMock,
@@ -378,27 +391,32 @@ final class MutationTestingRunnerTest extends TestCase
             ->withMutation($mutation0)
             ->withMutatedCode('mutated code 0')
             ->withDiff('- Assert::integer(1)')
-            ->build();
+            ->build()
+        ;
 
         $this->mutantFactoryMock
             ->method('create')
             ->with(...WithConsecutive::create(
                 [$mutation0],
             ))
-            ->willReturn($mutant);
+            ->willReturn($mutant)
+        ;
 
         $this->fileSystemMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $this->testFrameworkMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($this->emptyIterable());
+            ->with($this->emptyIterable())
+        ;
 
         $this->runner = new MutationTestingRunner(
             $this->testFrameworkMock,
@@ -438,27 +456,32 @@ final class MutationTestingRunnerTest extends TestCase
             ->withMutation($mutation0)
             ->withMutatedCode('mutated code 0')
             ->withDiff('- Assert::integer(1)')
-            ->build();
+            ->build()
+        ;
 
         $this->mutantFactoryMock
             ->method('create')
             ->with(...WithConsecutive::create(
                 [$mutation0],
             ))
-            ->willReturn($mutant);
+            ->willReturn($mutant)
+        ;
 
         $this->fileSystemMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $this->testFrameworkMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($this->emptyIterable());
+            ->with($this->emptyIterable())
+        ;
 
         $this->runner = new MutationTestingRunner(
             $this->testFrameworkMock,
@@ -491,7 +514,8 @@ final class MutationTestingRunnerTest extends TestCase
         $this->diffSourceCodeMatcher
             ->expects($this->once())
             ->method('matches')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $this->runner = new MutationTestingRunner(
             $this->testFrameworkMock,
@@ -512,7 +536,8 @@ final class MutationTestingRunnerTest extends TestCase
         $mutant = MutantBuilder::withMinimalTestData()
             ->withMutation($mutation)
             ->withMutatedCode('mutated code 0')
-            ->build();
+            ->build()
+        ;
 
         $result = $this->invokeMethod('ignoredByRegex', $mutant);
 
@@ -526,16 +551,19 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->mutantFactoryMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $this->testFrameworkMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($this->someIterable());
+            ->with($this->someIterable())
+        ;
 
         $this->runner = new MutationTestingRunner(
             $this->testFrameworkMock,
@@ -557,16 +585,19 @@ final class MutationTestingRunnerTest extends TestCase
         $mutations = [];
         $this->testFrameworkMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $this->mutantFactoryMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $this->processRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($this->emptyIterable());
+            ->with($this->emptyIterable())
+        ;
 
         $this->runner->run($mutations);
 
@@ -598,12 +629,14 @@ final class MutationTestingRunnerTest extends TestCase
         $process = $this->createMock(MutantProcess::class);
         $process->expects($this->once())
             ->method('getMutantExecutionResult')
-            ->willReturn($result);
+            ->willReturn($result)
+        ;
 
         $container = $this->createMock(MutantProcessContainer::class);
         $container->expects($this->once())
             ->method('getCurrent')
-            ->willReturn($process);
+            ->willReturn($process)
+        ;
 
         $result = $this->invokeMethod('containerToFinishedEvent', $container);
         $this->assertInstanceOf(MutantProcessWasFinished::class, $result);

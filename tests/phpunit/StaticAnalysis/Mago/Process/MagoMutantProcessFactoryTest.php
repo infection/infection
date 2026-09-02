@@ -93,7 +93,8 @@ final class MagoMutantProcessFactoryTest extends TestCase
 
                 DIFF)
             ->withPrettyPrintedOriginalCode('<?php $a = 1;')
-            ->build();
+            ->build()
+        ;
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
@@ -108,11 +109,13 @@ final class MagoMutantProcessFactoryTest extends TestCase
                 '--substitute',
                 "$originalFilePath=$mutantFilePath",
             ])
-            ->willReturn(['/path/to/mago']);
+            ->willReturn(['/path/to/mago'])
+        ;
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->never())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
 
         $factory = new MagoMutantProcessFactory(
             $phpStanMutantExecutionResultFactory,
@@ -175,7 +178,8 @@ final class MagoMutantProcessFactoryTest extends TestCase
 
                 DIFF)
             ->withPrettyPrintedOriginalCode('<?php $a = 1;')
-            ->build();
+            ->build()
+        ;
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
@@ -192,11 +196,13 @@ final class MagoMutantProcessFactoryTest extends TestCase
                 '--no-stubs',
                 '--baseline /path/to/baseline.toml',
             ])
-            ->willReturn(['/path/to/mago']);
+            ->willReturn(['/path/to/mago'])
+        ;
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->never())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
 
         $factory = new MagoMutantProcessFactory(
             $phpStanMutantExecutionResultFactory,
@@ -261,7 +267,8 @@ final class MagoMutantProcessFactoryTest extends TestCase
 
                 DIFF)
             ->withPrettyPrintedOriginalCode('<?php $a = 1;')
-            ->build();
+            ->build()
+        ;
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
@@ -276,11 +283,13 @@ final class MagoMutantProcessFactoryTest extends TestCase
                 '--substitute',
                 "$originalFilePath=$mutantFilePath",
             ])
-            ->willReturn(['/path/to/mago']);
+            ->willReturn(['/path/to/mago'])
+        ;
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->never())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
 
         $factory = new MagoMutantProcessFactory(
             $phpStanMutantExecutionResultFactory,

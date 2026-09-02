@@ -90,7 +90,8 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
 
         $this->composerFinder = $this->createStub(ComposerExecutableFinder::class);
         $this->composerFinder->method('find')
-            ->willReturn(['/usr/bin/composer']);
+            ->willReturn(['/usr/bin/composer'])
+        ;
 
         $this->shellCommandRunner = new SymfonyProcessShellCommandRunner();
     }
@@ -162,7 +163,8 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
             ->expects($this->once())
             ->method('mustRun')
             ->with(['/usr/bin/composer', 'config', 'bin-dir'])
-            ->willThrowException(new RuntimeException());
+            ->willThrowException(new RuntimeException())
+        ;
 
         $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $shellCommandRunner);
 
