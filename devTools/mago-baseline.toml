@@ -2715,13 +2715,13 @@ count = 1
 [[issues]]
 file = "src/PhpParser/Visitor/ExcludeUnchangedLinesVisitor.php"
 code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Infection\Source\Matcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
+message = 'Possible argument type mismatch for argument #2 of `Infection\Source\Matcher\Line\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
 count = 1
 
 [[issues]]
 file = "src/PhpParser/Visitor/ExcludeUnchangedLinesVisitor.php"
 code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #3 of `Infection\Source\Matcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
+message = 'Possible argument type mismatch for argument #3 of `Infection\Source\Matcher\Line\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
 count = 1
 
 [[issues]]
@@ -5131,7 +5131,7 @@ message = 'Possible argument type mismatch for argument #2 of `Infection\Source\
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Source/Matcher/GitDiffSourceLineMatcherTest.php"
+file = "tests/phpunit/Source/Matcher/Line/GitDiffSourceLineMatcherTest.php"
 code = "redundant-docblock-type"
 message = "Redundant docblock type for variable `$git`."
 count = 1

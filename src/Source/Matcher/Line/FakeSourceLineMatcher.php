@@ -33,20 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\Matcher;
+namespace Infection\Source\Matcher\Line;
+
+use DomainException;
 
 /**
- * Default implementation that corresponds to "matches everything".
- *
- * This is typically used if there is no filtering done on the source, or if
- * that filter filters files but does not apply to lines.
- *
  * @internal
  */
-final class NullSourceLineMatcher implements SourceLineMatcher
+final readonly class FakeSourceLineMatcher implements SourceLineMatcher
 {
     public function touches(string $fileRealPath, int $startLine, int $endLine): bool
     {
-        return true;
+        throw new DomainException('Not implemented');
     }
 }
