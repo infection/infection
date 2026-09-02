@@ -66,7 +66,6 @@ use function str_starts_with;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
  * @internal
@@ -100,9 +99,6 @@ final class ConfigureCommand extends BaseCommand
             );
     }
 
-    /**
-     * @throws IOException
-     */
     protected function executeCommand(IO $io): bool
     {
         if (!$io->isInteractive()) {

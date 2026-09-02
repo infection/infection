@@ -69,7 +69,9 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $locator = new TestFrameworkConfigLocator('/config-dir', $fileSystemMock);
 
-        $this->assertSame('/resolved/phpunit.xml.dist', $locator->locate('phpunit'));
+        $actual = $locator->locate('phpunit');
+
+        $this->assertSame('/resolved/phpunit.xml.dist', $actual);
     }
 
     public function test_it_throws_an_error_if_no_config_file_found(): void

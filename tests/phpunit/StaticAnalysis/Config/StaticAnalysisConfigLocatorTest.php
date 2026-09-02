@@ -68,7 +68,9 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
 
         $locator = new StaticAnalysisConfigLocator('/config-dir', $fileSystemMock);
 
-        $this->assertSame('/resolved/phpstan.neon.dist', $locator->locate('phpstan', '/custom-dir'));
+        $actual = $locator->locate('phpstan', '/custom-dir');
+
+        $this->assertSame('/resolved/phpstan.neon.dist', $actual);
     }
 
     public function test_it_throws_an_error_if_no_config_file_found(): void
