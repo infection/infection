@@ -54,7 +54,8 @@ final class BuildContextResolverTest extends TestCase
 
         $ciDetector
             ->method('detect')
-            ->willThrowException(new CiNotDetectedException());
+            ->willThrowException(new CiNotDetectedException())
+        ;
 
         $buildContextResolver = new BuildContextResolver($ciDetector);
 
@@ -70,13 +71,15 @@ final class BuildContextResolverTest extends TestCase
 
         $ci
             ->method('isPullRequest')
-            ->willReturn(TrinaryLogic::createFromBoolean(true));
+            ->willReturn(TrinaryLogic::createFromBoolean(true))
+        ;
 
         $ciDetector = $this->createStub(CiDetector::class);
 
         $ciDetector
             ->method('detect')
-            ->willReturn($ci);
+            ->willReturn($ci)
+        ;
 
         $buildContextResolver = new BuildContextResolver($ciDetector);
 
@@ -92,13 +95,15 @@ final class BuildContextResolverTest extends TestCase
 
         $ci
             ->method('isPullRequest')
-            ->willReturn(TrinaryLogic::createMaybe());
+            ->willReturn(TrinaryLogic::createMaybe())
+        ;
 
         $ciDetector = $this->createStub(CiDetector::class);
 
         $ciDetector
             ->method('detect')
-            ->willReturn($ci);
+            ->willReturn($ci)
+        ;
 
         $buildContextResolver = new BuildContextResolver($ciDetector);
 
@@ -117,21 +122,25 @@ final class BuildContextResolverTest extends TestCase
 
         $ci
             ->method('isPullRequest')
-            ->willReturn(TrinaryLogic::createFromBoolean(false));
+            ->willReturn(TrinaryLogic::createFromBoolean(false))
+        ;
 
         $ci
             ->method('getRepositoryName')
-            ->willReturn($repositoryName);
+            ->willReturn($repositoryName)
+        ;
 
         $ci
             ->method('getBranch')
-            ->willReturn($gitBranch);
+            ->willReturn($gitBranch)
+        ;
 
         $ciDetector = $this->createStub(CiDetector::class);
 
         $ciDetector
             ->method('detect')
-            ->willReturn($ci);
+            ->willReturn($ci)
+        ;
 
         $buildContextResolver = new BuildContextResolver($ciDetector);
 
@@ -150,21 +159,25 @@ final class BuildContextResolverTest extends TestCase
 
         $ci
             ->method('isPullRequest')
-            ->willReturn(TrinaryLogic::createFromBoolean(false));
+            ->willReturn(TrinaryLogic::createFromBoolean(false))
+        ;
 
         $ci
             ->method('getRepositoryName')
-            ->willReturn($repositoryName);
+            ->willReturn($repositoryName)
+        ;
 
         $ci
             ->method('getBranch')
-            ->willReturn($gitBranch);
+            ->willReturn($gitBranch)
+        ;
 
         $ciDetector = $this->createStub(CiDetector::class);
 
         $ciDetector
             ->method('detect')
-            ->willReturn($ci);
+            ->willReturn($ci)
+        ;
 
         $buildContextResolver = new BuildContextResolver($ciDetector);
 
@@ -190,21 +203,25 @@ final class BuildContextResolverTest extends TestCase
 
         $ci
             ->method('isPullRequest')
-            ->willReturn(TrinaryLogic::createFromBoolean(false));
+            ->willReturn(TrinaryLogic::createFromBoolean(false))
+        ;
 
         $ci
             ->method('getRepositoryName')
-            ->willReturn($repositoryName);
+            ->willReturn($repositoryName)
+        ;
 
         $ci
             ->method('getBranch')
-            ->willReturn($gitBranch);
+            ->willReturn($gitBranch)
+        ;
 
         $ciDetector = $this->createStub(CiDetector::class);
 
         $ciDetector
             ->method('detect')
-            ->willReturn($ci);
+            ->willReturn($ci)
+        ;
 
         $buildContextResolver = new BuildContextResolver($ciDetector);
 

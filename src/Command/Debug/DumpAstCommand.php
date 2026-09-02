@@ -170,13 +170,15 @@ final class DumpAstCommand extends BaseCommand
                 $file,
                 new EmptyTrace($file),
             )
-            ->traverse($initialStatements);
+            ->traverse($initialStatements)
+        ;
 
         return $traverserFactory
             ->createMutationTraverser(
                 new MarkTraversedNodesAsVisitedVisitor(),
             )
-            ->traverse($initialStatements);
+            ->traverse($initialStatements)
+        ;
     }
 
     private function getFile(IO $io): SplFileObject
@@ -286,7 +288,8 @@ final class DumpAstCommand extends BaseCommand
                 configFile: $configFile,
                 withUncovered: true,
                 sourceFilter: SourceFilterOptions::get($io),
-            );
+            )
+        ;
 
         if ($changedLinesRanges !== null) {
             $container = $container->cloneWithService(

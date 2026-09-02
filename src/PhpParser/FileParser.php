@@ -70,8 +70,7 @@ final readonly class FileParser
         } catch (Throwable $throwable) {
             $filePath = $fileInfo->getRealPath() === false
                 ? $fileInfo->getPathname()
-                : $fileInfo->getRealPath()
-            ;
+                : $fileInfo->getRealPath();
 
             throw UnparsableFile::fromInvalidFile($filePath, $throwable);
         }

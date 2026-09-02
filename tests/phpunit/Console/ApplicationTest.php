@@ -61,7 +61,8 @@ final class ApplicationTest extends TestCase
         $versionMock
             ->expects($this->once())
             ->method('prettyVersion')
-            ->willReturn('1.2.3');
+            ->willReturn('1.2.3')
+        ;
 
         $application = new Application(
             SingletonContainer::getContainer(),
@@ -155,7 +156,8 @@ final class ApplicationTest extends TestCase
             {
                 $this
                     ->setName('run')
-                    ->addArgument('paths', InputArgument::IS_ARRAY | InputArgument::OPTIONAL);
+                    ->addArgument('paths', InputArgument::IS_ARRAY | InputArgument::OPTIONAL)
+                ;
             }
 
             protected function execute(InputInterface $input, OutputInterface $output): int

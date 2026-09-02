@@ -93,7 +93,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
                 DIFF)
             ->withPrettyPrintedOriginalCode('<?php $a = 1;')
-            ->build();
+            ->build()
+        ;
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
@@ -125,7 +126,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                             parallel:
                                 maximumNumberOfProcesses: 1
                     NEON,
-            );
+            )
+        ;
 
         $factory = new PHPStanMutantProcessFactory(
             $filesystem,
@@ -191,7 +193,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
                 DIFF)
             ->withPrettyPrintedOriginalCode('<?php $a = 1;')
-            ->build();
+            ->build()
+        ;
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
@@ -224,7 +227,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                             parallel:
                                 maximumNumberOfProcesses: 1
                     NEON,
-            );
+            )
+        ;
 
         $factory = new PHPStanMutantProcessFactory(
             $filesystem,
@@ -289,7 +293,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
                 DIFF)
             ->withPrettyPrintedOriginalCode('<?php $a = 1;')
-            ->build();
+            ->build()
+        ;
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
@@ -309,7 +314,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->once())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
 
         $factory = new PHPStanMutantProcessFactory(
             $filesystem,

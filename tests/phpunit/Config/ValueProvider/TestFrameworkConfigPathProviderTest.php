@@ -78,7 +78,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
     {
         $this->locatorMock
             ->expects($this->once())
-            ->method('locate');
+            ->method('locate')
+        ;
 
         $this->fileSystemMock
             ->expects($this->never())
@@ -101,7 +102,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
         $this->consoleMock
             ->expects($this->once())
             ->method('getQuestion')
-            ->willReturn('foobar');
+            ->willReturn('foobar')
+        ;
 
         $this->locatorMock
             ->expects($this->exactly(3))
@@ -110,7 +112,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
                 $this->throwException(new Exception()),
                 $this->throwException(new Exception()),
                 '',
-            );
+            )
+        ;
 
         $this->expectComposerJsonIsRead();
 
@@ -187,11 +190,13 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
             ->willReturnOnConsecutiveCalls(
                 $this->throwException(new Exception()),
                 '',
-            );
+            )
+        ;
 
         $this->consoleMock
             ->expects($this->never())
-            ->method('getQuestion');
+            ->method('getQuestion')
+        ;
 
         $this->expectComposerJsonIsRead();
 
@@ -217,7 +222,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
                 $this->throwException(new Exception()),
                 $this->throwException(new Exception()),
                 '',
-            );
+            )
+        ;
 
         $this->expectComposerJsonIsRead();
 

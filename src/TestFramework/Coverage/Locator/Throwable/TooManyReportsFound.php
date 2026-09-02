@@ -45,13 +45,13 @@ use Throwable;
  */
 final class TooManyReportsFound extends RuntimeException implements ReportLocationThrowable
 {
+    /**
+     * @param list<string>|null $reportPathnames
+     */
     public function __construct(
         string $message = '',
         int $code = 0,
         ?Throwable $previous = null,
-        /**
-         * @var list<string>|null
-         */
         public readonly ?array $reportPathnames = null,
     ) {
         parent::__construct($message, $code, $previous);
