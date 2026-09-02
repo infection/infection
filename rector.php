@@ -33,6 +33,7 @@
 
 declare(strict_types=1);
 
+use Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector;
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\CodeQuality\Rector\BooleanNot\NegatedAndsToPositiveOrsRector;
 use Rector\CodeQuality\Rector\BooleanNot\SimplifyDeMorganBinaryRector;
@@ -124,6 +125,7 @@ $config = RectorConfig::configure()
         PrivatizeFinalClassMethodRector::class,
         PrivatizeFinalClassPropertyRector::class,
         TypedPropertyFromAssignsRector::class,
+        VarTagOnParameterToParamTagRector::class,
     ])
     ->withConfiguredRule(
         ClassPropertyAssignToConstructorPromotionRector::class,

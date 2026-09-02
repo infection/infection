@@ -33,21 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
+use Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector;
+use Rector\Config\RectorConfig;
 
-final readonly class AnalysisResult
-{
-    /**
-     * @param list<string> $environmentVariables
-     */
-    public function __construct(
-        public bool $hasTrivialImplementation,
-        public bool $usesIo,
-        public bool $isAConcretePHPUnitTestCase,
-        public bool $hasCoversNothing,
-        public bool $belongsToIntegrationGroup,
-        public bool $declaresPublicNonReadonlyProperty,
-        public array $environmentVariables,
-    ) {
-    }
-}
+return RectorConfig::configure()
+    ->withRules([VarTagOnParameterToParamTagRector::class]);
