@@ -47,7 +47,7 @@ use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
-use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\Source\Matcher\Line\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use PhpParser\NodeTraverser;

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
-use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\Source\Matcher\Line\SourceLineMatcher;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 

@@ -33,12 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Source\Matcher;
+namespace Infection\Tests\Source\Matcher\Line;
 
 use const DIRECTORY_SEPARATOR;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Git\Git;
-use Infection\Source\Matcher\GitDiffSourceLineMatcher;
+use Infection\Source\Matcher\Line\GitDiffSourceLineMatcher;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
