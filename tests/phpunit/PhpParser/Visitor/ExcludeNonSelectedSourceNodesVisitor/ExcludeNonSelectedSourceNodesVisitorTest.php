@@ -42,6 +42,8 @@ use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\Source\Matcher\SourceSymbolMatcher;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
+use PhpParser\Node;
+use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -50,6 +52,69 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[CoversClass(SourceSymbolMatcher::class)]
 final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
 {
+    public function test_it_applies_method_selection_to_lexically_nested_function_like_nodes(): void
+    {
+        $nodes = $this->parse(<<<'PHP'
+            <?php
+
+            function outside(): int
+            {
+                return 0;
+            }
+
+            final class Example
+            {
+                public function selected(): void
+                {
+                    $closure = static function (): int {
+                        return 1;
+                    };
+                    $arrow = static fn (): int => 2;
+
+                    function nestedInSelected(): int
+                    {
+                        return 3;
+                    }
+                }
+
+                public function unselected(): void
+                {
+                    $closure = static function (): int {
+                        return 4;
+                    };
+                    $arrow = static fn (): int => 5;
+
+                    function nestedInUnselected(): int
+                    {
+                        return 6;
+                    }
+                }
+            }
+            PHP);
+
+        (new NodeTraverser(
+            new LabelNodesAsEligibleVisitor(),
+            NameResolverFactory::create(),
+            new ExcludeNonSelectedSourceNodesVisitor(
+                new SourceSymbolMatcher([
+                    new SourceSymbolSelector('Example', 'selected', null),
+                ]),
+            ),
+        ))->traverse($nodes);
+
+        $functionLikes = (new NodeFinder())->findInstanceOf($nodes, Node\FunctionLike::class);
+
+        $this->assertFalse(LabelNodesAsEligibleVisitor::isEligible($functionLikes[0]), 'top-level named function');
+        $this->assertTrue(LabelNodesAsEligibleVisitor::isEligible($functionLikes[1]), 'selected method');
+        $this->assertTrue(LabelNodesAsEligibleVisitor::isEligible($functionLikes[2]), 'closure in selected method');
+        $this->assertTrue(LabelNodesAsEligibleVisitor::isEligible($functionLikes[3]), 'arrow function in selected method');
+        $this->assertTrue(LabelNodesAsEligibleVisitor::isEligible($functionLikes[4]), 'named function in selected method');
+        $this->assertFalse(LabelNodesAsEligibleVisitor::isEligible($functionLikes[5]), 'unselected method');
+        $this->assertFalse(LabelNodesAsEligibleVisitor::isEligible($functionLikes[6]), 'closure in unselected method');
+        $this->assertFalse(LabelNodesAsEligibleVisitor::isEligible($functionLikes[7]), 'arrow function in unselected method');
+        $this->assertFalse(LabelNodesAsEligibleVisitor::isEligible($functionLikes[8]), 'named function in unselected method');
+    }
+
     /**
      * @param list<SourceSymbolSelector> $selectors
      */

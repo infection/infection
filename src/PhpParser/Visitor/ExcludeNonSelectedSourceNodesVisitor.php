@@ -42,6 +42,9 @@ use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 /**
+ * Applies source-symbol selection lexically. Function-like nodes nested in a
+ * selected method inherit its selection, while functions outside a class do not.
+ *
  * @internal
  */
 final class ExcludeNonSelectedSourceNodesVisitor extends NodeVisitorAbstract
