@@ -763,12 +763,6 @@ parameters:
 			path: ../src/StaticAnalysis/StaticAnalysisToolAdapterFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\AbstractTestFrameworkAdapter should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/TestFramework/AbstractTestFrameworkAdapter.php
-
-		-
 			rawMessage: 'Parameter #2 $paths of method Composer\Autoload\ClassLoader::setPsr4() expects list<string>|string, array<string> given.'
 			identifier: argument.type
 			count: 1
@@ -877,25 +871,13 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\AbstractTestFrameworkAdapter
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 6
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\Config\InitialConfigBuilder
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\Config\MutationConfigBuilder
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
@@ -961,12 +943,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder should not depend on Infection\TestFramework\Config\InitialConfigBuilder
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder should not depend on Infection\TestFramework\XML\SafeDOMXPath
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 4
@@ -979,12 +955,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not depend on Infection\TestFramework\Config\MutationConfigBuilder
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not depend on Infection\TestFramework\Tracing\TestRunOrderResolver
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -994,12 +964,6 @@ parameters:
 			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not depend on Infection\TestFramework\XML\SafeDOMXPath
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 8
-			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not exist
-			identifier: phpat.testSourceConcreteClassesAreFinals
-			count: 1
 			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
 
 		-
