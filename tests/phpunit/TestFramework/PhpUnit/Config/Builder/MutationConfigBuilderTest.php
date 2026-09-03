@@ -89,14 +89,14 @@ final class MutationConfigBuilderTest extends TestCase
      */
     #[DataProvider('configurationProvider')]
     public function test_it_builds_the_xml_configuration(
-        string $fixture,
+        string $xml,
         array $tests,
         string $version,
         string $expectedXml,
     ): void {
-        $builder = $this->createConfigBuilder(self::FIXTURES . '/' . $fixture);
+        $builder = $this->createBuilder($xml);
 
-        $configurationPath = $builder->build(
+        $actualConfigurationPath = $builder->build(
             $tests,
             self::MUTATED_FILE_PATH,
             self::HASH,
@@ -104,12 +104,32 @@ final class MutationConfigBuilderTest extends TestCase
             $version,
         );
 
-        $this->assertSame(
-            self::TMP_DIR . '/phpunitConfiguration.a1b2c3.infection.xml',
-            $configurationPath,
+        $expectedConfigurationPath = self::TMP_DIR . '/phpunitConfiguration.a1b2c3.infection.xml';
+        $this->assertSame($expectedConfigurationPath, $actualConfigurationPath);
+
+        $actualXml = $this->filesystem->readFile($actualConfigurationPath);
+        $this->assertSame($expectedXml, $actualXml);
+    }
+
+    #[DataProvider('autoloadProvider')]
+    public function test_it_builds_the_autoload_file(
+        string $xml,
+        string $expectedAutoload,
+    ): void {
+        $builder = $this->createBuilder($xml);
+
+        $builder->build(
+            tests: [],  // irrelevant for this test
+            mutantFilePath: self::MUTATED_FILE_PATH,
+            mutationHash: self::HASH,
+            mutationOriginalFilePath: self::ORIGINAL_FILE_PATH,
+            version: '7.1',
         );
 
-        $this->assertSame($expectedXml, $this->filesystem->readFile($configurationPath));
+        $expectedAutoloadPath = self::TMP_DIR . '/interceptor.autoload.a1b2c3.infection.php';
+        $actualAutoload = $this->filesystem->readFile($expectedAutoloadPath);
+
+        $this->assertSame($expectedAutoload, $actualAutoload);
     }
 
     public function test_it_can_build_the_config_for_multiple_mutations(): void
@@ -353,7 +373,9 @@ final class MutationConfigBuilderTest extends TestCase
     {
         $tmp = self::TMP_DIR;
         $projectPath = Path::canonicalize(self::FIXTURES . '/project-path');
-        $configuration = static fn (string $attributes): string => <<<XML
+        $loadFixture = static fn (string $fixture): string => file_get_contents(self::FIXTURES . '/' . $fixture);
+
+        $createConfiguration = static fn (string $attributes): string => <<<XML
             <?xml version="1.0" encoding="UTF-8"?>
             <phpunit $attributes>
               <testsuites>
@@ -364,7 +386,7 @@ final class MutationConfigBuilderTest extends TestCase
             XML;
 
         yield 'standard configuration' => [
-            'phpunit.xml',
+            $loadFixture('phpunit.xml'),
             [],
             '7.1',
             <<<XML
@@ -394,7 +416,7 @@ final class MutationConfigBuilderTest extends TestCase
         ];
 
         yield 'configuration without a bootstrap' => [
-            'phpunit_without_bootstrap.xml',
+            $loadFixture('phpunit_without_bootstrap.xml'),
             [],
             '7.1',
             <<<XML
@@ -409,7 +431,7 @@ final class MutationConfigBuilderTest extends TestCase
         ];
 
         yield 'root test suite' => [
-            'phpunit_root_test_suite.xml',
+            $loadFixture('phpunit_root_test_suite.xml'),
             [],
             '7.1',
             <<<XML
@@ -437,7 +459,7 @@ final class MutationConfigBuilderTest extends TestCase
         ];
 
         yield 'ordered test files' => [
-            'phpunit_without_coverage_whitelist.xml',
+            $loadFixture('phpunit_without_coverage_whitelist.xml'),
             [
                 new TestLocation('A::test_a', '/path/to/A.php', 0.5),
                 new TestLocation('B::test_b', '/path/to/B.php', 0.1),
@@ -458,58 +480,107 @@ final class MutationConfigBuilderTest extends TestCase
         ];
 
         yield 'PHPUnit 5.1 does not add fail-on attributes' => [
-            'phpunit_without_coverage_whitelist.xml',
+            $loadFixture('phpunit_without_coverage_whitelist.xml'),
             [],
             '5.1.99',
-            $configuration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" stderr="false"'),
+            $createConfiguration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" stderr="false"'),
         ];
 
         yield 'PHPUnit 5.2 adds fail-on attributes' => [
-            'phpunit_without_coverage_whitelist.xml',
+            $loadFixture('phpunit_without_coverage_whitelist.xml'),
             [],
             '5.2',
-            $configuration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false"'),
+            $createConfiguration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false"'),
         ];
 
         yield 'an existing failOnRisky value is preserved' => [
-            'phpunit_with_fail_on_risky_set.xml',
+            $loadFixture('phpunit_with_fail_on_risky_set.xml'),
             [],
             '5.2',
-            $configuration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="reverse" failOnRisky="false" failOnWarning="true" stopOnFailure="true" stderr="false"'),
+            $createConfiguration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="reverse" failOnRisky="false" failOnWarning="true" stopOnFailure="true" stderr="false"'),
         ];
 
         yield 'an existing failOnWarning value is preserved' => [
-            'phpunit_with_fail_on_warning_set.xml',
+            $loadFixture('phpunit_with_fail_on_warning_set.xml'),
             [],
             '5.2',
-            $configuration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="reverse" failOnWarning="false" failOnRisky="true" stopOnFailure="true" stderr="false"'),
+            $createConfiguration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="reverse" failOnWarning="false" failOnRisky="true" stopOnFailure="true" stderr="false"'),
         ];
 
         yield 'PHPUnit 7.2 sets the default execution order when absent' => [
-            'phpunit_without_coverage_whitelist.xml',
+            $loadFixture('phpunit_without_coverage_whitelist.xml'),
             [],
             '7.2',
-            $configuration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="default" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false"'),
+            $createConfiguration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="default" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false"'),
         ];
 
         yield 'PHPUnit 7.2 replaces an existing execution order' => [
-            'phpunit_with_order_set.xml',
+            $loadFixture('phpunit_with_order_set.xml'),
             [],
             '7.2',
-            $configuration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="default" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false"'),
+            $createConfiguration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="default" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false"'),
         ];
 
         yield 'PHPUnit 7.3 enables result caching and defect ordering' => [
-            'phpunit_with_order_set.xml',
+            $loadFixture('phpunit_with_order_set.xml'),
             [],
             '7.3',
-            $configuration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="defects" cacheResult="true" cacheResultFile=".phpunit.result.cache.a1b2c3" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false"'),
+            $createConfiguration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="defects" cacheResult="true" cacheResultFile=".phpunit.result.cache.a1b2c3" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false"'),
+        ];
+    }
+
+    public static function autoloadProvider(): iterable
+    {
+        $interceptorPath = IncludeInterceptor::LOCATION;
+
+        $createAutoload = static fn (string $originalAutoload): string => <<<PHP
+            <?php
+
+            if (function_exists('proc_nice')) {
+                proc_nice(1);
+            }
+
+            require_once '$interceptorPath';
+
+            use Infection\StreamWrapper\IncludeInterceptor;
+
+            IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
+            IncludeInterceptor::enable();
+            require_once '$originalAutoload';
+
+            PHP;
+
+        yield 'configuration bootstrap' => [
+            '<phpunit bootstrap="app/autoload2.php"/>',
+            $createAutoload(Path::canonicalize(self::FIXTURES . '/project-path/app/autoload2.php')),
+        ];
+
+        yield 'default Composer autoloader' => [
+            '<phpunit/>',
+            $createAutoload('project/dir/vendor/autoload.php'),
         ];
     }
 
     private function queryXpath(string $xml, string $query): DOMNodeList
     {
         return SafeDOMXPath::fromString($xml)->queryList($query);
+    }
+
+    private function createBuilder(string $xml): MutationConfigBuilder
+    {
+        $replacer = new PathReplacer(
+            $this->filesystem,
+            $this->projectPath,
+        );
+
+        return new MutationConfigBuilder(
+            self::TMP_DIR,
+            $xml,
+            new XmlConfigurationManipulator($replacer, ''),
+            'project/dir',
+            new TestRunOrderResolver(),
+            $this->filesystem,
+        );
     }
 
     private function createConfigBuilder(
