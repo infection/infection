@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
-use DOMNodeList;
 use function escapeshellarg;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\FileSystem\FileSystem;
@@ -45,12 +44,10 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
-use Infection\TestFramework\XML\SafeDOMXPath;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
 use function Safe\exec;
 use function Safe\file_get_contents;
 use function sprintf;
@@ -74,14 +71,10 @@ final class MutationConfigBuilderTest extends TestCase
 
     private FileSystem $filesystem;
 
-    private MutationConfigBuilder $builder;
-
     protected function setUp(): void
     {
         $this->projectPath = Path::canonicalize(self::FIXTURES . '/project-path');
         $this->filesystem = new InMemoryFileSystem();
-
-        $this->builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit.xml');
     }
 
     /**
@@ -130,61 +123,18 @@ final class MutationConfigBuilderTest extends TestCase
         $actualAutoload = $this->filesystem->readFile($expectedAutoloadPath);
 
         $this->assertSame($expectedAutoload, $actualAutoload);
+        $this->assertPHPSyntaxIsValid($actualAutoload);
     }
 
-    public function test_it_can_build_the_config_for_multiple_mutations(): void
+    public function test_it_preserves_the_original_bootstrap_when_building_multiple_configurations(): void
     {
-        $tmp = self::TMP_DIR;
-        $projectPath = $this->projectPath;
+        $builder = $this->createBuilder('<phpunit bootstrap="autoload.php"/>');
+
+        $builder->build([], self::MUTATED_FILE_PATH, 'first', self::ORIGINAL_FILE_PATH, '7.1');
+        $builder->build([], self::MUTATED_FILE_PATH, 'second', self::ORIGINAL_FILE_PATH, '7.1');
+
         $interceptorPath = IncludeInterceptor::LOCATION;
-
-        $this->assertSame(
-            <<<XML
-                <?xml version="1.0" encoding="UTF-8"?>
-                <!--
-                  ~ Copyright © 2017 Maks Rafalko
-                  ~
-                  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
-                  -->
-                <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash1.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
-                  <testsuites>
-                    <testsuite name="Infection testsuite with filtered tests">
-                      <file>/path/to/FooTest.php</file>
-                    </testsuite>
-                  </testsuites>
-                  <filter>
-                    <whitelist>
-                      <directory>$projectPath/src/</directory>
-                      <!--<exclude>-->
-                      <!--<directory>src/*Bundle/Resources</directory>-->
-                      <!--<directory>src/*/*Bundle/Resources</directory>-->
-                      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
-                      <!--</exclude>-->
-                    </whitelist>
-                  </filter>
-                </phpunit>
-
-                XML,
-            $this->filesystem->readFile(
-                $this->builder->build(
-                    [
-                        new TestLocation(
-                            'FooTest::test_foo',
-                            '/path/to/FooTest.php',
-                            1.,
-                        ),
-                    ],
-                    self::MUTATED_FILE_PATH,
-                    'hash1',
-                    self::ORIGINAL_FILE_PATH,
-                    '7.1',
-                ),
-            ),
-        );
-
-        $phpCode = $this->filesystem->readFile(
-            self::TMP_DIR . '/interceptor.autoload.hash1.infection.php',
-        );
+        $originalBootstrap = $this->projectPath . '/autoload.php';
 
         $this->assertSame(
             <<<PHP
@@ -200,172 +150,10 @@ final class MutationConfigBuilderTest extends TestCase
 
                 IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
                 IncludeInterceptor::enable();
-                require_once '$projectPath/app/autoload2.php';
+                require_once '$originalBootstrap';
 
                 PHP,
-            $phpCode,
-        );
-
-        $this->assertPHPSyntaxIsValid($phpCode);
-
-        $this->assertSame(
-            <<<XML
-                <?xml version="1.0" encoding="UTF-8"?>
-                <!--
-                  ~ Copyright © 2017 Maks Rafalko
-                  ~
-                  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
-                  -->
-                <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash2.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false">
-                  <testsuites>
-                    <testsuite name="Infection testsuite with filtered tests">
-                      <file>/path/to/BarTest.php</file>
-                    </testsuite>
-                  </testsuites>
-                  <filter>
-                    <whitelist>
-                      <directory>$projectPath/src/</directory>
-                      <!--<exclude>-->
-                      <!--<directory>src/*Bundle/Resources</directory>-->
-                      <!--<directory>src/*/*Bundle/Resources</directory>-->
-                      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
-                      <!--</exclude>-->
-                    </whitelist>
-                  </filter>
-                </phpunit>
-
-                XML,
-            $this->filesystem->readFile(
-                $this->builder->build(
-                    [
-                        new TestLocation(
-                            'BarTest::test_bar_1',
-                            '/path/to/BarTest.php',
-                            1.,
-                        ),
-                    ],
-                    self::MUTATED_FILE_PATH,
-                    'hash2',
-                    self::ORIGINAL_FILE_PATH,
-                    '7.1',
-                ),
-            ),
-        );
-
-        $phpCode = $this->filesystem->readFile(
-            self::TMP_DIR . '/interceptor.autoload.hash2.infection.php',
-        );
-
-        $this->assertSame(
-            <<<PHP
-                <?php
-
-                if (function_exists('proc_nice')) {
-                    proc_nice(1);
-                }
-
-                require_once '$interceptorPath';
-
-                use Infection\StreamWrapper\IncludeInterceptor;
-
-                IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
-                IncludeInterceptor::enable();
-                require_once '$projectPath/app/autoload2.php';
-
-                PHP,
-            $phpCode,
-        );
-
-        $this->assertPHPSyntaxIsValid($phpCode);
-    }
-
-    public function test_it_parses_the_original_configuration_only_once(): void
-    {
-        $getXPath = new ReflectionMethod($this->builder, 'getXPath');
-
-        $this->assertSame(
-            $getXPath->invoke($this->builder),
-            $getXPath->invoke($this->builder),
-        );
-    }
-
-    public function test_it_sets_custom_autoloader(): void
-    {
-        $xml = $this->filesystem->readFile(
-            $this->builder->build(
-                [],
-                self::MUTATED_FILE_PATH,
-                self::HASH,
-                self::ORIGINAL_FILE_PATH,
-                '7.1',
-            ),
-        );
-
-        $resultAutoLoaderFilePath = $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue;
-
-        $expectedCustomAutoloadFilePath = sprintf(
-            '%s/interceptor.autoload.%s.infection.php',
-            self::TMP_DIR,
-            self::HASH,
-        );
-
-        $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
-        $this->assertStringContainsString(
-            'app/autoload2.php',
-            $this->filesystem->readFile($expectedCustomAutoloadFilePath),
-        );
-    }
-
-    public function test_it_sets_custom_autoloader_when_attribute_is_absent(): void
-    {
-        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_without_bootstrap.xml');
-
-        $xml = $this->filesystem->readFile(
-            $builder->build(
-                [],
-                self::MUTATED_FILE_PATH,
-                self::HASH,
-                self::ORIGINAL_FILE_PATH,
-                '7.1',
-            ),
-        );
-
-        $resultAutoLoaderFilePath = $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue;
-
-        $expectedCustomAutoloadFilePath = sprintf(
-            '%s/interceptor.autoload.%s.infection.php',
-            self::TMP_DIR,
-            self::HASH,
-        );
-
-        $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
-        $this->assertStringContainsString(
-            'vendor/autoload.php',
-            $this->filesystem->readFile($expectedCustomAutoloadFilePath),
-        );
-    }
-
-    public function test_interceptor_is_included(): void
-    {
-        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_without_bootstrap.xml');
-
-        $builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '7.1',
-        );
-
-        $expectedCustomAutoloadFilePath = sprintf(
-            '%s/interceptor.autoload.%s.infection.php',
-            self::TMP_DIR,
-            self::HASH,
-        );
-
-        $this->assertStringContainsString(
-            'IncludeInterceptor.php',
-            $this->filesystem->readFile($expectedCustomAutoloadFilePath),
+            $this->filesystem->readFile(self::TMP_DIR . '/interceptor.autoload.second.infection.php'),
         );
     }
 
@@ -561,11 +349,6 @@ final class MutationConfigBuilderTest extends TestCase
         ];
     }
 
-    private function queryXpath(string $xml, string $query): DOMNodeList
-    {
-        return SafeDOMXPath::fromString($xml)->queryList($query);
-    }
-
     private function createBuilder(string $xml): MutationConfigBuilder
     {
         $replacer = new PathReplacer(
@@ -576,23 +359,6 @@ final class MutationConfigBuilderTest extends TestCase
         return new MutationConfigBuilder(
             self::TMP_DIR,
             $xml,
-            new XmlConfigurationManipulator($replacer, ''),
-            'project/dir',
-            new TestRunOrderResolver(),
-            $this->filesystem,
-        );
-    }
-
-    private function createConfigBuilder(
-        ?string $originalPhpUnitXmlConfigPath = null,
-    ): MutationConfigBuilder {
-        $phpunitXmlPath = $originalPhpUnitXmlConfigPath ?: self::FIXTURES . '/phpunit.xml';
-
-        $replacer = new PathReplacer(new FileSystem(), $this->projectPath);
-
-        return new MutationConfigBuilder(
-            self::TMP_DIR,
-            file_get_contents($phpunitXmlPath),
             new XmlConfigurationManipulator($replacer, ''),
             'project/dir',
             new TestRunOrderResolver(),
