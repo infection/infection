@@ -529,10 +529,10 @@ final class InitialConfigBuilderTest extends TestCase
             XML;
 
         yield 'configuration is created' => self::createScenario(
-            $standard,
-            version: '6.5',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
         );
 
         if (!OperatingSystem::isWindows()) {
@@ -545,283 +545,283 @@ final class InitialConfigBuilderTest extends TestCase
         }
 
         yield 'relative paths are replaced with absolute paths' => self::createScenario(
-            $standard,
-            version: '6.5',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
         );
 
         yield 'stop on failure is enabled' => self::createScenario(
-            $standard,
-            version: '6.5',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
         );
 
         yield 'colors are disabled' => self::createScenario(
-            $standard,
-            version: '6.5',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
         );
 
         yield 'result caching is disabled' => self::createScenario(
-            $standard,
-            version: '6.5',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
         );
 
         yield 'PHPUnit 13.3 test run history is disabled' => self::createScenario(
-            $phpunit133,
-            version: '13.3',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '13.3',
+            expected: $phpunit133,
         );
 
         yield 'stderr redirection is disabled' => self::createScenario(
-            $standard,
-            version: '6.5',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
         );
 
         yield 'bootstrap path is replaced' => self::createScenario(
-            $standard,
-            version: '6.5',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
         );
 
         yield 'original loggers are removed' => self::createScenario(
-            $standard,
-            version: '6.5',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
         );
 
         yield 'coverage loggers are not added to legacy configuration' => self::createScenario(
-            $standard,
-            version: '6.5',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
         );
 
         yield 'coverage loggers are not added to latest configuration' => self::createScenario(
-            $phpunit94,
-            version: '9.4',
             xml: $loadFixture('phpunit_93.xml'),
             filteredSourceFilesToMutate: [],
+            version: '9.4',
+            expected: $phpunit94,
         );
 
         yield 'missing legacy coverage whitelist is created' => self::createScenario(
-            $missingWhitelist65,
-            version: '6.5',
             xml: $loadFixture('phpunit_without_coverage_whitelist.xml'),
             filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $missingWhitelist65,
         );
 
         yield 'missing legacy coverage whitelist is created for uncertain versions' => self::createScenario(
-            $missingWhitelist93,
-            version: '9.3',
             xml: $loadFixture('phpunit_without_coverage_whitelist.xml'),
             filteredSourceFilesToMutate: [],
+            version: '9.3',
+            expected: $missingWhitelist93,
         );
 
         yield 'coverage include is replaced when filtered source files are provided' => self::createScenario(
-            $filteredSource93,
-            version: '9.3',
             xml: $loadFixture('phpunit_with_coverage_include_directories.xml'),
             filteredSourceFilesToMutate: ['src/File1.php'],
+            version: '9.3',
+            expected: $filteredSource93,
         );
 
         yield 'PHPUnit 12 coverage include is preserved with filtered source files' => self::createScenario(
-            $preservedCoverage12,
-            version: '12.0',
             xml: $loadFixture('phpunit_with_coverage_include_directories.xml'),
             filteredSourceFilesToMutate: ['src/File1.php'],
+            version: '12.0',
+            expected: $preservedCoverage12,
         );
 
         yield 'PHPUnit 12 ignores filtered source files when creating source include' => self::createScenario(
-            $source101,
-            version: '12.0',
             xml: $loadFixture('phpunit_without_coverage_whitelist.xml'),
             filteredSourceFilesToMutate: ['src/File1.php'],
+            version: '12.0',
+            expected: $source101,
         );
 
         yield 'PHPUnit 10.0 coverage include is created when absent' => self::createScenario(
-            $coverage10,
-            version: '10.0',
             xml: $loadFixture('phpunit_without_coverage_whitelist.xml'),
             filteredSourceFilesToMutate: [],
+            version: '10.0',
+            expected: $coverage10,
         );
 
         yield 'PHPUnit 10.0 legacy coverage whitelist is not created' => self::createScenario(
-            $coverage10,
-            version: '10.0',
             xml: $loadFixture('phpunit_without_coverage_whitelist.xml'),
             filteredSourceFilesToMutate: [],
+            version: '10.0',
+            expected: $coverage10,
         );
 
         yield 'PHPUnit 10.1 source include is created when absent' => self::createScenario(
-            $source101,
-            version: '10.1',
             xml: $loadFixture('phpunit_without_coverage_whitelist.xml'),
             filteredSourceFilesToMutate: [],
+            version: '10.1',
+            expected: $source101,
         );
 
         yield 'existing legacy coverage whitelist is preserved' => self::createScenario(
-            $standard,
-            version: '6.5',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
         );
 
         yield 'existing coverage include is preserved' => self::createScenario(
-            $phpunit94,
-            version: '9.4',
             xml: $loadFixture('phpunit_93.xml'),
             filteredSourceFilesToMutate: [],
+            version: '9.4',
+            expected: $phpunit94,
         );
 
         yield 'printer class is removed' => self::createScenario(
-            $standard,
-            version: '6.5',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
         );
 
         yield 'PHPUnit 7.1.99 runs without random test order' => self::createScenario(
-            $standard,
-            version: '7.1.99',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '7.1.99',
+            expected: $standard,
         );
 
         yield 'PHPUnit 7.2 runs with random test order' => self::createScenario(
-            $executionOrder72,
-            version: '7.2',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '7.2',
+            expected: $executionOrder72,
         );
 
         yield 'PHPUnit 7.3.1 runs with random test order' => self::createScenario(
-            $executionOrder72,
-            version: '7.3.1',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '7.3.1',
+            expected: $executionOrder72,
         );
 
         yield 'PHPUnit 7.1.99 runs without dependency resolver' => self::createScenario(
-            $standard,
-            version: '7.1.99',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '7.1.99',
+            expected: $standard,
         );
 
         yield 'PHPUnit 7.2 runs with dependency resolver' => self::createScenario(
-            $executionOrder72,
-            version: '7.2',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '7.2',
+            expected: $executionOrder72,
         );
 
         yield 'PHPUnit 7.3.1 runs dependency resolver' => self::createScenario(
-            $executionOrder72,
-            version: '7.3.1',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '7.3.1',
+            expected: $executionOrder72,
         );
 
         yield 'PHPUnit 12.2.7 orders by defects and randomly' => self::createScenario(
-            $executionOrder12,
-            version: '12.2.7',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '12.2.7',
+            expected: $executionOrder12,
         );
 
         yield 'PHPUnit 13.3 only orders randomly without test run history' => self::createScenario(
-            $phpunit133,
-            version: '13.3',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '13.3',
+            expected: $phpunit133,
         );
 
         yield 'existing execution order is preserved' => self::createScenario(
-            $existingExecutionOrder,
-            version: '7.2',
             xml: $loadFixture('phpunit_with_order_set.xml'),
             filteredSourceFilesToMutate: [],
+            version: '7.2',
+            expected: $existingExecutionOrder,
         );
 
         yield 'PHPUnit 13.3 removes orders requiring test run history' => self::createScenario(
-            $executionOrder133,
-            version: '13.3',
             xml: $loadFixture('phpunit_with_order_requiring_test_run_history_set.xml'),
             filteredSourceFilesToMutate: [],
+            version: '13.3',
+            expected: $executionOrder133,
         );
 
         yield 'PHPUnit 13.2 preserves orders requiring test run history' => self::createScenario(
-            $executionOrder132,
-            version: '13.2',
             xml: $loadFixture('phpunit_with_order_requiring_test_run_history_set.xml'),
             filteredSourceFilesToMutate: [],
+            version: '13.2',
+            expected: $executionOrder132,
         );
 
         yield 'PHPUnit 5.1.99 runs without failOnRisky' => self::createScenario(
-            $phpunit51,
-            version: '5.1.99',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '5.1.99',
+            expected: $phpunit51,
         );
 
         yield 'PHPUnit 5.2 runs with failOnRisky' => self::createScenario(
-            $standard,
-            version: '5.2',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '5.2',
+            expected: $standard,
         );
 
         yield 'PHPUnit 5.3.1 runs with failOnRisky' => self::createScenario(
-            $standard,
-            version: '5.3.1',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '5.3.1',
+            expected: $standard,
         );
 
         yield 'PHPUnit 5.1.99 runs without failOnWarning' => self::createScenario(
-            $phpunit51,
-            version: '5.1.99',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '5.1.99',
+            expected: $phpunit51,
         );
 
         yield 'PHPUnit 5.2 runs with failOnWarning' => self::createScenario(
-            $standard,
-            version: '5.2',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '5.2',
+            expected: $standard,
         );
 
         yield 'PHPUnit 5.3.1 runs with failOnWarning' => self::createScenario(
-            $standard,
-            version: '5.3.1',
             xml: $loadFixture('phpunit.xml'),
             filteredSourceFilesToMutate: [],
+            version: '5.3.1',
+            expected: $standard,
         );
 
         yield 'existing failOnRisky is preserved' => self::createScenario(
-            $existingFailOnRisky,
-            version: '5.2',
             xml: $loadFixture('phpunit_with_fail_on_risky_set.xml'),
             filteredSourceFilesToMutate: [],
+            version: '5.2',
+            expected: $existingFailOnRisky,
         );
 
         yield 'existing failOnWarning is preserved' => self::createScenario(
-            $existingFailOnWarning,
-            version: '5.2',
             xml: $loadFixture('phpunit_with_fail_on_warning_set.xml'),
             filteredSourceFilesToMutate: [],
+            version: '5.2',
+            expected: $existingFailOnWarning,
         );
     }
 
@@ -830,10 +830,10 @@ final class InitialConfigBuilderTest extends TestCase
      * @return array{string, list<string>, string, string}
      */
     private static function createScenario(
-        string $expected,
-        string $version,
         string $xml,
         array $filteredSourceFilesToMutate,
+        string $version,
+        string $expected,
     ): array {
         return [
             $xml,
