@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
+use ReflectionMethod;
 use function escapeshellarg;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\FileSystem\FileSystem;
@@ -347,6 +348,20 @@ final class MutationConfigBuilderTest extends TestCase
             '<phpunit/>',
             $createAutoload('project/dir/vendor/autoload.php'),
         ];
+    }
+
+    public function test_it_parses_the_original_configuration_only_once(): void
+    {
+        $build = $this->createBuilder(
+            file_get_contents(self::FIXTURES . '/phpunit.xml'),
+        );
+
+        $getXPath = new ReflectionMethod($build, 'getXPath');
+
+        $this->assertSame(
+            $getXPath->invoke($build),
+            $getXPath->invoke($build),
+        );
     }
 
     private function createBuilder(string $xml): MutationConfigBuilder

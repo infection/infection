@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="{{PROJECT_PATH}}/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
+  <testsuites>
+    <testsuite name="Application Test Suite">
+      <directory>{{PROJECT_PATH}}/*Bundle</directory>
+    </testsuite>
+  </testsuites>
+  <filter>
+    <whitelist>
+      <directory>{{PROJECT_PATH}}/src</directory>
+      <directory>{{PROJECT_PATH}}/app</directory>
+    </whitelist>
+  </filter>
+</phpunit>
