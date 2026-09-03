@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <build time="Wed Sep 2 22:52:14 UTC 2026" phpunit="12.5.34" coverage="12.5.7">
+    <runtime name="PHP" version="8.4.10" url="https://www.php.net/"/>
+    <driver name="xdebug" version="3.5.1"/>
+  </build>
+  <project source="/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TestSuite_Bootstrap/src">
+    <tests>
+      <test name="Infection\E2ETests\PHPUnitTestSuiteBootstrap\Tests\Unit\CalculatorTest::test_it_returns_an_integer" size="unknown" status="success" time="0.006110"/>
+      <test name="Infection\E2ETests\PHPUnitTestSuiteBootstrap\Tests\Integration\CalculatorTest::test_it_returns_an_integer" size="unknown" status="success" time="0.000918"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="20" comments="0" code="20" executable="2" executed="1" percent="50.00"/>
+        <methods count="1" tested="1" percent="100.00"/>
+        <functions count="0" tested="0" percent="0"/>
+        <classes count="1" tested="1" percent="100.00"/>
+        <traits count="0" tested="0" percent="0"/>
+      </totals>
+      <file name="Calculator.php" href="Calculator.php.xml" hash="2e5b0cc00bd62362ee9b2491bc6fbf2945bbb4a0">
+        <totals>
+          <lines total="14" comments="0" code="14" executable="1" executed="1" percent="100.00"/>
+          <methods count="1" tested="1" percent="100.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="1" tested="1" percent="100.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="autoload.php" href="autoload.php.xml" hash="f93207d3454546eb2e6b82ef990a6794d439698d">
+        <totals>
+          <lines total="6" comments="0" code="6" executable="1" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+    </directory>
+  </project>
+</phpunit>

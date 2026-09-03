@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="autoload.php" path="/" hash="f93207d3454546eb2e6b82ef990a6794d439698d">
+    <totals>
+      <lines total="6" comments="0" code="6" executable="1" executed="0" percent="0.00"/>
+      <methods count="0" tested="0" percent="0"/>
+      <functions count="0" tested="0" percent="0"/>
+      <classes count="0" tested="0" percent="0"/>
+      <traits count="0" tested="0" percent="0"/>
+    </totals>
+    <coverage/>
+  </file>
+</phpunit>

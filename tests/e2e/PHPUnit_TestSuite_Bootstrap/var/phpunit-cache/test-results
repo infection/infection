@@ -1,0 +1,1 @@
+{"version":2,"defects":[],"times":{"Infection\\E2ETests\\PHPUnitTestSuiteBootstrap\\Tests\\Unit\\CalculatorTest::test_it_returns_an_integer":0.008,"Infection\\E2ETests\\PHPUnitTestSuiteBootstrap\\Tests\\Integration\\CalculatorTest::test_it_returns_an_integer":0}}

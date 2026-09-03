@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TestSuite_Bootstrap/var/infection-tmp/infection/phpunitConfiguration.initial.infection.xml" tests="2" assertions="4" errors="0" failures="0" skipped="0" time="0.012391">
+    <testsuite name="unit" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="0.011125">
+      <testsuite name="Infection\E2ETests\PHPUnitTestSuiteBootstrap\Tests\Unit\CalculatorTest" file="/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TestSuite_Bootstrap/tests/unit/CalculatorTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="0.011125">
+        <testcase name="test_it_returns_an_integer" file="/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TestSuite_Bootstrap/tests/unit/CalculatorTest.php" line="14" class="Infection\E2ETests\PHPUnitTestSuiteBootstrap\Tests\Unit\CalculatorTest" classname="Infection.E2ETests.PHPUnitTestSuiteBootstrap.Tests.Unit.CalculatorTest" assertions="2" time="0.011125"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="integration" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="0.001265">
+      <testsuite name="Infection\E2ETests\PHPUnitTestSuiteBootstrap\Tests\Integration\CalculatorTest" file="/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TestSuite_Bootstrap/tests/integration/CalculatorTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="0.001265">
+        <testcase name="test_it_returns_an_integer" file="/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TestSuite_Bootstrap/tests/integration/CalculatorTest.php" line="14" class="Infection\E2ETests\PHPUnitTestSuiteBootstrap\Tests\Integration\CalculatorTest" classname="Infection.E2ETests.PHPUnitTestSuiteBootstrap.Tests.Integration.CalculatorTest" assertions="2" time="0.001265"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
