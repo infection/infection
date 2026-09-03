@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
-use ReflectionMethod;
 use function escapeshellarg;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\FileSystem\FileSystem;
@@ -49,6 +48,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use function Safe\exec;
 use function Safe\file_get_contents;
 use function sprintf;
@@ -131,31 +131,73 @@ final class MutationConfigBuilderTest extends TestCase
     {
         $builder = $this->createBuilder('<phpunit bootstrap="autoload.php"/>');
 
-        $builder->build([], self::MUTATED_FILE_PATH, 'first', self::ORIGINAL_FILE_PATH, '7.1');
-        $builder->build([], self::MUTATED_FILE_PATH, 'second', self::ORIGINAL_FILE_PATH, '7.1');
+        $builder->build(
+            [new TestLocation('FooTest::test_foo', '/path/to/FooTest.php', 1.)],
+            self::MUTATED_FILE_PATH,
+            'first',
+            self::ORIGINAL_FILE_PATH,
+            '7.1',
+        );
+        $builder->build(
+            [new TestLocation('BarTest::test_bar', '/path/to/BarTest.php', 1.)],
+            self::MUTATED_FILE_PATH,
+            'second',
+            self::ORIGINAL_FILE_PATH,
+            '7.1',
+        );
+
+        $this->assertSame(
+            <<<'XML'
+                <?xml version="1.0"?>
+                <phpunit bootstrap="/tmp/infection/interceptor.autoload.first.infection.php" failOnRisky="true" failOnWarning="true" stopOnFailure="true" colors="false" stderr="false">
+                  <testsuite name="Infection testsuite with filtered tests">
+                    <file>/path/to/FooTest.php</file>
+                  </testsuite>
+                </phpunit>
+
+                XML,
+            $this->filesystem->readFile(self::TMP_DIR . '/phpunitConfiguration.first.infection.xml'),
+        );
+        $this->assertSame(
+            <<<'XML'
+                <?xml version="1.0"?>
+                <phpunit bootstrap="/tmp/infection/interceptor.autoload.second.infection.php" failOnRisky="true" failOnWarning="true" stopOnFailure="true" colors="false" stderr="false">
+                  <testsuite name="Infection testsuite with filtered tests">
+                    <file>/path/to/BarTest.php</file>
+                  </testsuite>
+                </phpunit>
+
+                XML,
+            $this->filesystem->readFile(self::TMP_DIR . '/phpunitConfiguration.second.infection.xml'),
+        );
 
         $interceptorPath = IncludeInterceptor::LOCATION;
         $originalBootstrap = $this->projectPath . '/autoload.php';
+        $expectedAutoload = <<<PHP
+            <?php
 
-        $this->assertSame(
-            <<<PHP
-                <?php
+            if (function_exists('proc_nice')) {
+                proc_nice(1);
+            }
 
-                if (function_exists('proc_nice')) {
-                    proc_nice(1);
-                }
+            require_once '$interceptorPath';
 
-                require_once '$interceptorPath';
+            use Infection\StreamWrapper\IncludeInterceptor;
 
-                use Infection\StreamWrapper\IncludeInterceptor;
+            IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
+            IncludeInterceptor::enable();
+            require_once '$originalBootstrap';
 
-                IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
-                IncludeInterceptor::enable();
-                require_once '$originalBootstrap';
+            PHP;
 
-                PHP,
-            $this->filesystem->readFile(self::TMP_DIR . '/interceptor.autoload.second.infection.php'),
-        );
+        foreach (['first', 'second'] as $hash) {
+            $actualAutoload = $this->filesystem->readFile(
+                sprintf('%s/interceptor.autoload.%s.infection.php', self::TMP_DIR, $hash),
+            );
+
+            $this->assertSame($expectedAutoload, $actualAutoload);
+            $this->assertPHPSyntaxIsValid($actualAutoload);
+        }
     }
 
     public static function configurationProvider(): iterable
@@ -279,6 +321,13 @@ final class MutationConfigBuilderTest extends TestCase
             $loadFixture('phpunit_without_coverage_whitelist.xml'),
             [],
             '5.2',
+            $createConfiguration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false"'),
+        ];
+
+        yield 'PHPUnit 5.3 adds fail-on attributes' => [
+            $loadFixture('phpunit_without_coverage_whitelist.xml'),
+            [],
+            '5.3.1',
             $createConfiguration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false"'),
         ];
 
