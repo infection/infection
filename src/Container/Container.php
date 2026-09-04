@@ -310,6 +310,7 @@ final class Container extends DIContainer
                     $container->getSourceCollector(),
                     GeneratedExtensionsConfig::EXTENSIONS,
                     $container->getShellCommandRunner(),
+                    $container->getFileSystem(),
                 );
             },
             StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
@@ -321,6 +322,7 @@ final class Container extends DIContainer
                     $container->getStaticAnalysisConfigLocator(),
                     $container->getShellCommandRunner(),
                     new PhpExecutableFinder(),
+                    $container->getFileSystem(),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
@@ -335,9 +337,11 @@ final class Container extends DIContainer
             ),
             TestFrameworkConfigLocator::class => static fn (self $container): TestFrameworkConfigLocator => new TestFrameworkConfigLocator(
                 (string) $container->getConfiguration()->phpUnit->configDir,
+                $container->getFileSystem(),
             ),
             StaticAnalysisConfigLocator::class => static fn (self $container): StaticAnalysisConfigLocator => new StaticAnalysisConfigLocator(
                 (string) $container->getConfiguration()->phpStan->configDir,
+                $container->getFileSystem(),
             ),
             MemoizedTestFileDataProvider::class => static fn (self $container): TestFileDataProvider => new MemoizedTestFileDataProvider(
                 new JUnitTestFileDataProvider($container->getJUnitReportLocator()),

@@ -56,7 +56,7 @@ final readonly class TestFrameworkConfigLocator implements TestFrameworkConfigLo
 
     public function __construct(
         private string $configDir,
-        private FileSystem $fileSystem = new FileSystem(),
+        private FileSystem $fileSystem,
     ) {
     }
 

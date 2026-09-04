@@ -35,6 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Console;
 
+use function array_map;
+use function array_values;
+use Infection\Command\ConfigureCommand;
+use Infection\Command\Debug\DumpAstCommand;
+use Infection\Command\Debug\MockTeamCityCommand;
+use Infection\Command\DescribeCommand;
+use Infection\Command\Git\GitBaseReferenceCommand;
+use Infection\Command\Git\GitChangedFilesCommand;
+use Infection\Command\Git\GitChangedLinesCommand;
+use Infection\Command\Git\GitDefaultBaseCommand;
+use Infection\Command\InitialTest\InitialTestRunCommand;
+use Infection\Command\ListSourcesCommand;
+use Infection\Command\MakeCustomMutatorCommand;
+use Infection\Command\RunCommand;
 use Infection\Console\Application;
 use Infection\Framework\InfectionVersion;
 use Infection\Testing\SingletonContainer;
@@ -55,6 +69,52 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[WithEnvironmentVariable('SHELL_VERBOSITY')]
 final class ApplicationTest extends TestCase
 {
+    /**
+     * @return iterable<string, array{class-string}>
+     */
+    public static function infectionCommandProvider(): iterable
+    {
+        yield 'configure' => [ConfigureCommand::class];
+
+        yield 'describe' => [DescribeCommand::class];
+
+        yield 'dump AST' => [DumpAstCommand::class];
+
+        yield 'git base reference' => [GitBaseReferenceCommand::class];
+
+        yield 'git changed files' => [GitChangedFilesCommand::class];
+
+        yield 'git changed lines' => [GitChangedLinesCommand::class];
+
+        yield 'git default base' => [GitDefaultBaseCommand::class];
+
+        yield 'initial test run' => [InitialTestRunCommand::class];
+
+        yield 'list sources' => [ListSourcesCommand::class];
+
+        yield 'make custom mutator' => [MakeCustomMutatorCommand::class];
+
+        yield 'mock TeamCity' => [MockTeamCityCommand::class];
+
+        yield 'run' => [RunCommand::class];
+    }
+
+    /**
+     * @param class-string $commandClass
+     */
+    #[DataProvider('infectionCommandProvider')]
+    public function test_it_registers_the_infection_commands(string $commandClass): void
+    {
+        $application = new Application(SingletonContainer::getContainer());
+
+        $registeredCommands = array_map(
+            get_class(...),
+            array_values($application->all()),
+        );
+
+        $this->assertContains($commandClass, $registeredCommands);
+    }
+
     public function test_it_uses_the_infection_version(): void
     {
         $versionMock = $this->createMock(InfectionVersion::class);

@@ -77,7 +77,7 @@ final class ConfigureCommand extends BaseCommand
     private const string OPTION_TEST_FRAMEWORK = 'test-framework';
 
     public function __construct(
-        private readonly FileSystem $fileSystem = new FileSystem(),
+        private readonly FileSystem $fileSystem,
     ) {
         parent::__construct();
     }
@@ -122,7 +122,7 @@ final class ConfigureCommand extends BaseCommand
         $io->newLine();
 
         $dirsInCurrentDir = glob('*', GLOB_ONLYDIR);
-        $testFrameworkConfigLocator = new TestFrameworkConfigLocator('.');
+        $testFrameworkConfigLocator = new TestFrameworkConfigLocator('.', $this->fileSystem);
 
         /** @var QuestionHelper $questionHelper */
         $questionHelper = $this->getHelper('question');
@@ -152,7 +152,7 @@ final class ConfigureCommand extends BaseCommand
 
         $excludedDirs = $excludeDirsProvider->get($io, $dirsInCurrentDir, $sourceDirs);
 
-        $phpUnitConfigPathProvider = new TestFrameworkConfigPathProvider($testFrameworkConfigLocator, $consoleHelper, $questionHelper);
+        $phpUnitConfigPathProvider = new TestFrameworkConfigPathProvider($testFrameworkConfigLocator, $consoleHelper, $questionHelper, $this->fileSystem);
         $phpUnitConfigPath = $phpUnitConfigPathProvider->get(
             $io,
             $dirsInCurrentDir,
@@ -165,7 +165,7 @@ final class ConfigureCommand extends BaseCommand
             $container->getComposerExecutableFinder(),
             $container->getShellCommandRunner(),
         );
-        $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper);
+        $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper, $this->fileSystem);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($io);
 
         $textLogFileProvider = new TextLogFileProvider($consoleHelper, $questionHelper);

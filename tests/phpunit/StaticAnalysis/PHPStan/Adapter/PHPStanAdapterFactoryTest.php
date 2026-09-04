@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
 
+use Infection\FileSystem\FileSystem;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
 use Infection\TestFramework\Contracts\FakeShellCommandRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -54,6 +55,7 @@ final class PHPStanAdapterFactoryTest extends TestCase
             '/tmp',
             [],
             new FakeShellCommandRunner(),
+            new FileSystem(),
         );
 
         $this->assertSame('PHPStan', $adapter->getName());

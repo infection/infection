@@ -5759,7 +5759,7 @@
         },
         {
             "name": "webmozarts/strict-phpunit",
-            "version": "7.24.2",
+            "version": "7.24.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/strict-phpunit.git",
@@ -5803,7 +5803,7 @@
             "description": "Enables type-safe comparisons of objects in PHPUnit",
             "support": {
                 "issues": "https://github.com/webmozarts/strict-phpunit/issues",
-                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.24.2"
+                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.24.3"
             },
             "time": "2026-07-03T15:09:51+00:00"
         }
