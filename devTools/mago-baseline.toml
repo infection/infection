@@ -1413,7 +1413,7 @@ count = 1
 [[issues]]
 file = "src/Differ/UnifiedDiffOutputBuilder.php"
 code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Differ\UnifiedDiffOutputBuilder::normalizeDiff`: expected `list<array{0: string, 1: int(0)|int(1)|int(2)|int(3)|int(4)}>`, but found `array{}|non-empty-list<list{string, int}>`.'
+message = 'Invalid return type for function `Infection\Differ\UnifiedDiffOutputBuilder::normalizeDiff`: expected `list<array{0: string, 1: int(0)|int(1)|int(2)|int(3)|int(4)}>`, but found `list<list{string, int}>`.'
 count = 1
 
 [[issues]]
@@ -1695,7 +1695,31 @@ count = 1
 [[issues]]
 file = "src/Framework/ClassName.php"
 code = "invalid-return-statement"
+message = 'Invalid return type for function `Infection\Framework\ClassName::getCanonicalSourceClassNames`: expected `array<array-key, class-string>`, but found `non-empty-list<string>`.'
+count = 1
+
+[[issues]]
+file = "src/Framework/ClassName.php"
+code = "invalid-return-statement"
+message = 'Invalid return type for function `Infection\Framework\ClassName::getCanonicalTestClassNames`: expected `array<array-key, class-string>`, but found `list{truthy-string, truthy-string}`.'
+count = 1
+
+[[issues]]
+file = "src/Framework/ClassName.php"
+code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\Framework\ClassName::getShortClassName`: expected `non-empty-string`, but found `string`.'
+count = 1
+
+[[issues]]
+file = "src/Framework/ClassName.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `Infection\Framework\ClassName::getCanonicalSourceClassNames`: expected `class-string`, but possibly received `string`.'
+count = 1
+
+[[issues]]
+file = "src/Framework/ClassName.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `Infection\Framework\ClassName::getShortClassName`: expected `class-string`, but possibly received `string`.'
 count = 1
 
 [[issues]]
@@ -2570,36 +2594,6 @@ count = 1
 
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
-code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$decorateNodes` (bool)."
-count = 1
-
-[[issues]]
-file = "src/PhpParser/NodeDumper/NodeDumper.php"
-code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$dumpOtherAttributes` (bool)."
-count = 1
-
-[[issues]]
-file = "src/PhpParser/NodeDumper/NodeDumper.php"
-code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$dumpPositions` (bool)."
-count = 1
-
-[[issues]]
-file = "src/PhpParser/NodeDumper/NodeDumper.php"
-code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$onlyVisitedNodes` (bool)."
-count = 1
-
-[[issues]]
-file = "src/PhpParser/NodeDumper/NodeDumper.php"
-code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$showLineNumbers` (bool)."
-count = 1
-
-[[issues]]
-file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "possibly-undefined-variable"
 message = "Variable `$originalDumpOtherAttributes` might not have been defined on all execution paths leading to this point."
 count = 1
@@ -2740,6 +2734,18 @@ count = 4
 file = "src/PhpParser/Visitor/ReflectionVisitor.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `Infection\PhpParser\Visitor\ReflectionVisitor::isStrictTypesEnabled`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ReflectionVisitor.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `Infection\Reflection\AnonymousClassReflection::fromClassName`: expected `class-string`, but possibly received `non-empty-string`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ReflectionVisitor.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `Infection\Reflection\CoreClassReflection::fromClassName`: expected `class-string`, but possibly received `non-empty-string`.'
 count = 1
 
 [[issues]]
@@ -3382,6 +3388,12 @@ count = 1
 file = "src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder::splitMethodNameFromProviderKey`: expected `array{0: string, 1: string}`, but found `non-empty-list<string>`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `Infection\Framework\ClassName::getShortClassName`: expected `class-string`, but possibly received `string`.'
 count = 1
 
 [[issues]]
@@ -4939,9 +4951,15 @@ message = "Redundant `<=` comparison: left-hand side is always less than or equa
 count = 2
 
 [[issues]]
-file = "tests/phpunit/Reflection/ContainerReflection.php"
-code = "redundant-docblock-type"
-message = "Redundant docblock type for variable `$returnTypeClassName`."
+file = "tests/phpunit/Reflection/AnonymousClassReflectionTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `Infection\Reflection\AnonymousClassReflection::fromClassName`: expected `class-string`, but possibly received `string`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Reflection/CoreClassReflectionTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `Infection\Reflection\CoreClassReflection::fromClassName`: expected `class-string`, but possibly received `string`.'
 count = 1
 
 [[issues]]
