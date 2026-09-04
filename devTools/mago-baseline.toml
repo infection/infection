@@ -3013,48 +3013,6 @@ message = "Parameter `$installedExtensions` is never used."
 count = 1
 
 [[issues]]
-file = "src/TestFramework/AbstractTestFrameworkAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\TestFramework\AbstractTestFrameworkAdapter::buildInitialConfigFile`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/AbstractTestFrameworkAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\TestFramework\AbstractTestFrameworkAdapter::buildMutationConfigFile`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/AbstractTestFrameworkAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\TestFramework\AbstractTestFrameworkAdapter::getMutantCommandLine`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/AbstractTestFrameworkAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\TestFramework\AbstractTestFrameworkAdapter::retrieveVersion`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/AbstractTestFrameworkAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\TestFramework\AbstractTestFrameworkAdapter::retrieveVersion`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/AbstractTestFrameworkAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\TestFramework\AbstractTestFrameworkAdapter::retrieveVersion`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/AbstractTestFrameworkAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\TestFramework\AbstractTestFrameworkAdapter::retrieveVersion`.'
-count = 1
-
-[[issues]]
 file = "src/TestFramework/AdapterInstallationDecider.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #1 of `class_exists`: expected `string`, but found `mixed`."
@@ -3358,6 +3316,36 @@ count = 1
 file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter::getInitialTestsFailRecommendations`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter::getMutantCommandLine`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter::getVersion`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter::getVersion`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter::getVersion`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter::getVersion`.'
 count = 1
 
 [[issues]]
