@@ -40,6 +40,7 @@ use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
 use Infection\Source\Collector\SourceCollector;
@@ -75,6 +76,7 @@ final readonly class Factory
         private SourceCollector $sourceCollector,
         private array $installedExtensions,
         private ShellCommandRunner $shellCommandRunner,
+        private FileSystem $fileSystem,
     ) {
     }
 
@@ -109,6 +111,7 @@ final readonly class Factory
                 $this->shellCommandRunner,
                 sourceDirectoryBasePath: dirname($this->infectionConfig->configurationPathname),
                 useWindowsFilterLimit: OperatingSystem::isWindows(),
+                fileSystem: $this->fileSystem,
             );
         }
 

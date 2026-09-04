@@ -78,7 +78,7 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
     public function test_it_throws_an_error_if_no_config_file_found(): void
     {
         $dir = $this->baseDir . 'NoFiles/';
-        $locator = new StaticAnalysisConfigLocator($dir);
+        $locator = new StaticAnalysisConfigLocator($dir, new FileSystem());
 
         $this->expectException(FileOrDirectoryNotFound::class);
         $this->expectExceptionMessage(
@@ -94,7 +94,7 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
     public function test_it_can_find_a_dist_file(): void
     {
         $dir = $this->baseDir . 'DistFile/';
-        $locator = new StaticAnalysisConfigLocator($dir);
+        $locator = new StaticAnalysisConfigLocator($dir, new FileSystem());
 
         $output = $locator->locate('phpstan');
 
@@ -108,7 +108,7 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
     public function test_it_can_find_an_alt_dist_file(): void
     {
         $dir = $this->baseDir . 'AltDistFile/';
-        $locator = new StaticAnalysisConfigLocator($dir);
+        $locator = new StaticAnalysisConfigLocator($dir, new FileSystem());
 
         $output = $locator->locate('phpstan');
 
@@ -122,7 +122,7 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
     public function test_it_can_find_a_neon_file(): void
     {
         $dir = $this->baseDir . 'NeonFile/';
-        $locator = new StaticAnalysisConfigLocator($dir);
+        $locator = new StaticAnalysisConfigLocator($dir, new FileSystem());
 
         $output = $locator->locate('phpstan');
 
@@ -136,7 +136,7 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
     public function test_it_prefers_non_dist_files(): void
     {
         $dir = $this->baseDir . 'BothNeonAndDist/';
-        $locator = new StaticAnalysisConfigLocator($dir);
+        $locator = new StaticAnalysisConfigLocator($dir, new FileSystem());
 
         $output = $locator->locate('phpstan');
 

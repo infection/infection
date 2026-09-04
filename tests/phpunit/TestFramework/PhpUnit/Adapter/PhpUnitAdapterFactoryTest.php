@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
+use Infection\FileSystem\FileSystem;
 use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -58,6 +59,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             true,
             shellCommandRunner: new SymfonyProcessShellCommandRunner(),
             sourceDirectoryBasePath: '/path/to/project',
+            fileSystem: new FileSystem(),
         );
 
         $this->assertSame('PHPUnit', $adapter->getName());
