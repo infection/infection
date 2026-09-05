@@ -104,7 +104,7 @@ class ConfigurationFactory
         private readonly ProjectDirectoryProvider $projectDirectoryProvider,
         private readonly CpuCoresCountProvider $cpuCoresCountProvider,
         private readonly PositionalPathsClassifier $positionalPathsClassifier,
-        private readonly FileSystem $fileSystem = new FileSystem(),
+        private readonly FileSystem $fileSystem,
     ) {
     }
 

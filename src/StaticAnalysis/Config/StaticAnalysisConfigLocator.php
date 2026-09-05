@@ -56,7 +56,7 @@ final readonly class StaticAnalysisConfigLocator implements TestFrameworkConfigL
 
     public function __construct(
         private string $configDir,
-        private FileSystem $fileSystem = new FileSystem(),
+        private FileSystem $fileSystem,
     ) {
     }
 

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
@@ -64,6 +65,7 @@ final class FactoryTest extends TestCase
             new FakeSourceCollector(),
             [],
             $this->createStub(ShellCommandRunner::class),
+            $this->createStub(FileSystem::class),
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -88,6 +90,7 @@ final class FactoryTest extends TestCase
                 ],
             ],
             $this->createStub(ShellCommandRunner::class),
+            $this->createStub(FileSystem::class),
         );
 
         $adapter = $factory->create('dummy', false);

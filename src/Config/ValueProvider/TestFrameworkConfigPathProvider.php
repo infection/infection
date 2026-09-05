@@ -59,7 +59,7 @@ final readonly class TestFrameworkConfigPathProvider
         private TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator,
         private ConsoleHelper $consoleHelper,
         private QuestionHelper $questionHelper,
-        private FileSystem $fileSystem = new FileSystem(),
+        private FileSystem $fileSystem,
     ) {
     }
 
