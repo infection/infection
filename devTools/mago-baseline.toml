@@ -1610,12 +1610,6 @@ count = 1
 
 [[issues]]
 file = "src/FileSystem/Finder/TestFrameworkFinder.php"
-code = "possibly-false-operand"
-message = "Possibly false right operand used in string concatenation (type `false|string`)."
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/TestFrameworkFinder.php"
 code = "possibly-null-argument"
 message = "Argument #1 of function `trim` is possibly `null`, but parameter type `string` does not accept it."
 count = 1

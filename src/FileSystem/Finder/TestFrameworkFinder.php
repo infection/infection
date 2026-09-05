@@ -37,19 +37,18 @@ namespace Infection\FileSystem\Finder;
 
 use function array_key_exists;
 use function dirname;
-use function file_exists;
-use function getenv;
+use function getenv as getenv_unsafe;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\TestFrameworkTypes;
 use function ltrim;
-use const PATH_SEPARATOR;
+use const PHP_OS_FAMILY;
 use function rtrim;
 use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\getcwd;
 use function Safe\preg_match;
-use function Safe\putenv;
 use function Safe\realpath;
 use function substr;
 use Symfony\Component\Process\ExecutableFinder;
@@ -71,17 +70,21 @@ class TestFrameworkFinder
     public function __construct(
         private readonly ComposerExecutableFinder $executableFinder,
         private readonly ShellCommandRunner $shellCommandRunner,
+        private readonly ComposerBinExecutableFinder $composerBinExecutableFinder,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
     public function find(string $testFrameworkName, string $customPath = ''): string
     {
         if (!array_key_exists($testFrameworkName, $this->cachedPath)) {
-            if (!$this->shouldUseCustomPath($testFrameworkName, $customPath)) {
-                $this->addComposerBinToPath();
-            }
+            $composerBinDir = $this->shouldUseCustomPath($testFrameworkName, $customPath)
+                ? null
+                : $this->getComposerBinDir();
 
-            $this->cachedPath[$testFrameworkName] = realpath($this->findTestFramework($testFrameworkName, $customPath));
+            $this->cachedPath[$testFrameworkName] = realpath(
+                $this->findTestFramework($testFrameworkName, $customPath, $composerBinDir),
+            );
 
             Assert::string($this->cachedPath[$testFrameworkName]);
 
@@ -99,21 +102,11 @@ class TestFrameworkFinder
             return false;
         }
 
-        if (file_exists($customPath)) {
+        if ($this->fileSystem->exists($customPath)) {
             return true;
         }
 
         throw FinderException::testCustomPathDoesNotExist($testFrameworkName, $customPath);
-    }
-
-    private function addComposerBinToPath(): void
-    {
-        $composerBinDir = $this->getComposerBinDir();
-
-        if ($composerBinDir !== null) {
-            $pathName = getenv('PATH') !== false ? 'PATH' : 'Path';
-            putenv($pathName . '=' . $composerBinDir . PATH_SEPARATOR . getenv($pathName));
-        }
     }
 
     /**
@@ -124,8 +117,11 @@ class TestFrameworkFinder
         return $this->executableFinder->find();
     }
 
-    private function findTestFramework(string $testFrameworkName, string $customPath): string
-    {
+    private function findTestFramework(
+        string $testFrameworkName,
+        string $customPath,
+        ?string $composerBinDir,
+    ): string {
         if ($this->shouldUseCustomPath($testFrameworkName, $customPath)) {
             return $customPath;
         }
@@ -152,11 +148,34 @@ class TestFrameworkFinder
         $cwd = getcwd();
         $extraDirs = [$cwd, $cwd . '/bin'];
 
+        if ($composerBinDir !== null) {
+            $composerExecutable = $this->composerBinExecutableFinder->find(
+                $candidates,
+                $composerBinDir,
+                PHP_OS_FAMILY,
+                getenv_unsafe('PATHEXT'),
+            );
+
+            if ($composerExecutable !== null) {
+                return $composerExecutable;
+            }
+        }
+
         foreach ($candidates as $name) {
             $path = $finder->find($name, null, $extraDirs);
 
             if ($path !== null) {
                 return $path;
+            }
+        }
+
+        if ($composerBinDir !== null) {
+            foreach ($candidates as $name) {
+                $composerCandidate = $composerBinDir . '/' . $name;
+
+                if ($this->fileSystem->exists($composerCandidate)) {
+                    return $composerCandidate;
+                }
             }
         }
 
@@ -185,7 +204,7 @@ class TestFrameworkFinder
             $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
             $script = realpath(dirname($path) . '/' . $target);
 
-            if (file_exists($script)) {
+            if ($this->fileSystem->exists($script)) {
                 $path = $script;
             }
         }
@@ -211,7 +230,7 @@ class TestFrameworkFinder
 
         $candidate = getcwd() . '/vendor/bin';
 
-        if (file_exists($candidate)) {
+        if ($this->fileSystem->exists($candidate)) {
             return $candidate;
         }
 
