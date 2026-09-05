@@ -69,6 +69,15 @@ final class InMemoryFileSystem extends FileSystem
      */
     private array $directories = [];
 
+    // An original instance we keep around for operations that are safe to delegate to keep the
+    // behaviour as close as the original.
+    private FileSystem $fileSystem;
+
+    public function __construct()
+    {
+        $this->fileSystem = new FileSystem();
+    }
+
     #[Override]
     public function dumpFile(string $filename, $content = ''): void
     {
@@ -223,7 +232,7 @@ final class InMemoryFileSystem extends FileSystem
     #[Override]
     public function isAbsolutePath(string $file): bool
     {
-        throw new DomainException('Unexpected call.');
+        return $this->fileSystem->isAbsolutePath($file);
     }
 
     #[Override]

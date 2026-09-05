@@ -1675,18 +1675,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
 
 		-
-			rawMessage: Anonymous function should return string but returns string|null.
-			identifier: return.type
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
-
-		-
-			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
-			identifier: ternary.shortNotAllowed
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
-
-		-
 			rawMessage: 'Parameter #1 $path of static method Symfony\Component\Filesystem\Path::normalize() expects string, string|null given.'
 			identifier: argument.type
 			count: 1
