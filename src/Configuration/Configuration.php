@@ -43,12 +43,14 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\Console\LogVerbosity;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_string;
 use function ltrim;
 use PhpParser\Node;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -57,12 +59,6 @@ use Webmozart\Assert\Assert;
  */
 readonly class Configuration
 {
-    private const array LOG_VERBOSITY = [
-        'all',
-        'none',
-        'default',
-    ];
-
     /**
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
@@ -113,7 +109,10 @@ readonly class Configuration
     ) {
         Assert::nullOrGreaterThanEq($processTimeout, 0);
         Assert::allIsInstanceOf($mutators, Mutator::class);
-        Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
+        Assert::true(
+            LogVerbosity::isValidOption($logVerbosity),
+            sprintf('Invalid "--log-verbosity" option "%s".', $logVerbosity),
+        );
         Assert::oneOf($testFramework, TestFrameworkTypes::getTypes());
         Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
         Assert::nullOrGreaterThanEq($minMsi, 0.);

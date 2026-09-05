@@ -341,7 +341,9 @@ final class RunCommand extends BaseCommand
                 self::OPTION_LOG_VERBOSITY,
                 null,
                 InputOption::VALUE_REQUIRED,
-                '"all" - full logs format, "default" - short logs format, "none" - no logs',
+                '"all" - full logs format, "default" - short logs format, "none" - no logs. '
+                . 'Also accepts a comma-separated list of mutant types with an optional "+" (include) or "-" (exclude) '
+                . 'prefix, applied on top of "default", e.g. "default,-timeout" or "none,+escaped,+timeout".',
                 Container::DEFAULT_LOG_VERBOSITY,
             )
         ;
