@@ -49,7 +49,7 @@ final readonly class FilteringResultsCollector implements Collector
      * @param DetectionStatus[] $targetDetectionStatuses
      */
     public function __construct(
-        private Collector $targetCollector,
+        private Collector $decoratedCollector,
         private array $targetDetectionStatuses,
     ) {
     }
@@ -62,7 +62,7 @@ final readonly class FilteringResultsCollector implements Collector
         );
 
         if ($filteredExecutionResults !== []) {
-            $this->targetCollector->collect(...$filteredExecutionResults);
+            $this->decoratedCollector->collect(...$filteredExecutionResults);
         }
     }
 }
