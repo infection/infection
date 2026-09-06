@@ -130,7 +130,8 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         $mockNode = $this->createStub(Node::class);
 
         $mockNode->method('getAttribute')
-                 ->willReturn($returnValue);
+                 ->willReturn($returnValue)
+        ;
 
         return $mockNode;
     }
@@ -140,7 +141,8 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         $mockFunction = $this->createStub(Function_::class);
 
         $mockFunction->method('getReturnType')
-            ->willReturn($returnValue);
+            ->willReturn($returnValue)
+        ;
 
         return $mockFunction;
     }

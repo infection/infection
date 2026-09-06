@@ -58,7 +58,8 @@ final class ClassesShouldBeFinalTest
             )
             ->should()
             ->beFinal()
-            ->because('Production interface implementations should be final by default.');
+            ->because('Production interface implementations should be final by default.')
+        ;
     }
 
     public function testSourceConcreteClassesAreFinals(): Rule
@@ -77,7 +78,8 @@ final class ClassesShouldBeFinalTest
             )
             ->shouldNot()
             ->exist()
-            ->because('Source concrete classes should be final or @final classes.');
+            ->because('Source concrete classes should be final or @final classes.')
+        ;
     }
 
     public function testParallelProcessRunnerIsNotExtended(): Rule
@@ -86,6 +88,7 @@ final class ClassesShouldBeFinalTest
             ->classes(Selector::extends(ParallelProcessRunner::class))
             ->shouldNot()
             ->exist()
-            ->because('ParallelProcessRunner is intentionally soft-final only to allow PHPUnit partial mocks.');
+            ->because('ParallelProcessRunner is intentionally soft-final only to allow PHPUnit partial mocks.')
+        ;
     }
 }

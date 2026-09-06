@@ -397,7 +397,8 @@ final class ConsoleDotLoggerTest extends TestCase
     {
         return MutantExecutionResultBuilder::withMinimalTestData()
             ->withDetectionStatus($detectionStatus)
-            ->build();
+            ->build()
+        ;
     }
 
     private function createTerminal(int $width): Terminal

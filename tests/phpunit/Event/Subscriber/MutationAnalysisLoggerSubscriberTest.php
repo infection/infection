@@ -75,7 +75,8 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
         $this->loggerMock
             ->expects($this->once())
             ->method('startAnalysis')
-            ->with(1);
+            ->with(1)
+        ;
 
         $this->dispatcher->dispatch(
             new MutationTestingWasStarted(
@@ -92,7 +93,8 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
         $this->loggerMock
             ->expects($this->once())
             ->method('startEvaluation')
-        ->with($this->identicalTo($mutation));
+        ->with($this->identicalTo($mutation))
+        ;
 
         $this->dispatcher->dispatch(
             new MutationEvaluationWasStarted($mutation),
@@ -107,7 +109,8 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
             ->with(
                 '/path/to/source.php',
                 ['mutationId1', 'mutationId2'],
-            );
+            )
+        ;
 
         $this->dispatcher->dispatch(
             new MutableFileWasProcessed(
@@ -121,7 +124,8 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
     {
         $this->loggerMock
             ->expects($this->never())
-            ->method('finishMutationGenerationForFile');
+            ->method('finishMutationGenerationForFile')
+        ;
 
         $this->dispatcher->dispatch(
             new MutableFileWasProcessed(
@@ -138,7 +142,8 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
         $this->loggerMock
             ->expects($this->once())
             ->method('finishEvaluation')
-            ->with($this->identicalTo($executionResult));
+            ->with($this->identicalTo($executionResult))
+        ;
 
         $this->dispatcher->dispatch(
             new MutantProcessWasFinished(
@@ -151,7 +156,8 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
     {
         $this->loggerMock
             ->expects($this->once())
-            ->method('finishAnalysis');
+            ->method('finishAnalysis')
+        ;
 
         $this->dispatcher->dispatch(new MutationTestingWasFinished());
     }

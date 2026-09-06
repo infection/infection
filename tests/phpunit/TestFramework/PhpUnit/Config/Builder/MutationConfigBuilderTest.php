@@ -54,6 +54,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use function Safe\exec;
 use function Safe\file_get_contents;
 use function Safe\simplexml_load_string;
@@ -302,6 +303,16 @@ final class MutationConfigBuilderTest extends TestCase
         );
 
         $this->assertPHPSyntaxIsValid($phpCode);
+    }
+
+    public function test_it_parses_the_original_configuration_only_once(): void
+    {
+        $getXPath = new ReflectionMethod($this->builder, 'getXPath');
+
+        $this->assertSame(
+            $getXPath->invoke($this->builder),
+            $getXPath->invoke($this->builder),
+        );
     }
 
     public function test_it_builds_path_to_mutation_config_file(): void

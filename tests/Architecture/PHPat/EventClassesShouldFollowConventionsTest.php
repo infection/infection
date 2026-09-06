@@ -49,7 +49,8 @@ final class EventClassesShouldFollowConventionsTest
             ->classes(InfectionSelector::eventClassWithoutCorrespondingSingleEventSubscriber())
             ->shouldNot()
             ->exist()
-            ->because('Each event should have a corresponding single-event subscriber named after the event with the "Subscriber" suffix.');
+            ->because('Each event should have a corresponding single-event subscriber named after the event with the "Subscriber" suffix.')
+        ;
     }
 
     public function testSingleEventSubscribersHaveACorrespondingEvent(): Rule
@@ -58,7 +59,8 @@ final class EventClassesShouldFollowConventionsTest
             ->classes(InfectionSelector::singleEventSubscriberWithoutCorrespondingEvent())
             ->shouldNot()
             ->exist()
-            ->because('Each single-event subscriber should be named after an existing event with the "Subscriber" suffix.');
+            ->because('Each single-event subscriber should be named after an existing event with the "Subscriber" suffix.')
+        ;
     }
 
     public function testSingleEventSubscribersImplementEventSubscriber(): Rule
@@ -68,7 +70,8 @@ final class EventClassesShouldFollowConventionsTest
             ->should()
             ->implement()
             ->classes(Selector::classname(EventSubscriber::class))
-            ->because('Single-event subscribers should implement the EventSubscriber interface.');
+            ->because('Single-event subscribers should implement the EventSubscriber interface.')
+        ;
     }
 
     public function testSingleEventSubscribersDeclareASinglePublicMethodNamedAfterTheirEvent(): Rule
@@ -77,7 +80,8 @@ final class EventClassesShouldFollowConventionsTest
             ->classes(InfectionSelector::singleEventSubscriberWithoutExpectedMethod())
             ->shouldNot()
             ->exist()
-            ->because('Single-event subscribers should declare a single public non-static method named on<EventName>(<EventName> $event): void.');
+            ->because('Single-event subscribers should declare a single public non-static method named on<EventName>(<EventName> $event): void.')
+        ;
     }
 
     public function testEventDirectoryContainsOnlyEventsAndSubscribers(): Rule
@@ -86,6 +90,7 @@ final class EventClassesShouldFollowConventionsTest
             ->classes(InfectionSelector::eventDirectoryClassWithoutExpectedShape())
             ->shouldNot()
             ->exist()
-            ->because('src/Event/Events should only contain events and their single-event subscribers.');
+            ->because('src/Event/Events should only contain events and their single-event subscribers.')
+        ;
     }
 }

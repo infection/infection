@@ -87,7 +87,8 @@ final class DetectConcreteClassMeaningfulImplementationVisitorTest extends Selec
 
         $actual = !$this->analyser
             ->analyse($classReflection)
-            ->hasTrivialImplementation;
+            ->hasTrivialImplementation
+        ;
 
         $this->assertSame($expected, $actual);
     }

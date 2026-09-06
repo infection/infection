@@ -14,6 +14,11 @@ commandTests:
         expectedOutput: ['(?m)^xdebug\.mode => coverage => coverage$']
         exitCode: 0
 
+    -   name: "PCOV is installed"
+        command: "php"
+        args: ["-r", "exit(extension_loaded('pcov') ? 0 : 1);"]
+        exitCode: 0
+
     -   name: "PHP memory limit is disabled"
         command: "php"
         args: ["-r", "echo ini_get('memory_limit'), PHP_EOL;"]

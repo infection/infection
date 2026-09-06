@@ -666,7 +666,8 @@ final class TeamCityLoggerTest extends TestCase
             ->withHash($hash)
             ->withAttribute('startFilePos', 7)
             ->withAttribute('endFilePos', 42)
-            ->build();
+            ->build()
+        ;
     }
 
     private static function createExecutionResult(Mutation $mutation): MutantExecutionResult
@@ -678,7 +679,8 @@ final class TeamCityLoggerTest extends TestCase
             ->withDetectionStatus(DetectionStatus::KILLED_BY_TESTS)
             ->withMutantDiff('mutationDiff')
             ->withProcessRuntime(.12)
-            ->build();
+            ->build()
+        ;
     }
 
     private static function ensureMutationHashesAreUnique(

@@ -76,7 +76,8 @@ final class MutatorRobustnessTest extends TestCase
         $this->fileMutationGenerator = SingletonContainer::getContainer()
             ->cloneWithService(SourceLineMatcher::class, new NullSourceLineMatcher())
             ->cloneWithService(Tracer::class, new DummyTracer())
-            ->getFileMutationGenerator();
+            ->getFileMutationGenerator()
+        ;
     }
 
     /**

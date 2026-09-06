@@ -579,7 +579,8 @@ final class SafeDOMXPathTest extends TestCase
             ->queryList('//book')
             ->item(0)
             ?->attributes
-            ?->getNamedItem('category');
+            ?->getNamedItem('category')
+        ;
         // Sanity check
         $this->assertNotNull($expected);
 
@@ -600,7 +601,8 @@ final class SafeDOMXPathTest extends TestCase
             ->queryList('//book/title[1]')
             ->item(0)
             ?->attributes
-            ?->getNamedItem('lang');
+            ?->getNamedItem('lang')
+        ;
         // Sanity check
         $this->assertNotNull($expected);
 

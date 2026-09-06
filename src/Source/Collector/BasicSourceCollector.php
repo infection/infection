@@ -147,7 +147,8 @@ final readonly class BasicSourceCollector implements SourceCollector
             ->exclude($this->excludedFilesOrDirectories)
             ->notPath($this->excludedFilesOrDirectories)
             ->files()
-            ->name('*.php');
+            ->name('*.php')
+        ;
     }
 
     /**

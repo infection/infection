@@ -61,7 +61,8 @@ final class XmlConfigurationVersionProviderTest extends TestCase
                     SafeDOMXPath::fromString($xml),
                     false,
                 ];
-            });
+            })
+        ;
 
         yield from take(self::mainlineConfigurationsProvider())
             ->map(static function (string $xml): iterable {
@@ -69,7 +70,8 @@ final class XmlConfigurationVersionProviderTest extends TestCase
                     SafeDOMXPath::fromString($xml),
                     true,
                 ];
-            });
+            })
+        ;
     }
 
     #[DataProvider('configurationsProvider')]

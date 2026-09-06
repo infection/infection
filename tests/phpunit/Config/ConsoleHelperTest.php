@@ -54,7 +54,8 @@ final class ConsoleHelperTest extends TestCase
                 'bg=blue;fg=white',
                 true,
             )
-            ->willReturn('Formatted Foo');
+            ->willReturn('Formatted Foo')
+        ;
 
         $output = $this->createMock(OutputInterface::class);
         $output->expects($this->once())
@@ -64,7 +65,8 @@ final class ConsoleHelperTest extends TestCase
                     'Formatted Foo',
                     '',
                 ],
-            );
+            )
+        ;
         $console = new ConsoleHelper($formatHelper);
 
         $console->writeSection($output, 'foo');

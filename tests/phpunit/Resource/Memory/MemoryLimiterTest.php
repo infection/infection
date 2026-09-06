@@ -96,11 +96,13 @@ final class MemoryLimiterTest extends FileSystemTestCase
     {
         $this->environmentMock
             ->expects($this->never())
-            ->method('hasMemoryLimitSet');
+            ->method('hasMemoryLimitSet')
+        ;
 
         $this->environmentMock
             ->expects($this->never())
-            ->method('isUsingSystemIni');
+            ->method('isUsingSystemIni')
+        ;
 
         $memoryLimiter = new MemoryLimiter(
             $this->fileSystemMock,
@@ -153,7 +155,8 @@ final class MemoryLimiterTest extends FileSystemTestCase
             ->with(
                 $filename,
                 PHP_EOL . sprintf('memory_limit = %dM', (int) $expectedLimit),
-            );
+            )
+        ;
 
         $this->configureEnvironmentToBeCalledOnce();
 

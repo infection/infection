@@ -79,7 +79,8 @@ final class BaseReportLocatorTest extends FileSystemTestCase
         $fileSystemMock
             ->expects($this->once())
             ->method('isReadableFile')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
 
         $this->locator = new DemoReportLocator(
             $fileSystemMock,
@@ -102,7 +103,8 @@ final class BaseReportLocatorTest extends FileSystemTestCase
             ->expects($this->once())
             ->method('isReadableFile')
             ->with($default)
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
 
         $locator = new DemoReportLocator(
             $fileSystemMock,
@@ -127,20 +129,23 @@ final class BaseReportLocatorTest extends FileSystemTestCase
             ->expects($this->once())
             ->method('isReadableFile')
             ->with($default)
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $fileSystemMock
             ->expects($this->once())
             ->method('isReadableDirectory')
             ->with($this->tmp)
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
 
         // We do not want to mock the Finder here because it's a PITA, but we still
         // want to spy on the behaviour of the FileSystem service.
         $fileSystemMock
             ->expects($this->once())
             ->method('createFinder')
-            ->willReturn(Finder::create());
+            ->willReturn(Finder::create())
+        ;
 
         $this->fileSystem->touch('report.demo');
         $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . 'report.demo');

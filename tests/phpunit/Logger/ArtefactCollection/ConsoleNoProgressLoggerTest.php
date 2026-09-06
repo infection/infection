@@ -69,12 +69,14 @@ final class ConsoleNoProgressLoggerTest extends TestCase
         $this->testFrameworkMock
             ->expects($this->once())
             ->method('getVersion')
-            ->willReturn('6.5.4');
+            ->willReturn('6.5.4')
+        ;
 
         $this->testFrameworkMock
             ->expects($this->once())
             ->method('getName')
-            ->willReturn('PHPUnit');
+            ->willReturn('PHPUnit')
+        ;
 
         $expected = <<<'EOF'
 

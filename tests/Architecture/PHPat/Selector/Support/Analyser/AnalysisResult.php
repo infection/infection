@@ -37,6 +37,9 @@ namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
 final readonly class AnalysisResult
 {
+    /**
+     * @param list<string> $environmentVariables
+     */
     public function __construct(
         public bool $hasTrivialImplementation,
         public bool $usesIo,
@@ -44,7 +47,6 @@ final readonly class AnalysisResult
         public bool $hasCoversNothing,
         public bool $belongsToIntegrationGroup,
         public bool $declaresPublicNonReadonlyProperty,
-        /** @var list<string> */
         public array $environmentVariables,
     ) {
     }

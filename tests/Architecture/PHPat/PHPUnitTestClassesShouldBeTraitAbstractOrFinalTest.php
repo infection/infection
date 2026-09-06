@@ -52,6 +52,7 @@ final class PHPUnitTestClassesShouldBeTraitAbstractOrFinalTest
             )
             ->should()
             ->beFinal()
-            ->because('PHPUnit test classes should be traits, abstract classes, or final classes.');
+            ->because('PHPUnit test classes should be traits, abstract classes, or final classes.')
+        ;
     }
 }

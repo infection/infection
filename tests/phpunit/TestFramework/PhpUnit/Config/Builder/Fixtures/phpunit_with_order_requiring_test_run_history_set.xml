@@ -2,7 +2,7 @@
 <phpunit bootstrap="app/autoload2.php"
          colors="true"
          cacheDirectory=".phpunit.cache"
-         executionOrder="depends,defects"
+         executionOrder="depends,defects,duration-ascending"
 >
     <testsuites>
         <testsuite name="Application Test Suite">

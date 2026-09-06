@@ -64,7 +64,6 @@ final readonly class InitialTestsExecutionLoggerFactory
                 $this->output,
                 $this->testFramework,
                 $this->debug,
-            )
-        ;
+            );
     }
 }

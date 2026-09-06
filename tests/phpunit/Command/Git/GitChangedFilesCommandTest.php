@@ -99,7 +99,8 @@ final class GitChangedFilesCommandTest extends TestCase
         $gitMock
             ->method('getBaseReference')
             ->with($expectedBase)
-            ->willReturn(self::REFERENCE);
+            ->willReturn(self::REFERENCE)
+        ;
         $gitMock
             ->method('getChangedFilePaths')
             ->with(
@@ -108,7 +109,8 @@ final class GitChangedFilesCommandTest extends TestCase
                 ['src', 'lib'],
                 self::FIXTURES_DIR,
             )
-            ->willReturn($files);
+            ->willReturn($files)
+        ;
 
         $tester = $this->createCommandTester($gitMock);
 
@@ -276,7 +278,8 @@ final class GitChangedFilesCommandTest extends TestCase
         $gitMock
             ->method('getBaseReference')
             ->with('origin/main')
-            ->willReturn(self::REFERENCE);
+            ->willReturn(self::REFERENCE)
+        ;
         $gitMock
             ->method('getChangedFilePaths')
             ->with(
@@ -285,7 +288,8 @@ final class GitChangedFilesCommandTest extends TestCase
                 self::SOURCE_DIRECTORIES,
                 self::FIXTURES_DIR,
             )
-            ->willReturn([self::FIXTURES_DIR . '/src/File1.php']);
+            ->willReturn([self::FIXTURES_DIR . '/src/File1.php'])
+        ;
 
         $tester = $this->createCommandTester($gitMock);
 
@@ -351,6 +355,7 @@ final class GitChangedFilesCommandTest extends TestCase
                     ['tests'],
                 ),
             )
-            ->build();
+            ->build()
+        ;
     }
 }

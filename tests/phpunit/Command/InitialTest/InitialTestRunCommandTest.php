@@ -165,12 +165,14 @@ final class InitialTestRunCommandTest extends TestCase
         $gitMock = $this->createMock(Git::class);
         $gitMock
             ->method('getBaseReference')
-            ->willReturn('<refinedGitReference>');
+            ->willReturn('<refinedGitReference>')
+        ;
 
         $testFrameworkMock = $this->createMock(TestFramework::class);
         $executeInitialRunExpectation = $testFrameworkMock
             ->expects($failure === null ? $this->exactly(2) : $this->once())
-            ->method('executeInitialRun');
+            ->method('executeInitialRun')
+        ;
 
         if ($failure !== null) {
             $executeInitialRunExpectation->willThrowException($failure);
@@ -180,7 +182,8 @@ final class InitialTestRunCommandTest extends TestCase
 
         $container = Container::create()
             ->cloneWithService(Git::class, $gitMock)
-            ->cloneWithService(TestFramework::class, $testFrameworkMock);
+            ->cloneWithService(TestFramework::class, $testFrameworkMock)
+        ;
 
         $application = new Application($container);
 

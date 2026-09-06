@@ -60,11 +60,13 @@ final class GitBaseReferenceCommandTest extends TestCase
     {
         $this->git
             ->expects($this->never())
-            ->method('getDefaultBase');
+            ->method('getDefaultBase')
+        ;
         $this->git
             ->method('getBaseReference')
             ->with('origin/main')
-            ->willReturn('8af25a159143aadacf4d875a3114014e99053430');
+            ->willReturn('8af25a159143aadacf4d875a3114014e99053430')
+        ;
 
         $expectedStdout = <<<'STDOUT'
             8af25a159143aadacf4d875a3114014e99053430
@@ -103,12 +105,14 @@ final class GitBaseReferenceCommandTest extends TestCase
     {
         $this->git
             ->expects($this->never())
-            ->method('getDefaultBase');
+            ->method('getDefaultBase')
+        ;
         $this->git
             ->expects($this->once())
             ->method('getBaseReference')
             ->with('origin/develop')
-            ->willReturn('def456abc789');
+            ->willReturn('def456abc789')
+        ;
 
         $tester = $this->createCommandTester();
 
@@ -121,10 +125,12 @@ final class GitBaseReferenceCommandTest extends TestCase
     {
         $this->git
             ->expects($this->never())
-            ->method('getDefaultBase');
+            ->method('getDefaultBase')
+        ;
         $this->git
             ->expects($this->never())
-            ->method('getBaseReference');
+            ->method('getBaseReference')
+        ;
 
         $tester = $this->createCommandTester();
 

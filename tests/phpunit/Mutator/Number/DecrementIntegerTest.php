@@ -442,6 +442,19 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
             ),
         ];
 
+        yield 'It does decrement a zero limit argument of a function other than preg_split' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    explode('//', 'string', 0);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    explode('//', 'string', -1);
+                    PHP,
+            ),
+        ];
+
         $minInt = PHP_INT_MIN;
 
         yield 'It does not decrement min int' => [

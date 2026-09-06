@@ -54,7 +54,8 @@ final class FilteringResultsCollectorFactoryTest extends TestCase
         $statusesProvider
             ->expects($this->once())
             ->method('get')
-            ->willReturn(DetectionStatus::cases());
+            ->willReturn(DetectionStatus::cases())
+        ;
 
         $factory = new FilteringResultsCollectorFactory($statusesProvider);
 

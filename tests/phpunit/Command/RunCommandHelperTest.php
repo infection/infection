@@ -63,7 +63,8 @@ final class RunCommandHelperTest extends TestCase
         $this->inputMock->expects($this->once())
             ->method('getOption')
             ->with(RunCommand::OPTION_LOGGER_GITHUB)
-            ->willReturn($optionValue);
+            ->willReturn($optionValue)
+        ;
 
         $commandHelper = new RunCommandHelper($this->inputMock, new CpuCoresCountProvider());
         $this->assertSame($expected, $commandHelper->getUseGitHubLogger());
@@ -86,7 +87,8 @@ final class RunCommandHelperTest extends TestCase
         $this->inputMock->expects($this->once())
             ->method('getOption')
             ->with(RunCommand::OPTION_THREADS)
-            ->willReturn($optionValue);
+            ->willReturn($optionValue)
+        ;
 
         $commandHelper = new RunCommandHelper($this->inputMock, $cpuCoresCountProvider);
         $this->assertSame($expected, $commandHelper->getThreadCount());
@@ -111,7 +113,8 @@ final class RunCommandHelperTest extends TestCase
         $this->inputMock->expects($this->once())
             ->method('getOption')
             ->with(RunCommand::OPTION_DOTS_PER_ROW)
-            ->willReturn($optionValue);
+            ->willReturn($optionValue)
+        ;
 
         $commandHelper = new RunCommandHelper($this->inputMock, new CpuCoresCountProvider());
 
@@ -161,7 +164,8 @@ final class RunCommandHelperTest extends TestCase
         $this->inputMock->expects($this->once())
             ->method('getOption')
             ->with(RunCommand::OPTION_SHOW_MUTATIONS)
-            ->willReturn($optionValue);
+            ->willReturn($optionValue)
+        ;
 
         $commandHelper = new RunCommandHelper($this->inputMock, new CpuCoresCountProvider());
         $this->assertSame($expected, $commandHelper->getNumberOfShownMutations());
@@ -182,7 +186,8 @@ final class RunCommandHelperTest extends TestCase
         $this->inputMock->expects($this->once())
             ->method('getOption')
             ->with(RunCommand::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS)
-            ->willReturn($optionValue);
+            ->willReturn($optionValue)
+        ;
 
         $commandHelper = new RunCommandHelper($this->inputMock, new CpuCoresCountProvider());
         $this->assertSame($expected, $commandHelper->getIgnoreMsiWithNoMutations());
@@ -205,7 +210,8 @@ final class RunCommandHelperTest extends TestCase
         $this->inputMock->expects($this->once())
             ->method('getOption')
             ->with(RunCommand::OPTION_WITH_TIMEOUTS)
-            ->willReturn($optionValue);
+            ->willReturn($optionValue)
+        ;
 
         $commandHelper = new RunCommandHelper($this->inputMock, new CpuCoresCountProvider());
         $this->assertSame($expected, $commandHelper->getTimeoutsAsEscaped());
@@ -224,7 +230,8 @@ final class RunCommandHelperTest extends TestCase
         $this->inputMock->expects($this->once())
             ->method('getOption')
             ->with(RunCommand::OPTION_MAX_TIMEOUTS)
-            ->willReturn($optionValue);
+            ->willReturn($optionValue)
+        ;
 
         $commandHelper = new RunCommandHelper($this->inputMock, new CpuCoresCountProvider());
         $this->assertSame($expected, $commandHelper->getMaxTimeouts());
@@ -247,7 +254,8 @@ final class RunCommandHelperTest extends TestCase
         $this->inputMock->expects($this->once())
             ->method('getOption')
             ->with('test-option')
-            ->willReturn($optionValue);
+            ->willReturn($optionValue)
+        ;
 
         $commandHelper = new RunCommandHelper($this->inputMock, new CpuCoresCountProvider());
         $this->assertSame($expected, $commandHelper->getStringOption('test-option', $default));

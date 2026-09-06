@@ -38,14 +38,14 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
-use Infection\TestFramework\Config\InitialConfigBuilder;
-use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Override;
 use function Safe\preg_match;
@@ -57,33 +57,23 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware
+final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware, TestFrameworkAdapter
 {
     public const string COVERAGE_DIR = 'coverage-xml';
 
     public function __construct(
-        string $testFrameworkExecutable,
+        private readonly string $testFrameworkExecutable,
         private readonly string $tmpDir,
         private readonly string $jUnitFilePath,
         private readonly PCOVDirectoryProvider $pcovDirectoryProvider,
-        InitialConfigBuilder $initialConfigBuilder,
-        MutationConfigBuilder $mutationConfigBuilder,
-        CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
-        ShellCommandRunner $shellCommandRunner,
-        VersionParser $versionParser,
-        CommandLineBuilder $commandLineBuilder,
-        ?string $version = null,
+        private readonly InitialConfigBuilder $initialConfigBuilder,
+        private readonly MutationConfigBuilder $mutationConfigBuilder,
+        private readonly CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
+        private readonly ShellCommandRunner $shellCommandRunner,
+        private readonly VersionParser $versionParser,
+        private readonly CommandLineBuilder $commandLineBuilder,
+        private ?string $version = null,
     ) {
-        parent::__construct(
-            $testFrameworkExecutable,
-            $initialConfigBuilder,
-            $mutationConfigBuilder,
-            $argumentsAndOptionsBuilder,
-            $shellCommandRunner,
-            $versionParser,
-            $commandLineBuilder,
-            $version,
-        );
     }
 
     public function hasJUnitReport(): bool
@@ -133,7 +123,50 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
             }
         }
 
-        return parent::getInitialTestRunCommandLine($extraOptions, $phpExtraArgs, $skipCoverage);
+        return $this->getCommandLine(
+            $phpExtraArgs,
+            $this->argumentsAndOptionsBuilder->buildForInitialTestsRun(
+                $this->initialConfigBuilder->build($this->getVersion()),
+                $extraOptions,
+            ),
+        );
+    }
+
+    public function getMutantCommandLine(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
+        string $extraOptions,
+    ): array {
+        return $this->getCommandLine(
+            [],
+            $this->argumentsAndOptionsBuilder->buildForMutant(
+                $this->mutationConfigBuilder->build(
+                    $coverageTests,
+                    $mutatedFilePath,
+                    $mutationHash,
+                    $mutationOriginalFilePath,
+                    $this->getVersion(),
+                ),
+                $extraOptions,
+                $coverageTests,
+                $this->getVersion(),
+            ),
+        );
+    }
+
+    public function getVersion(): string
+    {
+        return $this->version ??= $this->versionParser->parse(
+            $this->shellCommandRunner->mustRun(
+                $this->commandLineBuilder->build(
+                    $this->testFrameworkExecutable,
+                    [],
+                    ['--version'],
+                ),
+            ),
+        );
     }
 
     public function testsPass(string $output): bool
@@ -185,7 +218,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
     #[Override]
     public function getInitialTestsFailRecommendations(string $commandLine): string
     {
-        $recommendations = parent::getInitialTestsFailRecommendations($commandLine);
+        $recommendations = $this->createInitialTestsFailRecommendations($commandLine);
 
         if (self::supportsExecutionOrderDefectsRandom($this->getVersion())) {
             $recommendations = sprintf(
@@ -193,7 +226,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
                 "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
                 . 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="defects,random" resolveDependencies="true" ...',
                 'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
-                parent::getInitialTestsFailRecommendations($commandLine),
+                $this->createInitialTestsFailRecommendations($commandLine),
             );
         } elseif (version_compare($this->getVersion(), '7.2', '>=')) {
             $recommendations = sprintf(
@@ -201,7 +234,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
                 "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
                 . 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="random" resolveDependencies="true" ...',
                 'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
-                parent::getInitialTestsFailRecommendations($commandLine),
+                $this->createInitialTestsFailRecommendations($commandLine),
             );
         }
 
@@ -226,8 +259,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         return
             version_compare($version, '10.5.48', '>=') && version_compare($version, '11.0', '<')
             || version_compare($version, '11.5.27', '>=') && version_compare($version, '12.0', '<')
-            || version_compare($version, '12.2.7', '>=')
-        ;
+            || version_compare($version, '12.2.7', '>=');
     }
 
     /**
@@ -236,5 +268,25 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
     public function getInitialRunOnlyOptions(): array
     {
         return ['--configuration', '--filter', '--testsuite'];
+    }
+
+    /**
+     * @param string[] $phpExtraArgs
+     * @param string[] $testFrameworkArgs
+     *
+     * @return string[]
+     */
+    private function getCommandLine(array $phpExtraArgs, array $testFrameworkArgs): array
+    {
+        return $this->commandLineBuilder->build(
+            $this->testFrameworkExecutable,
+            $phpExtraArgs,
+            $testFrameworkArgs,
+        );
+    }
+
+    private function createInitialTestsFailRecommendations(string $commandLine): string
+    {
+        return sprintf('Check the executed command to identify the problem: %s', $commandLine);
     }
 }

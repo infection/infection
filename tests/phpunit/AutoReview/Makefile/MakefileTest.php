@@ -202,7 +202,7 @@ final class MakefileTest extends BaseMakefileTestCase
             }
 
             if ($target === 'test-docker') {
-                array_unshift($subTestTargets, 'autoreview');
+                array_unshift($subTestTargets, 'autoreview-docker');
             }
 
             $this->assertSame(
@@ -239,7 +239,7 @@ final class MakefileTest extends BaseMakefileTestCase
         $testPrerequisites = array_shift($testRules)->getPrerequisites();
 
         $rootTestTargets = self::getRootTestTargets($testRules, 2);
-        array_unshift($rootTestTargets, 'autoreview');
+        array_unshift($rootTestTargets, 'autoreview-docker');
 
         $this->assertEqualsCanonicalizing($rootTestTargets, $testPrerequisites);
     }
@@ -275,6 +275,7 @@ final class MakefileTest extends BaseMakefileTestCase
             [33mzizmor:[0m			 Runs zizmor
             [33mprofile:[0m 	 	 Runs Blackfire
             [33mautoreview:[0m 	 	 Runs various checks (static analysis & AutoReview test suite)
+            [33mautoreview-docker:[0m	 Runs various checks in docker (static analysis & AutoReview test suite)
             [33mtest:[0m		 	 Runs all the tests
             [33mtest-docker:[0m		 Runs all the tests on the different Docker platforms
             [33mtest-unit:[0m	 	 Runs the unit tests

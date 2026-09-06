@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner;
 
 use function implode;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\Runner\InitialTestsFailed;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -53,7 +53,7 @@ final class InitialTestsFailedTest extends TestCase
         $process->expects($this->once())->method('getErrorOutput')->willReturn('error string');
         $process->expects($this->once())->method('getCommandLine')->willReturn('vendor/bin/phpunit --order=random');
 
-        $testFrameworkAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $testFrameworkAdapter = $this->createMock(TestFrameworkAdapter::class);
         $testFrameworkAdapter->expects($this->once())->method('getName')->willReturn('phpunit');
         $testFrameworkAdapter->expects($this->once())->method('getInitialTestsFailRecommendations')->willReturn('-');
 

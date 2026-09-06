@@ -65,16 +65,19 @@ final class SourceFileInfoProviderTest extends TestCase
         $fileSystemMock
             ->expects($this->once())
             ->method('isReadableFile')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $fileSystemMock
             ->expects($this->once())
             ->method('readFile')
-            ->willReturnCallback(file_get_contents(...));
+            ->willReturnCallback(file_get_contents(...))
+        ;
         $fileSystemMock
             ->expects($this->once())
             ->method('realPath')
             ->with($expectedSourceFilePath)
-            ->willReturn($expectedSourceFilePath);
+            ->willReturn($expectedSourceFilePath)
+        ;
 
         $provider = new SourceFileInfoProvider(
             $coverageIndexPath,
@@ -105,7 +108,8 @@ final class SourceFileInfoProviderTest extends TestCase
         $fileSystemMock
             ->expects($this->once())
             ->method('isReadableFile')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $provider = new SourceFileInfoProvider(
             '/path/to/index.xml',
@@ -131,7 +135,8 @@ final class SourceFileInfoProviderTest extends TestCase
             ->expects($this->once())
             ->method('isReadableFile')
             ->with('/path/to/project/var/coverage-xml/src/zeroLevel.php.xml')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $fileSystemMock
             ->expects($this->once())
             ->method('readFile')
@@ -144,12 +149,14 @@ final class SourceFileInfoProviderTest extends TestCase
                       </file>
                     </phpunit>
                     XML,
-            );
+            )
+        ;
         $fileSystemMock
             ->expects($this->once())
             ->method('realPath')
             ->with('/path/to/project/src/Covered/Zero/Calculator.php')
-            ->willThrowException(new IOException(''));
+            ->willThrowException(new IOException(''))
+        ;
 
         $provider = new SourceFileInfoProvider(
             '/path/to/project/var/coverage-xml/index.xml',
@@ -174,11 +181,13 @@ final class SourceFileInfoProviderTest extends TestCase
         $fileSystemMock
             ->expects($this->once())
             ->method('isReadableFile')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $fileSystemMock
             ->expects($this->once())
             ->method('readFile')
-            ->willReturn('');
+            ->willReturn('')
+        ;
 
         $provider = new SourceFileInfoProvider(
             '/path/to/index.xml',

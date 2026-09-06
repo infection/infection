@@ -52,11 +52,11 @@ class MutantProcessContainer
 
     private int $currentProcessIndex = 0;
 
+    /**
+     * @param list<LazyMutantProcessFactory> $lazyMutantProcessCreators
+     */
     public function __construct(
         MutantProcess $phpUnitMutantProcess,
-        /**
-         * @var list<LazyMutantProcessFactory>
-         */
         private readonly array $lazyMutantProcessCreators,
     ) {
         $this->processes[] = $phpUnitMutantProcess;

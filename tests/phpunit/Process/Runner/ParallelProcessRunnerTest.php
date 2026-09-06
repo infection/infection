@@ -69,7 +69,8 @@ final class ParallelProcessRunnerTest extends TestCase
     {
         $clock = $this->createMock(TimeSpy::class);
         $clock->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $runner = new ParallelProcessRunner(4, 0, $clock);
 
@@ -149,7 +150,8 @@ final class ParallelProcessRunnerTest extends TestCase
                 $callSequence[] = 'enqueueFrom';
 
                 return 0;
-            });
+            })
+        ;
 
         $queueMock->expects($this->atLeastOnce())
             ->method('isEmpty')
@@ -157,7 +159,8 @@ final class ParallelProcessRunnerTest extends TestCase
                 $callSequence[] = 'isEmpty';
 
                 return true; // Exit loop immediately
-            });
+            })
+        ;
 
         $runner = new ParallelProcessRunner(2, 0, new TimeSpy(), $queueMock);
 
@@ -245,7 +248,8 @@ final class ParallelProcessRunnerTest extends TestCase
         // With mutated code: max(-1, 10000 - 15000) = max(-1, -5000) = -1
         $clockMock->expects($this->once())
             ->method('usleep')
-            ->with($this->identicalTo(0)); // Should be 0, not -1
+            ->with($this->identicalTo(0)) // Should be 0, not -1
+        ;
 
         $method->invokeArgs($runner, [$timeSpentDoingWork]);
     }
@@ -269,7 +273,8 @@ final class ParallelProcessRunnerTest extends TestCase
         // With mutated code: max(1, 10000 - 10000) = max(1, 0) = 1
         $clockMock->expects($this->once())
             ->method('usleep')
-            ->with($this->identicalTo(0)); // Should be 0, not 1
+            ->with($this->identicalTo(0)) // Should be 0, not 1
+        ;
 
         $method->invokeArgs($runner, [$timeSpentDoingWork]);
     }
@@ -292,7 +297,8 @@ final class ParallelProcessRunnerTest extends TestCase
         // With mutated code: max(0, 5000 + 2000) = max(0, 7000) = 7000
         $clockMock->expects($this->once())
             ->method('usleep')
-            ->with($this->identicalTo(3000)); // Should be 3000, not 7000
+            ->with($this->identicalTo(3000)) // Should be 3000, not 7000
+        ;
 
         $method->invokeArgs($runner, [$timeSpentDoingWork]);
     }
@@ -314,7 +320,8 @@ final class ParallelProcessRunnerTest extends TestCase
         // usleep must be called
         $clockMock->expects($this->once())
             ->method('usleep')
-            ->with($this->identicalTo(4000)); // Should be 4000
+            ->with($this->identicalTo(4000)) // Should be 4000
+        ;
 
         $method->invokeArgs($runner, [$timeSpentDoingWork]);
     }
@@ -333,22 +340,27 @@ final class ParallelProcessRunnerTest extends TestCase
         $processMock = $this->createMock(Process::class);
         $processMock->expects($this->once())
             ->method('checkTimeout')
-            ->willThrowException(new ProcessTimedOutException($processMock, 1));
+            ->willThrowException(new ProcessTimedOutException($processMock, 1))
+        ;
         $processMock->expects($this->once())
             ->method('isRunning')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $mutantProcessMock = $this->createMock(MutantProcess::class);
         $mutantProcessMock->expects($this->once())
             ->method('getProcess')
-            ->willReturn($processMock);
+            ->willReturn($processMock)
+        ;
         $mutantProcessMock->expects($this->once())
-            ->method('markAsTimedOut'); // This call must happen
+            ->method('markAsTimedOut') // This call must happen
+        ;
 
         $mutantProcessContainerMock = $this->createMock(MutantProcessContainer::class);
         $mutantProcessContainerMock->expects($this->once())
             ->method('getCurrent')
-            ->willReturn($mutantProcessMock);
+            ->willReturn($mutantProcessMock)
+        ;
 
         $container = new IndexedMutantProcessContainer(0, $mutantProcessContainerMock);
 
@@ -378,22 +390,27 @@ final class ParallelProcessRunnerTest extends TestCase
         // Create a finished process
         $processMock = $this->createMock(Process::class);
         $processMock->expects($this->once())
-            ->method('checkTimeout'); // No exception
+            ->method('checkTimeout') // No exception
+        ;
         $processMock->expects($this->once())
             ->method('isRunning')
-            ->willReturn(false); // Process is not running
+            ->willReturn(false) // Process is not running
+        ;
 
         $mutantProcessMock = $this->createMock(MutantProcess::class);
         $mutantProcessMock->expects($this->once())
             ->method('getProcess')
-            ->willReturn($processMock);
+            ->willReturn($processMock)
+        ;
         $mutantProcessMock->expects($this->once())
-            ->method('markAsFinished'); // This call must happen
+            ->method('markAsFinished') // This call must happen
+        ;
 
         $mutantProcessContainerMock = $this->createMock(MutantProcessContainer::class);
         $mutantProcessContainerMock->expects($this->once())
             ->method('getCurrent')
-            ->willReturn($mutantProcessMock);
+            ->willReturn($mutantProcessMock)
+        ;
 
         $container = new IndexedMutantProcessContainer(0, $mutantProcessContainerMock);
 
@@ -419,7 +436,8 @@ final class ParallelProcessRunnerTest extends TestCase
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
             ->setConstructorArgs([2, 0, new TimeSpy(), new ProcessQueue()])
             ->onlyMethods(['hasProcessesThatCouldBeFreed'])
-            ->getMock();
+            ->getMock()
+        ;
 
         $callCount = 0;
 
@@ -430,7 +448,8 @@ final class ParallelProcessRunnerTest extends TestCase
                 ++$callCount;
 
                 return $callCount <= 2; // Return true twice, then false
-            });
+            })
+        ;
 
         // Create processes
         $processes = [];
@@ -466,16 +485,19 @@ final class ParallelProcessRunnerTest extends TestCase
         $queueMock = $this->createMock(ProcessQueue::class);
         $queueMock->expects($this->atLeastOnce())
             ->method('enqueueFrom')
-            ->willReturn(self::SIMULATED_TIME_MICROSECONDS); // Return 1000 microseconds
+            ->willReturn(self::SIMULATED_TIME_MICROSECONDS) // Return 1000 microseconds
+        ;
 
         $queueMock->expects($this->atLeastOnce())
             ->method('isEmpty')
-            ->willReturn(false, false, false, true); // Need processes to run, then stop
+            ->willReturn(false, false, false, true) // Need processes to run, then stop
+        ;
 
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
             ->setConstructorArgs([2, 0, new TimeSpy(), $queueMock])
             ->onlyMethods(['hasProcessesThatCouldBeFreed', 'sleepRemaining'])
-            ->getMock();
+            ->getMock()
+        ;
 
         $callCount = 0;
 
@@ -486,12 +508,14 @@ final class ParallelProcessRunnerTest extends TestCase
                 ++$callCount;
 
                 return $callCount <= 1; // Return true once, then false
-            });
+            })
+        ;
 
         // sleepRemaining should be called with the return value from enqueueFrom
         $runner->expects($this->atLeastOnce())
             ->method('sleepRemaining')
-            ->with($this->identicalTo(self::SIMULATED_TIME_MICROSECONDS)); // Must be called with the enqueueFrom return value
+            ->with($this->identicalTo(self::SIMULATED_TIME_MICROSECONDS)) // Must be called with the enqueueFrom return value
+        ;
 
         // Create processes
         $processes = [];
@@ -515,7 +539,8 @@ final class ParallelProcessRunnerTest extends TestCase
         $container = $processes[0];
         $queueMock->expects($this->atLeastOnce())
             ->method('dequeue')
-            ->willReturn($container);
+            ->willReturn($container)
+        ;
 
         // Run the processes - sleepRemaining should be called with the enqueueFrom return value
         iterator_count($runner->run($processes));
@@ -614,14 +639,16 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $mutantExecutionResult = MutantExecutionResultBuilder::withMinimalTestData()
             ->withDetectionStatus(DetectionStatus::ESCAPED)
-            ->build();
+            ->build()
+        ;
 
         $mutantExecutionResultFactoryMock = $this->createMock(MutantExecutionResultFactory::class);
 
         $mutantExecutionResultFactoryMock
             ->expects($this->once())
             ->method('createFromProcess')
-            ->willReturn($mutantExecutionResult);
+            ->willReturn($mutantExecutionResult)
+        ;
 
         return new MutantProcessContainer(
             new DummyMutantProcess(

@@ -85,22 +85,26 @@ final class MutantProcessContainerTest extends TestCase
         $this->phpUnitMutantProcess
             ->expects($this->once())
             ->method('getMutant')
-            ->willReturn($this->mutant);
+            ->willReturn($this->mutant)
+        ;
 
         $mutantExecutionResult = MutantExecutionResultBuilder::withMinimalTestData()
             ->withDetectionStatus(DetectionStatus::ESCAPED)
-            ->build();
+            ->build()
+        ;
 
         $this->phpUnitMutantProcess
             ->expects($this->once())
             ->method('getMutantExecutionResult')
-            ->willReturn($mutantExecutionResult);
+            ->willReturn($mutantExecutionResult)
+        ;
 
         $this->lazyMutantProcessCreator
             ->expects($this->once())
             ->method('create')
             ->with($this->mutant)
-            ->willReturn($newMutantProcess);
+            ->willReturn($newMutantProcess)
+        ;
 
         $this->assertTrue($container->hasNext());
 
@@ -121,13 +125,15 @@ final class MutantProcessContainerTest extends TestCase
         $this->phpUnitMutantProcess
             ->expects($this->once())
             ->method('getMutant')
-            ->willReturn($this->mutant);
+            ->willReturn($this->mutant)
+        ;
 
         $this->lazyMutantProcessCreator
             ->expects($this->once())
             ->method('create')
             ->with($this->mutant)
-            ->willReturn($newMutantProcess);
+            ->willReturn($newMutantProcess)
+        ;
 
         $result = $container->createNext();
 
@@ -153,13 +159,15 @@ final class MutantProcessContainerTest extends TestCase
         $this->phpUnitMutantProcess
             ->expects($this->once())
             ->method('getMutant')
-            ->willReturn($this->mutant);
+            ->willReturn($this->mutant)
+        ;
 
         $this->lazyMutantProcessCreator
             ->expects($this->once())
             ->method('create')
             ->with($this->mutant)
-            ->willReturn($newMutantProcess);
+            ->willReturn($newMutantProcess)
+        ;
 
         $container->createNext();
 

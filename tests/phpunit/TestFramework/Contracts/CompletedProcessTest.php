@@ -75,6 +75,7 @@ final class CompletedProcessTest extends TestCase
     {
         return CompletedProcessBuilder::withMinimalTestData()
             ->withExitCode($exitCode)
-            ->build();
+            ->build()
+        ;
     }
 }

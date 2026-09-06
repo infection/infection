@@ -64,7 +64,8 @@ final class CommandLineBuilderTest extends TestCase
     {
         $this->phpExecutableFinderMock
             ->expects($this->never())
-            ->method('find');
+            ->method('find')
+        ;
 
         $commandLine = $this->commandLineBuilder->build(
             'phpunit.bat',
@@ -88,7 +89,8 @@ final class CommandLineBuilderTest extends TestCase
             ->expects($this->once())
             ->method('find')
             ->with(false)
-            ->willReturn('/custom/php');
+            ->willReturn('/custom/php')
+        ;
 
         $commandLine = $this->commandLineBuilder->build(
             testFrameworkExecutable: 'non-executable-phpunit',
@@ -108,7 +110,8 @@ final class CommandLineBuilderTest extends TestCase
             ->expects($this->once())
             ->method('find')
             ->with(false)
-            ->willReturn('/custom/php');
+            ->willReturn('/custom/php')
+        ;
 
         $firstCommandLine = $this->commandLineBuilder->build(
             'vendor/bin/phpunit',

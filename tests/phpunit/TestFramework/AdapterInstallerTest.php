@@ -75,7 +75,8 @@ final class AdapterInstallerTest extends TestCase
         $this->composerExecutableFinder
             ->expects($this->once())
             ->method('find')
-            ->willReturn(['php', '/path/to/composer']);
+            ->willReturn(['php', '/path/to/composer'])
+        ;
 
         $this->shellCommandRunner
             ->expects($this->once())
@@ -99,7 +100,8 @@ final class AdapterInstallerTest extends TestCase
                     ->withExitCode(1)
                     ->withStderr('Composer failed')
                     ->build(),
-            );
+            )
+        ;
 
         $this->adapterInstaller->install($adapterName);
     }
@@ -108,11 +110,13 @@ final class AdapterInstallerTest extends TestCase
     {
         $this->composerExecutableFinder
             ->expects($this->never())
-            ->method('find');
+            ->method('find')
+        ;
 
         $this->shellCommandRunner
             ->expects($this->never())
-            ->method('run');
+            ->method('run')
+        ;
 
         $this->expectException(InvalidArgumentException::class);
 

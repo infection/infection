@@ -188,7 +188,8 @@ final class GitDiffSourceLineMatcherTest extends TestCase
             ->expects($this->once())
             ->method('getChangedLinesRangesByFilePaths')
             ->with('AM', 'main', ['src', 'lib'], '/path/to')
-            ->willReturn($changedLinesRangesByFilePathname);
+            ->willReturn($changedLinesRangesByFilePathname)
+        ;
 
         return $git;
     }

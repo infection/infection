@@ -47,9 +47,7 @@ final class TestPhpExecutableFinder
 
     public static function find(): string
     {
-        if (!isset(self::$phpExecutable)) {
-            self::$phpExecutable = self::lookup();
-        }
+        self::$phpExecutable ??= self::lookup();
 
         return self::$phpExecutable;
     }

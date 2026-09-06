@@ -94,7 +94,8 @@ return static function (int $maxCount): Closure {
         ->cloneWithService(
             Tracer::class,
             new EmptyTraceTracer(),
-        );
+        )
+    ;
 
     $sources = iterator_to_array(
         collectSources(),

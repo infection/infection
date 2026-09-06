@@ -66,7 +66,8 @@ final class AddTestsVisitorTest extends TestCase
                 $this->anything(),
                 $scenario->isOnFunctionSignature ?? false,
             )
-            ->willReturn($scenario->traceTests);
+            ->willReturn($scenario->traceTests)
+        ;
 
         $visitor = new AddTestsVisitor(
             $traceMock,
@@ -91,7 +92,8 @@ final class AddTestsVisitorTest extends TestCase
         $traceMock = $this->createMock(Trace::class);
         $traceMock
             ->expects($this->never())
-            ->method('getAllTestsForMutation');
+            ->method('getAllTestsForMutation')
+        ;
 
         $visitor = new AddTestsVisitor(
             $traceMock,

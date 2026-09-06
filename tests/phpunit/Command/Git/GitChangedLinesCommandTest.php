@@ -99,7 +99,8 @@ final class GitChangedLinesCommandTest extends TestCase
         $gitMock
             ->method('getBaseReference')
             ->with($expectedBase)
-            ->willReturn(self::REFERENCE);
+            ->willReturn(self::REFERENCE)
+        ;
         $gitMock
             ->method('getChangedLinesRangesByFilePaths')
             ->with(
@@ -108,7 +109,8 @@ final class GitChangedLinesCommandTest extends TestCase
                 self::SOURCE_DIRECTORIES,
                 self::FIXTURES_DIR,
             )
-            ->willReturn($changedLines);
+            ->willReturn($changedLines)
+        ;
 
         $tester = $this->createCommandTester($gitMock);
 
@@ -293,6 +295,7 @@ final class GitChangedLinesCommandTest extends TestCase
                     ['tests'],
                 ),
             )
-            ->build();
+            ->build()
+        ;
     }
 }

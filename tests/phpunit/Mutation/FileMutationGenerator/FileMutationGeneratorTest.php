@@ -83,7 +83,8 @@ final class FileMutationGeneratorTest extends TestCase
                     'contents(%s)',
                     $path,
                 ),
-            );
+            )
+        ;
 
         $this->mutationGenerator = new FileMutationGenerator(
             new FileParser(
@@ -119,11 +120,13 @@ final class FileMutationGeneratorTest extends TestCase
             ->expects($this->once())
             ->method('parse')
             ->with('contents(/path/to/file)')
-            ->willReturn($initialStatements);
+            ->willReturn($initialStatements)
+        ;
         $this->phpParserMock
             ->expects($this->once())
             ->method('getTokens')
-            ->willReturn($originalFileTokens);
+            ->willReturn($originalFileTokens)
+        ;
 
         $preTraverserCalled = false;
 
@@ -141,7 +144,8 @@ final class FileMutationGeneratorTest extends TestCase
                     // original value, but this cannot be mimicked with mocks.
                     return [];
                 },
-            );
+            )
+        ;
 
         // Main traverser should be created and called after
         $traverserMock = $this->createMock(NodeTraverserInterface::class);
@@ -157,23 +161,27 @@ final class FileMutationGeneratorTest extends TestCase
                     // original value, but this cannot be mimicked with mocks.
                     return [];
                 },
-            );
+            )
+        ;
 
         // Set up expectations in order
         $this->traverserFactoryMock
             ->expects($this->exactly(2))
             ->method($this->anything())
-            ->willReturnOnConsecutiveCalls($preTraverserMock, $traverserMock);
+            ->willReturnOnConsecutiveCalls($preTraverserMock, $traverserMock)
+        ;
 
         $traceMock = $this->createMock(Trace::class);
         $traceMock
             ->expects($this->never())
-            ->method('hasTests');
+            ->method('hasTests')
+        ;
 
         $this->tracerMock
             ->method('trace')
             ->with($fileInfoMock)
-            ->willReturn($traceMock);
+            ->willReturn($traceMock)
+        ;
 
         $mutations = $this->mutationGenerator->generate(
             $fileInfoMock,
@@ -218,45 +226,54 @@ final class FileMutationGeneratorTest extends TestCase
         $traverserStub = $this->createMock(NodeTraverserInterface::class);
         $traverserStub
             ->method('traverse')
-            ->willReturn([]);
+            ->willReturn([])
+        ;
 
         if ($scenario->expected) {
             $this->phpParserMock
                 ->expects($this->once())
                 ->method('parse')
-                ->willReturn($initialStatements);
+                ->willReturn($initialStatements)
+            ;
             $this->phpParserMock
                 ->expects($this->once())
                 ->method('getTokens')
-                ->willReturn($originalFileTokens);
+                ->willReturn($originalFileTokens)
+            ;
 
             $this->traverserFactoryMock
                 ->method('createEnrichmentTraverser')
-                ->willReturn($traverserStub);
+                ->willReturn($traverserStub)
+            ;
         } else {
             $this->phpParserMock
                 ->expects($this->never())
-                ->method('parse');
+                ->method('parse')
+            ;
 
             $this->traverserFactoryMock
                 ->expects($this->never())
                 ->method('createEnrichmentTraverser')
-                ->willReturn($traverserStub);
+                ->willReturn($traverserStub)
+            ;
         }
 
         $traceMock = $this->createMock(Trace::class);
         $traceMock
             ->method('hasTests')
-            ->willReturn($scenario->traceHasTests);
+            ->willReturn($scenario->traceHasTests)
+        ;
 
         if ($scenario->hasTrace) {
             $this->tracerMock
                 ->method('trace')
-                ->willReturn($traceMock);
+                ->willReturn($traceMock)
+            ;
         } else {
             $this->tracerMock
                 ->method('trace')
-                ->willThrowException(new NoTraceFound());
+                ->willThrowException(new NoTraceFound())
+            ;
         }
 
         $mutations = $this->mutationGenerator->generate(

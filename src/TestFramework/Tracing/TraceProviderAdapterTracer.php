@@ -158,9 +158,7 @@ final class TraceProviderAdapterTracer implements Tracer
      */
     private function getTraceGenerator(): Generator
     {
-        if ($this->traceGenerator === null) {
-            $this->traceGenerator = GeneratorFactory::fromIterable($this->traceProvider->provideTraces());
-        }
+        $this->traceGenerator ??= GeneratorFactory::fromIterable($this->traceProvider->provideTraces());
 
         return $this->traceGenerator;
     }

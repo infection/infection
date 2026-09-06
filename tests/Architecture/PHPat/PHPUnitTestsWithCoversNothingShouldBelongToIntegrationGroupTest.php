@@ -52,6 +52,7 @@ final class PHPUnitTestsWithCoversNothingShouldBelongToIntegrationGroupTest
             )
             ->shouldNot()
             ->exist()
-            ->because('PHPUnit tests using CoversNothing should be marked with the integration group.');
+            ->because('PHPUnit tests using CoversNothing should be marked with the integration group.')
+        ;
     }
 }

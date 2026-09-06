@@ -150,7 +150,8 @@ final class StrykerReporterTest extends TestCase
 
         $this->strykerDashboardClient
             ->expects($this->never())
-            ->method('sendReport');
+            ->method('sendReport')
+        ;
 
         $this->reporter->report();
 

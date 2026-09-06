@@ -63,11 +63,13 @@ final class ConsoleProgressBarLoggerTest extends TestCase
     {
         $this->outputMock
             ->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+            ->willReturn(OutputInterface::VERBOSITY_QUIET)
+        ;
 
         $this->testFrameworkMock
             ->expects($this->once())
-            ->method('getVersion');
+            ->method('getVersion')
+        ;
 
         $this->createLogger(debug: false)->start();
     }
@@ -81,18 +83,22 @@ final class ConsoleProgressBarLoggerTest extends TestCase
                 '',
                 'Running initial tests with PHPUnit version unknown',
                 '',
-            ]);
+            ])
+        ;
         $this->outputMock
             ->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+            ->willReturn(OutputInterface::VERBOSITY_QUIET)
+        ;
 
         $this->testFrameworkMock
             ->expects($this->once())
             ->method('getName')
-            ->willReturn('PHPUnit');
+            ->willReturn('PHPUnit')
+        ;
         $this->testFrameworkMock
             ->method('getVersion')
-            ->willThrowException(new InvalidArgumentException());
+            ->willThrowException(new InvalidArgumentException())
+        ;
 
         $this->createLogger(debug: false)->start();
     }
@@ -104,11 +110,13 @@ final class ConsoleProgressBarLoggerTest extends TestCase
         $this->outputMock
             ->expects($this->once())
             ->method('writeln')
-            ->with('');
+            ->with('')
+        ;
 
         $this->outputMock
             ->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+            ->willReturn(OutputInterface::VERBOSITY_QUIET)
+        ;
 
         $this->createLogger(debug: false)->finish($testOutput);
     }
@@ -119,11 +127,13 @@ final class ConsoleProgressBarLoggerTest extends TestCase
 
         $this->outputMock
             ->expects($this->exactly(2))
-            ->method('writeln');
+            ->method('writeln')
+        ;
 
         $this->outputMock
             ->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+            ->willReturn(OutputInterface::VERBOSITY_QUIET)
+        ;
 
         $this->createLogger(debug: true)->finish($testOutput);
     }

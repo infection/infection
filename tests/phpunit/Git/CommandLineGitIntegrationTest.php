@@ -135,6 +135,8 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             'user.name=Infection',
             '-c',
             'user.email=infection@infection.github.io',
+            '-c',
+            'commit.gpgsign=false',
             'commit',
             '--quiet',
             '-m',
@@ -293,9 +295,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
 
     private function skipIfCommitReferenceIsNotAvailable(): void
     {
-        if (!isset(self::$commitReferenceExists)) {
-            self::$commitReferenceExists = self::checkIfCommitReferenceExists();
-        }
+        self::$commitReferenceExists ??= self::checkIfCommitReferenceExists();
 
         if (!self::$commitReferenceExists) {
             $this->markTestSkipped('Commit reference not found. It may require more history.');

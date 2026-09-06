@@ -114,7 +114,8 @@ abstract class BaseReportLocator implements ReportLocator
             // TODO: address this... eventually
             // @phpstan-ignore argument.templateType
             ->map(static fn (SplFileInfo $fileInfo) => Path::canonicalize($fileInfo->getPathname()))
-            ->toList();
+            ->toList()
+        ;
 
         if (count($reportPathnames) > 1) {
             throw $this->createTooManyReportsFound($this->sourceDirectory, $reportPathnames);
@@ -134,7 +135,8 @@ abstract class BaseReportLocator implements ReportLocator
         $finder = $this->filesystem
             ->createFinder()
             ->files()
-            ->in($coverageDirectory);
+            ->in($coverageDirectory)
+        ;
 
         $this->configureFinder($finder);
 

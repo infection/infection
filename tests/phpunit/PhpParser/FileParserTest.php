@@ -91,12 +91,14 @@ final class FileParserTest extends TestCase
             ->expects($this->once())
             ->method('parse')
             ->with($fileContents)
-            ->willReturn($expectedReturnedStatements = []);
+            ->willReturn($expectedReturnedStatements = [])
+        ;
 
         $phpParserMock
             ->expects($this->once())
             ->method('getTokens')
-            ->willReturn($expectedReturnedTokens = []);
+            ->willReturn($expectedReturnedTokens = [])
+        ;
 
         $parser = new FileParser(
             $phpParserMock,
@@ -325,7 +327,8 @@ final class FileParserTest extends TestCase
 
         $this->fileSystemMock
             ->method('readFile')
-            ->willReturn($contents);
+            ->willReturn($contents)
+        ;
 
         return $fileInfo;
     }

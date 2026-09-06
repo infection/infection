@@ -470,9 +470,9 @@ final class InitialConfigBuilderTest extends TestCase
         $this->assertSame(0, $resolveDependencies->length);
     }
 
-    public function test_it_removes_the_defects_order_already_set_for_phpunit_13_3(): void
+    public function test_it_removes_the_orders_requiring_the_test_run_history_already_set_for_phpunit_13_3(): void
     {
-        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_defects_order_set.xml');
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_order_requiring_test_run_history_set.xml');
 
         $xml = $this->filesystem->readFile($builder->build('13.3'));
 
@@ -487,16 +487,16 @@ final class InitialConfigBuilderTest extends TestCase
         $this->assertSame('false', $recordTestRunHistory[0]->nodeValue);
     }
 
-    public function test_it_keeps_the_defects_order_already_set_for_phpunit_13_2(): void
+    public function test_it_keeps_the_orders_requiring_the_test_run_history_already_set_for_phpunit_13_2(): void
     {
-        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_defects_order_set.xml');
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_order_requiring_test_run_history_set.xml');
 
         $xml = $this->filesystem->readFile($builder->build('13.2'));
 
         $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder');
 
         $this->assertInstanceOf(DOMNodeList::class, $executionOrder);
-        $this->assertSame('depends,defects', $executionOrder[0]->nodeValue);
+        $this->assertSame('depends,defects,duration-ascending', $executionOrder[0]->nodeValue);
     }
 
     #[DataProvider('failOnProvider')]

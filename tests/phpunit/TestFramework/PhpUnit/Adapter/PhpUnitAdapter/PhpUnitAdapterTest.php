@@ -82,7 +82,8 @@ final class PhpUnitAdapterTest extends TestCase
         $this->phpExecutableFinderMock = $this->createMock(PhpExecutableFinder::class);
         $this->phpExecutableFinderMock
             ->method('find')
-            ->willReturn(self::PHP_EXECUTABLE);
+            ->willReturn(self::PHP_EXECUTABLE)
+        ;
 
         $this->adapter = $this->createAdapter(
             <<<'XML'
@@ -96,10 +97,12 @@ final class PhpUnitAdapterTest extends TestCase
     {
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shouldProvide');
+            ->method('shouldProvide')
+        ;
 
         $this->assertSame('PHPUnit', $this->adapter->getName());
     }
@@ -108,10 +111,12 @@ final class PhpUnitAdapterTest extends TestCase
     {
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shouldProvide');
+            ->method('shouldProvide')
+        ;
 
         $this->assertTrue($this->adapter->hasJUnitReport());
     }
@@ -123,7 +128,8 @@ final class PhpUnitAdapterTest extends TestCase
             ->expects($this->once())
             ->method('mustRun')
             ->with([self::PHP_EXECUTABLE, '/path/to/phpunit', '--version'])
-            ->willReturn('PHPUnit 10.5.1 by Sebastian Bergmann and contributors.');
+            ->willReturn('PHPUnit 10.5.1 by Sebastian Bergmann and contributors.')
+        ;
 
         $expected = '10.5.1';
 
@@ -148,10 +154,12 @@ final class PhpUnitAdapterTest extends TestCase
     ): void {
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shouldProvide');
+            ->method('shouldProvide')
+        ;
 
         $actual = $this->adapter->testsPass($output);
 
@@ -165,10 +173,12 @@ final class PhpUnitAdapterTest extends TestCase
     ): void {
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shouldProvide');
+            ->method('shouldProvide')
+        ;
 
         $actual = $this->adapter->isSyntaxError($output);
 
@@ -182,10 +192,12 @@ final class PhpUnitAdapterTest extends TestCase
     ): void {
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shouldProvide');
+            ->method('shouldProvide')
+        ;
 
         $result = $this->adapter->getMemoryUsed($output);
 
@@ -196,10 +208,12 @@ final class PhpUnitAdapterTest extends TestCase
     {
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shouldProvide');
+            ->method('shouldProvide')
+        ;
 
         $options = $this->adapter->getInitialRunOnlyOptions();
 
@@ -217,16 +231,19 @@ final class PhpUnitAdapterTest extends TestCase
             ->expects($this->once())
             // Checking the content of the dumped XML is out of the scope of this test.
             // It is doable, but would be unnecessarily verbose.
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
 
         $this->pcovDirectoryProvider
             ->expects($scenario->skipCoverage ? $this->never() : $this->once())
             ->method('shouldProvide')
-            ->willReturn($scenario->pcovDirectory !== '');
+            ->willReturn($scenario->pcovDirectory !== '')
+        ;
         $this->pcovDirectoryProvider
             ->expects($this->atMost(1))
             ->method('getDirectory')
-            ->willReturn($scenario->pcovDirectory);
+            ->willReturn($scenario->pcovDirectory)
+        ;
 
         $adapter = $this->createAdapter(
             testFrameworkConfigContent: $scenario->testFrameworkConfigContent,
@@ -255,11 +272,13 @@ final class PhpUnitAdapterTest extends TestCase
         $this->fileSystemMock
             ->expects($this->exactly(2))
             // Checking the content of the dumped XML and generated autoload file is out of the scope of this test.
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
 
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shouldProvide');
+            ->method('shouldProvide')
+        ;
 
         $adapter = $this->createAdapter(
             testFrameworkConfigContent: $scenario->testFrameworkConfigContent,

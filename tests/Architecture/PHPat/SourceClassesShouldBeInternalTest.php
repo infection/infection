@@ -56,7 +56,8 @@ final class SourceClassesShouldBeInternalTest
             )
             ->shouldNot()
             ->exist()
-            ->because('Source classes should be marked @internal unless they are extension points.');
+            ->because('Source classes should be marked @internal unless they are extension points.')
+        ;
     }
 
     public function testExtensionPointsAreNotInternal(): Rule
@@ -70,6 +71,7 @@ final class SourceClassesShouldBeInternalTest
             )
             ->shouldNot()
             ->exist()
-            ->because('Extension points should not be tagged @internal.');
+            ->because('Extension points should not be tagged @internal.')
+        ;
     }
 }

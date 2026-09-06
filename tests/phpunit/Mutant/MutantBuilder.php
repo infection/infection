@@ -83,7 +83,8 @@ final class MutantBuilder
             ->withMutatedCode($mutatedCode)
             ->withDiff($diff)
             ->withPrettyPrintedOriginalCode($prettyPrintedOriginalCode)
-            ->build();
+            ->build()
+        ;
     }
 
     public static function withMinimalTestData(): self

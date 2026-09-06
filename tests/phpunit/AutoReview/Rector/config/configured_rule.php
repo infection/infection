@@ -33,12 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+use Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector;
+use Rector\Config\RectorConfig;
 
-/**
- * @internal
- */
-interface InitialConfigBuilder
-{
-    public function build(string $version): string;
-}
+return RectorConfig::configure()
+    ->withRules([VarTagOnParameterToParamTagRector::class])
+;

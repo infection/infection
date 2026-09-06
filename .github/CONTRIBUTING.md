@@ -15,8 +15,8 @@ Contributions are always welcome. Here are a few guidelines to be aware of:
 
 ## Tests
 
-To run the tests locally, you can run `make test`. It, however, requires [Docker][docker]. For more
-granular tests, you can run `make` to see the available commands.
+To run the tests locally, you can run `make test`, or, `make test-docker` to execute the command with [Docker][docker].
+Execute `make` to see the available commands. Most commands have a `-docker` variant.
 
 ### PhpParser visitor tests
 

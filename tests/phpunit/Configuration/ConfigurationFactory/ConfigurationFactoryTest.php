@@ -209,7 +209,8 @@ final class ConfigurationFactoryTest extends TestCase
     public static function valueProvider(): iterable
     {
         $defaultLogsBuilder = LogsBuilder::withMinimalTestData()
-            ->withUseGitHubAnnotationsLogger(true);
+            ->withUseGitHubAnnotationsLogger(true)
+        ;
         $defaultLogs = $defaultLogsBuilder->build();
 
         $defaultSchema = new SchemaConfiguration(
@@ -1656,17 +1657,15 @@ final class ConfigurationFactoryTest extends TestCase
      */
     private static function getDefaultMutators(): array
     {
-        if (self::$mutators === null) {
-            self::$mutators = SingletonContainer::getContainer()
-                ->getMutatorFactory()
-                ->create(
-                    SingletonContainer::getContainer()
-                        ->getMutatorResolver()
-                        ->resolve(['@default' => true]),
-                    false,
-                )
-            ;
-        }
+        self::$mutators ??= SingletonContainer::getContainer()
+            ->getMutatorFactory()
+            ->create(
+                SingletonContainer::getContainer()
+                    ->getMutatorResolver()
+                    ->resolve(['@default' => true]),
+                false,
+            )
+        ;
 
         return self::$mutators;
     }
@@ -1683,7 +1682,8 @@ final class ConfigurationFactoryTest extends TestCase
         $projectDirectoryProviderStub = $this->createStub(ProjectDirectoryProvider::class);
         $projectDirectoryProviderStub
             ->method('provide')
-            ->willReturn($projectDirectory);
+            ->willReturn($projectDirectory)
+        ;
 
         // Report paths living under a "tests" directory as existing on disk so that the
         // positional-paths scenarios can classify them as test paths, while bare values
@@ -1705,6 +1705,7 @@ final class ConfigurationFactoryTest extends TestCase
             $projectDirectoryProviderStub,
             $cpuCoresCountProvider,
             new PositionalPathsClassifier($fileSystem),
+            new FileSystem(),
         );
     }
 }

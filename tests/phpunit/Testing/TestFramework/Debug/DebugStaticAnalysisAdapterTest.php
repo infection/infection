@@ -50,7 +50,8 @@ final class DebugStaticAnalysisAdapterTest extends TestCase
         $phpExecutableFinder = $this->createStub(PhpExecutableFinder::class);
         $phpExecutableFinder
             ->method('find')
-            ->willReturn('/php');
+            ->willReturn('/php')
+        ;
 
         $adapter = new DebugStaticAnalysisAdapter(
             '/debug.php',

@@ -80,9 +80,7 @@ final class Ternary implements Mutator
     {
         $if = $node->if;
 
-        if ($if === null) {
-            $if = $node->cond;
-        }
+        $if ??= $node->cond;
 
         yield new Node\Expr\Ternary($node->cond, $node->else, $if, NodeAttributes::getAllExceptOriginalNode($node));
     }

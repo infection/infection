@@ -94,11 +94,9 @@ final class AddTestsVisitor extends NodeVisitorAbstract
     private function createAllTestsForNodeLocator(Node $node): Closure
     {
         return function () use ($node): array {
-            static $tests;
+            static $tests = null;
 
-            if (!isset($tests)) {
-                $tests = $this->getAllTestsForNode($node);
-            }
+            $tests ??= $this->getAllTestsForNode($node);
 
             return $tests;
         };
