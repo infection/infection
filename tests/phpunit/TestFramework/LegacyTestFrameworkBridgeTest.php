@@ -397,7 +397,8 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         ]);
         $adapter
             ->method('getInitialRunOnlyOptions')
-            ->willReturn(['--configuration']);
+            ->willReturn(['--configuration'])
+        ;
 
         return $adapter;
     }

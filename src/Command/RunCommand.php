@@ -587,8 +587,6 @@ final class RunCommand extends BaseCommand
             $consoleOutput->logNotInControlOfExitCodes();
         }
 
-        $container->getTestFramework()->checkRequirements();
-
         $config = $container->getConfiguration();
 
         $consoleOutput->logRunningWithThreadCount($config->threadCount);

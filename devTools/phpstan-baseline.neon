@@ -148,12 +148,6 @@ parameters:
 			path: ../src/Container/Container.php
 
 		-
-			rawMessage: Infection\Container\Container should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 3
-			path: ../src/Container/Container.php
-
-		-
 			rawMessage: '''
 				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
@@ -271,28 +265,10 @@ parameters:
 			path: ../src/Logger/ArtefactCollection/ConsoleNoProgressLogger.php
 
 		-
-			rawMessage: Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Logger/ArtefactCollection/ConsoleNoProgressLogger.php
-
-		-
 			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
 			identifier: catch.neverThrown
 			count: 1
 			path: ../src/Logger/ArtefactCollection/ConsoleProgressBarLogger.php
-
-		-
-			rawMessage: Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Logger/ArtefactCollection/ConsoleProgressBarLogger.php
-
-		-
-			rawMessage: Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLoggerFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Logger/ArtefactCollection/InitialTestsExecution/InitialTestsExecutionLoggerFactory.php
 
 		-
 			rawMessage: 'Parameter #1 $level (string) of method Infection\Logger\Console\ConsoleLogger::log() should be contravariant with parameter $level (mixed) of method Psr\Log\AbstractLogger::log()'
@@ -539,6 +515,12 @@ parameters:
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
 			count: 1
 			path: ../src/Process/Runner/InitialTestsFailed.php
+
+		-
+			rawMessage: Infection\Process\Runner\InitialTestsRunner should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/Process/Runner/InitialTestsRunner.php
 
 		-
 			rawMessage: 'Method Infection\Reflection\AnonymousClassReflection::__construct() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
@@ -817,10 +799,10 @@ parameters:
 			path: ../src/TestFramework/Coverage/CoverageChecker.php
 
 		-
-			rawMessage: Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			rawMessage: Infection\TestFramework\Coverage\CoverageCheckerFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
 			count: 1
-			path: ../src/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdder.php
+			path: ../src/TestFramework/Coverage/CoverageCheckerFactory.php
 
 		-
 			rawMessage: Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource should not exist
@@ -859,14 +841,14 @@ parameters:
 			path: ../src/TestFramework/Factory.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 

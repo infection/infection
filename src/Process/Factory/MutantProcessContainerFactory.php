@@ -56,11 +56,11 @@ class MutantProcessContainerFactory
 
     private const int TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
 
+    /**
+     * @param list<LazyMutantProcessFactory> $lazyMutantProcessCreators
+     */
     public function __construct(
         private readonly float $timeout,
-        /**
-         * @var list<LazyMutantProcessFactory>
-         */
         private readonly array $lazyMutantProcessCreators,
         private readonly Configuration $configuration,
     ) {
