@@ -40,7 +40,7 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\SourceFilter\FakeSourceFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\Configuration\SourceFilter\SourceFileFilter;
 use Infection\Git\Git;
 use Infection\Source\Collector\BasicSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
@@ -60,7 +60,7 @@ final class SourceCollectorFactoryTest extends TestCase
      */
     #[DataProvider('sourceFilterProvider')]
     public function test_it_can_create_a_collector(
-        ?SourceFilter $sourceFilter,
+        ?SourceFileFilter $sourceFilter,
         Exception|string $exceptionOrExpectedCollectorClassName,
     ): void {
         $factory = new SourceCollectorFactory(
