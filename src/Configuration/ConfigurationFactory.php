@@ -42,7 +42,6 @@ use function array_unique;
 use function array_values;
 use function dirname;
 use function explode;
-use function file_exists;
 use function implode;
 use function in_array;
 use Infection\Configuration\Entry\Logs;
@@ -57,6 +56,7 @@ use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
@@ -105,6 +105,7 @@ class ConfigurationFactory
         private readonly ProjectDirectoryProvider $projectDirectoryProvider,
         private readonly CpuCoresCountProvider $cpuCoresCountProvider,
         private readonly PositionalArgumentsClassifier $positionalArgumentsClassifier,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
@@ -241,7 +242,7 @@ class ConfigurationFactory
             return;
         }
 
-        if (!file_exists($bootstrap)) {
+        if (!$this->fileSystem->exists($bootstrap)) {
             throw FileOrDirectoryNotFound::fromFileName($bootstrap, [__DIR__]);
         }
 

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Config;
 
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -49,10 +50,36 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 {
     private string $baseDir = __DIR__ . '/../../Fixtures/ConfigLocator/';
 
+    public function test_it_looks_up_and_resolves_the_config_file_via_the_injected_file_system(): void
+    {
+        $fileSystemMock = $this->createMock(FileSystem::class);
+        $fileSystemMock
+            ->expects($this->exactly(3))
+            ->method('exists')
+            ->willReturnMap([
+                ['/config-dir/phpunit.xml', false],
+                ['/config-dir/phpunit.yml', false],
+                ['/config-dir/phpunit.xml.dist', true],
+            ])
+        ;
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('realPath')
+            ->with('/config-dir/phpunit.xml.dist')
+            ->willReturn('/resolved/phpunit.xml.dist')
+        ;
+
+        $locator = new TestFrameworkConfigLocator('/config-dir', $fileSystemMock);
+
+        $actual = $locator->locate('phpunit');
+
+        $this->assertSame('/resolved/phpunit.xml.dist', $actual);
+    }
+
     public function test_it_throws_an_error_if_no_config_file_found(): void
     {
         $dir = $this->baseDir . 'NoFiles/';
-        $locator = new TestFrameworkConfigLocator($dir);
+        $locator = new TestFrameworkConfigLocator($dir, new FileSystem());
 
         $this->expectException(FileOrDirectoryNotFound::class);
         $this->expectExceptionMessage(
@@ -68,7 +95,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
     public function test_it_can_find_a_dist_file(): void
     {
         $dir = $this->baseDir . 'DistFile/';
-        $locator = new TestFrameworkConfigLocator($dir);
+        $locator = new TestFrameworkConfigLocator($dir, new FileSystem());
 
         $output = $locator->locate('phpunit');
 
@@ -82,7 +109,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
     public function test_it_can_find_an_alt_dist_file(): void
     {
         $dir = $this->baseDir . 'AltDistFile/';
-        $locator = new TestFrameworkConfigLocator($dir);
+        $locator = new TestFrameworkConfigLocator($dir, new FileSystem());
 
         $output = $locator->locate('phpunit');
 
@@ -96,7 +123,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
     public function test_it_can_find_an_xml_file(): void
     {
         $dir = $this->baseDir . 'XmlFile/';
-        $locator = new TestFrameworkConfigLocator($dir);
+        $locator = new TestFrameworkConfigLocator($dir, new FileSystem());
 
         $output = $locator->locate('phpunit');
 
@@ -110,7 +137,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
     public function test_it_prefers_non_dist_files(): void
     {
         $dir = $this->baseDir . 'BothXmlAndDist/';
-        $locator = new TestFrameworkConfigLocator($dir);
+        $locator = new TestFrameworkConfigLocator($dir, new FileSystem());
 
         $output = $locator->locate('phpunit');
 
@@ -124,7 +151,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
     public function test_config_dir_can_be_overwritten(): void
     {
         $dir = $this->baseDir . 'DistFile/';
-        $locator = new TestFrameworkConfigLocator($dir);
+        $locator = new TestFrameworkConfigLocator($dir, new FileSystem());
 
         $output = $locator->locate('phpunit');
 

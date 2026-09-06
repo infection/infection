@@ -1734,6 +1734,7 @@ final class ConfigurationFactoryTest extends TestCase
             $projectDirectoryProviderStub,
             $cpuCoresCountProvider,
             new PositionalArgumentsClassifier($fileSystem, new SourceSymbolSelectorParser()),
+            new FileSystem(),
         );
     }
 }

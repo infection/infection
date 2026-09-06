@@ -40,18 +40,21 @@ use DOMNode;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
-use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\TestFramework\XML\SafeDOMXPath;
+use Phar;
 use function sprintf;
+use function str_replace;
+use function str_starts_with;
+use function strstr;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-class MutationConfigBuilder extends ConfigBuilder
+final class MutationConfigBuilder
 {
     private ?string $originalBootstrapFile = null;
 
@@ -155,6 +158,33 @@ class MutationConfigBuilder extends ConfigBuilder
             $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutantFilePath),
             $originalAutoloadFile,
         );
+    }
+
+    private function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutantFilePath): string
+    {
+        $infectionPhar = '';
+
+        if (str_starts_with(__FILE__, 'phar:')) {
+            $infectionPhar = sprintf(
+                '\\Phar::loadPhar("%s", "%s");',
+                str_replace('phar://', '', Phar::running(true)),
+                'infection.phar',
+            );
+        }
+
+        $prefix = strstr(__NAMESPACE__, 'Infection', true);
+
+        Assert::string($prefix);
+
+        return <<<CONTENT
+            {$infectionPhar}
+            require_once '{$interceptorPath}';
+
+            use {$prefix}Infection\StreamWrapper\IncludeInterceptor;
+
+            IncludeInterceptor::intercept('{$originalFilePath}', '{$mutantFilePath}');
+            IncludeInterceptor::enable();
+            CONTENT;
     }
 
     private function buildPath(string $mutationHash): string
