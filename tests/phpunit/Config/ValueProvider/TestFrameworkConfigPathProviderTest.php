@@ -39,6 +39,7 @@ use Exception;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Console\IO;
+use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -57,14 +58,19 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
 
     private MockObject&ConsoleHelper $consoleMock;
 
+    private MockObject&FileSystem $fileSystemMock;
+
     protected function setUp(): void
     {
         $this->locatorMock = $this->createMock(TestFrameworkConfigLocatorInterface::class);
         $this->consoleMock = $this->createMock(ConsoleHelper::class);
+        $this->fileSystemMock = $this->createMock(FileSystem::class);
+
         $this->provider = new TestFrameworkConfigPathProvider(
             $this->locatorMock,
             $this->consoleMock,
             $this->getQuestionHelper(),
+            $this->fileSystemMock,
         );
     }
 
@@ -73,6 +79,11 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
         $this->locatorMock
             ->expects($this->once())
             ->method('locate')
+        ;
+
+        $this->fileSystemMock
+            ->expects($this->never())
+            ->method('exists')
         ;
 
         $result = $this->provider->get(
@@ -105,8 +116,16 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
             )
         ;
 
-        // TODO: it would be better to inject the FS to be able to mock rather than relying on such a value
-        $inputPhpUnitPath = __DIR__;
+        $this->expectComposerJsonIsRead();
+
+        $inputPhpUnitPath = '/path/to/phpunit/config';
+
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('isReadableDirectory')
+            ->with($inputPhpUnitPath)
+            ->willReturn(true)
+        ;
 
         $path = $this->provider->get(
             new IO(
@@ -118,7 +137,56 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
         );
 
         $this->assertSame($inputPhpUnitPath, $path);
-        $this->assertDirectoryExists($path);
+    }
+
+    public function test_it_asks_question_without_guessing_when_there_is_no_composer_json(): void
+    {
+        $this->consoleMock
+            ->expects($this->once())
+            ->method('getQuestion')
+            ->willReturn('foobar')
+        ;
+
+        $this->locatorMock
+            ->expects($this->exactly(2))
+            ->method('locate')
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new Exception()),
+                '',
+            )
+        ;
+
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('exists')
+            ->with('composer.json')
+            ->willReturn(false)
+        ;
+
+        $this->fileSystemMock
+            ->expects($this->never())
+            ->method('readFile')
+        ;
+
+        $inputPhpUnitPath = '/path/to/phpunit/config';
+
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('isReadableDirectory')
+            ->with($inputPhpUnitPath)
+            ->willReturn(true)
+        ;
+
+        $path = $this->provider->get(
+            new IO(
+                $this->createStreamableInput($this->getInputStream("{$inputPhpUnitPath}\n")),
+                $this->createStreamOutput(),
+            ),
+            [],
+            'phpunit',
+        );
+
+        $this->assertSame($inputPhpUnitPath, $path);
     }
 
     public function test_it_automatically_guesses_path(): void
@@ -136,6 +204,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
             ->expects($this->never())
             ->method('getQuestion')
         ;
+
+        $this->expectComposerJsonIsRead();
 
         $path = $this->provider->get(
             IO::createNull(),
@@ -162,6 +232,17 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
             )
         ;
 
+        $this->expectComposerJsonIsRead();
+
+        $this->fileSystemMock
+            ->expects($this->exactly(2))
+            ->method('isReadableDirectory')
+            ->willReturnMap([
+                ['abc', false],
+                ['.', true],
+            ])
+        ;
+
         $path = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("abc\n")),
@@ -172,5 +253,22 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
         );
 
         $this->assertSame('.', $path); // fallbacks to default value
+    }
+
+    private function expectComposerJsonIsRead(): void
+    {
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('exists')
+            ->with('composer.json')
+            ->willReturn(true)
+        ;
+
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('readFile')
+            ->with('composer.json')
+            ->willReturn('{}')
+        ;
     }
 }
