@@ -135,6 +135,8 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             'user.name=Infection',
             '-c',
             'user.email=infection@infection.github.io',
+            '-c',
+            'commit.gpgsign=false',
             'commit',
             '--quiet',
             '-m',

@@ -64,6 +64,7 @@ unchecked-exceptions = [
     "PHPUnit\\Exception",
     "Psr\\Container\\ContainerExceptionInterface",
     "Safe\\Exceptions\\SafeExceptionInterface",
+    "Symfony\\Component\\Filesystem\\Exception\\ExceptionInterface",
 ]
 ignore = [
     { code = "unhandled-thrown-type", in = ["tests/"] },
