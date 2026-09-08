@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat;
 
+use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 
@@ -81,6 +83,9 @@ final class AdapterExtractionBoundariesTest
     {
         return PHPat::rule()
             ->classes(InfectionSelector::testFrameworkContractCandidate())
+            // The factory still needs Infection services to construct the legacy PHPUnit bridge
+            // while the adapter extraction in #3290 is in progress.
+            ->excluding(Selector::classname(TestFrameworkFactory::class))
             ->canOnly()
             ->dependOn()
             ->classes(
