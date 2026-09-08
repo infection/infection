@@ -1193,6 +1193,7 @@ final class Container extends DIContainer
         return $this->get(MutantFactory::class);
     }
 
+    // TODO: maybe worth to rename to `::getTestFrameworkFactory()` to make it a bit less ambiguous.
     private function getFactory(): Factory
     {
         return $this->get(Factory::class);

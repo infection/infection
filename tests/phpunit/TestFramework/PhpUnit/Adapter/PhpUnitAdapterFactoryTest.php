@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use Infection\Console\ConsoleOutput;
-use Infection\FileSystem\FileSystem as InfectionFileSystem;
+use Infection\FileSystem\FileSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\SymfonyProcessShellCommandRunner;
@@ -49,7 +49,6 @@ use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
 #[CoversClass(PhpUnitAdapterFactory::class)]
@@ -58,7 +57,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
     public function test_it_can_create_an_adapter(): void
     {
         $configuration = ConfigurationBuilder::withMinimalTestData()->build();
-        $fileSystem = $this->createStub(InfectionFileSystem::class);
+        $fileSystem = $this->createStub(FileSystem::class);
 
         $adapter = PhpUnitAdapterFactory::create(
             '/path/to/phpunit',
@@ -71,7 +70,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             true,
             shellCommandRunner: new SymfonyProcessShellCommandRunner(),
             sourceDirectoryBasePath: '/path/to/project',
-            fileSystem: new Filesystem(),
+            fileSystem: new FileSystem(),
             consoleOutput: $this->createStub(ConsoleOutput::class),
             coverageCheckerFactory: new CoverageCheckerFactory(
                 $configuration,

@@ -3361,12 +3361,6 @@ message = 'Class `Infection\TestFramework\LegacyTestFrameworkBridge` is deprecat
 count = 1
 
 [[issues]]
-file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
-code = "unused-parameter"
-message = "Parameter `$skipCoverage` is never used."
-count = 1
-
-[[issues]]
 file = "src/TestFramework/PhpUnit/CommandLine/ArgumentsAndOptionsBuilder.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder::createFilterString`: expected `non-empty-string`, but found `null|truthy-string`.'

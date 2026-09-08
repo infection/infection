@@ -153,7 +153,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
     }
 
     /**
-     * @param string[] $sourceDirectories
+     * @param non-empty-array<string> $sourceDirectories
      * @param SplFileInfo[] $filteredSourceFilesToMutate
      */
     private static function createLegacy(
