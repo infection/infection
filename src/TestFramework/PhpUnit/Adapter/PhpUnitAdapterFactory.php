@@ -99,6 +99,14 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         ?MutantProcessContainerFactory $processFactory = null,
         ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter = null,
     ): TestFramework {
+        Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
+        Assert::notEmpty(
+            $sourceDirectories,
+            'The source directories cannot be empty. This indicates that an invalid configuration reached the test framework adapter factory.',
+        );
+        Assert::notNull($shellCommandRunner);
+        Assert::notNull($sourceDirectoryBasePath);
+        Assert::notNull($fileSystem);
         Assert::notNull($consoleOutput);
         Assert::notNull($coverageCheckerFactory);
         Assert::notNull($initialTestsRunner);
@@ -114,7 +122,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $jUnitFilePath,
             $projectDir,
             $sourceDirectories,
-            $skipCoverage,
             $executeOnlyCoveringTestCases,
             $filteredSourceFilesToMutate,
             $mapSourceClassToTestStrategy,
@@ -153,28 +160,18 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         string $testFrameworkExecutable,
         string $tmpDir,
         string $testFrameworkConfigPath,
-        ?string $testFrameworkConfigDir,
+        string $testFrameworkConfigDir,
         string $jUnitFilePath,
         string $projectDir,
         array $sourceDirectories,
-        bool $skipCoverage,
-        bool $executeOnlyCoveringTestCases = false,
-        array $filteredSourceFilesToMutate = [],
-        ?string $mapSourceClassToTestStrategy = null,
-        ?ShellCommandRunner $shellCommandRunner = null,
-        ?string $sourceDirectoryBasePath = null,
-        bool $useWindowsFilterLimit = false,
-        ?Filesystem $fileSystem = null,
+        bool $executeOnlyCoveringTestCases,
+        array $filteredSourceFilesToMutate,
+        ?string $mapSourceClassToTestStrategy,
+        ShellCommandRunner $shellCommandRunner,
+        string $sourceDirectoryBasePath,
+        bool $useWindowsFilterLimit,
+        Filesystem $fileSystem,
     ): TestFrameworkAdapter {
-        Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
-        Assert::notEmpty(
-            $sourceDirectories,
-            'The source directories cannot be empty. This indicates that an invalid configuration reached the test framework adapter factory.',
-        );
-        Assert::notNull($shellCommandRunner);
-        Assert::notNull($sourceDirectoryBasePath);
-        Assert::notNull($fileSystem);
-
         $testFrameworkConfigContent = $fileSystem->readFile($testFrameworkConfigPath);
 
         $configManipulator = new XmlConfigurationManipulator(
