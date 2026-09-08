@@ -40,12 +40,18 @@ use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
+use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\TestFrameworkFactory;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
@@ -77,10 +83,32 @@ final readonly class Factory
         private array $installedExtensions,
         private ShellCommandRunner $shellCommandRunner,
         private FileSystem $fileSystem,
+        private ConsoleOutput $consoleOutput,
+        private CoverageCheckerFactory $coverageCheckerFactory,
+        private InitialTestsRunner $initialTestsRunner,
+        private MutantProcessContainerFactory $containerFactory,
+        private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
     ) {
     }
 
-    public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
+    public function create(string $adapterName, bool $skipCoverage): TestFramework
+    {
+        $testFramework = $this->createTestFramework($adapterName, $skipCoverage);
+
+        return $testFramework instanceof TestFramework
+            ? $testFramework
+            : new LegacyTestFrameworkBridge(
+                $testFramework,
+                $this->consoleOutput,
+                $this->coverageCheckerFactory->create($testFramework),
+                $this->initialTestsRunner,
+                $this->infectionConfig,
+                $this->containerFactory,
+                $this->extraOptionsFilter,
+            );
+    }
+
+    private function createTestFramework(string $adapterName, bool $skipCoverage): TestFramework|TestFrameworkAdapter
     {
         if ($adapterName === TestFrameworkTypes::DEBUG) {
             return new DebugTestFrameworkAdapter(
@@ -112,6 +140,12 @@ final readonly class Factory
                 sourceDirectoryBasePath: dirname($this->infectionConfig->configurationPathname),
                 useWindowsFilterLimit: OperatingSystem::isWindows(),
                 fileSystem: $this->fileSystem,
+                consoleOutput: $this->consoleOutput,
+                coverageCheckerFactory: $this->coverageCheckerFactory,
+                initialTestsRunner: $this->initialTestsRunner,
+                configuration: $this->infectionConfig,
+                processFactory: $this->containerFactory,
+                testFrameworkExtraOptionsFilter: $this->extraOptionsFilter,
             );
         }
 
@@ -122,7 +156,10 @@ final readonly class Factory
 
             Assert::classExists($factory);
 
-            if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
+            if (
+                !is_a($factory, TestFrameworkFactory::class, true)
+                && !is_a($factory, TestFrameworkAdapterFactory::class, true)
+            ) {
                 continue;
             }
 

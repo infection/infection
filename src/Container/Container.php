@@ -173,7 +173,6 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
-use Infection\TestFramework\LegacyTestFrameworkBridge;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
@@ -314,6 +313,11 @@ final class Container extends DIContainer
                     GeneratedExtensionsConfig::EXTENSIONS,
                     $container->getShellCommandRunner(),
                     $container->getFileSystem(),
+                    $container->get(ConsoleOutput::class),
+                    $container->getCoverageCheckerFactory(),
+                    $container->getInitialTestsRunner(),
+                    $container->getMutantProcessContainerFactory(),
+                    $container->getTestFrameworkExtraOptionsFilter(),
                 );
             },
             StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
@@ -647,19 +651,10 @@ final class Container extends DIContainer
             ),
             TestFramework::class => static function (self $container): TestFramework {
                 $config = $container->getConfiguration();
-                $adapter = $container->getFactory()->create(
+
+                return $container->getFactory()->create(
                     $config->testFramework,
                     $config->skipCoverage,
-                );
-
-                return new LegacyTestFrameworkBridge(
-                    $adapter,
-                    $container->get(ConsoleOutput::class),
-                    $container->getCoverageCheckerFactory()->create($adapter),
-                    $container->getInitialTestsRunner(),
-                    $config,
-                    $container->getMutantProcessContainerFactory(),
-                    $container->getTestFrameworkExtraOptionsFilter(),
                 );
             },
         ]);
