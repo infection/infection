@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\Matcher;
+namespace Infection\Source\MatcherLine;
 
 /**
  * Default implementation that corresponds to "matches everything".

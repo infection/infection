@@ -46,7 +46,7 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\Configuration\SourceFilter\SourceFileFilter;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
@@ -68,7 +68,7 @@ final class ConfigurationBuilder
     private function __construct(
         private float $timeout,
         private Source $source,
-        private ?SourceFilter $sourceFilter,
+        private ?SourceFileFilter $sourceFilter,
         private Logs $logs,
         private string $logVerbosity,
         private string $tmpDir,
@@ -313,7 +313,7 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withSourceFilter(?SourceFilter $sourceFilter): self
+    public function withSourceFilter(?SourceFileFilter $sourceFilter): self
     {
         $clone = clone $this;
         $clone->sourceFilter = $sourceFilter;
