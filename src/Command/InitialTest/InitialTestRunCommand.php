@@ -45,6 +45,8 @@ use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Command\Option\TestFrameworkOption;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
 use Infection\Logger\Console\ConsoleLogger;
 
 /**
@@ -90,6 +92,24 @@ final class InitialTestRunCommand extends BaseCommand
             sourceFilter: new IncompleteGitDiffFilter($inputFilter, $inputBase),
         );
 
+        // TODO: this is not very elegant but done this way for now to keep the same behaviour
+        //   as we migrate to the new test framework API.
+        $container->getEventDispatcher()->addSubscriber(
+            new readonly class($io) implements InitialTestSuiteWasStartedSubscriber {
+                public function __construct(
+                    private IO $io,
+                ) {
+                }
+
+                public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
+                {
+                    $this->io->writeln([
+                        'Command executed:',
+                        $event->commandLine,
+                    ]);
+                }
+            },
+        );
         $container->getSubscriberRegisterer()->registerSubscribers();
 
         $container->getTestFramework()->executeInitialRun();

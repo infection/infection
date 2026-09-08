@@ -38,6 +38,9 @@ namespace Infection\Tests\Command\InitialTest;
 use Infection\Command\InitialTest\InitialTestRunCommand;
 use Infection\Console\Application;
 use Infection\Container\Container;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Framework\Str;
 use Infection\Git\Git;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -47,6 +50,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
 use function Safe\chdir;
 use function Safe\getcwd;
@@ -55,6 +59,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 #[AllowMockObjectsWithoutExpectations]
 #[Group('integration')]
+#[WithEnvironmentVariable('GITHUB_ACTIONS', 'true')]
 #[CoversClass(InitialTestRunCommand::class)]
 final class InitialTestRunCommandTest extends TestCase
 {
@@ -101,7 +106,10 @@ final class InitialTestRunCommandTest extends TestCase
         yield 'default parameters with successful tests' => [
             'arguments' => [],
             'expectedStdout' => <<<STDOUT
+                Command executed:
+                test-framework initialConfig
 
+                Running initial tests with DemoTestFramework version 1.0
 
                  [OK] Initial test run successfully executed.
 
@@ -111,7 +119,10 @@ final class InitialTestRunCommandTest extends TestCase
 
                 STDERR,
             'expectedDisplay' => <<<DISPLAY
+                Command executed:
+                test-framework initialConfig
 
+                Running initial tests with DemoTestFramework version 1.0
 
                  [OK] Initial test run successfully executed.
 
@@ -169,19 +180,29 @@ final class InitialTestRunCommandTest extends TestCase
         ;
 
         $testFrameworkMock = $this->createMock(TestFramework::class);
+        $testFrameworkMock->method('getName')->willReturn('DemoTestFramework');
+        $testFrameworkMock->method('getVersion')->willReturn('1.0');
+        $eventDispatcher = new SyncEventDispatcher();
         $executeInitialRunExpectation = $testFrameworkMock
-            ->expects($failure === null ? $this->exactly(2) : $this->once())
+            ->expects($this->once())
             ->method('executeInitialRun')
         ;
 
         if ($failure !== null) {
             $executeInitialRunExpectation->willThrowException($failure);
         } else {
-            $executeInitialRunExpectation->willReturn(new InitialRunResults('', null));
+            $executeInitialRunExpectation->willReturnCallback(
+                static function () use ($eventDispatcher): InitialRunResults {
+                    $eventDispatcher->dispatch(new InitialTestSuiteWasStarted('test-framework initialConfig'));
+
+                    return new InitialRunResults('', null);
+                },
+            );
         }
 
         $container = Container::create()
             ->cloneWithService(Git::class, $gitMock)
+            ->cloneWithService(EventDispatcher::class, $eventDispatcher)
             ->cloneWithService(TestFramework::class, $testFrameworkMock)
         ;
 
@@ -213,15 +234,16 @@ final class InitialTestRunCommandTest extends TestCase
         $stdout = Str::rTrimLines($commandTester->getDisplay(normalize: true));
         $stderr = Str::rTrimLines($commandTester->getErrorOutput(normalize: true));
 
-        $commandTester->execute(
+        $secondCommandTester = $this->createCommandTester();
+        $secondCommandTester->execute(
             $arguments,
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
             ],
         );
 
-        $commandTester->assertCommandIsSuccessful();
-        $display = Str::rTrimLines($commandTester->getDisplay(normalize: true));
+        $secondCommandTester->assertCommandIsSuccessful();
+        $display = Str::rTrimLines($secondCommandTester->getDisplay(normalize: true));
 
         return [
             $stdout,

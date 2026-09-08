@@ -71,7 +71,7 @@ class InitialTestsRunner
             $skipCoverage,
         );
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted());
+        $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted($process->getCommandLine()));
 
         $process->run(function (string $type) use ($process): void {
             if ($type === Process::ERR) {

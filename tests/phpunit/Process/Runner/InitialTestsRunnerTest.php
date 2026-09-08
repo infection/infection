@@ -112,6 +112,7 @@ final class InitialTestsRunnerTest extends TestCase
             ],
             array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
         );
+        $this->assertSame($process->getCommandLine(), $this->eventDispatcher->getEvents()[0]->commandLine);
     }
 
     public function test_it_stops_the_process_execution_on_the_first_error(): void

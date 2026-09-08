@@ -805,6 +805,15 @@ parameters:
 			path: ../src/TestFramework/Coverage/CoverageCheckerFactory.php
 
 		-
+			rawMessage: '''
+				Call to deprecated method hasJUnitReport() of interface Infection\TestFramework\Contracts\TestFramework:
+				This is only for making the migration easier, to be removed.
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: ../src/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdder.php
+
+		-
 			rawMessage: Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
