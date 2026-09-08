@@ -69,13 +69,10 @@ final class InMemoryFileSystem extends FileSystem
      */
     private array $directories = [];
 
-    // An original instance we keep around for operations that are safe to delegate to keep the
-    // behaviour as close as the original.
-    private FileSystem $fileSystem;
-
-    public function __construct()
-    {
-        $this->fileSystem = new FileSystem();
+    public function __construct(
+        // Beware of not do any write operations with this instance.
+        private readonly FileSystem $fileSystem = new FileSystem(),
+    ) {
     }
 
     #[Override]
