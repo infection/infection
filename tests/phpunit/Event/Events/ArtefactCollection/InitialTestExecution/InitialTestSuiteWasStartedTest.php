@@ -42,13 +42,10 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(InitialTestSuiteWasStarted::class)]
 final class InitialTestSuiteWasStartedTest extends TestCase
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_instantiated(): void
+    public function test_it_exposes_the_command_line(): void
     {
-        $class = new InitialTestSuiteWasStarted();
+        $event = new InitialTestSuiteWasStarted('phpunit --configuration phpunit.xml');
 
-        $this->assertInstanceOf(InitialTestSuiteWasStarted::class, $class);
+        $this->assertSame('phpunit --configuration phpunit.xml', $event->commandLine);
     }
 }

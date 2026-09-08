@@ -129,12 +129,13 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
     public function test_it_executes_initial_run_and_reports_memory_usage(): void
     {
         $process = $this->createSuccessfulInitialRunProcess('output');
+        $adapter = new FakeAwareAdapter(42.0);
 
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with('', [''], false)
+            ->with($adapter, '', [''], false)
             ->willReturn($process)
         ;
 
@@ -146,7 +147,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         ;
 
         $testFramework = $this->createTestFramework(
-            adapter: new FakeAwareAdapter(42.0),
+            adapter: $adapter,
             coverageChecker: $coverageChecker,
             initialTestsRunner: $initialTestsRunner,
         );
@@ -164,16 +165,18 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
     public function test_it_forwards_initial_run_options(): void
     {
         $process = $this->createSuccessfulInitialRunProcess('output');
+        $adapter = new DummyTestFrameworkAdapter();
 
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with('--verbose', ['-d', 'memory_limit=1G'], true)
+            ->with($adapter, '--verbose', ['-d', 'memory_limit=1G'], true)
             ->willReturn($process)
         ;
 
         $testFramework = $this->createTestFramework(
+            adapter: $adapter,
             initialTestsRunner: $initialTestsRunner,
             initialTestsPhpOptions: '-d memory_limit=1G',
             testFrameworkExtraOptions: '--verbose',
@@ -259,16 +262,17 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
     {
         $mutant = MutantBuilder::withMinimalTestData()->build();
         $processContainer = $this->createStub(MutantProcessContainer::class);
+        $adapter = new DummyTestFrameworkAdapter();
 
         $processFactoryMock = $this->createMock(MutantProcessContainerFactory::class);
         $processFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with($mutant, '')
+            ->with($adapter, $mutant, '')
             ->willReturn($processContainer)
         ;
 
-        $testFramework = $this->createTestFramework(processFactory: $processFactoryMock);
+        $testFramework = $this->createTestFramework(adapter: $adapter, processFactory: $processFactoryMock);
 
         $actual = $testFramework->test($mutant);
 
@@ -279,12 +283,13 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
     {
         $mutant = MutantBuilder::withMinimalTestData()->build();
         $processContainer = $this->createStub(MutantProcessContainer::class);
+        $adapter = $this->createInitialRunOnlyOptionsAdapter();
 
         $processFactoryMock = $this->createMock(MutantProcessContainerFactory::class);
         $processFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with($mutant, '--filter FooTest')
+            ->with($adapter, $mutant, '--filter FooTest')
             ->willReturn($processContainer)
         ;
 
@@ -297,7 +302,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         ;
 
         $testFramework = $this->createTestFramework(
-            adapter: $this->createInitialRunOnlyOptionsAdapter(),
+            adapter: $adapter,
             processFactory: $processFactoryMock,
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter,
             testFrameworkExtraOptions: '--configuration phpunit.xml --filter FooTest',

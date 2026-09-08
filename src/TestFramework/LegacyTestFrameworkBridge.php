@@ -81,6 +81,8 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
     {
         // TODO: check supported version
 
+        $this->coverageChecker->checkCoverageRequirements();
+
         if ($this->config->skipInitialTests) {
             $this->consoleOutput->logSkippingInitialTests();
             $this->coverageChecker->checkCoverageExists();
@@ -90,6 +92,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
     public function executeInitialRun(): InitialRunResults
     {
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
+            $this->adapter,
             $this->config->testFrameworkExtraOptions,
             $this->getInitialTestsPhpOptionsArray(),
             $this->config->skipCoverage,
@@ -122,9 +125,15 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
     public function test(Mutant $mutant): MutantProcessContainer
     {
         return $this->processFactory->create(
+            $this->adapter,
             $mutant,
             $this->getFilteredExtraOptionsForMutant(),
         );
+    }
+
+    public function hasJUnitReport(): bool
+    {
+        return $this->adapter->hasJUnitReport();
     }
 
     /**

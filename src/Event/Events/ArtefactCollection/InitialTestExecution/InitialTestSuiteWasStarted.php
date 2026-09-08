@@ -40,4 +40,8 @@ namespace Infection\Event\Events\ArtefactCollection\InitialTestExecution;
  */
 final readonly class InitialTestSuiteWasStarted
 {
+    public function __construct(
+        public string $commandLine,
+    ) {
+    }
 }
