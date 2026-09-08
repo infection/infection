@@ -69,6 +69,12 @@ final class InMemoryFileSystem extends FileSystem
      */
     private array $directories = [];
 
+    public function __construct(
+        // Beware of not do any write operations with this instance.
+        private readonly FileSystem $fileSystem = new FileSystem(),
+    ) {
+    }
+
     #[Override]
     public function dumpFile(string $filename, $content = ''): void
     {
@@ -223,7 +229,7 @@ final class InMemoryFileSystem extends FileSystem
     #[Override]
     public function isAbsolutePath(string $file): bool
     {
-        throw new DomainException('Unexpected call.');
+        return $this->fileSystem->isAbsolutePath($file);
     }
 
     #[Override]

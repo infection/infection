@@ -5125,30 +5125,6 @@ message = 'Invalid return type for function `Infection\Tests\TestFramework\Legac
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "non-existent-property"
-message = "Property `$value` does not exist on class `DOMNameSpaceNode`."
-count = 4
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "non-existent-property"
-message = "Property `$value` does not exist on class `DOMNode`."
-count = 4
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "possibly-null-argument"
-message = 'Argument #1 of method `Symfony\Component\Filesystem\Path::normalize` is possibly `null`, but parameter type `string` does not accept it.'
-count = 2
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "invalid-return-statement"
-message = "Invalid return type for function `{closure:tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php:580:13}`: expected `string`, but found `null|string`."
-count = 1
-
-[[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #2 of `Safe\exec`: expected `array<array-key, mixed>|null`, but found `mixed`.'
@@ -5158,24 +5134,6 @@ count = 1
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #3 of `Safe\exec`: expected `int|null`, but found `mixed`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "non-existent-property"
-message = "Property `$value` does not exist on class `DOMNameSpaceNode`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "non-existent-property"
-message = "Property `$value` does not exist on class `DOMNode`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "nullable-return-statement"
-message = "Function `{closure:tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php:580:13}` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`)."
 count = 1
 
 [[issues]]
