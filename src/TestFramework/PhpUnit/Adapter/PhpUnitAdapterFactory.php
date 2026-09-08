@@ -49,7 +49,7 @@ use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
-use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
@@ -93,39 +93,41 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         bool $useWindowsFilterLimit = false,
         ?Filesystem $fileSystem = null,
         ?ConsoleOutput $consoleOutput = null,
-        ?CoverageChecker $coverageChecker = null,
+        ?CoverageCheckerFactory $coverageCheckerFactory = null,
         ?InitialTestsRunner $initialTestsRunner = null,
         ?Configuration $configuration = null,
         ?MutantProcessContainerFactory $processFactory = null,
         ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter = null,
     ): TestFramework {
         Assert::notNull($consoleOutput);
-        Assert::notNull($coverageChecker);
+        Assert::notNull($coverageCheckerFactory);
         Assert::notNull($initialTestsRunner);
         Assert::notNull($configuration);
         Assert::notNull($processFactory);
         Assert::notNull($testFrameworkExtraOptionsFilter);
 
+        $legacyAdapter = self::createLegacy(
+            $testFrameworkExecutable,
+            $tmpDir,
+            $testFrameworkConfigPath,
+            $testFrameworkConfigDir,
+            $jUnitFilePath,
+            $projectDir,
+            $sourceDirectories,
+            $skipCoverage,
+            $executeOnlyCoveringTestCases,
+            $filteredSourceFilesToMutate,
+            $mapSourceClassToTestStrategy,
+            $shellCommandRunner,
+            $sourceDirectoryBasePath,
+            $useWindowsFilterLimit,
+            $fileSystem,
+        );
+
         return new LegacyTestFrameworkBridge(
-            self::createLegacy(
-                $testFrameworkExecutable,
-                $tmpDir,
-                $testFrameworkConfigPath,
-                $testFrameworkConfigDir,
-                $jUnitFilePath,
-                $projectDir,
-                $sourceDirectories,
-                $skipCoverage,
-                $executeOnlyCoveringTestCases,
-                $filteredSourceFilesToMutate,
-                $mapSourceClassToTestStrategy,
-                $shellCommandRunner,
-                $sourceDirectoryBasePath,
-                $useWindowsFilterLimit,
-                $fileSystem,
-            ),
+            $legacyAdapter,
             consoleOutput: $consoleOutput,
-            coverageChecker: $coverageChecker,
+            coverageChecker: $coverageCheckerFactory->create($legacyAdapter),
             initialTestsRunner: $initialTestsRunner,
             config: $configuration,
             processFactory: $processFactory,
@@ -133,11 +135,21 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         );
     }
 
+    public static function getAdapterName(): string
+    {
+        return 'phpunit';
+    }
+
+    public static function getExecutableName(): string
+    {
+        return 'phpunit';
+    }
+
     /**
      * @param string[] $sourceDirectories
      * @param SplFileInfo[] $filteredSourceFilesToMutate
      */
-    public static function createLegacy(
+    private static function createLegacy(
         string $testFrameworkExecutable,
         string $tmpDir,
         string $testFrameworkConfigPath,
@@ -218,16 +230,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
                 new PhpExecutableFinder(),
             ),
         );
-    }
-
-    public static function getAdapterName(): string
-    {
-        return 'phpunit';
-    }
-
-    public static function getExecutableName(): string
-    {
-        return 'phpunit';
     }
 
     /**

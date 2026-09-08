@@ -44,7 +44,9 @@ use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
-use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -119,19 +121,26 @@ final class FactoryTest extends TestCase
      */
     private function createFactory(array $installedExtensions = []): Factory
     {
+        $configuration = ConfigurationBuilder::withMinimalTestData()->build();
+        $fileSystem = $this->createStub(FileSystem::class);
+
         return new Factory(
             '',
             '',
             $this->createStub(TestFrameworkConfigLocatorInterface::class),
             $this->createStub(TestFrameworkFinder::class),
             '',
-            ConfigurationBuilder::withMinimalTestData()->build(),
+            $configuration,
             new FakeSourceCollector(),
             $installedExtensions,
             $this->createStub(ShellCommandRunner::class),
-            $this->createStub(FileSystem::class),
+            $fileSystem,
             $this->createStub(ConsoleOutput::class),
-            fn () => $this->createStub(CoverageChecker::class),
+            new CoverageCheckerFactory(
+                $configuration,
+                JUnitReportLocator::create($fileSystem, ''),
+                IndexXmlCoverageLocator::create($fileSystem, ''),
+            ),
             $this->createStub(InitialTestsRunner::class),
             $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),

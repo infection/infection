@@ -39,7 +39,6 @@ use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
 use function dirname;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
@@ -162,7 +161,7 @@ use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
-use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
@@ -295,6 +294,11 @@ final class Container extends DIContainer
                 [$container->getProjectDir()],
                 $container->getFileSystem(),
             ),
+            CoverageCheckerFactory::class => static fn (self $container): CoverageCheckerFactory => new CoverageCheckerFactory(
+                $container->getConfiguration(),
+                $container->getJUnitReportLocator(),
+                $container->getIndexXmlCoverageLocator(),
+            ),
             Factory::class => static function (self $container): Factory {
                 $config = $container->getConfiguration();
 
@@ -310,20 +314,7 @@ final class Container extends DIContainer
                     $container->getShellCommandRunner(),
                     $container->getFileSystem(),
                     $container->get(ConsoleOutput::class),
-                    static function (TestFrameworkAdapter $adapter) use ($container): CoverageChecker {
-                        $config = $container->getConfiguration();
-
-                        return new CoverageChecker(
-                            $config->skipCoverage,
-                            $config->skipInitialTests,
-                            $config->initialTestsPhpOptions ?? '',
-                            $config->coveragePath,
-                            $adapter->hasJUnitReport(),
-                            $container->getJUnitReportLocator(),
-                            $adapter->getName(),
-                            $container->getIndexXmlCoverageLocator(),
-                        );
-                    },
+                    $container->getCoverageCheckerFactory(),
                     $container->getInitialTestsRunner(),
                     $container->getMutantProcessContainerFactory(),
                     $container->getTestFrameworkExtraOptionsFilter(),
@@ -1087,6 +1078,11 @@ final class Container extends DIContainer
     public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
     {
         return $this->get(RootsFileOrDirectoryLocator::class);
+    }
+
+    public function getCoverageCheckerFactory(): CoverageCheckerFactory
+    {
+        return $this->get(CoverageCheckerFactory::class);
     }
 
     public function getEventDispatcher(): EventDispatcher

@@ -139,12 +139,6 @@ parameters:
 			path: ../src/Container/Container.php
 
 		-
-			rawMessage: Infection\Container\Container should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 2
@@ -837,7 +831,7 @@ parameters:
 		-
 			rawMessage: Infection\TestFramework\Factory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 2
+			count: 1
 			path: ../src/TestFramework/Factory.php
 
 		-
@@ -925,7 +919,7 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\Coverage\CoverageChecker
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\Coverage\CoverageCheckerFactory
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
@@ -1628,6 +1622,15 @@ parameters:
 
 		-
 			rawMessage: '''
+				Call to deprecated method getExecutableName() of class Infection\Tests\TestFramework\Factory\ConfigurableTestFrameworkFactory:
+				It is here only to smoothen the migration, should be removed.
+			'''
+			identifier: staticMethod.deprecated
+			count: 3
+			path: ../tests/phpunit/TestFramework/Factory/ConfigurableTestFrameworkFactoryTest.php
+
+		-
+			rawMessage: '''
 				Access to constant on deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
@@ -1706,6 +1709,15 @@ parameters:
 			identifier: return.deprecatedClass
 			count: 1
 			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method getExecutableName() of class Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory:
+				It is here only to smoothen the migration, should be removed.
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactoryTest.php
 
 		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.

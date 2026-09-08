@@ -61,5 +61,8 @@ interface TestFrameworkFactory
      */
     public static function getAdapterName(): string;
 
+    /**
+     * @deprecated It is here only to smoothen the migration, should be removed.
+     */
     public static function getExecutableName(): string;
 }

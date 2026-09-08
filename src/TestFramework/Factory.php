@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Closure;
 use function dirname;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -52,7 +51,7 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
-use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
@@ -72,7 +71,6 @@ final readonly class Factory
 
     /**
      * @param array<string, array<string, mixed>> $installedExtensions
-     * @param Closure(TestFrameworkAdapter):CoverageChecker $coverageCheckerFactory
      */
     public function __construct(
         private string $tmpDir,
@@ -86,7 +84,7 @@ final readonly class Factory
         private ShellCommandRunner $shellCommandRunner,
         private FileSystem $fileSystem,
         private ConsoleOutput $consoleOutput,
-        private Closure $coverageCheckerFactory,
+        private CoverageCheckerFactory $coverageCheckerFactory,
         private InitialTestsRunner $initialTestsRunner,
         private MutantProcessContainerFactory $containerFactory,
         private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
@@ -102,7 +100,7 @@ final readonly class Factory
             : new LegacyTestFrameworkBridge(
                 $testFramework,
                 $this->consoleOutput,
-                ($this->coverageCheckerFactory)($testFramework),
+                $this->coverageCheckerFactory->create($testFramework),
                 $this->initialTestsRunner,
                 $this->infectionConfig,
                 $this->containerFactory,
@@ -123,7 +121,7 @@ final readonly class Factory
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
-            return PhpUnitAdapterFactory::createLegacy(
+            return PhpUnitAdapterFactory::create(
                 $this->testFrameworkFinder->find(
                     TestFrameworkTypes::PHPUNIT,
                     (string) $this->infectionConfig->phpUnit->customPath,
@@ -142,6 +140,12 @@ final readonly class Factory
                 sourceDirectoryBasePath: dirname($this->infectionConfig->configurationPathname),
                 useWindowsFilterLimit: OperatingSystem::isWindows(),
                 fileSystem: $this->fileSystem,
+                consoleOutput: $this->consoleOutput,
+                coverageCheckerFactory: $this->coverageCheckerFactory,
+                initialTestsRunner: $this->initialTestsRunner,
+                configuration: $this->infectionConfig,
+                processFactory: $this->containerFactory,
+                testFrameworkExtraOptionsFilter: $this->extraOptionsFilter,
             );
         }
 
