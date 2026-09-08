@@ -36,8 +36,16 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Factory;
 
 use Infection\CannotBeInstantiated;
+use Infection\Configuration\Configuration;
+use Infection\Console\ConsoleOutput;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
 final class ConfigurableTestFrameworkFactory implements TestFrameworkFactory
@@ -76,9 +84,6 @@ final class ConfigurableTestFrameworkFactory implements TestFrameworkFactory
         self::$executableName = null;
     }
 
-    /**
-     * @param array<array-key, mixed> $sourceDirectories
-     */
     public static function create(
         string $testFrameworkExecutable,
         string $tmpDir,
@@ -88,6 +93,19 @@ final class ConfigurableTestFrameworkFactory implements TestFrameworkFactory
         string $projectDir,
         array $sourceDirectories,
         bool $skipCoverage,
+        bool $executeOnlyCoveringTestCases,
+        array $filteredSourceFilesToMutate,
+        ?string $mapSourceClassToTestStrategy,
+        ShellCommandRunner $shellCommandRunner,
+        string $sourceDirectoryBasePath,
+        bool $useWindowsFilterLimit,
+        Filesystem $fileSystem,
+        ConsoleOutput $consoleOutput,
+        CoverageCheckerFactory $coverageCheckerFactory,
+        InitialTestsRunner $initialTestsRunner,
+        Configuration $configuration,
+        MutantProcessContainerFactory $processFactory,
+        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         $testFramework = self::$testFramework;
         Assert::notNull($testFramework, self::NOT_CONFIGURED_MESSAGE);
