@@ -33,26 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\Matcher;
-
-use Infection\Source\Exception\NoSourceFound;
+namespace Infection\TestFramework\Contracts;
 
 /**
- * Determines whether a specific line range in a file matches certain criteria.
+ * Defines how Infection discovers a test framework and creates it from the project's test-run configuration.
  *
  * @internal
  */
-interface SourceLineMatcher
+interface TestFrameworkFactory
 {
     /**
-     * Checks whether the specified line range in the given file matches the
-     * criteria defined by this matcher.
-     *
-     * @param string $fileRealPath Absolute path to the file to check.
-     * @param positive-int $startLine Starting line number of the range (inclusive).
-     * @param positive-int $endLine Ending line number of the range (inclusive).
-     *
-     * @throws NoSourceFound
+     * @param string[] $sourceDirectories
      */
-    public function touches(string $fileRealPath, int $startLine, int $endLine): bool;
+    public static function create(
+        string $testFrameworkExecutable,
+        string $tmpDir,
+        string $testFrameworkConfigPath,
+        ?string $testFrameworkConfigDir,
+        string $jUnitFilePath,
+        string $projectDir,
+        array $sourceDirectories,
+        bool $skipCoverage,
+    ): TestFramework;
+
+    /**
+     * Returns the identifier Infection uses to discover and select this test framework.
+     */
+    public static function getAdapterName(): string;
+
+    /**
+     * @deprecated It is here only to smoothen the migration, should be removed.
+     */
+    public static function getExecutableName(): string;
 }

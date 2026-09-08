@@ -33,14 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
+namespace Infection\Source\MatcherLine;
 
 /**
- * @internal
+ * Default implementation that corresponds to "matches everything".
  *
- * Represents a filter to apply to the configured source to reduce the scope of the eligible files and/or code
- * to mutate.
+ * This is typically used if there is no filtering done on the source, or if
+ * that filter filters files but does not apply to lines.
+ *
+ * @internal
  */
-interface SourceFilter
+final class NullSourceLineMatcher implements SourceLineMatcher
 {
+    public function touches(string $fileRealPath, int $startLine, int $endLine): bool
+    {
+        return true;
+    }
 }

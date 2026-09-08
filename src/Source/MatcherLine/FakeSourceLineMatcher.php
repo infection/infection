@@ -33,31 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
+namespace Infection\Source\MatcherLine;
 
-use Infection\FileSystem\FileSystem;
-use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
-use Infection\TestFramework\Contracts\FakeShellCommandRunner;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
+use DomainException;
 
-#[Group('integration')]
-#[CoversClass(PHPStanAdapterFactory::class)]
-final class PHPStanAdapterFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class FakeSourceLineMatcher implements SourceLineMatcher
 {
-    public function test_it_can_create_an_adapter(): void
+    public function touches(string $fileRealPath, int $startLine, int $endLine): bool
     {
-        $adapter = PHPStanAdapterFactory::create(
-            '/path/to/phpstan-config-path',
-            '/path/to/phpstan',
-            32.3,
-            '/tmp',
-            [],
-            new FakeShellCommandRunner(),
-            new FileSystem(),
-        );
-
-        $this->assertSame('PHPStan', $adapter->getName());
+        throw new DomainException('Not implemented');
     }
 }

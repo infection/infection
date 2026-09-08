@@ -33,66 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\Matcher;
+namespace Infection\TestFramework\Coverage;
 
-use Infection\Differ\ChangedLinesRange;
-use Infection\Framework\OperatingSystem;
-use Infection\Git\Git;
-use Infection\Source\Exception\NoSourceFound;
-use Symfony\Component\Filesystem\Path;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Configuration\Configuration;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 
 /**
  * @internal
  */
-final class GitDiffSourceLineMatcher implements SourceLineMatcher
+final readonly class CoverageCheckerFactory
 {
-    /** @var array<string, list<ChangedLinesRange>> */
-    private ?array $memoizedFilesChangedLinesMap = null;
-
-    /**
-     * @param non-empty-string $gitDiffBase
-     * @param non-empty-string $gitDiffFilter
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string $workingDirectory
-     */
     public function __construct(
-        private readonly Git $git,
-        private readonly string $gitDiffBase,
-        private readonly string $gitDiffFilter,
-        private readonly array $sourceDirectories,
-        private readonly string $workingDirectory,
+        private Configuration $configuration,
+        private JUnitReportLocator $jUnitReportLocator,
+        private IndexXmlCoverageLocator $indexXmlCoverageLocator,
     ) {
     }
 
-    public function touches(string $fileRealPath, int $startLine, int $endLine): bool
+    public function create(TestFrameworkAdapter $adapter): CoverageChecker
     {
-        foreach ($this->getChangedLinesRanges($fileRealPath) as $changedLinesRange) {
-            if ($changedLinesRange->touches($startLine, $endLine)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @throws NoSourceFound
-     *
-     * @return list<ChangedLinesRange>
-     */
-    private function getChangedLinesRanges(string $fileRealPath): array
-    {
-        $this->memoizedFilesChangedLinesMap ??= $this->git->getChangedLinesRangesByFilePaths(
-            $this->gitDiffFilter,
-            $this->gitDiffBase,
-            $this->sourceDirectories,
-            $this->workingDirectory,
+        return new CoverageChecker(
+            $this->configuration->skipCoverage,
+            $this->configuration->skipInitialTests,
+            $this->configuration->initialTestsPhpOptions ?? '',
+            $this->configuration->coveragePath,
+            $adapter->hasJUnitReport(),
+            $this->jUnitReportLocator,
+            $adapter->getName(),
+            $this->indexXmlCoverageLocator,
         );
-
-        if (OperatingSystem::isWindows()) {
-            $fileRealPath = Path::normalize($fileRealPath);
-        }
-
-        return $this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [];
     }
 }

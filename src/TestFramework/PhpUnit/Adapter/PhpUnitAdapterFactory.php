@@ -38,20 +38,27 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 use function array_map;
 use function array_values;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Configuration\Configuration;
+use Infection\Console\ConsoleOutput;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\TestFrameworkFactory;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
+use Infection\TestFramework\LegacyTestFrameworkBridge;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
-use function Safe\file_get_contents;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
@@ -61,7 +68,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
+final class PhpUnitAdapterFactory implements TestFrameworkFactory
 {
     use CannotBeInstantiated;
 
@@ -84,7 +91,14 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         ?ShellCommandRunner $shellCommandRunner = null,
         ?string $sourceDirectoryBasePath = null,
         bool $useWindowsFilterLimit = false,
-    ): TestFrameworkAdapter {
+        ?Filesystem $fileSystem = null,
+        ?ConsoleOutput $consoleOutput = null,
+        ?CoverageCheckerFactory $coverageCheckerFactory = null,
+        ?InitialTestsRunner $initialTestsRunner = null,
+        ?Configuration $configuration = null,
+        ?MutantProcessContainerFactory $processFactory = null,
+        ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter = null,
+    ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
         Assert::notEmpty(
             $sourceDirectories,
@@ -92,14 +106,76 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         );
         Assert::notNull($shellCommandRunner);
         Assert::notNull($sourceDirectoryBasePath);
+        Assert::notNull($fileSystem);
+        Assert::notNull($consoleOutput);
+        Assert::notNull($coverageCheckerFactory);
+        Assert::notNull($initialTestsRunner);
+        Assert::notNull($configuration);
+        Assert::notNull($processFactory);
+        Assert::notNull($testFrameworkExtraOptionsFilter);
 
-        $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
+        $legacyAdapter = self::createLegacy(
+            $testFrameworkExecutable,
+            $tmpDir,
+            $testFrameworkConfigPath,
+            $testFrameworkConfigDir,
+            $jUnitFilePath,
+            $projectDir,
+            $sourceDirectories,
+            $executeOnlyCoveringTestCases,
+            $filteredSourceFilesToMutate,
+            $mapSourceClassToTestStrategy,
+            $shellCommandRunner,
+            $sourceDirectoryBasePath,
+            $useWindowsFilterLimit,
+            $fileSystem,
+        );
+
+        return new LegacyTestFrameworkBridge(
+            $legacyAdapter,
+            consoleOutput: $consoleOutput,
+            coverageChecker: $coverageCheckerFactory->create($legacyAdapter),
+            initialTestsRunner: $initialTestsRunner,
+            config: $configuration,
+            processFactory: $processFactory,
+            testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter,
+        );
+    }
+
+    public static function getAdapterName(): string
+    {
+        return 'phpunit';
+    }
+
+    public static function getExecutableName(): string
+    {
+        return 'phpunit';
+    }
+
+    /**
+     * @param non-empty-array<string> $sourceDirectories
+     * @param SplFileInfo[] $filteredSourceFilesToMutate
+     */
+    private static function createLegacy(
+        string $testFrameworkExecutable,
+        string $tmpDir,
+        string $testFrameworkConfigPath,
+        string $testFrameworkConfigDir,
+        string $jUnitFilePath,
+        string $projectDir,
+        array $sourceDirectories,
+        bool $executeOnlyCoveringTestCases,
+        array $filteredSourceFilesToMutate,
+        ?string $mapSourceClassToTestStrategy,
+        ShellCommandRunner $shellCommandRunner,
+        string $sourceDirectoryBasePath,
+        bool $useWindowsFilterLimit,
+        Filesystem $fileSystem,
+    ): TestFrameworkAdapter {
+        $testFrameworkConfigContent = $fileSystem->readFile($testFrameworkConfigPath);
 
         $configManipulator = new XmlConfigurationManipulator(
-            new PathReplacer(
-                new Filesystem(),
-                $testFrameworkConfigDir,
-            ),
+            new PathReplacer($fileSystem, $testFrameworkConfigDir),
             $testFrameworkConfigDir,
         );
 
@@ -118,7 +194,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $testFrameworkConfigContent,
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
-                new Filesystem(),
+                $fileSystem,
                 $sourceDirectories,
                 array_map(
                     static function (SplFileInfo $fileInfo): string {
@@ -137,7 +213,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $configManipulator,
                 $projectDir,
                 new TestRunOrderResolver(),
-                new Filesystem(),
+                $fileSystem,
             ),
             new ArgumentsAndOptionsBuilder(
                 $executeOnlyCoveringTestCases,
@@ -151,16 +227,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 new PhpExecutableFinder(),
             ),
         );
-    }
-
-    public static function getAdapterName(): string
-    {
-        return 'phpunit';
-    }
-
-    public static function getExecutableName(): string
-    {
-        return 'phpunit';
     }
 
     /**

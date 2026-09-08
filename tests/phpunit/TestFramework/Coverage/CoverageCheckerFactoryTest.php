@@ -33,36 +33,55 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis;
+namespace Infection\Tests\TestFramework\Coverage;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\FileSystem;
-use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\StaticAnalysis\StaticAnalysisToolFactory;
-use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\Tests\Configuration\ConfigurationBuilder;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\PhpExecutableFinder;
 
-#[CoversClass(StaticAnalysisToolFactory::class)]
-final class StaticAnalysisToolFactoryTest extends TestCase
+#[CoversClass(CoverageCheckerFactory::class)]
+final class CoverageCheckerFactoryTest extends TestCase
 {
-    public function test_it_throws_an_exception_if_it_cant_find_sa_tool(): void
+    public function test_it_creates_a_coverage_checker_for_the_adapter(): void
     {
-        $factory = new StaticAnalysisToolFactory(
-            ConfigurationBuilder::withMinimalTestData()->build(),
-            $this->createStub(StaticAnalysisToolExecutableFinder::class),
-            $this->createStub(TestFrameworkConfigLocatorInterface::class),
-            $this->createStub(ShellCommandRunner::class),
-            $this->createStub(PhpExecutableFinder::class),
-            $this->createStub(FileSystem::class),
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withSkipCoverage(true)
+            ->withSkipInitialTests(true)
+            ->withInitialTestsPhpOptions('-d memory_limit=1G')
+            ->withCoveragePath('coverage')
+            ->build()
+        ;
+        $fileSystem = $this->createStub(FileSystem::class);
+        $jUnitReportLocator = JUnitReportLocator::create($fileSystem, 'coverage');
+        $indexXmlCoverageLocator = IndexXmlCoverageLocator::create($fileSystem, 'coverage');
+        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter->expects($this->once())->method('hasJUnitReport')->willReturn(true);
+        $adapter->expects($this->once())->method('getName')->willReturn('framework');
+
+        $factory = new CoverageCheckerFactory(
+            $configuration,
+            $jUnitReportLocator,
+            $indexXmlCoverageLocator,
         );
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid name of static analysis tool "Fake SA Tool". Available names are: phpstan, mago, debug');
-
-        $factory->create('Fake SA Tool', 30);
+        $this->assertEquals(
+            new CoverageChecker(
+                true,
+                true,
+                '-d memory_limit=1G',
+                'coverage',
+                true,
+                $jUnitReportLocator,
+                'framework',
+                $indexXmlCoverageLocator,
+            ),
+            $factory->create($adapter),
+        );
     }
 }

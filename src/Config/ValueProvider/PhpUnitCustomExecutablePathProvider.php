@@ -59,7 +59,7 @@ final readonly class PhpUnitCustomExecutablePathProvider
         private TestFrameworkFinder $phpUnitExecutableFinder,
         private ConsoleHelper $consoleHelper,
         private QuestionHelper $questionHelper,
-        private FileSystem $fileSystem = new FileSystem(),
+        private FileSystem $fileSystem,
     ) {
     }
 

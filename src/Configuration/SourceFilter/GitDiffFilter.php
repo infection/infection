@@ -40,7 +40,7 @@ namespace Infection\Configuration\SourceFilter;
  *
  * Represents the information supplied for applying a git diff filter.
  */
-final readonly class GitDiffFilter implements SourceFilter
+final readonly class GitDiffFilter implements SourceFileFilter
 {
     /**
      * @param non-empty-string $value E.g. 'AMD'

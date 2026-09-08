@@ -33,31 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
+namespace Infection\Configuration\SourceFilter;
 
-use Infection\FileSystem\FileSystem;
-use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
-use Infection\TestFramework\Contracts\FakeShellCommandRunner;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
-
-#[Group('integration')]
-#[CoversClass(PHPStanAdapterFactory::class)]
-final class PHPStanAdapterFactoryTest extends TestCase
+/**
+ * @internal
+ *
+ * Represents a filter to apply to the configured source to reduce the scope of the eligible files and/or code
+ * to mutate.
+ */
+interface SourceFileFilter
 {
-    public function test_it_can_create_an_adapter(): void
-    {
-        $adapter = PHPStanAdapterFactory::create(
-            '/path/to/phpstan-config-path',
-            '/path/to/phpstan',
-            32.3,
-            '/tmp',
-            [],
-            new FakeShellCommandRunner(),
-            new FileSystem(),
-        );
-
-        $this->assertSame('PHPStan', $adapter->getName());
-    }
 }

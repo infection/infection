@@ -73,7 +73,7 @@ final class InitialTestsExecutionLoggerSubscriberTest extends TestCase
         ;
 
         $this->dispatcher->dispatch(
-            new InitialTestSuiteWasStarted(),
+            new InitialTestSuiteWasStarted('<command line>'),
         );
     }
 

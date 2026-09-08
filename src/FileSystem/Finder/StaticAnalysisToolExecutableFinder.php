@@ -71,7 +71,7 @@ class StaticAnalysisToolExecutableFinder
     public function __construct(
         private readonly ComposerExecutableFinder $executableFinder,
         private readonly ShellCommandRunner $shellCommandRunner,
-        private readonly FileSystem $fileSystem = new FileSystem(),
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
