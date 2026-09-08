@@ -3092,6 +3092,12 @@ count = 1
 
 [[issues]]
 file = "src/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdder.php"
+code = "deprecated-method"
+message = 'Call to deprecated method: `Infection\TestFramework\Contracts\TestFramework::hasJUnitReport`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdder.php"
 code = "redundant-docblock-type"
 message = "Redundant docblock type for variable `$trace`."
 count = 1
@@ -4870,6 +4876,12 @@ count = 1
 file = "tests/phpunit/Process/Runner/DryProcessRunnerTest.php"
 code = "less-specific-nested-argument-type"
 message = 'Argument type mismatch for argument #1 of `Infection\Process\Runner\DryProcessRunner::run`: expected `iterable<mixed, Infection\Process\MutantProcessContainer>`, but provided type `iterable<mixed, mixed>` is less specific.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
 count = 1
 
 [[issues]]
