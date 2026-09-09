@@ -33,15 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework;
+
+use Infection\Mutant\Mutant;
+use Infection\Process\MutantProcessContainer;
+use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use LogicException;
 
 /**
+ * Takes the place of the static-analysis framework when no analyser is configured.
+ *
  * @internal
  */
-interface InitialStaticAnalysis
+final readonly class NullStaticAnalysisTestFramework implements StaticAnalysisTestFramework
 {
-    /**
-     * @throws InitialStaticAnalysisRunFailed
-     */
-    public function run(): void;
+    public function getName(): string
+    {
+        return 'None';
+    }
+
+    public function getVersion(): string
+    {
+        return '';
+    }
+
+    public function checkRequirements(): void
+    {
+    }
+
+    public function executeInitialRun(): InitialRunResults
+    {
+        return new InitialRunResults('', null);
+    }
+
+    public function test(Mutant $mutant): MutantProcessContainer
+    {
+        // Disabled static analysis must not be registered as a mutant-process factory.
+        throw new LogicException('Cannot create a mutant process when static analysis is disabled.');
+    }
+
+    public function hasJUnitReport(): bool
+    {
+        return false;
+    }
 }
