@@ -37,7 +37,6 @@ namespace Infection\Logger\ArtefactCollection;
 
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Contracts\TestFramework;
 use InvalidArgumentException;
 use function sprintf;
@@ -49,7 +48,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final readonly class ConsoleNoProgressLogger implements InitialStaticAnalysisExecutionLogger, InitialTestsExecutionLogger
 {
     public function __construct(
-        private TestFramework|StaticAnalysisToolAdapter $testFramework,
+        private TestFramework $testFramework,
         private OutputInterface $output,
     ) {
     }
