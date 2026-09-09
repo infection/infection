@@ -436,7 +436,7 @@ final class Container extends DIContainer
                 return new InitialStaticAnalysisExecutionLoggerFactory(
                     $config->noProgress,
                     $config->isDebugEnabled,
-                    $container->getStaticAnalysisToolAdapter(),
+                    $container->getStaticAnalysisTestFramework(),
                     $container->getOutput(),
                 );
             },
