@@ -33,19 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Runner;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-
-#[CoversClass(NullInitialStaticAnalysisRunner::class)]
-final class NullInitialStaticAnalysisRunnerTest extends TestCase
+/**
+ * Temporary type hint for the static-analysis framework in the container. Remove this
+ * interface once CombinedTestFramework composes static analysis with the test suite.
+ *
+ * @internal
+ *
+ * @deprecated Remove once CombinedTestFramework composes static analysis with the test suite.
+ */
+interface StaticAnalysisTestFramework extends TestFramework
 {
-    public function test_it_does_nothing(): void
-    {
-        $this->expectNotToPerformAssertions();
-
-        (new NullInitialStaticAnalysisRunner())->run();
-    }
 }

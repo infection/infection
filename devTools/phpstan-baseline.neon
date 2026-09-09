@@ -133,8 +133,44 @@ parameters:
 			path: ../src/Console/XdebugHandler.php
 
 		-
+			rawMessage: '''
+				Access to constant on deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
+				Remove once CombinedTestFramework composes static analysis with the test suite.
+			'''
+			identifier: classConstant.deprecatedInterface
+			count: 2
+			path: ../src/Container/Container.php
+
+		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: '''
+				Return type of method Infection\Container\Container::getStaticAnalysisTestFramework() has typehint with deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
+				Remove once CombinedTestFramework composes static analysis with the test suite.
+			'''
+			identifier: return.deprecatedInterface
 			count: 1
 			path: ../src/Container/Container.php
 
@@ -161,6 +197,24 @@ parameters:
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/Differ/Tokens.php
+
+		-
+			rawMessage: '''
+				Parameter $staticAnalysisTestFramework of method Infection\Engine::__construct() has typehint with deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
+				Remove once CombinedTestFramework composes static analysis with the test suite.
+			'''
+			identifier: parameter.deprecatedInterface
+			count: 1
+			path: ../src/Engine.php
+
+		-
+			rawMessage: '''
+				Property $staticAnalysisTestFramework references deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework in its type:
+				Remove once CombinedTestFramework composes static analysis with the test suite.
+			'''
+			identifier: property.deprecatedInterface
+			count: 1
+			path: ../src/Engine.php
 
 		-
 			rawMessage: 'Call to method maybe() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
@@ -850,6 +904,15 @@ parameters:
 			path: ../src/TestFramework/Factory.php
 
 		-
+			rawMessage: '''
+				Class Infection\TestFramework\NullStaticAnalysisTestFramework implements deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
+				Remove once CombinedTestFramework composes static analysis with the test suite.
+			'''
+			identifier: class.implementsDeprecatedInterface
+			count: 1
+			path: ../src/TestFramework/NullStaticAnalysisTestFramework.php
+
+		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
 			count: 1
@@ -1187,6 +1250,24 @@ parameters:
 			identifier: method.dynamicName
 			count: 1
 			path: ../tests/phpunit/Container/ContainerTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
+				Remove once CombinedTestFramework composes static analysis with the test suite.
+			'''
+			identifier: classConstant.deprecatedInterface
+			count: 1
+			path: ../tests/phpunit/EngineTest.php
+
+		-
+			rawMessage: '''
+				Parameter $staticAnalysisTestFramework of method Infection\Tests\EngineTest::createEngine() has typehint with deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
+				Remove once CombinedTestFramework composes static analysis with the test suite.
+			'''
+			identifier: parameter.deprecatedInterface
+			count: 1
+			path: ../tests/phpunit/EngineTest.php
 
 		-
 			rawMessage: 'Call to static method createFromBoolean() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
@@ -1628,6 +1709,87 @@ parameters:
 			identifier: staticMethod.deprecated
 			count: 3
 			path: ../tests/phpunit/TestFramework/Factory/ConfigurableTestFrameworkFactoryTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
+
+		-
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
+
+		-
+			rawMessage: '''
+				Call to method checkRequirements() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
+
+		-
+			rawMessage: '''
+				Call to method executeInitialRun() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: method.deprecatedClass
+			count: 2
+			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
+
+		-
+			rawMessage: '''
+				Call to method getName() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
+
+		-
+			rawMessage: '''
+				Call to method getVersion() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
+
+		-
+			rawMessage: '''
+				Call to method test() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
+
+		-
+			rawMessage: '''
+				Property $bridge references deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge in its type:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: property.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
 
 		-
 			rawMessage: '''
