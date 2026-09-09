@@ -35,11 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis;
 
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\NullStaticAnalysisTestFramework;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -51,18 +55,37 @@ final class StaticAnalysisToolFactoryTest extends TestCase
 {
     public function test_it_throws_an_exception_if_it_cant_find_sa_tool(): void
     {
-        $factory = new StaticAnalysisToolFactory(
+        $factory = $this->createFactory();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid name of static analysis tool "Fake SA Tool". Available names are: phpstan, mago, debug');
+
+        $factory->create('Fake SA Tool', 30);
+    }
+
+    public function test_it_creates_a_null_framework_when_static_analysis_is_disabled(): void
+    {
+        $this->assertInstanceOf(NullStaticAnalysisTestFramework::class, $this->createFactory()->create(null, 30));
+    }
+
+    public function test_it_wraps_the_static_analysis_adapter_in_a_test_framework(): void
+    {
+        $framework = $this->createFactory()->create(StaticAnalysisToolTypes::DEBUG, 30);
+
+        $this->assertInstanceOf(TestFramework::class, $framework);
+        $this->assertSame('Debug', $framework->getName());
+    }
+
+    private function createFactory(): StaticAnalysisToolFactory
+    {
+        return new StaticAnalysisToolFactory(
             ConfigurationBuilder::withMinimalTestData()->build(),
             $this->createStub(StaticAnalysisToolExecutableFinder::class),
             $this->createStub(TestFrameworkConfigLocatorInterface::class),
             $this->createStub(ShellCommandRunner::class),
             $this->createStub(PhpExecutableFinder::class),
             $this->createStub(FileSystem::class),
+            $this->createStub(EventDispatcher::class),
         );
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid name of static analysis tool "Fake SA Tool". Available names are: phpstan, mago, debug');
-
-        $factory->create('Fake SA Tool', 30);
     }
 }
