@@ -4171,6 +4171,12 @@ message = "Reference created from a previously undefined variable `$output`."
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Configuration/PositionalPathsClassifier/Scenario.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #2 of `Infection\Tests\Configuration\PositionalPathsClassifier\Scenario::__construct`: expected `non-empty-list<non-empty-string>`, but possibly received `array{}`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #2 of `Infection\Configuration\Schema\SchemaConfigurationFactory::create`: expected `stdClass`, but found `mixed`.'

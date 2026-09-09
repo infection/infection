@@ -160,7 +160,7 @@ final class ConfigurableTestFrameworkFactoryTest extends TestCase
             null,
             '',
             '',
-            [],
+            ['src'],
             false,
             false,
             [],

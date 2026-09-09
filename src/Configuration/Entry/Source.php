@@ -41,12 +41,12 @@ namespace Infection\Configuration\Entry;
 final readonly class Source
 {
     /**
-     * @param list<non-empty-string> $directories
+     * @param non-empty-list<non-empty-string> $directories
      * @param list<non-empty-string> $excludes
      */
     public function __construct(
-        public array $directories = [],
-        public array $excludes = [],
+        public array $directories,
+        public array $excludes,
     ) {
     }
 }

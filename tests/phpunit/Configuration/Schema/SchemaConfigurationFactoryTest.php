@@ -180,19 +180,21 @@ final class SchemaConfigurationFactoryTest extends TestCase
             ]),
         ];
 
-        yield '[source] empty strings' => [
-            <<<'JSON'
-                {
-                    "source": {
-                        "directories": [""],
-                        "excludes": [""]
-                    }
-                }
-                JSON,
-            self::createConfig([
-                'source' => new Source([], []),
-            ]),
-        ];
+        // TODO: invalid scenario, but may be worth have a test for such invalid scenarios, we dealing with user-input
+        //   so asserting the exception + message has an importance in terms of UX.
+        // yield '[source] empty strings' => [
+        //    <<<'JSON'
+        //        {
+        //            "source": {
+        //                "directories": [""],
+        //                "excludes": [""]
+        //            }
+        //        }
+        //        JSON,
+        //    self::createConfig([
+        //        'source' => new Source([], []),
+        //    ]),
+        // ];
 
         yield '[source] empty & untrimmed strings' => [
             <<<'JSON'
@@ -2779,7 +2781,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
         $defaultArgs = [
             'path' => '/path/to/config',
             'timeout' => null,
-            'source' => new Source([], []),
+            'source' => new Source(['src'], []),
             'logs' => Logs::createEmpty(),
             'tmpDir' => null,
             'phpunit' => new PhpUnit(null, null),
