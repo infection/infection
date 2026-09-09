@@ -155,33 +155,6 @@ parameters:
 
 		-
 			rawMessage: '''
-				Call to method __construct() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: method.deprecatedClass
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: '''
-				Instantiation of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: new.deprecatedClass
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: '''
-				Instantiation of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
-				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
-			'''
-			identifier: new.deprecatedClass
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: '''
 				Return type of method Infection\Container\Container::getStaticAnalysisTestFramework() has typehint with deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
 				Remove once CombinedTestFramework composes static analysis with the test suite.
 			'''
@@ -806,6 +779,42 @@ parameters:
 			identifier: shipmonk.deadMethod
 			count: 1
 			path: ../src/StaticAnalysis/StaticAnalysisToolAdapterFactory.php
+
+		-
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../src/StaticAnalysis/StaticAnalysisToolFactory.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../src/StaticAnalysis/StaticAnalysisToolFactory.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../src/StaticAnalysis/StaticAnalysisToolFactory.php
+
+		-
+			rawMessage: '''
+				Return type of method Infection\StaticAnalysis\StaticAnalysisToolFactory::create() has typehint with deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
+				Remove once CombinedTestFramework composes static analysis with the test suite.
+			'''
+			identifier: return.deprecatedInterface
+			count: 1
+			path: ../src/StaticAnalysis/StaticAnalysisToolFactory.php
 
 		-
 			rawMessage: 'Parameter #2 $paths of method Composer\Autoload\ClassLoader::setPsr4() expects list<string>|string, array<string> given.'
@@ -1840,6 +1849,15 @@ parameters:
 			identifier: variable.unused
 			count: 1
 			path: ../tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/StaticAnalysis/StaticAnalysisToolFactoryTest.php
 
 		-
 			rawMessage: Infection\Tests\TestFramework\Coverage\Locator\BaseReportLocator\DemoReportLocator should not exist
