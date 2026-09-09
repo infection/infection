@@ -66,7 +66,6 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\AdapterInstaller;
-use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\TestFrameworkTypes;
 use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
@@ -544,7 +543,6 @@ final class RunCommand extends BaseCommand
      *
      * @throws ProcessTimedOutException
      * @throws ProcessException
-     * @throws RequirementChecksFailed
      */
     private function startUp(
         Container $container,
@@ -585,10 +583,6 @@ final class RunCommand extends BaseCommand
         $config = $container->getConfiguration();
 
         $consoleOutput->logRunningWithThreadCount($config->threadCount);
-
-        if ($config->isStaticAnalysisEnabled()) {
-            $container->getStaticAnalysisTestFramework()->checkRequirements();
-        }
 
         $container->getFileSystem()->mkdir($config->tmpDir);
 

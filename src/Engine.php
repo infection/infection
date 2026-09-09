@@ -52,6 +52,7 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\PreloadedSourceChecker;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\Coverage\JUnit\TestNotFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
@@ -80,6 +81,7 @@ final readonly class Engine
     /**
      * @throws InitialTestsFailed
      * @throws InitialStaticAnalysisRunFailed
+     * @throws RequirementChecksFailed
      * @throws MinMsiCheckFailed
      * @throws MaxTimeoutCountReached
      * @throws UnparsableFile
@@ -94,6 +96,7 @@ final readonly class Engine
     {
         $this->preloadedSourceChecker->check();
 
+        $this->staticAnalysisTestFramework->checkRequirements();
         $this->runInitialTestSuite();
         $this->staticAnalysisTestFramework->executeInitialRun();
 
