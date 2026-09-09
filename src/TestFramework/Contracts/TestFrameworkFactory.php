@@ -52,8 +52,8 @@ use Symfony\Component\Filesystem\Filesystem;
 interface TestFrameworkFactory
 {
     /**
-     * @param SplFileInfo[] $filteredSourceFilesToMutate
      * @param string[] $sourceDirectories
+     * @param SplFileInfo[] $filteredSourceFilesToMutate
      */
     public static function create(
         string $testFrameworkExecutable,
