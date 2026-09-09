@@ -37,7 +37,7 @@ namespace Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
 
 use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
 use Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\Contracts\TestFramework;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -48,7 +48,7 @@ final readonly class InitialStaticAnalysisExecutionLoggerFactory
     public function __construct(
         private bool $skipProgressBar,
         private bool $debug,
-        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
+        private TestFramework $testFramework,
         private OutputInterface $output,
     ) {
     }
@@ -57,12 +57,12 @@ final readonly class InitialStaticAnalysisExecutionLoggerFactory
     {
         return $this->skipProgressBar
             ? new ConsoleNoProgressLogger(
-                $this->staticAnalysisToolAdapter,
+                $this->testFramework,
                 $this->output,
             )
             : new ConsoleProgressBarLogger(
                 $this->output,
-                $this->staticAnalysisToolAdapter,
+                $this->testFramework,
                 $this->debug,
             );
     }
