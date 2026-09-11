@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Factory;
 
+use Infection\Configuration\Configuration;
+use Infection\Configuration\Entry\PhpUnit;
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
@@ -71,7 +73,7 @@ final class FactoryTest extends TestCase
 
         $this->expectExceptionObject(
             new InvalidArgumentException(
-                'Invalid name of test framework "Fake Test Framework". Available names are: phpunit, debug',
+                'Invalid name of test framework "Fake Test Framework". Available names are: debug, phpunit',
             ),
         );
 
@@ -116,19 +118,53 @@ final class FactoryTest extends TestCase
         $this->assertSame($expectedTestFramework, $testFramework);
     }
 
+    public function test_it_creates_phpunit_with_its_custom_executable(): void
+    {
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withSourceDirectories('src')
+            ->withPhpUnit(new PhpUnit('config/phpunit', 'bin/phpunit'))
+            ->build()
+        ;
+        $configLocator = $this->createMock(TestFrameworkConfigLocatorInterface::class);
+        $configLocator->expects($this->once())
+            ->method('locate')
+            ->with('phpunit')
+            ->willReturn('/path/to/phpunit.xml')
+        ;
+        $testFrameworkFinder = $this->createMock(TestFrameworkFinder::class);
+        $testFrameworkFinder->expects($this->once())
+            ->method('find')
+            ->with('phpunit', 'bin/phpunit')
+            ->willReturn('/path/to/phpunit')
+        ;
+
+        $factory = $this->createFactory(
+            configuration: $configuration,
+            configLocator: $configLocator,
+            testFrameworkFinder: $testFrameworkFinder,
+        );
+
+        $this->assertSame('PHPUnit', $factory->create('phpunit', false)->getName());
+    }
+
     /**
      * @param array<string, array<string, mixed>> $installedExtensions
      */
-    private function createFactory(array $installedExtensions = []): Factory
-    {
-        $configuration = ConfigurationBuilder::withMinimalTestData()->build();
+    private function createFactory(
+        array $installedExtensions = [],
+        ?Configuration $configuration = null,
+        ?TestFrameworkConfigLocatorInterface $configLocator = null,
+        ?TestFrameworkFinder $testFrameworkFinder = null,
+    ): Factory {
+        $configuration ??= ConfigurationBuilder::withMinimalTestData()->build();
         $fileSystem = $this->createStub(FileSystem::class);
+        $fileSystem->method('readFile')->willReturn('<phpunit/>');
 
         return new Factory(
             '',
             '',
-            $this->createStub(TestFrameworkConfigLocatorInterface::class),
-            $this->createStub(TestFrameworkFinder::class),
+            $configLocator ?? $this->createStub(TestFrameworkConfigLocatorInterface::class),
+            $testFrameworkFinder ?? $this->createStub(TestFrameworkFinder::class),
             '',
             $configuration,
             new FakeSourceCollector(),
