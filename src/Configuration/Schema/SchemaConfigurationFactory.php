@@ -148,8 +148,16 @@ class SchemaConfigurationFactory
 
     private static function createSource(stdClass $source): Source
     {
+        $sourceDirectories = self::normalizeStringArray($source->directories ?? []);
+        // TODO: for consistency we should throw InvalidSchema here; likewise for other exceptions
+        //   and document the @throws
+        Assert::notEmpty(
+            $sourceDirectories,
+            'The source directories cannot be empty. This indicates that an invalid configuration reached the test framework adapter factory.',
+        );
+
         return new Source(
-            self::normalizeStringArray($source->directories ?? []),
+            $sourceDirectories,
             self::normalizeStringArray($source->excludes ?? []),
         );
     }

@@ -117,7 +117,7 @@ final class SchemaConfigurationBuilder
         return new self(
             pathname: '/path/to/infection.json',
             timeout: null,
-            source: new Source([], []),
+            source: new Source(['src'], []),
             logs: Logs::createEmpty(),
             tmpDir: null,
             phpUnit: new PhpUnit(null, null),
