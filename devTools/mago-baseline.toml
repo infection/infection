@@ -1388,12 +1388,6 @@ count = 1
 
 [[issues]]
 file = "src/Differ/UnifiedDiffOutputBuilder.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Differ\UnifiedDiffOutputBuilder::normalizeDiff`: expected `list<array{0: string, 1: int(0)|int(1)|int(2)|int(3)|int(4)}>`, but found `list<list{string, int}>`.'
-count = 1
-
-[[issues]]
-file = "src/Differ/UnifiedDiffOutputBuilder.php"
 code = "missing-parameter-type"
 message = "Parameter `$output` is missing a type hint."
 count = 2
@@ -1461,7 +1455,7 @@ count = 2
 [[issues]]
 file = "src/Event/EventDispatcher/SyncEventDispatcher.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `array<array-key, array<array-key, mixed>>` is being assigned to property `$listeners` (array<array-key, array<array-key, (callable(...mixed): mixed)>>)."
+message = "A value with a less specific type `non-empty-array<array-key, array<array-key, mixed>>` is being assigned to property `$listeners` (array<array-key, array<array-key, (callable(...mixed): mixed)>>)."
 count = 1
 
 [[issues]]
@@ -4291,24 +4285,6 @@ message = "Impossible type assertion: `$userSubscriber->count` of type `int(0)` 
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
-code = "impossible-assignment"
-message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
-code = "no-value"
-message = 'Argument #1 passed to method `Infection\Tests\Fixtures\Event\IONullSubscriber::__construct` has type `never`, meaning it cannot produce a value.'
-count = 3
-
-[[issues]]
-file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
-code = "non-existent-class"
-message = 'Class `Infection\Tests\Fixtures\Console\FakeOutput` not found.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php"
 code = "ambiguous-object-method-access"
 message = "Cannot statically verify method call on a generic `object` type."
@@ -4384,18 +4360,6 @@ count = 1
 file = "tests/phpunit/Logger/MutationAnalysis/MutationAnalysisLoggerFactoryTest.php"
 code = "possibly-invalid-argument"
 message = '''Possible argument type mismatch for argument #1 of `PHPUnit\Framework\Assert::assertInstanceOf`: expected `class-string<'ExpectedType.phpunit\framework\assert::assertinstanceof() extends object>`, but possibly received `string`.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Logger/MutationGeneration/MutationGenerationLoggerFactoryTest.php"
-code = "no-value"
-message = 'Argument #2 passed to method `Infection\Logger\MutationGeneration\MutationGenerationLoggerFactory::__construct` has type `never`, meaning it cannot produce a value.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Logger/MutationGeneration/MutationGenerationLoggerFactoryTest.php"
-code = "non-existent-class"
-message = 'Class `Infection\Tests\Fixtures\Console\FakeOutput` not found.'
 count = 1
 
 [[issues]]
