@@ -154,20 +154,6 @@ final class RunCommandTest extends TestCase
         ]);
     }
 
-    public function test_it_fails_when_a_positional_argument_is_an_fqcn(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('FQCN-style arguments like "\App\Foo" are not yet supported.');
-
-        $app = new Application(SingletonContainer::getContainer());
-
-        $tester = new CommandTester($app->find('run'));
-
-        $tester->execute([
-            'paths' => ['\App\Foo'],
-        ]);
-    }
-
     public function test_it_rethrows_when_no_source_to_mutate_was_found_without_a_filter(): void
     {
         $expected = NoSourceFound::noExecutableSourceCode();

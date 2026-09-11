@@ -159,6 +159,13 @@ parameters:
             count: 1
             path: ../tests/phpunit/TestingUtility/FS.php
 
+        # This matcher is tested through ExcludeNonSelectedSourceNodesVisitor, which supplies
+        # the class and method traversal context required by its public API.
+        -
+            identifier: phpat.testConcreteSourceClassesHaveTests
+            count: 1
+            path: ../src/Source/Matcher/SourceSymbolMatcher.php
+
         -
             message: "#queryCount#"
             identifier: return.type

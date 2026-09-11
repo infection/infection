@@ -41,6 +41,8 @@ use Infection\Command\BaseCommand;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\SourceFilterOptions;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelectorParser;
 use Infection\Console\IO;
 use Infection\Container\Container;
 use Infection\Differ\ChangedLinesRange;
@@ -73,6 +75,8 @@ final class DumpAstCommand extends BaseCommand
     private const string SHOW_ATTRIBUTES = 'show-attributes';
 
     private const string CHANGED_LINES_RANGES = 'changed-lines-ranges';
+
+    private const string SOURCE_SELECTOR = 'source-selector';
 
     private const int CHANGED_LINES_PARTS_COUNT = 2;
 
@@ -111,6 +115,12 @@ final class DumpAstCommand extends BaseCommand
             InputOption::VALUE_OPTIONAL,
             'List of changed line ranges. E.g. "10:12,24:30" will indicate that the lines 10, 11, 12, 24, 25, ..., 30 changed.',
         );
+        $this->addOption(
+            self::SOURCE_SELECTOR,
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Target a class, method, or absolute source line (for example Vendor\\Package\\Class::method::32).',
+        );
 
         ConfigurationOption::addOption($this);
 
@@ -123,7 +133,8 @@ final class DumpAstCommand extends BaseCommand
         $file = $this->getFile($io);
         $shouldShowAttributes = self::shouldShowAttributes($io);
         $changedLinesRanges = self::getChangedLinesRanges($io);
-        $hasChangedLines = $changedLinesRanges !== null;
+        $sourceSymbolSelector = self::getSourceSymbolSelector($io);
+        $showsEligibility = $changedLinesRanges !== null || $sourceSymbolSelector !== null;
         $configFile = ConfigurationOption::get($io);
         $logger = new ConsoleLogger($io);
         self::configureFormatter($io);
@@ -135,14 +146,14 @@ final class DumpAstCommand extends BaseCommand
             $changedLinesRanges,
         );
 
-        $nodes = $this->createAst($container, $file);
+        $nodes = $this->createAst($container, $file, $sourceSymbolSelector);
 
         $io->write(
             $container->getNodeDumper()->dump(
                 $nodes,
-                dumpOtherAttributes: $shouldShowAttributes || $hasChangedLines,
+                dumpOtherAttributes: $shouldShowAttributes || $showsEligibility,
                 decorateNodes: $io->isDecorated(),
-                showLineNumbers: $hasChangedLines,
+                showLineNumbers: $showsEligibility,
             ),
         );
 
@@ -155,6 +166,7 @@ final class DumpAstCommand extends BaseCommand
     private function createAst(
         Container $container,
         SplFileObject $file,
+        ?SourceSymbolSelector $sourceSymbolSelector,
     ): array {
         $traverserFactory = $container->getNodeTraverserFactory();
 
@@ -169,6 +181,7 @@ final class DumpAstCommand extends BaseCommand
             ->createEnrichmentTraverser(
                 $file,
                 new EmptyTrace($file),
+                $sourceSymbolSelector,
             )
             ->traverse($initialStatements)
         ;
@@ -209,6 +222,29 @@ final class DumpAstCommand extends BaseCommand
     private static function shouldShowAttributes(IO $io): bool
     {
         return (bool) $io->getInput()->getOption(self::SHOW_ATTRIBUTES);
+    }
+
+    private static function getSourceSymbolSelector(IO $io): ?SourceSymbolSelector
+    {
+        $value = self::asOptionalString($io->getInput()->getOption(self::SOURCE_SELECTOR));
+
+        if ($value === null) {
+            return null;
+        }
+
+        Assert::stringNotEmpty($value, 'Expected --source-selector to have a value.');
+
+        $selector = (new SourceSymbolSelectorParser())->parse($value);
+        Assert::notNull($selector, sprintf('Expected "%s" to be a source selector.', $value));
+
+        return $selector;
+    }
+
+    private static function asOptionalString(mixed $value): ?string
+    {
+        Assert::nullOrString($value);
+
+        return $value;
     }
 
     /**

@@ -33,30 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Container\Builder;
+namespace Infection\Configuration\SourceFilter;
 
-use DIContainer\Builder;
-use Infection\Configuration\Configuration;
-use Infection\FileSystem\FileSystem;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 
 /**
  * @internal
- * @implements Builder<IndexXmlCoverageParser>
+ *
+ * Represents filters to apply to the configured source to reduce the scope of the eligible files and/or code
+ * to mutate.
  */
-final readonly class IndexXmlCoverageParserBuilder implements Builder
+final readonly class SourceFilter
 {
+    /**
+     * @param list<SourceSymbolSelector> $symbolSelectors
+     */
     public function __construct(
-        private Configuration $configuration,
-        private FileSystem $fileSystem,
+        public ?SourceFileFilter $fileFilter,
+        public array $symbolSelectors,
     ) {
     }
 
-    public function build(): IndexXmlCoverageParser
+    public function filtersFiles(): bool
     {
-        return new IndexXmlCoverageParser(
-            isSourceFiltered: $this->configuration->sourceFilter->filtersFiles(),
-            fileSystem: $this->fileSystem,
-        );
+        return $this->fileFilter !== null;
     }
 }

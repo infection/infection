@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
+use Infection\PhpParser\Visitor\ExcludeNonSelectedSourceNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
 use Infection\PhpParser\Visitor\ExcludeUntestedNodesVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
@@ -47,6 +49,7 @@ use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
+use Infection\Source\Matcher\SourceSymbolMatcher;
 use Infection\Source\MatcherLine\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
@@ -62,11 +65,18 @@ use SplFileInfo;
  */
 readonly class NodeTraverserFactory
 {
+    private SourceSymbolMatcher $sourceSymbolMatcher;
+
+    /**
+     * @param list<SourceSymbolSelector> $sourceSymbolSelectors
+     */
     public function __construct(
         private SourceLineMatcher $sourceLineMatcher,
         private LineRangeCalculator $lineRangeCalculator,
         private bool $onlyCovered,
+        array $sourceSymbolSelectors,
     ) {
+        $this->sourceSymbolMatcher = new SourceSymbolMatcher($sourceSymbolSelectors);
     }
 
     /**
@@ -75,6 +85,7 @@ readonly class NodeTraverserFactory
     public function createEnrichmentTraverser(
         SplFileInfo $sourceFile,
         Trace $trace,
+        ?SourceSymbolSelector $sourceSymbolSelector = null,
     ): NodeTraverserInterface {
         $nodeIgnorers = [
             new InterfaceIgnorer(),
@@ -94,11 +105,22 @@ readonly class NodeTraverserFactory
                 $this->sourceLineMatcher,
                 $sourceFile->getRealPath(),
             ),
-            new AddTestsVisitor(
-                $trace,
-                $this->lineRangeCalculator,
-            ),
         ];
+
+        $sourceSymbolMatcher = $sourceSymbolSelector === null
+            ? $this->sourceSymbolMatcher
+            : new SourceSymbolMatcher([$sourceSymbolSelector]);
+
+        if ($sourceSymbolMatcher->hasSelectors()) {
+            $visitors[] = new ExcludeNonSelectedSourceNodesVisitor(
+                $sourceSymbolMatcher,
+            );
+        }
+
+        $visitors[] = new AddTestsVisitor(
+            $trace,
+            $this->lineRangeCalculator,
+        );
 
         if ($this->onlyCovered) {
             $visitors[] = new ExcludeUntestedNodesVisitor();
@@ -113,5 +135,10 @@ readonly class NodeTraverserFactory
             new NodeVisitor\CloningVisitor(),
             $mutationVisitor,
         );
+    }
+
+    public function getSourceSymbolMatcher(): SourceSymbolMatcher
+    {
+        return $this->sourceSymbolMatcher;
     }
 }

@@ -62,6 +62,18 @@ final class PathsArgumentTest extends TestCase
         $this->assertTrue($argument->isArray());
     }
 
+    public function test_it_adds_the_run_argument_with_source_selector_help(): void
+    {
+        $command = new Command('test');
+
+        PathsArgument::addRunArgument($command);
+
+        $argument = $command->getDefinition()->getArgument(PathsArgument::NAME);
+
+        $this->assertStringContainsString('source selectors', $argument->getDescription());
+        $this->assertStringContainsString('Differ::diff::32', $argument->getDescription());
+    }
+
     /**
      * @param array<string, list<string>> $arguments
      * @param list<non-empty-string> $expected
