@@ -31,6 +31,14 @@ services:
         tags:
             - phpat.test
     -
+        class: Infection\Tests\Architecture\PHPat\ExceptionsShouldNotHaveExceptionSuffixTest
+        tags:
+            - phpat.test
+    -
+        class: Infection\Tests\Architecture\PHPat\ExceptionsShouldNotExtendExceptionDirectlyTest
+        tags:
+            - phpat.test
+    -
         class: Infection\Tests\Architecture\PHPat\SourceClassesShouldNotExposePublicPropertiesTest
         tags:
             - phpat.test

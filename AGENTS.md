@@ -137,6 +137,7 @@ Current ADRs:
 - [`adr/0011-use-phpunit-environment-variable-attribute.md`](adr/0011-use-phpunit-environment-variable-attribute.md) - Use PHPUnit attributes for test environment variables
 - [`adr/0012-final-classes-over-final-docblock.md`](adr/0012-final-classes-over-final-docblock.md) - Prefer `final` to `@final` where possible
 - [`adr/0013-public-api-extension-point-registry.md`](adr/0013-public-api-extension-point-registry.md) - Define the public API through an extension-point registry
+- [`adr/0014-name-exceptions-after-domain-failures.md`](adr/0014-name-exceptions-after-domain-failures.md) - Name exceptions after domain failures
 <!-- adr-list:end -->
 
 ## Commands
