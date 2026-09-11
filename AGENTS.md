@@ -59,7 +59,7 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
    replacement node by token positions and prints a minimal diff.
    `src/Process/Runner/ParallelProcessRunner.php` streams mutant processes at N threads. An
    escaped mutant may get a follow-up static-analysis process
-   (`src/StaticAnalysis/` - PHPStan and Mago adapters).
+   (`src/TestFramework/PHPStan/` and `src/TestFramework/Mago/`).
 9. **Reporting** - metrics in `src/Metrics/` (Welford-based running variance for timings),
    loggers/reporters in `src/Logger/` and `src/Reporter/` (legacy) plus the newer
    `src/Report/` framework that is gradually replacing them.
