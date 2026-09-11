@@ -10,6 +10,9 @@ Contributions are always welcome. Here are a few guidelines to be aware of:
 - Before implementing a new big feature, consider creating a new issue on Github. It will save your
   time when the core team is not going to accept it or has good recommendations about how to
   proceed.
+- Read [ADR 0014][priorities-adr] before you start. It states the order in which maintainers
+  review work: bug fixes, then features, then refactoring that unblocks a named fix or feature.
+  Refactoring or tooling that no bug or feature needs waits behind all of them.
 - Target `master` branch
 
 
@@ -106,5 +109,6 @@ Read the [Benchmark documentation].
 
 [Benchmark documentation]: ../doc/benchmarking.md
 [docker]: https://www.docker.com/get-docker
+[priorities-adr]: ../adr/0014-priorities.md
 [readme]: /README.md
 [visitor-documentation]: ../tests/phpunit/PhpParser/Visitor/README.md
