@@ -49,6 +49,7 @@ use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\IO;
 use Infection\FileSystem\FileSystem;
+use Infection\FileSystem\Finder\ComposerBinExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\InfectionVersion;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -164,6 +165,8 @@ final class ConfigureCommand extends BaseCommand
         $phpUnitExecutableFinder = new TestFrameworkFinder(
             $container->getComposerExecutableFinder(),
             $container->getShellCommandRunner(),
+            new ComposerBinExecutableFinder(),
+            $this->fileSystem,
         );
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper, $this->fileSystem);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($io);
