@@ -3244,7 +3244,7 @@ count = 1
 file = "src/TestFramework/Factory.php"
 code = "deprecated-method"
 message = 'Call to deprecated method: `Infection\TestFramework\Contracts\TestFrameworkFactory::getExecutableName`.'
-count = 2
+count = 1
 
 [[issues]]
 file = "src/TestFramework/Factory.php"
@@ -3262,13 +3262,13 @@ count = 1
 file = "src/TestFramework/Factory.php"
 code = "possibly-static-access-on-interface"
 message = 'Potential static method call on interface `Infection\AbstractTestFramework\TestFrameworkAdapterFactory` via `class-string`.'
-count = 7
+count = 5
 
 [[issues]]
 file = "src/TestFramework/Factory.php"
 code = "possibly-static-access-on-interface"
 message = 'Potential static method call on interface `Infection\TestFramework\Contracts\TestFrameworkFactory` via `class-string`.'
-count = 7
+count = 5
 
 [[issues]]
 file = "src/TestFramework/Factory.php"

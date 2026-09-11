@@ -72,10 +72,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
 {
     use CannotBeInstantiated;
 
-    /**
-     * @param string[] $sourceDirectories
-     * @param SplFileInfo[] $filteredSourceFilesToMutate
-     */
     public static function create(
         string $testFrameworkExecutable,
         string $tmpDir,
@@ -85,34 +81,25 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         string $projectDir,
         array $sourceDirectories,
         bool $skipCoverage,
-        bool $executeOnlyCoveringTestCases = false,
-        array $filteredSourceFilesToMutate = [],
-        ?string $mapSourceClassToTestStrategy = null,
-        ?ShellCommandRunner $shellCommandRunner = null,
-        ?string $sourceDirectoryBasePath = null,
-        bool $useWindowsFilterLimit = false,
-        ?Filesystem $fileSystem = null,
-        ?ConsoleOutput $consoleOutput = null,
-        ?CoverageCheckerFactory $coverageCheckerFactory = null,
-        ?InitialTestsRunner $initialTestsRunner = null,
-        ?Configuration $configuration = null,
-        ?MutantProcessContainerFactory $processFactory = null,
-        ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter = null,
+        bool $executeOnlyCoveringTestCases,
+        array $filteredSourceFilesToMutate,
+        ?string $mapSourceClassToTestStrategy,
+        ShellCommandRunner $shellCommandRunner,
+        string $sourceDirectoryBasePath,
+        bool $useWindowsFilterLimit,
+        Filesystem $fileSystem,
+        ConsoleOutput $consoleOutput,
+        CoverageCheckerFactory $coverageCheckerFactory,
+        InitialTestsRunner $initialTestsRunner,
+        Configuration $configuration,
+        MutantProcessContainerFactory $processFactory,
+        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
         Assert::notEmpty(
             $sourceDirectories,
             'The source directories cannot be empty. This indicates that an invalid configuration reached the test framework adapter factory.',
         );
-        Assert::notNull($shellCommandRunner);
-        Assert::notNull($sourceDirectoryBasePath);
-        Assert::notNull($fileSystem);
-        Assert::notNull($consoleOutput);
-        Assert::notNull($coverageCheckerFactory);
-        Assert::notNull($initialTestsRunner);
-        Assert::notNull($configuration);
-        Assert::notNull($processFactory);
-        Assert::notNull($testFrameworkExtraOptionsFilter);
 
         $legacyAdapter = self::createLegacy(
             $testFrameworkExecutable,

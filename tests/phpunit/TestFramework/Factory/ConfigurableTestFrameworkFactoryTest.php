@@ -35,7 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Factory;
 
+use Infection\Console\ConsoleOutput;
+use Infection\FileSystem\FileSystem;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -50,12 +60,12 @@ final class ConfigurableTestFrameworkFactoryTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{callable(): mixed}>
+     * @return iterable<string, array{callable(self): mixed}>
      */
     public static function provideUnconfiguredOperation(): iterable
     {
         yield 'create test framework' => [
-            static fn () => ConfigurableTestFrameworkFactory::create('', '', '', null, '', '', [], false),
+            static fn (self $test) => $test->createTestFramework(),
         ];
 
         yield 'get adapter name' => [ConfigurableTestFrameworkFactory::getAdapterName(...)];
@@ -73,16 +83,7 @@ final class ConfigurableTestFrameworkFactoryTest extends TestCase
             'dummy-executable',
         );
 
-        $actualTestFramework = ConfigurableTestFrameworkFactory::create(
-            '',
-            '',
-            '',
-            null,
-            '',
-            '',
-            [],
-            false,
-        );
+        $actualTestFramework = $this->createTestFramework();
 
         $this->assertSame($expectedTestFramework, $actualTestFramework);
         $this->assertSame('dummy', ConfigurableTestFrameworkFactory::getAdapterName());
@@ -98,7 +99,7 @@ final class ConfigurableTestFrameworkFactoryTest extends TestCase
             ),
         );
 
-        $operation();
+        $operation($this);
     }
 
     public function test_it_cannot_be_configured_twice_without_reset(): void
@@ -140,7 +141,19 @@ final class ConfigurableTestFrameworkFactoryTest extends TestCase
             'second-executable',
         );
 
-        $actualTestFramework = ConfigurableTestFrameworkFactory::create(
+        $actualTestFramework = $this->createTestFramework();
+
+        $this->assertSame($expectedTestFramework, $actualTestFramework);
+        $this->assertSame('second', ConfigurableTestFrameworkFactory::getAdapterName());
+        $this->assertSame('second-executable', ConfigurableTestFrameworkFactory::getExecutableName());
+    }
+
+    private function createTestFramework(): TestFramework
+    {
+        $configuration = ConfigurationBuilder::withMinimalTestData()->build();
+        $fileSystem = $this->createStub(FileSystem::class);
+
+        return ConfigurableTestFrameworkFactory::create(
             '',
             '',
             '',
@@ -149,10 +162,23 @@ final class ConfigurableTestFrameworkFactoryTest extends TestCase
             '',
             [],
             false,
+            false,
+            [],
+            null,
+            $this->createStub(ShellCommandRunner::class),
+            '',
+            false,
+            $fileSystem,
+            $this->createStub(ConsoleOutput::class),
+            new CoverageCheckerFactory(
+                $configuration,
+                JUnitReportLocator::create($fileSystem, ''),
+                IndexXmlCoverageLocator::create($fileSystem, ''),
+            ),
+            $this->createStub(InitialTestsRunner::class),
+            $configuration,
+            $this->createStub(MutantProcessContainerFactory::class),
+            $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
-
-        $this->assertSame($expectedTestFramework, $actualTestFramework);
-        $this->assertSame('second', ConfigurableTestFrameworkFactory::getAdapterName());
-        $this->assertSame('second-executable', ConfigurableTestFrameworkFactory::getExecutableName());
     }
 }

@@ -35,6 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
+use Infection\Configuration\Configuration;
+use Infection\Console\ConsoleOutput;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use SplFileInfo;
+use Symfony\Component\Filesystem\Filesystem;
+
 /**
  * Defines how Infection discovers a test framework and creates it from the project's test-run configuration.
  *
@@ -44,6 +53,7 @@ interface TestFrameworkFactory
 {
     /**
      * @param string[] $sourceDirectories
+     * @param SplFileInfo[] $filteredSourceFilesToMutate
      */
     public static function create(
         string $testFrameworkExecutable,
@@ -54,6 +64,19 @@ interface TestFrameworkFactory
         string $projectDir,
         array $sourceDirectories,
         bool $skipCoverage,
+        bool $executeOnlyCoveringTestCases,
+        array $filteredSourceFilesToMutate,
+        ?string $mapSourceClassToTestStrategy,
+        ShellCommandRunner $shellCommandRunner,
+        string $sourceDirectoryBasePath,
+        bool $useWindowsFilterLimit,
+        Filesystem $fileSystem,
+        ConsoleOutput $consoleOutput,
+        CoverageCheckerFactory $coverageCheckerFactory,
+        InitialTestsRunner $initialTestsRunner,
+        Configuration $configuration,
+        MutantProcessContainerFactory $processFactory,
+        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework;
 
     /**
