@@ -33,47 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing\TestFramework\Debug;
+namespace Infection\TestFramework\Mago\Adapter;
 
-use Infection\Mutant\Mutant;
-use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\Process\MutantProcess;
+use Infection\CannotBeInstantiated;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
+use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
-use Symfony\Component\Process\Process;
+use Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * @internal
  */
-final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMutantProcessFactory
+final class MagoAdapterFactory implements StaticAnalysisToolAdapterFactory
 {
-    public function __construct(
-        private string $runtime,
-        private string $logFile,
-        private float $timeout,
-        private DebugCommandLine $commandLine,
-    ) {
-    }
+    use CannotBeInstantiated;
 
-    public function create(Mutant $mutant): MutantProcess
-    {
-        return new MutantProcess(
-            new Process(
-                command: $this->commandLine->create(
-                    runtime: $this->runtime,
-                    phpArguments: [],
-                    options: [
-                        'stage' => 'static-analysis-mutant',
-                        'log' => $this->logFile,
-                        'mutationHash' => $mutant->getMutation()->getHash(),
-                    ],
-                ),
-                env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
-                timeout: $this->timeout,
+    /**
+     * @param list<string> $staticAnalysisToolOptions
+     */
+    public static function create(
+        string $staticAnalysisConfigPath,
+        string $staticAnalysisToolExecutable,
+        float $timeout,
+        string $tmpDir,
+        array $staticAnalysisToolOptions,
+        ShellCommandRunner $shellCommandRunner,
+    ): StaticAnalysisToolAdapter {
+        return new MagoAdapter(
+            new MagoMutantExecutionResultFactory(),
+            $staticAnalysisConfigPath,
+            $staticAnalysisToolExecutable,
+            new CommandLineBuilder(
+                new PhpExecutableFinder(),
             ),
-            $mutant,
-            // There is not enough differences to warrant a different factory yet at the time of writing.
-            new PHPStanMutantExecutionResultFactory(),
+            new VersionParser(),
+            $timeout,
+            $staticAnalysisToolOptions,
+            $shellCommandRunner,
         );
     }
 }

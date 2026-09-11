@@ -33,47 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing\TestFramework\Debug;
+namespace Infection\Tests\TestFramework\PHPStan\Adapter;
 
-use Infection\Mutant\Mutant;
-use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\Process\MutantProcess;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
-use Symfony\Component\Process\Process;
+use Infection\FileSystem\FileSystem;
+use Infection\TestFramework\Contracts\FakeShellCommandRunner;
+use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapterFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMutantProcessFactory
+#[Group('integration')]
+#[CoversClass(PHPStanAdapterFactory::class)]
+final class PHPStanAdapterFactoryTest extends TestCase
 {
-    public function __construct(
-        private string $runtime,
-        private string $logFile,
-        private float $timeout,
-        private DebugCommandLine $commandLine,
-    ) {
-    }
-
-    public function create(Mutant $mutant): MutantProcess
+    public function test_it_can_create_an_adapter(): void
     {
-        return new MutantProcess(
-            new Process(
-                command: $this->commandLine->create(
-                    runtime: $this->runtime,
-                    phpArguments: [],
-                    options: [
-                        'stage' => 'static-analysis-mutant',
-                        'log' => $this->logFile,
-                        'mutationHash' => $mutant->getMutation()->getHash(),
-                    ],
-                ),
-                env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
-                timeout: $this->timeout,
-            ),
-            $mutant,
-            // There is not enough differences to warrant a different factory yet at the time of writing.
-            new PHPStanMutantExecutionResultFactory(),
+        $adapter = PHPStanAdapterFactory::create(
+            '/path/to/phpstan-config-path',
+            '/path/to/phpstan',
+            32.3,
+            '/tmp',
+            [],
+            new FakeShellCommandRunner(),
+            new FileSystem(),
         );
+
+        $this->assertSame('PHPStan', $adapter->getName());
     }
 }
