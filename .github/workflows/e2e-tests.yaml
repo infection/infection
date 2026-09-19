@@ -38,6 +38,10 @@ jobs:
           - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'dist/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.4', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.4', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.5', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.5', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.6', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.6', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
 
     name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependencies }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
@@ -62,10 +66,10 @@ jobs:
         if: matrix.dependencies != 'locked'
         run: composer config --unset platform.php
 
-      - name: Configure for PHP >= 8.4
-        if: "matrix.php-version >= '8.4'"
+      - name: Configure for PHP >= 8.6
+        if: "matrix.php-version >= '8.6'"
         run: |
-          composer config platform.php 8.4.99
+          composer config platform.php 8.5.99
 
       - name: Get composer cache directory
         id: composer-cache
