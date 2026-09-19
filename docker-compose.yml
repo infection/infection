@@ -36,3 +36,13 @@ services:
     volumes:
       - .:/opt/infection
 
+  # PHP 8.6 is not released yet: the base image is still a release candidate and
+  # no stable Xdebug supports it. Switch to '8.6'/a stable Xdebug once 8.6 is out.
+  php86:
+    build:
+      context: devTools
+      args:
+        PHP_VERSION: '8.6-rc'
+        XDEBUG_VERSION: '3.6.0alpha1'
+    volumes:
+      - .:/opt/infection
