@@ -90,7 +90,7 @@ final class PregMatchMatches implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        if ($node->args[2] instanceof Node\VariadicPlaceholder) {
+        if (!$node->args[2] instanceof Node\Arg) {
             return [];
         }
 

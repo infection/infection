@@ -201,7 +201,7 @@ final readonly class MBString implements ConfigurableMutator
             return null;
         }
 
-        if ($node->args[1] instanceof Node\VariadicPlaceholder) {
+        if (!$node->args[1] instanceof Node\Arg) {
             return null;
         }
 
@@ -247,7 +247,7 @@ final readonly class MBString implements ConfigurableMutator
     }
 
     /**
-     * @param array<Node\Arg|Node\VariadicPlaceholder> $args
+     * @param array<Node\Arg|Node\ArgPlaceholder|Node\VariadicPlaceholder> $args
      */
     private static function mapFunctionCall(Node\Expr\FuncCall $node, string $newFuncName, array $args): Node\Expr\FuncCall
     {
