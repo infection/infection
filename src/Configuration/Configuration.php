@@ -42,7 +42,7 @@ use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
-use Infection\Configuration\SourceFilter\SourceFileFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -73,7 +73,7 @@ readonly class Configuration
     public function __construct(
         public float $processTimeout,
         public Source $source,
-        public ?SourceFileFilter $sourceFilter,
+        public SourceFilter $sourceFilter,
         public Logs $logs,
         public string $logVerbosity,
         public string $tmpDir,

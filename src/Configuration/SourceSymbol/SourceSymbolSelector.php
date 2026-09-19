@@ -33,30 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Container\Builder;
-
-use DIContainer\Builder;
-use Infection\Configuration\Configuration;
-use Infection\FileSystem\FileSystem;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+namespace Infection\Configuration\SourceSymbol;
 
 /**
+ * A positional source selector. Line numbers are absolute source-file lines.
+ *
  * @internal
- * @implements Builder<IndexXmlCoverageParser>
  */
-final readonly class IndexXmlCoverageParserBuilder implements Builder
+final readonly class SourceSymbolSelector
 {
+    /**
+     * @param positive-int|null $line
+     */
     public function __construct(
-        private Configuration $configuration,
-        private FileSystem $fileSystem,
+        public string $className,
+        public ?string $methodName,
+        public ?int $line,
     ) {
-    }
-
-    public function build(): IndexXmlCoverageParser
-    {
-        return new IndexXmlCoverageParser(
-            isSourceFiltered: $this->configuration->sourceFilter->filtersFiles(),
-            fileSystem: $this->fileSystem,
-        );
     }
 }

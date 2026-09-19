@@ -33,30 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Container\Builder;
+namespace Infection\Configuration;
 
-use DIContainer\Builder;
-use Infection\Configuration\Configuration;
-use Infection\FileSystem\FileSystem;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 
 /**
+ * Result of positional path classification: source paths (equivalent to --filter)
+ * and test paths (equivalent to --test-framework-extra-args, space-joined).
+ *
  * @internal
- * @implements Builder<IndexXmlCoverageParser>
  */
-final readonly class IndexXmlCoverageParserBuilder implements Builder
+final readonly class ClassifiedPositionalArguments
 {
+    /**
+     * @param list<non-empty-string> $sourcePaths
+     * @param list<non-empty-string> $testPaths
+     * @param list<SourceSymbolSelector> $sourceSelectors
+     */
     public function __construct(
-        private Configuration $configuration,
-        private FileSystem $fileSystem,
+        public array $sourcePaths,
+        public array $testPaths,
+        public array $sourceSelectors,
     ) {
-    }
-
-    public function build(): IndexXmlCoverageParser
-    {
-        return new IndexXmlCoverageParser(
-            isSourceFiltered: $this->configuration->sourceFilter->filtersFiles(),
-            fileSystem: $this->fileSystem,
-        );
     }
 }

@@ -33,30 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Container\Builder;
+namespace Infection\Configuration\SourceSymbol;
 
-use DIContainer\Builder;
-use Infection\Configuration\Configuration;
-use Infection\FileSystem\FileSystem;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use InvalidArgumentException;
+use function sprintf;
 
 /**
  * @internal
- * @implements Builder<IndexXmlCoverageParser>
  */
-final readonly class IndexXmlCoverageParserBuilder implements Builder
+final class InvalidSourceSymbolSelector extends InvalidArgumentException
 {
-    public function __construct(
-        private Configuration $configuration,
-        private FileSystem $fileSystem,
-    ) {
-    }
-
-    public function build(): IndexXmlCoverageParser
+    public static function create(string $value): self
     {
-        return new IndexXmlCoverageParser(
-            isSourceFiltered: $this->configuration->sourceFilter->filtersFiles(),
-            fileSystem: $this->fileSystem,
+        return new self(
+            sprintf(
+                <<<'MESSAGE'
+                    Invalid source selector "%s". Expected one of:
+                    - Class
+                    - Class::method
+                    - Class::line
+                    - Class::method::line
+                    MESSAGE,
+                $value,
+            ),
         );
     }
 }
