@@ -646,7 +646,7 @@ final class MutationTestingRunnerTest extends TestCase
     {
         $method = (new ReflectionClass($this->runner))->getMethod($methodName);
 
-        return $method->invoke($this->runner, ...$args);
+        return $method->invoke($method->isStatic() ? null : $this->runner, ...$args);
     }
 
     /**

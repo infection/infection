@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "67def8caf736822a1d8361fb63525ae1",
+    "content-hash": "27d71cfa3e6ed3ccfa06d26175d384ef",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -4021,16 +4021,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "12.5.34",
+            "version": "12.5.35",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "6cbff63d670de92cb1cb3d2ff9f40327e9da9c7f"
+                "reference": "345ac22e42cb14cdc7aa8428655d8bb8c82a4aab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/6cbff63d670de92cb1cb3d2ff9f40327e9da9c7f",
-                "reference": "6cbff63d670de92cb1cb3d2ff9f40327e9da9c7f",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/345ac22e42cb14cdc7aa8428655d8bb8c82a4aab",
+                "reference": "345ac22e42cb14cdc7aa8428655d8bb8c82a4aab",
                 "shasum": ""
             },
             "require": {
@@ -4099,7 +4099,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.34"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.35"
             },
             "funding": [
                 {
@@ -4107,7 +4107,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-08-27T08:38:28+00:00"
+            "time": "2026-09-09T04:48:50+00:00"
         },
         {
             "name": "psr/cache",
@@ -5342,20 +5342,20 @@
         },
         {
             "name": "sidz/phpstan-rules",
-            "version": "0.5.2",
+            "version": "0.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sidz/phpstan-rules.git",
-                "reference": "81af1a29ef92e946a7d84b226f641ef5c8a2054e"
+                "reference": "ae227edf99d438ce7ea3472d9ca7c9ac1ea31b95"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sidz/phpstan-rules/zipball/81af1a29ef92e946a7d84b226f641ef5c8a2054e",
-                "reference": "81af1a29ef92e946a7d84b226f641ef5c8a2054e",
+                "url": "https://api.github.com/repos/sidz/phpstan-rules/zipball/ae227edf99d438ce7ea3472d9ca7c9ac1ea31b95",
+                "reference": "ae227edf99d438ce7ea3472d9ca7c9ac1ea31b95",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.1, <8.6",
+                "php": "^8.1, <8.7",
                 "phpstan/phpstan": "^2.0"
             },
             "require-dev": {
@@ -5399,7 +5399,7 @@
                 "issues": "https://github.com/sidz/phpstan-rules/issues",
                 "source": "https://github.com/sidz/phpstan-rules"
             },
-            "time": "2025-07-26T12:56:48+00:00"
+            "time": "2026-09-19T12:24:31+00:00"
         },
         {
             "name": "staabm/side-effects-detector",
@@ -5759,7 +5759,7 @@
         },
         {
             "name": "webmozarts/strict-phpunit",
-            "version": "7.24.3",
+            "version": "7.25.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/strict-phpunit.git",
@@ -5803,7 +5803,7 @@
             "description": "Enables type-safe comparisons of objects in PHPUnit",
             "support": {
                 "issues": "https://github.com/webmozarts/strict-phpunit/issues",
-                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.24.3"
+                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.25.0"
             },
             "time": "2026-07-03T15:09:51+00:00"
         }
