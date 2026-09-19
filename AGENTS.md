@@ -164,6 +164,51 @@ vendor/phpunit/phpunit/phpunit --filter test_method_name           # one method
 contributors. PHP floor is 8.3 (`composer.json` platform); Psalm is gone (2026), the static
 analysers are PHPStan and Mago.
 
+### Docker: when the host toolchain is not enough
+
+Most targets have a `-docker` twin that runs the same target inside the `php83` service from
+`docker-compose.yml` - PHP 8.3 with pcntl and Xdebug, repo bind-mounted at `/opt/infection`:
+
+```bash
+make cs-docker              # = make cs
+make autoreview-docker      # = make _autoreview in php83, then zizmor on the host
+make test-unit-docker       # = make test-unit
+make test-e2e-docker        # e2e with a real coverage driver
+make test-infection-docker  # dogfood with a real coverage driver
+make test-docker            # all of the above
+```
+
+The image pins the settings the suite needs, so the `-docker` twin runs a known-good
+configuration regardless of the host. Reach for the `-docker` twin when:
+
+- **the host `php.ini` may differ from `devTools/`.** The image sets `memory_limit = 512M`
+  (`devTools/memory-limit.ini`) and Xdebug mode off (`devTools/xdebug.ini`). A lower
+  `memory_limit` is not enough for the unit suite - it dies in `justinrainbow/json-schema`,
+  and PHPUnit reports it as `Premature end of PHP process`, which reads like a test bug and is
+  not one. CI never hits this because `setup-php` sets `memory_limit=-1`.
+- **the host PHP is not 8.3.** `cs` and `autoreview` run on 8.3 ONLY in CI, so a check that is
+  green on a newer host can still fail there. PHPStan is the exception - it reads
+  `config.platform.php` from `composer.json` and analyses at 8.3 whatever binary runs it, so
+  the drift is in the runtime: tests, Rector, CS tokenizer edge cases. The test count differs
+  between PHP versions too, because some tests are version-gated.
+- **the host has no Xdebug or PCOV.** `test-e2e` and `test-infection` need a coverage driver;
+  the image ships Xdebug with its mode off, so it costs nothing until Infection turns it on
+  per subprocess via `XDEBUG_MODE=coverage` (`OriginalPhpProcess`).
+- **the host has no PHP at all,** or `composer install` cannot satisfy the platform.
+- **you are reproducing a CI failure** and want the CI PHP version exactly.
+
+`vendor/` is bind-mounted, not rebuilt: dependencies installed by the host work as-is inside
+the container, because `config.platform.php` pins resolution to 8.3.
+
+Do NOT hand-roll `docker compose run --rm php83 make <target>`. The `-docker` targets also
+rebuild the image when `devTools/Dockerfile` changes (via the `devTools/Dockerfile.json`
+stamp), wrap the run in `devTools/flock`, and keep zizmor out of the PHP container. Raw
+`docker compose run --rm php83 <cmd>` is for one-offs with no `-docker` twin only, such as a
+single test file.
+
+Docker is not optional for `make autoreview` either way: zizmor runs as its own compose
+service. `php84` and `php85` services exist for manual version checks; no target uses them.
+
 ## Project coding rules
 
 Each entry gives three things: what agents often write, what this codebase does instead, and
@@ -583,7 +628,9 @@ Notes for review:
 - The MSI gate on changed files aims at ~100% but is soft: genuinely unkillable mutants can
   be bypassed BY DISCUSSION - say so in the thread rather than writing a contrived test.
 - Before finishing any task: `make cs`, then `make autoreview`, then the relevant test
-  groups. If CS is wrong, run `make cs` - never hand-edit style.
+  groups. If CS is wrong, run `make cs` - never hand-edit style. If the host PHP is not 8.3,
+  has no coverage driver, or dies with `Premature end of PHP process` (that is an OOM, not a
+  test bug), run the `-docker` twins instead (see Commands).
 
 ## Common high-cost mistakes (Gotchas)
 
