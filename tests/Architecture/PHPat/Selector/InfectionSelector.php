@@ -78,6 +78,14 @@ final class InfectionSelector
         return new InfectionTestCode();
     }
 
+    /**
+     * @param class-string $parentClassName
+     */
+    public static function directlyExtends(string $parentClassName): SelectorInterface
+    {
+        return new DirectlyExtends($parentClassName);
+    }
+
     public static function magoAdapterCandidate(): SelectorInterface
     {
         return Selector::AnyOf(
