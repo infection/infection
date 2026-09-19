@@ -215,11 +215,18 @@ final class BCMath implements ConfigurableMutator
     private static function makeBinaryOperatorMapper(string $operator): Closure
     {
         return static function (Node\Expr\FuncCall $node) use ($operator): iterable {
-            if (!$node->args[0] instanceof Node\Arg || !$node->args[1] instanceof Node\Arg) {
+            $leftArgument = $node->args[0];
+            $rightArgument = $node->args[1];
+
+            if (!$leftArgument instanceof Node\Arg) {
                 return;
             }
 
-            yield new $operator($node->args[0]->value, $node->args[1]->value);
+            if (!$rightArgument instanceof Node\Arg) {
+                return;
+            }
+
+            yield new $operator($leftArgument->value, $rightArgument->value);
         };
     }
 
@@ -239,7 +246,9 @@ final class BCMath implements ConfigurableMutator
     private static function makePowerModuloMapper(): Closure
     {
         return static function (Node\Expr\FuncCall $node): iterable {
-            if (!$node->args[2] instanceof Node\Arg) {
+            $modulusArgument = $node->args[2];
+
+            if (!$modulusArgument instanceof Node\Arg) {
                 return;
             }
 
@@ -248,7 +257,7 @@ final class BCMath implements ConfigurableMutator
                     new Node\Name('\pow'),
                     [$node->args[0], $node->args[1]],
                 ),
-                $node->args[2]->value,
+                $modulusArgument->value,
             );
         };
     }

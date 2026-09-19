@@ -90,11 +90,13 @@ final class PregMatchMatches implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        if (!$node->args[2] instanceof Node\Arg) {
+        $matchesArgument = $node->args[2];
+
+        if (!$matchesArgument instanceof Node\Arg) {
             return [];
         }
 
-        yield new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
+        yield new Node\Expr\Cast\Int_(new Node\Expr\Assign($matchesArgument->value, new Node\Expr\Array_()));
     }
 
     public function canMutate(Node $node): bool

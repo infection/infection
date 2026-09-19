@@ -201,11 +201,13 @@ final readonly class MBString implements ConfigurableMutator
             return null;
         }
 
-        if (!$node->args[1] instanceof Node\Arg) {
+        $modeArgument = $node->args[1];
+
+        if (!$modeArgument instanceof Node\Arg) {
             return null;
         }
 
-        $mode = $node->args[1]->value;
+        $mode = $modeArgument->value;
 
         if ($mode instanceof Node\Scalar\Int_) {
             return $mode->value;
