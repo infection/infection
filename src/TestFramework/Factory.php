@@ -168,16 +168,40 @@ final readonly class Factory
             if ($adapterName === $factory::getAdapterName()) {
                 $configuration = $this->infectionConfig;
 
-                return $factory::create(
-                    $this->testFrameworkFinder->find($factory::getExecutableName()),
-                    $this->tmpDir,
-                    $this->configLocator->locate($factory::getAdapterName()),
-                    null,
-                    $this->jUnitFilePath,
-                    $this->projectDir,
-                    $configuration->source->directories,
-                    $skipCoverage,
-                );
+                return is_a($factory, TestFrameworkFactory::class, true)
+                    ? $factory::create(
+                        $this->testFrameworkFinder->find($factory::getExecutableName()),
+                        $this->tmpDir,
+                        $this->configLocator->locate($factory::getAdapterName()),
+                        null,
+                        $this->jUnitFilePath,
+                        $this->projectDir,
+                        $configuration->source->directories,
+                        $skipCoverage,
+                        $configuration->executeOnlyCoveringTestCases,
+                        $this->getFilteredSourceFilesToMutate(),
+                        $configuration->mapSourceClassToTestStrategy,
+                        $this->shellCommandRunner,
+                        dirname($configuration->configurationPathname),
+                        OperatingSystem::isWindows(),
+                        $this->fileSystem,
+                        $this->consoleOutput,
+                        $this->coverageCheckerFactory,
+                        $this->initialTestsRunner,
+                        $configuration,
+                        $this->containerFactory,
+                        $this->extraOptionsFilter,
+                    )
+                    : $factory::create(
+                        $this->testFrameworkFinder->find($factory::getExecutableName()),
+                        $this->tmpDir,
+                        $this->configLocator->locate($factory::getAdapterName()),
+                        null,
+                        $this->jUnitFilePath,
+                        $this->projectDir,
+                        $configuration->source->directories,
+                        $skipCoverage,
+                    );
             }
         }
 
