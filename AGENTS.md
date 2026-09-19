@@ -181,7 +181,7 @@ make test-docker            # all of the above
 The image pins the settings the suite needs, so the `-docker` twin runs a known-good
 configuration regardless of the host. Reach for the `-docker` twin when:
 
-- **the host `php.ini` drifts from `devTools/`.** The image sets `memory_limit = 512M`
+- **the host `php.ini` may differ from `devTools/`.** The image sets `memory_limit = 512M`
   (`devTools/memory-limit.ini`) and Xdebug mode off (`devTools/xdebug.ini`). A lower
   `memory_limit` is not enough for the unit suite - it dies in `justinrainbow/json-schema`,
   and PHPUnit reports it as `Premature end of PHP process`, which reads like a test bug and is
