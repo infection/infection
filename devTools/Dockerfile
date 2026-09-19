@@ -8,8 +8,7 @@ RUN apk add --update --no-cache \
 		linux-headers \
 	;
 
-# mbstring is compiled below only when the base image lacks it: PHP >= 8.6 no
-# longer bundles it, and PHPUnit requires it.
+# PHPUnit requires mbstring, so we have to install it if missing
 RUN --mount=type=bind,from=ghcr.io/php/pie:bin,source=/pie,target=/usr/local/bin/pie \
     set -eux; \
     apk add --no-cache --virtual .build-deps \
