@@ -43,6 +43,9 @@ use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
+ * Locates Composer and returns its invocation as an argv prefix that callers can safely extend with Composer arguments.
+ * It supports executable installations, PHARs, and non-executable PHP scripts found on PATH or near the working directory.
+ *
  * @internal
  */
 final readonly class ConcreteComposerExecutableFinder implements ComposerExecutableFinder
