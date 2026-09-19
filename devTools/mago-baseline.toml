@@ -2293,12 +2293,6 @@ message = 'The value returned by generator function `Infection\Mutator\Regex\Abs
 count = 1
 
 [[issues]]
-file = "src/Mutator/Regex/AbstractPregMatch.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Infection\Mutator\Regex\AbstractPregMatch::getNewRegexArgument`: expected `PhpParser\Node\Arg`, but possibly received `PhpParser\Node\Arg|PhpParser\Node\VariadicPlaceholder`.'
-count = 1
-
-[[issues]]
 file = "src/Mutator/Regex/PregMatchMatches.php"
 code = "hidden-generator-return"
 message = 'The value returned by generator function `Infection\Mutator\Regex\PregMatchMatches::mutate` may be inaccessible to callers.'

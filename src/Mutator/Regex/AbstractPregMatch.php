@@ -61,14 +61,16 @@ abstract class AbstractPregMatch implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        if ($node->args[0] instanceof Node\VariadicPlaceholder) {
+        $regexArgument = $node->args[0];
+
+        if (!$regexArgument instanceof Node\Arg) {
             return [];
         }
 
-        $originalRegex = $this->pullOutRegex($node->args[0]);
+        $originalRegex = $this->pullOutRegex($regexArgument);
 
         foreach ($this->mutateRegex($originalRegex) as $mutatedRegex) {
-            $newArgument = $this->getNewRegexArgument($mutatedRegex, $node->args[0]);
+            $newArgument = $this->getNewRegexArgument($mutatedRegex, $regexArgument);
 
             yield new FuncCall($node->name, [$newArgument] + $node->args, NodeAttributes::getAllExceptOriginalNode($node));
         }
