@@ -3145,16 +3145,16 @@
         },
         {
             "name": "phpat/phpat",
-            "version": "0.12.4",
+            "version": "0.12.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/carlosas/phpat.git",
-                "reference": "5319264270c335f548451209bb0f32b55aa59924"
+                "reference": "408d16fdd893e1efc4a3c4a851f407204c69781a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/carlosas/phpat/zipball/5319264270c335f548451209bb0f32b55aa59924",
-                "reference": "5319264270c335f548451209bb0f32b55aa59924",
+                "url": "https://api.github.com/repos/carlosas/phpat/zipball/408d16fdd893e1efc4a3c4a851f407204c69781a",
+                "reference": "408d16fdd893e1efc4a3c4a851f407204c69781a",
                 "shasum": ""
             },
             "require": {
@@ -3196,9 +3196,9 @@
             "description": "PHP Architecture Tester",
             "support": {
                 "issues": "https://github.com/carlosas/phpat/issues",
-                "source": "https://github.com/carlosas/phpat/tree/0.12.4"
+                "source": "https://github.com/carlosas/phpat/tree/0.12.5"
             },
-            "time": "2026-03-17T16:47:43+00:00"
+            "time": "2026-09-15T18:11:37+00:00"
         },
         {
             "name": "phpbench/container",
