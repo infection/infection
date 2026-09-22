@@ -2846,20 +2846,8 @@ count = 1
 
 [[issues]]
 file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
-code = "possibly-null-argument"
-message = "Argument #1 of function `array_key_exists` is possibly `null`, but parameter type `bool|float|int|string` does not accept it."
-count = 1
-
-[[issues]]
-file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
 code = "possibly-null-array-access"
 message = "Cannot perform array access on possibly `null` value."
-count = 2
-
-[[issues]]
-file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
-code = "possibly-null-array-index"
-message = "Possibly using `null` as an array index to access element."
 count = 2
 
 [[issues]]

@@ -169,7 +169,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                                 'location' => ['start' => ['line' => 28, 'column' => 9], 'end' => ['line' => 28, 'column' => 65]],
                                 'status' => 'Survived',
                                 'statusReason' => 'PHPUnit output. Tests: 3, Assertions: 3',
-                                'coveredBy' => ['06a6c58caae5aa33e9b787f064618f5e', '949bee6dd4ac608462995babbe81ee12', '2733f8c97b5ba92b1aacb77d46837b0e'],
+                                'coveredBy' => ['06a6c58caae5aa33e9b787f064618f5e', '949bee6dd4ac608462995babbe81ee12', '2733f8c97b5ba92b1aacb77d46837b0e', '7e298a8c6c7002e092e354e96f3e8350'],
                                 'killedBy' => [],
                                 'testsCompleted' => 3,
                             ],
@@ -228,6 +228,14 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                             [
                                 'id' => '2733f8c97b5ba92b1aacb77d46837b0e',
                                 'name' => 'TestClass2::test_method3',
+                            ],
+                        ],
+                    ],
+                    '' => [
+                        'tests' => [
+                            [
+                                'id' => '7e298a8c6c7002e092e354e96f3e8350',
+                                'name' => 'TestClass3::test_method4',
                             ],
                         ],
                     ],
@@ -394,6 +402,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                     new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
                     new TestLocation('TestClass2::test_method2', '/infection/path/to/TestClass2.php', 0.456),
                     new TestLocation('TestClass2::test_method3', '/infection/path/to/TestClass2.php', 0.789),
+                    new TestLocation('TestClass3::test_method4', null, 0.987),
                 ],
                 'PHPUnit output. Tests: 3, Assertions: 3',
             ),
