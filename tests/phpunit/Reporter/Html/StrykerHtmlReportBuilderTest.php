@@ -402,6 +402,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                     new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
                     new TestLocation('TestClass2::test_method2', '/infection/path/to/TestClass2.php', 0.456),
                     new TestLocation('TestClass2::test_method3', '/infection/path/to/TestClass2.php', 0.789),
+                    // Some test frameworks cannot provide the file path and timings, e.g. at the time of writing PhpSpec which is missing the JUnit report and is using an outdated PHPUnit XML coverage.
                     new TestLocation('TestClass3::test_method4', null, 0.987),
                 ],
                 'PHPUnit output. Tests: 3, Assertions: 3',
