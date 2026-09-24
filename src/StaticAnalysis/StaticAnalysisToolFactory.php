@@ -37,12 +37,17 @@ namespace Infection\StaticAnalysis;
 
 use function implode;
 use Infection\Configuration\Configuration;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use Infection\TestFramework\LegacyStaticAnalysisBridge;
+use Infection\TestFramework\NullStaticAnalysisTestFramework;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
 use InvalidArgumentException;
@@ -63,10 +68,29 @@ final readonly class StaticAnalysisToolFactory
         private ShellCommandRunner $shellCommandRunner,
         private PhpExecutableFinder $phpExecutableFinder,
         private FileSystem $fileSystem,
+        private EventDispatcher $eventDispatcher,
     ) {
     }
 
-    public function create(string $adapterName, float $timeout): StaticAnalysisToolAdapter
+    public function create(?string $adapterName, float $timeout): StaticAnalysisTestFramework
+    {
+        if ($adapterName === null) {
+            return new NullStaticAnalysisTestFramework();
+        }
+
+        $adapter = $this->createAdapter($adapterName, $timeout);
+
+        return new LegacyStaticAnalysisBridge(
+            new InitialStaticAnalysisRunner(
+                $this->shellCommandRunner,
+                $this->eventDispatcher,
+                $adapter,
+            ),
+            $adapter,
+        );
+    }
+
+    private function createAdapter(string $adapterName, float $timeout): StaticAnalysisToolAdapter
     {
         if ($adapterName === StaticAnalysisToolTypes::DEBUG) {
             return new DebugStaticAnalysisAdapter(
