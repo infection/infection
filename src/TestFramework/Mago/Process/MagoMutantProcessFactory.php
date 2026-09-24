@@ -33,47 +33,75 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing\TestFramework\Debug;
+namespace Infection\TestFramework\Mago\Process;
 
+use function array_merge;
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
+use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMutantProcessFactory
+final readonly class MagoMutantProcessFactory implements LazyMutantProcessFactory
 {
+    /**
+     * @param list<string> $staticAnalysisToolOptions
+     */
     public function __construct(
-        private string $runtime,
-        private string $logFile,
+        private MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private string $staticAnalysisToolExecutable,
+        private CommandLineBuilder $commandLineBuilder,
         private float $timeout,
-        private DebugCommandLine $commandLine,
+        private array $staticAnalysisToolOptions,
     ) {
     }
 
     public function create(Mutant $mutant): MutantProcess
     {
-        return new MutantProcess(
-            new Process(
-                command: $this->commandLine->create(
-                    runtime: $this->runtime,
-                    phpArguments: [],
-                    options: [
-                        'stage' => 'static-analysis-mutant',
-                        'log' => $this->logFile,
-                        'mutationHash' => $mutant->getMutation()->getHash(),
-                    ],
-                ),
-                env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
-                timeout: $this->timeout,
+        $process = new Process(
+            command: $this->getMutantCommandLine(
+                $mutant->getFilePath(),
+                $mutant->getMutation()->getOriginalFilePath(),
             ),
+            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
+            timeout: $this->timeout,
+        );
+
+        return new MutantProcess(
+            $process,
             $mutant,
-            // There is not enough differences to warrant a different factory yet at the time of writing.
-            new PHPStanMutantExecutionResultFactory(),
+            $this->mutantExecutionResultFactory,
+        );
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getMutantCommandLine(
+        string $mutatedFilePath,
+        string $originalFilePath,
+    ): array {
+        $options = array_merge(
+            [
+                '--colors=never',
+                '--threads=1',
+                'analyze',
+                '--reporting-format=short',
+                '--substitute',
+                "$originalFilePath=$mutatedFilePath",
+            ],
+            $this->staticAnalysisToolOptions,
+        );
+
+        return $this->commandLineBuilder->build(
+            $this->staticAnalysisToolExecutable,
+            [],
+            $options,
         );
     }
 }

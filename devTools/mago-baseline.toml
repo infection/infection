@@ -2929,42 +2929,6 @@ message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrD
 count = 1
 
 [[issues]]
-file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter::assertMinimumVersionSatisfied`.'
-count = 1
-
-[[issues]]
-file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
-count = 1
-
-[[issues]]
-file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
-count = 1
-
-[[issues]]
-file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
-count = 1
-
-[[issues]]
-file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
-count = 1
-
-[[issues]]
-file = "src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php"
-code = "possibly-null-operand"
-message = "Left operand in `>` comparison might be `null` (type `int|null`)."
-count = 1
-
-[[issues]]
 file = "src/StaticAnalysis/StaticAnalysisToolFactory.php"
 code = "deprecated-class"
 message = 'Class `Infection\TestFramework\LegacyStaticAnalysisBridge` is deprecated and should no longer be used.'
@@ -3262,6 +3226,42 @@ count = 1
 file = "src/TestFramework/LegacyTestFrameworkBridge.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Process\Runner\InitialTestsFailed` in `Infection\TestFramework\LegacyTestFrameworkBridge::executeInitialRun`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PHPStan/Adapter/PHPStanAdapter.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter::assertMinimumVersionSatisfied`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PHPStan/Adapter/PHPStanAdapter.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PHPStan/Adapter/PHPStanAdapter.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PHPStan/Adapter/PHPStanAdapter.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PHPStan/Adapter/PHPStanAdapter.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php"
+code = "possibly-null-operand"
+message = "Left operand in `>` comparison might be `null` (type `int|null`)."
 count = 1
 
 [[issues]]
