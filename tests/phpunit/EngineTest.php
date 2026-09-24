@@ -200,11 +200,30 @@ final class EngineTest extends TestCase
         $callOrder = [];
 
         $this->testFramework
+            ->expects($this->once())
+            ->method('checkRequirements')
+            ->willReturnCallback(static function () use (&$callOrder): void {
+                $callOrder[] = 'testRequirements';
+            })
+        ;
+        $this->testFramework
+            ->expects($skipInitialTests ? $this->never() : $this->once())
             ->method('executeInitialRun')
-            ->willReturn($initialRunResults)
+            ->willReturnCallback(static function () use (&$callOrder, $initialRunResults): InitialRunResults {
+                $callOrder[] = 'initialTests';
+
+                return $initialRunResults;
+            })
         ;
 
         $initialStaticAnalysis = $this->createMock(StaticAnalysisTestFramework::class);
+        $initialStaticAnalysis
+            ->expects($this->once())
+            ->method('checkRequirements')
+            ->willReturnCallback(static function () use (&$callOrder): void {
+                $callOrder[] = 'staticAnalysisRequirements';
+            })
+        ;
         $initialStaticAnalysis
             ->expects($this->once())
             ->method('executeInitialRun')
@@ -266,7 +285,49 @@ final class EngineTest extends TestCase
 
         $engine->execute();
 
-        $this->assertSame(['staticAnalysis', 'limitMemory', 'generate'], $callOrder);
+        $expectedCallOrder = ['staticAnalysisRequirements', 'testRequirements'];
+
+        if (!$skipInitialTests) {
+            $expectedCallOrder[] = 'initialTests';
+        }
+
+        $expectedCallOrder[] = 'staticAnalysis';
+        $expectedCallOrder[] = 'limitMemory';
+        $expectedCallOrder[] = 'generate';
+
+        $this->assertSame($expectedCallOrder, $callOrder);
+    }
+
+    public function test_it_stops_when_static_analysis_requirements_are_not_satisfied(): void
+    {
+        $this->testFramework
+            ->expects($this->never())
+            ->method('executeInitialRun')
+        ;
+
+        $failure = new RuntimeException('Unsupported static analyser version.');
+        $staticAnalysis = $this->createMock(StaticAnalysisTestFramework::class);
+        $staticAnalysis
+            ->expects($this->once())
+            ->method('checkRequirements')
+            ->willThrowException($failure)
+        ;
+        $staticAnalysis
+            ->expects($this->never())
+            ->method('executeInitialRun')
+        ;
+        $this->memoryLimiter
+            ->expects($this->never())
+            ->method('limitMemory')
+        ;
+        $this->mutationGenerator
+            ->expects($this->never())
+            ->method('generate')
+        ;
+
+        $this->expectExceptionObject($failure);
+
+        $this->createEngine(staticAnalysisTestFramework: $staticAnalysis)->execute();
     }
 
     public static function skipInitialTestsProvider(): iterable
