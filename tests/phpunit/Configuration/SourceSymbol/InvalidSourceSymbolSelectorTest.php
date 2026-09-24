@@ -33,30 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Container\Builder;
+namespace Infection\Tests\Configuration\SourceSymbol;
 
-use DIContainer\Builder;
-use Infection\Configuration\Configuration;
-use Infection\FileSystem\FileSystem;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\Configuration\SourceSymbol\InvalidSourceSymbolSelector;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @implements Builder<IndexXmlCoverageParser>
- */
-final readonly class IndexXmlCoverageParserBuilder implements Builder
+#[CoversClass(InvalidSourceSymbolSelector::class)]
+final class InvalidSourceSymbolSelectorTest extends TestCase
 {
-    public function __construct(
-        private Configuration $configuration,
-        private FileSystem $fileSystem,
-    ) {
-    }
-
-    public function build(): IndexXmlCoverageParser
+    public function test_it_creates_an_exception_for_the_value(): void
     {
-        return new IndexXmlCoverageParser(
-            isSourceFiltered: $this->configuration->sourceFilter->filtersFiles(),
-            fileSystem: $this->fileSystem,
+        $exception = InvalidSourceSymbolSelector::create('App\Mailer::send:32');
+
+        $this->assertSame(
+            <<<'MESSAGE'
+                Invalid source selector "App\Mailer::send:32". Expected one of:
+                - Class
+                - Class::method
+                - Class::line
+                - Class::method::line
+                MESSAGE,
+            $exception->getMessage(),
         );
     }
 }

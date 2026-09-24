@@ -44,6 +44,8 @@ use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
+use Infection\Source\Exception\SourceSymbolNotFound;
+use Infection\Source\Matcher\SourceSymbolMatcher;
 use Infection\TestFramework\Coverage\JUnit\TestNotFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
@@ -69,6 +71,7 @@ class MutationGenerator
         array $mutators,
         private readonly EventDispatcher $eventDispatcher,
         private readonly FileMutationGenerator $fileMutationGenerator,
+        private readonly SourceSymbolMatcher $sourceSymbolMatcher,
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
         $this->mutators = $mutators;
@@ -80,6 +83,7 @@ class MutationGenerator
      * @throws UnparsableFile
      * @throws InvalidCoverage
      * @throws NoSourceFound
+     * @throws SourceSymbolNotFound
      * @throws NoReportFound
      * @throws TooManyReportsFound
      * @throws ReportLocationThrowable
@@ -89,6 +93,7 @@ class MutationGenerator
      */
     public function generate(bool $onlyCovered): iterable
     {
+        $this->sourceSymbolMatcher->reset();
         $sources = $this->sourceCollector->collect();
         $numberOfFiles = count($sources);
 
@@ -115,6 +120,12 @@ class MutationGenerator
                     $sourceFileMutationIds,
                 ),
             );
+        }
+
+        $unmatchedSelectors = $this->sourceSymbolMatcher->getUnmatchedSelectors();
+
+        if ($unmatchedSelectors !== []) {
+            throw SourceSymbolNotFound::forSelectors($unmatchedSelectors);
         }
 
         $this->eventDispatcher->dispatch(new MutationGenerationWasFinished());

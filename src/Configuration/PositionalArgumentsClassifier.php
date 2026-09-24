@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
-use function class_exists;
 use function ctype_upper;
 use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelectorParser;
 use Infection\FileSystem\FileSystem;
 use InvalidArgumentException;
 use function sprintf;
@@ -47,12 +47,11 @@ use function str_starts_with;
 use Symfony\Component\Filesystem\Path;
 
 /**
- * Classifies positional `path` arguments into source-filter and
- * test-framework-extra-args buckets.
- *
+ * Classifies positional arguments into source paths, test paths, and source
+ * symbol selectors.
  * @internal
  */
-final readonly class PositionalPathsClassifier
+final readonly class PositionalArgumentsClassifier
 {
     private const string KIND_SOURCE = 'source';
 
@@ -60,6 +59,7 @@ final readonly class PositionalPathsClassifier
 
     public function __construct(
         private FileSystem $fileSystem,
+        private SourceSymbolSelectorParser $sourceSymbolSelectorParser,
     ) {
     }
 
@@ -69,9 +69,9 @@ final readonly class PositionalPathsClassifier
     public function classify(
         array $paths,
         SchemaConfiguration $schema,
-    ): ClassifiedPaths {
+    ): ClassifiedPositionalArguments {
         if ($paths === []) {
-            return new ClassifiedPaths([], []);
+            return new ClassifiedPositionalArguments([], [], []);
         }
 
         $configDir = dirname($schema->pathname);
@@ -79,8 +79,23 @@ final readonly class PositionalPathsClassifier
 
         $sourcePaths = [];
         $testPaths = [];
+        $sourceSelectors = [];
 
         foreach ($paths as $path) {
+            $absolutePath = Path::isAbsolute($path)
+                ? $path
+                : Path::join($configDir, $path);
+
+            if (!$this->isValidPath($absolutePath)) {
+                $selector = $this->sourceSymbolSelectorParser->parse($path);
+
+                if ($selector !== null) {
+                    $sourceSelectors[] = $selector;
+
+                    continue;
+                }
+            }
+
             $kind = $this->classifyPathKind($path, $absoluteSourceDirs, $configDir);
 
             if ($kind === self::KIND_SOURCE) {
@@ -90,10 +105,18 @@ final readonly class PositionalPathsClassifier
             }
         }
 
-        return new ClassifiedPaths($sourcePaths, $testPaths);
+        return new ClassifiedPositionalArguments(
+            $sourcePaths,
+            $testPaths,
+            $sourceSelectors,
+        );
     }
 
     /**
+     * TODO: Consolidate this with BasicSourceCollector::makePathsAbsolute()
+     * and PhpUnitAdapterFactory::makeSourcePathsAbsolute(), accounting for
+     * their different canonicalization semantics.
+     *
      * @return list<non-empty-string>
      */
     private static function resolveAbsoluteSourceDirectories(
@@ -147,15 +170,6 @@ final readonly class PositionalPathsClassifier
         array $absoluteSourceDirs,
         string $configDir,
     ): string {
-        // TODO: FQCN-style arguments (e.g. "\App\Foo" or "\App\Foo::method::45") will
-        // be supported via https://github.com/infection/infection/issues/2237
-        if (self::looksLikeFqcnWithOptionalMethodOrLine($path)) {
-            throw new InvalidArgumentException(sprintf(
-                'FQCN-style arguments like "%s" are not yet supported. See https://github.com/infection/infection/issues/2237.',
-                $path,
-            ));
-        }
-
         $absolutePath = Path::isAbsolute($path)
             ? $path
             : Path::join($configDir, $path);
@@ -183,21 +197,6 @@ final readonly class PositionalPathsClassifier
         ));
     }
 
-    /**
-     * \SomeNamespace\Class
-     * \SomeNamespace\Class::method
-     * \SomeNamespace\Class::method::34
-     * App\Foo (bare, unbackslashed)
-     */
-    private static function looksLikeFqcnWithOptionalMethodOrLine(string $value): bool
-    {
-        if (str_starts_with($value, '\\') || str_contains($value, '::')) {
-            return true;
-        }
-
-        return class_exists($value);
-    }
-
     private static function looksLikeClassOrFileName(string $value): bool
     {
         return ctype_upper($value[0]) // class and file name starts with Pascal Case (A-Z only, not digits)
@@ -207,6 +206,7 @@ final readonly class PositionalPathsClassifier
 
     private function isValidPath(string $absolutePath): bool
     {
-        return $this->fileSystem->isReadableFile($absolutePath) || $this->fileSystem->isReadableDirectory($absolutePath);
+        return $this->fileSystem->isReadableFile($absolutePath)
+            || $this->fileSystem->isReadableDirectory($absolutePath);
     }
 }

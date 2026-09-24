@@ -33,30 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Container\Builder;
+namespace Infection\Tests\Configuration\SourceFilter;
 
-use DIContainer\Builder;
-use Infection\Configuration\Configuration;
-use Infection\FileSystem\FileSystem;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\SourceFileFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @implements Builder<IndexXmlCoverageParser>
- */
-final readonly class IndexXmlCoverageParserBuilder implements Builder
+#[CoversClass(SourceFilter::class)]
+final class SourceFilterTest extends TestCase
 {
-    public function __construct(
-        private Configuration $configuration,
-        private FileSystem $fileSystem,
-    ) {
+    #[DataProvider('fileFilterProvider')]
+    public function test_it_knows_whether_files_are_filtered(
+        ?SourceFileFilter $fileFilter,
+        bool $expected,
+    ): void {
+        $sourceFilter = new SourceFilter($fileFilter, []);
+
+        $this->assertSame($expected, $sourceFilter->filtersFiles());
     }
 
-    public function build(): IndexXmlCoverageParser
+    public static function fileFilterProvider(): iterable
     {
-        return new IndexXmlCoverageParser(
-            isSourceFiltered: $this->configuration->sourceFilter->filtersFiles(),
-            fileSystem: $this->fileSystem,
-        );
+        yield 'unfiltered' => [
+            null,
+            false,
+        ];
+
+        yield 'filtered' => [
+            new PlainFilter(['src/']),
+            true,
+        ];
     }
 }

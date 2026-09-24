@@ -33,30 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Container\Builder;
+namespace Infection\Tests\Source\Exception;
 
-use DIContainer\Builder;
-use Infection\Configuration\Configuration;
-use Infection\FileSystem\FileSystem;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
+use Infection\Source\Exception\SourceSymbolNotFound;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @implements Builder<IndexXmlCoverageParser>
- */
-final readonly class IndexXmlCoverageParserBuilder implements Builder
+#[CoversClass(SourceSymbolNotFound::class)]
+final class SourceSymbolNotFoundTest extends TestCase
 {
-    public function __construct(
-        private Configuration $configuration,
-        private FileSystem $fileSystem,
-    ) {
-    }
-
-    public function build(): IndexXmlCoverageParser
+    public function test_it_lists_every_unmatched_selector(): void
     {
-        return new IndexXmlCoverageParser(
-            isSourceFiltered: $this->configuration->sourceFilter->filtersFiles(),
-            fileSystem: $this->fileSystem,
+        $throwable = SourceSymbolNotFound::forSelectors([
+            new SourceSymbolSelector('Differ', null, null),
+            new SourceSymbolSelector('App\\Mailer', 'send', 42),
+        ]);
+
+        $this->assertSame(
+            'The following source selectors did not match any source symbol: "Differ", "App\\Mailer::send::42".',
+            $throwable->getMessage(),
         );
     }
 }

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Configuration\ClassifiedPaths;
+use Infection\Configuration\ClassifiedPositionalArguments;
 use Infection\Engine;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\Testing\SingletonContainer;
@@ -77,7 +77,7 @@ final class SourceClassWithPublicNonReadonlyPropertyTest extends SelectorTestCas
         ];
 
         yield 'readonly source class with public promoted properties' => [
-            ClassifiedPaths::class,
+            ClassifiedPositionalArguments::class,
             false,
         ];
 
