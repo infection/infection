@@ -53,10 +53,10 @@ use Iterator;
 final readonly class NonRewindableIterator implements Iterator
 {
     /**
-     * @param Iterator<TKey, TValue> $iterator
+     * @param Iterator<TKey, TValue> $decoratedIterator
      */
     public function __construct(
-        private Iterator $iterator,
+        private Iterator $decoratedIterator,
     ) {
     }
 
@@ -67,21 +67,21 @@ final readonly class NonRewindableIterator implements Iterator
 
     public function current(): mixed
     {
-        return $this->iterator->current();
+        return $this->decoratedIterator->current();
     }
 
     public function next(): void
     {
-        $this->iterator->next();
+        $this->decoratedIterator->next();
     }
 
     public function key(): mixed
     {
-        return $this->iterator->key();
+        return $this->decoratedIterator->key();
     }
 
     public function valid(): bool
     {
-        return $this->iterator->valid();
+        return $this->decoratedIterator->valid();
     }
 }

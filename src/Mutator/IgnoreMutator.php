@@ -59,11 +59,11 @@ use function sprintf;
 final readonly class IgnoreMutator implements Mutator
 {
     /**
-     * @param Mutator<TNode> $mutator
+     * @param Mutator<TNode> $decoratedMutator
      */
     public function __construct(
         private IgnoreConfig $config,
-        private Mutator $mutator,
+        private Mutator $decoratedMutator,
     ) {
     }
 
@@ -80,7 +80,7 @@ final readonly class IgnoreMutator implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        if (!$this->mutator->canMutate($node)) {
+        if (!$this->decoratedMutator->canMutate($node)) {
             return false;
         }
 
@@ -106,11 +106,11 @@ final readonly class IgnoreMutator implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        return $this->mutator->mutate($node);
+        return $this->decoratedMutator->mutate($node);
     }
 
     public function getName(): string
     {
-        return $this->mutator->getName();
+        return $this->decoratedMutator->getName();
     }
 }

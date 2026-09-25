@@ -48,7 +48,7 @@ use Webmozart\Assert\Assert;
 final readonly class GitDiffSourceCollector implements SourceCollector
 {
     public function __construct(
-        private SourceCollector $innerCollector,
+        private SourceCollector $decoratedCollector,
     ) {
     }
 
@@ -81,7 +81,7 @@ final readonly class GitDiffSourceCollector implements SourceCollector
 
     public function collect(): array
     {
-        return $this->innerCollector->collect();
+        return $this->decoratedCollector->collect();
     }
 
     /**
