@@ -42,6 +42,7 @@ use Infection\Logger\Console\ConsoleLogger;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Terminal;
@@ -66,6 +67,14 @@ final class ConsoleOutputTest extends TestCase
                 new IO(new StringInput(''), $this->output),
             ),
         );
+    }
+
+    public function test_log_skipping_test_impact_analysis(): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('notice')->with('PHPUnit test impact analysis is disabled. Missing metadata.');
+
+        (new ConsoleOutput($logger))->logSkippingTestImpactAnalysis('Missing metadata.');
     }
 
     public function test_log_verbosity_deprecation_notice(): void

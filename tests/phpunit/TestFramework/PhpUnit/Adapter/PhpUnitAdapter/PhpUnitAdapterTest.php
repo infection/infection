@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use function array_map;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
@@ -56,6 +57,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use SplFileInfo;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -218,7 +220,7 @@ final class PhpUnitAdapterTest extends TestCase
         $options = $this->adapter->getInitialRunOnlyOptions();
 
         $this->assertSame(
-            ['--configuration', '--filter', '--testsuite'],
+            ['--configuration', '--filter', '--testsuite', '--impacted-by-file'],
             $options,
         );
     }
@@ -1674,6 +1676,8 @@ final class PhpUnitAdapterTest extends TestCase
                 $this->fileSystemMock,
                 ['bin', 'src'],
                 $filteredSourceFilePathsToMutate,
+                $projectDir,
+                (new ConsoleOutput(new NullLogger()))->logSkippingTestImpactAnalysis(...),
             ),
             new MutationConfigBuilder(
                 $tmpDir,

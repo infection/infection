@@ -130,6 +130,11 @@ class ConsoleOutput
         );
     }
 
+    public function logSkippingTestImpactAnalysis(string $reason): void
+    {
+        $this->logger->notice('PHPUnit test impact analysis is disabled. ' . $reason);
+    }
+
     public function logSkippingInitialTests(): void
     {
         $this->logger->warning(implode(

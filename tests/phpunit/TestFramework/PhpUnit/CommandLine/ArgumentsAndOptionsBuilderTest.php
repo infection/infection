@@ -55,6 +55,43 @@ use function str_repeat;
 #[CoversClass(TestFrameworkExtraArgs::class)]
 final class ArgumentsAndOptionsBuilderTest extends TestCase
 {
+    #[DataProvider('impactOptionsProvider')]
+    public function test_impact_options_apply_only_to_the_initial_run(string $extraArgs): void
+    {
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null, false);
+        $extraArgs .= ' --group "a group"';
+
+        $this->assertSame(
+            ['--configuration', '/config', ...TestFrameworkExtraArgs::parseRawTokens($extraArgs)],
+            $builder->buildForInitialTestsRun('/config', $extraArgs),
+        );
+        $this->assertSame(
+            ['--configuration', '/config', '--group', 'a group'],
+            $builder->buildForMutant('/config', $extraArgs, [], '13.4-dev'),
+        );
+    }
+
+    public static function impactOptionsProvider(): iterable
+    {
+        yield 'observed execution' => ['--record-test-impact-data'];
+
+        yield 'disabled recording' => ['--do-not-record-test-impact-data'];
+
+        yield 'declared targets' => ['--derive-test-impact-data-from-coverage-targets'];
+
+        yield 'disabled declared targets' => ['--do-not-derive-test-impact-data-from-coverage-targets'];
+
+        yield 'automatic changes' => ['--only-impacted'];
+
+        yield 'explanation' => ['--explain-impacted'];
+
+        yield 'explicit paths' => ['--impacted-by "src/a file.php" --impacted-by=src/B.php'];
+
+        yield 'path list' => ['--impacted-by-file "a list.txt"'];
+
+        yield 'path list with equals' => ['--impacted-by-file="a list.txt"'];
+    }
+
     public function test_it_can_build_the_command_without_extra_options(): void
     {
         $builder = new ArgumentsAndOptionsBuilder(false, [], null, false);

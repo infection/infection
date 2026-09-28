@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<phpunit bootstrap="vendor/autoload.php" beStrictAboutCoverageMetadata="true" requireCoverageMetadata="true">
+    <testsuites>
+        <testsuite name="tests">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+</phpunit>

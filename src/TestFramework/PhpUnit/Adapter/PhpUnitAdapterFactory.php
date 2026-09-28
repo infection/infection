@@ -37,6 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
 use function array_values;
+use Closure;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
@@ -129,6 +130,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $sourceDirectoryBasePath,
             $useWindowsFilterLimit,
             $fileSystem,
+            $consoleOutput->logSkippingTestImpactAnalysis(...),
         );
 
         return new LegacyTestFrameworkBridge(
@@ -153,6 +155,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
     }
 
     /**
+     * @param Closure(string): void $logSkippedTestImpactAnalysis
      * @param non-empty-array<string> $sourceDirectories
      * @param SplFileInfo[] $filteredSourceFilesToMutate
      */
@@ -171,6 +174,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         string $sourceDirectoryBasePath,
         bool $useWindowsFilterLimit,
         Filesystem $fileSystem,
+        Closure $logSkippedTestImpactAnalysis,
     ): TestFrameworkAdapter {
         $testFrameworkConfigContent = $fileSystem->readFile($testFrameworkConfigPath);
 
@@ -206,6 +210,8 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
                     },
                     $filteredSourceFilesToMutate,
                 ),
+                $projectDir,
+                $logSkippedTestImpactAnalysis,
             ),
             new MutationConfigBuilder(
                 $tmpDir,

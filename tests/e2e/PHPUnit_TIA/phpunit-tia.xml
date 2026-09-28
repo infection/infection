@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         beStrictAboutCoverageMetadata="true"
+         requireCoverageMetadata="true"
+         failOnPhpunitWarning="false"
+         cacheDirectory="var/phpunit-impact"
+         recordTestRunHistory="true"
+         deriveTestImpactDataFromCoverageTargets="true"
+         recordTestImpactData="true">
+    <testsuites>
+        <testsuite name="tests">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+</phpunit>

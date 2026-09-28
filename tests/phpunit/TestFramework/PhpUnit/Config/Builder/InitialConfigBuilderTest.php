@@ -35,19 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
+use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\InMemoryFileSystem;
 use Infection\Framework\OperatingSystem;
+use Infection\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraArgs;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use function Safe\file_get_contents;
 use function Safe\simplexml_load_string;
 use function sprintf;
@@ -75,6 +79,149 @@ final class InitialConfigBuilderTest extends TestCase
         $this->builder = $this->createConfigBuilder(
             file_get_contents(self::FIXTURES . '/phpunit.xml'),
         );
+    }
+
+    /**
+     * @param list<string> $sources
+     */
+    #[DataProvider('impactSelectionProvider')]
+    public function test_it_prepares_impact_selection(
+        string $extraArgs,
+        string $expectedExtraArgs,
+        bool $selects = false,
+        string $xml = '<phpunit/>',
+        string $version = '13.4-dev',
+        bool $collectCoverage = true,
+        bool $warns = false,
+        array $sources = ['/src/A.php', '/src/B.php'],
+    ): void {
+        $consoleOutput = $this->createMock(ConsoleOutput::class);
+        $consoleOutput->expects($warns ? $this->once() : $this->never())
+            ->method('logSkippingTestImpactAnalysis')
+            ->with('Deriving dependencies from coverage targets requires requireCoverageMetadata="true" without disabling it for any test size.')
+        ;
+        $builder = $this->createConfigBuilder($xml, $sources, $consoleOutput);
+        $baseOptions = ['--configuration', '/initial.xml'];
+        $options = [...$baseOptions, ...TestFrameworkExtraArgs::parseRawTokens($extraArgs)];
+        $expected = [...$baseOptions, ...TestFrameworkExtraArgs::parseRawTokens($expectedExtraArgs)];
+        $path = self::TMP_DIR . '/phpunit-impact-sources.txt';
+
+        if ($selects) {
+            $expected = [...$expected, '--impacted-by-file', $path];
+        }
+
+        $this->assertSame($expected, $builder->configureTestImpactAnalysis($options, $version, $collectCoverage));
+        $this->assertSame($selects, $this->filesystem->isReadableFile($path));
+
+        if ($selects) {
+            $this->assertSame("/src/A.php\n/src/B.php\n", $this->filesystem->readFile($path));
+        }
+    }
+
+    public static function impactSelectionProvider(): iterable
+    {
+        yield 'observed coverage without metadata' => ['', '', true];
+
+        yield 'unfiltered source scope' => ['extraArgs' => '', 'expectedExtraArgs' => '', 'sources' => []];
+
+        yield 'unsupported version' => ['extraArgs' => '', 'expectedExtraArgs' => '', 'version' => '13.3'];
+
+        yield 'skipped coverage' => ['extraArgs' => '', 'expectedExtraArgs' => '', 'collectCoverage' => false];
+
+        yield 'no coverage with supplied reports' => ['extraArgs' => '--no-coverage', 'expectedExtraArgs' => '--no-coverage', 'collectCoverage' => false];
+
+        yield 'no coverage with supplied reports before TIA' => ['extraArgs' => '--no-coverage', 'expectedExtraArgs' => '--no-coverage', 'version' => '12.5', 'collectCoverage' => false];
+
+        yield 'recording disabled' => ['--do-not-record-test-impact-data', '--do-not-record-test-impact-data'];
+
+        yield 'history disabled' => ['--do-not-record-test-run-history', '--do-not-record-test-run-history --do-not-record-test-impact-data'];
+
+        yield 'opt out removes impact selection' => ['--only-impacted --do-not-record-test-impact-data', '--do-not-record-test-impact-data'];
+
+        yield 'declared targets' => ['--derive-test-impact-data-from-coverage-targets', '--derive-test-impact-data-from-coverage-targets', true, '<phpunit requireCoverageMetadata="true"/>'];
+
+        yield 'numeric metadata settings' => ['--derive-test-impact-data-from-coverage-targets', '--derive-test-impact-data-from-coverage-targets', true, '<phpunit requireCoverageMetadata="1" requireCoverageMetadataOnSmallTests="1"/>'];
+
+        yield 'missing metadata requirement' => ['extraArgs' => '--derive-test-impact-data-from-coverage-targets --impacted-by=src/A.php', 'expectedExtraArgs' => '--do-not-record-test-impact-data', 'warns' => true];
+
+        yield 'metadata requirement disabled' => ['extraArgs' => '--derive-test-impact-data-from-coverage-targets', 'expectedExtraArgs' => '--do-not-record-test-impact-data', 'xml' => '<phpunit requireCoverageMetadata="false"/>', 'warns' => true];
+
+        foreach (['Small', 'Medium', 'Large'] as $size) {
+            yield 'metadata disabled for ' . $size => ['extraArgs' => '--derive-test-impact-data-from-coverage-targets', 'expectedExtraArgs' => '--do-not-record-test-impact-data', 'xml' => '<phpunit requireCoverageMetadata="true" requireCoverageMetadataOn' . $size . 'Tests="false"/>', 'warns' => true];
+        }
+
+        yield 'derive override disabled' => ['--derive-test-impact-data-from-coverage-targets --do-not-derive-test-impact-data-from-coverage-targets', '--derive-test-impact-data-from-coverage-targets --do-not-derive-test-impact-data-from-coverage-targets', true];
+
+        foreach (['--filter=ATest', '--filter ATest', '--covers=A', '--uses=B', '--test-suffix=Spec.php', '--requires-php-extension=redis', '--testsuite=unit', '--exclude-testsuite=slow', '--group=unit', '--exclude-group=slow', '--exclude-filter=BTest', '--test-files-file=list.txt', '--run-test-id=abc', '--test-id-filter-file=list.txt', 'tests/ATest.php', '--impacted-by=src/A.php', '--impacted-by-file list.txt', '--only-impacted', '--explain-impacted'] as $restriction) {
+            yield $restriction => [$restriction, $restriction];
+        }
+    }
+
+    #[DataProvider('noCoverageOptionProvider')]
+    public function test_it_rejects_no_coverage_without_supplied_reports(string $version): void
+    {
+        $builder = $this->createConfigBuilder('<phpunit/>');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("The PHPUnit --no-coverage option requires existing coverage reports supplied through Infection's --coverage option.");
+
+        $builder->configureTestImpactAnalysis(['--configuration', '/initial.xml', '--no-coverage'], $version, true);
+    }
+
+    public static function noCoverageOptionProvider(): iterable
+    {
+        yield 'TIA snapshot' => ['13.4-dev'];
+
+        yield 'before TIA' => ['12.5'];
+    }
+
+    #[DataProvider('configurationOverrideProvider')]
+    public function test_tia_rejects_configuration_overrides(string $extraArgs): void
+    {
+        $builder = $this->createConfigBuilder('<phpunit/>');
+        $options = ['--configuration', '/initial.xml', ...TestFrameworkExtraArgs::parseRawTokens($extraArgs)];
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("PHPUnit configuration overrides via test-framework extra arguments are not supported with TIA yet. Use Infection's phpUnit.configDir setting instead.");
+
+        $builder->configureTestImpactAnalysis($options, '13.4-dev', true);
+    }
+
+    public static function configurationOverrideProvider(): iterable
+    {
+        yield 'equals' => ['--configuration=other.xml'];
+
+        yield 'separate value' => ['--configuration other.xml'];
+
+        yield 'short option' => ['-c other.xml'];
+
+        yield 'no configuration' => ['--no-configuration'];
+    }
+
+    #[DataProvider('impactConfigurationProvider')]
+    public function test_it_configures_impact_recording(string $version, bool $collectCoverage, bool $expected): void
+    {
+        $builder = $this->createConfigBuilder('<phpunit/>');
+        $path = $builder->build($version, $collectCoverage);
+        $xml = SafeDOMXPath::fromString($this->filesystem->readFile($path));
+        $phpunit = $xml->getElement('/phpunit');
+
+        $this->assertSame($expected ? 'true' : '', $phpunit->getAttribute('recordTestImpactData'));
+        $this->assertSame($expected ? 'false' : '', $phpunit->getAttribute('deriveTestImpactDataFromCoverageTargets'));
+        $this->assertSame($expected ? 'true' : 'false', $phpunit->getAttribute('recordTestRunHistory'));
+        $this->assertSame($expected ? $this->projectPath . '/.infection/phpunit' : '', $phpunit->getAttribute('cacheDirectory'));
+        $this->assertFalse($phpunit->hasAttribute('requireCoverageMetadata'));
+    }
+
+    public static function impactConfigurationProvider(): iterable
+    {
+        yield 'released PHPUnit without TIA' => ['13.3', true, false];
+
+        yield 'reviewed TIA snapshot' => ['13.4-dev', true, true];
+
+        yield 'no initial coverage collection' => ['13.4-dev', false, false];
+
+        yield 'unconfirmed future release' => ['13.4', true, false];
     }
 
     public function test_it_builds_and_dump_the_xml_configuration(): void
@@ -849,6 +996,7 @@ final class InitialConfigBuilderTest extends TestCase
     private function createConfigBuilder(
         string $originalPhpUnitXmlConfig,
         array $filteredSourceFilesToMutate = [],
+        ?ConsoleOutput $consoleOutput = null,
     ): InitialConfigBuilder {
         $srcDirs = ['src', 'app'];
 
@@ -865,6 +1013,8 @@ final class InitialConfigBuilderTest extends TestCase
             $this->filesystem,
             $srcDirs,
             $filteredSourceFilesToMutate,
+            $this->projectPath,
+            ($consoleOutput ?? new ConsoleOutput(new NullLogger()))->logSkippingTestImpactAnalysis(...),
         );
     }
 }
