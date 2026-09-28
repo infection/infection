@@ -67,6 +67,22 @@ final class NoSourceFound extends RuntimeException
         );
     }
 
+    public static function noSourceFileFoundForGitDiff(
+        string $diffFilter,
+        string $base,
+        self $previous,
+    ): self {
+        return new self(
+            isSourceFiltered: true,
+            message: sprintf(
+                'No source file found among the modified files in the configured sources for the git filter "%s" and the base "%s".',
+                $diffFilter,
+                $base,
+            ),
+            previous: $previous,
+        );
+    }
+
     public static function noChangedLinesForGitDiff(
         string $diffFilter,
         string $base,
