@@ -223,12 +223,6 @@ message = 'Argument #1 of method `Symfony\Component\Filesystem\Path::makeRelativ
 count = 1
 
 [[issues]]
-file = "src/Command/ListSourcesCommand.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\ListSourcesCommand::collectPaths`.'
-count = 1
-
-[[issues]]
 file = "src/Command/MakeCustomMutatorCommand.php"
 code = "invalid-return-statement"
 message = "Invalid return type for function `{closure:src/Command/MakeCustomMutatorCommand.php:108:33}`: expected `string`, but found `null|string`."
@@ -400,12 +394,6 @@ count = 1
 file = "src/Command/RunCommand.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Process\Runner\InitialStaticAnalysisRunFailed` in `Infection\Command\RunCommand::executeCommand`.'
-count = 1
-
-[[issues]]
-file = "src/Command/RunCommand.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\RunCommand::executeCommand`.'
 count = 1
 
 [[issues]]

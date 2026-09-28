@@ -56,6 +56,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -113,6 +114,28 @@ final class ApplicationTest extends TestCase
         );
 
         $this->assertContains($commandClass, $registeredCommands);
+    }
+
+    public function test_it_renders_a_hint_after_the_trace_and_clears_it(): void
+    {
+        $application = new Application(SingletonContainer::getContainer());
+        $output = new BufferedOutput(OutputInterface::VERBOSITY_VERBOSE);
+        $exception = new RuntimeException('Example failure');
+
+        $application->renderThrowable(
+            $exception,
+            $output,
+            static function (OutputInterface $hintOutput): void {
+                $hintOutput->writeln('Example hint');
+            },
+        );
+
+        $display = $output->fetch();
+        $this->assertMatchesRegularExpression('/Example failure.*Exception trace:.*Example hint/s', $display);
+
+        $application->renderThrowable($exception, $output);
+
+        $this->assertStringNotContainsString('Example hint', $output->fetch());
     }
 
     public function test_it_uses_the_infection_version(): void

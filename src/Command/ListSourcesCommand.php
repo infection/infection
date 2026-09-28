@@ -42,6 +42,7 @@ use Infection\Command\Option\SourceFilterOptions;
 use Infection\Console\IO;
 use Infection\Logger\Console\ConsoleLogger;
 use Infection\Source\Collector\SourceCollector;
+use Infection\Source\Exception\NoSourceFound;
 use function Safe\getcwd;
 use function sort;
 use SplFileInfo;
@@ -52,9 +53,11 @@ use Symfony\Component\Filesystem\Path;
  */
 final class ListSourcesCommand extends BaseCommand
 {
+    public const string NAME = 'config:list-sources';
+
     public function __construct()
     {
-        parent::__construct('config:list-sources');
+        parent::__construct(self::NAME);
     }
 
     protected function configure(): void
@@ -69,6 +72,9 @@ final class ListSourcesCommand extends BaseCommand
         );
     }
 
+    /**
+     * @throws NoSourceFound
+     */
     protected function executeCommand(IO $io): bool
     {
         $container = $this->getApplication()->getContainer()->withValues(
@@ -89,6 +95,8 @@ final class ListSourcesCommand extends BaseCommand
     }
 
     /**
+     * @throws NoSourceFound
+     *
      * @return string[]
      */
     private static function collectPaths(

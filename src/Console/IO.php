@@ -71,6 +71,19 @@ final class IO extends SymfonyStyle
         return $this->input;
     }
 
+    /**
+     * @param string|list<string> $message
+     */
+    public function hint(string|array $message): void
+    {
+        $this->block(
+            $message,
+            'HINT',
+            'fg=black;bg=cyan',
+            padding: true,
+        );
+    }
+
     public function isInteractive(): bool
     {
         return $this->input->isInteractive();

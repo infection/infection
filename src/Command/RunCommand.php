@@ -403,13 +403,7 @@ final class RunCommand extends BaseCommand
 
             return true;
         } catch (NoSourceFound $noSourceFoundException) {
-            if ($noSourceFoundException->isSourceFiltered) {
-                $io->success($noSourceFoundException->getMessage());
-
-                return true;
-            }
-
-            throw $noSourceFoundException;
+            return $this->handleNoSourceFound($noSourceFoundException, $io);
         } catch (InitialTestsFailed|MinMsiCheckFailed|MaxTimeoutCountReached $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
@@ -677,5 +671,32 @@ final class RunCommand extends BaseCommand
         Assert::stringNotEmpty($canonicalDirectory);
 
         return $canonicalDirectory;
+    }
+
+    private function handleNoSourceFound(NoSourceFound $noSourceFoundException, IO $io): bool
+    {
+        if ($noSourceFoundException->isSourceFiltered) {
+            $io->success($noSourceFoundException->getMessage());
+
+            return true;
+        }
+
+        $this->getApplication()->renderThrowable(
+            $noSourceFoundException,
+            $io->getOutput(),
+            hint: static fn () => self::hintOnListSourcesCommand($io),
+        );
+
+        return false;
+    }
+
+    private static function hintOnListSourcesCommand(IO $io): void
+    {
+        $io->hint(
+            sprintf(
+                'To list the source files matching your configuration, use the "%s" command.',
+                ListSourcesCommand::NAME,
+            ),
+        );
     }
 }

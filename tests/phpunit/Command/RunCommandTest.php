@@ -168,15 +168,18 @@ final class RunCommandTest extends TestCase
         ]);
     }
 
-    public function test_it_rethrows_when_no_source_to_mutate_was_found_without_a_filter(): void
+    public function test_it_reports_when_no_source_to_mutate_was_found_without_a_filter(): void
     {
         $expected = NoSourceFound::noExecutableSourceCode();
 
         $tester = $this->createCommandTesterFailingOnStartUp($expected);
 
-        $this->expectExceptionObject($expected);
-
         $tester->execute([]);
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $this->assertStringContainsString($expected->getMessage(), $tester->getDisplay(normalize: true));
+        $this->assertStringContainsString('[HINT]', $tester->getDisplay(normalize: true));
+        $this->assertStringContainsString('"config:list-sources" command.', $tester->getDisplay(normalize: true));
     }
 
     public static function caughtFailureProvider(): iterable

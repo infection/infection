@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use function array_merge;
+use Closure;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\Debug\DumpAstCommand;
 use Infection\Command\Debug\MockTeamCityCommand;
@@ -58,6 +59,7 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 use function trim;
 
 /**
@@ -77,6 +79,9 @@ final class Application extends BaseApplication
 <fg=blue>#StandWith</><fg=yellow>Ukraine</>
 
 ';
+
+    /** @var Closure(OutputInterface): void|null */
+    private ?Closure $exceptionHint = null;
 
     /**
      * @throws OutOfBoundsException
@@ -121,6 +126,36 @@ final class Application extends BaseApplication
     public function getHelp(): string
     {
         return self::LOGO . parent::getHelp();
+    }
+
+    /**
+     * @param Closure(OutputInterface): void|null $hint
+     */
+    #[Override]
+    public function renderThrowable(
+        Throwable $e,
+        OutputInterface $output,
+        ?Closure $hint = null,
+    ): void {
+        $this->exceptionHint = $hint;
+
+        try {
+            parent::renderThrowable($e, $output);
+        } finally {
+            $this->exceptionHint = null;
+        }
+    }
+
+    #[Override]
+    protected function doRenderThrowable(
+        Throwable $e,
+        OutputInterface $output,
+    ): void {
+        parent::doRenderThrowable($e, $output);
+
+        if ($this->exceptionHint !== null) {
+            ($this->exceptionHint)($output);
+        }
     }
 
     #[Override]
