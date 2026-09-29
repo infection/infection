@@ -37,6 +37,7 @@ namespace Infection\Reporter;
 
 use function floor;
 use Infection\Metrics\MetricsCalculator;
+use function sprintf;
 use function str_pad;
 use const STR_PAD_LEFT;
 use function str_repeat;
@@ -122,6 +123,26 @@ final readonly class ShowMetricsReporter implements Reporter
         $this->output->writeln(
             $this->addIndentation("Covered Code MSI: <{$coveredMsiTag}>{$coveredMsi}%</{$coveredMsiTag}>"),
         );
+
+        $this->reportIfNoMutations();
+    }
+
+    private function reportIfNoMutations(): void
+    {
+        $hasMutations = $this->metricsCalculator->getTotalMutantsCount() > 0;
+
+        if ($hasMutations) {
+            return;
+        }
+
+        $this->output->writeln([
+            '',
+            sprintf(
+                '<comment>No mutations were generated for the selected code%s. Set a minimum MSI score to make this outcome fail.</comment>',
+                $this->withUncovered ? '' : ' covered by tests',
+            ),
+            '',
+        ]);
     }
 
     private function getPadded(int|string $subject, int $padLength = self::PAD_LENGTH): string

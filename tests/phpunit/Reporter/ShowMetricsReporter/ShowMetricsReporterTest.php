@@ -94,6 +94,9 @@ final class ShowMetricsReporterTest extends TestCase
                          Mutation Code Coverage: <low>0%</low>
                          Covered Code MSI: <low>0%</low>
 
+                No mutations were generated for the selected code covered by tests. Set a minimum MSI score to make this outcome fail.
+
+
                 DISPLAY,
         );
 
@@ -149,6 +152,9 @@ final class ShowMetricsReporterTest extends TestCase
                              Mutation Code Coverage: <low>0%</low>
                              Covered Code MSI: <low>0%</low>
 
+                    No mutations were generated for the selected code. Set a minimum MSI score to make this outcome fail.
+
+
                     DISPLAY,
             )
             ->build()
@@ -200,6 +206,9 @@ final class ShowMetricsReporterTest extends TestCase
                              Mutation Code Coverage: <low>49%</low>
                              Covered Code MSI: <low>49%</low>
 
+                    No mutations were generated for the selected code. Set a minimum MSI score to make this outcome fail.
+
+
                     DISPLAY,
             )
             ->build()
@@ -221,6 +230,9 @@ final class ShowMetricsReporterTest extends TestCase
                              Mutation Score Indicator (MSI): <medium>50%</medium>
                              Mutation Code Coverage: <medium>50%</medium>
                              Covered Code MSI: <medium>50%</medium>
+
+                    No mutations were generated for the selected code. Set a minimum MSI score to make this outcome fail.
+
 
                     DISPLAY,
             )
@@ -244,6 +256,9 @@ final class ShowMetricsReporterTest extends TestCase
                              Mutation Code Coverage: <medium>89%</medium>
                              Covered Code MSI: <medium>89%</medium>
 
+                    No mutations were generated for the selected code. Set a minimum MSI score to make this outcome fail.
+
+
                     DISPLAY,
             )
             ->build()
@@ -265,6 +280,9 @@ final class ShowMetricsReporterTest extends TestCase
                              Mutation Score Indicator (MSI): <high>90%</high>
                              Mutation Code Coverage: <high>90%</high>
                              Covered Code MSI: <high>90%</high>
+
+                    No mutations were generated for the selected code. Set a minimum MSI score to make this outcome fail.
+
 
                     DISPLAY,
             )
@@ -288,6 +306,9 @@ final class ShowMetricsReporterTest extends TestCase
                              Mutation Code Coverage: <medium>60%</medium>
                              Covered Code MSI: <high>95%</high>
 
+                    No mutations were generated for the selected code. Set a minimum MSI score to make this outcome fail.
+
+
                     DISPLAY,
             )
             ->build()
@@ -309,6 +330,9 @@ final class ShowMetricsReporterTest extends TestCase
                              Mutation Score Indicator (MSI): <low>40%</low>
                              Mutation Code Coverage: <medium>60%</medium>
                              Covered Code MSI: <high>95%</high>
+
+                    No mutations were generated for the selected code. Set a minimum MSI score to make this outcome fail.
+
 
                     DISPLAY,
             )
