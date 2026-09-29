@@ -57,8 +57,6 @@ final class ShowMetricsReporterTest extends TestCase
     #[DataProvider('metricsProvider')]
     public function test_it_show_the_metrics(MetricsScenario $scenario): void
     {
-        $this->createMetricsCalculator($scenario);
-
         $reporter = $this->createReporter($scenario);
         $reporter->report();
 
