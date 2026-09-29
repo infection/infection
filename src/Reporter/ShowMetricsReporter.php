@@ -60,6 +60,9 @@ final readonly class ShowMetricsReporter implements Reporter
         private MetricsCalculator $metricsCalculator,
         private bool $withUncovered,
         private ?string $mutantId,
+        private bool $ignoreMsiWithNoMutations,
+        private ?float $minMsi,
+        private ?float $minCoveredMsi,
     ) {
     }
 
@@ -137,20 +140,46 @@ final readonly class ShowMetricsReporter implements Reporter
             return;
         }
 
-        $message = $this->mutantId !== null
-            ? sprintf(
-                '<comment>No mutation matches mutant ID "%s". Run Infection without "--%s" to list the current mutations.</comment>',
+        if ($this->mutantId !== null) {
+            $message = sprintf(
+                'No mutation matches mutant ID "%s". Run Infection without "--%s" to list the current mutations.',
                 $this->mutantId,
                 RunCommand::OPTION_MUTANT_ID,
-            )
-            : sprintf(
-                '<comment>No mutations were generated for the selected code%s. Set a minimum MSI score to make this outcome fail.</comment>',
+            );
+        } else {
+            $message = sprintf(
+                'No mutations were generated for the selected code%s.',
                 $this->withUncovered
                     ? ''
                     : ' covered by tests',
             );
 
-        $this->output->writeln(['', $message, '']);
+            // Note that it is not that a min MSI would be irrelevant here, but we already display
+            // a specific message when the mutant ID does not match so another suggestion would
+            // distract the user from that remedy.
+            if ($this->shouldSuggestMinimumMsi()) {
+                $message .= ' Set a minimum MSI score to make this outcome fail.';
+            }
+        }
+
+        $this->output->writeln([
+            '',
+            sprintf('<comment>%s</comment>', $message),
+            '',
+        ]);
+    }
+
+    private function shouldSuggestMinimumMsi(): bool
+    {
+        if ($this->ignoreMsiWithNoMutations) {
+            return false;
+        }
+
+        if (($this->minMsi ?? 0.) > 0) {
+            return false;
+        }
+
+        return ($this->minCoveredMsi ?? 0.) <= 0;
     }
 
     private function getPadded(int|string $subject, int $padLength = self::PAD_LENGTH): string

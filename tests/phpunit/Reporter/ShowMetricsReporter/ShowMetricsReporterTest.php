@@ -55,11 +55,9 @@ final class ShowMetricsReporterTest extends TestCase
     }
 
     #[DataProvider('metricsProvider')]
-    public function test_it_show_the_metrics(MetricsScenario $scenario, ?string $mutantId = null): void
+    public function test_it_show_the_metrics(MetricsScenario $scenario): void
     {
-        $this->createMetricsCalculator($scenario);
-
-        $reporter = $this->createReporter($scenario, $mutantId);
+        $reporter = $this->createReporter($scenario);
         $reporter->report();
 
         $actual = Str::toUnixLineEndings($this->output->fetch());
@@ -70,6 +68,10 @@ final class ShowMetricsReporterTest extends TestCase
     public static function metricsProvider(): iterable
     {
         $emptyScenario = new MetricsScenario(
+            mutantId: null,
+            ignoreMsiWithNoMutations: false,
+            minMsi: null,
+            minCoveredMsi: null,
             withUncovered: false,
             killedByTestsCount: 0,
             killedByStaticAnalysisCount: 0,
@@ -101,6 +103,10 @@ final class ShowMetricsReporterTest extends TestCase
         );
 
         $completeScenario = new MetricsScenario(
+            mutantId: null,
+            ignoreMsiWithNoMutations: false,
+            minMsi: null,
+            minCoveredMsi: null,
             withUncovered: false,
             killedByTestsCount: 3,
             killedByStaticAnalysisCount: 2,
@@ -138,8 +144,33 @@ final class ShowMetricsReporterTest extends TestCase
 
         yield 'no metrics' => $emptyScenario->build();
 
-        yield 'unmatched mutant ID' => [
-            $emptyScenario->withExpected(
+        yield 'no metrics with MSI ignored' => $emptyScenario
+            ->withIgnoreMsiWithNoMutations(true)
+            ->withoutMinimumMsiAdviceInExpected()
+            ->build()
+        ;
+
+        yield 'no metrics with minimum MSI' => $emptyScenario
+            ->withMinMsi(50.)
+            ->withoutMinimumMsiAdviceInExpected()
+            ->build()
+        ;
+
+        yield 'no metrics with minimum covered MSI' => $emptyScenario
+            ->withMinCoveredMsi(50.)
+            ->withoutMinimumMsiAdviceInExpected()
+            ->build()
+        ;
+
+        yield 'no metrics with zero minimum scores' => $emptyScenario
+            ->withMinMsi(0.)
+            ->withMinCoveredMsi(0.)
+            ->build()
+        ;
+
+        yield 'unmatched mutant ID' => $emptyScenario
+            ->withMutantId('mutant-id-1')
+            ->withExpected(
                 <<<'DISPLAY'
 
 
@@ -154,11 +185,14 @@ final class ShowMetricsReporterTest extends TestCase
 
 
                     DISPLAY,
-            ),
-            'mutant-id-1',
-        ];
+            )
+            ->build()
+        ;
 
-        yield 'matched mutant ID' => [$completeScenario, 'mutant-id-1'];
+        yield 'matched mutant ID' => $completeScenario
+            ->withMutantId('mutant-id-1')
+            ->build()
+        ;
 
         yield 'no metrics with uncovered' => $emptyScenario
             ->withUncovered(true)
@@ -383,15 +417,16 @@ final class ShowMetricsReporterTest extends TestCase
         ;
     }
 
-    private function createReporter(
-        MetricsScenario $scenario,
-        ?string $mutantId,
-    ): Reporter {
+    private function createReporter(MetricsScenario $scenario): Reporter
+    {
         return new ShowMetricsReporter(
             $this->output,
             $this->createMetricsCalculator($scenario),
             $scenario->withUncovered,
-            $mutantId,
+            $scenario->mutantId,
+            $scenario->ignoreMsiWithNoMutations,
+            $scenario->minMsi,
+            $scenario->minCoveredMsi,
         );
     }
 
