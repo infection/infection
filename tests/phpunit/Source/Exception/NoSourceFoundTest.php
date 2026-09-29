@@ -56,6 +56,24 @@ final class NoSourceFoundTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function test_it_can_be_created_when_modified_files_contain_no_source_file(): void
+    {
+        $previous = NoSourceFound::noSourceFileFound(
+            new PlainFilter(['src/README.md']),
+        );
+
+        $expected = new NoSourceFound(
+            isSourceFiltered: true,
+            message: 'No source file found for the filter applied to the configured sources. The git filter used was: "AM" with the base "main".',
+            previous: $previous,
+        );
+
+        $actual = NoSourceFound::noSourceFileFoundForGitDiff('AM', 'main', $previous);
+
+        $this->assertEquals($expected, $actual);
+        $this->assertSame($previous, $actual->getPrevious());
+    }
+
     #[DataProvider('changedLinesDiffProvider')]
     public function test_it_can_be_created_for_when_no_changed_lines_was_found_for_a_git_diff(
         string $diffFilter,
