@@ -42,6 +42,7 @@ use Infection\Command\Option\SourceFilterOptions;
 use Infection\Console\IO;
 use Infection\Logger\Console\ConsoleLogger;
 use Infection\Source\Collector\SourceCollector;
+use Infection\Source\Exception\NoSourceFound;
 use function Safe\getcwd;
 use function sort;
 use SplFileInfo;
@@ -89,6 +90,8 @@ final class ListSourcesCommand extends BaseCommand
     }
 
     /**
+     * @throws NoSourceFound
+     *
      * @return string[]
      */
     private static function collectPaths(

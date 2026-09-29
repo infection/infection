@@ -225,7 +225,7 @@ count = 1
 [[issues]]
 file = "src/Command/ListSourcesCommand.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\ListSourcesCommand::collectPaths`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\ListSourcesCommand::executeCommand`.'
 count = 1
 
 [[issues]]
