@@ -405,6 +405,12 @@ count = 1
 [[issues]]
 file = "src/Command/RunCommand.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\RunCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\RunCommand::installTestFrameworkIfNeeded`.'
 count = 1
 

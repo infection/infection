@@ -48,7 +48,6 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Throwable;
 
@@ -169,20 +168,15 @@ final class RunCommandTest extends TestCase
         ]);
     }
 
-    public function test_it_reports_when_no_source_to_mutate_was_found_without_a_filter(): void
+    public function test_it_rethrows_when_no_source_to_mutate_was_found_without_a_filter(): void
     {
         $expected = NoSourceFound::noExecutableSourceCode();
 
         $tester = $this->createCommandTesterFailingOnStartUp($expected);
 
+        $this->expectExceptionObject($expected);
+
         $tester->execute([]);
-
-        $actual = $tester->getDisplay(normalize: true);
-
-        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
-        $this->assertStringContainsString($expected->getMessage(), $actual);
-        $this->assertStringContainsString('[HINT]', $actual);
-        $this->assertMatchesRegularExpression('/"config:list-sources"\s+command\./', $actual);
     }
 
     public static function caughtFailureProvider(): iterable
