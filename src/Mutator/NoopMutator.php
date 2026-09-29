@@ -48,10 +48,10 @@ use function sprintf;
 final readonly class NoopMutator implements Mutator
 {
     /**
-     * @param Mutator<TNode> $mutator
+     * @param Mutator<TNode> $decoratedMutator
      */
     public function __construct(
-        private Mutator $mutator,
+        private Mutator $decoratedMutator,
     ) {
     }
 
@@ -65,7 +65,7 @@ final readonly class NoopMutator implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        return $this->mutator->canMutate($node);
+        return $this->decoratedMutator->canMutate($node);
     }
 
     /**
@@ -80,6 +80,6 @@ final readonly class NoopMutator implements Mutator
 
     public function getName(): string
     {
-        return $this->mutator->getName();
+        return $this->decoratedMutator->getName();
     }
 }
