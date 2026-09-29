@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Reporter;
 
 use function floor;
+use Infection\Command\RunCommand;
 use Infection\Metrics\MetricsCalculator;
 use function sprintf;
 use function str_pad;
@@ -58,6 +59,7 @@ final readonly class ShowMetricsReporter implements Reporter
         private OutputInterface $output,
         private MetricsCalculator $metricsCalculator,
         private bool $withUncovered,
+        private ?string $mutantId,
     ) {
     }
 
@@ -135,14 +137,20 @@ final readonly class ShowMetricsReporter implements Reporter
             return;
         }
 
-        $this->output->writeln([
-            '',
-            sprintf(
+        $message = $this->mutantId !== null
+            ? sprintf(
+                '<comment>No mutation matches mutant ID "%s". Run Infection without "--%s" to list the current mutations.</comment>',
+                $this->mutantId,
+                RunCommand::OPTION_MUTANT_ID,
+            )
+            : sprintf(
                 '<comment>No mutations were generated for the selected code%s. Set a minimum MSI score to make this outcome fail.</comment>',
-                $this->withUncovered ? '' : ' covered by tests',
-            ),
-            '',
-        ]);
+                $this->withUncovered
+                    ? ''
+                    : ' covered by tests',
+            );
+
+        $this->output->writeln(['', $message, '']);
     }
 
     private function getPadded(int|string $subject, int $padLength = self::PAD_LENGTH): string

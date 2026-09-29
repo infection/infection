@@ -55,11 +55,11 @@ final class ShowMetricsReporterTest extends TestCase
     }
 
     #[DataProvider('metricsProvider')]
-    public function test_it_show_the_metrics(MetricsScenario $scenario): void
+    public function test_it_show_the_metrics(MetricsScenario $scenario, ?string $mutantId = null): void
     {
         $this->createMetricsCalculator($scenario);
 
-        $reporter = $this->createReporter($scenario);
+        $reporter = $this->createReporter($scenario, $mutantId);
         $reporter->report();
 
         $actual = Str::toUnixLineEndings($this->output->fetch());
@@ -137,6 +137,28 @@ final class ShowMetricsReporterTest extends TestCase
         );
 
         yield 'no metrics' => $emptyScenario->build();
+
+        yield 'unmatched mutant ID' => [
+            $emptyScenario->withExpected(
+                <<<'DISPLAY'
+
+
+                    0 mutations were generated:
+                           0 mutants were killed by Test Framework
+
+                    Metrics:
+                             Mutation Code Coverage: <low>0%</low>
+                             Covered Code MSI: <low>0%</low>
+
+                    No mutation matches mutant ID "mutant-id-1". Run Infection without "--id" to list the current mutations.
+
+
+                    DISPLAY,
+            ),
+            'mutant-id-1',
+        ];
+
+        yield 'matched mutant ID' => [$completeScenario, 'mutant-id-1'];
 
         yield 'no metrics with uncovered' => $emptyScenario
             ->withUncovered(true)
@@ -363,11 +385,13 @@ final class ShowMetricsReporterTest extends TestCase
 
     private function createReporter(
         MetricsScenario $scenario,
+        ?string $mutantId,
     ): Reporter {
         return new ShowMetricsReporter(
             $this->output,
             $this->createMetricsCalculator($scenario),
             $scenario->withUncovered,
+            $mutantId,
         );
     }
 

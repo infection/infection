@@ -498,6 +498,7 @@ final class Container extends DIContainer
                             $output,
                             $container->getMetricsCalculator(),
                             !$config->mutateOnlyCoveredCode(),
+                            $config->mutantId,
                         ),
                         new AdvisoryReporter($output),
                         $container->getFileReporterFactory()->createFromConfiguration(
