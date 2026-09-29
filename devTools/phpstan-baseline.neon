@@ -601,162 +601,6 @@ parameters:
 			path: ../src/StaticAnalysis/Config/StaticAnalysisConfigLocator.php
 
 		-
-			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\Mutant\MutantExecutionResultFactory
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\Process\Factory\LazyMutantProcessFactory
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapterFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapterFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\DetectionStatus
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 5
-			path: ../src/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResult
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 2
-			path: ../src/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Process\MutantProcess
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 2
-			path: ../src/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Mutant\Mutant
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Process\Factory\LazyMutantProcessFactory
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Process\MutantProcess
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 2
-			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\Mutant\MutantExecutionResultFactory
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\Process\Factory\LazyMutantProcessFactory
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory should not depend on Infection\Mutant\DetectionStatus
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 5
-			path: ../src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResult
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 2
-			path: ../src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory should not depend on Infection\Process\MutantProcess
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 2
-			path: ../src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory should not depend on Infection\Mutant\Mutant
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory should not depend on Infection\Process\Factory\LazyMutantProcessFactory
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory should not depend on Infection\Process\MutantProcess
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 2
-			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
-
-		-
 			rawMessage: Unused Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory::create
 			identifier: shipmonk.deadMethod
 			count: 1
@@ -911,6 +755,84 @@ parameters:
 			identifier: new.deprecatedClass
 			count: 1
 			path: ../src/TestFramework/Factory.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Mago/Adapter/MagoAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\Process\Factory\LazyMutantProcessFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Mago/Adapter/MagoAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Mago/Adapter/MagoAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Mago/Adapter/MagoAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Mago/Adapter/MagoAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\DetectionStatus
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 5
+			path: ../src/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResult
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Process\MutantProcess
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Mutant\Mutant
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Mago/Process/MagoMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Mago/Process/MagoMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Process\Factory\LazyMutantProcessFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Mago/Process/MagoMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Process\MutantProcess
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/TestFramework/Mago/Process/MagoMutantProcessFactory.php
 
 		-
 			rawMessage: '''

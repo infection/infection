@@ -33,47 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing\TestFramework\Debug;
+namespace Infection\Tests\TestFramework\Mago\Adapter;
 
-use Infection\Mutant\Mutant;
-use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\Process\MutantProcess;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
-use Symfony\Component\Process\Process;
+use Infection\TestFramework\Contracts\FakeShellCommandRunner;
+use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMutantProcessFactory
+#[CoversClass(MagoAdapterFactory::class)]
+final class MagoAdapterFactoryTest extends TestCase
 {
-    public function __construct(
-        private string $runtime,
-        private string $logFile,
-        private float $timeout,
-        private DebugCommandLine $commandLine,
-    ) {
-    }
-
-    public function create(Mutant $mutant): MutantProcess
+    public function test_it_can_create_an_adapter(): void
     {
-        return new MutantProcess(
-            new Process(
-                command: $this->commandLine->create(
-                    runtime: $this->runtime,
-                    phpArguments: [],
-                    options: [
-                        'stage' => 'static-analysis-mutant',
-                        'log' => $this->logFile,
-                        'mutationHash' => $mutant->getMutation()->getHash(),
-                    ],
-                ),
-                env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
-                timeout: $this->timeout,
-            ),
-            $mutant,
-            // There is not enough differences to warrant a different factory yet at the time of writing.
-            new PHPStanMutantExecutionResultFactory(),
+        $adapter = MagoAdapterFactory::create(
+            '/path/to/mago-config-path',
+            '/path/to/mago',
+            32.3,
+            '/tmp',
+            [],
+            new FakeShellCommandRunner(),
         );
+
+        $this->assertSame('Mago', $adapter->getName());
     }
 }
