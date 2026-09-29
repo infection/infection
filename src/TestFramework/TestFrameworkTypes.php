@@ -38,6 +38,7 @@ namespace Infection\TestFramework;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\CannotBeInstantiated;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
+use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use function is_a;
 use Webmozart\Assert\Assert;
 
@@ -84,7 +85,9 @@ final class TestFrameworkTypes
 
             Assert::classExists($factory);
 
-            if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
+            if (!is_a($factory, TestFrameworkFactory::class, true)
+                && !is_a($factory, TestFrameworkAdapterFactory::class, true)
+            ) {
                 continue;
             }
 

@@ -139,30 +139,6 @@ parameters:
 			path: ../src/Container/Container.php
 
 		-
-			rawMessage: '''
-				Call to method __construct() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
-				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
-			'''
-			identifier: method.deprecatedClass
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: Infection\Container\Container should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 3
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: '''
-				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
-				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
-			'''
-			identifier: new.deprecatedClass
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 2
@@ -271,28 +247,10 @@ parameters:
 			path: ../src/Logger/ArtefactCollection/ConsoleNoProgressLogger.php
 
 		-
-			rawMessage: Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Logger/ArtefactCollection/ConsoleNoProgressLogger.php
-
-		-
 			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
 			identifier: catch.neverThrown
 			count: 1
 			path: ../src/Logger/ArtefactCollection/ConsoleProgressBarLogger.php
-
-		-
-			rawMessage: Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Logger/ArtefactCollection/ConsoleProgressBarLogger.php
-
-		-
-			rawMessage: Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLoggerFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Logger/ArtefactCollection/InitialTestsExecution/InitialTestsExecutionLoggerFactory.php
 
 		-
 			rawMessage: 'Parameter #1 $level (string) of method Infection\Logger\Console\ConsoleLogger::log() should be contravariant with parameter $level (mixed) of method Psr\Log\AbstractLogger::log()'
@@ -539,6 +497,12 @@ parameters:
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
 			count: 1
 			path: ../src/Process/Runner/InitialTestsFailed.php
+
+		-
+			rawMessage: Infection\Process\Runner\InitialTestsRunner should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/Process/Runner/InitialTestsRunner.php
 
 		-
 			rawMessage: 'Method Infection\Reflection\AnonymousClassReflection::__construct() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
@@ -811,20 +775,23 @@ parameters:
 			path: ../src/TestFramework/Contracts/TestFramework.php
 
 		-
-			rawMessage: Unused Infection\TestFramework\Contracts\TestFramework::getVersion
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: ../src/TestFramework/Contracts/TestFramework.php
-
-		-
 			rawMessage: Function ini_get is unsafe to use. It can return FALSE instead of throwing an exception. Please add 'use function Safe\ini_get;' at the beginning of the file to use the variant provided by the 'thecodingmachine/safe' library.
 			identifier: theCodingMachineSafe.function
 			count: 1
 			path: ../src/TestFramework/Coverage/CoverageChecker.php
 
 		-
-			rawMessage: Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			rawMessage: Infection\TestFramework\Coverage\CoverageCheckerFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/TestFramework/Coverage/CoverageCheckerFactory.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method hasJUnitReport() of interface Infection\TestFramework\Contracts\TestFramework:
+				This is only for making the migration easier, to be removed.
+			'''
+			identifier: method.deprecated
 			count: 1
 			path: ../src/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdder.php
 
@@ -853,6 +820,15 @@ parameters:
 			path: ../src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php
 
 		-
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../src/TestFramework/Factory.php
+
+		-
 			rawMessage: Infection\TestFramework\Factory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
 			count: 1
@@ -865,14 +841,23 @@ parameters:
 			path: ../src/TestFramework/Factory.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: new.deprecatedClass
 			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+			path: ../src/TestFramework/Factory.php
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
@@ -889,13 +874,16 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: method.deprecatedClass
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapterFactory
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
@@ -907,14 +895,59 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
 
 		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Configuration\Configuration
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Console\ConsoleOutput
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Process\Factory\MutantProcessContainerFactory
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Process\Runner\InitialTestsRunner
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\Coverage\CoverageCheckerFactory
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\LegacyTestFrameworkBridge
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\TestFrameworkExtraOptionsFilter
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\Tracing\TestRunOrderResolver
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
 
 		-
-			rawMessage: 'Parameter #7 $sourceDirectories (array<string>) of method Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory::create() should be contravariant with parameter $sourceDirectories (array) of method Infection\AbstractTestFramework\TestFrameworkAdapterFactory::create()'
-			identifier: method.childParameterType
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: new.deprecatedClass
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
 
@@ -1589,6 +1622,15 @@ parameters:
 
 		-
 			rawMessage: '''
+				Call to deprecated method getExecutableName() of class Infection\Tests\TestFramework\Factory\ConfigurableTestFrameworkFactory:
+				It is here only to smoothen the migration, should be removed.
+			'''
+			identifier: staticMethod.deprecated
+			count: 3
+			path: ../tests/phpunit/TestFramework/Factory/ConfigurableTestFrameworkFactoryTest.php
+
+		-
+			rawMessage: '''
 				Access to constant on deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
@@ -1669,22 +1711,13 @@ parameters:
 			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
 
 		-
-			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
-			identifier: ternary.shortNotAllowed
+			rawMessage: '''
+				Call to deprecated method getExecutableName() of class Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory:
+				It is here only to smoothen the migration, should be removed.
+			'''
+			identifier: staticMethod.deprecated
 			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
-
-		-
-			rawMessage: Anonymous function should return string but returns string|null.
-			identifier: return.type
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
-
-		-
-			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
-			identifier: ternary.shortNotAllowed
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
+			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactoryTest.php
 
 		-
 			rawMessage: 'Parameter #1 $path of static method Symfony\Component\Filesystem\Path::normalize() expects string, string|null given.'

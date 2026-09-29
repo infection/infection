@@ -33,16 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\TestFramework\Factory;
 
+use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
-use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -53,48 +60,90 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Factory::class)]
 final class FactoryTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        ConfigurableTestFrameworkFactory::reset();
+    }
+
     public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
     {
-        $factory = new Factory(
-            '',
-            '',
-            $this->createStub(TestFrameworkConfigLocatorInterface::class),
-            $this->createStub(TestFrameworkFinder::class),
-            '',
-            ConfigurationBuilder::withMinimalTestData()->build(),
-            new FakeSourceCollector(),
-            [],
-            $this->createStub(ShellCommandRunner::class),
-            $this->createStub(FileSystem::class),
+        $factory = $this->createFactory();
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Invalid name of test framework "Fake Test Framework". Available names are: phpunit, debug',
+            ),
         );
 
-        $this->expectException(InvalidArgumentException::class);
         $factory->create('Fake Test Framework', false);
     }
 
     public function test_it_uses_installed_test_framework_adapters(): void
     {
-        $factory = new Factory(
+        $factory = $this->createFactory([
+            'infection/dummy-adapter' => [
+                'install_path' => '/path/to/dummy/adapter/factory.php',
+                'extra' => ['class' => DummyTestFrameworkFactory::class],
+                'version' => '1.0.0',
+            ],
+        ]);
+
+        $adapter = $factory->create('dummy', false);
+
+        $this->assertInstanceOf(TestFramework::class, $adapter);
+    }
+
+    public function test_it_uses_installed_test_frameworks(): void
+    {
+        $expectedTestFramework = $this->createStub(TestFramework::class);
+
+        ConfigurableTestFrameworkFactory::configure(
+            $expectedTestFramework,
+            'dummy',
+            'dummy',
+        );
+
+        $factory = $this->createFactory([
+            'infection/dummy' => [
+                'install_path' => '/path/to/dummy/factory.php',
+                'extra' => ['class' => ConfigurableTestFrameworkFactory::class],
+                'version' => '1.0.0',
+            ],
+        ]);
+
+        $testFramework = $factory->create('dummy', false);
+
+        $this->assertSame($expectedTestFramework, $testFramework);
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $installedExtensions
+     */
+    private function createFactory(array $installedExtensions = []): Factory
+    {
+        $configuration = ConfigurationBuilder::withMinimalTestData()->build();
+        $fileSystem = $this->createStub(FileSystem::class);
+
+        return new Factory(
             '',
             '',
             $this->createStub(TestFrameworkConfigLocatorInterface::class),
             $this->createStub(TestFrameworkFinder::class),
             '',
-            ConfigurationBuilder::withMinimalTestData()->build(),
+            $configuration,
             new FakeSourceCollector(),
-            [
-                'infection/codeception-adapter' => [
-                    'install_path' => '/path/to/dummy/adapter/factory.php',
-                    'extra' => ['class' => DummyTestFrameworkFactory::class],
-                    'version' => '1.0.0',
-                ],
-            ],
+            $installedExtensions,
             $this->createStub(ShellCommandRunner::class),
-            $this->createStub(FileSystem::class),
+            $fileSystem,
+            $this->createStub(ConsoleOutput::class),
+            new CoverageCheckerFactory(
+                $configuration,
+                JUnitReportLocator::create($fileSystem, ''),
+                IndexXmlCoverageLocator::create($fileSystem, ''),
+            ),
+            $this->createStub(InitialTestsRunner::class),
+            $this->createStub(MutantProcessContainerFactory::class),
+            $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
-
-        $adapter = $factory->create('dummy', false);
-
-        $this->assertInstanceOf(DummyTestFrameworkAdapter::class, $adapter);
     }
 }

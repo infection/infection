@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\ArtefactCollection;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
+use Infection\TestFramework\Contracts\TestFramework;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -51,12 +51,12 @@ final class ConsoleProgressBarLoggerTest extends TestCase
 {
     private OutputInterface&MockObject $outputMock;
 
-    private TestFrameworkAdapter&MockObject $testFrameworkMock;
+    private TestFramework&MockObject $testFrameworkMock;
 
     protected function setUp(): void
     {
         $this->outputMock = $this->createMock(OutputInterface::class);
-        $this->testFrameworkMock = $this->createMock(TestFrameworkAdapter::class);
+        $this->testFrameworkMock = $this->createMock(TestFramework::class);
     }
 
     public function test_it_logs_the_start(): void

@@ -33,41 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Factory;
-
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Process\OriginalPhpProcess;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Symfony\Component\Process\Process;
+namespace Infection\TestFramework\Contracts;
 
 /**
+ * Defines how Infection discovers a test framework and creates it from the project's test-run configuration.
+ *
  * @internal
- * @final
  */
-class InitialTestsRunProcessFactory
+interface TestFrameworkFactory
 {
     /**
-     * Creates process with enabled debugger as test framework is going to use in the code coverage.
-     *
-     * @param string[] $phpExtraOptions
+     * @param string[] $sourceDirectories
      */
-    public function createProcess(
-        TestFrameworkAdapter $testFrameworkAdapter,
-        string $testFrameworkExtraOptions,
-        array $phpExtraOptions,
+    public static function create(
+        string $testFrameworkExecutable,
+        string $tmpDir,
+        string $testFrameworkConfigPath,
+        ?string $testFrameworkConfigDir,
+        string $jUnitFilePath,
+        string $projectDir,
+        array $sourceDirectories,
         bool $skipCoverage,
-    ): Process {
-        // If we're expecting to receive a code coverage, test process must run in a vanilla environment
-        $processClass = $skipCoverage ? Process::class : OriginalPhpProcess::class;
+    ): TestFramework;
 
-        return new $processClass(
-            command: $testFrameworkAdapter->getInitialTestRunCommandLine(
-                $testFrameworkExtraOptions,
-                $phpExtraOptions,
-                $skipCoverage,
-            ),
-            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
-            timeout: null, // Ignore the default timeout of 60 seconds
-        );
-    }
+    /**
+     * Returns the identifier Infection uses to discover and select this test framework.
+     */
+    public static function getAdapterName(): string;
+
+    /**
+     * @deprecated It is here only to smoothen the migration, should be removed.
+     */
+    public static function getExecutableName(): string;
 }

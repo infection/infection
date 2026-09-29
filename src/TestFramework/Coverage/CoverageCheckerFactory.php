@@ -33,41 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Factory;
+namespace Infection\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Process\OriginalPhpProcess;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Symfony\Component\Process\Process;
+use Infection\Configuration\Configuration;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 
 /**
  * @internal
- * @final
  */
-class InitialTestsRunProcessFactory
+final readonly class CoverageCheckerFactory
 {
-    /**
-     * Creates process with enabled debugger as test framework is going to use in the code coverage.
-     *
-     * @param string[] $phpExtraOptions
-     */
-    public function createProcess(
-        TestFrameworkAdapter $testFrameworkAdapter,
-        string $testFrameworkExtraOptions,
-        array $phpExtraOptions,
-        bool $skipCoverage,
-    ): Process {
-        // If we're expecting to receive a code coverage, test process must run in a vanilla environment
-        $processClass = $skipCoverage ? Process::class : OriginalPhpProcess::class;
+    public function __construct(
+        private Configuration $configuration,
+        private JUnitReportLocator $jUnitReportLocator,
+        private IndexXmlCoverageLocator $indexXmlCoverageLocator,
+    ) {
+    }
 
-        return new $processClass(
-            command: $testFrameworkAdapter->getInitialTestRunCommandLine(
-                $testFrameworkExtraOptions,
-                $phpExtraOptions,
-                $skipCoverage,
-            ),
-            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
-            timeout: null, // Ignore the default timeout of 60 seconds
+    public function create(TestFrameworkAdapter $adapter): CoverageChecker
+    {
+        return new CoverageChecker(
+            $this->configuration->skipCoverage,
+            $this->configuration->skipInitialTests,
+            $this->configuration->initialTestsPhpOptions ?? '',
+            $this->configuration->coveragePath,
+            $adapter->hasJUnitReport(),
+            $this->jUnitReportLocator,
+            $adapter->getName(),
+            $this->indexXmlCoverageLocator,
         );
     }
 }

@@ -8,6 +8,7 @@ RUN apk add --update --no-cache \
 		linux-headers \
 	;
 
+# PHPUnit requires mbstring, so we have to install it if missing
 RUN --mount=type=bind,from=ghcr.io/php/pie:bin,source=/pie,target=/usr/local/bin/pie \
     set -eux; \
     apk add --no-cache --virtual .build-deps \
@@ -15,6 +16,7 @@ RUN --mount=type=bind,from=ghcr.io/php/pie:bin,source=/pie,target=/usr/local/bin
         build-base \
         libzip-dev \
         libtool \
+        oniguruma-dev \
         unzip \
         zlib-dev \
     ; \
@@ -22,6 +24,7 @@ RUN --mount=type=bind,from=ghcr.io/php/pie:bin,source=/pie,target=/usr/local/bin
     docker-php-ext-install -j$(nproc) \
         pcntl \
     ; \
+    php -m | grep -qx mbstring || docker-php-ext-install -j$(nproc) mbstring; \
     pie install --no-cache xdebug/xdebug:${XDEBUG_VERSION}; \
     rm -rf /root/.pie; \
     runDeps="$( \

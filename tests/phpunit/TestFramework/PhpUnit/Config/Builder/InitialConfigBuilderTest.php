@@ -35,19 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
-use DOMNameSpaceNode;
-use DOMNode;
-use DOMNodeList;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\InMemoryFileSystem;
+use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
-use Infection\TestFramework\XML\SafeDOMXPath;
 use InvalidArgumentException;
-use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -76,7 +72,9 @@ final class InitialConfigBuilderTest extends TestCase
         $this->projectPath = Path::canonicalize(self::FIXTURES . '/project-path');
         $this->filesystem = new InMemoryFileSystem();
 
-        $this->builder = $this->createConfigBuilder();
+        $this->builder = $this->createConfigBuilder(
+            file_get_contents(self::FIXTURES . '/phpunit.xml'),
+        );
     }
 
     public function test_it_builds_and_dump_the_xml_configuration(): void
@@ -96,29 +94,11 @@ final class InitialConfigBuilderTest extends TestCase
         );
     }
 
-    public function test_it_preserves_white_spaces_and_formatting(): void
-    {
-        if (PHP_EOL === "\r\n") {
-            $this->markTestSkipped('Test fixture uses Unix line endings');
-        }
-
-        $builder = $this->createConfigBuilder(
-            self::FIXTURES . '/format-whitespace/original-phpunit.xml',
-        );
-
-        $configurationPath = $builder->build('6.5');
-
-        $this->assertSame(
-            file_get_contents(self::FIXTURES . '/format-whitespace/expected-phpunit.xml'),
-            $this->filesystem->readFile($configurationPath),
-        );
-    }
-
     public function test_the_original_xml_config_must_be_a_valid_xml_file(): void
     {
         try {
             $this->createConfigBuilder(
-                self::FIXTURES . '/invalid/empty-phpunit.xml',
+                file_get_contents(self::FIXTURES . '/invalid/empty-phpunit.xml'),
             );
 
             $this->fail('Expected an exception to be thrown.');
@@ -133,7 +113,7 @@ final class InitialConfigBuilderTest extends TestCase
     public function test_the_original_xml_config_must_be_a_valid_phpunit_config_file(): void
     {
         $builder = $this->createConfigBuilder(
-            self::FIXTURES . '/invalid/invalid-phpunit.xml',
+            file_get_contents(self::FIXTURES . '/invalid/invalid-phpunit.xml'),
         );
 
         try {
@@ -151,558 +131,735 @@ final class InitialConfigBuilderTest extends TestCase
         }
     }
 
-    public function test_it_replaces_relative_path_to_absolute_path(): void
-    {
-        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
-
-        $directories = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/directory');
-
-        $this->assertInstanceOf(DOMNodeList::class, $directories);
-
-        $this->assertSame(1, $directories->length);
-        $this->assertSame(
-            $this->projectPath . '/*Bundle',
-            Path::normalize($directories[0]->nodeValue),
-        );
-    }
-
-    public function test_it_sets_stops_on_failure(): void
-    {
-        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
-
-        $stopOnFailure = $this->queryXpath($xml, '/phpunit/@stopOnFailure')[0]->nodeValue;
-
-        $this->assertSame('true', $stopOnFailure);
-    }
-
-    public function test_it_deactivates_the_colors(): void
-    {
-        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
-
-        $colors = $this->queryXpath($xml, '/phpunit/@colors')[0]->nodeValue;
-
-        $this->assertSame('false', $colors);
-    }
-
-    public function test_it_disables_caching(): void
-    {
-        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
-
-        $cacheResult = $this->queryXpath($xml, '/phpunit/@cacheResult')[0]->nodeValue;
-
-        $this->assertSame('false', $cacheResult);
-    }
-
-    public function test_it_disables_caching_for_phpunit_13_3(): void
-    {
-        $xml = $this->filesystem->readFile($this->builder->build('13.3'));
-
-        $cacheResult = $this->queryXpath($xml, '/phpunit/@cacheResult');
-
-        $this->assertInstanceOf(DOMNodeList::class, $cacheResult);
-
-        $this->assertSame(0, $cacheResult->length);
-
-        $recordTestRunHistory = $this->queryXpath($xml, '/phpunit/@recordTestRunHistory')[0]->nodeValue;
-
-        $this->assertSame('false', $recordTestRunHistory);
-    }
-
-    public function test_it_deactivates_stderr_redirection(): void
-    {
-        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
-
-        $stdErr = $this->queryXpath($xml, '/phpunit/@stderr')[0]->nodeValue;
-
-        $this->assertSame('false', $stdErr);
-    }
-
-    public function test_it_replaces_bootstrap_file(): void
-    {
-        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
-
-        $bootstrap = Path::normalize(
-            $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue,
-        );
-
-        $this->assertSame($this->projectPath . '/app/autoload2.php', $bootstrap);
-    }
-
-    public function test_it_removes_original_loggers(): void
-    {
-        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
-
-        $logEntries = $this->queryXpath($xml, '/phpunit/logging/log[@type="coverage-html"]');
-
-        $this->assertSame(0, $logEntries->length);
-    }
-
-    public function test_it_does_not_add_coverage_loggers_ever_for_legacy_configuration(): void
-    {
-        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
-
-        $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
-
-        $this->assertInstanceOf(DOMNodeList::class, $logEntries);
-
-        $this->assertSame(0, $logEntries->length);
-    }
-
-    public function test_it_does_not_add_coverage_loggers_ever_for_latest_configuration(): void
-    {
-        $builder = $this->createConfigBuilderForPHPUnit93();
-
-        $xml = $this->filesystem->readFile($builder->build('9.4'));
-
-        $logEntries = $this->queryXpath($xml, '/phpunit/logging');
-
-        $this->assertInstanceOf(DOMNodeList::class, $logEntries);
-
-        $this->assertSame(0, $logEntries->length);
-    }
-
-    public function test_it_creates_coverage_filter_whitelist_node_if_does_not_exist(): void
-    {
-        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
-
-        $xml = $this->filesystem->readFile(
-            $this->createConfigBuilder($phpunitXmlPath)->build('6.5'),
-        );
-
-        $whitelistedDirectories = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
-
-        $this->assertInstanceOf(DOMNodeList::class, $whitelistedDirectories);
-
-        $this->assertSame(2, $whitelistedDirectories->length);
-    }
-
-    public function test_it_creates_coverage_filter_whitelist_node_if_does_not_exist_and_version_situation_is_uncertain(): void
-    {
-        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
-
-        $xml = $this->filesystem->readFile(
-            $this->createConfigBuilder($phpunitXmlPath)->build('9.3'),
-        );
-
-        $whitelistedDirectories = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
-
-        $this->assertInstanceOf(DOMNodeList::class, $whitelistedDirectories);
-
-        $this->assertSame(2, $whitelistedDirectories->length);
-    }
-
-    public function test_it_replaces_coverage_filter_include_node_if_exists_but_filtered_source_files_provided(): void
-    {
-        $phpunitXmlPath = self::FIXTURES . '/phpunit_with_coverage_include_directories.xml';
-
-        $xml = $this->filesystem->readFile(
-            $this->createConfigBuilder($phpunitXmlPath, ['src/File1.php'])->build('9.3'),
-        );
-
-        $coverageIncludeFiles = $this->queryXpath($xml, '/phpunit/coverage/include/file');
-
-        $this->assertInstanceOf(DOMNodeList::class, $coverageIncludeFiles);
-
-        $this->assertSame(1, $coverageIncludeFiles->length);
-    }
-
-    public function test_it_does_not_replace_coverage_filter_include_node_for_phpunit_12_even_if_filtered_source_files_provided(): void
-    {
-        $phpunitXmlPath = self::FIXTURES . '/phpunit_with_coverage_include_directories.xml';
-
-        $xml = $this->filesystem->readFile(
-            $this->createConfigBuilder($phpunitXmlPath, ['src/File1.php'])->build('12.0'),
-        );
-
-        $coverageIncludeFiles = $this->queryXpath($xml, '/phpunit/coverage/include/file');
-        $coverageIncludeDirectories = $this->queryXpath($xml, '/phpunit/coverage/include/directory');
-
-        $this->assertInstanceOf(DOMNodeList::class, $coverageIncludeFiles);
-        $this->assertSame(0, $coverageIncludeFiles->length);
-
-        $this->assertInstanceOf(DOMNodeList::class, $coverageIncludeDirectories);
-        $this->assertGreaterThanOrEqual(1, $coverageIncludeDirectories->length);
-    }
-
-    public function test_it_ignores_filtered_source_files_for_phpunit_12_when_creating_source_include_node(): void
-    {
-        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
-
-        $xml = $this->filesystem->readFile(
-            $this->createConfigBuilder($phpunitXmlPath, ['src/File1.php'])->build('12.0'),
-        );
-
-        $sourceIncludeFiles = $this->queryXpath($xml, '/phpunit/source/include/file');
-        $sourceIncludeDirectories = $this->queryXpath($xml, '/phpunit/source/include/directory');
-
-        $this->assertInstanceOf(DOMNodeList::class, $sourceIncludeFiles);
-        $this->assertSame(0, $sourceIncludeFiles->length);
-
-        $this->assertInstanceOf(DOMNodeList::class, $sourceIncludeDirectories);
-        $this->assertSame(2, $sourceIncludeDirectories->length);
-    }
-
-    public function test_it_creates_coverage_include_node_if_does_not_exist_for_10_0_version_of_phpunit(): void
-    {
-        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
-
-        $xml = $this->filesystem->readFile(
-            $this->createConfigBuilder($phpunitXmlPath)->build('10.0'),
-        );
-
-        $includedDirectories = $this->queryXpath($xml, '/phpunit/coverage/include/directory');
-
-        $this->assertInstanceOf(DOMNodeList::class, $includedDirectories);
-
-        $this->assertSame(2, $includedDirectories->length);
-    }
-
-    public function test_it_does_not_create_legacy_coverage_filter_whitelist_node_for_10_0_version_of_phpunit(): void
-    {
-        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
-
-        $xml = $this->filesystem->readFile(
-            $this->createConfigBuilder($phpunitXmlPath)->build('10.0'),
-        );
-
-        $whitelistedDirectories = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
-
-        $this->assertInstanceOf(DOMNodeList::class, $whitelistedDirectories);
-
-        $this->assertSame(0, $whitelistedDirectories->length);
-    }
-
-    public function test_it_creates_source_include_node_if_does_not_exist_for_10_1_version_of_phpunit(): void
-    {
-        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
-
-        $xml = $this->filesystem->readFile(
-            $this->createConfigBuilder($phpunitXmlPath)->build('10.1'),
-        );
-
-        $includedDirectories = $this->queryXpath($xml, '/phpunit/source/include/directory');
-
-        $this->assertInstanceOf(DOMNodeList::class, $includedDirectories);
-
-        $this->assertSame(2, $includedDirectories->length);
-    }
-
-    public function test_it_does_not_create_coverage_filter_whitelist_node_if_already_exist(): void
-    {
-        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
-
-        $whitelistedDirectories = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
-
-        $this->assertInstanceOf(DOMNodeList::class, $whitelistedDirectories);
-
-        $this->assertSame(1, $whitelistedDirectories->length);
-    }
-
-    public function test_it_does_not_create_coverage_include_node_if_already_exist(): void
-    {
-        $builder = $this->createConfigBuilderForPHPUnit93();
-
-        $xml = $this->filesystem->readFile($builder->build('9.4'));
-
-        $includedDirectories = $this->queryXpath($xml, '/phpunit/coverage/include');
-
-        $this->assertInstanceOf(DOMNodeList::class, $includedDirectories);
-
-        $this->assertSame(1, $includedDirectories->length);
-    }
-
-    public function test_it_removes_printer_class(): void
-    {
-        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
-
-        $printerClass = $this->queryXpath($xml, '/phpunit/@printerClass');
-
-        $this->assertInstanceOf(DOMNodeList::class, $printerClass);
-
-        $this->assertSame(0, $printerClass->length);
-    }
-
-    #[DataProvider('executionOrderProvider')]
-    public function test_it_adds_execution_order_for_proper_phpunit_versions(
+    /**
+     * @param list<string> $filteredSourceFilesToMutate
+     */
+    #[DataProvider('configurationProvider')]
+    public function test_it_builds_the_expected_configuration(
+        string $xml,
+        array $filteredSourceFilesToMutate,
         string $version,
-        string $attributeName,
-        int $expectedNodeCount,
+        string $expected,
     ): void {
-        $xml = $this->filesystem->readFile($this->builder->build($version));
-
-        $nodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', $attributeName));
-
-        $this->assertInstanceOf(DOMNodeList::class, $nodes);
-
-        $this->assertSame($expectedNodeCount, $nodes->length);
-    }
-
-    #[DataProvider('executionOrderValueProvider')]
-    public function test_it_adds_the_execution_order_supported_by_the_phpunit_version(
-        string $version,
-        string $expectedExecutionOrder,
-    ): void {
-        $xml = $this->filesystem->readFile($this->builder->build($version));
-
-        $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder');
-
-        $this->assertInstanceOf(DOMNodeList::class, $executionOrder);
-
-        $this->assertSame($expectedExecutionOrder, $executionOrder[0]->value);
-    }
-
-    public function test_it_does_not_update_order_if_it_is_already_set(): void
-    {
-        $phpunitXmlPath = self::FIXTURES . '/phpunit_with_order_set.xml';
-
-        $builder = $this->createConfigBuilder($phpunitXmlPath);
-
-        $xml = $this->filesystem->readFile($builder->build('7.2'));
-
-        $executionOrder = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'executionOrder'));
-
-        $this->assertInstanceOf(DOMNodeList::class, $executionOrder);
-        $this->assertSame('reverse', $executionOrder[0]->value);
-
-        $resolveDependencies = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'resolveDependencies'));
-
-        $this->assertInstanceOf(DOMNodeList::class, $resolveDependencies);
-        $this->assertSame(0, $resolveDependencies->length);
-    }
-
-    public function test_it_removes_the_orders_requiring_the_test_run_history_already_set_for_phpunit_13_3(): void
-    {
-        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_order_requiring_test_run_history_set.xml');
-
-        $xml = $this->filesystem->readFile($builder->build('13.3'));
-
-        $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder');
-
-        $this->assertInstanceOf(DOMNodeList::class, $executionOrder);
-        $this->assertSame('depends', $executionOrder[0]->nodeValue);
-
-        $recordTestRunHistory = $this->queryXpath($xml, '/phpunit/@recordTestRunHistory');
-
-        $this->assertInstanceOf(DOMNodeList::class, $recordTestRunHistory);
-        $this->assertSame('false', $recordTestRunHistory[0]->nodeValue);
-    }
-
-    public function test_it_keeps_the_orders_requiring_the_test_run_history_already_set_for_phpunit_13_2(): void
-    {
-        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_order_requiring_test_run_history_set.xml');
-
-        $xml = $this->filesystem->readFile($builder->build('13.2'));
-
-        $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder');
-
-        $this->assertInstanceOf(DOMNodeList::class, $executionOrder);
-        $this->assertSame('depends,defects,duration-ascending', $executionOrder[0]->nodeValue);
-    }
-
-    #[DataProvider('failOnProvider')]
-    public function test_it_adds_fail_on_risky_and_warning_for_proper_phpunit_versions(
-        string $version,
-        string $attributeName,
-        int $expectedNodeCount,
-    ): void {
-        $xml = $this->filesystem->readFile($this->builder->build($version));
-
-        $nodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', $attributeName));
-
-        $this->assertInstanceOf(DOMNodeList::class, $nodes);
-
-        $this->assertSame($expectedNodeCount, $nodes->length);
-    }
-
-    public function test_it_does_not_update_fail_on_risky_attributes_if_it_is_already_set(): void
-    {
-        $phpunitXmlPath = self::FIXTURES . '/phpunit_with_fail_on_risky_set.xml';
-
-        $builder = $this->createConfigBuilder($phpunitXmlPath);
-
-        $xml = $this->filesystem->readFile($builder->build('5.2'));
-
-        $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnRisky'));
-
-        $this->assertInstanceOf(DOMNodeList::class, $failOnRisky);
-        $this->assertSame('false', $failOnRisky[0]->value);
-    }
-
-    public function test_it_does_not_update_fail_on_warning_attributes_if_it_is_already_set(): void
-    {
-        $phpunitXmlPath = self::FIXTURES . '/phpunit_with_fail_on_warning_set.xml';
-
-        $builder = $this->createConfigBuilder($phpunitXmlPath);
-
-        $xml = $this->filesystem->readFile($builder->build('5.2'));
-
-        $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnWarning'));
-
-        $this->assertInstanceOf(DOMNodeList::class, $failOnRisky);
-        $this->assertSame('false', $failOnRisky[0]->value);
-    }
-
-    public function test_it_creates_a_configuration(): void
-    {
         $builder = $this->createConfigBuilder(
-            self::FIXTURES . '/phpunit.xml',
+            $xml,
+            $filteredSourceFilesToMutate,
         );
 
-        $configurationPath = $builder->build('6.5');
+        $path = $builder->build($version);
+        $actual = $this->filesystem->readFile($path);
 
-        $projectPath = $this->projectPath;
+        $this->assertSame($expected, $actual);
+    }
 
-        $this->assertSame(
-            <<<XML
-                <?xml version="1.0" encoding="UTF-8"?>
-                <!--
-                  ~ Copyright © 2017 Maks Rafalko
-                  ~
-                  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
-                  -->
-                <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" defaultTestSuite="unit" failOnRisky="true" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
-                  <testsuites>
-                    <testsuite name="Application Test Suite">
-                      <directory>$projectPath/*Bundle</directory>
-                    </testsuite>
-                  </testsuites>
-                  <filter>
-                    <whitelist>
-                      <directory>$projectPath/src/</directory>
-                      <!--<exclude>-->
-                      <!--<directory>src/*Bundle/Resources</directory>-->
-                      <!--<directory>src/*/*Bundle/Resources</directory>-->
-                      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
-                      <!--</exclude>-->
-                    </whitelist>
-                  </filter>
-                </phpunit>
+    public static function configurationProvider(): iterable
+    {
+        $projectPath = Path::canonicalize(self::FIXTURES . '/project-path');
+        $loadFixture = static fn (string $fixture): string => file_get_contents(self::FIXTURES . '/' . $fixture);
 
-                XML,
-            $this->filesystem->readFile($configurationPath),
+        $coverage10 = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="random" resolveDependencies="true" failOnRisky="true" failOnWarning="true" stopOnDefect="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <coverage>
+                <include>
+                  <directory>$projectPath/src</directory>
+                  <directory>$projectPath/app</directory>
+                </include>
+              </coverage>
+            </phpunit>
+
+            XML;
+
+        $executionOrder12 = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!--
+              ~ Copyright © 2017 Maks Rafalko
+              ~
+              ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+              -->
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" defaultTestSuite="unit" executionOrder="defects,random" resolveDependencies="true" failOnRisky="true" failOnWarning="true" stopOnDefect="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <filter>
+                <whitelist>
+                  <directory>$projectPath/src/</directory>
+                  <!--<exclude>-->
+                  <!--<directory>src/*Bundle/Resources</directory>-->
+                  <!--<directory>src/*/*Bundle/Resources</directory>-->
+                  <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+                  <!--</exclude>-->
+                </whitelist>
+              </filter>
+              <source>
+                <include>
+                  <directory>$projectPath/src</directory>
+                  <directory>$projectPath/app</directory>
+                </include>
+              </source>
+            </phpunit>
+
+            XML;
+
+        $executionOrder132 = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit bootstrap="$projectPath/app/autoload2.php" colors="false" cacheDirectory=".phpunit.cache" executionOrder="depends,defects,duration-ascending" failOnRisky="true" failOnWarning="true" stopOnDefect="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <source>
+                <include>
+                  <directory>$projectPath/src</directory>
+                  <directory>$projectPath/app</directory>
+                </include>
+              </source>
+            </phpunit>
+
+            XML;
+
+        $executionOrder133 = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit bootstrap="$projectPath/app/autoload2.php" colors="false" cacheDirectory=".phpunit.cache" executionOrder="depends" failOnRisky="true" failOnWarning="true" stopOnDefect="true" recordTestRunHistory="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <source>
+                <include>
+                  <directory>$projectPath/src</directory>
+                  <directory>$projectPath/app</directory>
+                </include>
+              </source>
+            </phpunit>
+
+            XML;
+
+        $executionOrder72 = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!--
+              ~ Copyright © 2017 Maks Rafalko
+              ~
+              ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+              -->
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" defaultTestSuite="unit" executionOrder="random" resolveDependencies="true" failOnRisky="true" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <filter>
+                <whitelist>
+                  <directory>$projectPath/src/</directory>
+                  <!--<exclude>-->
+                  <!--<directory>src/*Bundle/Resources</directory>-->
+                  <!--<directory>src/*/*Bundle/Resources</directory>-->
+                  <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+                  <!--</exclude>-->
+                </whitelist>
+              </filter>
+            </phpunit>
+
+            XML;
+
+        $existingExecutionOrder = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="reverse" failOnRisky="true" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <filter>
+                <whitelist>
+                  <directory>$projectPath/src</directory>
+                  <directory>$projectPath/app</directory>
+                </whitelist>
+              </filter>
+            </phpunit>
+
+            XML;
+
+        $existingFailOnRisky = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="reverse" failOnRisky="false" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <filter>
+                <whitelist>
+                  <directory>$projectPath/src</directory>
+                  <directory>$projectPath/app</directory>
+                </whitelist>
+              </filter>
+            </phpunit>
+
+            XML;
+
+        $existingFailOnWarning = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="reverse" failOnWarning="false" failOnRisky="true" stopOnFailure="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <filter>
+                <whitelist>
+                  <directory>$projectPath/src</directory>
+                  <directory>$projectPath/app</directory>
+                </whitelist>
+              </filter>
+            </phpunit>
+
+            XML;
+
+        $filteredSource93 = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="random" resolveDependencies="true" failOnRisky="true" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <coverage>
+                <include>
+                  <file>$projectPath/src/File1.php</file>
+                </include>
+              </coverage>
+            </phpunit>
+
+            XML;
+
+        $missingWhitelist65 = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" failOnRisky="true" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <filter>
+                <whitelist>
+                  <directory>$projectPath/src</directory>
+                  <directory>$projectPath/app</directory>
+                </whitelist>
+              </filter>
+            </phpunit>
+
+            XML;
+
+        $missingWhitelist93 = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="random" resolveDependencies="true" failOnRisky="true" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <filter>
+                <whitelist>
+                  <directory>$projectPath/src</directory>
+                  <directory>$projectPath/app</directory>
+                </whitelist>
+              </filter>
+            </phpunit>
+
+            XML;
+
+        $phpunit133 = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!--
+              ~ Copyright © 2017 Maks Rafalko
+              ~
+              ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+              -->
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" defaultTestSuite="unit" executionOrder="random" resolveDependencies="true" failOnRisky="true" failOnWarning="true" stopOnDefect="true" recordTestRunHistory="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <filter>
+                <whitelist>
+                  <directory>$projectPath/src/</directory>
+                  <!--<exclude>-->
+                  <!--<directory>src/*Bundle/Resources</directory>-->
+                  <!--<directory>src/*/*Bundle/Resources</directory>-->
+                  <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+                  <!--</exclude>-->
+                </whitelist>
+              </filter>
+              <source>
+                <include>
+                  <directory>$projectPath/src</directory>
+                  <directory>$projectPath/app</directory>
+                </include>
+              </source>
+            </phpunit>
+
+            XML;
+
+        $phpunit51 = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!--
+              ~ Copyright © 2017 Maks Rafalko
+              ~
+              ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+              -->
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" defaultTestSuite="unit" stopOnFailure="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <filter>
+                <whitelist>
+                  <directory>$projectPath/src/</directory>
+                  <!--<exclude>-->
+                  <!--<directory>src/*Bundle/Resources</directory>-->
+                  <!--<directory>src/*/*Bundle/Resources</directory>-->
+                  <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+                  <!--</exclude>-->
+                </whitelist>
+              </filter>
+            </phpunit>
+
+            XML;
+
+        $phpunit94 = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" defaultTestSuite="unit" executionOrder="random" resolveDependencies="true" failOnRisky="true" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <coverage includeUncoveredFiles="true" processUncoveredFiles="true" ignoreDeprecatedCodeUnits="true" disableCodeCoverageIgnore="true">
+                <include>
+                  <directory suffix=".php">$projectPath/src</directory>
+                </include>
+                <exclude>
+                  <directory suffix=".php">$projectPath/src/generated</directory>
+                  <file>$projectPath/src/autoload.php</file>
+                </exclude>
+              </coverage>
+            </phpunit>
+
+            XML;
+
+        $preservedCoverage12 = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="random" resolveDependencies="true" failOnRisky="true" failOnWarning="true" stopOnDefect="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <coverage>
+                <include>
+                  <directory>$projectPath/src/</directory>
+                  <directory>$projectPath/example/</directory>
+                </include>
+              </coverage>
+              <source>
+                <include>
+                  <directory>$projectPath/src</directory>
+                  <directory>$projectPath/app</directory>
+                </include>
+              </source>
+            </phpunit>
+
+            XML;
+
+        $source101 = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="random" resolveDependencies="true" failOnRisky="true" failOnWarning="true" stopOnDefect="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <source>
+                <include>
+                  <directory>$projectPath/src</directory>
+                  <directory>$projectPath/app</directory>
+                </include>
+              </source>
+            </phpunit>
+
+            XML;
+
+        $standard = <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!--
+              ~ Copyright © 2017 Maks Rafalko
+              ~
+              ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+              -->
+            <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$projectPath/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" defaultTestSuite="unit" failOnRisky="true" failOnWarning="true" stopOnFailure="true" cacheResult="false" stderr="false">
+              <testsuites>
+                <testsuite name="Application Test Suite">
+                  <directory>$projectPath/*Bundle</directory>
+                </testsuite>
+              </testsuites>
+              <filter>
+                <whitelist>
+                  <directory>$projectPath/src/</directory>
+                  <!--<exclude>-->
+                  <!--<directory>src/*Bundle/Resources</directory>-->
+                  <!--<directory>src/*/*Bundle/Resources</directory>-->
+                  <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+                  <!--</exclude>-->
+                </whitelist>
+              </filter>
+            </phpunit>
+
+            XML;
+
+        yield 'configuration is created' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
         );
-    }
 
-    public static function executionOrderProvider(): iterable
-    {
-        yield 'PHPUnit 7.1.99 runs without random test order' => [
-            '7.1.99',
-            'executionOrder',
-            0,
-        ];
+        if (!OperatingSystem::isWindows()) {
+            yield 'white spaces and formatting are preserved' => [
+                $loadFixture('format-whitespace/original-phpunit.xml'),
+                [],
+                '6.5',
+                file_get_contents(self::FIXTURES . '/format-whitespace/expected-phpunit.xml'),
+            ];
+        }
 
-        yield 'PHPUnit 7.2 runs with random test order' => [
-            '7.2',
-            'executionOrder',
-            1,
-        ];
+        yield 'relative paths are replaced with absolute paths' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
+        );
 
-        yield 'PHPUnit 7.3.1 runs with random test order' => [
-            '7.3.1',
-            'executionOrder',
-            1,
-        ];
+        yield 'stop on failure is enabled' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
+        );
 
-        yield 'PHPUnit 7.1.99 runs without dependency resolver' => [
-            '7.1.99',
-            'resolveDependencies',
-            0,
-        ];
+        yield 'colors are disabled' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
+        );
 
-        yield 'PHPUnit 7.2 runs with dependency resolver' => [
-            '7.2',
-            'resolveDependencies',
-            1,
-        ];
+        yield 'result caching is disabled' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
+        );
 
-        yield 'PHPUnit 7.3.1 runs dependency resolver' => [
-            '7.3.1',
-            'resolveDependencies',
-            1,
-        ];
-    }
+        yield 'PHPUnit 13.3 test run history is disabled' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '13.3',
+            expected: $phpunit133,
+        );
 
-    public static function executionOrderValueProvider(): iterable
-    {
-        yield 'PHPUnit 12.2.7 orders by defects and randomly' => [
-            '12.2.7',
-            'defects,random',
-        ];
+        yield 'stderr redirection is disabled' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
+        );
 
-        yield 'PHPUnit 13.3 only orders randomly, it records no test run history' => [
-            '13.3',
-            'random',
-        ];
-    }
+        yield 'bootstrap path is replaced' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
+        );
 
-    public static function failOnProvider(): iterable
-    {
-        yield 'PHPUnit 5.1.99 runs without failOnRisky' => [
-            '5.1.99',
-            'failOnRisky',
-            0,
-        ];
+        yield 'original loggers are removed' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
+        );
 
-        yield 'PHPUnit 5.2 runs with failOnRisky' => [
-            '5.2',
-            'failOnRisky',
-            1,
-        ];
+        yield 'coverage loggers are not added to legacy configuration' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
+        );
 
-        yield 'PHPUnit 5.3.1 runs with failOnRisky' => [
-            '5.3.1',
-            'failOnRisky',
-            1,
-        ];
+        yield 'coverage loggers are not added to latest configuration' => self::createScenario(
+            xml: $loadFixture('phpunit_93.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '9.4',
+            expected: $phpunit94,
+        );
 
-        yield 'PHPUnit 5.1.99 runs without resolveDependencies' => [
-            '5.1.99',
-            'failOnWarning',
-            0,
-        ];
+        yield 'missing legacy coverage whitelist is created' => self::createScenario(
+            xml: $loadFixture('phpunit_without_coverage_whitelist.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $missingWhitelist65,
+        );
 
-        yield 'PHPUnit 5.2 runs with resolveDependencies' => [
-            '5.2',
-            'failOnWarning',
-            1,
-        ];
+        yield 'missing legacy coverage whitelist is created for uncertain versions' => self::createScenario(
+            xml: $loadFixture('phpunit_without_coverage_whitelist.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '9.3',
+            expected: $missingWhitelist93,
+        );
 
-        yield 'PHPUnit 5.3.1 runs resolveDependencies' => [
-            '5.3.1',
-            'failOnWarning',
-            1,
-        ];
+        yield 'coverage include is replaced when filtered source files are provided' => self::createScenario(
+            xml: $loadFixture('phpunit_with_coverage_include_directories.xml'),
+            filteredSourceFilesToMutate: ['src/File1.php'],
+            version: '9.3',
+            expected: $filteredSource93,
+        );
+
+        yield 'PHPUnit 12 coverage include is preserved with filtered source files' => self::createScenario(
+            xml: $loadFixture('phpunit_with_coverage_include_directories.xml'),
+            filteredSourceFilesToMutate: ['src/File1.php'],
+            version: '12.0',
+            expected: $preservedCoverage12,
+        );
+
+        yield 'PHPUnit 12 ignores filtered source files when creating source include' => self::createScenario(
+            xml: $loadFixture('phpunit_without_coverage_whitelist.xml'),
+            filteredSourceFilesToMutate: ['src/File1.php'],
+            version: '12.0',
+            expected: $source101,
+        );
+
+        yield 'PHPUnit 10.0 coverage include is created when absent' => self::createScenario(
+            xml: $loadFixture('phpunit_without_coverage_whitelist.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '10.0',
+            expected: $coverage10,
+        );
+
+        yield 'PHPUnit 10.0 legacy coverage whitelist is not created' => self::createScenario(
+            xml: $loadFixture('phpunit_without_coverage_whitelist.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '10.0',
+            expected: $coverage10,
+        );
+
+        yield 'PHPUnit 10.1 source include is created when absent' => self::createScenario(
+            xml: $loadFixture('phpunit_without_coverage_whitelist.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '10.1',
+            expected: $source101,
+        );
+
+        yield 'existing legacy coverage whitelist is preserved' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
+        );
+
+        yield 'existing coverage include is preserved' => self::createScenario(
+            xml: $loadFixture('phpunit_93.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '9.4',
+            expected: $phpunit94,
+        );
+
+        yield 'printer class is removed' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '6.5',
+            expected: $standard,
+        );
+
+        yield 'PHPUnit 7.1.99 runs without random test order' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '7.1.99',
+            expected: $standard,
+        );
+
+        yield 'PHPUnit 7.2 runs with random test order' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '7.2',
+            expected: $executionOrder72,
+        );
+
+        yield 'PHPUnit 7.3.1 runs with random test order' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '7.3.1',
+            expected: $executionOrder72,
+        );
+
+        yield 'PHPUnit 7.1.99 runs without dependency resolver' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '7.1.99',
+            expected: $standard,
+        );
+
+        yield 'PHPUnit 7.2 runs with dependency resolver' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '7.2',
+            expected: $executionOrder72,
+        );
+
+        yield 'PHPUnit 7.3.1 runs dependency resolver' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '7.3.1',
+            expected: $executionOrder72,
+        );
+
+        yield 'PHPUnit 12.2.7 orders by defects and randomly' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '12.2.7',
+            expected: $executionOrder12,
+        );
+
+        yield 'PHPUnit 13.3 only orders randomly without test run history' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '13.3',
+            expected: $phpunit133,
+        );
+
+        yield 'existing execution order is preserved' => self::createScenario(
+            xml: $loadFixture('phpunit_with_order_set.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '7.2',
+            expected: $existingExecutionOrder,
+        );
+
+        yield 'PHPUnit 13.3 removes orders requiring test run history' => self::createScenario(
+            xml: $loadFixture('phpunit_with_order_requiring_test_run_history_set.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '13.3',
+            expected: $executionOrder133,
+        );
+
+        yield 'PHPUnit 13.2 preserves orders requiring test run history' => self::createScenario(
+            xml: $loadFixture('phpunit_with_order_requiring_test_run_history_set.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '13.2',
+            expected: $executionOrder132,
+        );
+
+        yield 'PHPUnit 5.1.99 runs without failOnRisky' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '5.1.99',
+            expected: $phpunit51,
+        );
+
+        yield 'PHPUnit 5.2 runs with failOnRisky' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '5.2',
+            expected: $standard,
+        );
+
+        yield 'PHPUnit 5.3.1 runs with failOnRisky' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '5.3.1',
+            expected: $standard,
+        );
+
+        yield 'PHPUnit 5.1.99 runs without failOnWarning' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '5.1.99',
+            expected: $phpunit51,
+        );
+
+        yield 'PHPUnit 5.2 runs with failOnWarning' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '5.2',
+            expected: $standard,
+        );
+
+        yield 'PHPUnit 5.3.1 runs with failOnWarning' => self::createScenario(
+            xml: $loadFixture('phpunit.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '5.3.1',
+            expected: $standard,
+        );
+
+        yield 'existing failOnRisky is preserved' => self::createScenario(
+            xml: $loadFixture('phpunit_with_fail_on_risky_set.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '5.2',
+            expected: $existingFailOnRisky,
+        );
+
+        yield 'existing failOnWarning is preserved' => self::createScenario(
+            xml: $loadFixture('phpunit_with_fail_on_warning_set.xml'),
+            filteredSourceFilesToMutate: [],
+            version: '5.2',
+            expected: $existingFailOnWarning,
+        );
     }
 
     /**
-     * @return DOMNodeList<DOMNameSpaceNode|DOMNode>
+     * @param list<string> $filteredSourceFilesToMutate
+     * @return array{string, list<string>, string, string}
      */
-    private function queryXpath(string $xml, string $query): DOMNodeList
-    {
-        return SafeDOMXPath::fromString($xml)->queryList($query);
-    }
-
-    private function createConfigBuilderForPHPUnit93(): InitialConfigBuilder
-    {
-        return $this->createConfigBuilder(self::FIXTURES . '/phpunit_93.xml');
+    private static function createScenario(
+        string $xml,
+        array $filteredSourceFilesToMutate,
+        string $version,
+        string $expected,
+    ): array {
+        return [
+            $xml,
+            $filteredSourceFilesToMutate,
+            $version,
+            $expected,
+        ];
     }
 
     /**
      * @param list<string> $filteredSourceFilesToMutate
      */
     private function createConfigBuilder(
-        ?string $originalPhpUnitXmlConfigPath = null,
+        string $originalPhpUnitXmlConfig,
         array $filteredSourceFilesToMutate = [],
     ): InitialConfigBuilder {
-        $phpunitXmlPath = $originalPhpUnitXmlConfigPath ?: self::FIXTURES . '/phpunit.xml';
-
         $srcDirs = ['src', 'app'];
 
-        $replacer = new PathReplacer(new FileSystem(), $this->projectPath);
+        $replacer = new PathReplacer(
+            $this->filesystem,
+            $this->projectPath,
+        );
 
         return new InitialConfigBuilder(
             self::TMP_DIR,
-            file_get_contents($phpunitXmlPath),
+            $originalPhpUnitXmlConfig,
             new XmlConfigurationManipulator($replacer, ''),
             new XmlConfigurationVersionProvider(),
             $this->filesystem,
