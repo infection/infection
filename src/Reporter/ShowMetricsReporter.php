@@ -171,15 +171,12 @@ final readonly class ShowMetricsReporter implements Reporter
 
     private function shouldSuggestMinimumMsi(): bool
     {
-        if ($this->ignoreMsiWithNoMutations) {
-            return false;
-        }
+        $hasMsi = ($this->minMsi ?? 0.) > 0;
+        $hasMinCoveredMsi = ($this->minCoveredMsi ?? 0.) > 0;
 
-        if (($this->minMsi ?? 0.) > 0) {
-            return false;
-        }
-
-        return ($this->minCoveredMsi ?? 0.) <= 0;
+        return !$this->ignoreMsiWithNoMutations
+            && !$hasMsi
+            && !$hasMinCoveredMsi;
     }
 
     private function getPadded(int|string $subject, int $padLength = self::PAD_LENGTH): string
