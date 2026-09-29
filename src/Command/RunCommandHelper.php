@@ -96,11 +96,15 @@ final readonly class RunCommandHelper
             return true;
         }
 
-        Assert::same($useGitHubLogger, 'false', sprintf(
-            'Cannot pass "%s" to "--%s": only "true", "false" or no argument is supported',
+        Assert::same(
             $useGitHubLogger,
-            RunCommand::OPTION_LOGGER_GITHUB,
-        ));
+            'false',
+            sprintf(
+                'Cannot pass "%s" to "--%s": only "true", "false" or no argument is supported',
+                $useGitHubLogger,
+                RunCommand::OPTION_LOGGER_GITHUB,
+            ),
+        );
 
         return false;
     }

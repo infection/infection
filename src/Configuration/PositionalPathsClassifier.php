@@ -173,10 +173,13 @@ final readonly class PositionalPathsClassifier
         }
 
         // like `SomeFile` or `SomeFile.php` - bare values behave as --filter values
-        Assert::true(self::looksLikeClassOrFileName($path), sprintf(
-            'Invalid path argument "%s": multiple paths must be passed as separate arguments.',
-            $path,
-        ));
+        Assert::true(
+            self::looksLikeClassOrFileName($path),
+            sprintf(
+                'Invalid path argument "%s": multiple paths must be passed as separate arguments.',
+                $path,
+            ),
+        );
 
         return self::KIND_SOURCE;
     }

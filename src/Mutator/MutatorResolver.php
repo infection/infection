@@ -116,10 +116,13 @@ final class MutatorResolver
                 continue;
             }
 
-            Assert::true(self::isValidMutator($mutatorOrProfile), sprintf(
-                'The profile or mutator "%s" was not recognized.',
-                $mutatorOrProfile,
-            ));
+            Assert::true(
+                self::isValidMutator($mutatorOrProfile),
+                sprintf(
+                    'The profile or mutator "%s" was not recognized.',
+                    $mutatorOrProfile,
+                ),
+            );
 
             self::registerFromClass(
                 $mutatorOrProfile,
@@ -188,12 +191,15 @@ final class MutatorResolver
                 continue;
             }
 
-            Assert::true(class_exists($mutatorOrProfile, true), sprintf(
-                'The "%s" profile contains the "%s" mutator which was '
-                . 'not recognized.',
-                $profile,
-                $mutatorOrProfile,
-            ));
+            Assert::true(
+                class_exists($mutatorOrProfile, true),
+                sprintf(
+                    'The "%s" profile contains the "%s" mutator which was '
+                    . 'not recognized.',
+                    $profile,
+                    $mutatorOrProfile,
+                ),
+            );
 
             self::registerFromClass(
                 $mutatorOrProfile,

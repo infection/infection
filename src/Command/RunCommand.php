@@ -449,7 +449,8 @@ final class RunCommand extends BaseCommand
             sprintf(
                 'Cannot pass both "%s" and "%s" option: use none or only one of them',
                 self::OPTION_NO_PROGRESS,
-                self::OPTION_FORCE_PROGRESS),
+                self::OPTION_FORCE_PROGRESS,
+            ),
         );
 
         self::assertTestFrameworkOptionsAreNotBothProvided($io);

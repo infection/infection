@@ -163,7 +163,8 @@ final readonly class SafeDOMXPath
             $validContext = false;
         }
 
-        Assert::true($validContext,
+        Assert::true(
+            $validContext,
             sprintf(
                 'The context node passed for the query "%s" is invalid.',
                 $query,

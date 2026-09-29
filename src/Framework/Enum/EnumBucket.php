@@ -143,7 +143,10 @@ final class EnumBucket
 
     public function assertIsEmpty(): void
     {
-        Assert::true($this->isEmpty(), $this->describeNonEmptyBucket(...));
+        Assert::true(
+            $this->isEmpty(),
+            $this->describeNonEmptyBucket(...),
+        );
     }
 
     /**
@@ -170,7 +173,12 @@ final class EnumBucket
     private function throwValueNotAvailable(mixed $value): never
     {
         $this->asserValueIsANativeEnum($value);
-        Assert::inArray($value, $this->allValues, fn (): string => $this->describeUnknownEnumValue($value));
+
+        Assert::inArray(
+            $value,
+            $this->allValues,
+            fn (): string => $this->describeUnknownEnumValue($value),
+        );
 
         throw $this->createEnumValueNoLongerAvailable($value);
     }

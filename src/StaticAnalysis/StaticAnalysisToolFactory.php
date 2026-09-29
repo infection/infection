@@ -100,11 +100,15 @@ final readonly class StaticAnalysisToolFactory
             StaticAnalysisToolTypes::DEBUG,
         ];
 
-        Assert::same($adapterName, StaticAnalysisToolTypes::MAGO, sprintf(
-            'Invalid name of static analysis tool "%s". Available names are: %s',
+        Assert::same(
             $adapterName,
-            implode(', ', $availableTestFrameworks),
-        ));
+            StaticAnalysisToolTypes::MAGO,
+            sprintf(
+                'Invalid name of static analysis tool "%s". Available names are: %s',
+                $adapterName,
+                implode(', ', $availableTestFrameworks),
+            ),
+        );
 
         $magoConfigPath = $this->staticAnalysisConfigLocator->locate(StaticAnalysisToolTypes::MAGO);
 
