@@ -510,7 +510,7 @@ final class RunCommand extends BaseCommand
     {
         Assert::false(
             TestFrameworkOptionsOption::isProvided($io)
-            && TestFrameworkExtraArgsOption::isProvided($io),
+                && TestFrameworkExtraArgsOption::isProvided($io),
             sprintf(
                 'Cannot pass both the legacy option "--%s" and "--%s".',
                 TestFrameworkOptionsOption::NAME,

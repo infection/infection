@@ -45,9 +45,9 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
+use InvalidArgumentException;
 use function sprintf;
 use Symfony\Component\Process\PhpExecutableFinder;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -94,34 +94,33 @@ final readonly class StaticAnalysisToolFactory
             );
         }
 
+        if ($adapterName === StaticAnalysisToolTypes::MAGO) {
+            $magoConfigPath = $this->staticAnalysisConfigLocator->locate(StaticAnalysisToolTypes::MAGO);
+
+            return MagoAdapterFactory::create(
+                $magoConfigPath,
+                $this->staticAnalysisToolExecutableFiner->find(
+                    StaticAnalysisToolTypes::MAGO,
+                    (string) $this->infectionConfig->mago->customPath,
+                ),
+                $timeout,
+                $this->infectionConfig->tmpDir,
+                $this->infectionConfig->getStaticAnalysisToolOptions(),
+                $this->shellCommandRunner,
+            );
+        }
+
         $availableTestFrameworks = [
             StaticAnalysisToolTypes::PHPSTAN,
             StaticAnalysisToolTypes::MAGO,
             StaticAnalysisToolTypes::DEBUG,
         ];
 
-        Assert::same(
+        // @phpstan-ignore infection.invalidArgumentException (Keep the fallback after the adapter-specific returns.)
+        throw new InvalidArgumentException(sprintf(
+            'Invalid name of static analysis tool "%s". Available names are: %s',
             $adapterName,
-            StaticAnalysisToolTypes::MAGO,
-            sprintf(
-                'Invalid name of static analysis tool "%s". Available names are: %s',
-                $adapterName,
-                implode(', ', $availableTestFrameworks),
-            ),
-        );
-
-        $magoConfigPath = $this->staticAnalysisConfigLocator->locate(StaticAnalysisToolTypes::MAGO);
-
-        return MagoAdapterFactory::create(
-            $magoConfigPath,
-            $this->staticAnalysisToolExecutableFiner->find(
-                StaticAnalysisToolTypes::MAGO,
-                (string) $this->infectionConfig->mago->customPath,
-            ),
-            $timeout,
-            $this->infectionConfig->tmpDir,
-            $this->infectionConfig->getStaticAnalysisToolOptions(),
-            $this->shellCommandRunner,
-        );
+            implode(', ', $availableTestFrameworks),
+        ));
     }
 }

@@ -212,8 +212,7 @@ final class SourceFilterOptions
         bool $isForGitDiffLines,
     ): void {
         Assert::false(
-            $isForGitDiffLines
-            && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_FILTER,
+            $isForGitDiffLines && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_FILTER,
             sprintf(
                 'The options "--%s" and "--%s" are mutually exclusive. Please use only one of them.',
                 self::GIT_DIFF_LINES_NAME,
@@ -231,8 +230,7 @@ final class SourceFilterOptions
         ?string $gitDiffBase,
     ): void {
         Assert::false(
-            $gitDiffBase !== null
-            && $gitDiffFilter === null,
+            $gitDiffBase !== null && $gitDiffFilter === null,
             sprintf(
                 'The option "--%s" cannot be used without the option "--%s" or "--%s".',
                 self::GIT_DIFF_BASE_NAME,

@@ -41,8 +41,9 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFileFilter;
 use Infection\Git\Git;
+use InvalidArgumentException;
 use function sprintf;
-use Webmozart\Assert\Assert;
+use const true;
 
 /**
  * @internal
@@ -62,30 +63,27 @@ final readonly class SourceCollectorFactory
         Source $source,
         ?SourceFileFilter $sourceFilter,
     ): SourceCollector {
-        if ($sourceFilter instanceof GitDiffFilter) {
-            return GitDiffSourceCollector::create(
+        return match (true) {
+            $sourceFilter instanceof GitDiffFilter => GitDiffSourceCollector::create(
                 $this->git,
                 $configurationPathname,
                 $source->directories,
                 $source->excludes,
                 $sourceFilter,
-            );
-        }
-
-        Assert::nullOrIsInstanceOf(
-            $sourceFilter,
-            PlainFilter::class,
-            sprintf(
-                'Unknown source filter "%s".',
-                get_debug_type($sourceFilter),
             ),
-        );
-
-        return BasicSourceCollector::create(
-            $configurationPathname,
-            $source->directories,
-            $source->excludes,
-            $sourceFilter,
-        );
+            $sourceFilter === null || $sourceFilter instanceof PlainFilter => BasicSourceCollector::create(
+                $configurationPathname,
+                $source->directories,
+                $source->excludes,
+                $sourceFilter,
+            ),
+            // @phpstan-ignore infection.invalidArgumentException (Keep the exhaustive match expression.)
+            default => throw new InvalidArgumentException(
+                sprintf(
+                    'Unknown source filter "%s".',
+                    get_debug_type($sourceFilter),
+                ),
+            ),
+        };
     }
 }

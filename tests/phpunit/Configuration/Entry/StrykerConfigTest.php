@@ -91,9 +91,11 @@ final class StrykerConfigTest extends TestCase
 
     public function test_it_rejects_invalid_regex(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Provided branchMatchRegex "/[/" is not a valid regex');
-        $this->expectExceptionCode(0);
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Provided branchMatchRegex "/[/" is not a valid regex',
+            ),
+        );
 
         StrykerConfig::forBadge('/[/');
     }
