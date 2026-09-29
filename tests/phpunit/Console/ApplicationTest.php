@@ -125,12 +125,11 @@ final class ApplicationTest extends TestCase
         $application->renderThrowable(
             $exception,
             $output,
-            static function (OutputInterface $hintOutput): void {
-                $hintOutput->writeln('Example hint');
-            },
+            static fn (OutputInterface $hintOutput) => $hintOutput->writeln('Example hint'),
         );
 
         $display = $output->fetch();
+
         $this->assertMatchesRegularExpression('/Example failure.*Exception trace:.*Example hint/s', $display);
 
         $application->renderThrowable($exception, $output);

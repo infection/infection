@@ -48,6 +48,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Throwable;
 
@@ -176,10 +177,12 @@ final class RunCommandTest extends TestCase
 
         $tester->execute([]);
 
-        $this->assertSame(1, $tester->getStatusCode());
-        $this->assertStringContainsString($expected->getMessage(), $tester->getDisplay(normalize: true));
-        $this->assertStringContainsString('[HINT]', $tester->getDisplay(normalize: true));
-        $this->assertStringContainsString('"config:list-sources" command.', $tester->getDisplay(normalize: true));
+        $actual = $tester->getDisplay(normalize: true);
+
+        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
+        $this->assertStringContainsString($expected->getMessage(), $actual);
+        $this->assertStringContainsString('[HINT]', $actual);
+        $this->assertMatchesRegularExpression('/"config:list-sources"\s+command\./', $actual);
     }
 
     public static function caughtFailureProvider(): iterable
