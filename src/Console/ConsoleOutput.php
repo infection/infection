@@ -71,6 +71,20 @@ class ConsoleOutput
         );
     }
 
+    public function logMsiChecksSkippedWithNoThresholds(): void
+    {
+        $this->logger->notice(
+            'MSI checks were skipped because no minimum MSI thresholds are enabled. Set "minMsi" or "minCoveredMsi" above 0 to enable them.',
+        );
+    }
+
+    public function logMsiChecksSkippedWithNoMutations(): void
+    {
+        $this->logger->notice(
+            'MSI checks were skipped because no mutations were tested and "ignoreMsiWithNoMutations" is enabled. Set "ignoreMsiWithNoMutations" to false to fail when the configured MSI thresholds are not met.',
+        );
+    }
+
     public function logMinMsiCanGetIncreasedNotice(float $minMsi, float $msi): void
     {
         $typeString = 'MSI';

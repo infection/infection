@@ -191,4 +191,24 @@ final class ConsoleOutputTest extends TestCase
             Str::rTrimLines($this->output->fetch()),
         );
     }
+
+    public function test_log_msi_checks_skipped_with_no_thresholds(): void
+    {
+        $this->consoleOutput->logMsiChecksSkippedWithNoThresholds();
+
+        $this->assertSame(
+            '[notice] MSI checks were skipped because no minimum MSI thresholds are enabled. Set "minMsi" or "minCoveredMsi" above 0 to enable them.' . PHP_EOL,
+            $this->output->fetch(),
+        );
+    }
+
+    public function test_log_msi_checks_skipped_with_no_mutations(): void
+    {
+        $this->consoleOutput->logMsiChecksSkippedWithNoMutations();
+
+        $this->assertSame(
+            '[notice] MSI checks were skipped because no mutations were tested and "ignoreMsiWithNoMutations" is enabled. Set "ignoreMsiWithNoMutations" to false to fail when the configured MSI thresholds are not met.' . PHP_EOL,
+            $this->output->fetch(),
+        );
+    }
 }

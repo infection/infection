@@ -43,6 +43,7 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -181,12 +182,71 @@ final class MinMsiCheckerTest extends TestCase
         $this->assertSame('', $this->output->fetch());
     }
 
-    public function test_it_does_nothing_if_the_msis_are_too_low_but_we_ignore_it_with_no_mutations_and_there_is_no_mutations(): void
+    public function test_it_logs_when_msi_checks_are_skipped_with_no_mutations(): void
     {
         $msiChecker = new MinMsiChecker($this->consoleOutput, true, 10., 10.);
 
         $msiChecker->checkMetrics(0, 2, 2);
 
-        $this->assertSame('', $this->output->fetch());
+        $this->assertSame(
+            '[notice] MSI checks were skipped because no mutations were tested and "ignoreMsiWithNoMutations" is enabled. Set "ignoreMsiWithNoMutations" to false to fail when the configured MSI thresholds are not met.' . PHP_EOL,
+            $this->output->fetch(),
+        );
+    }
+
+    #[DataProvider('disabledThresholdsProvider')]
+    public function test_it_logs_when_msi_checks_are_skipped_with_no_thresholds(
+        bool $ignoreMsiWithNoMutations,
+        int $totalMutantCount,
+    ): void {
+        $msiChecker = new MinMsiChecker($this->consoleOutput, $ignoreMsiWithNoMutations, 0., 0.);
+
+        $msiChecker->checkMetrics($totalMutantCount, 80., 80.);
+
+        $this->assertSame(
+            '[notice] MSI checks were skipped because no minimum MSI thresholds are enabled. Set "minMsi" or "minCoveredMsi" above 0 to enable them.' . PHP_EOL,
+            $this->output->fetch(),
+        );
+    }
+
+    public static function disabledThresholdsProvider(): iterable
+    {
+        yield 'mutations tested' => [false, 2];
+
+        yield 'no mutations tested' => [false, 0];
+
+        yield 'ignore enabled with mutations' => [true, 2];
+
+        yield 'disabled thresholds take precedence over ignored mutations' => [true, 0];
+    }
+
+    #[DataProvider('enforcedThresholdsProvider')]
+    public function test_it_enforces_enabled_thresholds(
+        float $minMsi,
+        float $minCoveredCodeMsi,
+        bool $ignoreMsiWithNoMutations,
+        int $totalMutantCount,
+    ): void {
+        $msiChecker = new MinMsiChecker(
+            $this->consoleOutput,
+            $ignoreMsiWithNoMutations,
+            $minMsi,
+            $minCoveredCodeMsi,
+        );
+
+        $this->expectException(MinMsiCheckFailed::class);
+
+        $msiChecker->checkMetrics($totalMutantCount, 0., 0.);
+    }
+
+    public static function enforcedThresholdsProvider(): iterable
+    {
+        yield 'only MSI enabled' => [10., 0., false, 2];
+
+        yield 'only covered code MSI enabled' => [0., 10., false, 2];
+
+        yield 'no mutations with ignore disabled' => [10., 10., false, 0];
+
+        yield 'mutations tested with ignore enabled' => [10., 10., true, 2];
     }
 }
