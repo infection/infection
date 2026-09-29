@@ -40,10 +40,12 @@ use function array_key_exists;
 use function array_map;
 use function array_unique;
 use function array_values;
+use function count;
 use function dirname;
 use function explode;
 use function implode;
 use function in_array;
+use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
@@ -69,7 +71,6 @@ use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
-use InvalidArgumentException;
 use function is_numeric;
 use function ltrim;
 use function max;
@@ -441,16 +442,16 @@ class ConfigurationFactory
             $schema,
         );
 
-        $resolvedFilter = $classified->sourcePaths !== []
-            ? new PlainFilter(array_values(array_unique($classified->sourcePaths)))
-            : null;
+        $resolvedFilter = PlainFilter::tryToCreate($classified->sourcePaths);
 
-        if ($classified->testPaths !== []) {
-            if ($testFrameworkExtraArgs !== null) {
-                throw new InvalidArgumentException(
-                    'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
-                );
-            }
+        if (count($classified->testPaths) > 0) {
+            Assert::notNull(
+                $testFrameworkExtraArgs,
+                sprintf(
+                    'Cannot pass test paths as positional arguments together with the "--%s" option. Use either form, not both.',
+                    TestFrameworkExtraArgsOption::NAME,
+                ),
+            );
 
             $testFrameworkExtraArgs = implode(' ', $classified->testPaths);
         }

@@ -64,7 +64,6 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\Source\Exception\SourceSymbolNotFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
@@ -382,9 +381,6 @@ final class RunCommand extends BaseCommand
         ;
     }
 
-    /**
-     * @throws SourceSymbolNotFound
-     */
     protected function executeCommand(IO $io): bool
     {
         $logger = new ConsoleLogger($io);

@@ -40,6 +40,7 @@ use function array_map;
 use function count;
 use function explode;
 use function implode;
+use function is_array;
 
 /**
  * @internal
@@ -55,9 +56,9 @@ final readonly class PlainFilter implements SourceFileFilter
     }
 
     /**
-     * @param string $value A comma separated list of paths to exclude.
+     * @param string|string[] $value A comma separated list of paths to exclude.
      */
-    public static function tryToCreate(string $value): ?self
+    public static function tryToCreate(string|array $value): ?self
     {
         $values = self::parseValues($value);
 
@@ -75,14 +76,18 @@ final readonly class PlainFilter implements SourceFileFilter
     }
 
     /**
+     * @param string|string[] $value
+     *
      * @return non-empty-string[]
      */
-    private static function parseValues(string $value): array
+    private static function parseValues(string|array $value): array
     {
         return array_filter(
             array_map(
                 trim(...),
-                explode(',', $value),
+                is_array($value)
+                    ? $value
+                    : explode(',', $value),
             ),
         );
     }

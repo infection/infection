@@ -56,7 +56,10 @@ final class SourceSymbolNotFound extends RuntimeException
                 'The following source selectors did not match any source symbol: %s.',
                 implode(
                     ', ',
-                    array_map(self::formatSelector(...), $selectors),
+                    array_map(
+                        self::formatSelector(...),
+                        $selectors,
+                    ),
                 ),
             ),
         );
