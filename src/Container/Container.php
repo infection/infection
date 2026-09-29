@@ -121,11 +121,9 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
-use Infection\Process\Runner\InitialStaticAnalysis;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\SymfonyProcessShellCommandRunner;
@@ -160,6 +158,7 @@ use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
@@ -173,6 +172,8 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\LegacyStaticAnalysisBridge;
+use Infection\TestFramework\NullStaticAnalysisTestFramework;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
@@ -536,14 +537,34 @@ final class Container extends DIContainer
                     $config->processTimeout,
                 );
             },
-            InitialStaticAnalysis::class => static function (self $container): InitialStaticAnalysis {
-                // do not create a chain of classes for SA if not enabled
-                if (!$container->getConfiguration()->isStaticAnalysisEnabled()) {
-                    return new NullInitialStaticAnalysisRunner();
-                }
-
-                return $container->getInitialStaticAnalysisRunner();
-            },
+            // Autowiring also matches StaticAnalysisTestFramework when resolving TestFramework.
+            Engine::class => (/**
+             * @throws FileOrDirectoryNotFound
+             * @throws NoSourceFound
+             */
+                static fn (self $container): Engine => new Engine(
+                    $container->getConfiguration(),
+                    $container->getTestFramework(),
+                    $container->getEventDispatcher(),
+                    $container->getMemoryLimiter(),
+                    $container->getMutationGenerator(),
+                    $container->getMutationTestingRunner(),
+                    $container->getMinMsiChecker(),
+                    $container->getMaxTimeoutsChecker(),
+                    $container->getMetricsCalculator(),
+                    $container->getPreloadedSourceChecker(),
+                    $container->getStaticAnalysisTestFramework(),
+                )),
+            JUnitTestExecutionInfoAdder::class => static fn (self $container): JUnitTestExecutionInfoAdder => new JUnitTestExecutionInfoAdder(
+                $container->getTestFramework(),
+                $container->get(MemoizedTestFileDataProvider::class),
+            ),
+            StaticAnalysisTestFramework::class => static fn (self $container) => $container->getConfiguration()->isStaticAnalysisEnabled()
+                ? new LegacyStaticAnalysisBridge(
+                    $container->getInitialStaticAnalysisRunner(),
+                    $container->getStaticAnalysisToolAdapter(),
+                )
+                : new NullStaticAnalysisTestFramework(),
             MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
                 $config = $container->getConfiguration();
 
@@ -935,9 +956,9 @@ final class Container extends DIContainer
         return $this->get(InitialTestsRunner::class);
     }
 
-    public function getInitialStaticAnalysis(): InitialStaticAnalysis
+    public function getStaticAnalysisTestFramework(): StaticAnalysisTestFramework
     {
-        return $this->get(InitialStaticAnalysis::class);
+        return $this->get(StaticAnalysisTestFramework::class);
     }
 
     public function getInitialStaticAnalysisRunner(): InitialStaticAnalysisRunner

@@ -33,59 +33,73 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Mutant\Mutant;
+use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
- * This is needed for 2 purposes:
- *
- * 1. To warm up the SA tool's cache
- * 2. To make sure SA passes before using it inside Infection to kill Mutants
+ * Compatibility layer for the built-in static-analysis adapters. No third-party adapter
+ * packages depend on this bridge.
  *
  * @internal
- * @final
+ *
+ * @deprecated Remove once the built-in static-analysis adapters implement TestFramework directly.
  */
-readonly class InitialStaticAnalysisRunner
+final readonly class LegacyStaticAnalysisBridge implements StaticAnalysisTestFramework
 {
     public function __construct(
-        private ShellCommandRunner $shellCommandRunner,
-        private EventDispatcher $eventDispatcher,
+        private InitialStaticAnalysisRunner $initialStaticAnalysisRunner,
         private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
     ) {
+    }
+
+    public function getName(): string
+    {
+        return $this->staticAnalysisToolAdapter->getName();
+    }
+
+    public function getVersion(): string
+    {
+        return $this->staticAnalysisToolAdapter->getVersion();
+    }
+
+    public function checkRequirements(): void
+    {
+        $this->staticAnalysisToolAdapter->assertMinimumVersionSatisfied();
     }
 
     /**
      * @throws InitialStaticAnalysisRunFailed
      * @throws RuntimeException
-     * @throws ProcessSignaledException
      * @throws ProcessTimedOutException
+     * @throws ProcessSignaledException
      */
-    public function run(): void
+    public function executeInitialRun(): InitialRunResults
     {
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
+        $this->initialStaticAnalysisRunner->run();
 
-        $process = $this->shellCommandRunner->run(
-            command: $this->staticAnalysisToolAdapter->getInitialRunCommandLine(),
-            callback: fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()),
-            timeout: null,
+        return new InitialRunResults('', null);
+    }
+
+    public function test(Mutant $mutant): MutantProcessContainer
+    {
+        return new MutantProcessContainer(
+            $this->staticAnalysisToolAdapter->createMutantProcessFactory()->create($mutant),
+            [],
         );
+    }
 
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($process->stdout));
-
-        if (!$process->isSuccessful()) {
-            throw InitialStaticAnalysisRunFailed::fromCompletedProcessAndAdapter(
-                $process,
-                $this->staticAnalysisToolAdapter->getName(),
-            );
-        }
+    public function hasJUnitReport(): bool
+    {
+        return false;
     }
 }
