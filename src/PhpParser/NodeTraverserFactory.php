@@ -85,7 +85,6 @@ readonly class NodeTraverserFactory
     public function createEnrichmentTraverser(
         SplFileInfo $sourceFile,
         Trace $trace,
-        ?SourceSymbolSelector $sourceSymbolSelector = null,
     ): NodeTraverserInterface {
         $nodeIgnorers = [
             new InterfaceIgnorer(),
@@ -107,13 +106,9 @@ readonly class NodeTraverserFactory
             ),
         ];
 
-        $sourceSymbolMatcher = $sourceSymbolSelector === null
-            ? $this->sourceSymbolMatcher
-            : new SourceSymbolMatcher([$sourceSymbolSelector]);
-
-        if ($sourceSymbolMatcher->hasSelectors()) {
+        if ($this->sourceSymbolMatcher->hasSelectors()) {
             $visitors[] = new ExcludeNonSelectedSourceNodesVisitor(
-                $sourceSymbolMatcher,
+                $this->sourceSymbolMatcher,
             );
         }
 
@@ -135,10 +130,5 @@ readonly class NodeTraverserFactory
             new NodeVisitor\CloningVisitor(),
             $mutationVisitor,
         );
-    }
-
-    public function getSourceSymbolMatcher(): SourceSymbolMatcher
-    {
-        return $this->sourceSymbolMatcher;
     }
 }

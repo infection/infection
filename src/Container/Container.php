@@ -569,7 +569,6 @@ final class Container extends DIContainer
                     $config->mutators,
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
-                    $container->getNodeTraverserFactory()->getSourceSymbolMatcher(),
                 );
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {

@@ -16,16 +16,4 @@ then
     exit 1
 fi
 
-if unmatched_output="$(php "$INFECTION" ../../../tests/phpunit/Differ Differ::diff Differ::missing --with-uncovered --dry-run --no-progress --no-interaction 2>&1)"
-then
-    echo 'An unmatched source selector did not fail the run.' >&2
-
-    exit 1
-fi
-
-if ! grep --fixed-strings 'The following source selectors did not match any source symbol:' <<< "$unmatched_output"
-then
-    echo 'An unmatched source selector was not reported.' >&2
-
-    exit 1
-fi
+php "$INFECTION" ../../../tests/phpunit/Differ Differ::diff Differ::missing --with-uncovered --dry-run --no-progress --no-interaction

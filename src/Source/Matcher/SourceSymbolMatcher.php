@@ -46,18 +46,13 @@ use function strcasecmp;
  *
  * @internal
  */
-final class SourceSymbolMatcher
+final readonly class SourceSymbolMatcher
 {
-    /**
-     * @var array<int, true>
-     */
-    private array $matchedSelectors = [];
-
     /**
      * @param list<SourceSymbolSelector> $selectors
      */
     public function __construct(
-        private readonly array $selectors,
+        private array $selectors,
     ) {
     }
 
@@ -66,44 +61,18 @@ final class SourceSymbolMatcher
         ?Node\Stmt\ClassLike $class,
         ?Node\Stmt\ClassMethod $method,
     ): bool {
-        $matches = false;
-
-        foreach ($this->selectors as $index => $selector) {
-            if (!$this->matchesSelector($node, $class, $method, $selector)) {
-                continue;
+        foreach ($this->selectors as $selector) {
+            if ($this->matchesSelector($node, $class, $method, $selector)) {
+                return true;
             }
-
-            $this->matchedSelectors[$index] = true;
-            $matches = true;
         }
 
-        return $matches;
+        return false;
     }
 
     public function hasSelectors(): bool
     {
         return $this->selectors !== [];
-    }
-
-    /**
-     * @return list<SourceSymbolSelector>
-     */
-    public function getUnmatchedSelectors(): array
-    {
-        $unmatched = [];
-
-        foreach ($this->selectors as $index => $selector) {
-            if (!isset($this->matchedSelectors[$index])) {
-                $unmatched[] = $selector;
-            }
-        }
-
-        return $unmatched;
-    }
-
-    public function reset(): void
-    {
-        $this->matchedSelectors = [];
     }
 
     private function matchesSelector(
