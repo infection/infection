@@ -64,7 +64,7 @@ final class NoSourceFoundTest extends TestCase
 
         $expected = new NoSourceFound(
             isSourceFiltered: true,
-            message: 'No source file found among the modified files in the configured sources for the git filter "AM" and the base "main".',
+            message: 'No source file found for the filter applied to the configured sources. The git filter used was: "AM" with the base "main".',
             previous: $previous,
         );
 

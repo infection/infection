@@ -75,7 +75,7 @@ final class NoSourceFound extends RuntimeException
         return new self(
             isSourceFiltered: true,
             message: sprintf(
-                'No source file found among the modified files in the configured sources for the git filter "%s" and the base "%s".',
+                'No source file found for the filter applied to the configured sources. The git filter used was: "%s" with the base "%s".',
                 $diffFilter,
                 $base,
             ),
