@@ -72,9 +72,6 @@ final class ListSourcesCommand extends BaseCommand
         );
     }
 
-    /**
-     * @throws NoSourceFound
-     */
     protected function executeCommand(IO $io): bool
     {
         $container = $this->getApplication()->getContainer()->withValues(
