@@ -223,6 +223,12 @@ message = 'Argument #1 of method `Symfony\Component\Filesystem\Path::makeRelativ
 count = 1
 
 [[issues]]
+file = "src/Command/ListSourcesCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\ListSourcesCommand::executeCommand`.'
+count = 1
+
+[[issues]]
 file = "src/Command/MakeCustomMutatorCommand.php"
 code = "invalid-return-statement"
 message = "Invalid return type for function `{closure:src/Command/MakeCustomMutatorCommand.php:108:33}`: expected `string`, but found `null|string`."
