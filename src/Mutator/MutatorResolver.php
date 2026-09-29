@@ -41,11 +41,11 @@ use function array_unique;
 use function array_values;
 use function class_exists;
 use function in_array;
-use InvalidArgumentException;
 use function is_subclass_of;
 use PhpParser\Node;
 use function sprintf;
 use stdClass;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -116,20 +116,16 @@ final class MutatorResolver
                 continue;
             }
 
-            if (self::isValidMutator($mutatorOrProfile)) {
-                self::registerFromClass(
-                    $mutatorOrProfile,
-                    $resolvedSettings,
-                    $mutators,
-                );
-
-                continue;
-            }
-
-            throw new InvalidArgumentException(sprintf(
+            Assert::true(self::isValidMutator($mutatorOrProfile), sprintf(
                 'The profile or mutator "%s" was not recognized.',
                 $mutatorOrProfile,
             ));
+
+            self::registerFromClass(
+                $mutatorOrProfile,
+                $resolvedSettings,
+                $mutators,
+            );
         }
 
         return $mutators;
@@ -192,22 +188,18 @@ final class MutatorResolver
                 continue;
             }
 
-            if (class_exists($mutatorOrProfile, true)) {
-                self::registerFromClass(
-                    $mutatorOrProfile,
-                    $settings,
-                    $mutators,
-                );
-
-                continue;
-            }
-
-            throw new InvalidArgumentException(sprintf(
+            Assert::true(class_exists($mutatorOrProfile, true), sprintf(
                 'The "%s" profile contains the "%s" mutator which was '
                 . 'not recognized.',
                 $profile,
                 $mutatorOrProfile,
             ));
+
+            self::registerFromClass(
+                $mutatorOrProfile,
+                $settings,
+                $mutators,
+            );
         }
     }
 
@@ -220,12 +212,14 @@ final class MutatorResolver
         array|bool $settings,
         array &$mutators,
     ): void {
-        if (!array_key_exists($mutator, ProfileList::ALL_MUTATORS)) {
-            throw new InvalidArgumentException(sprintf(
+        Assert::keyExists(
+            ProfileList::ALL_MUTATORS,
+            $mutator,
+            sprintf(
                 'The "%s" mutator/profile was not recognized.',
                 $mutator,
-            ));
-        }
+            ),
+        );
 
         self::registerFromClass(
             ProfileList::ALL_MUTATORS[$mutator],

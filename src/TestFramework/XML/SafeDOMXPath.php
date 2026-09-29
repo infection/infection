@@ -43,7 +43,6 @@ use DOMNode;
 use DOMNodeList;
 use DOMXPath;
 use Error;
-use InvalidArgumentException;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -155,16 +154,21 @@ final readonly class SafeDOMXPath
      */
     public function queryList(string $query, ?DOMNode $contextNode = null): DOMNodeList
     {
+        $validContext = true;
+        $nodes = false;
+
         try {
             $nodes = @$this->xPath->query($query, $contextNode);
         } catch (Error) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The context node passed for the query "%s" is invalid.',
-                    $query,
-                ),
-            );
+            $validContext = false;
         }
+
+        Assert::true($validContext,
+            sprintf(
+                'The context node passed for the query "%s" is invalid.',
+                $query,
+            ),
+        );
 
         Assert::isInstanceOf(
             $nodes,

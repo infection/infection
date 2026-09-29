@@ -40,11 +40,11 @@ use function ctype_upper;
 use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\FileSystem;
-use InvalidArgumentException;
 use function sprintf;
 use function str_contains;
 use function str_starts_with;
 use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
 
 /**
  * Classifies positional `path` arguments into source-filter and
@@ -149,12 +149,13 @@ final readonly class PositionalPathsClassifier
     ): string {
         // TODO: FQCN-style arguments (e.g. "\App\Foo" or "\App\Foo::method::45") will
         // be supported via https://github.com/infection/infection/issues/2237
-        if (self::looksLikeFqcnWithOptionalMethodOrLine($path)) {
-            throw new InvalidArgumentException(sprintf(
+        Assert::false(
+            self::looksLikeFqcnWithOptionalMethodOrLine($path),
+            sprintf(
                 'FQCN-style arguments like "%s" are not yet supported. See https://github.com/infection/infection/issues/2237.',
                 $path,
-            ));
-        }
+            ),
+        );
 
         $absolutePath = Path::isAbsolute($path)
             ? $path
@@ -172,15 +173,12 @@ final readonly class PositionalPathsClassifier
         }
 
         // like `SomeFile` or `SomeFile.php` - bare values behave as --filter values
-        if (self::looksLikeClassOrFileName($path)) {
-            return self::KIND_SOURCE;
-        }
-
-        // reaching here means it's neither a valid path (source or test) nor a Class-like string, so something is wrong
-        throw new InvalidArgumentException(sprintf(
+        Assert::true(self::looksLikeClassOrFileName($path), sprintf(
             'Invalid path argument "%s": multiple paths must be passed as separate arguments.',
             $path,
         ));
+
+        return self::KIND_SOURCE;
     }
 
     /**

@@ -35,11 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Metrics;
 
-use function array_key_exists;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use InvalidArgumentException;
 use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -69,12 +68,14 @@ final class ResultsCollector implements Collector
 
             $detectionStatus = $executionResult->getDetectionStatus();
 
-            if (!array_key_exists($detectionStatus->value, $this->resultsByStatus)) {
-                throw new InvalidArgumentException(sprintf(
+            Assert::keyExists(
+                $this->resultsByStatus,
+                $detectionStatus->value,
+                sprintf(
                     'Unknown execution result process result code "%s"',
                     $detectionStatus->value,
-                ));
-            }
+                ),
+            );
 
             $this->resultsByStatus[$detectionStatus->value]->add($executionResult);
         }

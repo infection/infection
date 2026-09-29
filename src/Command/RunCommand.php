@@ -68,7 +68,6 @@ use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\TestFrameworkTypes;
-use InvalidArgumentException;
 use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function sprintf;
@@ -445,14 +444,13 @@ final class RunCommand extends BaseCommand
         $noProgress = (bool) $input->getOption(self::OPTION_NO_PROGRESS);
         $forceProgress = (bool) $input->getOption(self::OPTION_FORCE_PROGRESS);
 
-        if ($noProgress && $forceProgress) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Cannot pass both "%s" and "%s" option: use none or only one of them',
-                    self::OPTION_NO_PROGRESS,
-                    self::OPTION_FORCE_PROGRESS),
-            );
-        }
+        Assert::false(
+            $noProgress && $forceProgress,
+            sprintf(
+                'Cannot pass both "%s" and "%s" option: use none or only one of them',
+                self::OPTION_NO_PROGRESS,
+                self::OPTION_FORCE_PROGRESS),
+        );
 
         self::assertTestFrameworkOptionsAreNotBothProvided($io);
 
@@ -509,18 +507,15 @@ final class RunCommand extends BaseCommand
 
     private static function assertTestFrameworkOptionsAreNotBothProvided(IO $io): void
     {
-        if (
+        Assert::false(
             TestFrameworkOptionsOption::isProvided($io)
-            && TestFrameworkExtraArgsOption::isProvided($io)
-        ) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Cannot pass both the legacy option "--%s" and "--%s".',
-                    TestFrameworkOptionsOption::NAME,
-                    TestFrameworkExtraArgsOption::NAME,
-                ),
-            );
-        }
+            && TestFrameworkExtraArgsOption::isProvided($io),
+            sprintf(
+                'Cannot pass both the legacy option "--%s" and "--%s".',
+                TestFrameworkOptionsOption::NAME,
+                TestFrameworkExtraArgsOption::NAME,
+            ),
+        );
     }
 
     /**
