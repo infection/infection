@@ -456,7 +456,11 @@ class ConfigurationFactory
             $testFrameworkExtraArgs = implode(' ', $classified->testPaths);
         }
 
-        return [$resolvedFilter, $testFrameworkExtraArgs, $classified->sourceSelectors];
+        return [
+            $resolvedFilter,
+            $testFrameworkExtraArgs,
+            $classified->sourceSelectors,
+        ];
     }
 
     /**
@@ -484,7 +488,10 @@ class ConfigurationFactory
             );
         }
 
-        return [new SourceFilter($sourceFilter, $sourceSymbolSelectors), $testFrameworkExtraArgs];
+        return [
+            new SourceFilter($sourceFilter, $sourceSymbolSelectors),
+            $testFrameworkExtraArgs,
+        ];
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath, ?string $summaryJsonLogFilePath): Logs

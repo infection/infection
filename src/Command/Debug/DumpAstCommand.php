@@ -40,6 +40,7 @@ use function explode;
 use Infection\Command\BaseCommand;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\PathsArgument;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Console\IO;
 use Infection\Container\Container;
@@ -99,6 +100,11 @@ final class DumpAstCommand extends BaseCommand
             InputArgument::REQUIRED,
             'Path to the file to parse.',
         );
+        $this->addArgument(
+            PathsArgument::NAME,
+            InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
+            'Limit eligible nodes to the given source selectors, for example Differ::diff or Differ::diff::32.',
+        );
         $this->addOption(
             self::SHOW_ATTRIBUTES,
             null,
@@ -123,7 +129,6 @@ final class DumpAstCommand extends BaseCommand
         $file = $this->getFile($io);
         $shouldShowAttributes = self::shouldShowAttributes($io);
         $changedLinesRanges = self::getChangedLinesRanges($io);
-        $hasChangedLines = $changedLinesRanges !== null;
         $configFile = ConfigurationOption::get($io);
         $logger = new ConsoleLogger($io);
         self::configureFormatter($io);
@@ -135,14 +140,16 @@ final class DumpAstCommand extends BaseCommand
             $changedLinesRanges,
         );
 
+        $showsEligibility = $changedLinesRanges !== null
+            || $container->getConfiguration()->sourceFilter->symbolSelectors !== [];
         $nodes = $this->createAst($container, $file);
 
         $io->write(
             $container->getNodeDumper()->dump(
                 $nodes,
-                dumpOtherAttributes: $shouldShowAttributes || $hasChangedLines,
+                dumpOtherAttributes: $shouldShowAttributes || $showsEligibility,
                 decorateNodes: $io->isDecorated(),
-                showLineNumbers: $hasChangedLines,
+                showLineNumbers: $showsEligibility,
             ),
         );
 
@@ -287,7 +294,7 @@ final class DumpAstCommand extends BaseCommand
                 output: $io->getOutput(),
                 configFile: $configFile,
                 withUncovered: true,
-                sourceFilter: SourceFilterOptions::get($io),
+                sourceFilter: SourceFilterOptions::get($io, PathsArgument::get($io)),
             )
         ;
 
