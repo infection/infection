@@ -107,6 +107,8 @@ final class RunCommand extends BaseCommand
 
     public const string OPTION_MAX_TIMEOUTS = 'max-timeouts';
 
+    public const string OPTION_MUTANT_ID = 'id';
+
     private const string OPTION_STATIC_ANALYSIS_TOOL = 'static-analysis-tool';
 
     private const string OPTION_STATIC_ANALYSIS_TOOL_OPTIONS = 'static-analysis-tool-options';
@@ -145,8 +147,6 @@ final class RunCommand extends BaseCommand
     private const string OPTION_SKIP_INITIAL_TESTS = 'skip-initial-tests';
 
     private const string OPTION_DRY_RUN = 'dry-run';
-
-    private const string OPTION_MUTANT_ID = 'id';
 
     private const string OPTION_TEAMCITY = 'teamcity';
 

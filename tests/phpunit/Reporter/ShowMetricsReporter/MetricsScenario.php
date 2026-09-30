@@ -35,9 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Reporter\ShowMetricsReporter;
 
+use function str_replace;
+
 final class MetricsScenario
 {
     public function __construct(
+        public ?string $mutantId,
+        public bool $ignoreMsiWithNoMutations,
+        public ?float $minMsi,
+        public ?float $minCoveredMsi,
         public bool $withUncovered,
         public int $killedByTestsCount,
         public int $killedByStaticAnalysisCount,
@@ -54,6 +60,38 @@ final class MetricsScenario
         public float $coveredCodeMutationScoreIndicator,
         public string $expected,
     ) {
+    }
+
+    public function withMutantId(?string $mutantId): self
+    {
+        $clone = clone $this;
+        $clone->mutantId = $mutantId;
+
+        return $clone;
+    }
+
+    public function withIgnoreMsiWithNoMutations(bool $ignoreMsiWithNoMutations): self
+    {
+        $clone = clone $this;
+        $clone->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
+
+        return $clone;
+    }
+
+    public function withMinMsi(?float $minMsi): self
+    {
+        $clone = clone $this;
+        $clone->minMsi = $minMsi;
+
+        return $clone;
+    }
+
+    public function withMinCoveredMsi(?float $minCoveredMsi): self
+    {
+        $clone = clone $this;
+        $clone->minCoveredMsi = $minCoveredMsi;
+
+        return $clone;
     }
 
     public function withUncovered(bool $withUncovered): self
@@ -110,6 +148,15 @@ final class MetricsScenario
         $clone->coveredCodeMutationScoreIndicator = $coveredCodeMutationScoreIndicator;
 
         return $clone;
+    }
+
+    public function withoutMinimumMsiAdviceInExpected(): self
+    {
+        return $this->withExpected(str_replace(
+            ' Set a minimum MSI score to make this outcome fail.',
+            '',
+            $this->expected,
+        ));
     }
 
     public function withExpected(string $expected): self
