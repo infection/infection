@@ -55,6 +55,13 @@ final class NoSourceFound extends RuntimeException
         parent::__construct($message, $code, $previous);
     }
 
+    public function appendHint(string $hint): self
+    {
+        $this->message = $this->getMessage() . ' ' . $hint;
+
+        return $this;
+    }
+
     public static function noFilesForGitDiff(string $diffFilter, string $base): self
     {
         return new self(
