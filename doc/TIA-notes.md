@@ -1,0 +1,192 @@
+## Scenarios
+
+We have two scenarios to consider and test properly:
+
+- A project that does not have TIA enabled.
+- A project that has TIA enabled.
+
+For both cases, we can consider the following scenarios:
+
+- A single run (e.g. CI).
+- An initial run, an escaped mutation is reported, the user updates the tests, execute infection again. 
+- An initial run, the user adds some code (source or tests) and execute infection again.
+
+TODO: have end-to-end tests that reliably capture those scenarios.
+
+## Gotchas
+
+- security issues
+- can TIA be enabled?
+- communicate that a subset of tests was executed or why it wasn't
+- cache / artefact re-use
+- coverage vs covers
+- Do not use TIA during mutant execution: we already know which tests to execute and in what order. Ensure that any pre-existing TIA configuration or configuration added for the initial run has no side effects in mutant processes. In particular, running a mutant must not update or invalidate the impact data recorded during the initial run.
+- ???
+
+## Feedback for PHPUnit
+
+
+### Verbose output
+
+The output can be quite verbose:
+
+<details>
+<summary>Output example</summary>
+
+```shell
+'/Users/tfidry/Project/Humbug/infection/vendor/bin/phpunit' '--configuration' '/var/folders/p3/lkw0cgjj2fq0656q_9rd0mk80000gn/T/infection/phpunitConfiguration.initial.infection.xml' '--exclude-source-from-xml-coverage' '--coverage-xml=/var/folders/p3/lkw0cgjj2fq0656q_9rd0mk80000gn/T/infection/coverage-xml' '--log-junit=/var/folders/p3/lkw0cgjj2fq0656q_9rd0mk80000gn/T/infection/junit.xml' '--impacted-by-file' '/var/folders/p3/lkw0cgjj2fq0656q_9rd0mk80000gn/T/infection/phpunit-impact-sources.txt' --explain
+PHPUnit 13.4-dev by Sebastian Bergmann and contributors.
+
+Recorded at 2026-09-30 09:23:53 UTC from what the tests executed and, for a test that ran in a process of its own, what that process loaded.
+
+72 of 518 tests can be affected by what changed.
+
+68 tests depend on something that changed:
+ - Infection\Tests\Process\Runner\MutationTestingRunnerTest::test_it_does_not_create_processes_when_code_is_ignored_by_regex
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffSourceCodeMatcher.php
+ - Infection\Tests\Differ\ChangedLinesRangeTest::test_it_can_be_created_for_a_line
+   /Users/tfidry/Project/Humbug/infection/src/Differ/ChangedLinesRange.php
+ - Infection\Tests\Differ\ChangedLinesRangeTest::test_it_can_be_created_for_a_range
+   /Users/tfidry/Project/Humbug/infection/src/Differ/ChangedLinesRange.php
+ - Infection\Tests\Differ\ChangedLinesRangeTest::test_it_can_be_created_with_an_end_line_lesser_than_a_start_line
+   /Users/tfidry/Project/Humbug/infection/src/Differ/ChangedLinesRange.php
+ - Infection\Tests\Differ\ChangedLinesRangeTest::test_it_can_check_if_it_contains_the_given_range#the mutation touches some of the changed lines
+   /Users/tfidry/Project/Humbug/infection/src/Differ/ChangedLinesRange.php
+ - Infection\Tests\Differ\ChangedLinesRangeTest::test_it_can_check_if_it_contains_the_given_range#the mutation touches all the changed lines
+   /Users/tfidry/Project/Humbug/infection/src/Differ/ChangedLinesRange.php
+ - Infection\Tests\Differ\ChangedLinesRangeTest::test_it_can_check_if_it_contains_the_given_range#the mutation touches all changed lines and more
+   /Users/tfidry/Project/Humbug/infection/src/Differ/ChangedLinesRange.php
+ - Infection\Tests\Differ\ChangedLinesRangeTest::test_it_can_check_if_it_contains_the_given_range#the first line of the mutation touches the changed lines
+   /Users/tfidry/Project/Humbug/infection/src/Differ/ChangedLinesRange.php
+ - Infection\Tests\Differ\ChangedLinesRangeTest::test_it_can_check_if_it_contains_the_given_range#the last line of the mutation touches the changed lines
+   /Users/tfidry/Project/Humbug/infection/src/Differ/ChangedLinesRange.php
+ - Infection\Tests\Differ\ChangedLinesRangeTest::test_it_can_check_if_it_contains_the_given_range#the mutation touches the changed lines
+   /Users/tfidry/Project/Humbug/infection/src/Differ/ChangedLinesRange.php
+ - Infection\Tests\Differ\ChangedLinesRangeTest::test_it_can_check_if_it_contains_the_given_range#the mutation touches some of the changed lines (before)
+   /Users/tfidry/Project/Humbug/infection/src/Differ/ChangedLinesRange.php
+ - Infection\Tests\Differ\ChangedLinesRangeTest::test_it_can_check_if_it_contains_the_given_range#the mutation touches some of the changed lines (after)
+   /Users/tfidry/Project/Humbug/infection/src/Differ/ChangedLinesRange.php
+ - Infection\Tests\Differ\ChangedLinesRangeTest::test_it_can_check_if_it_contains_the_given_range#the mutation does not affect any changed lines (before)
+   /Users/tfidry/Project/Humbug/infection/src/Differ/ChangedLinesRange.php
+ - Infection\Tests\Differ\ChangedLinesRangeTest::test_it_can_check_if_it_contains_the_given_range#the mutation does not affect any changed lines (after)
+   /Users/tfidry/Project/Humbug/infection/src/Differ/ChangedLinesRange.php
+ - Infection\Tests\Differ\ChangedLinesRangeTest::test_it_can_check_if_it_contains_the_given_range#invalid range given (start & end inversed) still contained
+   /Users/tfidry/Project/Humbug/infection/src/Differ/ChangedLinesRange.php
+ - Infection\Tests\Differ\DiffColorizerTest::test_id_adds_colours_to_a_given_diff#full-deletion
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffColorizer.php
+ - Infection\Tests\Differ\DiffColorizerTest::test_id_adds_colours_to_a_given_diff#full-addition
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffColorizer.php
+ - Infection\Tests\Differ\DiffColorizerTest::test_id_adds_colours_to_a_given_diff#partial-deletion
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffColorizer.php
+ - Infection\Tests\Differ\DiffColorizerTest::test_id_adds_colours_to_a_given_diff#partial-addition
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffColorizer.php
+ - Infection\Tests\Differ\DiffColorizerTest::test_id_adds_colours_to_a_given_diff#deletion-and-addition
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffColorizer.php
+ - Infection\Tests\Differ\DiffColorizerTest::test_id_adds_colours_to_a_given_diff#bug-1999
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffColorizer.php
+ - Infection\Tests\Differ\DiffColorizerTest::test_id_adds_colours_to_a_given_diff#multiple-removed-lines
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffColorizer.php
+ - Infection\Tests\Differ\DiffColorizerTest::test_id_adds_colours_to_a_given_diff#code string containing symfony style-tags
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffColorizer.php
+ - Infection\Tests\Differ\DiffColorizerTest::test_id_adds_colours_to_a_given_diff#surrounding comment containing symfony style-tags
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffColorizer.php
+ - Infection\Tests\Differ\DiffColorizerTest::test_id_adds_colours_to_a_given_diff#multibyte characters full-deletion
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffColorizer.php
+ - Infection\Tests\Differ\DiffColorizerTest::test_id_adds_colours_to_a_given_diff#multibyte characters partial-deletion
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffColorizer.php
+ - Infection\Tests\Differ\DiffSourceCodeMatcherTest::test_it_matches_diff_with_provided_regex#Method name with PublicVisibility mutator
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffSourceCodeMatcher.php
+ - Infection\Tests\Differ\DiffSourceCodeMatcherTest::test_it_matches_diff_with_provided_regex#Method name with MethodCallRemoval mutator
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffSourceCodeMatcher.php
+ - Infection\Tests\Differ\DiffSourceCodeMatcherTest::test_it_matches_diff_with_provided_regex#Method name with not related PublicVisibility mutator
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffSourceCodeMatcher.php
+ - Infection\Tests\Differ\DiffSourceCodeMatcherTest::test_it_matches_diff_with_provided_regex#Method call on object with MethodCallRemoval mutator
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffSourceCodeMatcher.php
+ - Infection\Tests\Differ\DiffSourceCodeMatcherTest::test_it_matches_diff_with_provided_regex#All methods of static class calls with MethodCallRemoval mutator
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffSourceCodeMatcher.php
+ - Infection\Tests\Differ\DiffSourceCodeMatcherTest::test_it_matches_diff_with_provided_regex#Method name with the minus operator
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffSourceCodeMatcher.php
+ - Infection\Tests\Differ\DiffSourceCodeMatcherTest::test_it_matches_diff_with_provided_regex#Regex containing common delimiters should not lead to syntax error
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffSourceCodeMatcher.php
+ - Infection\Tests\Differ\DiffSourceCodeMatcherTest::test_it_matches_diff_with_provided_regex#Regex containing less common delimiters should not lead to syntax error
+   /Users/tfidry/Project/Humbug/infection/src/Differ/DiffSourceCodeMatcher.php
+ - Infection\Tests\Differ\DifferTest::test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines#empty
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\DifferTest::test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines#nominal
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\DifferTest::test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines#no change
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\DifferTest::test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines#line excess
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\DifferTest::test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines#line excess with multiple changes
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\DifferTest::test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines#a line with the carriage return as the only difference
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\DifferTest::test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines#a line with change and the carriage return as the only difference
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\DifferTest::test_it_can_diff_the_code_as_arrays#empty
+   /Users/tfidry/Project/Humbug/infection/src/Differ/Tokens.php
+ - Infection\Tests\Differ\DifferTest::test_it_can_diff_the_code_as_arrays#nominal
+   /Users/tfidry/Project/Humbug/infection/src/Differ/Tokens.php
+ - Infection\Tests\Differ\DifferTest::test_it_can_diff_the_code_as_arrays#no change
+   /Users/tfidry/Project/Humbug/infection/src/Differ/Tokens.php
+ - Infection\Tests\Differ\DifferTest::test_it_can_diff_the_code_as_arrays#line excess
+   /Users/tfidry/Project/Humbug/infection/src/Differ/Tokens.php
+ - Infection\Tests\Differ\DifferTest::test_it_can_diff_the_code_as_arrays#line excess with multiple changes
+   /Users/tfidry/Project/Humbug/infection/src/Differ/Tokens.php
+ - Infection\Tests\Differ\DifferTest::test_it_can_diff_the_code_as_arrays#a line with the carriage return as the only difference
+   /Users/tfidry/Project/Humbug/infection/src/Differ/Tokens.php
+ - Infection\Tests\Differ\DifferTest::test_it_can_diff_the_code_as_arrays#a line with change and the carriage return as the only difference
+   /Users/tfidry/Project/Humbug/infection/src/Differ/Tokens.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#empty diff
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#basic diff
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#trailing line break is added when the diff does not have one
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#no line end warning tokens are preserved as blank lines
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#no line end warnings are ignored when there is no change
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#carriage return terminated line ending warnings are preserved
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#line ending warnings without line breaks are terminated
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#missing line break warnings are added after the trailing unchanged line
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#carriage return terminated trailing unchanged lines get missing line break warnings
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#trailing unchanged lines control their own missing line break warning
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#missing line break warnings are added after the latest added line
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#missing line breaks are added for changed lines at the end of a file
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#missing line breaks are added for added lines before removed lines
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#only the latest added and removed lines get missing line break warnings
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#only the latest added and removed lines are checked for missing line breaks
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_builds_a_unified_diff#distant changes are split into separate hunks
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_rejects_invalid_diff_entries#entry is not an array
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_rejects_invalid_diff_entries#entry has more than two elements
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_rejects_invalid_diff_entries#token is not a string
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+ - Infection\Tests\Differ\UnifiedDiffOutputBuilderTest::test_it_rejects_invalid_diff_entries#diff type is unknown
+   /Users/tfidry/Project/Humbug/infection/src/Differ/UnifiedDiffOutputBuilder.php
+
+4 tests have never been recorded:
+ - Infection\Tests\TestFramework\Coverage\CoverageChecker\CoverageCheckerTest::test_it_needs_code_coverage_generator_enabled_if_coverage_is_not_provided
+ - Infection\Tests\TestFramework\Coverage\JUnit\JUnitReportLocatorTest::test_it_cannot_locate_the_default_report_with_the_wrong_case_on_a_case_sensitive_system
+ - Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocatorTest::test_it_cannot_locate_the_default_report_with_the_wrong_case_on_a_case_sensitive_system
+ - Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocatorTest::test_it_cannot_find_the_report_if_there_is_more_than_one_valid_report
+
+```
+
+</details>
+
+In this situation, listing the test cases would be sufficient, and the user could expand with an increased verbosity.

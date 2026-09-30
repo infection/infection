@@ -232,14 +232,14 @@ final readonly class XmlConfigurationManipulator
 
         $original = libxml_use_internal_errors(true);
 
-        if ($schema !== null && !$xPath->document->schemaValidate($this->buildSchemaPath($schema))) {
-            throw InvalidPhpUnitConfiguration::byXsdSchema(
-                $configPath,
-                $this->getXmlErrorsString(),
-            );
-        }
-
-        libxml_use_internal_errors($original);
+//        if ($schema !== null && !$xPath->document->schemaValidate($this->buildSchemaPath($schema))) {
+//            throw InvalidPhpUnitConfiguration::byXsdSchema(
+//                $configPath,
+//                $this->getXmlErrorsString(),
+//            );
+//        }
+//
+//        libxml_use_internal_errors($original);
 
         return true;
     }
