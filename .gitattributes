@@ -7,7 +7,7 @@
 # Directories and files we do not want to distribute
 /.*                     export-ignore
 /adr/                   export-ignore
-/build/                 export-ignore
+/AGENTS.md              export-ignore
 /devTools/              export-ignore
 /tests/                 export-ignore
 /box.json.dist          export-ignore
@@ -15,6 +15,7 @@
 /docker-compose.yml     export-ignore
 /infection.json5        export-ignore
 /Makefile               export-ignore
+/mago.toml              export-ignore
 /phpbench.json          export-ignore
 /phpunit.xml.dist       export-ignore
 /phpunit_autoreview.xml export-ignore

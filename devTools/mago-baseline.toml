@@ -225,7 +225,7 @@ count = 1
 [[issues]]
 file = "src/Command/ListSourcesCommand.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\ListSourcesCommand::collectPaths`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\ListSourcesCommand::executeCommand`.'
 count = 1
 
 [[issues]]
@@ -1077,73 +1077,73 @@ count = 1
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:519:55}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:523:55}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:530:49}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:534:49}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:562:51}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:566:51}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:568:53}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:572:53}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:585:41}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:589:41}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:595:45}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:599:45}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:619:41}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:623:41}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:634:17}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:638:17}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:647:32}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:651:32}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:651:53}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:655:53}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:673:37}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:677:37}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:770:13}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:774:13}`.'
 count = 1
 
 [[issues]]
@@ -1281,73 +1281,73 @@ count = 1
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:519:55}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:523:55}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:530:49}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:534:49}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:562:51}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:566:51}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:568:53}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:572:53}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:585:41}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:589:41}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:595:45}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:599:45}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:619:41}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:623:41}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:634:17}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:638:17}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:647:32}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:651:32}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:651:53}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:655:53}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:673:37}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:677:37}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:770:13}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:774:13}`.'
 count = 1
 
 [[issues]]
@@ -1400,12 +1400,6 @@ count = 1
 
 [[issues]]
 file = "src/Differ/UnifiedDiffOutputBuilder.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Differ\UnifiedDiffOutputBuilder::normalizeDiff`: expected `list<array{0: string, 1: int(0)|int(1)|int(2)|int(3)|int(4)}>`, but found `list<list{string, int}>`.'
-count = 1
-
-[[issues]]
-file = "src/Differ/UnifiedDiffOutputBuilder.php"
 code = "missing-parameter-type"
 message = "Parameter `$output` is missing a type hint."
 count = 2
@@ -1415,12 +1409,6 @@ file = "src/Differ/UnifiedDiffOutputBuilder.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 3
-
-[[issues]]
-file = "src/Differ/UnifiedDiffOutputBuilder.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #1 of `Infection\Differ\UnifiedDiffOutputBuilder::writeHunk`: expected `list<array{0: string, 1: int(0)|int(1)|int(2)|int(3)|int(4)}>`, but possibly received `list<array{0: string, 1: int}|list{truthy-string, int}>`.'
-count = 2
 
 [[issues]]
 file = "src/Differ/UnifiedDiffOutputBuilder.php"
@@ -1466,6 +1454,12 @@ count = 1
 
 [[issues]]
 file = "src/Event/EventDispatcher/SyncEventDispatcher.php"
+code = "impossible-condition"
+message = "This condition (type `false`) will always evaluate to false."
+count = 1
+
+[[issues]]
+file = "src/Event/EventDispatcher/SyncEventDispatcher.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 2
@@ -1473,7 +1467,7 @@ count = 2
 [[issues]]
 file = "src/Event/EventDispatcher/SyncEventDispatcher.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `array<array-key, array<array-key, mixed>>` is being assigned to property `$listeners` (array<array-key, array<array-key, (callable(...mixed): mixed)>>)."
+message = "A value with a less specific type `non-empty-array<array-key, array<array-key, mixed>>` is being assigned to property `$listeners` (array<array-key, array<array-key, (callable(...mixed): mixed)>>)."
 count = 1
 
 [[issues]]
@@ -2311,12 +2305,6 @@ message = 'The value returned by generator function `Infection\Mutator\Regex\Abs
 count = 1
 
 [[issues]]
-file = "src/Mutator/Regex/AbstractPregMatch.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Infection\Mutator\Regex\AbstractPregMatch::getNewRegexArgument`: expected `PhpParser\Node\Arg`, but possibly received `PhpParser\Node\Arg|PhpParser\Node\VariadicPlaceholder`.'
-count = 1
-
-[[issues]]
 file = "src/Mutator/Regex/PregMatchMatches.php"
 code = "hidden-generator-return"
 message = 'The value returned by generator function `Infection\Mutator\Regex\PregMatchMatches::mutate` may be inaccessible to callers.'
@@ -2852,20 +2840,8 @@ count = 1
 
 [[issues]]
 file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
-code = "possibly-null-argument"
-message = "Argument #1 of function `array_key_exists` is possibly `null`, but parameter type `bool|float|int|string` does not accept it."
-count = 1
-
-[[issues]]
-file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
 code = "possibly-null-array-access"
 message = "Cannot perform array access on possibly `null` value."
-count = 2
-
-[[issues]]
-file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
-code = "possibly-null-array-index"
-message = "Possibly using `null` as an array index to access element."
 count = 2
 
 [[issues]]
@@ -3238,7 +3214,7 @@ count = 1
 file = "src/TestFramework/Factory.php"
 code = "deprecated-method"
 message = 'Call to deprecated method: `Infection\TestFramework\Contracts\TestFrameworkFactory::getExecutableName`.'
-count = 2
+count = 1
 
 [[issues]]
 file = "src/TestFramework/Factory.php"
@@ -3256,13 +3232,13 @@ count = 1
 file = "src/TestFramework/Factory.php"
 code = "possibly-static-access-on-interface"
 message = 'Potential static method call on interface `Infection\AbstractTestFramework\TestFrameworkAdapterFactory` via `class-string`.'
-count = 7
+count = 5
 
 [[issues]]
 file = "src/TestFramework/Factory.php"
 code = "possibly-static-access-on-interface"
 message = 'Potential static method call on interface `Infection\TestFramework\Contracts\TestFrameworkFactory` via `class-string`.'
-count = 7
+count = 5
 
 [[issues]]
 file = "src/TestFramework/Factory.php"
@@ -4285,24 +4261,6 @@ message = "Impossible type assertion: `$userSubscriber->count` of type `int(0)` 
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
-code = "impossible-assignment"
-message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
-code = "no-value"
-message = 'Argument #1 passed to method `Infection\Tests\Fixtures\Event\IONullSubscriber::__construct` has type `never`, meaning it cannot produce a value.'
-count = 3
-
-[[issues]]
-file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
-code = "non-existent-class"
-message = 'Class `Infection\Tests\Fixtures\Console\FakeOutput` not found.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php"
 code = "ambiguous-object-method-access"
 message = "Cannot statically verify method call on a generic `object` type."
@@ -4378,18 +4336,6 @@ count = 1
 file = "tests/phpunit/Logger/MutationAnalysis/MutationAnalysisLoggerFactoryTest.php"
 code = "possibly-invalid-argument"
 message = '''Possible argument type mismatch for argument #1 of `PHPUnit\Framework\Assert::assertInstanceOf`: expected `class-string<'ExpectedType.phpunit\framework\assert::assertinstanceof() extends object>`, but possibly received `string`.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Logger/MutationGeneration/MutationGenerationLoggerFactoryTest.php"
-code = "no-value"
-message = 'Argument #2 passed to method `Infection\Logger\MutationGeneration\MutationGenerationLoggerFactory::__construct` has type `never`, meaning it cannot produce a value.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Logger/MutationGeneration/MutationGenerationLoggerFactoryTest.php"
-code = "non-existent-class"
-message = 'Class `Infection\Tests\Fixtures\Console\FakeOutput` not found.'
 count = 1
 
 [[issues]]
@@ -5327,12 +5273,6 @@ file = "tests/phpunit/TestingUtility/Iterable/TrackableIteratorTest.php"
 code = "less-specific-argument"
 message = 'Argument type mismatch for argument #1 of `Infection\Tests\TestingUtility\Iterable\TrackableIteratorTest::assertIteratorStateIs`: expected `Infection\Tests\TestingUtility\Iterable\TrackableIterator<array-key, mixed>`, but provided type `Infection\Tests\TestingUtility\Iterable\TrackableIterator<string|string|string, string|string|string>` is less specific.'
 count = 12
-
-[[issues]]
-file = "tests/phpunit/TestingUtility/Iterable/TrackableIteratorTest.php"
-code = "mixed-assignment"
-message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 8
 
 [[issues]]
 file = "tests/phpunit/TestingUtility/PHPUnit/DataProviderFactory.php"

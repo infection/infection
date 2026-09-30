@@ -499,6 +499,10 @@ final class Container extends DIContainer
                             $output,
                             $container->getMetricsCalculator(),
                             !$config->mutateOnlyCoveredCode(),
+                            $config->mutantId,
+                            $config->ignoreMsiWithNoMutations,
+                            $config->minMsi,
+                            $config->minCoveredMsi,
                         ),
                         new AdvisoryReporter($output),
                         $container->getFileReporterFactory()->createFromConfiguration(

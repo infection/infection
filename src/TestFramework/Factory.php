@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use function array_merge;
 use function dirname;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -118,40 +119,14 @@ final readonly class Factory
             );
         }
 
-        if ($adapterName === TestFrameworkTypes::PHPUNIT) {
-            $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
+        $availableTestFrameworks = [TestFrameworkTypes::DEBUG];
 
-            return PhpUnitAdapterFactory::create(
-                $this->testFrameworkFinder->find(
-                    TestFrameworkTypes::PHPUNIT,
-                    (string) $this->infectionConfig->phpUnit->customPath,
-                ),
-                $this->tmpDir,
-                $phpUnitConfigPath,
-                (string) $this->infectionConfig->phpUnit->configDir,
-                $this->jUnitFilePath,
-                $this->projectDir,
-                $this->infectionConfig->source->directories,
-                $skipCoverage,
-                $this->infectionConfig->executeOnlyCoveringTestCases,
-                $this->getFilteredSourceFilesToMutate(),
-                $this->infectionConfig->mapSourceClassToTestStrategy,
-                $this->shellCommandRunner,
-                sourceDirectoryBasePath: dirname($this->infectionConfig->configurationPathname),
-                useWindowsFilterLimit: OperatingSystem::isWindows(),
-                fileSystem: $this->fileSystem,
-                consoleOutput: $this->consoleOutput,
-                coverageCheckerFactory: $this->coverageCheckerFactory,
-                initialTestsRunner: $this->initialTestsRunner,
-                configuration: $this->infectionConfig,
-                processFactory: $this->containerFactory,
-                testFrameworkExtraOptionsFilter: $this->extraOptionsFilter,
-            );
-        }
+        $installedExtensions = array_merge(
+            [['extra' => ['class' => PhpUnitAdapterFactory::class]]],
+            $this->installedExtensions,
+        );
 
-        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::DEBUG];
-
-        foreach ($this->installedExtensions as $installedExtension) {
+        foreach ($installedExtensions as $installedExtension) {
             $factory = $installedExtension['extra']['class'];
 
             Assert::classExists($factory);
@@ -167,17 +142,49 @@ final readonly class Factory
 
             if ($adapterName === $factory::getAdapterName()) {
                 $configuration = $this->infectionConfig;
+                $executableName = $factory::getExecutableName();
+                $isPhpUnit = $factory === PhpUnitAdapterFactory::class;
+                $configPath = $this->configLocator->locate($factory::getAdapterName());
+                $customPath = $isPhpUnit ? (string) $configuration->phpUnit->customPath : '';
+                $configDir = $isPhpUnit ? (string) $configuration->phpUnit->configDir : null;
 
-                return $factory::create(
-                    $this->testFrameworkFinder->find($factory::getExecutableName()),
-                    $this->tmpDir,
-                    $this->configLocator->locate($factory::getAdapterName()),
-                    null,
-                    $this->jUnitFilePath,
-                    $this->projectDir,
-                    $configuration->source->directories,
-                    $skipCoverage,
-                );
+                return is_a($factory, TestFrameworkFactory::class, true)
+                    ? $factory::create(
+                        $this->testFrameworkFinder->find(
+                            $executableName,
+                            $customPath,
+                        ),
+                        $this->tmpDir,
+                        $configPath,
+                        $configDir,
+                        $this->jUnitFilePath,
+                        $this->projectDir,
+                        $configuration->source->directories,
+                        $skipCoverage,
+                        $configuration->executeOnlyCoveringTestCases,
+                        $this->getFilteredSourceFilesToMutate(),
+                        $configuration->mapSourceClassToTestStrategy,
+                        $this->shellCommandRunner,
+                        dirname($configuration->configurationPathname),
+                        OperatingSystem::isWindows(),
+                        $this->fileSystem,
+                        $this->consoleOutput,
+                        $this->coverageCheckerFactory,
+                        $this->initialTestsRunner,
+                        $configuration,
+                        $this->containerFactory,
+                        $this->extraOptionsFilter,
+                    )
+                    : $factory::create(
+                        $this->testFrameworkFinder->find($executableName),
+                        $this->tmpDir,
+                        $configPath,
+                        null,
+                        $this->jUnitFilePath,
+                        $this->projectDir,
+                        $configuration->source->directories,
+                        $skipCoverage,
+                    );
             }
         }
 

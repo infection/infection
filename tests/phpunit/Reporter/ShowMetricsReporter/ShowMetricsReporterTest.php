@@ -57,8 +57,6 @@ final class ShowMetricsReporterTest extends TestCase
     #[DataProvider('metricsProvider')]
     public function test_it_show_the_metrics(MetricsScenario $scenario): void
     {
-        $this->createMetricsCalculator($scenario);
-
         $reporter = $this->createReporter($scenario);
         $reporter->report();
 
@@ -70,6 +68,10 @@ final class ShowMetricsReporterTest extends TestCase
     public static function metricsProvider(): iterable
     {
         $emptyScenario = new MetricsScenario(
+            mutantId: null,
+            ignoreMsiWithNoMutations: false,
+            minMsi: null,
+            minCoveredMsi: null,
             withUncovered: false,
             killedByTestsCount: 0,
             killedByStaticAnalysisCount: 0,
@@ -94,10 +96,17 @@ final class ShowMetricsReporterTest extends TestCase
                          Mutation Code Coverage: <low>0%</low>
                          Covered Code MSI: <low>0%</low>
 
+                No mutations were generated for the selected code covered by tests. Set a minimum MSI score to make this outcome fail.
+
+
                 DISPLAY,
         );
 
         $completeScenario = new MetricsScenario(
+            mutantId: null,
+            ignoreMsiWithNoMutations: false,
+            minMsi: null,
+            minCoveredMsi: null,
             withUncovered: false,
             killedByTestsCount: 3,
             killedByStaticAnalysisCount: 2,
@@ -135,6 +144,56 @@ final class ShowMetricsReporterTest extends TestCase
 
         yield 'no metrics' => $emptyScenario->build();
 
+        yield 'no metrics with MSI ignored' => $emptyScenario
+            ->withIgnoreMsiWithNoMutations(true)
+            ->withoutMinimumMsiAdviceInExpected()
+            ->build()
+        ;
+
+        yield 'no metrics with minimum MSI' => $emptyScenario
+            ->withMinMsi(50.)
+            ->withoutMinimumMsiAdviceInExpected()
+            ->build()
+        ;
+
+        yield 'no metrics with minimum covered MSI' => $emptyScenario
+            ->withMinCoveredMsi(50.)
+            ->withoutMinimumMsiAdviceInExpected()
+            ->build()
+        ;
+
+        yield 'no metrics with zero minimum scores' => $emptyScenario
+            ->withMinMsi(0.)
+            ->withMinCoveredMsi(0.)
+            ->build()
+        ;
+
+        yield 'unmatched mutant ID' => $emptyScenario
+            ->withMutantId('mutant-id-1')
+            ->withExpected(
+                <<<'DISPLAY'
+
+
+                    0 mutations were generated:
+                           0 mutants were killed by Test Framework
+
+                    Metrics:
+                             Mutation Code Coverage: <low>0%</low>
+                             Covered Code MSI: <low>0%</low>
+
+                    No mutation matches mutant ID "mutant-id-1". Run Infection without "--id" to list the current mutations.
+
+
+                    DISPLAY,
+            )
+            ->build()
+        ;
+
+        yield 'matched mutant ID' => $completeScenario
+            ->withMutantId('mutant-id-1')
+            ->build()
+        ;
+
         yield 'no metrics with uncovered' => $emptyScenario
             ->withUncovered(true)
             ->withExpected(
@@ -148,6 +207,9 @@ final class ShowMetricsReporterTest extends TestCase
                              Mutation Score Indicator (MSI): <low>0%</low>
                              Mutation Code Coverage: <low>0%</low>
                              Covered Code MSI: <low>0%</low>
+
+                    No mutations were generated for the selected code. Set a minimum MSI score to make this outcome fail.
+
 
                     DISPLAY,
             )
@@ -200,6 +262,9 @@ final class ShowMetricsReporterTest extends TestCase
                              Mutation Code Coverage: <low>49%</low>
                              Covered Code MSI: <low>49%</low>
 
+                    No mutations were generated for the selected code. Set a minimum MSI score to make this outcome fail.
+
+
                     DISPLAY,
             )
             ->build()
@@ -221,6 +286,9 @@ final class ShowMetricsReporterTest extends TestCase
                              Mutation Score Indicator (MSI): <medium>50%</medium>
                              Mutation Code Coverage: <medium>50%</medium>
                              Covered Code MSI: <medium>50%</medium>
+
+                    No mutations were generated for the selected code. Set a minimum MSI score to make this outcome fail.
+
 
                     DISPLAY,
             )
@@ -244,6 +312,9 @@ final class ShowMetricsReporterTest extends TestCase
                              Mutation Code Coverage: <medium>89%</medium>
                              Covered Code MSI: <medium>89%</medium>
 
+                    No mutations were generated for the selected code. Set a minimum MSI score to make this outcome fail.
+
+
                     DISPLAY,
             )
             ->build()
@@ -265,6 +336,9 @@ final class ShowMetricsReporterTest extends TestCase
                              Mutation Score Indicator (MSI): <high>90%</high>
                              Mutation Code Coverage: <high>90%</high>
                              Covered Code MSI: <high>90%</high>
+
+                    No mutations were generated for the selected code. Set a minimum MSI score to make this outcome fail.
+
 
                     DISPLAY,
             )
@@ -288,6 +362,9 @@ final class ShowMetricsReporterTest extends TestCase
                              Mutation Code Coverage: <medium>60%</medium>
                              Covered Code MSI: <high>95%</high>
 
+                    No mutations were generated for the selected code. Set a minimum MSI score to make this outcome fail.
+
+
                     DISPLAY,
             )
             ->build()
@@ -309,6 +386,9 @@ final class ShowMetricsReporterTest extends TestCase
                              Mutation Score Indicator (MSI): <low>40%</low>
                              Mutation Code Coverage: <medium>60%</medium>
                              Covered Code MSI: <high>95%</high>
+
+                    No mutations were generated for the selected code. Set a minimum MSI score to make this outcome fail.
+
 
                     DISPLAY,
             )
@@ -337,13 +417,16 @@ final class ShowMetricsReporterTest extends TestCase
         ;
     }
 
-    private function createReporter(
-        MetricsScenario $scenario,
-    ): Reporter {
+    private function createReporter(MetricsScenario $scenario): Reporter
+    {
         return new ShowMetricsReporter(
             $this->output,
             $this->createMetricsCalculator($scenario),
             $scenario->withUncovered,
+            $scenario->mutantId,
+            $scenario->ignoreMsiWithNoMutations,
+            $scenario->minMsi,
+            $scenario->minCoveredMsi,
         );
     }
 
