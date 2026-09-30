@@ -1195,6 +1195,12 @@ parameters:
 			path: ../tests/phpunit/Console/E2ETest.php
 
 		-
+			rawMessage: 'assertNotEmpty() is not allowed. Use more strict assertion.'
+			identifier: empty.notAllowed
+			count: 2
+			path: ../tests/phpunit/Console/E2ETest.php
+
+		-
 			rawMessage: Fetching deprecated class constant DEBUG_INTEGER of class Infection\Console\LogVerbosity.
 			identifier: classConstant.deprecated
 			count: 2
@@ -1541,6 +1547,18 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/ConcreteVisitorTestCase.php
+
+		-
+			rawMessage: 'assertNotEmpty() is not allowed. Use more strict assertion.'
+			identifier: empty.notAllowed
+			count: 1
+			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/VisitorTestCaseTest.php
+
+		-
+			rawMessage: 'assertNotEmpty() is not allowed. Use more strict assertion.'
+			identifier: empty.notAllowed
+			count: 1
+			path: ../tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php
 
 		-
 			rawMessage: Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest should not exist
