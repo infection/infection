@@ -409,7 +409,12 @@ final class RunCommand extends BaseCommand
                 return true;
             }
 
-            throw $noSourceFoundException;
+            throw $noSourceFoundException->appendHint(
+                sprintf(
+                    'To list the source files matching your configuration, use the "%s" command.',
+                    ListSourcesCommand::NAME,
+                ),
+            );
         } catch (InitialTestsFailed|MinMsiCheckFailed|MaxTimeoutCountReached $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead

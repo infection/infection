@@ -44,6 +44,21 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(NoSourceFound::class)]
 final class NoSourceFoundTest extends TestCase
 {
+    public function test_it_appends_a_hint_to_the_same_exception(): void
+    {
+        $exception = NoSourceFound::noExecutableSourceCode();
+        $trace = $exception->getTrace();
+
+        $actual = $exception->appendHint('Check the configured sources.');
+
+        $this->assertSame($exception, $actual);
+        $this->assertSame(
+            'No source code was executed by the test framework. Check the configured sources.',
+            $actual->getMessage(),
+        );
+        $this->assertSame($trace, $actual->getTrace());
+    }
+
     public function test_it_can_be_created_for_when_no_source_file_was_found_for_a_git_diff(): void
     {
         $expected = new NoSourceFound(
