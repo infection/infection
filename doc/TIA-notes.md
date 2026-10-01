@@ -17,9 +17,19 @@ TODO: have end-to-end tests that reliably capture those scenarios.
 
 - security issues
 - can TIA be enabled?
+  - If the impact cache cannot be created or written, disable TIA with a diagnostic and continue the initial run without it. Cache writability checks and fallback remain a TODO in the implementation.
+  - Respect explicit user opt-outs and do not add impact selection when its prerequisites are disabled. Add a setting under Infection's `phpUnit` configuration to disable TIA entirely.
 - communicate that a subset of tests was executed or why it wasn't
+- Distinguish a legitimate empty test selection from missing or unusable impact data. PHPUnit already selects the full suite when the recording is missing, empty, or incompatible, or a queried path is unknown. A legitimate empty selection can still occur, for example when intersecting TIA with a user-selected group; Infection must handle and explain that outcome.
 - cache / artefact re-use
+- A cold impact-history cache provides no test-selection benefit on the first run. PHPUnit runs the full suite and records dependencies for subsequent runs.
+- Concurrent Infection runs in the same project share the impact-history cache and may update it concurrently. Known gotcha; we do not intend to address it in this integration.
+- Preserve PHPUnit's dependency-change safeguards when generating the initial configuration. PHPUnit already invalidates impact recordings when configuration, bootstrap scripts, or `composer.lock` change. Ensure it still discovers the project's `composer.lock` when Infection writes its generated XML outside the project.
+- Ensure changes to declared external fixtures remain accounted for when Infection supplies explicit impact queries. Executed PHP coverage alone cannot reveal dependencies on files such as JSON fixtures or templates.
 - coverage vs covers
+- Debatable: should automatic TIA selection further narrow an explicit test selection (e.g. `--filter`, `--group`, or `--testsuite`)? Current preference: yes, optimising within the user's selected subset is acceptable. The implementation currently skips automatic impact selection when another selector is present.
+- Select initial tests for all files being mutated, regardless of whether those files changed since the previous run. For example, running Infection against unchanged `B.php` still requires its coverage and tests; PHPUnit's `--only-impacted` could select no tests.
+- Explicit impact queries must account for changed tests and data providers. In the PHPUnit snapshot being evaluated, `--impacted-by-file` queries recorded dependencies instead of comparing their current hashes. For example, a previously passing test covers only `A.php`; the user edits it to also cover `B.php`, then runs Infection against `B.php`. The old impact map can omit that test, leaving Infection with incomplete coverage. Partial updates cannot refresh its dependencies unless the test runs.
 - Do not use TIA during mutant execution: we already know which tests to execute and in what order. Ensure that any pre-existing TIA configuration or configuration added for the initial run has no side effects in mutant processes. In particular, running a mutant must not update or invalidate the impact data recorded during the initial run.
 - ???
 
