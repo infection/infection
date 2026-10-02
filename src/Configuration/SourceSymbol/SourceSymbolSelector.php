@@ -33,62 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
-
-use function array_filter;
-use function array_map;
-use function count;
-use function explode;
-use function implode;
-use function is_array;
+namespace Infection\Configuration\SourceSymbol;
 
 /**
+ * A positional source selector. Line numbers are absolute source-file lines.
+ *
  * @internal
  */
-final readonly class PlainFilter implements SourceFileFilter
+final readonly class SourceSymbolSelector
 {
     /**
-     * @param non-empty-array<non-empty-string> $values
+     * @param positive-int|null $line
      */
     public function __construct(
-        public array $values,
+        public string $className,
+        public ?string $methodName,
+        public ?int $line,
     ) {
-    }
-
-    /**
-     * @param string|string[] $value A comma separated list of paths to exclude.
-     */
-    public static function tryToCreate(string|array $value): ?self
-    {
-        $values = self::parseValues($value);
-
-        return count($values) === 0
-            ? null
-            : new self($values);
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    public function toString(): string
-    {
-        return implode(',', $this->values);
-    }
-
-    /**
-     * @param string|string[] $value
-     *
-     * @return non-empty-string[]
-     */
-    private static function parseValues(string|array $value): array
-    {
-        return array_filter(
-            array_map(
-                trim(...),
-                is_array($value)
-                    ? $value
-                    : explode(',', $value),
-            ),
-        );
     }
 }

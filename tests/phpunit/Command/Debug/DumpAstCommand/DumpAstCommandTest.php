@@ -43,12 +43,31 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use function substr_count;
 use Symfony\Component\Console\Tester\CommandTester;
 
 #[Group('integration')]
 #[CoversClass(DumpAstCommand::class)]
 final class DumpAstCommandTest extends FileSystemTestCase
 {
+    public function test_it_can_preview_multiple_source_symbol_selectors(): void
+    {
+        $tester = $this->createCommandTester();
+
+        $tester->execute([
+            'file' => __DIR__ . '/EchoGreeter.php',
+            'paths' => ['OtherClass::method', __NAMESPACE__ . '\\EchoGreeter::greet::42'],
+            '--configuration' => __DIR__ . '/infection.json5',
+        ]);
+
+        $actual = $tester->getDisplay();
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame(3, substr_count($actual, 'eligible: true'));
+        $this->assertSame(11, substr_count($actual, 'eligible: false'));
+        $this->assertStringContainsString('startLine: 42', $actual);
+    }
+
     /**
      * @param array<string, string|null> $options
      */

@@ -33,62 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
+namespace Infection\Tests\Configuration\SourceFilter;
 
-use function array_filter;
-use function array_map;
-use function count;
-use function explode;
-use function implode;
-use function is_array;
+use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\SourceFileFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class PlainFilter implements SourceFileFilter
+#[CoversClass(SourceFilter::class)]
+final class SourceFilterTest extends TestCase
 {
-    /**
-     * @param non-empty-array<non-empty-string> $values
-     */
-    public function __construct(
-        public array $values,
-    ) {
+    #[DataProvider('fileFilterProvider')]
+    public function test_it_knows_whether_files_are_filtered(
+        ?SourceFileFilter $fileFilter,
+        bool $expected,
+    ): void {
+        $sourceFilter = new SourceFilter($fileFilter, []);
+
+        $this->assertSame($expected, $sourceFilter->filtersFiles());
     }
 
-    /**
-     * @param string|string[] $value A comma separated list of paths to exclude.
-     */
-    public static function tryToCreate(string|array $value): ?self
+    public static function fileFilterProvider(): iterable
     {
-        $values = self::parseValues($value);
+        yield 'unfiltered' => [
+            null,
+            false,
+        ];
 
-        return count($values) === 0
-            ? null
-            : new self($values);
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    public function toString(): string
-    {
-        return implode(',', $this->values);
-    }
-
-    /**
-     * @param string|string[] $value
-     *
-     * @return non-empty-string[]
-     */
-    private static function parseValues(string|array $value): array
-    {
-        return array_filter(
-            array_map(
-                trim(...),
-                is_array($value)
-                    ? $value
-                    : explode(',', $value),
-            ),
-        );
+        yield 'filtered' => [
+            new PlainFilter(['src/']),
+            true,
+        ];
     }
 }

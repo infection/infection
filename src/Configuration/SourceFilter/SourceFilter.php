@@ -35,60 +35,27 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\SourceFilter;
 
-use function array_filter;
-use function array_map;
-use function count;
-use function explode;
-use function implode;
-use function is_array;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 
 /**
  * @internal
+ *
+ * Represents filters to apply to the configured source to reduce the scope of the eligible files and/or code
+ * to mutate.
  */
-final readonly class PlainFilter implements SourceFileFilter
+final readonly class SourceFilter
 {
     /**
-     * @param non-empty-array<non-empty-string> $values
+     * @param list<SourceSymbolSelector> $symbolSelectors
      */
     public function __construct(
-        public array $values,
+        public ?SourceFileFilter $fileFilter,
+        public array $symbolSelectors,
     ) {
     }
 
-    /**
-     * @param string|string[] $value A comma separated list of paths to exclude.
-     */
-    public static function tryToCreate(string|array $value): ?self
+    public function filtersFiles(): bool
     {
-        $values = self::parseValues($value);
-
-        return count($values) === 0
-            ? null
-            : new self($values);
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    public function toString(): string
-    {
-        return implode(',', $this->values);
-    }
-
-    /**
-     * @param string|string[] $value
-     *
-     * @return non-empty-string[]
-     */
-    private static function parseValues(string|array $value): array
-    {
-        return array_filter(
-            array_map(
-                trim(...),
-                is_array($value)
-                    ? $value
-                    : explode(',', $value),
-            ),
-        );
+        return $this->fileFilter !== null;
     }
 }

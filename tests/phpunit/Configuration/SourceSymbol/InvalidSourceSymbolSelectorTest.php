@@ -33,23 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration;
+namespace Infection\Tests\Configuration\SourceSymbol;
 
-/**
- * Result of positional path classification: source paths (equivalent to --filter)
- * and test paths (equivalent to --test-framework-extra-args, space-joined).
- *
- * @internal
- */
-final readonly class ClassifiedPaths
+use Infection\Configuration\SourceSymbol\InvalidSourceSymbolSelector;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(InvalidSourceSymbolSelector::class)]
+final class InvalidSourceSymbolSelectorTest extends TestCase
 {
-    /**
-     * @param list<non-empty-string> $sourcePaths
-     * @param list<non-empty-string> $testPaths
-     */
-    public function __construct(
-        public array $sourcePaths,
-        public array $testPaths,
-    ) {
+    public function test_it_creates_an_exception_for_the_value(): void
+    {
+        $exception = InvalidSourceSymbolSelector::create('App\Mailer::send:32');
+
+        $this->assertSame(
+            <<<'MESSAGE'
+                Invalid source selector "App\Mailer::send:32". Expected one of:
+                - Class
+                - Class::method
+                - Class::line
+                - Class::method::line
+                MESSAGE,
+            $exception->getMessage(),
+        );
     }
 }

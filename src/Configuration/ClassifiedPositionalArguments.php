@@ -33,62 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
+namespace Infection\Configuration;
 
-use function array_filter;
-use function array_map;
-use function count;
-use function explode;
-use function implode;
-use function is_array;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 
 /**
+ * Result of positional path classification: source paths (equivalent to --filter)
+ * and test paths (equivalent to --test-framework-extra-args, space-joined).
+ *
  * @internal
  */
-final readonly class PlainFilter implements SourceFileFilter
+final readonly class ClassifiedPositionalArguments
 {
     /**
-     * @param non-empty-array<non-empty-string> $values
+     * @param list<non-empty-string> $sourcePaths
+     * @param list<non-empty-string> $testPaths
+     * @param list<SourceSymbolSelector> $sourceSelectors
      */
     public function __construct(
-        public array $values,
+        public array $sourcePaths,
+        public array $testPaths,
+        public array $sourceSelectors,
     ) {
-    }
-
-    /**
-     * @param string|string[] $value A comma separated list of paths to exclude.
-     */
-    public static function tryToCreate(string|array $value): ?self
-    {
-        $values = self::parseValues($value);
-
-        return count($values) === 0
-            ? null
-            : new self($values);
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    public function toString(): string
-    {
-        return implode(',', $this->values);
-    }
-
-    /**
-     * @param string|string[] $value
-     *
-     * @return non-empty-string[]
-     */
-    private static function parseValues(string|array $value): array
-    {
-        return array_filter(
-            array_map(
-                trim(...),
-                is_array($value)
-                    ? $value
-                    : explode(',', $value),
-            ),
-        );
     }
 }

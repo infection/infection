@@ -47,6 +47,8 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFileFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
@@ -68,7 +70,7 @@ final class ConfigurationBuilder
     private function __construct(
         private float $timeout,
         private Source $source,
-        private ?SourceFileFilter $sourceFilter,
+        private SourceFilter $sourceFilter,
         private Logs $logs,
         private string $logVerbosity,
         private string $tmpDir,
@@ -160,7 +162,7 @@ final class ConfigurationBuilder
         return new self(
             timeout: 10.0,
             source: new Source(),
-            sourceFilter: null,
+            sourceFilter: new SourceFilter(null, []),
             logs: Logs::createEmpty(),
             logVerbosity: 'none',
             tmpDir: '/tmp/infection',
@@ -208,10 +210,13 @@ final class ConfigurationBuilder
                 ['src', 'lib'],
                 ['vendor', 'tests'],
             ),
-            sourceFilter: new PlainFilter([
-                'src/Foo.php',
-                'src/Bar.php',
-            ]),
+            sourceFilter: new SourceFilter(
+                new PlainFilter([
+                    'src/Foo.php',
+                    'src/Bar.php',
+                ]),
+                [],
+            ),
             logs: new Logs(
                 textLogFilePath: 'text.log',
                 htmlLogFilePath: 'report.html',
@@ -316,7 +321,18 @@ final class ConfigurationBuilder
     public function withSourceFilter(?SourceFileFilter $sourceFilter): self
     {
         $clone = clone $this;
-        $clone->sourceFilter = $sourceFilter;
+        $clone->sourceFilter = new SourceFilter($sourceFilter, $this->sourceFilter->symbolSelectors);
+
+        return $clone;
+    }
+
+    public function withSourceSymbolSelectors(SourceSymbolSelector ...$sourceSymbolSelectors): self
+    {
+        $clone = clone $this;
+        $clone->sourceFilter = new SourceFilter(
+            $this->sourceFilter->fileFilter,
+            array_values($sourceSymbolSelectors),
+        );
 
         return $clone;
     }

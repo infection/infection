@@ -33,61 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
+namespace Infection\Configuration\SourceSymbol;
 
-use function array_filter;
-use function array_map;
-use function count;
-use function explode;
-use function implode;
-use function is_array;
+use InvalidArgumentException;
+use function sprintf;
 
 /**
  * @internal
  */
-final readonly class PlainFilter implements SourceFileFilter
+final class InvalidSourceSymbolSelector extends InvalidArgumentException
 {
-    /**
-     * @param non-empty-array<non-empty-string> $values
-     */
-    public function __construct(
-        public array $values,
-    ) {
-    }
-
-    /**
-     * @param string|string[] $value A comma separated list of paths to exclude.
-     */
-    public static function tryToCreate(string|array $value): ?self
+    public static function create(string $value): self
     {
-        $values = self::parseValues($value);
-
-        return count($values) === 0
-            ? null
-            : new self($values);
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    public function toString(): string
-    {
-        return implode(',', $this->values);
-    }
-
-    /**
-     * @param string|string[] $value
-     *
-     * @return non-empty-string[]
-     */
-    private static function parseValues(string|array $value): array
-    {
-        return array_filter(
-            array_map(
-                trim(...),
-                is_array($value)
-                    ? $value
-                    : explode(',', $value),
+        return new self(
+            sprintf(
+                <<<'MESSAGE'
+                    Invalid source selector "%s". Expected one of:
+                    - Class
+                    - Class::method
+                    - Class::line
+                    - Class::method::line
+                    MESSAGE,
+                $value,
             ),
         );
     }

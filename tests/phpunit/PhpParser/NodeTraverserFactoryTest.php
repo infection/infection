@@ -36,10 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser;
 
 use function array_map;
+use function array_slice;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
+use Infection\PhpParser\Visitor\ExcludeNonSelectedSourceNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
 use Infection\PhpParser\Visitor\ExcludeUntestedNodesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
@@ -132,6 +135,34 @@ final class NodeTraverserFactoryTest extends TestCase
         );
     }
 
+    public function test_it_places_source_selection_after_enrichment_and_before_tests(): void
+    {
+        $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
+        $traverser = (new NodeTraverserFactory(
+            sourceLineMatcher: new NullSourceLineMatcher(),
+            lineRangeCalculator: new LineRangeCalculator(),
+            onlyCovered: false,
+            sourceSymbolSelectors: [new SourceSymbolSelector('Vendor\\Package\\ClassName', 'method', 42)],
+        ))->createEnrichmentTraverser(
+            $sourceFile,
+            new EmptyTrace($sourceFile),
+        );
+
+        $this->assertInstanceOf(NodeTraverser::class, $traverser);
+
+        $visitors = self::getVisitorClassNames($traverser);
+
+        $this->assertSame(
+            [
+                ExcludeNonMutableCodeVisitor::class,
+                ExcludeUnchangedLinesVisitor::class,
+                ExcludeNonSelectedSourceNodesVisitor::class,
+                AddTestsVisitor::class,
+            ],
+            array_slice($visitors, 7, 4),
+        );
+    }
+
     /**
      * @param list<class-string<NodeVisitor>> $expected
      */
@@ -173,6 +204,7 @@ final class NodeTraverserFactoryTest extends TestCase
             sourceLineMatcher: new NullSourceLineMatcher(),
             lineRangeCalculator: new LineRangeCalculator(),
             onlyCovered: $onlyCovered,
+            sourceSymbolSelectors: [],
         );
     }
 }
