@@ -167,7 +167,7 @@ final class FilterBuilder
          * in PHPUnit >=10 data providers with keys are stored as `Class\\test_method#some key` or `Class\\test_method#0`
          * in PHPUnit <10 data providers with keys are stored as `Class\\test_method with data set "some key"` or `Class\\test_method with data set #0`
          *
-         * we need to translate to the old format because this is what PHPUnit <10 and >=10 understands from CLI `--filter` option
+         * Translate coverage IDs to the test names that PHPUnit matches with `--filter`.
          */
         if (self::isPhpUnit10OrHigher($testFrameworkVersion)) {
             $methodNameParts = self::splitMethodNameFromProviderKey($rawTestMethod, $testFrameworkVersion);
@@ -175,13 +175,43 @@ final class FilterBuilder
             if (count($methodNameParts) > 1) {
                 [$methodName, $dataProviderKey] = $methodNameParts;
 
-                return self::isIntegerKey($dataProviderKey)
-                    ? sprintf('%s with data set #%s', $methodName, $dataProviderKey)
-                    : sprintf('%s with data set "%s"', $methodName, $dataProviderKey);
+                return self::formatMethodWithDataSet(
+                    $methodName,
+                    $dataProviderKey,
+                    $testFrameworkVersion,
+                );
             }
         }
 
         return $rawTestMethod;
+    }
+
+    private static function formatMethodWithDataSet(
+        string $methodName,
+        string $dataProviderKey,
+        string $testFrameworkVersion,
+    ): string {
+        if (self::isIntegerKey($dataProviderKey)) {
+            return sprintf(
+                '%s with data set #%s',
+                $methodName,
+                $dataProviderKey,
+            );
+        }
+
+        // PHPUnit 12.3 added an @ prefix to named data sets. 12.4.1 restored the
+        // previous filter format: https://github.com/sebastianbergmann/phpunit/pull/6364
+        if (self::isPhpUnit123OrHigher($testFrameworkVersion)
+            && !self::isPhpUnit1241OrHigher($testFrameworkVersion)
+        ) {
+            $dataProviderKey = '@' . $dataProviderKey;
+        }
+
+        return sprintf(
+            '%s with data set "%s"',
+            $methodName,
+            $dataProviderKey,
+        );
     }
 
     /**
@@ -211,6 +241,28 @@ final class FilterBuilder
 
         if (!array_key_exists($testFrameworkVersion, $versions)) {
             $versions[$testFrameworkVersion] = version_compare($testFrameworkVersion, '10', '>=');
+        }
+
+        return $versions[$testFrameworkVersion];
+    }
+
+    private static function isPhpUnit123OrHigher(string $testFrameworkVersion): bool
+    {
+        static $versions = [];
+
+        if (!array_key_exists($testFrameworkVersion, $versions)) {
+            $versions[$testFrameworkVersion] = version_compare($testFrameworkVersion, '12.3.0', '>=');
+        }
+
+        return $versions[$testFrameworkVersion];
+    }
+
+    private static function isPhpUnit1241OrHigher(string $testFrameworkVersion): bool
+    {
+        static $versions = [];
+
+        if (!array_key_exists($testFrameworkVersion, $versions)) {
+            $versions[$testFrameworkVersion] = version_compare($testFrameworkVersion, '12.4.1', '>=');
         }
 
         return $versions[$testFrameworkVersion];

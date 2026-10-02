@@ -352,10 +352,13 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             '/ServiceTest\:\:test_case with data set "01"|ServiceTest\:\:test_case with data set "1\.5"|ServiceTest\:\:test_case with data set "1e3"|ServiceTest\:\:test_case with data set "\+1"/',
         ];
 
-        // These cases record current behaviour. TODO: PHPUnit >=12.3.0 and <12.4.1 needs
-        // `with data set "@named"` and `with data set "@01"`; integer keys stay unchanged.
-        // PHPUnit 12.4.1 restored the earlier format: https://github.com/sebastianbergmann/phpunit/pull/6364
-        foreach (['12.2.0', '12.3.0', '12.3.15', '12.4.0', '12.4.1'] as $phpunitVersion) {
+        foreach ([
+            '12.2.0' => '',
+            '12.3.0' => '@',
+            '12.3.15' => '@',
+            '12.4.0' => '@',
+            '12.4.1' => '',
+        ] as $phpunitVersion => $namedDataSetPrefix) {
             yield sprintf('data provider filter format (PHPUnit %s)', $phpunitVersion) => [
                 true,
                 [
@@ -364,7 +367,11 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                     'App\ServiceTest::test_case#01',
                 ],
                 $phpunitVersion,
-                '/ServiceTest\:\:test_case with data set \#0|ServiceTest\:\:test_case with data set "named"|ServiceTest\:\:test_case with data set "01"/',
+                sprintf(
+                    '/ServiceTest\:\:test_case with data set \#0|ServiceTest\:\:test_case with data set "%snamed"|ServiceTest\:\:test_case with data set "%s01"/',
+                    $namedDataSetPrefix,
+                    $namedDataSetPrefix,
+                ),
             ];
         }
 
