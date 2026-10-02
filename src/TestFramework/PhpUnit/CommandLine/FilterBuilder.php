@@ -41,7 +41,6 @@ use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\CannotBeInstantiated;
 use Infection\Framework\ClassName;
-use function is_numeric;
 use function preg_quote;
 use function sprintf;
 use function strlen;
@@ -176,13 +175,21 @@ final class FilterBuilder
             if (count($methodNameParts) > 1) {
                 [$methodName, $dataProviderKey] = $methodNameParts;
 
-                return is_numeric($dataProviderKey)
+                return self::isIntegerKey($dataProviderKey)
                     ? sprintf('%s with data set #%s', $methodName, $dataProviderKey)
                     : sprintf('%s with data set "%s"', $methodName, $dataProviderKey);
             }
         }
 
         return $rawTestMethod;
+    }
+
+    /**
+     * PHPUnit stores data sets in an array: "1" becomes an int key, "01" stays a string.
+     */
+    private static function isIntegerKey(string $dataProviderKey): bool
+    {
+        return $dataProviderKey === (string) (int) $dataProviderKey;
     }
 
     /**
