@@ -305,6 +305,30 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             '/ServiceTest\:\:test_case with data set "\#1"|ServiceTest\:\:test_case with data set "\#2"/',
         ];
 
+        // PHPUnit 9 already includes the key's type in coverage IDs. Preserve the unquoted
+        // integer keys and quoted string keys, including names that look like numbers.
+        yield 'tests from a data provider with integer keys (PHPUnit9)' => [
+            true,
+            [
+                'App\ServiceTest::test_case with data set #0',
+                'App\ServiceTest::test_case with data set #1',
+            ],
+            $phpunit9,
+            '/ServiceTest\:\:test_case with data set \#0|ServiceTest\:\:test_case with data set \#1/',
+        ];
+
+        yield 'tests from a data provider with numeric-looking string keys (PHPUnit9)' => [
+            true,
+            [
+                'App\ServiceTest::test_case with data set "01"',
+                'App\ServiceTest::test_case with data set "1.5"',
+                'App\ServiceTest::test_case with data set "1e3"',
+                'App\ServiceTest::test_case with data set "+1"',
+            ],
+            $phpunit9,
+            '/ServiceTest\:\:test_case with data set "01"|ServiceTest\:\:test_case with data set "1\.5"|ServiceTest\:\:test_case with data set "1e3"|ServiceTest\:\:test_case with data set "\+1"/',
+        ];
+
         yield 'tests from a data provider with integer keys (>=PHPUnit10)' => [
             true,
             [
@@ -327,6 +351,22 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             $phpunit10,
             '/ServiceTest\:\:test_case with data set "01"|ServiceTest\:\:test_case with data set "1\.5"|ServiceTest\:\:test_case with data set "1e3"|ServiceTest\:\:test_case with data set "\+1"/',
         ];
+
+        // These cases record current behaviour. TODO: PHPUnit >=12.3.0 and <12.4.1 needs
+        // `with data set "@named"` and `with data set "@01"`; integer keys stay unchanged.
+        // PHPUnit 12.4.1 restored the earlier format: https://github.com/sebastianbergmann/phpunit/pull/6364
+        foreach (['12.2.0', '12.3.0', '12.3.15', '12.4.0', '12.4.1'] as $phpunitVersion) {
+            yield sprintf('data provider filter format (PHPUnit %s)', $phpunitVersion) => [
+                true,
+                [
+                    'App\ServiceTest::test_case#0',
+                    'App\ServiceTest::test_case#named',
+                    'App\ServiceTest::test_case#01',
+                ],
+                $phpunitVersion,
+                '/ServiceTest\:\:test_case with data set \#0|ServiceTest\:\:test_case with data set "named"|ServiceTest\:\:test_case with data set "01"/',
+            ];
+        }
 
         yield 'multiple tests from a data provider of the same test case (<=PHPUnit9)' => [
             true,
