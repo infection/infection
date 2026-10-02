@@ -305,6 +305,29 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             '/ServiceTest\:\:test_case with data set "\#1"|ServiceTest\:\:test_case with data set "\#2"/',
         ];
 
+        yield 'tests from a data provider with integer keys (>=PHPUnit10)' => [
+            true,
+            [
+                'App\ServiceTest::test_case#0',
+                'App\ServiceTest::test_case#1',
+                'App\ServiceTest::test_case#-1',
+            ],
+            $phpunit10,
+            '/ServiceTest\:\:test_case with data set \#0|ServiceTest\:\:test_case with data set \#1|ServiceTest\:\:test_case with data set \#\-1/',
+        ];
+
+        yield 'tests from a data provider with numeric-looking string keys (>=PHPUnit10)' => [
+            true,
+            [
+                'App\ServiceTest::test_case#01',
+                'App\ServiceTest::test_case#1.5',
+                'App\ServiceTest::test_case#1e3',
+                'App\ServiceTest::test_case#+1',
+            ],
+            $phpunit10,
+            '/ServiceTest\:\:test_case with data set "01"|ServiceTest\:\:test_case with data set "1\.5"|ServiceTest\:\:test_case with data set "1e3"|ServiceTest\:\:test_case with data set "\+1"/',
+        ];
+
         yield 'multiple tests from a data provider of the same test case (<=PHPUnit9)' => [
             true,
             [
