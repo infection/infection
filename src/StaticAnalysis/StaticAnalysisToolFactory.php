@@ -116,6 +116,7 @@ final readonly class StaticAnalysisToolFactory
             StaticAnalysisToolTypes::DEBUG,
         ];
 
+        // @phpstan-ignore infection.invalidArgumentException (Keep the fallback after the adapter-specific returns.)
         throw new InvalidArgumentException(sprintf(
             'Invalid name of static analysis tool "%s". Available names are: %s',
             $adapterName,
