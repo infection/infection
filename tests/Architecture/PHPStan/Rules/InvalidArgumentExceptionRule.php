@@ -51,10 +51,10 @@ use Symfony\Component\Filesystem\Path;
  *
  * @implements Rule<New_>
  */
-final class InvalidArgumentExceptionRule implements Rule
+final readonly class InvalidArgumentExceptionRule implements Rule
 {
     public function __construct(
-        private readonly string $sourceDirectory,
+        private string $sourceDirectory,
     ) {
     }
 
