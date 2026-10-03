@@ -553,12 +553,6 @@ parameters:
 			path: ../src/Source/Collector/FixedSourceCollector.php
 
 		-
-			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
-			identifier: infection.invalidArgumentException
-			count: 1
-			path: ../src/Source/Collector/SourceCollectorFactory.php
-
-		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
 			identifier: ternary.shortNotAllowed
 			count: 1
