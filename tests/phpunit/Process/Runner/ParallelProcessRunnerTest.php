@@ -167,7 +167,7 @@ final class ParallelProcessRunnerTest extends TestCase
         iterator_count($runner->run([]));
 
         // Verify enqueueFrom was called before the first isEmpty check
-        $this->assertNotEmpty($callSequence, 'Call sequence must be tracked');
+        $this->assertNotSame([], $callSequence, 'Call sequence must be tracked');
         $this->assertSame('enqueueFrom', $callSequence[0], 'First call must be enqueueFrom (pre-loading)');
         $this->assertContains('isEmpty', $callSequence, 'isEmpty must be called during loop');
 
