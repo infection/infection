@@ -68,8 +68,12 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             '/path/to/project',
             ['src'],
             true,
+            executeOnlyCoveringTestCases: false,
+            filteredSourceFilesToMutate: [],
+            mapSourceClassToTestStrategy: null,
             shellCommandRunner: new SymfonyProcessShellCommandRunner(),
             sourceDirectoryBasePath: '/path/to/project',
+            useWindowsFilterLimit: false,
             fileSystem: new FileSystem(),
             consoleOutput: $this->createStub(ConsoleOutput::class),
             coverageCheckerFactory: new CoverageCheckerFactory(

@@ -53,9 +53,11 @@ use Symfony\Component\Filesystem\Path;
  */
 final class ListSourcesCommand extends BaseCommand
 {
+    public const string NAME = 'config:list-sources';
+
     public function __construct()
     {
-        parent::__construct('config:list-sources');
+        parent::__construct(self::NAME);
     }
 
     protected function configure(): void
