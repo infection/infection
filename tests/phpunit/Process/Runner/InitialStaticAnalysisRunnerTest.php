@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use function array_map;
-use function array_unique;
-use function array_values;
 use Closure;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
@@ -106,13 +103,13 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
         $this->runner->run();
 
-        $this->assertSame(
+        $this->assertEquals(
             [
-                InitialStaticAnalysisRunWasStarted::class,
-                InitialStaticAnalysisSubStepWasCompleted::class,
-                InitialStaticAnalysisRunWasFinished::class,
+                new InitialStaticAnalysisRunWasStarted(),
+                new InitialStaticAnalysisSubStepWasCompleted(),
+                new InitialStaticAnalysisRunWasFinished('pingpong'),
             ],
-            array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
+            $this->eventDispatcher->getEvents(),
         );
     }
 

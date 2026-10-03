@@ -45,7 +45,6 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
 use Infection\PhpParser\UnparsableFile;
-use Infection\Process\Runner\InitialStaticAnalysis;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -53,6 +52,7 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\PreloadedSourceChecker;
 use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\JUnit\TestNotFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
@@ -76,13 +76,14 @@ final readonly class Engine
         private MaxTimeoutsChecker $maxTimeoutsChecker,
         private MetricsCalculator $metricsCalculator,
         private PreloadedSourceChecker $preloadedSourceChecker,
-        private InitialStaticAnalysis $initialStaticAnalysis,
+        private StaticAnalysisTestFramework $staticAnalysisTestFramework,
     ) {
     }
 
     /**
      * @throws InitialTestsFailed
      * @throws InitialStaticAnalysisRunFailed
+     * @throws \Infection\TestFramework\Contracts\Throwable\InitialTestsFailed
      * @throws MinMsiCheckFailed
      * @throws MaxTimeoutCountReached
      * @throws UnparsableFile
@@ -98,7 +99,7 @@ final readonly class Engine
         $this->preloadedSourceChecker->check();
 
         $initialRunResults = $this->runInitialTestSuite();
-        $this->initialStaticAnalysis->run();
+        $this->staticAnalysisTestFramework->executeInitialRun();
 
         /*
          * Limit the memory used for the mutation processes based on the memory
