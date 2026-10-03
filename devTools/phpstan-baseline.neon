@@ -1196,7 +1196,7 @@ parameters:
 
 		-
 			rawMessage: 'assertNotEmpty() is not allowed. Use more strict assertion.'
-			identifier: empty.notAllowed
+			identifier: phpunit.assertEmpty
 			count: 2
 			path: ../tests/phpunit/Console/E2ETest.php
 
@@ -1550,13 +1550,13 @@ parameters:
 
 		-
 			rawMessage: 'assertNotEmpty() is not allowed. Use more strict assertion.'
-			identifier: empty.notAllowed
+			identifier: phpunit.assertEmpty
 			count: 1
 			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/VisitorTestCaseTest.php
 
 		-
 			rawMessage: 'assertNotEmpty() is not allowed. Use more strict assertion.'
-			identifier: empty.notAllowed
+			identifier: phpunit.assertEmpty
 			count: 1
 			path: ../tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php
 
