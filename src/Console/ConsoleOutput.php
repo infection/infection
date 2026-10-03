@@ -73,15 +73,15 @@ class ConsoleOutput
 
     public function logMsiChecksSkippedWithNoThresholds(): void
     {
-        $this->logger->notice(
-            'MSI checks were skipped because no minimum MSI thresholds are enabled. Set "minMsi" or "minCoveredMsi" above 0 to enable them.',
+        $this->logger->info(
+            'MSI checks were skipped because no minimum MSI thresholds are enabled. Set a minimum MSI threshold above 0 to enable them.',
         );
     }
 
     public function logMsiChecksSkippedWithNoMutations(): void
     {
-        $this->logger->notice(
-            'MSI checks were skipped because no mutations were tested and "ignoreMsiWithNoMutations" is enabled. Set "ignoreMsiWithNoMutations" to false to fail when the configured MSI thresholds are not met.',
+        $this->logger->info(
+            'MSI checks were skipped because no mutations were tested and this run is configured to ignore MSI thresholds in that case.',
         );
     }
 

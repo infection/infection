@@ -44,6 +44,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 
 #[CoversClass(ConsoleOutput::class)]
@@ -196,8 +197,14 @@ final class ConsoleOutputTest extends TestCase
     {
         $this->consoleOutput->logMsiChecksSkippedWithNoThresholds();
 
+        $this->assertSame('', $this->output->fetch());
+
+        $this->output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+
+        $this->consoleOutput->logMsiChecksSkippedWithNoThresholds();
+
         $this->assertSame(
-            '[notice] MSI checks were skipped because no minimum MSI thresholds are enabled. Set "minMsi" or "minCoveredMsi" above 0 to enable them.' . PHP_EOL,
+            '[info] MSI checks were skipped because no minimum MSI thresholds are enabled. Set a minimum MSI threshold above 0 to enable them.' . PHP_EOL,
             $this->output->fetch(),
         );
     }
@@ -206,8 +213,14 @@ final class ConsoleOutputTest extends TestCase
     {
         $this->consoleOutput->logMsiChecksSkippedWithNoMutations();
 
+        $this->assertSame('', $this->output->fetch());
+
+        $this->output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+
+        $this->consoleOutput->logMsiChecksSkippedWithNoMutations();
+
         $this->assertSame(
-            '[notice] MSI checks were skipped because no mutations were tested and "ignoreMsiWithNoMutations" is enabled. Set "ignoreMsiWithNoMutations" to false to fail when the configured MSI thresholds are not met.' . PHP_EOL,
+            '[info] MSI checks were skipped because no mutations were tested and this run is configured to ignore MSI thresholds in that case.' . PHP_EOL,
             $this->output->fetch(),
         );
     }

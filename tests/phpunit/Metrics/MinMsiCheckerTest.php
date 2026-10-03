@@ -47,6 +47,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 
 #[CoversClass(MinMsiChecker::class)]
@@ -184,12 +185,14 @@ final class MinMsiCheckerTest extends TestCase
 
     public function test_it_logs_when_msi_checks_are_skipped_with_no_mutations(): void
     {
+        $this->output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+
         $msiChecker = new MinMsiChecker($this->consoleOutput, true, 10., 10.);
 
         $msiChecker->checkMetrics(0, 2, 2);
 
         $this->assertSame(
-            '[notice] MSI checks were skipped because no mutations were tested and "ignoreMsiWithNoMutations" is enabled. Set "ignoreMsiWithNoMutations" to false to fail when the configured MSI thresholds are not met.' . PHP_EOL,
+            '[info] MSI checks were skipped because no mutations were tested and this run is configured to ignore MSI thresholds in that case.' . PHP_EOL,
             $this->output->fetch(),
         );
     }
@@ -199,12 +202,14 @@ final class MinMsiCheckerTest extends TestCase
         bool $ignoreMsiWithNoMutations,
         int $totalMutantCount,
     ): void {
+        $this->output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+
         $msiChecker = new MinMsiChecker($this->consoleOutput, $ignoreMsiWithNoMutations, 0., 0.);
 
         $msiChecker->checkMetrics($totalMutantCount, 80., 80.);
 
         $this->assertSame(
-            '[notice] MSI checks were skipped because no minimum MSI thresholds are enabled. Set "minMsi" or "minCoveredMsi" above 0 to enable them.' . PHP_EOL,
+            '[info] MSI checks were skipped because no minimum MSI thresholds are enabled. Set a minimum MSI threshold above 0 to enable them.' . PHP_EOL,
             $this->output->fetch(),
         );
     }
