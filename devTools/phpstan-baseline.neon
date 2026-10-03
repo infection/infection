@@ -1191,12 +1191,6 @@ parameters:
 		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
 			identifier: ternary.shortNotAllowed
-			count: 1
-			path: ../tests/phpunit/Console/E2ETest.php
-
-		-
-			rawMessage: 'assertNotEmpty() is not allowed. Use more strict assertion.'
-			identifier: phpunit.assertEmpty
 			count: 2
 			path: ../tests/phpunit/Console/E2ETest.php
 
@@ -1547,18 +1541,6 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/ConcreteVisitorTestCase.php
-
-		-
-			rawMessage: 'assertNotEmpty() is not allowed. Use more strict assertion.'
-			identifier: phpunit.assertEmpty
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/VisitorTestCaseTest.php
-
-		-
-			rawMessage: 'assertNotEmpty() is not allowed. Use more strict assertion.'
-			identifier: phpunit.assertEmpty
-			count: 1
-			path: ../tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php
 
 		-
 			rawMessage: Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest should not exist
