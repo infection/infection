@@ -40,7 +40,6 @@ use function preg_quote;
 use Safe\Exceptions\PcreException;
 use function Safe\preg_match;
 use function sprintf;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -66,19 +65,17 @@ final readonly class StrykerConfig
             return;
         }
 
-        $validRegex = true;
-
         try {
             // Yes, the `@` is intentional. For some reason, `thecodingmachine/safe` does not suppress the warnings here
             @preg_match($branch, '');
-        } catch (PcreException) {
-            $validRegex = false;
+        } catch (PcreException $invalidRegex) {
+            // @phpstan-ignore infection.invalidArgumentException
+            throw new InvalidArgumentException(
+                sprintf('Provided branchMatchRegex "%s" is not a valid regex', $branch),
+                0,
+                $invalidRegex,
+            );
         }
-
-        Assert::true(
-            $validRegex,
-            sprintf('Provided branchMatchRegex "%s" is not a valid regex', $branch),
-        );
 
         $this->branchMatch = $branch;
     }
