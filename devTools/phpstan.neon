@@ -7,6 +7,12 @@ rules:
 
 services:
     -
+        class: Infection\Tests\Architecture\PHPStan\Rules\InvalidArgumentExceptionRule
+        arguments:
+            sourceDirectory: %currentWorkingDirectory%/src
+        tags:
+            - phpstan.rules.rule
+    -
         class: Infection\Tests\Architecture\PHPStan\ResultCache\PHPatArchitectureResultCacheMetaExtension
         tags:
             - phpstan.resultCacheMetaExtension

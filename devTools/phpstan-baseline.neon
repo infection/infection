@@ -43,9 +43,21 @@ parameters:
 			path: ../src/Command/Option/ConfigurationOption.php
 
 		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 1
+			path: ../src/Command/Option/MapSourceClassToTestOption.php
+
+		-
 			rawMessage: Infection\Command\Option\SourceFilterOptions should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
+			path: ../src/Command/Option/SourceFilterOptions.php
+
+		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 5
 			path: ../src/Command/Option/SourceFilterOptions.php
 
 		-
@@ -53,6 +65,18 @@ parameters:
 			identifier: ternary.shortNotAllowed
 			count: 1
 			path: ../src/Command/RunCommand.php
+
+		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 2
+			path: ../src/Command/RunCommand.php
+
+		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 1
+			path: ../src/Command/RunCommandHelper.php
 
 		-
 			rawMessage: Infection\Config\ConsoleHelper should not exist
@@ -73,10 +97,28 @@ parameters:
 			path: ../src/Config/Guesser/SourceDirGuesser.php
 
 		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 1
+			path: ../src/Configuration/ConfigurationFactory.php
+
+		-
 			rawMessage: Infection\Configuration\Entry\Logs should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/Configuration/Entry/Logs.php
+
+		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 1
+			path: ../src/Configuration/Entry/StrykerConfig.php
+
+		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 2
+			path: ../src/Configuration/PositionalPathsClassifier.php
 
 		-
 			rawMessage: Infection\Configuration\ProjectDirectoryProvider\CurrentWorkingDirectoryProvider should not exist
@@ -163,6 +205,12 @@ parameters:
 			path: ../src/Differ/Tokens.php
 
 		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 2
+			path: ../src/Differ/UnifiedDiffOutputBuilder.php
+
+		-
 			rawMessage: 'Call to method maybe() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
 			identifier: method.internalClass
 			count: 1
@@ -221,6 +269,12 @@ parameters:
 			identifier: phpat.testSourceConcreteClassesAreFinals
 			count: 1
 			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
+
+		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 3
+			path: ../src/Framework/Enum/EnumBucket.php
 
 		-
 			rawMessage: Infection\Framework\OperatingSystem should not exist
@@ -313,6 +367,18 @@ parameters:
 			path: ../src/Metrics/MetricsCalculator.php
 
 		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 1
+			path: ../src/Metrics/MetricsCalculator.php
+
+		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 1
+			path: ../src/Metrics/ResultsCollector.php
+
+		-
 			rawMessage: 'Call to deprecated method findRequired() of class Infection\Metrics\TargetDetectionStatusesProvider.'
 			identifier: method.deprecated
 			count: 1
@@ -382,6 +448,12 @@ parameters:
 			path: ../src/Mutator/MutatorResolver.php
 
 		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 3
+			path: ../src/Mutator/MutatorResolver.php
+
+		-
 			rawMessage: Infection\Mutator\NodeMutationGenerator should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
@@ -443,6 +515,12 @@ parameters:
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/PhpParser/InfectionPrettyPrinter.php
+
+		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 1
+			path: ../src/PhpParser/NodeDumper/NodeDumper.php
 
 		-
 			rawMessage: 'Method Infection\PhpParser\Visitor\AddTestsVisitor::createAllTestsForNodeLocator() should return Closure(): list<Infection\AbstractTestFramework\Coverage\TestLocation> but returns Closure(): array.'
@@ -551,6 +629,12 @@ parameters:
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/Source/Collector/FixedSourceCollector.php
+
+		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 1
+			path: ../src/Source/Collector/SourceCollectorFactory.php
 
 		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
@@ -721,6 +805,12 @@ parameters:
 			path: ../src/StaticAnalysis/StaticAnalysisToolAdapterFactory.php
 
 		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
+			count: 1
+			path: ../src/StaticAnalysis/StaticAnalysisToolFactory.php
+
+		-
 			rawMessage: 'Parameter #2 $paths of method Composer\Autoload\ClassLoader::setPsr4() expects list<string>|string, array<string> given.'
 			identifier: argument.type
 			count: 1
@@ -876,6 +966,12 @@ parameters:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
 			identifier: new.deprecatedClass
+			count: 1
+			path: ../src/TestFramework/Factory.php
+
+		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
 			count: 1
 			path: ../src/TestFramework/Factory.php
 
@@ -1089,6 +1185,12 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $filename of method DOMDocument::load() expects non-empty-string, string given.'
 			identifier: argument.type
+			count: 1
+			path: ../src/TestFramework/XML/SafeDOMXPath.php
+
+		-
+			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
+			identifier: infection.invalidArgumentException
 			count: 1
 			path: ../src/TestFramework/XML/SafeDOMXPath.php
 
