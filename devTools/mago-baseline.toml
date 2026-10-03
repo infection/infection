@@ -4987,12 +4987,6 @@ message = '''Possible argument type mismatch for argument #1 of `PHPUnit\Framewo
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Resource/Memory/MemoryLimiterEnvironmentTest.php"
-code = "too-few-arguments"
-message = "Too few arguments provided for method `ReflectionProperty::setValue`."
-count = 2
-
-[[issues]]
 file = "tests/phpunit/Resource/Time/StopwatchTest.php"
 code = "possibly-invalid-argument"
 message = "Possible argument type mismatch for argument #1 of `usleep`: expected `non-negative-int`, but possibly received `int`."
