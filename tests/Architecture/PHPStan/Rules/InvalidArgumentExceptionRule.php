@@ -33,70 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Entry;
+namespace Infection\Tests\Architecture\PHPStan\Rules;
 
 use InvalidArgumentException;
-use function preg_quote;
-use Safe\Exceptions\PcreException;
-use function Safe\preg_match;
-use function sprintf;
+use Override;
+use PhpParser\Node;
+use PhpParser\Node\Expr\New_;
+use PHPStan\Analyser\Scope;
+use PHPStan\Rules\Rule;
+use PHPStan\Rules\RuleErrorBuilder;
+use Symfony\Component\Filesystem\Path;
 
 /**
- * @internal
+ * Enforces ADR 0014's preference for Webmozart Assert by reporting direct construction
+ * of the base InvalidArgumentException within the configured source directory.
+ * Excludes subclasses to preserve domain-specific exception contracts.
+ *
+ * @implements Rule<New_>
  */
-final readonly class StrykerConfig
+final readonly class InvalidArgumentExceptionRule implements Rule
 {
-    private string $branchMatch;
-
-    /**
-     * Stryker has 2 ways for integration (https://stryker-mutator.io/docs/General/dashboard):
-     *  - badge only
-     *  - full report
-     *
-     * @throws InvalidArgumentException when the provided $branch looks like a regular expression, but is not a valid one
-     */
-    private function __construct(
-        string $branch,
-        private bool $isForFullReport,
+    public function __construct(
+        private string $sourceDirectory,
     ) {
-        if (preg_match('#^/.+/$#', $branch) === 0) {
-            $this->branchMatch = '/^' . preg_quote($branch, '/') . '$/';
+    }
 
-            return;
+    #[Override]
+    public function getNodeType(): string
+    {
+        return New_::class;
+    }
+
+    #[Override]
+    public function processNode(Node $node, Scope $scope): array
+    {
+        if (!Path::isBasePath($this->sourceDirectory, $scope->getFile())) {
+            return [];
         }
 
-        try {
-            // Yes, the `@` is intentional. For some reason, `thecodingmachine/safe` does not suppress the warnings here
-            @preg_match($branch, '');
-        } catch (PcreException $invalidRegex) {
-            // @phpstan-ignore infection.invalidArgumentException
-            throw new InvalidArgumentException(
-                sprintf('Provided branchMatchRegex "%s" is not a valid regex', $branch),
-                0,
-                $invalidRegex,
-            );
+        if (!$node->class instanceof Node\Name) {
+            return [];
         }
 
-        $this->branchMatch = $branch;
-    }
+        if ($scope->resolveName($node->class) !== InvalidArgumentException::class) {
+            return [];
+        }
 
-    public static function forBadge(string $branch): self
-    {
-        return new self($branch, false);
-    }
-
-    public static function forFullReport(string $branch): self
-    {
-        return new self($branch, true);
-    }
-
-    public function isForFullReport(): bool
-    {
-        return $this->isForFullReport;
-    }
-
-    public function applicableForBranch(string $branchName): bool
-    {
-        return preg_match($this->branchMatch, $branchName) === 1;
+        return [RuleErrorBuilder::message(
+            'Use Webmozart\\Assert\\Assert instead of instantiating InvalidArgumentException.',
+        )->identifier('infection.invalidArgumentException')->build()];
     }
 }

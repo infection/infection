@@ -39,7 +39,6 @@ use function ctype_digit;
 use function getenv;
 use Infection\Container\Container;
 use Infection\Resource\Processor\CpuCoresCountProvider;
-use InvalidArgumentException;
 use function is_numeric;
 use function is_string;
 use function max;
@@ -97,15 +96,17 @@ final readonly class RunCommandHelper
             return true;
         }
 
-        if ($useGitHubLogger === 'false') {
-            return false;
-        }
-
-        throw new InvalidArgumentException(sprintf(
-            'Cannot pass "%s" to "--%s": only "true", "false" or no argument is supported',
+        Assert::same(
             $useGitHubLogger,
-            RunCommand::OPTION_LOGGER_GITHUB,
-        ));
+            'false',
+            sprintf(
+                'Cannot pass "%s" to "--%s": only "true", "false" or no argument is supported',
+                $useGitHubLogger,
+                RunCommand::OPTION_LOGGER_GITHUB,
+            ),
+        );
+
+        return false;
     }
 
     public function getThreadCount(): ?int
