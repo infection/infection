@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<phpunit bootstrap="/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TIA/scenarios/01-unchanged-files/var/observed-project-off/project/bootstrap.php" cacheDirectory="/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TIA/scenarios/01-unchanged-files/var/observed-project-off/project/.infection/phpunit" executionOrder="default" beStrictAboutCoverageMetadata="true" requireCoverageMetadata="true" failOnRisky="true" failOnWarning="true" stopOnDefect="true" colors="false" recordTestRunHistory="true" recordTestImpactData="true" deriveTestImpactDataFromCoverageTargets="false" stderr="false">
+  <testsuites>
+    <testsuite name="tests">
+      <directory>/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TIA/scenarios/01-unchanged-files/var/observed-project-off/project/tests</directory>
+    </testsuite>
+  </testsuites>
+  <source>
+    <include>
+      <directory>/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TIA/scenarios/01-unchanged-files/var/observed-project-off/project/src</directory>
+    </include>
+  </source>
+</phpunit>

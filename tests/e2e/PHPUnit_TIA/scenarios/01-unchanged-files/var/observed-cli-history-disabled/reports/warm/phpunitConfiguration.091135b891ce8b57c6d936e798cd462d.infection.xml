@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<phpunit bootstrap="/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TIA/scenarios/01-unchanged-files/var/observed-cli-history-disabled/project/var/infection-scenario01/infection/interceptor.autoload.091135b891ce8b57c6d936e798cd462d.infection.php" cacheDirectory="/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TIA/scenarios/01-unchanged-files/var/observed-cli-history-disabled/project/var/infection-scenario01/infection/.phpunit.result.cache.091135b891ce8b57c6d936e798cd462d" executionOrder="defects" beStrictAboutCoverageMetadata="true" requireCoverageMetadata="true" recordTestRunHistory="true" failOnRisky="true" failOnWarning="true" stopOnDefect="true" colors="false" stderr="false">
+  <testsuites>
+    <testsuite name="Infection testsuite with filtered tests">
+      <file>/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TIA/scenarios/01-unchanged-files/var/observed-cli-history-disabled/project/tests/CalculatorTest.php</file>
+    </testsuite>
+  </testsuites>
+  <source>
+    <include>
+      <directory>/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TIA/scenarios/01-unchanged-files/var/observed-cli-history-disabled/project/src</directory>
+    </include>
+  </source>
+</phpunit>

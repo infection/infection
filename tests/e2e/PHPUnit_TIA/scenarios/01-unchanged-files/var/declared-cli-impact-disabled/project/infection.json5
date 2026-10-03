@@ -1,0 +1,21 @@
+{
+    "$schema": "/Users/tfidry/Project/Humbug/infection/resources/schema.json",
+    "timeout": 25,
+    "threads": 1,
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "mutators": {
+        "Plus": true
+    },
+    "phpUnit": {
+        "customPath": "/Users/tfidry/Project/Humbug/infection/tests/e2e/PHPUnit_TIA/vendor/bin/phpunit"
+    },
+    "logs": {
+        "summary": "var/infection.log",
+        "json": "var/infection.json"
+    },
+    "tmpDir": "var/infection-scenario01"
+}

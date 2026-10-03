@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<phpunit bootstrap="bootstrap.php" cacheDirectory="var/phpunit-scenario01" executionOrder="default" beStrictAboutCoverageMetadata="true" requireCoverageMetadata="true" recordTestRunHistory="true" recordTestImpactData="true">
+
+    <testsuites>
+        <testsuite name="tests">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+</phpunit>
