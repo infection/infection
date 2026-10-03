@@ -238,7 +238,7 @@ final class E2ETest extends TestCase
 
         if (!file_exists('vendor/autoload.php')) {
             // Install deps only if there's none
-            $this->assertNotEmpty(getenv('PATH') ?: getenv('Path'), 'E2E tests need a system composer installed, but it could not be found without a PATH set');
+            $this->assertNotSame('', getenv('PATH') ?: getenv('Path') ?: '', 'E2E tests need a system composer installed, but it could not be found without a PATH set');
 
             try {
                 $process = new Process([
@@ -292,11 +292,11 @@ final class E2ETest extends TestCase
         // $vendorDir is normally defined inside autoload_psr4.php, but PHPStan
         // can't see there, so have to both tell it so, and verify that too
         $vendorDir ??= null;
-        $this->assertNotEmpty($vendorDir, 'Unexpected autoload_psr4.php found: please confirm that all dependencies are installed correctly for this fixture.');
+        $this->assertIsString($vendorDir, 'Unexpected autoload_psr4.php found: please confirm that all dependencies are installed correctly for this fixture.');
 
         foreach ($map as $namespace => $paths) {
             foreach ($paths as $path) {
-                if (str_contains((string) $path, (string) $vendorDir)) {
+                if (str_contains((string) $path, $vendorDir)) {
                     // Skip known dependency from autoloading
                     continue 2;
                 }
@@ -309,7 +309,7 @@ final class E2ETest extends TestCase
 
         foreach ($mapPsr0 as $namespace => $paths) {
             foreach ($paths as $path) {
-                if (str_contains((string) $path, (string) $vendorDir)) {
+                if (str_contains((string) $path, $vendorDir)) {
                     // Skip known dependency from autoloading
                     continue 2;
                 }
