@@ -43,11 +43,9 @@ use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNod
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
-use InvalidArgumentException;
 use function is_array;
 use function is_float;
 use function is_int;
-use function is_object;
 use function is_string;
 use function ksort;
 use Later\Interfaces\Deferred;
@@ -522,15 +520,15 @@ final class NodeDumper
 
                 $result .= "$newLine))";
             }
-        } elseif (is_object($node)) {
-            $result .= $node::class;
         } else {
-            throw new InvalidArgumentException(
+            Assert::object($node,
                 sprintf(
                     'Can only dump nodes and arrays. Got "%s".',
                     get_debug_type($node),
                 ),
             );
+
+            $result .= $node::class;
         }
 
         if ($indent) {

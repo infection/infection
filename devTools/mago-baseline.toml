@@ -1712,12 +1712,6 @@ count = 1
 
 [[issues]]
 file = "src/Framework/Enum/EnumBucket.php"
-code = "redundant-comparison"
-message = "Avoid direct comparison with boolean literals."
-count = 1
-
-[[issues]]
-file = "src/Framework/Enum/EnumBucket.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Framework\Enum\EnumBucket::throwValueNotAvailable`.'
 count = 1
@@ -4985,12 +4979,6 @@ file = "tests/phpunit/Reporter/StrykerReporterFactoryTest.php"
 code = "possibly-invalid-argument"
 message = '''Possible argument type mismatch for argument #1 of `PHPUnit\Framework\Assert::assertInstanceOf`: expected `class-string<'ExpectedType.phpunit\framework\assert::assertinstanceof() extends object>`, but possibly received `string`.'''
 count = 1
-
-[[issues]]
-file = "tests/phpunit/Resource/Memory/MemoryLimiterEnvironmentTest.php"
-code = "too-few-arguments"
-message = "Too few arguments provided for method `ReflectionProperty::setValue`."
-count = 2
 
 [[issues]]
 file = "tests/phpunit/Resource/Time/StopwatchTest.php"

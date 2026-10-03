@@ -48,7 +48,7 @@ use function Safe\fopen;
 use function Safe\fwrite;
 use function Safe\stream_get_contents;
 use function substr;
-use InvalidArgumentException;
+use Webmozart\Assert\Assert;
 use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Diff\Output\DiffOutputBuilderInterface;
 
@@ -241,15 +241,17 @@ final readonly class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterf
         ];
 
         foreach ($diff as $entry) {
-            if (!is_array($entry) || count($entry) !== self::DIFF_ENTRY_SIZE) {
-                throw new InvalidArgumentException('Diff entries must be pairs of token and diff type.');
-            }
+            Assert::false(
+                !is_array($entry) || count($entry) !== self::DIFF_ENTRY_SIZE,
+                'Diff entries must be pairs of token and diff type.',
+            );
 
             [$token, $diffType] = $entry;
 
-            if (!is_string($token) || !is_int($diffType) || !in_array($diffType, $validDiffTypes, true)) {
-                throw new InvalidArgumentException('Diff entries must be pairs of token and diff type.');
-            }
+            Assert::false(
+                !is_string($token) || !is_int($diffType) || !in_array($diffType, $validDiffTypes, true),
+                'Diff entries must be pairs of token and diff type.',
+            );
 
             $normalizedDiff[] = [$token, $diffType];
         }
