@@ -60,6 +60,7 @@ final class TeamCityLoggerStateTest extends TestCase
             'infection:///path/to/project/src/Infrastructure/Http/Action/Greet.php:1-3',
             'TA',
             $testSuite->nodeId,
+            '/path/to/project/src/Infrastructure/Http/Action/Greet.php',
         );
 
         $state->openTestSuite($testSuite);
@@ -89,6 +90,7 @@ final class TeamCityLoggerStateTest extends TestCase
             'infection:///path/to/project/src/Infrastructure/Http/Action/Greet.php:1-3',
             'TA',
             $testSuite->nodeId,
+            '/path/to/project/src/Infrastructure/Http/Action/Greet.php',
         );
 
         $testB = new Test(
@@ -97,6 +99,7 @@ final class TeamCityLoggerStateTest extends TestCase
             'infection:///path/to/project/src/Infrastructure/Http/Action/Greet.php:7-13',
             'T2',
             $testSuite->nodeId,
+            '/path/to/project/src/Infrastructure/Http/Action/Greet.php',
         );
 
         $state->openTestSuite($testSuite);
@@ -130,6 +133,7 @@ final class TeamCityLoggerStateTest extends TestCase
             'infection:///path/to/project/src/source.php:1-3',
             'TA',
             $testSuite->nodeId,
+            '/path/to/project/src/source.php',
         );
 
         $testB = new Test(
@@ -138,6 +142,7 @@ final class TeamCityLoggerStateTest extends TestCase
             'infection:///path/to/project/src/source.php:1-3',
             'T2',
             $testSuite->nodeId,
+            '/path/to/project/src/source.php',
         );
 
         $state->openTestSuite($testSuite);
@@ -208,6 +213,7 @@ final class TeamCityLoggerStateTest extends TestCase
             'infection:///path/to/project/src/Infrastructure/Http/Action/Greet.php:1-3',
             'TA',
             $testSuite->nodeId,
+            '/path/to/project/src/Infrastructure/Http/Action/Greet.php',
         );
 
         $this->expectExceptionMessage(
