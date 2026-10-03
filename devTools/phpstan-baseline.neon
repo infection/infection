@@ -631,12 +631,6 @@ parameters:
 			path: ../src/Source/Collector/FixedSourceCollector.php
 
 		-
-			rawMessage: Infection\Source\Collector\GitDiffSourceCollector should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Source/Collector/GitDiffSourceCollector.php
-
-		-
 			rawMessage: Use Webmozart\Assert\Assert instead of instantiating InvalidArgumentException.
 			identifier: infection.invalidArgumentException
 			count: 1
@@ -863,6 +857,42 @@ parameters:
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Contracts/TestFramework.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\Configuration\Configuration
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\Console\ConsoleOutput
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\Process\Factory\MutantProcessContainerFactory
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\Process\Runner\InitialTestsRunner
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\TestFramework\Coverage\CoverageCheckerFactory
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\TestFramework\TestFrameworkExtraOptionsFilter
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
 
 		-
 			rawMessage: Function ini_get is unsafe to use. It can return FALSE instead of throwing an exception. Please add 'use function Safe\ini_get;' at the beginning of the file to use the variant provided by the 'thecodingmachine/safe' library.
@@ -1267,6 +1297,12 @@ parameters:
 			path: ../tests/phpunit/Console/E2ETest.php
 
 		-
+			rawMessage: 'assertNotEmpty() is not allowed. Use more strict assertion.'
+			identifier: phpunit.assertEmpty
+			count: 2
+			path: ../tests/phpunit/Console/E2ETest.php
+
+		-
 			rawMessage: Fetching deprecated class constant DEBUG_INTEGER of class Infection\Console\LogVerbosity.
 			identifier: classConstant.deprecated
 			count: 2
@@ -1613,6 +1649,18 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/ConcreteVisitorTestCase.php
+
+		-
+			rawMessage: 'assertNotEmpty() is not allowed. Use more strict assertion.'
+			identifier: phpunit.assertEmpty
+			count: 1
+			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/VisitorTestCaseTest.php
+
+		-
+			rawMessage: 'assertNotEmpty() is not allowed. Use more strict assertion.'
+			identifier: phpunit.assertEmpty
+			count: 1
+			path: ../tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php
 
 		-
 			rawMessage: Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest should not exist
