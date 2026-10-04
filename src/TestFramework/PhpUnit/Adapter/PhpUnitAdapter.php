@@ -49,8 +49,12 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Override;
+use RuntimeException;
 use function Safe\preg_match;
 use function sprintf;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Exception\ProcessSignaledException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use function trim;
 use function version_compare;
 use Webmozart\Assert\Assert;
@@ -73,6 +77,7 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
         private readonly ShellCommandRunner $shellCommandRunner,
         private readonly VersionParser $versionParser,
         private readonly CommandLineBuilder $commandLineBuilder,
+        private readonly string $testFrameworkConfigPath,
         private ?string $version = null,
     ) {
     }
@@ -83,11 +88,15 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
     }
 
     /**
-     * Returns array of arguments to pass them into the Initial Run Process
+     * Validates the original configuration when supported, then returns the initial run command.
      *
      * @param string[] $phpExtraArgs
      *
      * @throws InvalidPhpUnitConfiguration
+     * @throws RuntimeException
+     * @throws ProcessFailedException
+     * @throws ProcessSignaledException
+     * @throws ProcessTimedOutException
      *
      * @return string[]
      */
@@ -97,6 +106,23 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
         array $phpExtraArgs,
         bool $skipCoverage,
     ): array {
+        // PHPUnit 13.2 introduced validation against its bundled schema, without
+        // resolving the schema URL declared in the configuration.
+        // https://github.com/sebastianbergmann/phpunit/commit/e85b58eda9e750763f3b26fb416612d5931299aa
+        if (version_compare($this->getVersion(), '13.2', '>=')) {
+            $this->shellCommandRunner->mustRun(
+                $this->commandLineBuilder->build(
+                    $this->testFrameworkExecutable,
+                    $phpExtraArgs,
+                    [
+                        '--configuration',
+                        $this->testFrameworkConfigPath,
+                        '--validate-configuration',
+                    ],
+                ),
+            );
+        }
+
         if ($skipCoverage === false) {
             $generatedOptions = [];
 
