@@ -40,19 +40,10 @@ use DOMDocument;
 use DOMElement;
 use DOMNode;
 use function explode;
-use const FILTER_VALIDATE_URL;
-use function filter_var;
 use function implode;
 use function in_array;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\XML\SafeDOMXPath;
-use const LIBXML_ERR_ERROR;
-use const LIBXML_ERR_FATAL;
-use const LIBXML_ERR_WARNING;
-use function libxml_get_errors;
-use function libxml_use_internal_errors;
-use LibXMLError;
-use LogicException;
 use function sprintf;
 use function version_compare;
 use Webmozart\Assert\Assert;
@@ -78,7 +69,6 @@ final readonly class XmlConfigurationManipulator
 
     public function __construct(
         private PathReplacer $pathReplacer,
-        private string $phpUnitConfigDir,
     ) {
     }
 
@@ -216,6 +206,8 @@ final readonly class XmlConfigurationManipulator
         $this->addOrUpdateCoverageNodes('source', 'include', $xPath, $srcDirs, $filteredSourceFilesToMutate);
     }
 
+    // PHPUnit owns schema validation. Resolving the declared XSD here would require
+    // network access and break offline or proxied runs (https://github.com/infection/infection/issues/2303).
     /**
      * @throws InvalidPhpUnitConfiguration
      */
@@ -224,16 +216,6 @@ final readonly class XmlConfigurationManipulator
         if ($xPath->queryCount('/phpunit') === 0) {
             throw InvalidPhpUnitConfiguration::byRootNode($configPath);
         }
-
-        if ($xPath->queryCount('namespace::xsi') === 0) {
-            return;
-        }
-
-        $this->validateAgainstSchema(
-            $configPath,
-            $xPath->document,
-            $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue,
-        );
     }
 
     public function removeDefaultTestSuite(SafeDOMXPath $xPath): void
@@ -252,29 +234,6 @@ final readonly class XmlConfigurationManipulator
 
         $this->addAttributeIfNotSet('failOnRisky', 'true', $xPath);
         $this->addAttributeIfNotSet('failOnWarning', 'true', $xPath);
-    }
-
-    /**
-     * @throws InvalidPhpUnitConfiguration
-     */
-    private function validateAgainstSchema(
-        string $configPath,
-        DOMDocument $document,
-        ?string $schema,
-    ): void {
-        $original = libxml_use_internal_errors(true);
-
-        if (
-            $schema !== null
-            && !$document->schemaValidate($this->buildSchemaPath($schema))
-        ) {
-            throw InvalidPhpUnitConfiguration::byXsdSchema(
-                $configPath,
-                $this->getXmlErrorsString(),
-            );
-        }
-
-        libxml_use_internal_errors($original);
     }
 
     /**
@@ -335,42 +294,6 @@ final readonly class XmlConfigurationManipulator
         $document->appendChild($node);
 
         return $node;
-    }
-
-    private function getXmlErrorsString(): string
-    {
-        $errorsString = '';
-        $errors = libxml_get_errors();
-
-        foreach ($errors as $error) {
-            $level = $this->getErrorLevelName($error);
-            $errorsString .= sprintf('[%s] %s', $level, $error->message);
-
-            if ($error->file !== '') {
-                $errorsString .= sprintf(' in %s (line %s, col %s)', $error->file, $error->line, $error->column);
-            }
-
-            $errorsString .= "\n";
-        }
-
-        return $errorsString;
-    }
-
-    private function buildSchemaPath(string $nodeValue): string
-    {
-        if (filter_var($nodeValue, FILTER_VALIDATE_URL) !== false) {
-            return $nodeValue;
-        }
-
-        if ($this->phpUnitConfigDir === '') {
-            $schemaPath = $nodeValue;
-        } else {
-            $schemaPath = sprintf('%s/%s', $this->phpUnitConfigDir, $nodeValue);
-        }
-
-        Assert::fileExists($schemaPath, 'Invalid schema path found %s');
-
-        return $schemaPath;
     }
 
     /**
@@ -434,23 +357,6 @@ final readonly class XmlConfigurationManipulator
                 ->setAttribute($name, $value)
             ;
         }
-    }
-
-    private function getErrorLevelName(LibXMLError $error): string
-    {
-        if ($error->level === LIBXML_ERR_WARNING) {
-            return 'Warning';
-        }
-
-        if ($error->level === LIBXML_ERR_ERROR) {
-            return 'Error';
-        }
-
-        if ($error->level === LIBXML_ERR_FATAL) {
-            return 'Fatal';
-        }
-
-        throw new LogicException(sprintf('Unknown lib XML error level "%s"', $error->level));
     }
 
     private function removeCoverageChildNode(SafeDOMXPath $xPath, string $nodeQuery): void

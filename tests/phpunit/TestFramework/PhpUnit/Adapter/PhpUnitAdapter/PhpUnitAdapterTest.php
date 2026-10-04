@@ -1658,7 +1658,6 @@ final class PhpUnitAdapterTest extends TestCase
                 $this->fileSystemMock,
                 $testFrameworkConfigDir,
             ),
-            $testFrameworkConfigDir,
         );
 
         return new PhpUnitAdapter(

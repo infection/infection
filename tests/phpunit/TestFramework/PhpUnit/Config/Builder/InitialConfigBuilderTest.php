@@ -860,7 +860,7 @@ final class InitialConfigBuilderTest extends TestCase
         return new InitialConfigBuilder(
             self::TMP_DIR,
             $originalPhpUnitXmlConfig,
-            new XmlConfigurationManipulator($replacer, ''),
+            new XmlConfigurationManipulator($replacer),
             new XmlConfigurationVersionProvider(),
             $this->filesystem,
             $srcDirs,
