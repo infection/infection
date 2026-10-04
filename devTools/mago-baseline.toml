@@ -1712,12 +1712,6 @@ count = 1
 
 [[issues]]
 file = "src/Framework/Enum/EnumBucket.php"
-code = "redundant-comparison"
-message = "Avoid direct comparison with boolean literals."
-count = 1
-
-[[issues]]
-file = "src/Framework/Enum/EnumBucket.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Framework\Enum\EnumBucket::throwValueNotAvailable`.'
 count = 1

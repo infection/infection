@@ -188,6 +188,7 @@ final readonly class Factory
             }
         }
 
+        // @phpstan-ignore infection.invalidArgumentException (Keep the fallback after the adapter-specific returns.)
         throw new InvalidArgumentException(sprintf(
             'Invalid name of test framework "%s". Available names are: %s',
             $adapterName,

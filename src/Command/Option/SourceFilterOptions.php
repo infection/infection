@@ -42,7 +42,6 @@ use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\IO;
 use Infection\Container\Container;
 use Infection\Git\Git;
-use InvalidArgumentException;
 use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -212,17 +211,14 @@ final class SourceFilterOptions
         ?string $gitDiffFilter,
         bool $isForGitDiffLines,
     ): void {
-        if ($isForGitDiffLines
-            && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_FILTER
-        ) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The options "--%s" and "--%s" are mutually exclusive. Please use only one of them.',
-                    self::GIT_DIFF_LINES_NAME,
-                    self::GIT_DIFF_FILTER_NAME,
-                ),
-            );
-        }
+        Assert::false(
+            $isForGitDiffLines && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_FILTER,
+            sprintf(
+                'The options "--%s" and "--%s" are mutually exclusive. Please use only one of them.',
+                self::GIT_DIFF_LINES_NAME,
+                self::GIT_DIFF_FILTER_NAME,
+            ),
+        );
     }
 
     /**
@@ -233,18 +229,15 @@ final class SourceFilterOptions
         ?string $gitDiffFilter,
         ?string $gitDiffBase,
     ): void {
-        if ($gitDiffBase !== null
-            && $gitDiffFilter === null
-        ) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The option "--%s" cannot be used without the option "--%s" or "--%s".',
-                    self::GIT_DIFF_BASE_NAME,
-                    self::GIT_DIFF_LINES_NAME,
-                    self::GIT_DIFF_FILTER_NAME,
-                ),
-            );
-        }
+        Assert::false(
+            $gitDiffBase !== null && $gitDiffFilter === null,
+            sprintf(
+                'The option "--%s" cannot be used without the option "--%s" or "--%s".',
+                self::GIT_DIFF_BASE_NAME,
+                self::GIT_DIFF_LINES_NAME,
+                self::GIT_DIFF_FILTER_NAME,
+            ),
+        );
     }
 
     /**
@@ -255,35 +248,32 @@ final class SourceFilterOptions
         ?IncompleteGitDiffFilter $gitFilter,
         array $positionalPaths,
     ): void {
-        if ($plainFilter !== null && $gitFilter !== null) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The options "--%s" and "--%s" are mutually exclusive. Use "--%s" for regular filtering or "--%s" for Git-based filtering.',
-                    self::PLAIN_FILTER_NAME,
-                    self::GIT_DIFF_FILTER_NAME,
-                    self::PLAIN_FILTER_NAME,
-                    self::GIT_DIFF_FILTER_NAME,
-                ),
-            );
-        }
+        Assert::false(
+            $plainFilter !== null && $gitFilter !== null,
+            sprintf(
+                'The options "--%s" and "--%s" are mutually exclusive. Use "--%s" for regular filtering or "--%s" for Git-based filtering.',
+                self::PLAIN_FILTER_NAME,
+                self::GIT_DIFF_FILTER_NAME,
+                self::PLAIN_FILTER_NAME,
+                self::GIT_DIFF_FILTER_NAME,
+            ),
+        );
 
-        if ($positionalPaths !== [] && $plainFilter !== null) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Cannot pass source paths as positional arguments together with the "--%s" option. Use either form, not both.',
-                    self::PLAIN_FILTER_NAME,
-                ),
-            );
-        }
+        Assert::false(
+            $positionalPaths !== [] && $plainFilter !== null,
+            sprintf(
+                'Cannot pass source paths as positional arguments together with the "--%s" option. Use either form, not both.',
+                self::PLAIN_FILTER_NAME,
+            ),
+        );
 
-        if ($positionalPaths !== [] && $gitFilter !== null) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Cannot pass positional paths together with "--%s" / "--%s". Use either form, not both.',
-                    self::GIT_DIFF_FILTER_NAME,
-                    self::GIT_DIFF_LINES_NAME,
-                ),
-            );
-        }
+        Assert::false(
+            $positionalPaths !== [] && $gitFilter !== null,
+            sprintf(
+                'Cannot pass positional paths together with "--%s" / "--%s". Use either form, not both.',
+                self::GIT_DIFF_FILTER_NAME,
+                self::GIT_DIFF_LINES_NAME,
+            ),
+        );
     }
 }
