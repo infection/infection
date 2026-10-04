@@ -145,7 +145,7 @@ final class EnumBucket
     {
         Assert::true(
             $this->isEmpty(),
-            $this->describeNonEmptyBucket(...),
+            $this->describeNonEmptyBucket(),
         );
     }
 
@@ -177,7 +177,7 @@ final class EnumBucket
         Assert::inArray(
             $value,
             $this->allValues,
-            fn (): string => $this->describeUnknownEnumValue($value),
+            $this->describeUnknownEnumValue($value),
         );
 
         throw $this->createEnumValueNoLongerAvailable($value);
