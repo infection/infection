@@ -20,9 +20,12 @@ final readonly class RecordLoadedTestsSubscriber implements LoadedSubscriber
         private string $filePath,
         private Filesystem $filesystem,
     ) {
-        Assert::stringNotEmpty($filePath, 'The loaded test recording path must not be empty.');
+        Assert::stringNotEmpty(
+            $filePath,
+            'The loaded test recording path must not be empty.',
+        );
 
-        $this->resetRecordingForNewInitialRun();
+        $this->resetRecordingForNewRun();
     }
 
     #[Override]
@@ -45,8 +48,11 @@ final readonly class RecordLoadedTestsSubscriber implements LoadedSubscriber
         );
     }
 
-    private function resetRecordingForNewInitialRun(): void
+    private function resetRecordingForNewRun(): void
     {
-        $this->filesystem->dumpFile($this->filePath, '[]');
+        $this->filesystem->dumpFile(
+            $this->filePath,
+            '[]',
+        );
     }
 }

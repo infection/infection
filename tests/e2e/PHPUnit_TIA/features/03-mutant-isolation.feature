@@ -1,30 +1,46 @@
-@draft @priority_1
 Feature: Keep TIA out of mutant execution
-  Infection already selects and orders covering tests for each mutant.
-  Mutant execution must leave the initial run's impact recording intact.
+    Infection supplies the covering tests for each mutant.
+    Mutants must leave the initial run's persistent impact data and test history intact.
 
-  Scenario Outline: Mutants neither select through TIA nor change its recording
-    Given the project records dependencies from <strategy>
-    And a successful initial run has recorded both tests
-    When I run Infection for "src/Calculator.php"
-    Then the initial test run executes only the following tests:
-      | CalculatorTest::test_calculate |
-    And the Calculator mutant executes the covering tests in Infection's chosen order
-    And no mutant command or generated configuration enables TIA selection or recording
-    And no mutant process emits TIA selection output
-    And the impact data and test-run history are unchanged between the end of the initial run and the end of mutant execution
-    And CalculatorTest kills the Calculator Plus mutant
+    Background:
+        Given PHPUnit is configured to record test impact data from executed code without deriving it from coverage targets
 
-    Examples:
-      | strategy          |
-      | observed execution |
-      | declared coverage targets |
+    Scenario Outline: Mutant isolation with <strategy> dependencies
+        Given I apply this diff to "src/Calculator.php":
+            """diff
+            -        return $a + $b;
+            +        return $a + $b + 0;
+            """
+        When I run Infection on "src/Calculator.php" with the following options:
+            | --test-framework-options=<option> |
+        Then the initial test run executes all tests
+        And the effective PHPUnit configuration includes:
+            | recordTestImpactData                    | true      |
+            | deriveTestImpactDataFromCoverageTargets | <derived> |
+        And each mutant is tested using exactly these tests:
+            | CalculatorTest::test_calculate |
+        And TIA selection and recording are disabled for mutant test runs
+        And mutants leave the initial impact data and test-run history unchanged
+        When I run Infection again with the same options and unchanged source, tests, and configuration
+        Then the initial test run executes only the following tests:
+            | CalculatorTest::test_calculate |
+        And the mutants that were evaluated are:
+            | file               | mutator | outcome         |
+            | src/Calculator.php | Plus    | killed by tests |
+            | src/Calculator.php | Plus    | escaped         |
+        And each mutant is tested using exactly these tests:
+            | CalculatorTest::test_calculate |
+        And TIA selection and recording are disabled for mutant test runs
+        And mutants leave the initial impact data and test-run history unchanged
+        And line-to-test coverage for "src/Calculator.php" is unchanged from the first Infection run
+        And the generated mutations and their detection statuses are unchanged from the first Infection run
+        And the results match a run with TIA disabled:
+            | coverage            |
+            | generated mutations |
+            | detection statuses  |
+            | MSI                 |
 
-  Scenario: A mutant does not poison the next warm run
-    Given a successful initial run has recorded both tests
-    And an Infection run for Calculator has evaluated its Plus mutant
-    When I run Infection for "src/Calculator.php" again without changing the project
-    Then the initial test run executes only the following tests:
-      | CalculatorTest::test_calculate |
-    And no impact dependency refers to a temporary mutant file
-    And the mutation results match a run with TIA disabled
+        Examples:
+            | strategy                  | option                                                 | derived |
+            | observed execution        | --do-not-derive-test-impact-data-from-coverage-targets | false   |
+            | declared coverage targets | --derive-test-impact-data-from-coverage-targets        | true    |

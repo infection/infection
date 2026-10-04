@@ -1,4 +1,3 @@
-@priority_2
 Feature: Keep test selection correct as the project evolves
     Infection reuses impact data while developers change source code and tests.
     Updated projects retain the coverage and mutation results of a full-suite run.
@@ -13,9 +12,9 @@ Feature: Keep test selection correct as the project evolves
             -        $this->assertSame(3, (new Calculator())->calculate(1, 2));
             +        $this->assertSame(3, (new Calculator())->calculate(3, 0));
             """
-        When I run Infection for "src/Calculator.php"
+        When I run Infection on "src/Calculator.php"
         Then the initial test run executes all tests
-        And the following mutations are generated and evaluated:
+        And the mutants that were evaluated are:
             | file               | mutator | outcome |
             | src/Calculator.php | Plus    | escaped |
         When I apply this diff to "tests/CalculatorTest.php":
@@ -23,18 +22,22 @@ Feature: Keep test selection correct as the project evolves
             -        $this->assertSame(3, (new Calculator())->calculate(3, 0));
             +        $this->assertSame(3, (new Calculator())->calculate(1, 2));
             """
-        And I run Infection for "src/Calculator.php"
+        And I run Infection on "src/Calculator.php"
         Then the initial test run executes only the following tests:
             | CalculatorTest::test_calculate |
-        And the following mutations are generated and evaluated:
+        And the mutants that were evaluated are:
             | file               | mutator | outcome         |
             | src/Calculator.php | Plus    | killed by tests |
-        And coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled
+        And the results match a run with TIA disabled:
+            | coverage            |
+            | generated mutations |
+            | detection statuses  |
+            | MSI                 |
 
     # Blocker: ../../../../doc/TIA-notes.md#explicit-impact-queries-miss-changed-tests
     @skip
     Scenario: An existing test starts covering another source file
-        When I run Infection for "src/Calculator.php"
+        When I run Infection on "src/Calculator.php"
         Then the initial test run executes all tests
         When I apply this diff to "tests/UnrelatedTest.php":
             """
@@ -47,7 +50,7 @@ Feature: Keep test selection correct as the project evolves
             +        $this->assertSame(2, (new Unrelated())->calculate(1, 2), 'Unrelated must multiply both operands.');
             +        $this->assertSame(3, (new \Infection\E2ETests\PHPUnitTIA\Calculator())->calculate(1, 2), 'Calculator must add both operands.');
             """
-        And I run Infection for "src/Calculator.php"
+        And I run Infection on "src/Calculator.php"
         Then the initial test run executes only the following tests:
             | CalculatorTest::test_calculate |
             | UnrelatedTest::test_calculate  |
@@ -55,7 +58,11 @@ Feature: Keep test selection correct as the project evolves
         Then the initial test run executes only the following tests:
             | CalculatorTest::test_calculate |
             | UnrelatedTest::test_calculate  |
-        And coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled
+        And the results match a run with TIA disabled:
+            | coverage            |
+            | generated mutations |
+            | detection statuses  |
+            | MSI                 |
 
     # Blocker: ../../../../doc/TIA-notes.md#explicit-impact-queries-miss-changed-tests
     @skip
@@ -90,14 +97,14 @@ Feature: Keep test selection correct as the project evolves
                 }
             }
             """
-        When I run Infection for "src/Calculator.php"
+        When I run Infection on "src/Calculator.php"
         Then the initial test run executes all tests
         When I apply this diff to "tests/UnrelatedTest.php":
             """
             -        yield 'selected calculator' => [Unrelated::class, 2];
             +        yield 'selected calculator' => [Calculator::class, 3];
             """
-        And I run Infection for "src/Calculator.php"
+        And I run Infection on "src/Calculator.php"
         Then the initial test run executes only the following tests:
             | CalculatorTest::test_calculate                    |
             | UnrelatedTest::test_calculate#selected calculator |
@@ -105,10 +112,14 @@ Feature: Keep test selection correct as the project evolves
         Then the initial test run executes only the following tests:
             | CalculatorTest::test_calculate                    |
             | UnrelatedTest::test_calculate#selected calculator |
-        And coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled
+        And the results match a run with TIA disabled:
+            | coverage            |
+            | generated mutations |
+            | detection statuses  |
+            | MSI                 |
 
     Scenario: A new test contributes coverage immediately
-        When I run Infection for "src/Calculator.php"
+        When I run Infection on "src/Calculator.php"
         Then the initial test run executes all tests
         Given the project file "tests/AdditionalCalculatorTest.php" contains:
             """
@@ -131,7 +142,7 @@ Feature: Keep test selection correct as the project evolves
                 }
             }
             """
-        When I run Infection for "src/Calculator.php"
+        When I run Infection on "src/Calculator.php"
         Then the initial test run executes only the following tests:
             | AdditionalCalculatorTest::test_calculate |
             | CalculatorTest::test_calculate           |
@@ -139,13 +150,17 @@ Feature: Keep test selection correct as the project evolves
         Then the initial test run executes only the following tests:
             | AdditionalCalculatorTest::test_calculate |
             | CalculatorTest::test_calculate           |
-        And the following mutations are generated and evaluated:
+        And the mutants that were evaluated are:
             | file               | mutator | outcome         |
             | src/Calculator.php | Plus    | killed by tests |
-        And coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled
+        And the results match a run with TIA disabled:
+            | coverage            |
+            | generated mutations |
+            | detection statuses  |
+            | MSI                 |
 
     Scenario: A new source file and its tests are not omitted
-        When I run Infection for "src/Calculator.php"
+        When I run Infection on "src/Calculator.php"
         Then the initial test run executes all tests
         Given the project file "src/AdditionalCalculator.php" contains:
             """
@@ -184,21 +199,25 @@ Feature: Keep test selection correct as the project evolves
                 }
             }
             """
-        When I run Infection for "src/AdditionalCalculator.php"
+        When I run Infection on "src/AdditionalCalculator.php"
         Then the initial test run executes all tests
-        And the following mutations are generated and evaluated:
+        And the mutants that were evaluated are:
             | file                         | mutator | outcome         |
             | src/AdditionalCalculator.php | Plus    | killed by tests |
         When I run Infection again with the same options and unchanged source, tests, and configuration
         Then the initial test run executes only the following tests:
             | AdditionalCalculatorTest::test_calculate |
-        And the following mutations are generated and evaluated:
+        And the mutants that were evaluated are:
             | file                         | mutator | outcome         |
             | src/AdditionalCalculator.php | Plus    | killed by tests |
-        And coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled
+        And the results match a run with TIA disabled:
+            | coverage            |
+            | generated mutations |
+            | detection statuses  |
+            | MSI                 |
 
     Scenario: Changing existing source refreshes coverage
-        When I run Infection for "src/Calculator.php"
+        When I run Infection on "src/Calculator.php"
         Then the initial test run executes all tests
         When I apply this diff to "src/Calculator.php":
             """
@@ -208,25 +227,33 @@ Feature: Keep test selection correct as the project evolves
             +
                      return $a + $b;
             """
-        And I run Infection for "src/Calculator.php"
+        And I run Infection on "src/Calculator.php"
         Then the initial test run executes only the following tests:
             | CalculatorTest::test_calculate |
-        And the following mutations are generated and evaluated:
+        And the mutants that were evaluated are:
             | file               | mutator | outcome         |
             | src/Calculator.php | Plus    | killed by tests |
-        And coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled
+        And the results match a run with TIA disabled:
+            | coverage            |
+            | generated mutations |
+            | detection statuses  |
+            | MSI                 |
 
     Scenario: A partial run retains dependencies for other source files
-        When I run Infection for "src/Calculator.php"
+        When I run Infection on "src/Calculator.php"
         Then the initial test run executes all tests
         When I run Infection again with the same options and unchanged source, tests, and configuration
         Then the initial test run executes only the following tests:
             | CalculatorTest::test_calculate |
-        When I run Infection for "src/Unrelated.php"
+        When I run Infection on "src/Unrelated.php"
         Then the initial test run executes only the following tests:
             | UnrelatedTest::test_calculate |
-        And coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled
-        When I run Infection for "src/Calculator.php"
+        And the results match a run with TIA disabled:
+            | coverage            |
+            | generated mutations |
+            | detection statuses  |
+            | MSI                 |
+        When I run Infection on "src/Calculator.php"
         Then the initial test run executes only the following tests:
             | CalculatorTest::test_calculate |
         And the generated mutations and their detection statuses are unchanged from the first Infection run

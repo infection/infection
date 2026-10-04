@@ -12,16 +12,18 @@ use PHPUnit\Event\Test\PreparedSubscriber;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
-final readonly class RecordInitialTestsSubscriber implements PreparedSubscriber
+final readonly class RecordExecutedTestsSubscriber implements PreparedSubscriber
 {
     public function __construct(
         private string $filePath,
         private Filesystem $filesystem,
-    )
-    {
-        Assert::stringNotEmpty($filePath, 'The initial test recording path must not be empty.');
+    ) {
+        Assert::stringNotEmpty(
+            $filePath,
+            'The executed test recording path must not be empty.',
+        );
 
-        $this->resetRecordingForNewInitialRun();
+        $this->resetRecordingForNewRun();
     }
 
     #[Override]
@@ -42,8 +44,11 @@ final readonly class RecordInitialTestsSubscriber implements PreparedSubscriber
         );
     }
 
-    private function resetRecordingForNewInitialRun(): void
+    private function resetRecordingForNewRun(): void
     {
-        $this->filesystem->dumpFile($this->filePath, '');
+        $this->filesystem->dumpFile(
+            $this->filePath,
+            '',
+        );
     }
 }

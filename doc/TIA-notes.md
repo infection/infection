@@ -11,8 +11,8 @@ For both cases, we can consider the following scenarios:
 - An initial run, an escaped mutation is reported, the user updates the tests, execute infection again.
 - An initial run, the user adds some code (source or tests) and execute infection again.
 
-The active Behat features cover the project with TIA enabled. A project without
-explicit TIA settings remains to be covered.
+The active Behat features cover projects with TIA enabled and automatic activation
+when the project has no explicit TIA settings.
 
 ## Execution evidence
 
@@ -26,8 +26,8 @@ status unless a scenario specifically needs framework failure output.
 
 ## Implemented initial-run scenarios
 
-Behat runs `tests/e2e/PHPUnit_TIA/features/01-initial-run.feature` and
-`tests/e2e/PHPUnit_TIA/features/02-development-cycle.feature`.
+Behat runs all five features under `tests/e2e/PHPUnit_TIA/features/`. Confirmed
+blockers retain their desired assertions under `@skip`; the `blocked` profile runs them.
 The cold-start scenario passes: the first Infection run executes both tests, and the
 second executes CalculatorTest only with identical Calculator coverage and mutation results.
 
@@ -111,6 +111,139 @@ XDEBUG_MODE=coverage php vendor/bin/phpunit \
     --only-impacted --explain
 ```
 
+## Mutant isolation, cache reuse, and configuration
+
+Features `03` through `05` now exercise the pinned build with the same execution
+snapshots and explicit outcomes as the initial-run and development-cycle features.
+
+Passing cases establish that:
+
+- Observed-execution and declared-target recordings both survive mutant execution.
+  Mutant commands and XML do not enable impact recording or selection. Scoped PHPUnit
+  recordings show that each mutant loads and executes only CalculatorTest. Shared impact-data and test-history
+  hashes remain unchanged. A subsequent warm run still selects CalculatorTest only.
+  This fixture has one covering test; it does not establish ordering among multiple tests.
+- Missing, empty, and incompatible recordings cause an explained full-suite fallback
+  and are replaced with data that narrows the next run. An unrecorded queried source
+  also causes a full-suite fallback.
+- Changing an execution setting in XML, the bootstrap script, or `composer.lock`
+  invalidates an existing recording when generated XML remains within the project.
+- Plain PHPUnit and Infection accept each other's recordings when both explicitly use
+  `.infection/phpunit`. Their differing report paths and presentation settings do not
+  prevent reuse. This isolates the cache-directory override blocker in feature `01`.
+- Without explicit TIA settings, Infection records observed execution and reuses it.
+  CLI recording/history opt-outs work. Declared-target recording requires complete
+  coverage metadata, and declarations do not make unexecuted lines eligible for mutation.
+- Explicit filter, group, and suite restrictions remain effective. Scenarios tagged
+  `@current_behavior` record today's suppression of automatic TIA; that policy is not settled.
+
+### PHPUnit feedback: expose impact selection in the merged configuration
+
+In the pinned PHPUnit build, `--only-impacted`, `--impacted-by`, and
+`--impacted-by-file` are available through the CLI configuration but absent from
+`PHPUnit\TextUI\Configuration\Configuration`, which extensions receive in `bootstrap()`.
+Our [recording extension](../tests/e2e/PHPUnit_TIA/phpunit/RecordExecutionExtension.php)
+therefore reparses `$_SERVER['argv']` using `PHPUnit\TextUI\CliArguments\Builder`
+to record these settings alongside the effective configuration.
+
+It would be useful to expose the effective impact-selection mode and inputs on the
+merged configuration too. Extensions could then inspect and report them through
+the configuration they already receive, without reparsing the command line or depending
+on the CLI parser. This request concerns configuration introspection; it does not
+require adding XML equivalents for these options.
+
+### PHP runtime options are not fingerprinted
+
+`04` records both tests, then repeats Infection with
+`--initial-tests-php-options="-d precision=15"`. PHPUnit still selects CalculatorTest
+only; it does not invalidate the recording. `ExecutionSettings::from()` describes
+settings from PHPUnit's merged configuration, not arbitrary interpreter settings.
+This is a missing safeguard for changes that can alter test execution. The scenario
+requires a full-suite fallback and remains skipped. Whether PHPUnit should track a
+selected set of runtime settings, or Infection should supply an additional recording
+fingerprint, needs discussion.
+
+A separate attempt to pass `-d precision=15` through `--test-framework-options`
+revealed an existing argument-handling issue: Infection forwards `--d`, which PHPUnit
+rejects as ambiguous. That issue is separate from TIA; no argument-parser fix is included here.
+
+### Generated XML can track the wrong dependency lock
+
+`04` places generated XML in a sibling directory outside the scenario project before
+recording. Changing the scenario's `composer.lock` then leaves the old recording usable:
+only CalculatorTest runs. PHPUnit's `Assumptions::composerLockFileNearest()` searches
+upwards from the generated XML, so it discovers the fixture root's lock instead of
+that scenario project's lock. The equivalent scenario with XML inside the project passes.
+This confirms the integration TODO: generated XML needs a way to retain the project's
+lock-file identity, independently of where Infection stores temporary files.
+
+### Explicit impact queries miss changed external fixtures
+
+`04` adds `#[UsesFixture('input.json')]` to UnrelatedTest, records a run that reads
+that JSON file, and changes the fixture without changing the test ID or PHP file.
+Infection's explicit query for Calculator still selects only CalculatorTest. The
+expected initial selection includes UnrelatedTest as well. This is the same explicit-query
+limitation as changed test bodies and providers, now reproduced for declared non-PHP
+inputs. Such dependencies must be included in any proposed changed-input safeguard.
+
+### Cache write failures do not disable TIA
+
+Two deterministic path obstructions reproduce the missing fallback without relying on
+Unix permissions (which privileged processes may bypass):
+
+- Replacing the cache directory with a regular file makes PHPUnit reject the impact
+  query: `Cannot run only the tests that are affected by what changed because no cache
+  directory is configured`. Infection exits unsuccessfully.
+- Replacing `test-impact-data` with a directory makes the initial run execute both tests,
+  then emit an `fopen(...): Is a directory` warning. In this run the initial process
+  ended with exit code 143 and Infection failed before mutation testing.
+
+The skipped scenarios require Infection to disable automatic impact selection and
+recording and complete mutation testing. Cache validation and diagnostics are Infection
+integration work; handling a failed recording destination is also useful PHPUnit feedback.
+These cases do not claim to cover every permission or filesystem failure.
+
+### XML opt-outs are overridden
+
+`05` warms a recording, then sets either `recordTestImpactData="false"` or
+`recordTestRunHistory="false"` in project XML. The generated configuration and recorded
+effective settings still enable both. `InitialConfigBuilder::build()` sets these
+attributes unconditionally. Both scenarios are skipped. The corresponding CLI opt-outs
+pass, so this is an Infection precedence issue rather than a PHPUnit opt-out failure.
+
+An Infection-level TIA opt-out remains a separate API TODO: `phpUnit` currently has no
+such schema option. The previous draft's speculative setting is documented here instead
+of adding a scenario against an invented option name.
+
+### Open question: explicit test selection
+
+Should TIA further narrow an explicit `--filter`, `--group`, or `--testsuite` selection,
+or should an explicit selector suppress automatic TIA? Neither policy may widen the
+user's selection. Current implementation suppresses automatic TIA, and feature `05`
+characterizes that behaviour; it does not close this question. If intersection is chosen,
+add a scenario whose explicit selection contains both impacted and unrelated tests so
+that the additional narrowing is observable.
+
+### Empty intersections need an outcome policy
+
+An explicit `--impacted-by=src/Calculator.php --filter=UnrelatedTest` selects no tests
+from an otherwise valid recording. PHPUnit reports `No tests executed!` and exits 1;
+Infection presents its general initial-test-failure diagnostic and exits 1. This is a
+legitimate empty intersection, not missing impact data. The `@skip @decision_pending`
+scenario expresses a possible successful-empty outcome with no generated or evaluated
+mutants. Its final exit status, explanation, and report contract still need agreement.
+
+Run all documented reproductions with:
+
+```sh
+cd tests/e2e/PHPUnit_TIA
+php vendor/bin/behat --xdebug --profile=blocked
+```
+
+A feature path may be appended to focus the run. Failures are expected; the default
+profile excludes them. Generated scenario files and numbered output logs remain under
+`var/behat/scenarios/`; external-XML artefacts remain under `var/behat/external/`.
+
 ## Gotchas
 
 - security issues
@@ -125,7 +258,7 @@ XDEBUG_MODE=coverage php vendor/bin/phpunit \
 - Preserve PHPUnit's dependency-change safeguards when generating the initial configuration. PHPUnit already invalidates impact recordings when configuration, bootstrap scripts, or `composer.lock` change. Ensure it still discovers the project's `composer.lock` when Infection writes its generated XML outside the project.
 - Ensure changes to declared external fixtures remain accounted for when Infection supplies explicit impact queries. Executed PHP coverage alone cannot reveal dependencies on files such as JSON fixtures or templates.
 - coverage vs covers
-- Debatable: should automatic TIA selection further narrow an explicit test selection (e.g. `--filter`, `--group`, or `--testsuite`)? Current preference: yes, optimising within the user's selected subset is acceptable. The implementation currently skips automatic impact selection when another selector is present.
+- Whether automatic TIA should further narrow an explicit test selection remains an open question; see [selection boundaries](#open-question-explicit-test-selection).
 - Select initial tests for all files being mutated, regardless of whether those files changed since the previous run. For example, running Infection against unchanged `B.php` still requires its coverage and tests; PHPUnit's `--only-impacted` could select no tests.
 - Explicit impact queries must account for changed tests and data providers. In the PHPUnit snapshot being evaluated, `--impacted-by-file` queries recorded dependencies instead of comparing their current hashes. For example, a previously passing test covers only `A.php`; the user edits it to also cover `B.php`, then runs Infection against `B.php`. The old impact map can omit that test, leaving Infection with incomplete coverage. Partial updates cannot refresh its dependencies unless the test runs.
 - Do not use TIA during mutant execution: we already know which tests to execute and in what order. Ensure that any pre-existing TIA configuration or configuration added for the initial run has no side effects in mutant processes. In particular, running a mutant must not update or invalidate the impact data recorded during the initial run.

@@ -9,9 +9,9 @@
 
     <extensions>
         <bootstrap class="Infection\E2ETests\PHPUnitTIA\PHPUnit\RecordExecutionExtension">
-            <parameter name="executedTestsFilePath" value="var/phpunit/initial-tests.jsonl"/>
-            <parameter name="loadedTestsFilePath" value="var/phpunit/initial-loaded-tests.json"/>
-            <parameter name="configurationFilePath" value="var/phpunit/initial-configuration.json"/>
+            <parameter name="executedTestsFilePath" value="var/phpunit/executed-tests.jsonl"/>
+            <parameter name="loadedTestsFilePath" value="var/phpunit/loaded-tests.json"/>
+            <parameter name="configurationFilePath" value="var/phpunit/configuration.json"/>
         </bootstrap>
     </extensions>
 

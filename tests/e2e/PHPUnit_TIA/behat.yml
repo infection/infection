@@ -4,6 +4,9 @@ default:
             paths:
                 - features/01-initial-run.feature
                 - features/02-development-cycle.feature
+                - features/03-mutant-isolation.feature
+                - features/04-cache-and-dependencies.feature
+                - features/05-configuration-and-boundaries.feature
             services:
                 filesystem: Symfony\Component\Filesystem\Filesystem
                 shellCommandRunner: Infection\E2ETests\PHPUnitTIA\Behat\ShellCommandRunner

@@ -1,65 +1,163 @@
-@draft @priority_4
-Feature: Respect TIA configuration and explain selection boundaries
-  These scenarios cover compatibility and choices that need agreement before implementation.
+Feature: Respect TIA configuration and selection boundaries
+    Infection can enable observed-execution TIA for projects without explicit settings.
+    Explicit opt-outs and test selections must remain effective.
 
-  Scenario Outline: Explicit opt-outs take precedence over automatic TIA
-    Given a successful initial run has recorded both tests
-    And <opt_out>
-    When I run Infection for "src/Calculator.php"
-    Then Infection does not add automatic impact selection or enable impact recording
-    And the initial test run executes all tests
-    And CalculatorTest kills the Calculator Plus mutant
+    Background:
+        Given PHPUnit is configured to record test impact data from executed code without deriving it from coverage targets
 
-    Examples:
-      | opt_out                                             |
-      | PHPUnit impact recording is explicitly disabled     |
-      | PHPUnit test-run history is explicitly disabled      |
-      | TIA is disabled in Infection's phpUnit configuration |
+    Scenario: Infection enables reusable TIA without explicit project settings
+        Given PHPUnit has no explicit TIA configuration
+        When I run Infection on "src/Calculator.php"
+        Then the initial test run executes all tests
+        And the effective PHPUnit configuration includes:
+            | recordTestImpactData                    | true  |
+            | recordTestRunHistory                    | true  |
+            | deriveTestImpactDataFromCoverageTargets | false |
+        When I run Infection again with the same options and unchanged source, tests, and configuration
+        Then the initial test run executes only the following tests:
+            | CalculatorTest::test_calculate |
+        And the results match a run with TIA disabled:
+            | coverage            |
+            | generated mutations |
+            | detection statuses  |
+            | MSI                 |
 
-  Scenario: Declared targets cannot replace actual mutation coverage
-    Given impact dependencies are derived from declared coverage targets
-    And CalculatorTest declares Calculator as a target but executes only part of it
-    When I run Infection for "src/Calculator.php"
-    Then mutation eligibility uses executed line coverage
-    And unexecuted lines are not treated as covered merely because Calculator was declared
+    Scenario Outline: The CLI opt-out <option> disables automatic impact selection
+        When I run Infection on "src/Calculator.php"
+        Then the initial test run executes all tests
+        When I run Infection on "src/Calculator.php" with the following options:
+            | --test-framework-options=<option> |
+        Then the effective PHPUnit configuration includes:
+            | recordTestImpactData | false |
+            | impactedByFile       | null  |
+            | impactedBy           | []    |
+            | onlyImpacted         | false |
+        And the initial test run executes all tests
+        And the mutants that were evaluated are:
+            | file               | mutator | outcome         |
+            | src/Calculator.php | Plus    | killed by tests |
 
-  Scenario: Declared-target recording requires complete coverage metadata
-    Given impact dependencies are derived from declared coverage targets
-    And coverage metadata is not required for every test
-    When I run Infection for "src/Calculator.php"
-    Then Infection explains why declared-target TIA cannot be enabled
-    And the initial run executes CalculatorTest and UnrelatedTest without TIA
-    And CalculatorTest kills the Calculator Plus mutant
+        Examples:
+            | option                           |
+            | --do-not-record-test-impact-data |
+            | --do-not-record-test-run-history |
 
-  # Proposed preference from TIA-notes.md; current integration skips automatic
-  # impact selection when a user test selector is present.
-  @decision_pending
-  Scenario Outline: TIA narrows an explicit selection without widening it
-    Given a successful initial run has recorded both tests
-    And the user's <selector> includes CalculatorTest and UnrelatedTest
-    When I run Infection for "src/Calculator.php"
-    Then the initial test run executes only the following tests:
-      | CalculatorTest::test_calculate |
-    And no test outside the user's selection is executed
-    And the mutation results match a run with TIA disabled and the same selector
+    # Blocker: ../../../../doc/TIA-notes.md#xml-opt-outs-are-overridden
+    @skip
+    Scenario Outline: The XML opt-out <attribute> disables automatic impact selection
+        When I run Infection on "src/Calculator.php"
+        Then the initial test run executes all tests
+        Given the PHPUnit configuration has these attributes:
+            | <attribute> | false |
+        When I run Infection on "src/Calculator.php"
+        Then the effective PHPUnit configuration includes:
+            | <attribute>          | false |
+            | recordTestImpactData | false |
+            | impactedByFile       | null  |
+        And the initial test run executes all tests
+        And the mutants that were evaluated are:
+            | file               | mutator | outcome         |
+            | src/Calculator.php | Plus    | killed by tests |
 
-    Examples:
-      | selector      |
-      | --filter      |
-      | --group       |
-      | --testsuite   |
+        Examples:
+            | attribute            |
+            | recordTestImpactData |
+            | recordTestRunHistory |
 
-  # Agree on the exit status and report shape before implementing this case.
-  @decision_pending
-  Scenario: A legitimate empty intersection is explained
-    Given valid impact data selects only CalculatorTest for Calculator
-    And the user's group selects only UnrelatedTest
-    When I run Infection for "src/Calculator.php"
-    Then Infection explains that no tests match both selections
-    And the empty selection is not described as missing or unusable impact data
-    And no mutation is reported as killed by tests that did not execute
+    Scenario: Declared targets do not turn unexecuted code into mutation coverage
+        Given I apply this diff to "src/Calculator.php":
+            """
+            +        if ($a === 99) {
+            +            return $a + $b;
+            +        }
+            +
+                     return $a + $b;
+            """
+        When I run Infection on "src/Calculator.php" with the following options:
+            | --test-framework-options=--derive-test-impact-data-from-coverage-targets |
+        Then the initial test run executes all tests
+        When I run Infection again with the same options and unchanged source, tests, and configuration
+        Then the initial test run executes only the following tests:
+            | CalculatorTest::test_calculate |
+        And the effective PHPUnit configuration includes:
+            | deriveTestImpactDataFromCoverageTargets | true |
+        And coverage for "src/Calculator.php" contains exactly these lines:
+            | 11 |
+            | 15 |
+        And the mutants that were evaluated are:
+            | file               | mutator | outcome         |
+            | src/Calculator.php | Plus    | killed by tests |
+        And the results match a run with TIA disabled:
+            | coverage            |
+            | generated mutations |
+            | detection statuses  |
+            | MSI                 |
 
-  # No concurrency guarantee is proposed: concurrent cache updates are a known
-  # limitation in TIA-notes.md and are outside this integration's scope.
-  # The note "security issues" needs a concrete threat model before scenarios
-  # can state an observable security requirement.
+    Scenario: Declared-target recording requires complete coverage metadata
+        Given the PHPUnit configuration has these attributes:
+            | requireCoverageMetadata | false |
+        When I run Infection on "src/Calculator.php" with the following options:
+            | --test-framework-options=--derive-test-impact-data-from-coverage-targets |
+        Then Infection output contains 'Deriving dependencies from coverage targets requires requireCoverageMetadata="true"'
+        And the effective PHPUnit configuration includes:
+            | recordTestImpactData                    | false |
+            | deriveTestImpactDataFromCoverageTargets | false |
+            | impactedByFile                          | null  |
+        And the initial test run executes all tests
+        And the mutants that were evaluated are:
+            | file               | mutator | outcome         |
+            | src/Calculator.php | Plus    | killed by tests |
+
+    # Characterizes the current implementation. Whether TIA should narrow this
+    # selection further remains an open question in doc/TIA-notes.md.
+    @current_behavior
+    Scenario Outline: The explicit selector <selector> currently suppresses automatic TIA
+        Given I apply this diff to "tests/CalculatorTest.php":
+            """
+             #[CoversClass(Calculator::class)]
+            +#[\PHPUnit\Framework\Attributes\Group('calculator')]
+            """
+        And I apply this diff to "phpunit.xml":
+            """
+            -        <testsuite name="tests">
+            -            <directory>tests</directory>
+            +        <testsuite name="calculator">
+            +            <file>tests/CalculatorTest.php</file>
+            +        </testsuite>
+            +        <testsuite name="unrelated">
+            +            <file>tests/UnrelatedTest.php</file>
+                     </testsuite>
+            """
+        When I run Infection on "src/Calculator.php"
+        Then the initial test run executes all tests
+        When I run Infection on "src/Calculator.php" with the following options:
+            | --test-framework-options=<selector> |
+        Then the initial test run executes only the following tests:
+            | CalculatorTest::test_calculate |
+        And the effective PHPUnit configuration includes:
+            | impactedByFile | null  |
+            | impactedBy     | []    |
+            | onlyImpacted   | false |
+        And line-to-test coverage for "src/Calculator.php" is unchanged from the first Infection run
+        And the generated mutations and their detection statuses are unchanged from the first Infection run
+        And the mutants that were evaluated are:
+            | file               | mutator | outcome         |
+            | src/Calculator.php | Plus    | killed by tests |
+
+        Examples:
+            | selector                |
+            | --filter=CalculatorTest |
+            | --group=calculator      |
+            | --testsuite=calculator  |
+
+    # Blocker: ../../../../doc/TIA-notes.md#empty-intersections-need-an-outcome-policy
+    # A successful-empty outcome remains a proposal, including its exit status and reports.
+    @skip @decision_pending
+    Scenario: An empty explicit impact intersection is distinguished from missing data
+        When I run Infection on "src/Calculator.php"
+        Then the initial test run executes all tests
+        When I run Infection on "src/Calculator.php" with the following options:
+            | --test-framework-options=--impacted-by=src/Calculator.php --filter=UnrelatedTest |
+        Then PHPUnit output contains "No tests executed!"
+        And the initial test run executes no tests
+        And no mutations are generated or evaluated

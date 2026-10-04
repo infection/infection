@@ -47,7 +47,12 @@ final readonly class InfectionExecutionResult
             output: $output,
             executionEvents: array_map(
                 Json::decode(...),
-                $executionReport === '' ? [] : explode("\n", $executionReport),
+                $executionReport === ''
+                    ? []
+                    : explode(
+                        "\n",
+                        $executionReport,
+                    ),
             ),
             report: Json::decode($infectionReportJson),
         );
@@ -58,7 +63,14 @@ final readonly class InfectionExecutionResult
      */
     public function getSources(): array
     {
-        return $this->selectEvents('source_processed', ['file', 'mutationHashes', 'coverage']);
+        return $this->selectEvents(
+            'source_processed',
+            [
+                'file',
+                'mutationHashes',
+                'coverage',
+            ],
+        );
     }
 
     /**
@@ -68,7 +80,15 @@ final readonly class InfectionExecutionResult
     {
         return $this->selectEvents(
             'mutant_finished',
-            ['hash', 'file', 'mutator', 'startLine', 'endLine', 'diff', 'status'],
+            [
+                'hash',
+                'file',
+                'mutator',
+                'startLine',
+                'endLine',
+                'diff',
+                'status',
+            ],
         );
     }
 
@@ -79,7 +99,10 @@ final readonly class InfectionExecutionResult
 
     public function getInitialPhpUnitOutput(): string
     {
-        $initialTestResults = $this->selectEvents('initial_tests_finished', ['output']);
+        $initialTestResults = $this->selectEvents(
+            'initial_tests_finished',
+            ['output'],
+        );
 
         Assert::count(
             $initialTestResults,
@@ -97,13 +120,24 @@ final readonly class InfectionExecutionResult
      */
     private function selectEvents(string $type, array $fields): array
     {
-        $matchesEventType = static fn (array $event): bool => $event['event'] === $type;
-        $selectFields = static fn (array $event): array => array_intersect_key($event, array_flip($fields));
+        $selectFields = static fn (array $event): array => array_intersect_key(
+            $event,
+            array_flip($fields),
+        );
 
+        return array_map(
+            $selectFields,
+            $this->getEvents($type),
+        );
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function getEvents(string $type): array
+    {
         return array_values(
-            array_map(
-                $selectFields,
-                array_filter($this->executionEvents, $matchesEventType),
+            array_filter(
+                $this->executionEvents,
+                static fn (array $event): bool => $event['event'] === $type,
             ),
         );
     }

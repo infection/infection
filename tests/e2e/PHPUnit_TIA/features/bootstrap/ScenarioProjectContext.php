@@ -108,7 +108,10 @@ final class ScenarioProjectContext implements Context
             sprintf('The diff matches more than one block of lines in "%s"; add context to remove the ambiguity.', $path),
         );
 
-        return substr(str_replace($original, $replacement, $contents), 1);
+        return substr(
+            str_replace($original, $replacement, $contents),
+            1,
+        );
     }
 
     private static function createScenarioDirectoryName(BeforeScenarioScope $scope): string
