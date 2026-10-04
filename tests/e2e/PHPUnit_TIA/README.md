@@ -25,36 +25,62 @@ Or use the e2e runner:
 ./tests/e2e_tests bin/infection '^./PHPUnit_TIA$'
 ```
 
-`ScenarioProjectContext` recreates the isolated scenario project under `var/behat/scenarios/`;
-its directory name combines the feature filename and scenario title, lowercased
-with punctuation and spaces replaced by hyphens.
-The contexts receive the same mutable `ScenarioState`, which `ScenarioStateContext`
-resets after each scenario. It holds the scenario project path and execution histories.
-Its `infectionExecutionResults` history holds immutable `InfectionExecutionResult`
-snapshots of each command, console output, execution events, and summary report.
-The context repeats the latest snapshot's command and compares the first and latest
-results through `getFirstInfectionExecutionResult()` and `getLastInfectionExecutionResult()`.
-`findLastInfectionExecutionResult()` returns `null` before any execution.
-Its `phpUnitExecutionResults` history holds immutable
-`PhpUnitExecutionResult` snapshots for direct PHPUnit executions and Infection's
-initial tests: command, output, loaded and executed test identities, and configuration.
-`findLastPhpUnitExecutionResult()` returns `null` before any execution;
-`getLastPhpUnitExecutionResult()` asserts that an execution has been recorded.
-Snapshots retain their contents when later executions overwrite the logs.
-Infection's reports (`infection.json` and `execution.jsonl`), console logs
-(`output-<run>.log`), and temporary execution files (`tmp/`) live under `var/infection/`.
-`InfectionContext` runs Infection and checks mutation results;
-`PhpUnitContext` configures PHPUnit, seeds impact data, and checks executed tests. Commands, execution
-reports, test identities, and configuration snapshots remain there for inspection.
-Each scenario copies the fixture's installed dependencies and rebuilds its Composer
-autoloader to load its own source files and PHPUnit extension.
-Each scenario describes its PHPUnit configuration with
-`Given PHPUnit is configured to record test impact data from executed code without deriving it from coverage targets`.
-The step copies `configurations/tia-observed.xml` into the scenario project as
-`phpunit.xml`. The configuration stays unchanged across repeated runs.
-Add prepared configurations here when new scenarios require different PHPUnit settings.
-Behat is installed only in this fixture. The entry point preserves Xdebug for the
-PHPUnit subprocess that records impact data.
+## Setup and where to look
+
+There are two test layers: Behat runs the scenarios, while PHPUnit runs the small
+PHP project that Infection mutates. This fixture has its own Composer dependencies,
+including Behat and a pinned PHPUnit build with TIA support. The Infection executable
+comes from the repository (or the path passed to the runner), not the fixture's `vendor/`.
+The fixture pins PHPUnit PR #6919 at `5f4f80f15f1bb1907e6ba277f2cec0756fbb8046`
+until a release includes TIA.
+
+The execution flow is:
+
+1. [run_tests.bash](run_tests.bash) selects the Infection executable through
+   `TIA_INFECTION` and starts the fixture's Behat with Xdebug preserved.
+   [behat.yml](behat.yml) selects the feature and wires the contexts to shared services.
+2. Before the `Background` runs, `ScenarioProjectContext` recreates a project under
+   `var/behat/scenarios/<feature-and-scenario-name>/`. It copies the source, tests,
+   PHPUnit extension, installed dependencies, Composer files, and Infection configuration,
+   then rebuilds the copied project's autoloader. The directory name comes from the
+   feature filename and scenario title, lowercased with punctuation and spaces replaced
+   by hyphens.
+3. The `Background` uses `PhpUnitContext` to copy a prepared configuration from
+   `configurations/` to the scenario project's `phpunit.xml`. Subsequent steps run
+   PHPUnit or Infection with that project as their working directory. Repeated runs
+   within a scenario reuse the same project and its caches.
+4. After each PHPUnit or Infection run, the contexts capture results in memory for comparisons.
+   `ScenarioStateContext` resets the shared state after the scenario. Files remain
+   available for inspection until that scenario's project is recreated on the next run.
+
+| What to inspect or change | Where to look |
+| --- | --- |
+| Behaviour and expected results | [features/01-initial-run.feature](features/01-initial-run.feature) |
+| Suite selection, excluded tags, and context services | [behat.yml](behat.yml) |
+| Scenario project creation and copied files | [ScenarioProjectContext.php](features/bootstrap/ScenarioProjectContext.php) |
+| PHPUnit configuration, recording seed, and executed-test assertions | [PhpUnitContext.php](features/bootstrap/PhpUnitContext.php) |
+| Infection commands, repeated runs, and coverage/mutation/MSI assertions | [InfectionContext.php](features/bootstrap/InfectionContext.php) |
+| Shared execution histories and their reset | [ScenarioState.php](features/bootstrap/ScenarioState.php) and [ScenarioStateContext.php](features/bootstrap/ScenarioStateContext.php) |
+| Parsing reports into immutable snapshots | [InfectionExecutionResult.php](features/bootstrap/InfectionExecutionResult.php) and [PhpUnitExecutionResult.php](features/bootstrap/PhpUnitExecutionResult.php) |
+| Subprocess execution and failure handling | [ShellCommandRunner.php](features/bootstrap/ShellCommandRunner.php) |
+| Prepared PHPUnit settings and Infection settings | [configurations/](configurations/) and [infection.json5](infection.json5) |
+| Project code and its PHPUnit tests | [src/](src/) and [tests/](tests/) |
+| Recording what PHPUnit actually loads and executes | [phpunit/](phpunit/), starting with [RecordExecutionExtension.php](phpunit/RecordExecutionExtension.php) |
+
+The PHPUnit extension records loaded tests, executed tests, and effective configuration
+for both direct PHPUnit runs and Infection's initial test runs. It skips mutant processes
+when `TEST_TOKEN` is present, so they cannot overwrite the initial-run evidence.
+Infection's execution report supplies coverage and mutation results; its JSON summary
+supplies MSI. The result snapshots preserve earlier evidence when later runs overwrite
+the report files. See [the execution report contract](../../../doc/execution-report.md)
+and [the PHPUnit recording details below](#initial-test-execution-recording).
+
+For debugging, start inside the generated scenario project. Its `var/infection/`
+contains `infection.json`, `execution.jsonl`, numbered `output-<run>.log` files, and
+temporary execution files under `tmp/`. Its `var/phpunit/` contains the extension's
+recordings and direct PHPUnit output in `output.log`. Add new prepared PHPUnit
+configurations under `configurations/`; the active setup does not copy the fixture-root
+`phpunit.xml`.
 
 The other feature files remain drafts and are excluded by `behat.yml`.
 The previous script is retained as `run_legacy_tests.bash`; the runner does not invoke it.
@@ -66,9 +92,6 @@ excluded by the suite filter because Infection
 replaces the project's configured cache directory with `.infection/phpunit`. It runs
 both initial tests instead of reusing PHPUnit's recording to select CalculatorTest.
 See [the blocker](../../../doc/TIA-notes.md#project-configured-cache-is-not-reused).
-
-The fixture pins PHPUnit PR #6919 at `5f4f80f15f1bb1907e6ba277f2cec0756fbb8046`.
-This dependency is temporary until a release includes TIA.
 
 ## Initial test execution recording
 
@@ -86,8 +109,8 @@ Mutant processes leave this recording untouched.
 The extension also writes `var/phpunit/initial-configuration.json`, configured through
 the `configurationFilePath` parameter. It records coverage metadata requirements
 and targeting, impact recording and selection options, and cache and test-run
-history settings. Paths are relative to `PHPUnit_TIA`; unavailable paths are
-`null`, and `-` retains its meaning of standard input. The impact-data filename
+history settings. Recorded configuration paths are relative to the scenario project;
+unavailable paths are `null`, and `-` retains its meaning of standard input. The impact-data filename
 is derived from PHPUnit's cache directory. Mutant processes leave this snapshot
 untouched.
 

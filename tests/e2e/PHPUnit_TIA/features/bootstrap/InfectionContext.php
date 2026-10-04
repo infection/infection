@@ -48,8 +48,8 @@ final class InfectionContext implements Context
         ]);
     }
 
-    #[When('I repeat the same Infection command without changing any project files')]
-    public function repeatInfection(): void
+    #[When('I run Infection again with the same options and unchanged source, tests, and configuration')]
+    public function runInfectionAgainWithSameOptionsAndUnchangedProject(): void
     {
         $this->executeInfection(
             $this->scenarioState->getLastInfectionExecutionResult()->command,
@@ -81,8 +81,8 @@ final class InfectionContext implements Context
         );
     }
 
-    #[Then("Calculator's covering tests are unchanged from the first Infection run")]
-    public function assertCalculatorCoveringTestsAreUnchanged(): void
+    #[Then("Calculator's line-to-test coverage is unchanged from the first Infection run")]
+    public function assertCalculatorLineToTestCoverageIsUnchanged(): void
     {
         $executionResult = $this->scenarioState->getLastInfectionExecutionResult();
 
@@ -102,8 +102,8 @@ final class InfectionContext implements Context
         );
     }
 
-    #[Then('the generated and evaluated mutations are identical to the first Infection run')]
-    public function assertGeneratedAndEvaluatedMutationsAreUnchanged(): void
+    #[Then('the generated mutations and their detection statuses are unchanged from the first Infection run')]
+    public function assertGeneratedMutationsAndDetectionStatusesAreUnchanged(): void
     {
         Assert::same(
             array_column($this->scenarioState->getLastInfectionExecutionResult()->getSources(), 'mutationHashes'),
@@ -117,8 +117,8 @@ final class InfectionContext implements Context
         );
     }
 
-    #[Then('the reported MSI is identical to the first Infection run')]
-    public function assertSameMsi(): void
+    #[Then('the reported MSI is unchanged from the first Infection run')]
+    public function assertReportedMsiIsUnchanged(): void
     {
         Assert::same(
             $this->scenarioState->getLastInfectionExecutionResult()->getMsi(),

@@ -67,25 +67,33 @@ final class PhpUnitContext implements Context
         );
     }
 
-    #[Then('the initial run executes the following tests:')]
-    public function assertListedTestsWereExecuted(TableNode $tests): void
+    #[Then('the initial test run executes only the following tests:')]
+    public function assertOnlyListedTestsWereExecuted(TableNode $tests): void
     {
-        $qualifyTestName = static fn (string $test): string => 'Infection\\E2ETests\\PHPUnitTIA\\Tests\\' . $test;
-
         $this->assertExecutedTests(
             array_map(
-                $qualifyTestName,
+                self::qualifyTestName(...),
                 $tests->getColumn(0),
             ),
         );
     }
 
-    #[Then('the initial run executes all tests')]
+    #[Then('the initial test run executes all tests')]
     public function assertAllTestsWereExecuted(): void
     {
         $this->assertExecutedTests(
             $this->scenarioState->getLastPhpUnitExecutionResult()->loadedTests,
         );
+    }
+
+    /**
+     * @param string $testName E.g. "CalculatorTest"
+     *
+     * @return string FQCN
+     */
+    private static function qualifyTestName(string $testName): string
+    {
+        return sprintf("Infection\\E2ETests\\PHPUnitTIA\\Tests\\%s", $testName);
     }
 
     /**
@@ -120,10 +128,12 @@ final class PhpUnitContext implements Context
      */
     private function assertExecutedTests(array $expected): void
     {
+        $actual = self::sortTests(
+            $this->scenarioState->getLastPhpUnitExecutionResult()->executedTests,
+        );
+
         Assert::same(
-            self::sortTests(
-                $this->scenarioState->getLastPhpUnitExecutionResult()->executedTests,
-            ),
+            $actual,
             self::sortTests($expected),
             'The executed tests do not match the expected tests.',
         );

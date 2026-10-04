@@ -7,7 +7,7 @@ Feature: Keep TIA out of mutant execution
     Given the project records dependencies from <strategy>
     And a successful initial run has recorded both tests
     When I run Infection for "src/Calculator.php"
-    Then the initial run executes the following tests:
+    Then the initial test run executes only the following tests:
       | CalculatorTest::test_calculate |
     And the Calculator mutant executes the covering tests in Infection's chosen order
     And no mutant command or generated configuration enables TIA selection or recording
@@ -24,7 +24,7 @@ Feature: Keep TIA out of mutant execution
     Given a successful initial run has recorded both tests
     And an Infection run for Calculator has evaluated its Plus mutant
     When I run Infection for "src/Calculator.php" again without changing the project
-    Then the initial run executes the following tests:
+    Then the initial test run executes only the following tests:
       | CalculatorTest::test_calculate |
     And no impact dependency refers to a temporary mutant file
     And the mutation results match a run with TIA disabled

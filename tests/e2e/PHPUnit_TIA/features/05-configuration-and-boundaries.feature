@@ -7,7 +7,7 @@ Feature: Respect TIA configuration and explain selection boundaries
     And <opt_out>
     When I run Infection for "src/Calculator.php"
     Then Infection does not add automatic impact selection or enable impact recording
-    And the initial run executes all tests
+    And the initial test run executes all tests
     And CalculatorTest kills the Calculator Plus mutant
 
     Examples:
@@ -38,7 +38,7 @@ Feature: Respect TIA configuration and explain selection boundaries
     Given a successful initial run has recorded both tests
     And the user's <selector> includes CalculatorTest and UnrelatedTest
     When I run Infection for "src/Calculator.php"
-    Then the initial run executes the following tests:
+    Then the initial test run executes only the following tests:
       | CalculatorTest::test_calculate |
     And no test outside the user's selection is executed
     And the mutation results match a run with TIA disabled and the same selector

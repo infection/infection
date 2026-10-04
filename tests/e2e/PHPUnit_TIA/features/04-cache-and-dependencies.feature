@@ -5,7 +5,7 @@ Feature: Reuse valid impact data and fall back when it cannot be used
   Scenario Outline: Missing or unusable recordings do not omit tests
     Given the impact recording is <state>
     When I run Infection for "src/Calculator.php"
-    Then the initial run executes all tests
+    Then the initial test run executes all tests
     And the output explains why impact selection was unavailable
     And CalculatorTest kills the Calculator Plus mutant
 
@@ -19,7 +19,7 @@ Feature: Reuse valid impact data and fall back when it cannot be used
     Given a successful initial run has recorded both tests
     And Calculator's path is absent from the recorded impact dependencies
     When I run Infection for "src/Calculator.php"
-    Then the initial run executes all tests
+    Then the initial test run executes all tests
     And Calculator has the same line-to-test coverage as a run with TIA disabled
 
   Scenario Outline: Shared execution dependencies invalidate old recordings
@@ -27,7 +27,7 @@ Feature: Reuse valid impact data and fall back when it cannot be used
     And I change <dependency>
     When I run Infection for "src/Calculator.php"
     Then the old recording is not used to omit tests
-    And the initial run executes all tests
+    And the initial test run executes all tests
     And the output explains why the recording was invalidated
 
     Examples:
@@ -43,7 +43,7 @@ Feature: Reuse valid impact data and fall back when it cannot be used
     And I change the project's composer.lock
     When I run Infection for "src/Calculator.php"
     Then the old recording is invalidated by the dependency-lock change
-    And the initial run executes all tests
+    And the initial test run executes all tests
 
   Scenario Outline: Plain PHPUnit and Infection can share a compatible recording
     Given <producer> has recorded both tests in the cache used by both tools
