@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use function array_key_exists;
 use function implode;
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -49,12 +51,12 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Override;
-use RuntimeException;
 use function Safe\preg_match;
 use function sprintf;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use function trim;
 use function version_compare;
 use Webmozart\Assert\Assert;
@@ -93,10 +95,11 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
      * @param string[] $phpExtraArgs
      *
      * @throws InvalidPhpUnitConfiguration
-     * @throws RuntimeException
      * @throws ProcessFailedException
      * @throws ProcessSignaledException
      * @throws ProcessTimedOutException
+     * @throws SymfonyProcessRuntimeException
+     * @throws InvalidVersion
      *
      * @return string[]
      */
@@ -106,22 +109,7 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
         array $phpExtraArgs,
         bool $skipCoverage,
     ): array {
-        // PHPUnit 13.2 introduced validation against its bundled schema, without
-        // resolving the schema URL declared in the configuration.
-        // https://github.com/sebastianbergmann/phpunit/commit/e85b58eda9e750763f3b26fb416612d5931299aa
-        if (version_compare($this->getVersion(), '13.2', '>=')) {
-            $this->shellCommandRunner->mustRun(
-                $this->commandLineBuilder->build(
-                    $this->testFrameworkExecutable,
-                    $phpExtraArgs,
-                    [
-                        '--configuration',
-                        $this->testFrameworkConfigPath,
-                        '--validate-configuration',
-                    ],
-                ),
-            );
-        }
+        $this->validateConfigurationIfSupported($phpExtraArgs);
 
         if ($skipCoverage === false) {
             $generatedOptions = [];
@@ -317,5 +305,47 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
     private function createInitialTestsFailRecommendations(string $commandLine): string
     {
         return sprintf('Check the executed command to identify the problem: %s', $commandLine);
+    }
+
+    /**
+     * @param string[] $phpExtraArgs
+     *
+     * @throws ProcessSignaledException
+     * @throws ProcessTimedOutException
+     * @throws ProcessFailedException
+     * @throws SymfonyProcessRuntimeException
+     * @throws InvalidVersion
+     */
+    private function validateConfigurationIfSupported(array $phpExtraArgs): void
+    {
+        // PHPUnit 13.2 introduced validation against its bundled schema, without
+        // resolving the schema URL declared in the configuration.
+        // https://github.com/sebastianbergmann/phpunit/commit/e85b58eda9e750763f3b26fb416612d5931299aa
+        if (!$this->isPhpUnit132OrHigher($this->getVersion())) {
+            return;
+        }
+
+        $this->shellCommandRunner->mustRun(
+            $this->commandLineBuilder->build(
+                $this->testFrameworkExecutable,
+                $phpExtraArgs,
+                [
+                    '--configuration',
+                    $this->testFrameworkConfigPath,
+                    '--validate-configuration',
+                ],
+            ),
+        );
+    }
+
+    private function isPhpUnit132OrHigher(string $testFrameworkVersion): bool
+    {
+        static $versions = [];
+
+        if (!array_key_exists($testFrameworkVersion, $versions)) {
+            $versions[$testFrameworkVersion] = version_compare($testFrameworkVersion, '13.2.0', '>=');
+        }
+
+        return $versions[$testFrameworkVersion];
     }
 }
