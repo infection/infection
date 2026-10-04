@@ -82,7 +82,7 @@ final class VisitorTestCaseTest extends TestCase
         $nodesById = $this->testCase->addIdsToNodesPublic($nodes);
 
         $this->assertIsArray($nodesById);
-        $this->assertNotEmpty($nodesById);
+        $this->assertNotSame([], $nodesById);
 
         foreach ($nodesById as $id => $node) {
             $this->assertIsInt($id);
