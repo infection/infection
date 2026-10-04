@@ -1,11 +1,9 @@
 # PHPUnit Test Impact Analysis options
 
-This reference describes the feature-branch snapshot reviewed in
-[the original integration sketch](phpunit-test-impact-analysis.md):
+This overview describes the pinned snapshot of
 [PHPUnit PR #6919](https://github.com/sebastianbergmann/phpunit/pull/6919), commit
-`09b54d872f5d2bb764c07617b8cf28c6fb6ce41f`. It does not describe a guaranteed released
-PHPUnit API. For subsequent compatibility and diagnostic changes, see
-[the current findings](phpunit-tia-findings.md).
+[`e21b72d4ac3a9d9351eaa065638dd5e6259879bd`](https://github.com/sebastianbergmann/phpunit/tree/e21b72d4ac3a9d9351eaa065638dd5e6259879bd),
+which reports `13.5-dev`. The feature is not merged; these options are experimental.
 
 The options cover three steps: build a dependency map, select tests from it, and explain
 that selection.
@@ -14,7 +12,7 @@ that selection.
 
 | Option | Behaviour |
 | --- | --- |
-| `--record-test-impact-data` | Records which files each test actually executes, using a coverage driver. Saves that information for later selection. |
+| `--record-test-impact-data` | Records which source files each test executes, using a coverage driver. Also tracks test code and fixture dependencies. |
 | `--derive-test-impact-data-from-coverage-targets` | Builds the dependency map from declared coverage targets, both `Covers*` and `Uses*` metadata, instead of observed execution. Implies impact recording. |
 | `--do-not-record-test-impact-data` | Disables impact recording, including derivation from coverage targets. |
 | `--do-not-derive-test-impact-data-from-coverage-targets` | Disables the metadata-based approach. If recording remains enabled, PHPUnit uses observed execution. |
@@ -22,7 +20,8 @@ that selection.
 The first two are alternative sources of dependency information:
 
 - **Observed execution** learns what tests execute, but requires a coverage driver and
-  running the tests.
+  running the tests. For tests running in a separate process, loaded source files also
+  count as dependencies.
 - **Declared targets** need no coverage driver to build the map, but accuracy depends on
   complete declarations. PHPUnit requires coverage metadata to be mandatory for all tests
   (`requireCoverageMetadata` and all effective size-specific requirements); otherwise it
@@ -30,7 +29,9 @@ The first two are alternative sources of dependency information:
   but that warning alone does not disable derivation.
 
 Recording alone does not narrow the test run. A full suite run can build a map for
-subsequent runs.
+subsequent runs. Both strategies need a non-empty source filter. Tests without usable
+coverage targets, including `CoversNothing` tests, remain unknown in declared-target
+recordings and are therefore selected conservatively.
 
 Two supporting options matter: `--cache-directory` supplies persistent storage, and
 `--record-test-run-history` preserves test outcomes. Impact selection requires a cache
@@ -39,6 +40,41 @@ Selection can read a compatible existing recording without collecting coverage a
 PHPUnit's longstanding `--no-coverage` option disables observed-execution recording but
 allows metadata-derived recording. It differs from `--do-not-record-test-impact-data`,
 which disables both recording strategies.
+
+The XML equivalents on `<phpunit>` are `recordTestImpactData`,
+`deriveTestImpactDataFromCoverageTargets`, `recordTestRunHistory`, and `cacheDirectory`.
+CLI settings override their XML counterparts. Impact recording and derivation default
+to `false`.
+
+## Include dependencies beyond source code
+
+PHPUnit also tracks the files that define tests, including parent classes, traits, and
+data providers. For inputs that execution cannot reveal:
+
+- `#[UsesFixture('input.json')]` declares a file or directory dependency on a test class,
+  test method, or data-provider method. Relative paths start from the PHP file containing
+  the attribute. It works with both recording strategies.
+- `$this->registerFixture($path)` registers a dependency discovered during a test run
+  for observed-execution recording. Relative paths start from the working directory.
+
+Fixture directories are hashed recursively, so added, removed, or changed files count
+as changes to the dependency.
+
+PHP helper files in configured test-suite directories are watched automatically. Add
+other inputs to `<testImpactAnalysis><watch>` in the PHPUnit XML configuration:
+
+```xml
+<testImpactAnalysis>
+    <watch>
+        <directory suffix=".json">fixtures</directory>
+        <file>config/testing.ini</file>
+    </watch>
+</testImpactAnalysis>
+```
+
+These paths are relative to the XML configuration file. Watched directories default to
+the `.php` suffix. Watching ensures automatic change detection notices files even when
+no test has a recorded dependency on them; such changes cause a full-suite fallback.
 
 ## Choose what counts as changed
 
@@ -55,13 +91,15 @@ The distinction is automatic change detection versus an explicit change set:
   not actually need to have changed. This option already enables selection; adding
   `--only-impacted` is unnecessary.
 
-The explicit paths can name source files, test files, or directories. The two explicit-path
-options can be combined; their paths are merged into a union of affected tests. Relative paths
-are resolved against the current working directory, including paths read from a list file.
+The explicit paths can name source files, test files, fixtures, or directories. The two
+explicit-path options can be combined; their paths are merged into a union of affected
+tests. Relative paths are resolved against the current working directory, including
+paths read from a list file.
 
-Explicit paths replace automatic change detection; they do not supplement it. This is
-the source of the changed-test concern in the findings: supplying only `src/A.php` can
-omit an existing test that changed to cover A after the recording.
+Explicit paths replace automatic change detection; they do not supplement it. Supplying
+only `src/A.php` can therefore omit an existing test that changed to cover A after the
+recording, or one whose fixture changed. Adding `--only-impacted` does not combine the
+two modes. Existing suite, group, and filter restrictions still apply.
 
 ## Inspect the decision
 
@@ -76,8 +114,31 @@ phpunit --explain-impacted --impacted-by src/A.php
 ```
 
 It uses the same selection logic as an actual run. Reasons include dependency on a changed
-file, missing information about a test, a previous unsuccessful outcome, or another selected
-test depending on it.
+file, missing information about a test, a previous unsuccessful outcome, or dependencies
+between tests. Selection includes both tests affected by another selected test and the
+prerequisite tests needed to run selected tests.
+
+`--list-tests-that-depend-on <file>` instead inspects the recorded dependency map without
+running tests. It reports the recording time and strategy, and distinguishes dependencies
+on the file's current contents from dependencies on an older version. This is a recording
+lookup, so it does not include all the conservative safeguards used by impact selection.
+
+## When PHPUnit runs everything
+
+A missing, empty, unreadable, or incompatible recording falls back to all otherwise
+eligible tests. Compatibility checks cover the PHP and PHPUnit versions, recording
+strategy, effective execution settings, bootstrap scripts, first-party source definition,
+and the nearest `composer.lock` found in or above the configuration directory (or working
+directory when no configuration is used). Changing report paths or presentation settings
+alone does not invalidate a recording.
+
+Automatic detection also falls back when source or watched files are new or changed in
+ways no recorded dependency explains. Recorded code executed outside any test is treated as a
+dependency of every test. An explicit query for an unknown path also triggers a fallback.
+PHPUnit reports the reason in its impact summary and explanation output.
+
+Missing prerequisites are errors: selection requires a configured cache directory and
+enabled test-run history even when it cannot reuse impact data.
 
 ## Typical workflow
 
@@ -94,12 +155,7 @@ phpunit --record-test-impact-data --only-impacted
 phpunit --record-test-impact-data --impacted-by-file changed-paths.txt
 ```
 
-A missing or invalid recording falls back to all otherwise eligible tests. Unknown tests
-and certain changes the recording cannot account for also trigger conservative selection.
+Partial runs refresh the recorded dependencies of tests they run while preserving data
+for tests they do not run.
 
-## Relevance to Infection
-
-`--impacted-by-file` can select the initial coverage tests for the source files Infection
-intends to mutate. XML coverage and JUnit remain necessary, and TIA should stay out of
-mutant execution. The experimental integration now automates that query. The explicit-change-set
-semantics around changed tests remain a release blocker; see [the findings](phpunit-tia-findings.md).
+For Infection's integration scenarios and blockers, see [the integration problems](phpunit-tia-problems.md).

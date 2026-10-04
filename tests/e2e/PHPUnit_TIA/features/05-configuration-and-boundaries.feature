@@ -42,7 +42,7 @@ Feature: Respect TIA configuration and selection boundaries
             | --do-not-record-test-impact-data |
             | --do-not-record-test-run-history |
 
-    # Blocker: ../../../../doc/TIA-notes.md#xml-opt-outs-are-overridden
+    # Blocker: ../../../../doc/phpunit-tia-problems.md#3-infection-integration-gaps
     @skip
     Scenario Outline: The XML opt-out <attribute> disables automatic impact selection
         When I run Infection on "src/Calculator.php"
@@ -109,7 +109,7 @@ Feature: Respect TIA configuration and selection boundaries
             | src/Calculator.php | Plus    | killed by tests |
 
     # Characterizes the current implementation. Whether TIA should narrow this
-    # selection further remains an open question in doc/TIA-notes.md.
+    # selection further remains an open question in doc/phpunit-tia-problems.md.
     @current_behavior
     Scenario Outline: The explicit selector <selector> currently suppresses automatic TIA
         Given I apply this diff to "tests/CalculatorTest.php":
@@ -150,7 +150,7 @@ Feature: Respect TIA configuration and selection boundaries
             | --group=calculator      |
             | --testsuite=calculator  |
 
-    # Blocker: ../../../../doc/TIA-notes.md#empty-intersections-need-an-outcome-policy
+    # Blocker: ../../../../doc/phpunit-tia-problems.md#open-decisions-and-missing-evidence
     # A successful-empty outcome remains a proposal, including its exit status and reports.
     @skip @decision_pending
     Scenario: An empty explicit impact intersection is distinguished from missing data

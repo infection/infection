@@ -5,7 +5,7 @@ Feature: Reuse project-configured PHPUnit test impact data
     Background:
         Given PHPUnit is configured to record test impact data from executed code without deriving it from coverage targets
 
-  # Blocker: ../../../../doc/TIA-notes.md#project-configured-cache-is-not-reused
+  # Blocker: ../../../../doc/phpunit-tia-problems.md#3-infection-integration-gaps
     @skip
     Scenario: Infection reuses impact data from a previous PHPUnit run
         Given a successful PHPUnit run has executed all tests and recorded their impact data

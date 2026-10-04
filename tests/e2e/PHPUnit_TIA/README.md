@@ -106,22 +106,27 @@ The previous script is retained as `run_legacy_tests.bash`; the runner does not 
 
 ## Current blockers
 
+At the current pin, the default suite has 22 passing scenarios and three failures in
+feature `04`: sharing recordings fails in both directions, and the unrecorded-source
+scenario falls back with a different explanation. See the
+[current verification results](../../../doc/phpunit-tia-problems.md).
+
 The cold-start scenario passes. The PHPUnit-seeded scenario is tagged `@skip` and
 excluded by the suite filter because Infection
 replaces the project's configured cache directory with `.infection/phpunit`. It runs
 both initial tests instead of reusing PHPUnit's recording to select CalculatorTest.
-See [the blocker](../../../doc/TIA-notes.md#project-configured-cache-is-not-reused).
+See [the blocker](../../../doc/phpunit-tia-problems.md#3-infection-integration-gaps).
 
 Five development-cycle scenarios pass. Two are tagged `@skip`: an existing test starts
 covering Calculator after a test-body or data-provider change. PHPUnit's explicit impact
 query omits that test because its previous recording does not depend on Calculator.
-See [the reproductions and PHPUnit feedback](../../../doc/TIA-notes.md#explicit-impact-queries-miss-changed-tests).
+See [the reproductions and PHPUnit feedback](../../../doc/phpunit-tia-problems.md#1-explicit-queries-can-omit-newly-relevant-tests).
 
 The remaining features reproduce XML opt-outs being overridden, runtime-setting changes
 being missed, the wrong lock file being tracked when XML is outside the project, changed
 external fixtures being omitted, and cache write failures stopping mutation testing.
 An empty-selection outcome remains a proposal under `@decision_pending`.
-See [the findings and open questions](../../../doc/TIA-notes.md#mutant-isolation-cache-reuse-and-configuration).
+See [the findings and open questions](../../../doc/phpunit-tia-problems.md).
 
 Run all blocked scenarios explicitly (they are expected to fail):
 
