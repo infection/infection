@@ -516,6 +516,7 @@ class ConfigurationFactory
             $logs->getUseGitHubAnnotationsLogger(),
             $logs->getStrykerConfig(),
             self::pathToAbsolute($logs->getSummaryJsonLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getExecutionLogFilePath(), $configDir),
         );
     }
 

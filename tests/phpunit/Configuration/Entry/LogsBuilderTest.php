@@ -57,6 +57,8 @@ final class LogsBuilderTest extends TestCase
             LogsBuilder::withMinimalTestData()->build(),
         ];
 
+        yield 'execution report' => [LogsBuilder::withMinimalTestData()->withExecutionLogFilePath('/report.jsonl')->build()];
+
         yield 'complete test data' => [
             LogsBuilder::withCompleteTestData()->build(),
         ];

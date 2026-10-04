@@ -52,6 +52,7 @@ class Logs
         private bool $useGitHubAnnotationsLogger,
         private readonly ?StrykerConfig $strykerConfig,
         private ?string $summaryJsonLogFilePath,
+        private readonly ?string $executionLogFilePath,
     ) {
     }
 
@@ -68,7 +69,13 @@ class Logs
             false,
             null,
             null,
+            null,
         );
+    }
+
+    public function getExecutionLogFilePath(): ?string
+    {
+        return $this->executionLogFilePath;
     }
 
     public function getTextLogFilePath(): ?string

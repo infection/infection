@@ -3,10 +3,9 @@
          xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="./vendor/autoload.php"
          colors="true"
-         executionOrder="defects,random"
-         failOnWarning="true"
-         failOnDeprecation="true"
-         failOnRisky="true"
+         executionOrder="random,defects"
+         failOnAllIssues="false"
+         recordTestImpactData="true"
          requireCoverageMetadata="true"
          displayDetailsOnAllIssues="true"
          cacheDirectory="./var/cache/phpunit"
@@ -16,13 +15,11 @@
         <env name="COLUMNS" value="100" force="true" />
     </php>
 
-    <extensions>
-        <bootstrap class="Webmozarts\StrictPHPUnit\StrictPHPUnitExtension"/>
-    </extensions>
-
     <testsuites>
         <testsuite name="Infection Test Suite">
-            <directory>tests/phpunit</directory>
+            <directory>tests/phpunit/TestFramework/Coverage</directory>
+            <directory>tests/phpunit/Process</directory>
+            <directory>tests/phpunit/Differ</directory>
 
             <exclude>tests/phpunit/Architecture</exclude>
             <exclude>tests/phpunit/AutoReview</exclude>

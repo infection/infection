@@ -175,8 +175,8 @@ final class InitialTestRunCommandTest extends TestCase
     {
         $gitMock = $this->createMock(Git::class);
         $gitMock
+            ->expects($this->never())
             ->method('getBaseReference')
-            ->willReturn('<refinedGitReference>')
         ;
 
         $testFrameworkMock = $this->createMock(TestFramework::class);

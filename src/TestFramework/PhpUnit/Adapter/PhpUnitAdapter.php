@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use function array_values;
 use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
@@ -125,9 +126,13 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
 
         return $this->getCommandLine(
             $phpExtraArgs,
-            $this->argumentsAndOptionsBuilder->buildForInitialTestsRun(
-                $this->initialConfigBuilder->build($this->getVersion()),
-                $extraOptions,
+            $this->initialConfigBuilder->configureTestImpactAnalysis(
+                array_values($this->argumentsAndOptionsBuilder->buildForInitialTestsRun(
+                    $this->initialConfigBuilder->build($this->getVersion(), !$skipCoverage),
+                    $extraOptions,
+                )),
+                $this->getVersion(),
+                !$skipCoverage,
             ),
         );
     }
@@ -249,6 +254,13 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
         return version_compare($version, '12.5', '>=');
     }
 
+    public static function supportsTestImpactAnalysis(string $version): bool
+    {
+        // TODO: Replace this experimental snapshot gate with the first released TIA version.
+        // 13.5-dev is the version reported by the pinned PHPUnit PR #6919 fixture.
+        return $version === '13.5-dev';
+    }
+
     public static function supportsExecutionOrderDefectsRandom(string $version): bool
     {
         // ordering by defects needs the test run history, which the initial run deactivates. PHPUnit ignored that combination silently until 13.3 turned it into a warning https://github.com/sebastianbergmann/phpunit/blob/13.3.0/src/TextUI/Application.php
@@ -267,7 +279,7 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
      */
     public function getInitialRunOnlyOptions(): array
     {
-        return ['--configuration', '--filter', '--testsuite'];
+        return ['--configuration', '--filter', '--testsuite', '--impacted-by-file'];
     }
 
     /**

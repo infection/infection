@@ -1,0 +1,22 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "dev-feature/test-impact-analysis#e21b72d4ac3a9d9351eaa065638dd5e6259879bd as 13.4.0",
+        "webmozart/assert": "^2.0",
+        "symfony/filesystem": "^7.4",
+        "behat/behat": "^3.29",
+        "symfony/process": "^7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Infection\\E2ETests\\PHPUnitTIA\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Infection\\E2ETests\\PHPUnitTIA\\PHPUnit\\": "phpunit/",
+            "Infection\\E2ETests\\PHPUnitTIA\\Behat\\": "features/bootstrap/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

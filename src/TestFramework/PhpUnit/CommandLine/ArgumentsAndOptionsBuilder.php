@@ -38,6 +38,7 @@ namespace Infection\TestFramework\PhpUnit\CommandLine;
 use function array_map;
 use function array_merge;
 use function count;
+use function explode;
 use function implode;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
@@ -92,7 +93,7 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
      */
     public function buildForMutant(string $configPath, string $extraOptions, array $tests, string $testFrameworkVersion): array
     {
-        $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
+        $options = self::withoutTestImpactOptions($this->prepareArgumentsAndOptions($configPath, $extraOptions));
 
         if ($this->executeOnlyCoveringTestCases && count($tests) > 0) {
             $filter = $this->createFilterString(
@@ -107,6 +108,48 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         }
 
         return $options;
+    }
+
+    /**
+     * @param list<string> $options
+     *
+     * @return list<string>
+     */
+    public static function withoutTestImpactOptions(array $options): array
+    {
+        $result = [];
+        $skipValue = false;
+
+        foreach ($options as $option) {
+            if ($skipValue) {
+                $skipValue = false;
+
+                continue;
+            }
+
+            $parts = explode('=', $option);
+
+            if (in_array($parts[0], ['--impacted-by', '--impacted-by-file'], true)) {
+                $skipValue = count($parts) === 1;
+
+                continue;
+            }
+
+            if (in_array($option, [
+                '--record-test-impact-data',
+                '--do-not-record-test-impact-data',
+                '--derive-test-impact-data-from-coverage-targets',
+                '--do-not-derive-test-impact-data-from-coverage-targets',
+                '--only-impacted',
+                '--explain-impacted',
+            ], true)) {
+                continue;
+            }
+
+            $result[] = $option;
+        }
+
+        return $result;
     }
 
     private function mapSourceClassToTestClass(SplFileInfo $sourceFile): string
