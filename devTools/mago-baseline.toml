@@ -5101,30 +5101,6 @@ message = 'Argument #1 of method `Symfony\Component\Filesystem\Path::normalize` 
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php"
-code = "unused-parameter"
-message = "Parameter `$file` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php"
-code = "unused-parameter"
-message = "Parameter `$line` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php"
-code = "unused-parameter"
-message = "Parameter `$message` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php"
-code = "unused-parameter"
-message = "Parameter `$type` is never used."
-count = 1
-
-[[issues]]
 file = "tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php"
 code = "missing-parameter-type"
 message = "Parameter `$uniqueTestLocations` is missing a type hint."

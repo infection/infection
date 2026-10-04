@@ -423,7 +423,7 @@ final class MutationConfigBuilderTest extends TestCase
         return new MutationConfigBuilder(
             self::TMP_DIR,
             $xml,
-            new XmlConfigurationManipulator($replacer, ''),
+            new XmlConfigurationManipulator($replacer),
             'project/dir',
             new TestRunOrderResolver(),
             $this->filesystem,
