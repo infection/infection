@@ -436,6 +436,7 @@
                 "MethodCallRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "CloneRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "ConcatOperandRemoval": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalOrOperandRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "SharedCaseRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "ReturnRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayOneItem": { "$ref": "#/definitions/default-mutator-config" },
