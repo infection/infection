@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a0aee868b4b00705c91026093700e153",
+    "content-hash": "122e891b32ac3e99e490892b1e44c600",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -4066,16 +4066,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "dev-main",
+            "version": "dev-feature/test-impact-analysis",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "e93d35cd312ffad3e2e6bb79695ea22879e9677f"
+                "reference": "e21b72d4ac3a9d9351eaa065638dd5e6259879bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/e93d35cd312ffad3e2e6bb79695ea22879e9677f",
-                "reference": "e93d35cd312ffad3e2e6bb79695ea22879e9677f",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/e21b72d4ac3a9d9351eaa065638dd5e6259879bd",
+                "reference": "e21b72d4ac3a9d9351eaa065638dd5e6259879bd",
                 "shasum": ""
             },
             "require": {
@@ -4108,7 +4108,6 @@
                 "sebastian/version": "^7.0.1",
                 "staabm/side-effects-detector": "^1.0.5"
             },
-            "default-branch": true,
             "bin": [
                 "phpunit"
             ],
@@ -4147,7 +4146,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/main"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/feature/test-impact-analysis"
             },
             "funding": [
                 {
@@ -4155,7 +4154,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-10-04T13:11:00+00:00"
+            "time": "2026-10-04T06:39:11+00:00"
         },
         {
             "name": "psr/cache",
@@ -5991,7 +5990,14 @@
             "time": "2024-03-07T20:33:40+00:00"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "package": "phpunit/phpunit",
+            "version": "dev-feature/test-impact-analysis",
+            "alias": "13.4.0",
+            "alias_normalized": "13.4.0.0"
+        }
+    ],
     "minimum-stability": "stable",
     "stability-flags": {
         "phpunit/php-code-coverage": 20,

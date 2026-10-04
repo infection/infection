@@ -67,7 +67,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         );
         $this->assertSame(
             ['--configuration', '/config', '--group', 'a group'],
-            $builder->buildForMutant('/config', $extraArgs, [], '13.4-dev'),
+            $builder->buildForMutant('/config', $extraArgs, [], '13.5-dev'),
         );
     }
 

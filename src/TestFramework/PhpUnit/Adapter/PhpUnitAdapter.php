@@ -257,8 +257,8 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
     public static function supportsTestImpactAnalysis(string $version): bool
     {
         // TODO: Replace this experimental snapshot gate with the first released TIA version.
-        // 13.4-dev is the version reported by the pinned PHPUnit PR #6919 fixture.
-        return $version === '13.4-dev';
+        // 13.5-dev is the version reported by the pinned PHPUnit PR #6919 fixture.
+        return $version === '13.5-dev';
     }
 
     public static function supportsExecutionOrderDefectsRandom(string $version): bool

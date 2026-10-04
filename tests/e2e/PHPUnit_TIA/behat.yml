@@ -1,4 +1,8 @@
 default:
+    formatters:
+        progress: true
+    testers:
+        strict: true
     suites:
         initial_run:
             paths:

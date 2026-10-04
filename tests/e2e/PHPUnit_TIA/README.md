@@ -29,6 +29,8 @@ writing the file. Add context when the same code occurs in several places.
 
 ## Run
 
+`behat.yml` enables the progress formatter and strict mode for all profiles.
+
 Use PHP 8.4.1+ with Xdebug or PCOV, Composer, and Infection's installed dependencies:
 
 ```sh
@@ -48,7 +50,7 @@ There are two test layers: Behat runs the scenarios, while PHPUnit runs the smal
 PHP project that Infection mutates. This fixture has its own Composer dependencies,
 including Behat and a pinned PHPUnit build with TIA support. The Infection executable
 comes from the repository (or the path passed to the runner), not the fixture's `vendor/`.
-The fixture pins PHPUnit PR #6919 at `5f4f80f15f1bb1907e6ba277f2cec0756fbb8046`
+The fixture pins PHPUnit PR #6919 at `e21b72d4ac3a9d9351eaa065638dd5e6259879bd`
 until a release includes TIA.
 
 The execution flow is:

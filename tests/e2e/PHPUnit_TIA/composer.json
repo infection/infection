@@ -1,6 +1,6 @@
 {
     "require-dev": {
-        "phpunit/phpunit": "dev-feature/test-impact-analysis#5f4f80f15f1bb1907e6ba277f2cec0756fbb8046 as 13.4.0",
+        "phpunit/phpunit": "dev-feature/test-impact-analysis#e21b72d4ac3a9d9351eaa065638dd5e6259879bd as 13.4.0",
         "webmozart/assert": "^2.0",
         "symfony/filesystem": "^7.4",
         "behat/behat": "^3.29",

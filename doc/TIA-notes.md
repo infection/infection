@@ -1,3 +1,19 @@
+## Snapshot update: 2026-10-04
+
+Both Composer projects now pin PHPUnit PR #6919 at
+`e21b72d4ac3a9d9351eaa065638dd5e6259879bd`, which reports `13.5-dev`.
+After updating Infection's experimental version check, the default Behat suite has
+22 passing scenarios and three failures in feature `04`:
+
+- The unrecorded-source scenario still runs the full suite, but reports
+  `what is first-party code changed since the test impact data was recorded`
+  instead of the expected unrecorded-file explanation.
+- Sharing recordings between plain PHPUnit and Infection fails in both directions.
+  Each consumer runs the full suite with the same first-party-code explanation.
+
+These assertions remain active. The earlier recording-sharing findings below describe
+the previous pin; the new invalidation needs investigation before claiming reuse.
+
 ## Scenarios
 
 We have two scenarios to consider and test properly:

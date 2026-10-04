@@ -109,7 +109,7 @@ final class MutationConfigBuilderTest extends TestCase
     public function test_mutants_do_not_record_test_impact_data(): void
     {
         $builder = $this->createBuilder('<phpunit recordTestImpactData="true" deriveTestImpactDataFromCoverageTargets="true"/>');
-        $path = $builder->build([], self::MUTATED_FILE_PATH, self::HASH, self::ORIGINAL_FILE_PATH, '13.4-dev');
+        $path = $builder->build([], self::MUTATED_FILE_PATH, self::HASH, self::ORIGINAL_FILE_PATH, '13.5-dev');
         $xml = SafeDOMXPath::fromString($this->filesystem->readFile($path));
         $phpunit = $xml->getElement('/phpunit');
 

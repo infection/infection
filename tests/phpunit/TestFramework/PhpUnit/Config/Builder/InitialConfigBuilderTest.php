@@ -90,7 +90,7 @@ final class InitialConfigBuilderTest extends TestCase
         string $expectedExtraArgs,
         bool $selects = false,
         string $xml = '<phpunit/>',
-        string $version = '13.4-dev',
+        string $version = '13.5-dev',
         bool $collectCoverage = true,
         bool $warns = false,
         array $sources = ['/src/A.php', '/src/B.php'],
@@ -170,7 +170,7 @@ final class InitialConfigBuilderTest extends TestCase
 
     public static function noCoverageOptionProvider(): iterable
     {
-        yield 'TIA snapshot' => ['13.4-dev'];
+        yield 'TIA snapshot' => ['13.5-dev'];
 
         yield 'before TIA' => ['12.5'];
     }
@@ -184,7 +184,7 @@ final class InitialConfigBuilderTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("PHPUnit configuration overrides via test-framework extra arguments are not supported with TIA yet. Use Infection's phpUnit.configDir setting instead.");
 
-        $builder->configureTestImpactAnalysis($options, '13.4-dev', true);
+        $builder->configureTestImpactAnalysis($options, '13.5-dev', true);
     }
 
     public static function configurationOverrideProvider(): iterable
@@ -217,11 +217,11 @@ final class InitialConfigBuilderTest extends TestCase
     {
         yield 'released PHPUnit without TIA' => ['13.3', true, false];
 
-        yield 'reviewed TIA snapshot' => ['13.4-dev', true, true];
+        yield 'reviewed TIA snapshot' => ['13.5-dev', true, true];
 
-        yield 'no initial coverage collection' => ['13.4-dev', false, false];
+        yield 'no initial coverage collection' => ['13.5-dev', false, false];
 
-        yield 'unconfirmed future release' => ['13.4', true, false];
+        yield 'unconfirmed future release' => ['13.5', true, false];
     }
 
     public function test_it_builds_and_dump_the_xml_configuration(): void

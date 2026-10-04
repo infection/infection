@@ -91,7 +91,7 @@
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpstan/phpstan-webmozart-assert": "^2.0",
         "phpunit/php-code-coverage": "^14.4@dev",
-        "phpunit/phpunit": "dev-main#e93d35cd312ffad3e2e6bb79695ea22879e9677f",
+        "phpunit/phpunit": "dev-feature/test-impact-analysis#e21b72d4ac3a9d9351eaa065638dd5e6259879bd as 13.4.0",
         "rector/rector": "^2.2.4",
         "shipmonk/dead-code-detector": "^1.3",
         "shipmonk/name-collision-detector": "^2.1",
