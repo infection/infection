@@ -65,10 +65,9 @@ use BackedEnum;
 use function count;
 use function get_debug_type;
 use function implode;
-use function in_array;
-use InvalidArgumentException;
 use OutOfBoundsException;
 use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -144,9 +143,10 @@ final class EnumBucket
 
     public function assertIsEmpty(): void
     {
-        if (!$this->isEmpty()) {
-            throw $this->createBucketIsNotEmpty();
-        }
+        Assert::true(
+            $this->isEmpty(),
+            $this->describeNonEmptyBucket(),
+        );
     }
 
     /**
@@ -172,13 +172,13 @@ final class EnumBucket
      */
     private function throwValueNotAvailable(mixed $value): never
     {
-        $indexInAllValues = in_array($value, $this->allValues, true);
+        $this->asserValueIsANativeEnum($value);
 
-        if ($indexInAllValues === false) {
-            $this->asserValueIsANativeEnum($value);
-
-            throw $this->createEnumValueDoesNotExist($value);
-        }
+        Assert::inArray(
+            $value,
+            $this->allValues,
+            $this->describeUnknownEnumValue($value),
+        );
 
         throw $this->createEnumValueNoLongerAvailable($value);
     }
@@ -188,14 +188,9 @@ final class EnumBucket
      */
     private function asserValueIsANativeEnum(mixed $value): void
     {
-        if (!($value instanceof BackedEnum)) {
-            throw $this->createExpectedValueToBeAnEnumException($value);
-        }
-    }
-
-    private function createExpectedValueToBeAnEnumException(mixed $value): InvalidArgumentException
-    {
-        return new InvalidArgumentException(
+        Assert::isInstanceOf(
+            $value,
+            BackedEnum::class,
             sprintf(
                 'Expected value "%s" to be a case of the enum "%s".',
                 get_debug_type($value),
@@ -204,19 +199,17 @@ final class EnumBucket
         );
     }
 
-    private function createEnumValueDoesNotExist(mixed $value): InvalidArgumentException
+    private function describeUnknownEnumValue(mixed $value): string
     {
-        return new InvalidArgumentException(
-            sprintf(
-                'The enum "%s" does not have a case "%s". Known names are: "%s".',
-                $this->enumClassName,
-                self::describeCase($value),
-                implode(
-                    '", "',
-                    array_map(
-                        self::describeCase(...),
-                        $this->allValues,
-                    ),
+        return sprintf(
+            'The enum "%s" does not have a case "%s". Known names are: "%s".',
+            $this->enumClassName,
+            self::describeCase($value),
+            implode(
+                '", "',
+                array_map(
+                    self::describeCase(...),
+                    $this->allValues,
                 ),
             ),
         );
@@ -239,17 +232,15 @@ final class EnumBucket
         );
     }
 
-    private function createBucketIsNotEmpty(): InvalidArgumentException
+    private function describeNonEmptyBucket(): string
     {
-        return new InvalidArgumentException(
-            sprintf(
-                'Expected the bucket to be empty. The following case(s) were found: "%s".',
-                implode(
-                    '", "',
-                    array_map(
-                        self::describeCase(...),
-                        $this->values,
-                    ),
+        return sprintf(
+            'Expected the bucket to be empty. The following case(s) were found: "%s".',
+            implode(
+                '", "',
+                array_map(
+                    self::describeCase(...),
+                    $this->values,
                 ),
             ),
         );

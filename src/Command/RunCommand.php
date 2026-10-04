@@ -68,7 +68,6 @@ use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\TestFrameworkTypes;
-use InvalidArgumentException;
 use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function sprintf;
@@ -106,6 +105,8 @@ final class RunCommand extends BaseCommand
     public const string OPTION_WITH_TIMEOUTS = 'with-timeouts';
 
     public const string OPTION_MAX_TIMEOUTS = 'max-timeouts';
+
+    public const string OPTION_MUTANT_ID = 'id';
 
     private const string OPTION_STATIC_ANALYSIS_TOOL = 'static-analysis-tool';
 
@@ -145,8 +146,6 @@ final class RunCommand extends BaseCommand
     private const string OPTION_SKIP_INITIAL_TESTS = 'skip-initial-tests';
 
     private const string OPTION_DRY_RUN = 'dry-run';
-
-    private const string OPTION_MUTANT_ID = 'id';
 
     private const string OPTION_TEAMCITY = 'teamcity';
 
@@ -409,7 +408,12 @@ final class RunCommand extends BaseCommand
                 return true;
             }
 
-            throw $noSourceFoundException;
+            throw $noSourceFoundException->appendHint(
+                sprintf(
+                    'To list the source files matching your configuration, use the "%s" command.',
+                    ListSourcesCommand::NAME,
+                ),
+            );
         } catch (InitialTestsFailed|MinMsiCheckFailed|MaxTimeoutCountReached $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
@@ -440,14 +444,14 @@ final class RunCommand extends BaseCommand
         $noProgress = (bool) $input->getOption(self::OPTION_NO_PROGRESS);
         $forceProgress = (bool) $input->getOption(self::OPTION_FORCE_PROGRESS);
 
-        if ($noProgress && $forceProgress) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Cannot pass both "%s" and "%s" option: use none or only one of them',
-                    self::OPTION_NO_PROGRESS,
-                    self::OPTION_FORCE_PROGRESS),
-            );
-        }
+        Assert::false(
+            $noProgress && $forceProgress,
+            sprintf(
+                'Cannot pass both "%s" and "%s" option: use none or only one of them',
+                self::OPTION_NO_PROGRESS,
+                self::OPTION_FORCE_PROGRESS,
+            ),
+        );
 
         self::assertTestFrameworkOptionsAreNotBothProvided($io);
 
@@ -504,18 +508,15 @@ final class RunCommand extends BaseCommand
 
     private static function assertTestFrameworkOptionsAreNotBothProvided(IO $io): void
     {
-        if (
+        Assert::false(
             TestFrameworkOptionsOption::isProvided($io)
-            && TestFrameworkExtraArgsOption::isProvided($io)
-        ) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Cannot pass both the legacy option "--%s" and "--%s".',
-                    TestFrameworkOptionsOption::NAME,
-                    TestFrameworkExtraArgsOption::NAME,
-                ),
-            );
-        }
+                && TestFrameworkExtraArgsOption::isProvided($io),
+            sprintf(
+                'Cannot pass both the legacy option "--%s" and "--%s".',
+                TestFrameworkOptionsOption::NAME,
+                TestFrameworkExtraArgsOption::NAME,
+            ),
+        );
     }
 
     /**

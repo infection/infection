@@ -33,33 +33,55 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\Architecture\PHPStan\Rules;
 
-use Infection\Mutation\Mutation;
-use Infection\PhpParser\Visitor\MutatorVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\CloningVisitor;
+use Override;
+use PHPStan\Testing\RuleTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
- * @internal
- * @final
+ * @extends RuleTestCase<InvalidArgumentExceptionRule>
  */
-class MutantCodeFactory
+#[CoversClass(InvalidArgumentExceptionRule::class)]
+final class InvalidArgumentExceptionRuleTest extends RuleTestCase
 {
-    public function __construct(
-        private readonly MutantCodePrinter $mutatedCodePrinter,
-    ) {
+    /**
+     * @param list<array{string, int}> $expected
+     */
+    #[DataProvider('fileProvider')]
+    public function test_it_reports_direct_invalid_argument_exception_construction(
+        string $file,
+        array $expected,
+    ): void {
+        $fixturePath = __DIR__ . '/Fixtures/' . $file;
+
+        $this->analyse(
+            files: [$fixturePath],
+            expectedErrors: $expected,
+        );
     }
 
-    public function createCode(Mutation $mutation): string
+    public static function fileProvider(): iterable
     {
-        $traverser = new NodeTraverser();
+        yield 'production code' => [
+            'Source/exceptions.php.fixture',
+            [
+                ['Use Webmozart\\Assert\\Assert instead of instantiating InvalidArgumentException.', 10],
+                ['Use Webmozart\\Assert\\Assert instead of instantiating InvalidArgumentException.', 11],
+                ['Use Webmozart\\Assert\\Assert instead of instantiating InvalidArgumentException.', 12],
+            ],
+        ];
 
-        $traverser->addVisitor(new CloningVisitor());
-        $traverser->addVisitor(new MutatorVisitor($mutation));
+        yield 'outside source, with a shared directory prefix' => [
+            'SourceOutside/exceptions.php.fixture',
+            [],
+        ];
+    }
 
-        $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
-
-        return $this->mutatedCodePrinter->print($mutatedStatements, $mutation);
+    #[Override]
+    protected function getRule(): InvalidArgumentExceptionRule
+    {
+        return new InvalidArgumentExceptionRule(__DIR__ . '/Fixtures/Source');
     }
 }

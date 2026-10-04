@@ -68,7 +68,6 @@ use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
-use InvalidArgumentException;
 use function is_numeric;
 use function ltrim;
 use function max;
@@ -445,11 +444,10 @@ class ConfigurationFactory
             : null;
 
         if ($classified->testPaths !== []) {
-            if ($testFrameworkExtraArgs !== null) {
-                throw new InvalidArgumentException(
-                    'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
-                );
-            }
+            Assert::null(
+                $testFrameworkExtraArgs,
+                'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
+            );
 
             $testFrameworkExtraArgs = implode(' ', $classified->testPaths);
         }

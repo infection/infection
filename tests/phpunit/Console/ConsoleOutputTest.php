@@ -45,6 +45,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 
 #[CoversClass(ConsoleOutput::class)]
@@ -198,6 +199,38 @@ final class ConsoleOutputTest extends TestCase
 
                 TXT,
             Str::rTrimLines($this->output->fetch()),
+        );
+    }
+
+    public function test_log_msi_checks_skipped_with_no_thresholds(): void
+    {
+        $this->consoleOutput->logMsiChecksSkippedWithNoThresholds();
+
+        $this->assertSame('', $this->output->fetch());
+
+        $this->output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+
+        $this->consoleOutput->logMsiChecksSkippedWithNoThresholds();
+
+        $this->assertSame(
+            '[info] MSI checks were skipped because no minimum MSI thresholds are enabled. Set a minimum MSI threshold above 0 to enable them.' . PHP_EOL,
+            $this->output->fetch(),
+        );
+    }
+
+    public function test_log_msi_checks_skipped_with_no_mutations(): void
+    {
+        $this->consoleOutput->logMsiChecksSkippedWithNoMutations();
+
+        $this->assertSame('', $this->output->fetch());
+
+        $this->output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+
+        $this->consoleOutput->logMsiChecksSkippedWithNoMutations();
+
+        $this->assertSame(
+            '[info] MSI checks were skipped because no mutations were tested and this run is configured to ignore MSI thresholds in that case.' . PHP_EOL,
+            $this->output->fetch(),
         );
     }
 }

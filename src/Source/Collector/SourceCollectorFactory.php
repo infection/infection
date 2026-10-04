@@ -77,6 +77,7 @@ final readonly class SourceCollectorFactory
                 $source->excludes,
                 $sourceFilter,
             ),
+            // @phpstan-ignore infection.invalidArgumentException (Keep the exhaustive match expression.)
             default => throw new InvalidArgumentException(
                 sprintf(
                     'Unknown source filter "%s".',

@@ -137,6 +137,7 @@ Current ADRs:
 - [`adr/0011-use-phpunit-environment-variable-attribute.md`](adr/0011-use-phpunit-environment-variable-attribute.md) - Use PHPUnit attributes for test environment variables
 - [`adr/0012-final-classes-over-final-docblock.md`](adr/0012-final-classes-over-final-docblock.md) - Prefer `final` to `@final` where possible
 - [`adr/0013-public-api-extension-point-registry.md`](adr/0013-public-api-extension-point-registry.md) - Define the public API through an extension-point registry
+- [`adr/0014-prefer-webmozart-assert-for-argument-validation.md`](adr/0014-prefer-webmozart-assert-for-argument-validation.md) - Prefer Webmozart Assert for argument validation
 <!-- adr-list:end -->
 
 ## Commands
@@ -424,9 +425,10 @@ is packaged, not inlined.
 ### 5. Mutant code generation - token positions and an untouched original AST
 
 `MutatorVisitor` matches the target node by `startTokenPos`/`endTokenPos` + node class -
-not file positions, not object identity. `MutantCodeFactory` runs `CloningVisitor` as its
-own pass BEFORE adding `MutatorVisitor` (the original AST must remain byte-identical; a test
-dumps and compares it). Printing is `printFormatPreserving()` against original tokens;
+not file positions, not object identity. `MutantCodeFactory` registers `CloningVisitor`
+BEFORE `MutatorVisitor` in one traversal, so the mutation only replaces nodes of the clone
+(the original AST must remain byte-identical; a test dumps and compares it). Printing is
+`printFormatPreserving()` against original tokens;
 `InfectionPrettyPrinter` overrides exactly one method to stop php-parser canonicalizing
 backslash escapes in single-quoted strings - mutation diffs must be minimal and faithful to
 the original bytes. `Mutation::getHash()` is

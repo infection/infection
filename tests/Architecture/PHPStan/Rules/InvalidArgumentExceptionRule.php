@@ -33,33 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\Architecture\PHPStan\Rules;
 
-use Infection\Mutation\Mutation;
-use Infection\PhpParser\Visitor\MutatorVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\CloningVisitor;
+use InvalidArgumentException;
+use Override;
+use PhpParser\Node;
+use PhpParser\Node\Expr\New_;
+use PHPStan\Analyser\Scope;
+use PHPStan\Rules\Rule;
+use PHPStan\Rules\RuleErrorBuilder;
+use Symfony\Component\Filesystem\Path;
 
 /**
- * @internal
- * @final
+ * Enforces ADR 0014's preference for Webmozart Assert by reporting direct construction
+ * of the base InvalidArgumentException within the configured source directory.
+ * Excludes subclasses to preserve domain-specific exception contracts.
+ *
+ * @implements Rule<New_>
  */
-class MutantCodeFactory
+final readonly class InvalidArgumentExceptionRule implements Rule
 {
     public function __construct(
-        private readonly MutantCodePrinter $mutatedCodePrinter,
+        private string $sourceDirectory,
     ) {
     }
 
-    public function createCode(Mutation $mutation): string
+    #[Override]
+    public function getNodeType(): string
     {
-        $traverser = new NodeTraverser();
+        return New_::class;
+    }
 
-        $traverser->addVisitor(new CloningVisitor());
-        $traverser->addVisitor(new MutatorVisitor($mutation));
+    #[Override]
+    public function processNode(Node $node, Scope $scope): array
+    {
+        if (!Path::isBasePath($this->sourceDirectory, $scope->getFile())) {
+            return [];
+        }
 
-        $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
+        if (!$node->class instanceof Node\Name) {
+            return [];
+        }
 
-        return $this->mutatedCodePrinter->print($mutatedStatements, $mutation);
+        if ($scope->resolveName($node->class) !== InvalidArgumentException::class) {
+            return [];
+        }
+
+        return [RuleErrorBuilder::message(
+            'Use Webmozart\\Assert\\Assert instead of instantiating InvalidArgumentException.',
+        )->identifier('infection.invalidArgumentException')->build()];
     }
 }
