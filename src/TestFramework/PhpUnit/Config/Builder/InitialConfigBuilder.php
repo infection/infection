@@ -112,6 +112,8 @@ final readonly class InitialConfigBuilder
             $phpunit->setAttribute('recordTestRunHistory', 'true');
             $phpunit->setAttribute('recordTestImpactData', 'true');
             $phpunit->setAttribute('deriveTestImpactDataFromCoverageTargets', 'false');
+            // TODO: Preserve the project's configured cache to reuse plain PHPUnit recordings.
+            // Blocker: doc/TIA-notes.md#project-configured-cache-is-not-reused
             // Keep Infection's recording separate from the project's, and outside the cleaned tmpDir.
             $phpunit->setAttribute('cacheDirectory', $this->projectDir . '/.infection/phpunit');
         } else {

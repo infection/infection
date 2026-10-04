@@ -1,0 +1,25 @@
+default:
+    suites:
+        initial_run:
+            paths: [features/01-initial-run.feature]
+            services:
+                filesystem: Symfony\Component\Filesystem\Filesystem
+                shellCommandRunner: Infection\E2ETests\PHPUnitTIA\Behat\ShellCommandRunner
+                scenarioState: Infection\E2ETests\PHPUnitTIA\Behat\ScenarioState
+            contexts:
+                -   Infection\E2ETests\PHPUnitTIA\Behat\ScenarioStateContext:
+                        scenarioState: '@scenarioState'
+                -   Infection\E2ETests\PHPUnitTIA\Behat\ScenarioProjectContext:
+                        filesystem: '@filesystem'
+                        shellCommandRunner: '@shellCommandRunner'
+                        scenarioState: '@scenarioState'
+                -   Infection\E2ETests\PHPUnitTIA\Behat\InfectionContext:
+                        filesystem: '@filesystem'
+                        shellCommandRunner: '@shellCommandRunner'
+                        scenarioState: '@scenarioState'
+                -   Infection\E2ETests\PHPUnitTIA\Behat\PhpUnitContext:
+                        filesystem: '@filesystem'
+                        shellCommandRunner: '@shellCommandRunner'
+                        scenarioState: '@scenarioState'
+            filters:
+                tags: "~@skip"

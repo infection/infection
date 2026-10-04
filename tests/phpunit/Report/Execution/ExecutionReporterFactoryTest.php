@@ -33,34 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Tests\Report\Execution;
 
-use Infection\Configuration\Entry\Logs;
+use Infection\Report\ComposableReporter;
+use Infection\Report\Execution\ExecutionReportDataProducer;
+use Infection\Report\Execution\ExecutionReporterFactory;
+use Infection\Report\Framework\Writer\FileWriter;
+use Infection\Report\NullReporter;
+use Infection\Tests\Configuration\Entry\LogsBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
-#[CoversClass(LogsBuilder::class)]
-final class LogsBuilderTest extends TestCase
+#[CoversClass(ExecutionReporterFactory::class)]
+final class ExecutionReporterFactoryTest extends TestCase
 {
-    #[DataProvider('logsProvider')]
-    public function test_it_can_create_a_builder_from_a_built_instance(Logs $logs): void
+    public function test_it_creates_a_composable_file_reporter_when_configured(): void
     {
-        $actual = LogsBuilder::from($logs)->build();
+        $producer = $this->createStub(ExecutionReportDataProducer::class);
+        $filesystem = $this->createStub(Filesystem::class);
+        $config = LogsBuilder::withMinimalTestData()->withExecutionLogFilePath('/report.jsonl')->build();
 
-        $this->assertEquals($logs, $actual);
+        $actual = (new ExecutionReporterFactory($producer, $filesystem))->create($config);
+
+        $this->assertEquals(new ComposableReporter($producer, new FileWriter($filesystem, '/report.jsonl')), $actual);
     }
 
-    public static function logsProvider(): iterable
+    public function test_it_disables_the_report_when_no_destination_is_configured(): void
     {
-        yield 'minimal test data' => [
-            LogsBuilder::withMinimalTestData()->build(),
-        ];
+        $factory = new ExecutionReporterFactory($this->createStub(ExecutionReportDataProducer::class), $this->createStub(Filesystem::class));
 
-        yield 'execution report' => [LogsBuilder::withMinimalTestData()->withExecutionLogFilePath('/report.jsonl')->build()];
-
-        yield 'complete test data' => [
-            LogsBuilder::withCompleteTestData()->build(),
-        ];
+        $this->assertEquals(new NullReporter(), $factory->create(LogsBuilder::withMinimalTestData()->build()));
     }
 }

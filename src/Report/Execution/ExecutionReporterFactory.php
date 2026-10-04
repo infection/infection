@@ -33,34 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Report\Execution;
 
 use Infection\Configuration\Entry\Logs;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
+use Infection\Report\ComposableReporter;
+use Infection\Report\Framework\Factory\ReporterFactory;
+use Infection\Report\Framework\Writer\FileWriter;
+use Infection\Report\NullReporter;
+use Infection\Reporter\Reporter;
+use Override;
+use Symfony\Component\Filesystem\Filesystem;
 
-#[CoversClass(LogsBuilder::class)]
-final class LogsBuilderTest extends TestCase
+/** @internal */
+final readonly class ExecutionReporterFactory implements ReporterFactory
 {
-    #[DataProvider('logsProvider')]
-    public function test_it_can_create_a_builder_from_a_built_instance(Logs $logs): void
-    {
-        $actual = LogsBuilder::from($logs)->build();
-
-        $this->assertEquals($logs, $actual);
+    public function __construct(
+        private ExecutionReportDataProducer $producer,
+        private Filesystem $filesystem,
+    ) {
     }
 
-    public static function logsProvider(): iterable
+    #[Override]
+    public function create(Logs $logConfig): Reporter
     {
-        yield 'minimal test data' => [
-            LogsBuilder::withMinimalTestData()->build(),
-        ];
+        $path = $logConfig->getExecutionLogFilePath();
 
-        yield 'execution report' => [LogsBuilder::withMinimalTestData()->withExecutionLogFilePath('/report.jsonl')->build()];
+        if ($path === null) {
+            return new NullReporter();
+        }
 
-        yield 'complete test data' => [
-            LogsBuilder::withCompleteTestData()->build(),
-        ];
+        return new ComposableReporter($this->producer, new FileWriter($this->filesystem, $path));
     }
 }

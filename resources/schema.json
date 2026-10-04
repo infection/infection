@@ -125,6 +125,11 @@
                     "type": "string",
                     "definition": "GitLab (Code Climate) code quality json file."
                 },
+                "execution": {
+                    "type": "string",
+                    "pattern": "^(?!php://)",
+                    "description": "Diagnostic execution report in newline-delimited JSON, including initial tests, coverage and mutant results."
+                },
                 "summaryJson": {
                     "type": "string",
                     "definition": "Summary JSON log file, which contains only the statistics from the complete JSON file."

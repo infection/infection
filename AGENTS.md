@@ -161,7 +161,7 @@ vendor/phpunit/phpunit/phpunit --filter test_method_name           # one method
 ```
 
 `make autoreview` green is the definition of done - maintainers repeat this verbatim to AI
-contributors. PHP floor is 8.3 (`composer.json` platform); Psalm is gone (2026), the static
+contributors. PHP floor is 8.4 (`composer.json` requirement); Psalm is gone (2026), the static
 analysers are PHPStan and Mago.
 
 ### Docker: when the host toolchain is not enough
@@ -188,7 +188,7 @@ configuration regardless of the host. Reach for the `-docker` twin when:
   not one. CI never hits this because `setup-php` sets `memory_limit=-1`.
 - **the host PHP is not 8.3.** `cs` and `autoreview` run on 8.3 ONLY in CI, so a check that is
   green on a newer host can still fail there. PHPStan is the exception - it reads
-  `config.platform.php` from `composer.json` and analyses at 8.3 whatever binary runs it, so
+  the PHP requirement from `composer.json` whatever binary runs it, so
   the drift is in the runtime: tests, Rector, CS tokenizer edge cases. The test count differs
   between PHP versions too, because some tests are version-gated.
 - **the host has no Xdebug or PCOV.** `test-e2e` and `test-infection` need a coverage driver;
@@ -197,8 +197,9 @@ configuration regardless of the host. Reach for the `-docker` twin when:
 - **the host has no PHP at all,** or `composer install` cannot satisfy the platform.
 - **you are reproducing a CI failure** and want the CI PHP version exactly.
 
-`vendor/` is bind-mounted, not rebuilt: dependencies installed by the host work as-is inside
-the container, because `config.platform.php` pins resolution to 8.3.
+`vendor/` is bind-mounted, not rebuilt. The current `composer.json` requires PHP 8.4, so
+its dependencies may not run in the `php83` service; check the installed platform before
+using that service.
 
 Do NOT hand-roll `docker compose run --rm php83 make <target>`. The `-docker` targets also
 rebuild the image when `devTools/Dockerfile` changes (via the `devTools/Dockerfile.json`

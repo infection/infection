@@ -1,8 +1,0 @@
-{
-    "require-dev": {
-        "phpunit/phpunit": "dev-feature/test-impact-analysis#5f4f80f15f1bb1907e6ba277f2cec0756fbb8046 as 13.4.0"
-    },
-    "autoload": {"psr-4": {"Infection\\E2ETests\\PHPUnitTIA\\": "src/"}},
-    "minimum-stability": "dev",
-    "prefer-stable": true
-}

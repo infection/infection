@@ -1,8 +1,22 @@
 {
     "require-dev": {
-        "phpunit/phpunit": "dev-feature/test-impact-analysis#5f4f80f15f1bb1907e6ba277f2cec0756fbb8046 as 13.4.0"
+        "phpunit/phpunit": "dev-feature/test-impact-analysis#5f4f80f15f1bb1907e6ba277f2cec0756fbb8046 as 13.4.0",
+        "webmozart/assert": "^2.0",
+        "symfony/filesystem": "^7.4",
+        "behat/behat": "^3.29",
+        "symfony/process": "^7.4"
     },
-    "autoload": {"psr-4": {"Infection\\E2ETests\\PHPUnitTIA\\": "src/"}},
+    "autoload": {
+        "psr-4": {
+            "Infection\\E2ETests\\PHPUnitTIA\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Infection\\E2ETests\\PHPUnitTIA\\PHPUnit\\": "phpunit/",
+            "Infection\\E2ETests\\PHPUnitTIA\\Behat\\": "features/bootstrap/"
+        }
+    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }

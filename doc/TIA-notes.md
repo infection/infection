@@ -8,10 +8,34 @@ We have two scenarios to consider and test properly:
 For both cases, we can consider the following scenarios:
 
 - A single run (e.g. CI).
-- An initial run, an escaped mutation is reported, the user updates the tests, execute infection again. 
+- An initial run, an escaped mutation is reported, the user updates the tests, execute infection again.
 - An initial run, the user adds some code (source or tests) and execute infection again.
 
 TODO: have end-to-end tests that reliably capture those scenarios.
+
+## Execution evidence
+
+The `logs.execution` report provides initial test identities, line-to-test coverage,
+mutation results, commands, generated PHPUnit XML, and configured-cache snapshots.
+See [the report contract and scenario checks](execution-report.md).
+
+A cache file or recording setting does not prove reuse: verify it with a subsequent
+warm run. A killed mutation does not identify its killing test: assert its detection
+status unless a scenario specifically needs framework failure output.
+
+## Implemented initial-run scenarios
+
+Behat runs only `tests/e2e/PHPUnit_TIA/features/01-initial-run.feature`.
+The cold-start scenario passes: the first Infection run executes both tests, and the
+second executes CalculatorTest only with identical Calculator coverage and mutation results.
+
+### Project-configured cache is not reused
+
+The PHPUnit-seeded scenario is tagged `@skip` and excluded from the Behat suite until
+this blocker is resolved. `InitialConfigBuilder` replaces the project-configured
+cache directory with `.infection/phpunit`, so the initial run executes both tests instead
+of reusing the recording produced by plain PHPUnit. This is an Infection integration
+blocker, not evidence of PHPUnit invalidating a shared recording.
 
 ## Gotchas
 

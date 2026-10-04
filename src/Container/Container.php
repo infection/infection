@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Container;
 
 use function array_filter;
+use function array_unshift;
 use Closure;
 use DIContainer\Container as DIContainer;
 use function dirname;
@@ -69,6 +70,7 @@ use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
+use Infection\Event\Subscriber\ExecutionReporterSubscriber;
 use Infection\Event\Subscriber\InitialStaticAnalysisExecutionLoggerSubscriber;
 use Infection\Event\Subscriber\InitialTestsExecutionLoggerSubscriber;
 use Infection\Event\Subscriber\MutationAnalysisLoggerSubscriber;
@@ -129,6 +131,8 @@ use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\SymfonyProcessShellCommandRunner;
+use Infection\Report\Execution\ExecutionReportDataProducer;
+use Infection\Report\Execution\ExecutionReporterFactory;
 use Infection\Reporter\AdvisoryReporter;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileLocationReporter;
@@ -404,6 +408,23 @@ final class Container extends DIContainer
 
                 if ($container->getConfiguration()->isStaticAnalysisEnabled()) {
                     $subscriberFactories[] = $container->get(InitialStaticAnalysisExecutionLoggerSubscriber::class);
+                }
+
+                $executionLogPath = $container->getConfiguration()->logs->getExecutionLogFilePath();
+
+                if ($executionLogPath !== null) {
+                    // Register before cleanup so generated configurations are still readable.
+                    $producer = new ExecutionReportDataProducer(
+                        $container->getFileSystem(),
+                        $container->getTracer(),
+                        $container->getConfiguration()->tmpDir,
+                        $container->getJUnitReportLocator()->getDefaultLocation(),
+                    );
+                    $factory = new ExecutionReporterFactory($producer, $container->getFileSystem());
+                    array_unshift($subscriberFactories, new ExecutionReporterSubscriber(
+                        $producer,
+                        $factory->create($container->getConfiguration()->logs),
+                    ));
                 }
 
                 return new ChainSubscriberFactory(...$subscriberFactories);

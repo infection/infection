@@ -2,8 +2,17 @@
     "$schema": "../../../resources/schema.json",
     "timeout": 25,
     "threads": 1,
-    "source": {"directories": ["src"]},
-    "mutators": {"Plus": true},
-    "logs": {"summary": "var/infection.log", "json": "var/infection.json"},
-    "tmpDir": "var/infection-tmp"
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "mutators": {
+        "Plus": true
+    },
+    "logs": {
+        "json": "var/infection/infection.json",
+        "execution": "var/infection/execution.jsonl"
+    },
+    "tmpDir": "var/infection/tmp"
 }

@@ -1,0 +1,102 @@
+<?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
+
+namespace Infection\Event\Subscriber;
+
+use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
+use Infection\Event\Events\Application\ApplicationExecutionWasStartedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
+use Infection\Report\Execution\ExecutionReportDataProducer;
+use Infection\Reporter\Reporter;
+use Override;
+
+/** @internal */
+final readonly class ExecutionReporterSubscriber implements ApplicationExecutionWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationTestingWasFinishedSubscriber
+{
+    public function __construct(
+        private ExecutionReportDataProducer $producer,
+        private Reporter $reporter,
+    ) {
+    }
+
+    #[Override]
+    public function onApplicationExecutionWasStarted(ApplicationExecutionWasStarted $event): void
+    {
+        $this->producer->start();
+        $this->reporter->report();
+    }
+
+    #[Override]
+    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
+    {
+        $this->producer->recordInitialStart($event->commandLine);
+        $this->reporter->report();
+    }
+
+    #[Override]
+    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
+    {
+        $this->producer->recordInitialFinish($event->outputText);
+        $this->reporter->report();
+    }
+
+    #[Override]
+    public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
+    {
+        $this->producer->recordSource($event->sourceFilePath, $event->mutationHashes);
+    }
+
+    #[Override]
+    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    {
+        $this->producer->recordMutant($event->executionResult);
+    }
+
+    #[Override]
+    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
+    {
+        $this->producer->finish();
+        $this->reporter->report();
+    }
+}

@@ -332,6 +332,12 @@ final class ConfigurationFactoryTest extends TestCase
 
         yield 'minimal' => [$defaultScenario];
 
+        yield 'execution report path is relative to the configuration directory' => [
+            $defaultScenario
+                ->withSchema($defaultSchemaBuilder->withLogs(LogsBuilder::withMinimalTestData()->withExecutionLogFilePath('var/execution.jsonl')->build()))
+                ->withExpected($defaultConfigurationBuilder->withLogs(LogsBuilder::withMinimalTestData()->withExecutionLogFilePath('/path/to/var/execution.jsonl')->withUseGitHubAnnotationsLogger(true)->build())->build()),
+        ];
+
         yield 'relative debug log file path' => [
             $defaultScenario
                 ->withSchema($defaultSchemaBuilder->withDebugTestFrameworkLogFile('var/processes.jsonl'))

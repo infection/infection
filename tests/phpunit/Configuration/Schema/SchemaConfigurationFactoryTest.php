@@ -52,6 +52,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Mutator\ProfileList;
 use Infection\TestFramework\TestFrameworkTypes;
+use Infection\Tests\Configuration\Entry\LogsBuilder;
 use InvalidArgumentException;
 use JsonSchema\Validator;
 use const PHP_EOL;
@@ -223,6 +224,14 @@ final class SchemaConfigurationFactoryTest extends TestCase
             ]),
         ];
 
+        yield '[logs][execution] nominal' => [
+            '{"source":{"directories":["src"]},"logs":{"execution":"var/execution.jsonl"}}',
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => LogsBuilder::withMinimalTestData()->withExecutionLogFilePath('var/execution.jsonl')->build(),
+            ]),
+        ];
+
         yield '[logs][text] nominal' => [
             <<<'JSON'
                 {
@@ -245,6 +254,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     false,
+                    null,
                     null,
                     null,
                 ),
@@ -275,6 +285,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     null,
                     null,
+                    null,
                 ),
             ]),
         ];
@@ -301,6 +312,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     false,
+                    null,
                     null,
                     null,
                 ),
@@ -331,6 +343,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     null,
                     null,
+                    null,
                 ),
             ]),
         ];
@@ -357,6 +370,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     false,
+                    null,
                     null,
                     null,
                 ),
@@ -387,6 +401,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     null,
                     null,
+                    null,
                 ),
             ]),
         ];
@@ -413,6 +428,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     null,
                     'perMutator.log',
                     false,
+                    null,
                     null,
                     null,
                 ),
@@ -445,6 +461,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     StrykerConfig::forBadge('master'),
                     null,
+                    null,
                 ),
             ]),
         ];
@@ -474,6 +491,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     null,
                     false,
                     StrykerConfig::forFullReport('master'),
+                    null,
                     null,
                 ),
             ]),
@@ -505,6 +523,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     StrykerConfig::forBadge('/^foo$/'),
                     null,
+                    null,
                 ),
             ]),
         ];
@@ -535,6 +554,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     StrykerConfig::forFullReport('/^foo$/'),
                     null,
+                    null,
                 ),
             ]),
         ];
@@ -563,6 +583,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     null,
                     'summary.json',
+                    null,
                 ),
             ]),
         ];
@@ -602,6 +623,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     true,
                     StrykerConfig::forBadge('master'),
                     'summary.json',
+                    null,
                 ),
             ]),
         ];
@@ -687,6 +709,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     true,
                     StrykerConfig::forBadge('master'),
                     'summary.json',
+                    null,
                 ),
             ]),
         ];
@@ -2572,6 +2595,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     true,
                     StrykerConfig::forBadge('master'),
                     'summary.json',
+                    null,
                 ),
                 'tmpDir' => 'custom-tmp',
                 'phpunit' => new PhpUnit(

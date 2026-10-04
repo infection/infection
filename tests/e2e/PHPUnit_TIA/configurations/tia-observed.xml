@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <phpunit bootstrap="vendor/autoload.php"
+         cacheDirectory="var/phpunit-cache"
+         recordTestRunHistory="true"
+         recordTestImpactData="true"
+         deriveTestImpactDataFromCoverageTargets="false"
          beStrictAboutCoverageMetadata="true"
          requireCoverageMetadata="true">
 
