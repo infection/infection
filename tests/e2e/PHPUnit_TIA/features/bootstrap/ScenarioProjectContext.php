@@ -7,8 +7,17 @@ namespace Infection\E2ETests\PHPUnitTIA\Behat;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Hook\BeforeScenario;
+use Behat\Gherkin\Node\PyStringNode;
+use Behat\Step\Given;
+use Behat\Step\When;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
+use function sprintf;
+use function str_replace;
+use function strpos;
+use function strrpos;
+use function substr;
 
 /**
  * Recreates an isolated scenario project before each PHPUnit TIA scenario and records
@@ -53,6 +62,53 @@ final class ScenarioProjectContext implements Context
         );
 
         $this->createScenarioProject();
+    }
+
+    #[Given('the project file :path contains:')]
+    public function writeProjectFile(string $path, PyStringNode $contents): void
+    {
+        $this->filesystem->dumpFile(
+            Path::join($this->scenarioState->scenarioProjectDirectory, $path),
+            $contents->getRaw() . "\n",
+        );
+    }
+
+    #[When('I apply this diff to :path:')]
+    public function applyDiffToProjectFile(string $path, PyStringNode $diff): void
+    {
+        $file = Path::join($this->scenarioState->scenarioProjectDirectory, $path);
+        $parsedDiff = Diff::fromString($diff->getRaw());
+
+        $updatedContents = self::replaceUniqueBlock(
+            contents: $this->filesystem->readFile($file),
+            original: $parsedDiff->original,
+            replacement: $parsedDiff->replacement,
+            path: $path,
+        );
+
+        $this->filesystem->dumpFile($file, $updatedContents);
+    }
+
+    private static function replaceUniqueBlock(
+        string $contents,
+        string $original,
+        string $replacement,
+        string $path,
+    ): string {
+        // Include the leading line boundary even at the start of the file, so matching
+        // requires complete lines and preserves indentation without fuzzy matching.
+        $contents = "\n" . $contents;
+        $original = "\n" . $original;
+        $replacement = "\n" . $replacement;
+
+        Assert::contains($contents, $original, sprintf('The diff does not match any complete block of lines in "%s".', $path));
+        Assert::same(
+            strpos($contents, $original),
+            strrpos($contents, $original),
+            sprintf('The diff matches more than one block of lines in "%s"; add context to remove the ambiguity.', $path),
+        );
+
+        return substr(str_replace($original, $replacement, $contents), 1);
     }
 
     private static function createScenarioDirectoryName(BeforeScenarioScope $scope): string

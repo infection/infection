@@ -1,64 +1,232 @@
-@draft @priority_2
+@priority_2
 Feature: Keep test selection correct as the project evolves
-  An old impact map must not hide new coverage or improved assertions.
-  Each comparison uses a separate copy of the same updated project with TIA disabled.
+    Infection reuses impact data while developers change source code and tests.
+    Updated projects retain the coverage and mutation results of a full-suite run.
 
-  Scenario Outline: Strengthening a test kills a previously escaped mutant
-    Given the project has <configuration>
-    And CalculatorTest has an assertion that allows the Plus mutant to escape
-    And an Infection run has recorded both tests and reported that escaped mutant
-    And I strengthen CalculatorTest to distinguish addition from subtraction
-    When I run Infection for "src/Calculator.php" again
-    Then the initial run executes the strengthened CalculatorTest
-    And CalculatorTest kills the previously escaped mutant
-    And the mutation results match a run with TIA disabled
+    Background:
+        Given PHPUnit is configured to record test impact data from executed code without deriving it from coverage targets
+        And PHPUnit has not been run and there is no recorded impact data
 
-    Examples:
-      | configuration                       |
-      | no explicit PHPUnit TIA settings    |
-      | PHPUnit TIA enabled in its XML      |
+    Scenario: Strengthening an assertion kills a previously escaped mutant
+        Given I apply this diff to "tests/CalculatorTest.php":
+            """
+            -        $this->assertSame(3, (new Calculator())->calculate(1, 2));
+            +        $this->assertSame(3, (new Calculator())->calculate(3, 0));
+            """
+        When I run Infection for "src/Calculator.php"
+        Then the initial test run executes all tests
+        And the following mutations are generated and evaluated:
+            | file               | mutator | outcome |
+            | src/Calculator.php | Plus    | escaped |
+        When I apply this diff to "tests/CalculatorTest.php":
+            """
+            -        $this->assertSame(3, (new Calculator())->calculate(3, 0));
+            +        $this->assertSame(3, (new Calculator())->calculate(1, 2));
+            """
+        And I run Infection for "src/Calculator.php"
+        Then the initial test run executes only the following tests:
+            | CalculatorTest::test_calculate |
+        And the following mutations are generated and evaluated:
+            | file               | mutator | outcome         |
+            | src/Calculator.php | Plus    | killed by tests |
+        And coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled
 
-  Scenario Outline: Changed test inputs establish a previously unknown dependency
-    Given a successful initial run has recorded both tests
-    And UnrelatedTest did not previously execute Calculator
-    And I change <input> so that UnrelatedTest also executes Calculator
-    When I run Infection for "src/Calculator.php"
-    Then the initial run executes UnrelatedTest with the changed inputs
-    And the refreshed impact data records its dependency on Calculator
-    And Calculator has the same line-to-test coverage as a run with TIA disabled
-    And the mutation results match a run with TIA disabled
+    # Blocker: ../../../../doc/TIA-notes.md#explicit-impact-queries-miss-changed-tests
+    @skip
+    Scenario: An existing test starts covering another source file
+        When I run Infection for "src/Calculator.php"
+        Then the initial test run executes all tests
+        When I apply this diff to "tests/UnrelatedTest.php":
+            """
+             #[CoversClass(Unrelated::class)]
+            +#[CoversClass(\Infection\E2ETests\PHPUnitTIA\Calculator::class)]
+            """
+        And I apply this diff to "tests/UnrelatedTest.php":
+            """
+            -        $this->assertSame(2, (new Unrelated())->calculate(1, 2));
+            +        $this->assertSame(2, (new Unrelated())->calculate(1, 2), 'Unrelated must multiply both operands.');
+            +        $this->assertSame(3, (new \Infection\E2ETests\PHPUnitTIA\Calculator())->calculate(1, 2), 'Calculator must add both operands.');
+            """
+        And I run Infection for "src/Calculator.php"
+        Then the initial test run executes only the following tests:
+            | CalculatorTest::test_calculate |
+            | UnrelatedTest::test_calculate  |
+        When I run Infection again with the same options and unchanged source, tests, and configuration
+        Then the initial test run executes only the following tests:
+            | CalculatorTest::test_calculate |
+            | UnrelatedTest::test_calculate  |
+        And coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled
 
-    Examples:
-      | input                                  |
-      | the body of UnrelatedTest              |
-      | a data provider used by UnrelatedTest  |
+    # Blocker: ../../../../doc/TIA-notes.md#explicit-impact-queries-miss-changed-tests
+    @skip
+    Scenario: Changed data-provider inputs establish a previously unknown dependency
+        Given the project file "tests/UnrelatedTest.php" contains:
+            """
+            <?php
 
-  Scenario: A new test contributes coverage immediately
-    Given a successful initial run has recorded both tests
-    And I add a new test that executes Calculator
-    When I run Infection for "src/Calculator.php"
-    Then the initial run executes the new test and CalculatorTest
-    And the new test appears in Calculator's line-to-test coverage
-    And the mutation results match a run with TIA disabled
+            declare(strict_types=1);
 
-  Scenario: A new source file and its tests are not omitted
-    Given a successful initial run has recorded both tests
-    And I add a new source file with a Plus mutation and a test that kills it
-    When I run Infection for the new source file
-    Then the initial run executes the new test
-    And the new Plus mutant is generated and killed
+            namespace Infection\E2ETests\PHPUnitTIA\Tests;
 
-  Scenario: Changing existing source refreshes coverage
-    Given a successful initial run has recorded both tests
-    And I extend Calculator with a branch exercised by CalculatorTest
-    When I run Infection for "src/Calculator.php"
-    Then the initial run executes CalculatorTest
-    And coverage includes the new branch
-    And the mutation results match a run with TIA disabled
+            use Infection\E2ETests\PHPUnitTIA\Calculator;
+            use Infection\E2ETests\PHPUnitTIA\Unrelated;
+            use PHPUnit\Framework\Attributes\CoversClass;
+            use PHPUnit\Framework\Attributes\DataProvider;
+            use PHPUnit\Framework\TestCase;
 
-  Scenario: A partial run retains dependencies for other source files
-    Given a successful initial run has recorded both tests
-    And I run Infection for "src/Calculator.php"
-    When I subsequently run Infection for "src/Unrelated.php"
-    Then the initial run executes UnrelatedTest
-    And Unrelated has the same line-to-test coverage as a run with TIA disabled
+            #[CoversClass(Unrelated::class)]
+            #[CoversClass(Calculator::class)]
+            final class UnrelatedTest extends TestCase
+            {
+                #[DataProvider('calculators')]
+                public function test_calculate(string $class, int $expected): void
+                {
+                    $this->assertSame($expected, (new $class())->calculate(1, 2), 'The calculator returned the wrong result.');
+                }
+
+                public static function calculators(): iterable
+                {
+                    yield 'selected calculator' => [Unrelated::class, 2];
+                }
+            }
+            """
+        When I run Infection for "src/Calculator.php"
+        Then the initial test run executes all tests
+        When I apply this diff to "tests/UnrelatedTest.php":
+            """
+            -        yield 'selected calculator' => [Unrelated::class, 2];
+            +        yield 'selected calculator' => [Calculator::class, 3];
+            """
+        And I run Infection for "src/Calculator.php"
+        Then the initial test run executes only the following tests:
+            | CalculatorTest::test_calculate                    |
+            | UnrelatedTest::test_calculate#selected calculator |
+        When I run Infection again with the same options and unchanged source, tests, and configuration
+        Then the initial test run executes only the following tests:
+            | CalculatorTest::test_calculate                    |
+            | UnrelatedTest::test_calculate#selected calculator |
+        And coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled
+
+    Scenario: A new test contributes coverage immediately
+        When I run Infection for "src/Calculator.php"
+        Then the initial test run executes all tests
+        Given the project file "tests/AdditionalCalculatorTest.php" contains:
+            """
+            <?php
+
+            declare(strict_types=1);
+
+            namespace Infection\E2ETests\PHPUnitTIA\Tests;
+
+            use Infection\E2ETests\PHPUnitTIA\Calculator;
+            use PHPUnit\Framework\Attributes\CoversClass;
+            use PHPUnit\Framework\TestCase;
+
+            #[CoversClass(Calculator::class)]
+            final class AdditionalCalculatorTest extends TestCase
+            {
+                public function test_calculate(): void
+                {
+                    $this->assertSame(7, (new Calculator())->calculate(3, 4), 'Calculator must add both operands.');
+                }
+            }
+            """
+        When I run Infection for "src/Calculator.php"
+        Then the initial test run executes only the following tests:
+            | AdditionalCalculatorTest::test_calculate |
+            | CalculatorTest::test_calculate           |
+        When I run Infection again with the same options and unchanged source, tests, and configuration
+        Then the initial test run executes only the following tests:
+            | AdditionalCalculatorTest::test_calculate |
+            | CalculatorTest::test_calculate           |
+        And the following mutations are generated and evaluated:
+            | file               | mutator | outcome         |
+            | src/Calculator.php | Plus    | killed by tests |
+        And coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled
+
+    Scenario: A new source file and its tests are not omitted
+        When I run Infection for "src/Calculator.php"
+        Then the initial test run executes all tests
+        Given the project file "src/AdditionalCalculator.php" contains:
+            """
+            <?php
+
+            declare(strict_types=1);
+
+            namespace Infection\E2ETests\PHPUnitTIA;
+
+            final class AdditionalCalculator
+            {
+                public function calculate(int $a, int $b): int
+                {
+                    return $a + $b;
+                }
+            }
+            """
+        And the project file "tests/AdditionalCalculatorTest.php" contains:
+            """
+            <?php
+
+            declare(strict_types=1);
+
+            namespace Infection\E2ETests\PHPUnitTIA\Tests;
+
+            use Infection\E2ETests\PHPUnitTIA\AdditionalCalculator;
+            use PHPUnit\Framework\Attributes\CoversClass;
+            use PHPUnit\Framework\TestCase;
+
+            #[CoversClass(AdditionalCalculator::class)]
+            final class AdditionalCalculatorTest extends TestCase
+            {
+                public function test_calculate(): void
+                {
+                    $this->assertSame(7, (new AdditionalCalculator())->calculate(3, 4), 'AdditionalCalculator must add both operands.');
+                }
+            }
+            """
+        When I run Infection for "src/AdditionalCalculator.php"
+        Then the initial test run executes all tests
+        And the following mutations are generated and evaluated:
+            | file                         | mutator | outcome         |
+            | src/AdditionalCalculator.php | Plus    | killed by tests |
+        When I run Infection again with the same options and unchanged source, tests, and configuration
+        Then the initial test run executes only the following tests:
+            | AdditionalCalculatorTest::test_calculate |
+        And the following mutations are generated and evaluated:
+            | file                         | mutator | outcome         |
+            | src/AdditionalCalculator.php | Plus    | killed by tests |
+        And coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled
+
+    Scenario: Changing existing source refreshes coverage
+        When I run Infection for "src/Calculator.php"
+        Then the initial test run executes all tests
+        When I apply this diff to "src/Calculator.php":
+            """
+            +        if ($a === 1) {
+            +            return 1 + $b;
+            +        }
+            +
+                     return $a + $b;
+            """
+        And I run Infection for "src/Calculator.php"
+        Then the initial test run executes only the following tests:
+            | CalculatorTest::test_calculate |
+        And the following mutations are generated and evaluated:
+            | file               | mutator | outcome         |
+            | src/Calculator.php | Plus    | killed by tests |
+        And coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled
+
+    Scenario: A partial run retains dependencies for other source files
+        When I run Infection for "src/Calculator.php"
+        Then the initial test run executes all tests
+        When I run Infection again with the same options and unchanged source, tests, and configuration
+        Then the initial test run executes only the following tests:
+            | CalculatorTest::test_calculate |
+        When I run Infection for "src/Unrelated.php"
+        Then the initial test run executes only the following tests:
+            | UnrelatedTest::test_calculate |
+        And coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled
+        When I run Infection for "src/Calculator.php"
+        Then the initial test run executes only the following tests:
+            | CalculatorTest::test_calculate |
+        And the generated mutations and their detection statuses are unchanged from the first Infection run

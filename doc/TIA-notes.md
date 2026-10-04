@@ -11,7 +11,8 @@ For both cases, we can consider the following scenarios:
 - An initial run, an escaped mutation is reported, the user updates the tests, execute infection again.
 - An initial run, the user adds some code (source or tests) and execute infection again.
 
-TODO: have end-to-end tests that reliably capture those scenarios.
+The active Behat features cover the project with TIA enabled. A project without
+explicit TIA settings remains to be covered.
 
 ## Execution evidence
 
@@ -25,7 +26,8 @@ status unless a scenario specifically needs framework failure output.
 
 ## Implemented initial-run scenarios
 
-Behat runs only `tests/e2e/PHPUnit_TIA/features/01-initial-run.feature`.
+Behat runs `tests/e2e/PHPUnit_TIA/features/01-initial-run.feature` and
+`tests/e2e/PHPUnit_TIA/features/02-development-cycle.feature`.
 The cold-start scenario passes: the first Infection run executes both tests, and the
 second executes CalculatorTest only with identical Calculator coverage and mutation results.
 
@@ -36,6 +38,78 @@ this blocker is resolved. `InitialConfigBuilder` replaces the project-configured
 cache directory with `.infection/phpunit`, so the initial run executes both tests instead
 of reusing the recording produced by plain PHPUnit. This is an Infection integration
 blocker, not evidence of PHPUnit invalidating a shared recording.
+
+## Implemented development-cycle scenarios
+
+Five scenarios pass with the pinned PHPUnit build:
+
+- Strengthening an existing test changes a Plus mutant from escaped to killed.
+- A new test runs immediately and remains selected on the next unchanged run.
+- A new source file triggers a full-suite fallback; the next run selects only its test.
+- Editing Calculator to add an executed branch refreshes coverage and mutation results.
+- Selecting Calculator, then Unrelated, then Calculator retains both sets of dependencies.
+
+Each scenario compares the updated project's line-to-test coverage, generated mutation
+hashes, evaluated mutations and detection statuses, and MSI against a full-suite run
+with impact recording and automatic impact selection disabled. Both runs use the same
+project directory; snapshots preserve results and avoid path/hash normalization.
+
+Two scenarios retain their desired assertions under `@skip`, for the limitation below.
+
+### Explicit impact queries miss changed tests
+
+Reproduced with PHPUnit PR #6919 at `5f4f80f15f1bb1907e6ba277f2cec0756fbb8046`.
+Infection passes the selected source paths through `--impacted-by-file`. PHPUnit queries
+the recorded dependencies of those paths without also detecting changed tests.
+
+Both scenarios start with a cold Infection run that executes CalculatorTest and
+UnrelatedTest and records dependencies from executed code. Then they keep the existing
+test identity but change how UnrelatedTest executes:
+
+| Scenario | Edit | Expected initial tests | Actual initial tests |
+| --- | --- | --- | --- |
+| An existing test starts covering another source file | Add a Calculator assertion to UnrelatedTest | CalculatorTest and UnrelatedTest | CalculatorTest only |
+| Changed data-provider inputs establish a previously unknown dependency | Change the same named data set from `[Unrelated::class, 2]` to `[Calculator::class, 3]` | CalculatorTest and UnrelatedTest's existing data set | CalculatorTest only |
+
+For both updated projects, a direct PHPUnit `--impacted-by-file ... --explain` reports
+only CalculatorTest. `--only-impacted --explain` instead reports the changed UnrelatedTest.
+A full Infection run with `--test-framework-options=--do-not-record-test-impact-data`
+executes both tests, and Calculator's coverage includes UnrelatedTest. The TIA run's
+coverage omits it. The Plus mutant is killed in both runs by the existing coverage, so
+equal MSI alone would hide this problem.
+
+The provider scenario declares both classes as coverage targets before recording, but
+derivation from targets is disabled. Its data-set name stays `selected calculator`;
+changing the identity would exercise the already-working fallback for unknown tests.
+
+This is a missing capability for Infection's integration, rather than a violation of
+PHPUnit's explicit-query contract. `Runner/TestImpactAnalysis/Selector::explain()` uses
+`testsThatDependOnAnyOf()` for explicit paths and `testsAffectedByWhatChanged()` only
+when no explicit paths were supplied. Infection needs the union of dependencies on its
+selected source files and tests whose changed code or inputs may establish new dependencies.
+Using `--only-impacted` alone cannot provide coverage for unchanged selected source files.
+Feedback for PHPUnit: could explicit queries optionally include changed-test and
+data-provider safeguards? Until that is available, Infection needs a conservative fallback
+before enabling this optimization generally.
+
+To reproduce the desired assertions (two expected failures):
+
+```sh
+cd tests/e2e/PHPUnit_TIA
+php vendor/bin/behat --xdebug --profile=blocked features/02-development-cycle.feature
+```
+
+After a failed scenario, run the following from its generated directory under
+`var/behat/scenarios/02-development-cycle-*/` to compare PHPUnit's explanations:
+
+```sh
+XDEBUG_MODE=coverage php vendor/bin/phpunit \
+    --configuration var/infection/tmp/infection/phpunitConfiguration.initial.infection.xml \
+    --impacted-by-file var/infection/tmp/infection/phpunit-impact-sources.txt --explain
+XDEBUG_MODE=coverage php vendor/bin/phpunit \
+    --configuration var/infection/tmp/infection/phpunitConfiguration.initial.infection.xml \
+    --only-impacted --explain
+```
 
 ## Gotchas
 

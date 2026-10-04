@@ -1,7 +1,9 @@
 default:
     suites:
         initial_run:
-            paths: [features/01-initial-run.feature]
+            paths:
+                - features/01-initial-run.feature
+                - features/02-development-cycle.feature
             services:
                 filesystem: Symfony\Component\Filesystem\Filesystem
                 shellCommandRunner: Infection\E2ETests\PHPUnitTIA\Behat\ShellCommandRunner
@@ -23,3 +25,9 @@ default:
                         scenarioState: '@scenarioState'
             filters:
                 tags: "~@skip"
+
+blocked:
+    suites:
+        initial_run:
+            filters:
+                tags: "@skip"

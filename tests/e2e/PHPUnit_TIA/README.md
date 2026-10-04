@@ -1,14 +1,28 @@
 # PHPUnit TIA for Infection's initial tests
 
-Behat executes only `features/01-initial-run.feature`. It covers a project with
+Behat executes `features/01-initial-run.feature` and `features/02-development-cycle.feature`.
+They cover a project with
 TIA enabled in PHPUnit XML, using dependencies recorded from executed code:
 
 - Reuse impact data recorded by a preceding PHPUnit run.
 - Record impact data on a cold Infection run and select fewer tests on the next run.
+- Reuse recordings after stronger assertions, new tests, new source files, and source edits.
+- Preserve dependencies for other source files after partial runs.
 
 Repeated Infection runs compare executed tests, Calculator's line-to-test coverage,
 generated mutations, detection statuses, and MSI. Timing and process output are not
 part of that comparison.
+
+Development-cycle scenarios also compare the updated project's coverage, generated mutations,
+detection statuses, and MSI with a full-suite run. This control uses the same scenario directory
+and adds `--test-framework-options=--do-not-record-test-impact-data`, which suppresses Infection's
+automatic impact query. It does not refresh impact data. Keeping paths identical allows direct
+comparison of mutation hashes; in-memory snapshots preserve the preceding TIA result.
+
+Project edits use a single diff hunk without file or line-number headers: `-` removes
+a line, `+` adds one, and a leading space supplies unchanged context. The original block
+must match exactly once, including indentation; missing or ambiguous matches fail before
+writing the file. Add context when the same code occurs in several places.
 
 ## Run
 
@@ -55,9 +69,9 @@ The execution flow is:
 
 | What to inspect or change | Where to look |
 | --- | --- |
-| Behaviour and expected results | [features/01-initial-run.feature](features/01-initial-run.feature) |
+| Behaviour and expected results | [features/01-initial-run.feature](features/01-initial-run.feature) and [features/02-development-cycle.feature](features/02-development-cycle.feature) |
 | Suite selection, excluded tags, and context services | [behat.yml](behat.yml) |
-| Scenario project creation and copied files | [ScenarioProjectContext.php](features/bootstrap/ScenarioProjectContext.php) |
+| Scenario project creation, copied files, and source/test edits | [ScenarioProjectContext.php](features/bootstrap/ScenarioProjectContext.php) |
 | PHPUnit configuration, recording seed, and executed-test assertions | [PhpUnitContext.php](features/bootstrap/PhpUnitContext.php) |
 | Infection commands, repeated runs, and coverage/mutation/MSI assertions | [InfectionContext.php](features/bootstrap/InfectionContext.php) |
 | Shared execution histories and their reset | [ScenarioState.php](features/bootstrap/ScenarioState.php) and [ScenarioStateContext.php](features/bootstrap/ScenarioStateContext.php) |
@@ -82,16 +96,28 @@ recordings and direct PHPUnit output in `output.log`. Add new prepared PHPUnit
 configurations under `configurations/`; the active setup does not copy the fixture-root
 `phpunit.xml`.
 
-The other feature files remain drafts and are excluded by `behat.yml`.
+Feature files from `03` onwards remain drafts and are excluded by `behat.yml`.
 The previous script is retained as `run_legacy_tests.bash`; the runner does not invoke it.
 
-## Current blocker
+## Current blockers
 
 The cold-start scenario passes. The PHPUnit-seeded scenario is tagged `@skip` and
 excluded by the suite filter because Infection
 replaces the project's configured cache directory with `.infection/phpunit`. It runs
 both initial tests instead of reusing PHPUnit's recording to select CalculatorTest.
 See [the blocker](../../../doc/TIA-notes.md#project-configured-cache-is-not-reused).
+
+Five development-cycle scenarios pass. Two are tagged `@skip`: an existing test starts
+covering Calculator after a test-body or data-provider change. PHPUnit's explicit impact
+query omits that test because its previous recording does not depend on Calculator.
+See [the reproductions and PHPUnit feedback](../../../doc/TIA-notes.md#explicit-impact-queries-miss-changed-tests).
+
+Run the blocked development-cycle scenarios explicitly (they are expected to fail):
+
+```sh
+cd tests/e2e/PHPUnit_TIA
+php vendor/bin/behat --xdebug --profile=blocked features/02-development-cycle.feature
+```
 
 ## Initial test execution recording
 

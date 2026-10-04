@@ -41,7 +41,8 @@ final class InfectionContext implements Context
             PHP_BINARY,
             $this->getInfectionBin(),
             $source,
-            '--min-msi=100',
+            // Escaped mutants are expected in development-cycle scenarios; assert their outcomes below.
+            '--min-msi=0',
             '--debug',
             '--no-progress',
             '--no-interaction',
@@ -125,6 +126,34 @@ final class InfectionContext implements Context
             $this->scenarioState->getFirstInfectionExecutionResult()->getMsi(),
             'The reported MSI differs from the first Infection run.',
         );
+    }
+
+    #[Then('coverage, generated mutations, detection statuses, and MSI match a run with TIA disabled')]
+    public function assertResultsMatchWithoutTia(): void
+    {
+        $withTia = $this->scenarioState->getLastInfectionExecutionResult();
+
+        // Reuse the same project to keep paths and mutation hashes comparable. Disabling
+        // recording also disables Infection's automatic impact query, without refreshing it.
+        $this->executeInfection([
+            ...$withTia->command,
+            '--test-framework-options=--do-not-record-test-impact-data',
+        ]);
+
+        $withoutTia = $this->scenarioState->getLastInfectionExecutionResult();
+        $phpunit = $this->scenarioState->getLastPhpUnitExecutionResult();
+        $executed = $phpunit->executedTests;
+        $loaded = $phpunit->loadedTests;
+        sort($executed);
+        sort($loaded);
+
+        Assert::notEmpty($loaded, 'The TIA-disabled comparison must load tests.');
+        Assert::same($executed, $loaded, 'The TIA-disabled comparison must execute the full loaded suite.');
+        Assert::false($phpunit->configuration['recordTestImpactData'], 'The comparison must not refresh impact data.');
+        Assert::null($phpunit->configuration['impactedByFile'], 'The comparison must not use an explicit impact query.');
+        Assert::same($withTia->getSources(), $withoutTia->getSources(), 'TIA changed line-to-test coverage or generated mutation hashes.');
+        Assert::same($withTia->getMutations(), $withoutTia->getMutations(), 'TIA changed evaluated mutations or their detection statuses.');
+        Assert::same($withTia->getMsi(), $withoutTia->getMsi(), 'TIA changed the reported MSI.');
     }
 
     private function readInitialPhpUnitExecutionResult(InfectionExecutionResult $result): PhpUnitExecutionResult
