@@ -43,6 +43,7 @@ use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -87,6 +88,11 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             testFrameworkExtraOptionsFilter: $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 
+        $this->assertInstanceOf(
+            PhpUnitAdapter::class,
+            $adapter,
+            'PHPUnit must implement TestFramework directly without a legacy bridge.',
+        );
         $this->assertSame('PHPUnit', $adapter->getName());
     }
 

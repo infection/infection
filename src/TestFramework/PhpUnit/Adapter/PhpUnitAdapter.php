@@ -35,18 +35,29 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use function explode;
 use function implode;
-use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Configuration\Configuration;
+use Infection\Console\ConsoleOutput;
+use Infection\Mutant\Mutant;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
-use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Override;
 use function Safe\preg_match;
 use function sprintf;
@@ -57,9 +68,11 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware, TestFrameworkAdapter
+final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrameworkAdapter
 {
     public const string COVERAGE_DIR = 'coverage-xml';
+
+    private readonly CoverageChecker $coverageChecker;
 
     public function __construct(
         private readonly string $testFrameworkExecutable,
@@ -72,8 +85,76 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
         private readonly ShellCommandRunner $shellCommandRunner,
         private readonly VersionParser $versionParser,
         private readonly CommandLineBuilder $commandLineBuilder,
+        private readonly ConsoleOutput $consoleOutput,
+        CoverageCheckerFactory $coverageCheckerFactory,
+        private readonly InitialTestsRunner $initialTestsRunner,
+        private readonly Configuration $config,
+        private readonly MutantProcessContainerFactory $processFactory,
+        private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private ?string $version = null,
     ) {
+        $this->coverageChecker = $coverageCheckerFactory->create($this);
+    }
+
+    #[Override]
+    public function checkRequirements(): void
+    {
+        // TODO: check supported version
+
+        $this->coverageChecker->checkCoverageRequirements();
+
+        if ($this->config->skipInitialTests) {
+            $this->consoleOutput->logSkippingInitialTests();
+            $this->coverageChecker->checkCoverageExists();
+        }
+    }
+
+    #[Override]
+    public function executeInitialRun(): InitialRunResults
+    {
+        $initialTestSuiteProcess = $this->initialTestsRunner->run(
+            $this,
+            $this->config->testFrameworkExtraOptions,
+            explode(
+                ' ',
+                (string) $this->config->initialTestsPhpOptions,
+            ),
+            $this->config->skipCoverage,
+        );
+
+        if (!$initialTestSuiteProcess->isSuccessful()) {
+            throw InitialTestsFailed::fromProcessAndAdapter(
+                $initialTestSuiteProcess,
+                $this,
+            );
+        }
+
+        $output = $initialTestSuiteProcess->getOutput();
+
+        $this->coverageChecker->checkCoverageHasBeenGenerated(
+            $initialTestSuiteProcess->getCommandLine(),
+            $output,
+        );
+
+        $memoryUsage = $this->getMemoryUsed($output);
+
+        return new InitialRunResults(
+            output: $output,
+            memoryUsage: $memoryUsage === -1. ? null : $memoryUsage,
+        );
+    }
+
+    #[Override]
+    public function test(Mutant $mutant): MutantProcessContainer
+    {
+        return $this->processFactory->create(
+            $this,
+            $mutant,
+            $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
+                $this->config->testFrameworkExtraOptions,
+                $this->getInitialRunOnlyOptions(),
+            ),
+        );
     }
 
     public function hasJUnitReport(): bool

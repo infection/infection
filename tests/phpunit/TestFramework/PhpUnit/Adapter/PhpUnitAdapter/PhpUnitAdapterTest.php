@@ -38,10 +38,20 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use function array_map;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Configuration\Configuration;
+use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
@@ -50,7 +60,10 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
+use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -58,6 +71,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(PhpUnitAdapter::class)]
@@ -119,6 +133,168 @@ final class PhpUnitAdapterTest extends TestCase
         ;
 
         $this->assertTrue($this->adapter->hasJUnitReport());
+    }
+
+    #[DataProvider('initialRunOutputProvider')]
+    public function test_it_executes_the_initial_run(
+        string $output,
+        ?float $memoryUsage,
+    ): void {
+        $process = $this->createStub(Process::class);
+        $process
+            ->method('isSuccessful')
+            ->willReturn(true)
+        ;
+        $process
+            ->method('getOutput')
+            ->willReturn($output)
+        ;
+
+        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withInitialTestsPhpOptions('-d memory_limit=1G')
+            ->withTestFrameworkExtraOptions('--verbose')
+            ->withSkipCoverage(true)
+            ->build()
+        ;
+        $adapter = $this->createAdapter(
+            '<phpunit/>',
+            configuration: $configuration,
+            initialTestsRunner: $initialTestsRunner,
+        );
+
+        $initialTestsRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with(
+                $adapter,
+                '--verbose',
+                ['-d', 'memory_limit=1G'],
+                true,
+            )
+            ->willReturn($process)
+        ;
+        $this->fileSystemMock
+            ->expects($this->exactly(2))
+            ->method('isReadableFile')
+            ->willReturn(true)
+        ;
+
+        $this->assertEquals(
+            new InitialRunResults(
+                $output,
+                $memoryUsage,
+            ),
+            $adapter->executeInitialRun(),
+            'The initial run must preserve the output and normalize unknown memory usage.',
+        );
+    }
+
+    public static function initialRunOutputProvider(): iterable
+    {
+        yield 'reported memory usage' => ['Memory: 42.00 MB', 42.0];
+
+        yield 'unknown memory usage' => ['output', null];
+    }
+
+    public function test_it_throws_when_the_initial_run_fails(): void
+    {
+        $process = $this->createStub(Process::class);
+        $process
+            ->method('isSuccessful')
+            ->willReturn(false)
+        ;
+        $process
+            ->method('getExitCode')
+            ->willReturn(1)
+        ;
+
+        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
+        $adapter = $this->createAdapter(
+            '<phpunit/>',
+            initialTestsRunner: $initialTestsRunner,
+        );
+        $initialTestsRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with(
+                $adapter,
+                '',
+                [''],
+                false,
+            )
+            ->willReturn($process)
+        ;
+        $this->fileSystemMock
+            ->expects($this->never())
+            ->method('isReadableFile')
+        ;
+
+        $this->expectException(InitialTestsFailed::class);
+
+        $adapter->executeInitialRun();
+    }
+
+    public function test_it_filters_initial_run_only_options_from_mutant_evaluation(): void
+    {
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+        $processContainer = $this->createStub(MutantProcessContainer::class);
+        $processFactory = $this->createMock(MutantProcessContainerFactory::class);
+        $adapter = $this->createAdapter(
+            '<phpunit/>',
+            configuration: ConfigurationBuilder::withMinimalTestData()
+                ->withTestFrameworkExtraOptions('--configuration phpunit.xml --filter Foo --testsuite unit --verbose')
+                ->build(),
+            processFactory: $processFactory,
+        );
+        $processFactory
+            ->expects($this->once())
+            ->method('create')
+            ->with(
+                $adapter,
+                $mutant,
+                '--verbose',
+            )
+            ->willReturn($processContainer)
+        ;
+
+        $this->assertSame(
+            $processContainer,
+            $adapter->test($mutant),
+            'Mutant evaluation must use the process factory with initial-run options removed.',
+        );
+    }
+
+    #[DataProvider('skipInitialTestsProvider')]
+    public function test_it_checks_requirements(bool $skipInitialTests): void
+    {
+        $consoleOutput = $this->createMock(ConsoleOutput::class);
+        $consoleOutput
+            ->expects($this->exactly($skipInitialTests ? 1 : 0))
+            ->method('logSkippingInitialTests')
+        ;
+        $this->fileSystemMock
+            ->expects($this->exactly($skipInitialTests ? 2 : 0))
+            ->method('isReadableFile')
+            ->willReturn(true)
+        ;
+        $adapter = $this->createAdapter(
+            '<phpunit/>',
+            configuration: ConfigurationBuilder::withMinimalTestData()
+                ->withSkipCoverage(true)
+                ->withSkipInitialTests($skipInitialTests)
+                ->build(),
+            consoleOutput: $consoleOutput,
+        );
+
+        $adapter->checkRequirements();
+    }
+
+    public static function skipInitialTestsProvider(): iterable
+    {
+        yield 'initial tests are run' => [false];
+
+        yield 'initial tests are skipped' => [true];
     }
 
     public function test_it_retrieves_version(): void
@@ -1644,7 +1820,12 @@ final class PhpUnitAdapterTest extends TestCase
         bool $executeOnlyCoveringTestCases = false,
         ?string $mapSourceClassToTestStrategy = null,
         ?ShellCommandRunner $shellCommandRunner = null,
+        ?Configuration $configuration = null,
+        ?InitialTestsRunner $initialTestsRunner = null,
+        ?MutantProcessContainerFactory $processFactory = null,
+        ?ConsoleOutput $consoleOutput = null,
     ): PhpUnitAdapter {
+        $configuration ??= ConfigurationBuilder::withMinimalTestData()->build();
         $tmpDir = '/tmp';
         $projectDir = '/path/to/project';
         $testFrameworkConfigDir = '/path/to/project/tools/phpunit';
@@ -1692,6 +1873,22 @@ final class PhpUnitAdapterTest extends TestCase
             $shellCommandRunner ?? $this->createStub(ShellCommandRunner::class),
             new VersionParser(),    // won't be used since we pass the version
             new CommandLineBuilder($this->phpExecutableFinderMock),
+            $consoleOutput ?? $this->createStub(ConsoleOutput::class),
+            new CoverageCheckerFactory(
+                $configuration,
+                JUnitReportLocator::create(
+                    $this->fileSystemMock,
+                    '',
+                ),
+                IndexXmlCoverageLocator::create(
+                    $this->fileSystemMock,
+                    '',
+                ),
+            ),
+            $initialTestsRunner ?? $this->createStub(InitialTestsRunner::class),
+            $configuration,
+            $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
+            new TestFrameworkExtraOptionsFilter(),
             $version,
         );
     }

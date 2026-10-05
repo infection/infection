@@ -37,7 +37,6 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
 use function array_values;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
@@ -50,7 +49,6 @@ use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
-use Infection\TestFramework\LegacyTestFrameworkBridge;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
@@ -101,64 +99,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             'The source directories cannot be empty. This indicates that an invalid configuration reached the test framework adapter factory.',
         );
 
-        $legacyAdapter = self::createLegacy(
-            $testFrameworkExecutable,
-            $tmpDir,
-            $testFrameworkConfigPath,
-            $testFrameworkConfigDir,
-            $jUnitFilePath,
-            $projectDir,
-            $sourceDirectories,
-            $executeOnlyCoveringTestCases,
-            $filteredSourceFilesToMutate,
-            $mapSourceClassToTestStrategy,
-            $shellCommandRunner,
-            $sourceDirectoryBasePath,
-            $useWindowsFilterLimit,
-            $fileSystem,
-        );
-
-        return new LegacyTestFrameworkBridge(
-            $legacyAdapter,
-            consoleOutput: $consoleOutput,
-            coverageChecker: $coverageCheckerFactory->create($legacyAdapter),
-            initialTestsRunner: $initialTestsRunner,
-            config: $configuration,
-            processFactory: $processFactory,
-            testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter,
-        );
-    }
-
-    public static function getAdapterName(): string
-    {
-        return 'phpunit';
-    }
-
-    public static function getExecutableName(): string
-    {
-        return 'phpunit';
-    }
-
-    /**
-     * @param non-empty-array<string> $sourceDirectories
-     * @param SplFileInfo[] $filteredSourceFilesToMutate
-     */
-    private static function createLegacy(
-        string $testFrameworkExecutable,
-        string $tmpDir,
-        string $testFrameworkConfigPath,
-        string $testFrameworkConfigDir,
-        string $jUnitFilePath,
-        string $projectDir,
-        array $sourceDirectories,
-        bool $executeOnlyCoveringTestCases,
-        array $filteredSourceFilesToMutate,
-        ?string $mapSourceClassToTestStrategy,
-        ShellCommandRunner $shellCommandRunner,
-        string $sourceDirectoryBasePath,
-        bool $useWindowsFilterLimit,
-        Filesystem $fileSystem,
-    ): TestFrameworkAdapter {
         $testFrameworkConfigContent = $fileSystem->readFile($testFrameworkConfigPath);
 
         $configManipulator = new XmlConfigurationManipulator(
@@ -213,7 +153,23 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
+            $consoleOutput,
+            $coverageCheckerFactory,
+            $initialTestsRunner,
+            $configuration,
+            $processFactory,
+            $testFrameworkExtraOptionsFilter,
         );
+    }
+
+    public static function getAdapterName(): string
+    {
+        return 'phpunit';
+    }
+
+    public static function getExecutableName(): string
+    {
+        return 'phpunit';
     }
 
     /**

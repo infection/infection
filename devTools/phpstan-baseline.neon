@@ -892,31 +892,70 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Configuration\Configuration
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Console\ConsoleOutput
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Mutant\Mutant
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\Factory\MutantProcessContainerFactory
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\MutantProcessContainer
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\Runner\InitialTestsFailed
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\Runner\InitialTestsRunner
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\ProvidesInitialRunOnlyOptions
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\Coverage\CoverageChecker
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: '''
-				Call to method __construct() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
-				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
-			'''
-			identifier: method.deprecatedClass
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\Coverage\CoverageCheckerFactory
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\TestFrameworkExtraOptionsFilter
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
@@ -955,12 +994,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\LegacyTestFrameworkBridge
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\TestFrameworkExtraOptionsFilter
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -969,15 +1002,6 @@ parameters:
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\Tracing\TestRunOrderResolver
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
-			rawMessage: '''
-				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
-				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
-			'''
-			identifier: new.deprecatedClass
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
 
@@ -1757,6 +1781,15 @@ parameters:
 			identifier: return.deprecatedClass
 			count: 1
 			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method hasJUnitReport() of class Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter:
+				This is only for making the migration easier, to be removed.
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapter/PhpUnitAdapterTest.php
 
 		-
 			rawMessage: '''
