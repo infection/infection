@@ -44,14 +44,15 @@ use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\ProvidesForkAutoloadFile;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
-use Infection\TestFramework\ProvidesForkAutoloadFile;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Override;
-use function realpath;
+use Safe\Exceptions\FilesystemException;
 use function Safe\preg_match;
+use function Safe\realpath;
 use function sprintf;
 use function trim;
 use function version_compare;
@@ -166,10 +167,14 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesForkAutoloadFile
     #[Override]
     public function getForkAutoloadFile(array $command): ?string
     {
-        $autoloadFile = realpath(dirname($command[0]) . '/../autoload.php');
-        $bootstrapFile = realpath((string) $this->mutationConfigBuilder->getOriginalBootstrapFile());
+        try {
+            $autoloadFile = realpath(dirname($command[0]) . '/../autoload.php');
+            $bootstrapFile = realpath((string) $this->mutationConfigBuilder->getOriginalBootstrapFile());
+        } catch (FilesystemException) {
+            return null;
+        }
 
-        return $autoloadFile !== false && $autoloadFile === $bootstrapFile ? $autoloadFile : null;
+        return $autoloadFile === $bootstrapFile ? $autoloadFile : null;
     }
 
     public function getVersion(): string

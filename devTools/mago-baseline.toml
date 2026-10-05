@@ -2719,6 +2719,60 @@ message = 'Unsafe `new $class_name`: constructor of `Symfony\Component\Process\P
 count = 1
 
 [[issues]]
+file = "src/Process/ForkedProcess.php"
+code = "invalid-return-statement"
+message = 'Invalid return type for function `Infection\Process\ForkedProcess::startWorker`: expected `array{0: resource, 1: resource, 2: resource}`, but found `list{open-resource, null, null|resource}`.'
+count = 1
+
+[[issues]]
+file = "src/Process/ForkedProcess.php"
+code = "missing-parameter-type"
+message = "Parameter `$workerOutput` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Process/ForkedProcess.php"
+code = "missing-property-type"
+message = "Property `$workerOutput` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Process/ForkedProcess.php"
+code = "possibly-invalid-argument"
+message = "Possible argument type mismatch for argument #2 of `proc_open`: expected `array{0?: array{0: string('file'), 1: non-empty-string, 2?: string('r')|string('w')}|array{0: string('pipe'), 1: string('r')|string('w')}|object|resource, 1?: array{0: string('file'), 1: non-empty-string, 2?: string('r')|string('w')}|array{0: string('pipe'), 1: string('r')|string('w')}|object|resource, 2?: array{0: string('file'), 1: non-empty-string, 2?: string('r')|string('w')}|array{0: string('pipe'), 1: string('r')|string('w')}|object|resource}`, but possibly received `list{list{string('file'), string('/dev/null'), string('r')}, list{string('pipe'), string('w')}, list{string('redirect'), int(1)}, list{string('pipe'), string('r')}}`."
+count = 1
+
+[[issues]]
+file = "src/Process/ForkedProcess.php"
+code = "possibly-null-argument"
+message = 'Argument #1 of function `Safe\stream_set_blocking` is possibly `null`, but parameter type `resource` does not accept it.'
+count = 1
+
+[[issues]]
+file = "src/Process/ForkedProcess.php"
+code = "possibly-null-argument"
+message = "Argument #1 of function `strlen` is possibly `null`, but parameter type `string` does not accept it."
+count = 1
+
+[[issues]]
+file = "src/Process/ForkedProcess.php"
+code = "possibly-null-array-access"
+message = "Cannot perform array access on possibly `null` value."
+count = 3
+
+[[issues]]
+file = "src/Process/ForkedProcess.php"
+code = "possibly-undefined-int-array-index"
+message = "Possibly undefined array key 1 accessed on `array{0?: resource, 1?: resource, 2?: resource}`."
+count = 2
+
+[[issues]]
+file = "src/Process/ForkedProcess.php"
+code = "undefined-int-array-index"
+message = "Undefined array key 3 accessed on `array{0?: resource, 1?: resource, 2?: resource}`."
+count = 1
+
+[[issues]]
 file = "src/Process/OriginalPhpProcess.php"
 code = "incompatible-parameter-type"
 message = 'Parameter `$env` of `Infection\Process\OriginalPhpProcess::start()` expects type `array<array-key, bool|string>|null` but parent `Symfony\Component\Process\Process::start()` expects type `array<array-key, mixed>`'

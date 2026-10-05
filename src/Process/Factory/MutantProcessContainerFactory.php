@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Process\Factory;
 
+use function function_exists;
+use function getenv;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
@@ -43,10 +45,8 @@ use Infection\Process\DryRunProcess;
 use Infection\Process\ForkedProcess;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\TestFramework\Contracts\ProvidesForkAutoloadFile;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Infection\TestFramework\ProvidesForkAutoloadFile;
-use function function_exists;
-use function getenv;
 use function min;
 use Symfony\Component\Process\Process;
 
@@ -87,7 +87,9 @@ class MutantProcessContainerFactory
         );
         $env = ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY];
 
-        $autoloadFile = self::findForkAutoloadFile($testFrameworkAdapter, $command);
+        $autoloadFile = $testFrameworkAdapter instanceof ProvidesForkAutoloadFile && self::canFork()
+            ? $testFrameworkAdapter->getForkAutoloadFile($command)
+            : null;
 
         $process = $autoloadFile !== null
             ? new ForkedProcess($command, $env, $timeout, $autoloadFile, $mutant->getMutation()->getOriginalFilePath())
@@ -109,20 +111,11 @@ class MutantProcessContainerFactory
 
     /**
      * To disable the fork: INFECTION_FORK=0.
-     *
-     * @param list<string> $command
      */
-    private static function findForkAutoloadFile(TestFrameworkAdapter $testFrameworkAdapter, array $command): ?string
+    private static function canFork(): bool
     {
-        if (
-            getenv('INFECTION_FORK') === '0'
-            || !function_exists('pcntl_fork')
-            || !function_exists('posix_kill')
-            || !$testFrameworkAdapter instanceof ProvidesForkAutoloadFile
-        ) {
-            return null;
-        }
-
-        return $testFrameworkAdapter->getForkAutoloadFile($command);
+        return getenv('INFECTION_FORK') !== '0'
+            && function_exists('pcntl_fork')
+            && function_exists('posix_kill');
     }
 }

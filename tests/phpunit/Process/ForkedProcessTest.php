@@ -33,18 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Tests\Process;
 
-/**
- * @internal
- */
-interface ProvidesForkAutoloadFile
+use Infection\Process\ForkedProcess;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\TestCase;
+use function Safe\file_put_contents;
+use function Safe\unlink;
+use function sys_get_temp_dir;
+use function uniqid;
+use function usleep;
+
+#[CoversClass(ForkedProcess::class)]
+#[Group('integration')]
+#[RequiresPhpExtension('pcntl')]
+#[RequiresPhpExtension('posix')]
+final class ForkedProcessTest extends TestCase
 {
-    /**
-     * Returns the autoload file that the script of the command loads before the test framework bootstrap.
-     * A fork worker can load this file a single time for all mutants. Returns null if a fork is not possible.
-     *
-     * @param list<string> $command
-     */
-    public function getForkAutoloadFile(array $command): ?string;
+    public function test_it_runs_a_script_in_a_fork_of_the_worker(): void
+    {
+        $script = sys_get_temp_dir() . '/' . uniqid('infection-fork-', true) . '.php';
+        file_put_contents($script, '<?php echo getenv("FOO"); exit(3);');
+
+        $process = new ForkedProcess([$script], ['FOO' => 'bar'], 10.0, __DIR__ . '/../../../vendor/autoload.php', __FILE__);
+
+        $this->assertFalse($process->isStarted());
+
+        $process->start();
+
+        while ($process->isRunning()) {
+            usleep(1000);
+        }
+
+        unlink($script);
+
+        $this->assertTrue($process->isTerminated());
+        $this->assertSame('bar', $process->getOutput());
+        $this->assertSame(3, $process->getExitCode());
+    }
 }

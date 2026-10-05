@@ -35,26 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use function fclose;
 use function feof;
-use function fwrite;
-use function is_resource;
-use function json_encode;
 use function microtime;
 use Override;
 use const PHP_BINARY;
-use function preg_match;
-use function proc_close;
 use function proc_open;
 use function register_shutdown_function;
+use function Safe\fclose;
+use function Safe\fwrite;
+use function Safe\json_encode;
+use function Safe\preg_match;
+use function Safe\stream_get_contents;
+use function Safe\stream_set_blocking;
 use function sprintf;
-use function stream_get_contents;
-use function stream_set_blocking;
 use function strlen;
 use function substr;
-use function var_export;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
+use function var_export;
+use Webmozart\Assert\Assert;
 
 /**
  * This process runs a PHP script in a fork of a long-lived worker (see resources/fork-worker.php).
@@ -68,6 +67,8 @@ final class ForkedProcess extends Process
     private const string WORKER = __DIR__ . '/../../resources/fork-worker.php';
 
     private const int WORKER_FAILURE_EXIT_CODE = 255;
+
+    private const float STOP_TIMEOUT = 10.0;
 
     /**
      * @var array<int|string, array{resource, resource, resource}> the process, its input and its output for each thread
@@ -90,7 +91,7 @@ final class ForkedProcess extends Process
     private float $startTime = 0.0;
 
     /**
-     * @param list<string> $command the PHP script with its arguments
+     * @param array<string> $command the PHP script with its arguments
      * @param array<string, string|int> $forkEnv
      * @param string $autoloadFile the file that the worker loads a single time, before the first fork
      * @param string $sourceFile the original file of the mutant; it must not be in the worker
@@ -106,7 +107,7 @@ final class ForkedProcess extends Process
     }
 
     /**
-     * @param array<string, string|int> $env
+     * @param array<mixed> $env
      */
     #[Override]
     public function start(?callable $callback = null, array $env = []): void
@@ -155,7 +156,7 @@ final class ForkedProcess extends Process
     }
 
     #[Override]
-    public function stop(float $timeout = 10, ?int $signal = null): ?int
+    public function stop(float $timeout = self::STOP_TIMEOUT, ?int $signal = null): ?int
     {
         return $this->exitCode;
     }
@@ -221,7 +222,11 @@ final class ForkedProcess extends Process
 
         $this->output .= stream_get_contents($this->workerOutput);
 
-        if (preg_match('/\0FORK (\d+) (\d)\n$/', $this->output, $matches) === 1) {
+        $matches = [];
+
+        preg_match('/\0FORK (\d+) (\d)\n$/', $this->output, $matches);
+
+        if ($matches !== []) {
             $this->output = substr($this->output, 0, -strlen($matches[0]));
             $this->exitCode = (int) $matches[1];
             $this->timedOut = $matches[2] === '1';
@@ -244,14 +249,20 @@ final class ForkedProcess extends Process
             register_shutdown_function(self::stopWorkers(...));
         }
 
+        $pipes = [];
+
         // The worker inherits the environment as is, with the PHP configuration of this process.
+        // @phpstan-ignore theCodingMachineSafe.function (Safe\proc_open() does not accept a list of arguments.)
         $process = proc_open(
             // PHP's CLI does not accept a phar:// path as the script.
             [PHP_BINARY, '-r', sprintf('require %s;', var_export(self::WORKER, true))],
             // The requests use descriptor 3: a script that reads STDIN must get an end of file, not the next request.
+            // @phpstan-ignore argument.type (The stub does not know the "redirect" descriptor.)
             [['file', '/dev/null', 'r'], ['pipe', 'w'], ['redirect', 1], ['pipe', 'r']],
             $pipes,
         );
+
+        Assert::resource($process, message: 'Could not start the fork worker.');
 
         stream_set_blocking($pipes[1], false);
 
@@ -270,7 +281,7 @@ final class ForkedProcess extends Process
      */
     private static function forgetWorker($workerOutput): void
     {
-        foreach (self::$workers as $index => [$process, $input, $output]) {
+        foreach (self::$workers as $index => [, $input, $output]) {
             if ($output !== $workerOutput) {
                 continue;
             }
@@ -279,10 +290,6 @@ final class ForkedProcess extends Process
 
             fclose($input);
             fclose($output);
-
-            if (is_resource($process)) {
-                proc_close($process);
-            }
         }
     }
 }

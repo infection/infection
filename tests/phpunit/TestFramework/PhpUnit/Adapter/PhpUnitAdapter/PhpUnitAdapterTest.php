@@ -54,6 +54,7 @@ use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
@@ -61,6 +62,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(PhpUnitAdapter::class)]
+#[Group('integration')]
 final class PhpUnitAdapterTest extends TestCase
 {
     private const string DEFAULT_PHPUNIT_VERSION = '9.0';
