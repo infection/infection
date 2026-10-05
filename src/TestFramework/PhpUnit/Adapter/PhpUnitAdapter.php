@@ -53,9 +53,6 @@ use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Override;
 use function Safe\preg_match;
 use function sprintf;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\ProcessSignaledException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use function trim;
 use function version_compare;
@@ -95,10 +92,6 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
      * @param string[] $phpExtraArgs
      *
      * @throws InvalidPhpUnitConfiguration
-     * @throws ProcessFailedException
-     * @throws ProcessSignaledException
-     * @throws ProcessTimedOutException
-     * @throws SymfonyProcessRuntimeException
      * @throws InvalidVersion
      *
      * @return string[]
@@ -311,10 +304,6 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
      * @param string[] $phpExtraArgs
      *
      * @throws InvalidPhpUnitConfiguration
-     * @throws ProcessSignaledException
-     * @throws ProcessTimedOutException
-     * @throws ProcessFailedException
-     * @throws SymfonyProcessRuntimeException
      * @throws InvalidVersion
      */
     private function validateConfigurationIfSupported(array $phpExtraArgs): void
@@ -337,6 +326,7 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
                         '--validate-configuration',
                     ],
                 ),
+                timeout: 2,
             );
         } catch (SymfonyProcessRuntimeException $processFailed) {
             throw new InvalidPhpUnitConfiguration(
