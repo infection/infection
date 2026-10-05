@@ -216,35 +216,26 @@ final readonly class XmlConfigurationManipulator
         $this->addOrUpdateCoverageNodes('source', 'include', $xPath, $srcDirs, $filteredSourceFilesToMutate);
     }
 
-    // TODO: fix return type... There is no point in returning true if we
-    //   never return false.
     /**
      * @throws InvalidPhpUnitConfiguration
      */
-    public function validate(string $configPath, SafeDOMXPath $xPath): true
-    {
+    public function validate(
+        string $configPath,
+        SafeDOMXPath $xPath,
+    ): void {
         if ($xPath->queryCount('/phpunit') === 0) {
             throw InvalidPhpUnitConfiguration::byRootNode($configPath);
         }
 
         if ($xPath->queryCount('namespace::xsi') === 0) {
-            return true;
+            return;
         }
 
-        $schema = $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue;
-
-        $original = libxml_use_internal_errors(true);
-
-        if ($schema !== null && !$xPath->document->schemaValidate($this->buildSchemaPath($schema))) {
-            throw InvalidPhpUnitConfiguration::byXsdSchema(
-                $configPath,
-                $this->getXmlErrorsString(),
-            );
-        }
-
-        libxml_use_internal_errors($original);
-
-        return true;
+        $this->validateAgainstSchema(
+            $configPath,
+            $xPath->document,
+            $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue,
+        );
     }
 
     public function removeDefaultTestSuite(SafeDOMXPath $xPath): void
@@ -263,6 +254,29 @@ final readonly class XmlConfigurationManipulator
 
         $this->addAttributeIfNotSet('failOnRisky', 'true', $xPath);
         $this->addAttributeIfNotSet('failOnWarning', 'true', $xPath);
+    }
+
+    /**
+     * @throws InvalidPhpUnitConfiguration
+     */
+    private function validateAgainstSchema(
+        string $configPath,
+        DOMDocument $document,
+        ?string $schema,
+    ): void {
+        $original = libxml_use_internal_errors(true);
+
+        if (
+            $schema !== null
+            && !$document->schemaValidate($this->buildSchemaPath($schema))
+        ) {
+            throw InvalidPhpUnitConfiguration::byXsdSchema(
+                $configPath,
+                $this->getXmlErrorsString(),
+            );
+        }
+
+        libxml_use_internal_errors($original);
     }
 
     /**
