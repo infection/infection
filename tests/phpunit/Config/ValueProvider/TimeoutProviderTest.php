@@ -43,6 +43,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\rewind;
 use function Safe\stream_get_contents;
+use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\StringInput;
 
 #[Group('integration')]
 #[CoversClass(TimeoutProvider::class)]
@@ -165,5 +168,24 @@ final class TimeoutProviderTest extends BaseProviderTestCase
         yield 'zero' => ['0'];
 
         yield 'negative' => ['-5'];
+    }
+
+    public function test_it_returns_default_when_question_helper_throws_runtime_exception(): void
+    {
+        $questionHelperMock = $this->createMock(QuestionHelper::class);
+        $questionHelperMock
+            ->expects($this->once())
+            ->method('ask')
+            ->willThrowException(new SymfonyRuntimeException())
+        ;
+
+        $provider = new TimeoutProvider(
+            $this->createStub(ConsoleHelper::class),
+            $questionHelperMock,
+        );
+
+        $timeout = $provider->get(new IO(new StringInput(''), $this->createStreamOutput()));
+
+        $this->assertSame(TimeoutProvider::DEFAULT_TIMEOUT, $timeout);
     }
 }

@@ -38,6 +38,7 @@ namespace Infection\Config\ValueProvider;
 use Closure;
 use Infection\Config\ConsoleHelper;
 use Infection\Console\IO;
+use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
 use Webmozart\Assert\Assert;
@@ -53,7 +54,7 @@ final readonly class TimeoutProvider
         '',
         'Infection limits how long each mutant test process is allowed to run.',
         'Any mutant process that exceeds this timeout will be killed and considered timed out.',
-        'Furthermore, mutations that are known to take longer than this timeout will be skipped automatically.',
+        'Make sure to set it to a higher value than your tests are executed in seconds to avoid false-positives.',
         '',
     ];
 
@@ -75,14 +76,18 @@ final readonly class TimeoutProvider
         $question = new Question($questionText, self::DEFAULT_TIMEOUT);
         $question->setValidator($this->getValidator());
 
-        /** @var int|float $answer */
-        $answer = $this->questionHelper->ask(
-            $io->getInput(),
-            $io->getOutput(),
-            $question,
-        );
+        try {
+            /** @var int|float $answer */
+            $answer = $this->questionHelper->ask(
+                $io->getInput(),
+                $io->getOutput(),
+                $question,
+            );
 
-        return $answer;
+            return $answer;
+        } catch (SymfonyRuntimeException) {
+            return self::DEFAULT_TIMEOUT;
+        }
     }
 
     /**
