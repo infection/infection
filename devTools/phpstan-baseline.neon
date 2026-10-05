@@ -1863,6 +1863,12 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Path/PathReplacerTest.php
 
 		-
+			rawMessage: 'Call to method PHPUnit\Framework\Assert::assertTrue() with true will always evaluate to true.'
+			identifier: method.alreadyNarrowedType
+			count: 3
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php
+
+		-
 			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
 			identifier: catch.neverThrown
 			count: 1
