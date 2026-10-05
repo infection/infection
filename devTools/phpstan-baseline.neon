@@ -1293,7 +1293,7 @@ parameters:
 				Remove once CombinedTestFramework composes static analysis with the test suite.
 			'''
 			identifier: classConstant.deprecatedInterface
-			count: 1
+			count: 2
 			path: ../tests/phpunit/EngineTest.php
 
 		-
