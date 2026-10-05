@@ -221,10 +221,8 @@ final readonly class XmlConfigurationManipulator
     /**
      * @throws InvalidPhpUnitConfiguration
      */
-    public function validate(
-        string $configPath,
-        SafeDOMXPath $xPath,
-    ): true {
+    public function validate(string $configPath, SafeDOMXPath $xPath): true
+    {
         if ($xPath->queryCount('/phpunit') === 0) {
             throw InvalidPhpUnitConfiguration::byRootNode($configPath);
         }
