@@ -216,6 +216,8 @@ final readonly class XmlConfigurationManipulator
         $this->addOrUpdateCoverageNodes('source', 'include', $xPath, $srcDirs, $filteredSourceFilesToMutate);
     }
 
+    // TODO: fix return type... There is no point in returning true if we
+    //   never return false.
     /**
      * @throws InvalidPhpUnitConfiguration
      */
@@ -223,8 +225,6 @@ final readonly class XmlConfigurationManipulator
         string $configPath,
         SafeDOMXPath $xPath,
     ): true {
-        // TODO: fix return type... There is no point in returning true if we
-        //   never return false.
         if ($xPath->queryCount('/phpunit') === 0) {
             throw InvalidPhpUnitConfiguration::byRootNode($configPath);
         }

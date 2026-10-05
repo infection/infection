@@ -2745,12 +2745,6 @@ count = 1
 [[issues]]
 file = "src/Process/Runner/InitialTestsRunner.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration` in `Infection\Process\Runner\InitialTestsRunner::run`.'
-count = 1
-
-[[issues]]
-file = "src/Process/Runner/InitialTestsRunner.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Process\Runner\InitialTestsRunner::run`.'
 count = 1
 
