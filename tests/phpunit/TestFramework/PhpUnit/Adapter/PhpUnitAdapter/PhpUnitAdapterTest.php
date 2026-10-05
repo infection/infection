@@ -192,9 +192,13 @@ final class PhpUnitAdapterTest extends TestCase
 
     public static function initialRunOutputProvider(): iterable
     {
-        yield 'reported memory usage' => ['Memory: 42.00 MB', 42.0];
+        yield 'single-digit memory usage' => ['Memory: 8.00MB', 8.0];
 
-        yield 'unknown memory usage' => ['output', null];
+        yield 'multiple-digit memory usage' => ['Memory: 68.00MB', 68.0];
+
+        yield 'space before the unit' => ['Memory: 68.00 MB', 68.0];
+
+        yield 'unknown memory usage' => ['Time: 2.51 seconds', null];
     }
 
     public function test_it_throws_when_the_initial_run_fails(): void
@@ -361,44 +365,6 @@ final class PhpUnitAdapterTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    #[DataProvider('memoryReportProvider')]
-    public function test_it_can_tell_the_memory_usage_from_the_output(
-        string $output,
-        float $expectedResult,
-    ): void {
-        $this->fileSystemMock
-            ->expects($this->never())
-            ->method('dumpFile')
-        ;
-        $this->pcovDirectoryProvider
-            ->expects($this->never())
-            ->method('shouldProvide')
-        ;
-
-        $result = $this->adapter->getMemoryUsed($output);
-
-        $this->assertSame($expectedResult, $result);
-    }
-
-    public function test_it_provides_initial_run_only_options(): void
-    {
-        $this->fileSystemMock
-            ->expects($this->never())
-            ->method('dumpFile')
-        ;
-        $this->pcovDirectoryProvider
-            ->expects($this->never())
-            ->method('shouldProvide')
-        ;
-
-        $options = $this->adapter->getInitialRunOnlyOptions();
-
-        $this->assertSame(
-            ['--configuration', '--filter', '--testsuite'],
-            $options,
-        );
-    }
-
     #[DataProvider('initialTestRunProvider')]
     public function test_it_provides_initial_test_run_command_line(
         InitialTestRunScenario $scenario,
@@ -494,17 +460,6 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['OK, but incomplete, skipped, or risky tests!', false];
 
         yield ['ParseError: syntax error, unexpected ">"', true];
-    }
-
-    public static function memoryReportProvider(): iterable
-    {
-        yield ['Memory: 8.00MB', 8.0];
-
-        yield ['Memory: 68.00MB', 68.0];
-
-        yield ['Memory: 68.00 MB', 68.0];
-
-        yield ['Time: 2.51 seconds', -1.0];
     }
 
     #[DataProvider('executionOrderProvider')]

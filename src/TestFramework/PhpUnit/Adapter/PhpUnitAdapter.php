@@ -280,17 +280,6 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         return preg_match('/ParseError: syntax error/i', $output) === 1;
     }
 
-    public function getMemoryUsed(string $output): float
-    {
-        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match) === 1) {
-            Assert::keyExists($match, 1);
-
-            return (float) $match[1];
-        }
-
-        return -1.;
-    }
-
     public function getName(): string
     {
         return 'PHPUnit';
@@ -346,9 +335,20 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
     /**
      * @return string[]
      */
-    public function getInitialRunOnlyOptions(): array
+    private function getInitialRunOnlyOptions(): array
     {
         return ['--configuration', '--filter', '--testsuite'];
+    }
+
+    private function getMemoryUsed(string $output): float
+    {
+        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match) === 1) {
+            Assert::keyExists($match, 1);
+
+            return (float) $match[1];
+        }
+
+        return -1.;
     }
 
     /**
