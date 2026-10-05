@@ -163,6 +163,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
 
         $configManipulator = new XmlConfigurationManipulator(
             new PathReplacer($fileSystem, $testFrameworkConfigDir),
+            $testFrameworkConfigDir,
         );
 
         return new PhpUnitAdapter(
