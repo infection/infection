@@ -248,13 +248,14 @@ final class ForkedProcess extends Process
         $process = proc_open(
             // PHP's CLI does not accept a phar:// path as the script.
             [PHP_BINARY, '-r', sprintf('require %s;', var_export(self::WORKER, true))],
-            [['pipe', 'r'], ['pipe', 'w'], ['redirect', 1]],
+            // The requests use descriptor 3: a script that reads STDIN must get an end of file, not the next request.
+            [['file', '/dev/null', 'r'], ['pipe', 'w'], ['redirect', 1], ['pipe', 'r']],
             $pipes,
         );
 
         stream_set_blocking($pipes[1], false);
 
-        return [$process, $pipes[0], $pipes[1]];
+        return [$process, $pipes[3], $pipes[1]];
     }
 
     private static function stopWorkers(): void

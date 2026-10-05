@@ -9,7 +9,7 @@ declare(strict_types=1);
  * itself does before the test framework bootstrap. After each run the child reports the vendor
  * files it loaded, and the worker loads these files before the next fork.
  *
- * Request, one line on STDIN:
+ * Request, one line on file descriptor 3 (STDIN stays free for the script):
  *   {"argv": ["/path/to/vendor/bin/phpunit", "--configuration", "..."], "env": {"TEST_TOKEN": 1}, "timeout": 5.0,
  *    "autoload": "/path/to/vendor/autoload.php", "source": "/path/to/src/Mutated.php"}
  * Response on STDOUT: the output of the child, then "\0FORK <exit code> <timed out>\n"
@@ -25,6 +25,7 @@ use function dirname;
 use function fclose;
 use function feof;
 use function fgets;
+use function fopen;
 use function fread;
 use function fwrite;
 use function get_included_files;
@@ -46,7 +47,6 @@ use function putenv;
 use function realpath;
 use function register_shutdown_function;
 use const SIGKILL;
-use const STDIN;
 use function str_ends_with;
 use function str_starts_with;
 use function stream_select;
@@ -195,7 +195,9 @@ function preload(array $files): void
 
 $vendorDir = null;
 
-while (false !== $line = fgets(STDIN)) {
+$requests = fopen('php://fd/3', 'r');
+
+while (false !== $line = fgets($requests)) {
     $request = json_decode($line, true);
 
     $vendorDir ??= load_autoload_file($request);
