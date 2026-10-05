@@ -46,6 +46,7 @@ use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Override;
 use function Safe\preg_match;
@@ -85,6 +86,8 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
      * Returns array of arguments to pass them into the Initial Run Process
      *
      * @param string[] $phpExtraArgs
+     *
+     * @throws InvalidPhpUnitConfiguration
      *
      * @return string[]
      */
