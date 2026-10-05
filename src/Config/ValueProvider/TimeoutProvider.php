@@ -38,7 +38,6 @@ namespace Infection\Config\ValueProvider;
 use Closure;
 use Infection\Config\ConsoleHelper;
 use Infection\Console\IO;
-use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
 use Webmozart\Assert\Assert;
@@ -76,18 +75,14 @@ final readonly class TimeoutProvider
         $question = new Question($questionText, self::DEFAULT_TIMEOUT);
         $question->setValidator($this->getValidator());
 
-        try {
-            /** @var int|float $answer */
-            $answer = $this->questionHelper->ask(
-                $io->getInput(),
-                $io->getOutput(),
-                $question,
-            );
+        /** @var int|float $answer */
+        $answer = $this->questionHelper->ask(
+            $io->getInput(),
+            $io->getOutput(),
+            $question,
+        );
 
-            return $answer;
-        } catch (SymfonyRuntimeException) {
-            return self::DEFAULT_TIMEOUT;
-        }
+        return $answer;
     }
 
     /**
@@ -96,10 +91,6 @@ final readonly class TimeoutProvider
     private function getValidator(): Closure
     {
         return static function (mixed $value): int|float {
-            if ($value === '' || $value === null) {
-                return self::DEFAULT_TIMEOUT;
-            }
-
             Assert::numeric($value, 'The timeout must be a positive number.');
 
             $floatValue = (float) $value;

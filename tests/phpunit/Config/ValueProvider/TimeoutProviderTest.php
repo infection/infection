@@ -124,7 +124,27 @@ final class TimeoutProviderTest extends BaseProviderTestCase
 
         $timeout = $this->provider->get(
             new IO(
-                $this->createStreamableInput($this->getInputStream("{$invalidInput}\n")),
+                $this->createStreamableInput($this->getInputStream("{$invalidInput}\n15\n")),
+                $output,
+            ),
+        );
+
+        $this->assertSame(15, $timeout);
+
+        $stream = $output->getStream();
+        rewind($stream);
+        $display = stream_get_contents($stream);
+
+        $this->assertStringContainsString('The timeout must be a positive number.', $display);
+    }
+
+    public function test_validates_incorrect_value_then_accepts_default(): void
+    {
+        $output = $this->createStreamOutput();
+
+        $timeout = $this->provider->get(
+            new IO(
+                $this->createStreamableInput($this->getInputStream("invalid\n\n")),
                 $output,
             ),
         );
