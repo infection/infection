@@ -40,10 +40,14 @@ use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
+use Infection\Process\ForkedProcess;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use function function_exists;
+use function getenv;
 use function min;
+use function str_ends_with;
 use Symfony\Component\Process\Process;
 
 /**
@@ -74,17 +78,18 @@ class MutantProcessContainerFactory
         // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
         $timeout = min(self::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (self::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime()), $this->timeout);
 
-        $process = new Process(
-            command: $testFrameworkAdapter->getMutantCommandLine(
-                $mutant->getTests(),
-                $mutant->getFilePath(),
-                $mutant->getMutation()->getHash(),
-                $mutant->getMutation()->getOriginalFilePath(),
-                $testFrameworkExtraOptions,
-            ),
-            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
-            timeout: $timeout,
+        $command = $testFrameworkAdapter->getMutantCommandLine(
+            $mutant->getTests(),
+            $mutant->getFilePath(),
+            $mutant->getMutation()->getHash(),
+            $mutant->getMutation()->getOriginalFilePath(),
+            $testFrameworkExtraOptions,
         );
+        $env = ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY];
+
+        $process = self::canFork($command)
+            ? new ForkedProcess($command, $env, $timeout)
+            : new Process(command: $command, env: $env, timeout: $timeout);
 
         if ($this->configuration->isDryRun) {
             $process = DryRunProcess::fromProcess($process);
@@ -98,5 +103,17 @@ class MutantProcessContainerFactory
             ),
             $this->lazyMutantProcessCreators,
         );
+    }
+
+    /**
+     * A fork is possible only if the command is a PHP script without PHP options.
+     *
+     * @param list<string> $command
+     */
+    private static function canFork(array $command): bool
+    {
+        return getenv('INFECTION_FORK') === '1'
+            && function_exists('pcntl_fork')
+            && str_ends_with($command[0], 'phpunit');
     }
 }
