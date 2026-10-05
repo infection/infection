@@ -38,11 +38,9 @@ namespace Infection\Config\ValueProvider;
 use Closure;
 use Infection\Config\ConsoleHelper;
 use Infection\Console\IO;
-use function is_numeric;
-use function is_string;
+use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
-use function trim;
 use Webmozart\Assert\Assert;
 
 /**
@@ -52,23 +50,26 @@ final readonly class TimeoutProvider
 {
     public const int DEFAULT_TIMEOUT = 10;
 
+    private const array TIMEOUT_NOTICE = [
+        '',
+        'Infection limits how long each mutant test process is allowed to run.',
+        'Any mutant process that exceeds this timeout will be killed and considered timed out.',
+        'Furthermore, mutations that are known to take longer than this timeout will be skipped automatically.',
+        '',
+    ];
+
     public function __construct(
         private ConsoleHelper $consoleHelper,
         private QuestionHelper $questionHelper,
     ) {
     }
 
+    /**
+     * @throws SymfonyRuntimeException
+     */
     public function get(IO $io): int|float
     {
-        $io->writeln(['']);
-
-        $io->writeln([
-            '',
-            'Infection limits how long each mutant test process is allowed to run.',
-            'Any mutant process that exceeds this timeout will be killed and considered timed out.',
-            'Furthermore, mutations that are known to take longer than this timeout will be skipped automatically.',
-            '',
-        ]);
+        $io->writeln(self::TIMEOUT_NOTICE);
 
         $questionText = $this->consoleHelper->getQuestion(
             'What is the maximum allowed time in seconds for each mutant process?',
@@ -98,20 +99,11 @@ final readonly class TimeoutProvider
                 return self::DEFAULT_TIMEOUT;
             }
 
-            if (is_string($value)) {
-                $value = trim($value);
-
-                if ($value === '') {
-                    return self::DEFAULT_TIMEOUT;
-                }
-            }
-
-            Assert::true(
-                is_numeric($value) && (float) $value > 0,
-                'The timeout must be a positive number.',
-            );
+            Assert::numeric($value, 'The timeout must be a positive number.');
 
             $floatValue = (float) $value;
+
+            Assert::greaterThan($floatValue, 0, 'The timeout must be a positive number.');
 
             return (float) (int) $floatValue === $floatValue ? (int) $floatValue : $floatValue;
         };

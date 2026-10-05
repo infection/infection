@@ -39,8 +39,10 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TimeoutProvider;
 use Infection\Console\IO;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
+use function Safe\rewind;
+use function Safe\stream_get_contents;
 
 #[Group('integration')]
 #[CoversClass(TimeoutProvider::class)]
@@ -58,14 +60,25 @@ final class TimeoutProviderTest extends BaseProviderTestCase
 
     public function test_it_uses_default_value(): void
     {
+        $output = $this->createStreamOutput();
+
         $timeout = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("\n")),
-                $this->createStreamOutput(),
+                $output,
             ),
         );
 
         $this->assertSame(TimeoutProvider::DEFAULT_TIMEOUT, $timeout);
+
+        $stream = $output->getStream();
+        rewind($stream);
+        $display = stream_get_contents($stream);
+
+        $this->assertStringContainsString(
+            'Infection limits how long each mutant test process is allowed to run.',
+            $display,
+        );
     }
 
     public function test_it_uses_default_value_when_whitespace_is_provided(): void
@@ -104,19 +117,33 @@ final class TimeoutProviderTest extends BaseProviderTestCase
         $this->assertSame(2.5, $timeout);
     }
 
-    public function test_validates_incorrect_value(): void
+    #[DataProvider('invalidTimeoutProvider')]
+    public function test_validates_incorrect_value(string $invalidInput): void
     {
-        if (!$this->hasSttyAvailable()) {
-            $this->markTestSkipped('Stty is not available');
-        }
+        $output = $this->createStreamOutput();
 
-        $this->expectException(SymfonyRuntimeException::class);
-
-        $this->provider->get(
+        $timeout = $this->provider->get(
             new IO(
-                $this->createStreamableInput($this->getInputStream("invalid\n")),
-                $this->createStreamOutput(),
+                $this->createStreamableInput($this->getInputStream("{$invalidInput}\n")),
+                $output,
             ),
         );
+
+        $this->assertSame(TimeoutProvider::DEFAULT_TIMEOUT, $timeout);
+
+        $stream = $output->getStream();
+        rewind($stream);
+        $display = stream_get_contents($stream);
+
+        $this->assertStringContainsString('The timeout must be a positive number.', $display);
+    }
+
+    public static function invalidTimeoutProvider(): iterable
+    {
+        yield 'non-numeric' => ['invalid'];
+
+        yield 'zero' => ['0'];
+
+        yield 'negative' => ['-5'];
     }
 }
