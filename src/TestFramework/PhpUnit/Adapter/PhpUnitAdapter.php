@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use function dirname;
 use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
@@ -46,8 +47,10 @@ use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
+use Infection\TestFramework\ProvidesForkAutoloadFile;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Override;
+use function realpath;
 use function Safe\preg_match;
 use function sprintf;
 use function trim;
@@ -57,7 +60,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware, TestFrameworkAdapter
+final class PhpUnitAdapter implements MemoryUsageAware, ProvidesForkAutoloadFile, ProvidesInitialRunOnlyOptions, SyntaxErrorAware, TestFrameworkAdapter
 {
     public const string COVERAGE_DIR = 'coverage-xml';
 
@@ -154,6 +157,19 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
                 $this->getVersion(),
             ),
         );
+    }
+
+    /**
+     * A fork is possible only for a Composer bin script, and only if the bootstrap is the autoload file of that script.
+     * A custom bootstrap file disables the fork.
+     */
+    #[Override]
+    public function getForkAutoloadFile(array $command): ?string
+    {
+        $autoloadFile = realpath(dirname($command[0]) . '/../autoload.php');
+        $bootstrapFile = realpath((string) $this->mutationConfigBuilder->getOriginalBootstrapFile());
+
+        return $autoloadFile !== false && $autoloadFile === $bootstrapFile ? $autoloadFile : null;
     }
 
     public function getVersion(): string

@@ -44,10 +44,10 @@ use Infection\Process\ForkedProcess;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\ProvidesForkAutoloadFile;
 use function function_exists;
 use function getenv;
 use function min;
-use function str_ends_with;
 use Symfony\Component\Process\Process;
 
 /**
@@ -87,8 +87,10 @@ class MutantProcessContainerFactory
         );
         $env = ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY];
 
-        $process = self::canFork($command)
-            ? new ForkedProcess($command, $env, $timeout)
+        $autoloadFile = self::findForkAutoloadFile($testFrameworkAdapter, $command);
+
+        $process = $autoloadFile !== null
+            ? new ForkedProcess($command, $env, $timeout, $autoloadFile, $mutant->getMutation()->getOriginalFilePath())
             : new Process(command: $command, env: $env, timeout: $timeout);
 
         if ($this->configuration->isDryRun) {
@@ -106,16 +108,21 @@ class MutantProcessContainerFactory
     }
 
     /**
-     * A fork is possible only if the command is a PHP script without PHP options.
      * To disable the fork: INFECTION_FORK=0.
      *
      * @param list<string> $command
      */
-    private static function canFork(array $command): bool
+    private static function findForkAutoloadFile(TestFrameworkAdapter $testFrameworkAdapter, array $command): ?string
     {
-        return getenv('INFECTION_FORK') !== '0'
-            && function_exists('pcntl_fork')
-            && function_exists('posix_kill')
-            && str_ends_with($command[0], 'phpunit');
+        if (
+            getenv('INFECTION_FORK') === '0'
+            || !function_exists('pcntl_fork')
+            || !function_exists('posix_kill')
+            || !$testFrameworkAdapter instanceof ProvidesForkAutoloadFile
+        ) {
+            return null;
+        }
+
+        return $testFrameworkAdapter->getForkAutoloadFile($command);
     }
 }

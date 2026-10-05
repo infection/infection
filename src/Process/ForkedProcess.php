@@ -92,11 +92,15 @@ final class ForkedProcess extends Process
     /**
      * @param list<string> $command the PHP script with its arguments
      * @param array<string, string|int> $forkEnv
+     * @param string $autoloadFile the file that the worker loads a single time, before the first fork
+     * @param string $sourceFile the original file of the mutant; it must not be in the worker
      */
     public function __construct(
         private readonly array $command,
         private readonly array $forkEnv,
         private readonly float $forkTimeout,
+        private readonly string $autoloadFile,
+        private readonly string $sourceFile,
     ) {
         parent::__construct($command, env: $forkEnv, timeout: $forkTimeout);
     }
@@ -111,7 +115,13 @@ final class ForkedProcess extends Process
 
         $this->startTime = microtime(true);
 
-        fwrite($input, json_encode(['argv' => $this->command, 'env' => $env + $this->forkEnv, 'timeout' => $this->forkTimeout]) . "\n");
+        fwrite($input, json_encode([
+            'argv' => $this->command,
+            'env' => $env + $this->forkEnv,
+            'timeout' => $this->forkTimeout,
+            'autoload' => $this->autoloadFile,
+            'source' => $this->sourceFile,
+        ]) . "\n");
     }
 
     /**

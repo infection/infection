@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 /*
  * This worker runs a PHP script, such as vendor/bin/phpunit, in a forked child for each request.
- * The worker loads only files from the Composer vendor directory: a child reports the vendor
+ *
+ * Before the first fork the worker loads the Composer autoload file of the script, as the script
+ * itself does before the test framework bootstrap. After each run the child reports the vendor
  * files it loaded, and the worker loads these files before the next fork.
  *
- * Request, one line on STDIN:  {"argv": ["/path/to/vendor/bin/phpunit", "--configuration", "..."], "env": {"TEST_TOKEN": 1}, "timeout": 5.0}
- * Response on STDOUT:          the output of the child, then "\0FORK <exit code> <timed out>\n"
+ * Request, one line on STDIN:
+ *   {"argv": ["/path/to/vendor/bin/phpunit", "--configuration", "..."], "env": {"TEST_TOKEN": 1}, "timeout": 5.0,
+ *    "autoload": "/path/to/vendor/autoload.php", "source": "/path/to/src/Mutated.php"}
+ * Response on STDOUT: the output of the child, then "\0FORK <exit code> <timed out>\n"
  */
 
 namespace Infection\ForkWorker;
 
 use function array_diff;
 use function array_filter;
-use function array_keys;
-use function array_map;
 use function array_values;
 use function count;
 use function dirname;
@@ -26,17 +28,18 @@ use function fgets;
 use function fread;
 use function fwrite;
 use function get_included_files;
-use function implode;
-use function is_file;
+use function in_array;
 use function json_decode;
 use function json_encode;
 use function max;
 use function microtime;
+use function pcntl_exec;
 use function pcntl_fork;
 use function pcntl_waitpid;
 use function pcntl_wexitstatus;
 use function pcntl_wifexited;
 use function pcntl_wtermsig;
+use const PHP_BINARY;
 use function posix_kill;
 use function printf;
 use function putenv;
@@ -54,98 +57,6 @@ use const STREAM_SOCK_STREAM;
 const KILLED_EXIT_CODE_BASE = 128;
 
 /**
- * Finds the Composer vendor directory that contains the given script.
- */
-function find_vendor_dir(string $script): ?string
-{
-    $dir = dirname((string) realpath($script));
-
-    while (!is_file($dir . '/composer/autoload_classmap.php') && $dir !== dirname($dir)) {
-        $dir = dirname($dir);
-    }
-
-    return is_file($dir . '/composer/autoload_classmap.php') ? $dir : null;
-}
-
-/**
- * Makes vendor classes loadable for the time of a preload, without the project's own autoload files.
- */
-function vendor_class_loader(string $vendorDir): object
-{
-    require_once $vendorDir . '/composer/ClassLoader.php';
-
-    // This is the project's class, not the copy in the Infection PHAR; PHP-Scoper must not add a prefix to the name.
-    $class = implode('\\', ['Composer', 'Autoload', 'ClassLoader']);
-
-    $loader = new $class($vendorDir);
-    $loader->addClassMap(require $vendorDir . '/composer/autoload_classmap.php');
-
-    $psr4 = require $vendorDir . '/composer/autoload_psr4.php';
-    array_map($loader->setPsr4(...), array_keys($psr4), $psr4);
-
-    return $loader;
-}
-
-/**
- * @return array<string, string> the Composer "files" autoload entries from the vendor directory
- */
-function vendor_autoload_files(string $vendorDir): array
-{
-    if (!is_file($vendorDir . '/composer/autoload_files.php')) {
-        return [];
-    }
-
-    return array_filter(
-        require $vendorDir . '/composer/autoload_files.php',
-        static fn (string $file) => str_starts_with((string) realpath($file), $vendorDir . '/'),
-    );
-}
-
-/**
- * Loads the Composer "files" autoload entries from the vendor directory.
- */
-function preload_autoload_files(string $vendorDir): void
-{
-    foreach (vendor_autoload_files($vendorDir) as $identifier => $file) {
-        // Composer skips a file with this flag, thus a child loads only the project's own files.
-        $GLOBALS['__composer_autoload_files'][$identifier] = true;
-
-        require_once $file;
-    }
-}
-
-/**
- * @param list<string> $files
- */
-function preload(string $vendorDir, array $files): void
-{
-    $loader = vendor_class_loader($vendorDir);
-    $loader->register();
-
-    foreach ($files as $file) {
-        require_once $file;
-    }
-
-    $loader->unregister();
-}
-
-/**
- * @return list<string> the vendor files that the current process loaded and the worker did not
- */
-function new_vendor_files(string $vendorDir, array $known): array
-{
-    $files = array_filter(
-        get_included_files(),
-        static fn (string $file) => str_starts_with($file, $vendorDir . '/')
-            && str_ends_with($file, '.php')
-            && !str_starts_with($file, $vendorDir . '/composer/')
-            && $file !== $vendorDir . '/autoload.php',
-    );
-
-    return array_values(array_diff($files, $known));
-}
-
-/**
  * @param array<string, string|int> $env
  */
 function set_environment(array $env): void
@@ -157,24 +68,40 @@ function set_environment(array $env): void
 }
 
 /**
+ * @param list<string> $known
+ * @return list<string> the vendor files that the current process loaded and the worker did not
+ */
+function new_vendor_files(string $vendorDir, array $known): array
+{
+    $files = array_filter(
+        array_diff(get_included_files(), $known),
+        static fn (string $file) => str_starts_with($file, $vendorDir . '/') && str_ends_with($file, '.php'),
+    );
+
+    return array_values($files);
+}
+
+/**
  * Runs the requested script in the current (child) process.
  *
- * @param array{argv: list<string>, env: array<string, string|int>, timeout: float} $request
+ * @param array{argv: list<string>, env: array<string, string|int>, source: string} $request
  * @param resource $report
  */
-function run_script(array $request, ?string $vendorDir, $report): never
+function run_script(array $request, string $vendorDir, $report): never
 {
     $arguments = $request['argv'];
+    $known = get_included_files();
 
     set_environment($request['env']);
 
-    if ($vendorDir !== null) {
-        $known = get_included_files();
-
-        register_shutdown_function(static function () use ($vendorDir, $known, $report): void {
-            fwrite($report, (string) json_encode(new_vendor_files($vendorDir, $known)));
-        });
+    // A file that the worker loaded cannot be replaced with its mutant: run the script in a new PHP process.
+    if (in_array(realpath($request['source']), $known, true)) {
+        pcntl_exec(PHP_BINARY, $arguments);
     }
+
+    register_shutdown_function(static function () use ($vendorDir, $known, $report): void {
+        fwrite($report, (string) json_encode(new_vendor_files($vendorDir, $known)));
+    });
 
     $GLOBALS['argv'] = $_SERVER['argv'] = $arguments;
     $GLOBALS['argc'] = $_SERVER['argc'] = count($arguments);
@@ -212,10 +139,10 @@ function await_child(int $pid, $report, float $deadline): array
 }
 
 /**
- * @param array{argv: list<string>, env: array<string, string|int>, timeout: float} $request
- * @return list<string> the vendor files to preload before the next request
+ * @param array{argv: list<string>, env: array<string, string|int>, timeout: float, source: string} $request
+ * @return list<string> the vendor files to load before the next request
  */
-function handle(array $request, ?string $vendorDir): array
+function handle(array $request, string $vendorDir): array
 {
     [$reader, $writer] = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, 0);
 
@@ -241,18 +168,37 @@ function handle(array $request, ?string $vendorDir): array
     return json_decode($report, true) ?? [];
 }
 
+/**
+ * Loads the autoload file the same way the script does, with the environment of a run.
+ *
+ * @param array{env: array<string, string|int>, autoload: string} $request
+ * @return string the vendor directory
+ */
+function load_autoload_file(array $request): string
+{
+    set_environment($request['env']);
+
+    require $request['autoload'];
+
+    return dirname((string) realpath($request['autoload']));
+}
+
+/**
+ * @param list<string> $files
+ */
+function preload(array $files): void
+{
+    foreach ($files as $file) {
+        require_once $file;
+    }
+}
+
 $vendorDir = null;
 
 while (false !== $line = fgets(STDIN)) {
     $request = json_decode($line, true);
 
-    if ($vendorDir === null && null !== $vendorDir = find_vendor_dir($request['argv'][0])) {
-        preload_autoload_files($vendorDir);
-    }
+    $vendorDir ??= load_autoload_file($request);
 
-    $files = handle($request, $vendorDir);
-
-    if ($files !== []) {
-        preload($vendorDir, $files);
-    }
+    preload(handle($request, $vendorDir));
 }

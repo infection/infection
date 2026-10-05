@@ -71,6 +71,14 @@ final class MutationConfigBuilder
     }
 
     /**
+     * Returns the bootstrap file of the original configuration, or null before the first build.
+     */
+    public function getOriginalBootstrapFile(): ?string
+    {
+        return $this->originalBootstrapFile;
+    }
+
+    /**
      * @param TestLocation[] $tests
      */
     public function build(
