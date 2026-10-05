@@ -229,6 +229,10 @@ final readonly class XmlConfigurationManipulator
             throw InvalidPhpUnitConfiguration::byRootNode($configPath);
         }
 
+        if ($xPath->queryCount('namespace::xsi') === 0) {
+            return;
+        }
+
         $this->validateAgainstSchemaIfNecessary(
             $version,
             $configPath,
@@ -265,10 +269,7 @@ final readonly class XmlConfigurationManipulator
         // PHPUnit 9 and older only print schema errors and can exit successfully even with
         // failOnWarning enabled. PHPUnit 10+ reports them as test runner warnings, which
         // fail Infection's initial run, so avoid resolving external schemas for those versions.
-        if (
-            self::isPhpUnit10OrHigher($version)
-            || $xPath->queryCount('namespace::xsi') === 0
-        ) {
+        if (self::isPhpUnit10OrHigher($version)) {
             return;
         }
 
@@ -283,10 +284,7 @@ final readonly class XmlConfigurationManipulator
     {
         static $versions = [];
 
-        if (!array_key_exists(
-            $version,
-            $versions,
-        )) {
+        if (!array_key_exists($version, $versions)) {
             $versions[$version] = version_compare(
                 $version,
                 '10.0',
@@ -307,9 +305,10 @@ final readonly class XmlConfigurationManipulator
     ): void {
         $original = libxml_use_internal_errors(true);
 
-        if ($schema !== null && !$document->schemaValidate(
-            $this->buildSchemaPath($schema),
-        )) {
+        if (
+            $schema !== null
+            && !$document->schemaValidate($this->buildSchemaPath($schema))
+        ) {
             throw InvalidPhpUnitConfiguration::byXsdSchema(
                 $configPath,
                 $this->getXmlErrorsString(),

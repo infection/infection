@@ -1068,7 +1068,7 @@ parameters:
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator should not depend on Infection\TestFramework\XML\SafeDOMXPath
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 22
+			count: 23
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
 
 		-
@@ -1861,6 +1861,12 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Path/PathReplacerTest.php
+
+		-
+			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
+			identifier: catch.neverThrown
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php
 
 		-
 			rawMessage: 'Parameter #1 $callback of function set_error_handler expects (callable(int, string, string, int): bool)|null, Closure(int, string, string, string): void given.'
