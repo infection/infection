@@ -47,10 +47,12 @@ use function preg_match;
 use function proc_close;
 use function proc_open;
 use function register_shutdown_function;
+use function sprintf;
 use function stream_get_contents;
 use function stream_set_blocking;
 use function strlen;
 use function substr;
+use function var_export;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
@@ -112,37 +114,26 @@ final class ForkedProcess extends Process
         fwrite($input, json_encode(['argv' => $this->command, 'env' => $env + $this->forkEnv, 'timeout' => $this->forkTimeout]) . "\n");
     }
 
+    /**
+     * A run with a timeout stays in the running state until checkTimeout() reports the timeout.
+     * Otherwise a result that arrives between checkTimeout() and isRunning() loses its timeout.
+     */
     #[Override]
     public function isRunning(): bool
     {
-        if ($this->workerOutput === null || $this->exitCode !== null) {
+        if ($this->workerOutput === null) {
             return false;
         }
 
-        $this->output .= stream_get_contents($this->workerOutput);
+        $this->readResult();
 
-        if (preg_match('/\0FORK (\d+) (\d)\n$/', $this->output, $matches) === 1) {
-            $this->output = substr($this->output, 0, -strlen($matches[0]));
-            $this->exitCode = (int) $matches[1];
-            $this->timedOut = $matches[2] === '1';
-
-            return false;
-        }
-
-        if (feof($this->workerOutput)) {
-            $this->exitCode = self::WORKER_FAILURE_EXIT_CODE;
-            self::forgetWorker($this->workerOutput);
-
-            return false;
-        }
-
-        return true;
+        return $this->exitCode === null || ($this->timedOut && !$this->timeoutReported);
     }
 
     #[Override]
     public function checkTimeout(): void
     {
-        $this->isRunning();
+        $this->readResult();
 
         if (!$this->timedOut || $this->timeoutReported) {
             return;
@@ -184,7 +175,7 @@ final class ForkedProcess extends Process
     #[Override]
     public function getOutput(): string
     {
-        $this->isRunning();
+        $this->readResult();
 
         return $this->output;
     }
@@ -198,7 +189,7 @@ final class ForkedProcess extends Process
     #[Override]
     public function getExitCode(): ?int
     {
-        $this->isRunning();
+        $this->readResult();
 
         return $this->exitCode;
     }
@@ -207,6 +198,31 @@ final class ForkedProcess extends Process
     public function getStartTime(): float
     {
         return $this->startTime;
+    }
+
+    /**
+     * Reads the available output of the worker, and the result if the run is complete.
+     */
+    private function readResult(): void
+    {
+        if ($this->workerOutput === null || $this->exitCode !== null) {
+            return;
+        }
+
+        $this->output .= stream_get_contents($this->workerOutput);
+
+        if (preg_match('/\0FORK (\d+) (\d)\n$/', $this->output, $matches) === 1) {
+            $this->output = substr($this->output, 0, -strlen($matches[0]));
+            $this->exitCode = (int) $matches[1];
+            $this->timedOut = $matches[2] === '1';
+
+            return;
+        }
+
+        if (feof($this->workerOutput)) {
+            $this->exitCode = self::WORKER_FAILURE_EXIT_CODE;
+            self::forgetWorker($this->workerOutput);
+        }
     }
 
     /**
@@ -219,7 +235,12 @@ final class ForkedProcess extends Process
         }
 
         // The worker inherits the environment as is, with the PHP configuration of this process.
-        $process = proc_open([PHP_BINARY, self::WORKER], [['pipe', 'r'], ['pipe', 'w'], ['redirect', 1]], $pipes);
+        $process = proc_open(
+            // PHP's CLI does not accept a phar:// path as the script.
+            [PHP_BINARY, '-r', sprintf('require %s;', var_export(self::WORKER, true))],
+            [['pipe', 'r'], ['pipe', 'w'], ['redirect', 1]],
+            $pipes,
+        );
 
         stream_set_blocking($pipes[1], false);
 

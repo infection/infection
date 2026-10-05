@@ -18,7 +18,6 @@ use function array_filter;
 use function array_keys;
 use function array_map;
 use function array_values;
-use Composer\Autoload\ClassLoader;
 use function count;
 use function dirname;
 use function fclose;
@@ -27,6 +26,7 @@ use function fgets;
 use function fread;
 use function fwrite;
 use function get_included_files;
+use function implode;
 use function is_file;
 use function json_decode;
 use function json_encode;
@@ -70,11 +70,14 @@ function find_vendor_dir(string $script): ?string
 /**
  * Makes vendor classes loadable for the time of a preload, without the project's own autoload files.
  */
-function vendor_class_loader(string $vendorDir): ClassLoader
+function vendor_class_loader(string $vendorDir): object
 {
     require_once $vendorDir . '/composer/ClassLoader.php';
 
-    $loader = new ClassLoader($vendorDir);
+    // This is the project's class, not the copy in the Infection PHAR; PHP-Scoper must not add a prefix to the name.
+    $class = implode('\\', ['Composer', 'Autoload', 'ClassLoader']);
+
+    $loader = new $class($vendorDir);
     $loader->addClassMap(require $vendorDir . '/composer/autoload_classmap.php');
 
     $psr4 = require $vendorDir . '/composer/autoload_psr4.php';
