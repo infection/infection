@@ -222,13 +222,15 @@ final readonly class XmlConfigurationManipulator
     public function validate(
         string $configPath,
         SafeDOMXPath $xPath,
-    ): void {
+    ): true {
+        // TODO: fix return type... There is no point in returning true if we
+        //   never return false.
         if ($xPath->queryCount('/phpunit') === 0) {
             throw InvalidPhpUnitConfiguration::byRootNode($configPath);
         }
 
         if ($xPath->queryCount('namespace::xsi') === 0) {
-            return;
+            return true;
         }
 
         $this->validateAgainstSchema(
@@ -236,6 +238,8 @@ final readonly class XmlConfigurationManipulator
             $xPath->document,
             $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue,
         );
+
+        return true;
     }
 
     public function removeDefaultTestSuite(SafeDOMXPath $xPath): void

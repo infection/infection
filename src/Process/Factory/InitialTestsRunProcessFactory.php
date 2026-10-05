@@ -38,7 +38,6 @@ namespace Infection\Process\Factory;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\OriginalPhpProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Symfony\Component\Process\Process;
 
 /**
@@ -51,8 +50,6 @@ class InitialTestsRunProcessFactory
      * Creates process with enabled debugger as test framework is going to use in the code coverage.
      *
      * @param string[] $phpExtraOptions
-     *
-     * @throws InvalidPhpUnitConfiguration
      */
     public function createProcess(
         TestFrameworkAdapter $testFrameworkAdapter,
