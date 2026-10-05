@@ -47,23 +47,27 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use SplFileInfo;
+use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(PhpUnitAdapter::class)]
 final class PhpUnitAdapterTest extends TestCase
 {
+    use ExpectsThrowables;
+
     private const string DEFAULT_PHPUNIT_VERSION = '9.0';
 
     private const string PHP_EXECUTABLE = '/path/to/php';
@@ -271,7 +275,10 @@ final class PhpUnitAdapterTest extends TestCase
 
     public function test_it_stops_before_building_the_initial_configuration_when_validation_fails(): void
     {
-        $failure = new RuntimeException('The configuration does not validate against the PHPUnit schema.');
+        $failure = new SymfonyProcessRuntimeException(
+            'The configuration does not validate against the PHPUnit schema.',
+            42,
+        );
 
         $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
         $shellCommandRunner
@@ -298,13 +305,21 @@ final class PhpUnitAdapterTest extends TestCase
             shellCommandRunner: $shellCommandRunner,
         );
 
-        $this->expectExceptionObject($failure);
-
-        $adapter->getInitialTestRunCommandLine(
-            extraOptions: '',
-            phpExtraArgs: [],
-            skipCoverage: true,
+        $exception = $this->expectToThrow(
+            static fn () => $adapter->getInitialTestRunCommandLine(
+                extraOptions: '',
+                phpExtraArgs: [],
+                skipCoverage: true,
+            ),
         );
+
+        $this->assertInstanceOf(InvalidPhpUnitConfiguration::class, $exception);
+        $this->assertSame(
+            'Could not validate the PHPUnit configuration file "/path/to/project/tools/phpunit/phpunit.xml".',
+            $exception->getMessage(),
+        );
+        $this->assertSame(42, $exception->getCode());
+        $this->assertSame($failure, $exception->getPrevious());
     }
 
     public static function configurationValidationProvider(): iterable

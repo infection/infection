@@ -310,6 +310,7 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
     /**
      * @param string[] $phpExtraArgs
      *
+     * @throws InvalidPhpUnitConfiguration
      * @throws ProcessSignaledException
      * @throws ProcessTimedOutException
      * @throws ProcessFailedException
@@ -325,17 +326,28 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
             return;
         }
 
-        $this->shellCommandRunner->mustRun(
-            $this->commandLineBuilder->build(
-                $this->testFrameworkExecutable,
-                $phpExtraArgs,
-                [
-                    '--configuration',
+        try {
+            $this->shellCommandRunner->mustRun(
+                $this->commandLineBuilder->build(
+                    $this->testFrameworkExecutable,
+                    $phpExtraArgs,
+                    [
+                        '--configuration',
+                        $this->testFrameworkConfigPath,
+                        '--validate-configuration',
+                    ],
+                ),
+            );
+        } catch (SymfonyProcessRuntimeException $processFailed) {
+            throw new InvalidPhpUnitConfiguration(
+                sprintf(
+                    'Could not validate the PHPUnit configuration file "%s".',
                     $this->testFrameworkConfigPath,
-                    '--validate-configuration',
-                ],
-            ),
-        );
+                ),
+                (int) $processFailed->getCode(),
+                previous: $processFailed,
+            );
+        }
     }
 
     private function isPhpUnit132OrHigher(string $testFrameworkVersion): bool
