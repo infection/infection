@@ -64,9 +64,6 @@ final readonly class TimeoutProvider
     ) {
     }
 
-    /**
-     * @throws SymfonyRuntimeException
-     */
     public function get(IO $io): int|float
     {
         $io->writeln(self::TIMEOUT_NOTICE);
@@ -79,14 +76,18 @@ final readonly class TimeoutProvider
         $question = new Question($questionText, self::DEFAULT_TIMEOUT);
         $question->setValidator($this->getValidator());
 
-        /** @var int|float $answer */
-        $answer = $this->questionHelper->ask(
-            $io->getInput(),
-            $io->getOutput(),
-            $question,
-        );
+        try {
+            /** @var int|float $answer */
+            $answer = $this->questionHelper->ask(
+                $io->getInput(),
+                $io->getOutput(),
+                $question,
+            );
 
-        return $answer;
+            return $answer;
+        } catch (SymfonyRuntimeException) {
+            return self::DEFAULT_TIMEOUT;
+        }
     }
 
     /**
