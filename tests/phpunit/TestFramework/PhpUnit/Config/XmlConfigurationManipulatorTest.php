@@ -962,7 +962,12 @@ final class XmlConfigurationManipulatorTest extends TestCase
             XML
         );
 
-        $this->assertTrue($this->configManipulator->validate('/path/to/phpunit.xml', $xPath));
+        $this->expectNotToPerformAssertions();
+
+        $this->configManipulator->validate(
+            '/path/to/phpunit.xml',
+            $xPath,
+        );
     }
 
     /**
@@ -1016,7 +1021,12 @@ final class XmlConfigurationManipulatorTest extends TestCase
             XML_WRAP
         );
 
-        $this->assertTrue($this->configManipulator->validate('/path/to/phpunit.xml', $xPath));
+        $this->expectNotToPerformAssertions();
+
+        $this->configManipulator->validate(
+            '/path/to/phpunit.xml',
+            $xPath,
+        );
     }
 
     /**
@@ -1086,7 +1096,12 @@ final class XmlConfigurationManipulatorTest extends TestCase
             XML
         );
 
-        $this->assertTrue($this->configManipulator->validate('/path/to/phpunit.xml', $xPath));
+        $this->expectNotToPerformAssertions();
+
+        $this->configManipulator->validate(
+            '/path/to/phpunit.xml',
+            $xPath,
+        );
     }
 
     public function test_it_uses_the_configured_phpunit_config_dir_to_build_schema_paths(): void
