@@ -107,13 +107,15 @@ class MutantProcessContainerFactory
 
     /**
      * A fork is possible only if the command is a PHP script without PHP options.
+     * To disable the fork: INFECTION_FORK=0.
      *
      * @param list<string> $command
      */
     private static function canFork(array $command): bool
     {
-        return getenv('INFECTION_FORK') === '1'
+        return getenv('INFECTION_FORK') !== '0'
             && function_exists('pcntl_fork')
+            && function_exists('posix_kill')
             && str_ends_with($command[0], 'phpunit');
     }
 }
