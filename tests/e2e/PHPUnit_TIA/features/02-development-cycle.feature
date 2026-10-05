@@ -34,7 +34,7 @@ Feature: Keep test selection correct as the project evolves
             | detection statuses  |
             | MSI                 |
 
-    # Blocker: ../../../../doc/phpunit-tia-problems.md#1-explicit-queries-can-omit-newly-relevant-tests
+    # Blocker: ../../../../doc/TIA/phpunit/changed-tests.md
     @skip
     Scenario: An existing test starts covering another source file
         When I run Infection on "src/Calculator.php"
@@ -64,7 +64,7 @@ Feature: Keep test selection correct as the project evolves
             | detection statuses  |
             | MSI                 |
 
-    # Blocker: ../../../../doc/phpunit-tia-problems.md#1-explicit-queries-can-omit-newly-relevant-tests
+    # Blocker: ../../../../doc/TIA/phpunit/changed-tests.md
     @skip
     Scenario: Changed data-provider inputs establish a previously unknown dependency
         Given the project file "tests/UnrelatedTest.php" contains:

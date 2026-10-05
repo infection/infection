@@ -8,8 +8,8 @@ Behat executes all five features under `features/`:
 - `04`: Cache fallback, dependency invalidation, and sharing recordings with PHPUnit.
 - `05`: Automatic activation, opt-outs, coverage metadata, and selection boundaries.
 
-Confirmed blockers are tagged `@skip`. The `blocked` profile runs their desired
-assertions and is expected to fail. The explicit-selector scenarios are tagged
+Only scenarios whose assertions currently fail are tagged `@skip`. The `blocked` profile
+runs those scenarios and is expected to fail. The explicit-selector scenarios are tagged
 `@current_behavior`; whether TIA should further narrow those selections remains open.
 
 Repeated Infection runs compare executed tests, Calculator's line-to-test coverage,
@@ -106,27 +106,28 @@ The previous script is retained as `run_legacy_tests.bash`; the runner does not 
 
 ## Current blockers
 
-At the current pin, the default suite has 22 passing scenarios and three failures in
-feature `04`: sharing recordings fails in both directions, and the unrecorded-source
-scenario falls back with a different explanation. See the
-[current verification results](../../../doc/phpunit-tia-problems.md).
+At the current pin, all 22 examples in the default suite pass. All 14 examples selected
+by the `blocked` profile fail when run explicitly. These include sharing recordings in
+both directions and the unrecorded-source scenario, which falls back with a different
+explanation. See the
+[current verification results](../../../doc/TIA/README.md).
 
 The cold-start scenario passes. The PHPUnit-seeded scenario is tagged `@skip` and
 excluded by the suite filter because Infection
 replaces the project's configured cache directory with `.infection/phpunit`. It runs
 both initial tests instead of reusing PHPUnit's recording to select CalculatorTest.
-See [the blocker](../../../doc/phpunit-tia-problems.md#3-infection-integration-gaps).
+See [the blocker](../../../doc/TIA/infection/project-cache.md).
 
 Five development-cycle scenarios pass. Two are tagged `@skip`: an existing test starts
 covering Calculator after a test-body or data-provider change. PHPUnit's explicit impact
 query omits that test because its previous recording does not depend on Calculator.
-See [the reproductions and PHPUnit feedback](../../../doc/phpunit-tia-problems.md#1-explicit-queries-can-omit-newly-relevant-tests).
+See [the reproductions and PHPUnit feedback](../../../doc/TIA/phpunit/changed-tests.md).
 
 The remaining features reproduce XML opt-outs being overridden, runtime-setting changes
 being missed, the wrong lock file being tracked when XML is outside the project, changed
 external fixtures being omitted, and cache write failures stopping mutation testing.
 An empty-selection outcome remains a proposal under `@decision_pending`.
-See [the findings and open questions](../../../doc/phpunit-tia-problems.md).
+See [the findings and open questions](../../../doc/TIA/README.md).
 
 Run all blocked scenarios explicitly (they are expected to fail):
 

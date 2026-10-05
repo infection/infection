@@ -29,6 +29,9 @@ Feature: Reuse valid impact data and fall back when it cannot be used
             | empty        | the test impact data that was recorded cannot be read             |
             | incompatible | the test impact data was recorded with another version of PHPUnit |
 
+    # Blocker: ../../../../doc/TIA/phpunit/recording-sharing.md
+    # Configuration identity invalidates the recording before the unknown-source check.
+    @skip
     Scenario: An unrecorded queried source triggers a full-suite fallback
         Given the PHPUnit configuration has these attributes:
             | cacheDirectory | .infection/phpunit |
@@ -48,6 +51,7 @@ Feature: Reuse valid impact data and fall back when it cannot be used
             | detection statuses  |
             | MSI                 |
 
+    # The XML-setting example switches to configurations/tia-observed-backup-globals.xml.
     Scenario Outline: Changing <dependency> invalidates a warm recording
         When I run Infection on "src/Calculator.php"
         Then the initial test run executes all tests
@@ -70,7 +74,7 @@ Feature: Reuse valid impact data and fall back when it cannot be used
             | bootstrap script    | a bootstrap script changed since the test impact data was recorded |
             | composer.lock       | composer.lock changed since the test impact data was recorded      |
 
-    # Blocker: ../../../../doc/phpunit-tia-problems.md#2-configuration-and-recording-identity
+    # Blocker: ../../../../doc/TIA/phpunit/runtime-settings.md
     @skip
     Scenario: A changed PHP runtime setting invalidates a warm recording
         When I run Infection on "src/Calculator.php"
@@ -85,8 +89,9 @@ Feature: Reuse valid impact data and fall back when it cannot be used
             | detection statuses  |
             | MSI                 |
 
-    # Blocker: ../../../../doc/phpunit-tia-problems.md#2-configuration-and-recording-identity
+    # Blocker: ../../../../doc/TIA/phpunit/dependency-lock.md
     @skip
+    # Infection defaults to the system temporary directory when tmpDir is not configured.
     Scenario: Generated XML outside the project still tracks the project's dependency lock
         Given Infection writes generated PHPUnit XML outside the scenario project
         When I run Infection on "src/Calculator.php"
@@ -101,6 +106,8 @@ Feature: Reuse valid impact data and fall back when it cannot be used
             | detection statuses  |
             | MSI                 |
 
+    # Blocker: ../../../../doc/TIA/phpunit/recording-sharing.md
+    @skip
     Scenario: Infection reuses a PHPUnit recording when both tools use the same cache
         Given the PHPUnit configuration has these attributes:
             | cacheDirectory | .infection/phpunit |
@@ -114,6 +121,8 @@ Feature: Reuse valid impact data and fall back when it cannot be used
             | detection statuses  |
             | MSI                 |
 
+    # Blocker: ../../../../doc/TIA/phpunit/recording-sharing.md
+    @skip
     Scenario: PHPUnit reuses an Infection recording when both tools use the same cache
         Given the PHPUnit configuration has these attributes:
             | cacheDirectory | .infection/phpunit |
@@ -124,7 +133,7 @@ Feature: Reuse valid impact data and fall back when it cannot be used
         Then the initial test run executes only the following tests:
             | CalculatorTest::test_calculate |
 
-    # Blocker: ../../../../doc/phpunit-tia-problems.md#1-explicit-queries-can-omit-newly-relevant-tests
+    # Blocker: ../../../../doc/TIA/phpunit/changed-tests.md
     @skip
     Scenario: A changed external fixture remains relevant to an explicit impact query
         Given the project file "tests/input.json" contains:
@@ -153,7 +162,7 @@ Feature: Reuse valid impact data and fall back when it cannot be used
             | CalculatorTest::test_calculate |
             | UnrelatedTest::test_calculate  |
 
-    # Blocker: ../../../../doc/phpunit-tia-problems.md#3-infection-integration-gaps
+    # Blocker: ../../../../doc/TIA/infection/cache-fallback.md
     @skip
     Scenario Outline: Cache obstruction by <obstruction> permits mutation testing without TIA
         When I run Infection on "src/Calculator.php"

@@ -113,7 +113,7 @@ final readonly class InitialConfigBuilder
             $phpunit->setAttribute('recordTestImpactData', 'true');
             $phpunit->setAttribute('deriveTestImpactDataFromCoverageTargets', 'false');
             // TODO: Preserve the project's configured cache to reuse plain PHPUnit recordings.
-            // Blocker: doc/phpunit-tia-problems.md#3-infection-integration-gaps
+            // Blocker: doc/TIA/infection/project-cache.md
             // Keep Infection's recording separate from the project's, and outside the cleaned tmpDir.
             $phpunit->setAttribute('cacheDirectory', $this->projectDir . '/.infection/phpunit');
         } else {

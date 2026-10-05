@@ -270,19 +270,8 @@ final class PhpUnitContext implements Context
             'Unknown shared execution dependency.',
         );
 
-        $path = $project . '/phpunit.xml';
-        $document = new DOMDocument();
-        $document->loadXML(
-            $this->filesystem->readFile($path),
-        );
-        $document->documentElement->setAttribute(
-            'backupGlobals',
-            'true',
-        );
-
-        $this->filesystem->dumpFile(
-            $path,
-            $document->saveXML(),
+        $this->copyPhpUnitConfiguration(
+            __DIR__.'/../../configurations/tia-observed-backup-globals.xml',
         );
     }
 

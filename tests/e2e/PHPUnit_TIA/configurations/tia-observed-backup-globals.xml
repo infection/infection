@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<phpunit bootstrap="vendor/autoload.php"
+         cacheDirectory="var/phpunit-cache"
+         recordTestRunHistory="true"
+         recordTestImpactData="true"
+         deriveTestImpactDataFromCoverageTargets="false"
+         beStrictAboutCoverageMetadata="true"
+         requireCoverageMetadata="true"
+         backupGlobals="true">
+
+    <extensions>
+        <bootstrap class="Infection\E2ETests\PHPUnitTIA\PHPUnit\RecordExecutionExtension">
+            <parameter name="executedTestsFilePath" value="var/phpunit/executed-tests.jsonl"/>
+            <parameter name="loadedTestsFilePath" value="var/phpunit/loaded-tests.json"/>
+            <parameter name="configurationFilePath" value="var/phpunit/configuration.json"/>
+        </bootstrap>
+    </extensions>
+
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+
+    <testsuites>
+        <testsuite name="tests">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

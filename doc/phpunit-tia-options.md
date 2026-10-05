@@ -158,4 +158,4 @@ phpunit --record-test-impact-data --impacted-by-file changed-paths.txt
 Partial runs refresh the recorded dependencies of tests they run while preserving data
 for tests they do not run.
 
-For Infection's integration scenarios and blockers, see [the integration problems](phpunit-tia-problems.md).
+For Infection's integration scenarios and blockers, see [the integration overview and feedback](TIA/README.md).
