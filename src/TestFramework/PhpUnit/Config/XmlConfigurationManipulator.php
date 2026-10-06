@@ -218,6 +218,9 @@ final readonly class XmlConfigurationManipulator
 
     // TODO: fix return type... There is no point in returning true if we
     //   never return false.
+    /**
+     * @throws InvalidPhpUnitConfiguration
+     */
     public function validate(string $configPath, SafeDOMXPath $xPath): true
     {
         if ($xPath->queryCount('/phpunit') === 0) {
