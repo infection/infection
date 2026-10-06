@@ -33,68 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\Report\Framework\Writer;
+namespace Infection\Container\Builder;
 
-use function implode;
-use function in_array;
-use Infection\Reporter\FileReporter;
-use function is_string;
-use function iterator_to_array;
+use DIContainer\Builder;
+use Infection\Configuration\Configuration;
+use Infection\Event\EventDispatcher\DebugEventDispatcher;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\FileSystem\FileSystem;
+use Infection\Report\ComposableReporter;
+use Infection\Report\DebugEventsDataProducer;
+use Infection\Report\Framework\Writer\FileWriter;
 use Override;
-use function Safe\file_put_contents;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
+ * @implements Builder<EventDispatcher>
  */
-final class FileWriter implements ReportWriter
+final readonly class EventDispatcherBuilder implements Builder
 {
-    private bool $appendNextWrite = false;
-
     public function __construct(
-        private readonly Filesystem $filesystem,
-        private readonly string $filePath,
-        // Appending still replaces the previous run on the first write.
-        private readonly bool $append,
+        private Configuration $configuration,
+        private FileSystem $fileSystem,
     ) {
     }
 
-    /**
-     * @throws IOException
-     */
     #[Override]
-    public function write(iterable|string $contentOrLines): void
+    public function build(): EventDispatcher
     {
-        $contents = is_string($contentOrLines)
-            ? $contentOrLines
-            : implode(
-                "\n",
-                iterator_to_array($contentOrLines),
-            );
+        $dispatcher = new SyncEventDispatcher();
+        $filePath = $this->configuration->logs->getDebugEventsLogFilePath();
 
-        if (in_array($this->filePath, FileReporter::ALLOWED_PHP_STREAMS, true)) {
-            file_put_contents(
-                $this->filePath,
-                $contents,
-            );
-
-            return;
+        if ($filePath === null) {
+            return $dispatcher;
         }
 
-        if ($this->appendNextWrite) {
-            $this->filesystem->appendToFile(
-                $this->filePath,
-                $contents,
-            );
+        $dataProducer = new DebugEventsDataProducer();
 
-            return;
-        }
-
-        $this->filesystem->dumpFile(
-            $this->filePath,
-            $contents,
+        return new DebugEventDispatcher(
+            $dispatcher,
+            $dataProducer,
+            new ComposableReporter(
+                $dataProducer,
+                new FileWriter(
+                    $this->fileSystem,
+                    $filePath,
+                    append: true,
+                ),
+            ),
         );
-        $this->appendNextWrite = $this->append;
     }
 }

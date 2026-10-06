@@ -342,6 +342,32 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
+        foreach ([
+            'relative path' => ['var/debug-events.jsonl', '/path/to/var/debug-events.jsonl'],
+            'absolute path' => ['/var/debug-events.jsonl', '/var/debug-events.jsonl'],
+            'output stream' => ['php://output', 'php://output'],
+        ] as $name => [$configuredPath, $expectedPath]) {
+            yield 'debug events ' . $name => [
+                $defaultScenario
+                    ->withSchema(
+                        $defaultSchemaBuilder->withLogs(
+                            LogsBuilder::withMinimalTestData()
+                                ->withDebugEventsLogFilePath($configuredPath)
+                                ->build(),
+                        ),
+                    )
+                    ->withExpected(
+                        $defaultConfigurationBuilder
+                            ->withLogs(
+                                LogsBuilder::from($defaultLogs)
+                                    ->withDebugEventsLogFilePath($expectedPath)
+                                    ->build(),
+                            )
+                            ->build(),
+                    ),
+            ];
+        }
+
         yield 'null html file log path' => [
             $defaultScenario->forValueForHtmlLogFilePath(
                 '/path/to/from-config.html',
@@ -1512,6 +1538,7 @@ final class ConfigurationFactoryTest extends TestCase
                             ->withUseGitHubAnnotationsLogger(true)
                             ->withStrykerConfig(StrykerConfig::forFullReport('master'))
                             ->withSummaryJsonLogFilePath('/summary.json')
+                            ->withDebugEventsLogFilePath('/debug-events.jsonl')
                             ->build(),
                     )
                     ->withTmpDir('config/tmp')
@@ -1587,6 +1614,7 @@ final class ConfigurationFactoryTest extends TestCase
                             ->withUseGitHubAnnotationsLogger(true)
                             ->withStrykerConfig(StrykerConfig::forFullReport('master'))
                             ->withSummaryJsonLogFilePath('/summary.json')
+                            ->withDebugEventsLogFilePath('/debug-events.jsonl')
                             ->build(),
                     )
                     ->withLogVerbosity(LogVerbosity::NONE)

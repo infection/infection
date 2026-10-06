@@ -37,12 +37,16 @@ namespace Infection\Tests\Report\Framework\Writer;
 
 use Infection\FileSystem\FileSystem;
 use Infection\Report\Framework\Writer\FileWriter;
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\Group;
+use function Safe\ob_get_clean;
+use function Safe\ob_start;
 
 #[CoversClass(FileWriter::class)]
-final class FileWriterTest extends TestCase
+#[Group('integration')]
+final class FileWriterTest extends FileSystemTestCase
 {
     /**
      * @param iterable<string>|string $contentOrLines
@@ -52,20 +56,20 @@ final class FileWriterTest extends TestCase
         iterable|string $contentOrLines,
         string $expected,
     ): void {
-        $filePath = '/path/to/file.log';
-
-        $fileSystemMock = $this->createMock(FileSystem::class);
-        $fileSystemMock
-            ->expects($this->once())
-            ->method('dumpFile')
-            ->with($filePath, $expected)
-        ;
-
+        $filePath = $this->tmp . '/nested/file.log';
+        $fileSystem = new FileSystem();
         $writer = new FileWriter(
-            $fileSystemMock,
+            $fileSystem,
             $filePath,
+            append: false,
         );
         $writer->write($contentOrLines);
+
+        $this->assertSame(
+            $expected,
+            $fileSystem->readFile($filePath),
+            'The writer must preserve the content and join iterable lines with newlines.',
+        );
     }
 
     public static function contentsOrLinesProvider(): iterable
@@ -85,5 +89,77 @@ final class FileWriterTest extends TestCase
                 Second line
                 EOF,
         ];
+    }
+
+    #[DataProvider('writeModesProvider')]
+    public function test_it_replaces_the_previous_run_and_applies_the_write_mode(
+        bool $append,
+        string $expected,
+    ): void {
+        $fileSystem = new FileSystem();
+        $filePath = $this->tmp . '/file.log';
+        $fileSystem->dumpFile(
+            $filePath,
+            'Previous run',
+        );
+        $writer = new FileWriter(
+            $fileSystem,
+            $filePath,
+            $append,
+        );
+
+        $writer->write("First\n");
+
+        $this->assertSame(
+            "First\n",
+            $fileSystem->readFile($filePath),
+            'The first write must replace data from the previous run in either mode.',
+        );
+
+        $writer->write("Second\n");
+        $writer->write("Third\n");
+
+        $this->assertSame(
+            $expected,
+            $fileSystem->readFile($filePath),
+            'Later writes must follow the selected append or replace mode.',
+        );
+    }
+
+    public static function writeModesProvider(): iterable
+    {
+        yield 'replace on each write' => [
+            false,
+            "Third\n",
+        ];
+
+        yield 'append after the first write' => [
+            true,
+            "First\nSecond\nThird\n",
+        ];
+    }
+
+    public function test_it_can_write_raw_content_to_the_php_output_stream(): void
+    {
+        $writer = new FileWriter(
+            new FileSystem(),
+            'php://output',
+            append: true,
+        );
+
+        ob_start();
+
+        try {
+            $writer->write("<error>First</error>\n");
+            $writer->write("Second\n");
+        } finally {
+            $output = ob_get_clean();
+        }
+
+        $this->assertSame(
+            "<error>First</error>\nSecond\n",
+            $output,
+            'Stream destinations must preserve raw content across writes.',
+        );
     }
 }

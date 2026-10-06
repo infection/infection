@@ -33,68 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Report\Framework\Writer;
+namespace Infection\Event\EventDispatcher;
 
-use function implode;
-use function in_array;
-use Infection\Reporter\FileReporter;
-use function is_string;
-use function iterator_to_array;
+use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Report\DebugEventsDataProducer;
+use Infection\Reporter\Reporter;
 use Override;
-use function Safe\file_put_contents;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
  */
-final class FileWriter implements ReportWriter
+final readonly class DebugEventDispatcher implements EventDispatcher
 {
-    private bool $appendNextWrite = false;
-
     public function __construct(
-        private readonly Filesystem $filesystem,
-        private readonly string $filePath,
-        // Appending still replaces the previous run on the first write.
-        private readonly bool $append,
+        private EventDispatcher $dispatcher,
+        private DebugEventsDataProducer $dataProducer,
+        private Reporter $reporter,
     ) {
     }
 
-    /**
-     * @throws IOException
-     */
     #[Override]
-    public function write(iterable|string $contentOrLines): void
+    public function dispatch(object $event): void
     {
-        $contents = is_string($contentOrLines)
-            ? $contentOrLines
-            : implode(
-                "\n",
-                iterator_to_array($contentOrLines),
-            );
+        // Record before invoking subscribers, which may fail or dispatch other events.
+        $this->dataProducer->recordEvent($event);
+        $this->reporter->report();
 
-        if (in_array($this->filePath, FileReporter::ALLOWED_PHP_STREAMS, true)) {
-            file_put_contents(
-                $this->filePath,
-                $contents,
-            );
+        $this->dispatcher->dispatch($event);
+    }
 
-            return;
-        }
-
-        if ($this->appendNextWrite) {
-            $this->filesystem->appendToFile(
-                $this->filePath,
-                $contents,
-            );
-
-            return;
-        }
-
-        $this->filesystem->dumpFile(
-            $this->filePath,
-            $contents,
-        );
-        $this->appendNextWrite = $this->append;
+    #[Override]
+    public function addSubscriber(EventSubscriber $eventSubscriber): void
+    {
+        $this->dispatcher->addSubscriber($eventSubscriber);
     }
 }

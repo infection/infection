@@ -58,6 +58,7 @@ use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
+use Infection\Container\Builder\EventDispatcherBuilder;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
@@ -65,7 +66,6 @@ use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Differ\UnifiedDiffOutputBuilder;
 use Infection\Engine;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
@@ -338,7 +338,7 @@ final class Container extends DIContainer
                 $container->getMutantCodeFactory(),
             ),
             Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder())),
-            EventDispatcher::class => SyncEventDispatcher::class,
+            EventDispatcher::class => EventDispatcherBuilder::class,
             ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner(
                 $container->getConfiguration()->threadCount,
             ),

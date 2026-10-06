@@ -91,6 +91,10 @@
                     "type": "string",
                     "description": "Debug log file, which displays what mutations were found on what line, per category. More intended for internal purposes."
                 },
+                "debugEvents": {
+                    "type": "string",
+                    "description": "JSONL trace of all dispatched events, intended for debugging Infection's execution. Event names and payloads are internal details and may change between versions."
+                },
                 "perMutator": {
                     "type": "string",
                     "description": "Markdown file which will give a break-down of the effectiveness of each mutator."
