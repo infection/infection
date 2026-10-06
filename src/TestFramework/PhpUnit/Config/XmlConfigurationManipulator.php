@@ -231,18 +231,11 @@ final readonly class XmlConfigurationManipulator
             return true;
         }
 
-        $schema = $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue;
-
-        $original = libxml_use_internal_errors(true);
-
-        if ($schema !== null && !$xPath->document->schemaValidate($this->buildSchemaPath($schema))) {
-            throw InvalidPhpUnitConfiguration::byXsdSchema(
-                $configPath,
-                $this->getXmlErrorsString(),
-            );
-        }
-
-        libxml_use_internal_errors($original);
+        $this->validateAgainstSchema(
+            $configPath,
+            $xPath->document,
+            $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue,
+        );
 
         return true;
     }
@@ -263,6 +256,29 @@ final readonly class XmlConfigurationManipulator
 
         $this->addAttributeIfNotSet('failOnRisky', 'true', $xPath);
         $this->addAttributeIfNotSet('failOnWarning', 'true', $xPath);
+    }
+
+    /**
+     * @throws InvalidPhpUnitConfiguration
+     */
+    private function validateAgainstSchema(
+        string $configPath,
+        DOMDocument $document,
+        ?string $schema,
+    ): void {
+        $original = libxml_use_internal_errors(true);
+
+        if (
+            $schema !== null
+            && !$document->schemaValidate($this->buildSchemaPath($schema))
+        ) {
+            throw InvalidPhpUnitConfiguration::byXsdSchema(
+                $configPath,
+                $this->getXmlErrorsString(),
+            );
+        }
+
+        libxml_use_internal_errors($original);
     }
 
     /**
