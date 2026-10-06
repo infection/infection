@@ -82,6 +82,13 @@ final class DebugEventsDataProducerTest extends TestCase
         $producer = new DebugEventsDataProducer($collectingDispatcher);
 
         $actual = take($producer->produce())
+            ->tap(function (string $record): void {
+                $this->assertInstanceOf(
+                    stdClass::class,
+                    json_decode($record)->data,
+                    'Event payloads must be JSON objects, including events without data.',
+                );
+            })
             ->cast(
                 static fn (string $record) => json_decode(
                     $record,
