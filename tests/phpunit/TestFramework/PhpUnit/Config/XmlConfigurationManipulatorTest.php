@@ -943,14 +943,19 @@ final class XmlConfigurationManipulatorTest extends TestCase
         );
     }
 
-    public function test_it_cannot_validate_invalid_phpunit_xml_configuration(): void
+    #[DataProvider('rootValidationVersionProvider')]
+    public function test_it_cannot_validate_invalid_phpunit_xml_configuration(string $version): void
     {
         $xPath = $this->createXPath('<invalid></invalid>');
 
         $this->expectException(InvalidPhpUnitConfiguration::class);
         $this->expectExceptionMessage('The file "/path/to/phpunit.xml" is not a valid PHPUnit configuration file');
 
-        $this->configManipulator->validate('/path/to/phpunit.xml', $xPath);
+        $this->configManipulator->validate(
+            $version,
+            '/path/to/phpunit.xml',
+            $xPath,
+        );
     }
 
     public function test_it_consider_as_valid_a_phpunit_xml_configuration_without_xsd(): void
@@ -965,6 +970,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $this->configManipulator->validate(
+            '9.6',
             '/path/to/phpunit.xml',
             $xPath,
         );
@@ -998,7 +1004,11 @@ final class XmlConfigurationManipulatorTest extends TestCase
         );
 
         try {
-            $this->configManipulator->validate('/path/to/phpunit.xml', $xPath);
+            $this->configManipulator->validate(
+                '9.6',
+                '/path/to/phpunit.xml',
+                $xPath,
+            );
 
             $this->fail('Expected exception to be thrown');
         } catch (InvalidArgumentException|InvalidPhpUnitConfiguration $exception) {
@@ -1024,6 +1034,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $this->configManipulator->validate(
+            '9.6',
             '/path/to/phpunit.xml',
             $xPath,
         );
@@ -1049,7 +1060,11 @@ final class XmlConfigurationManipulatorTest extends TestCase
         );
 
         try {
-            $this->configManipulator->validate('/path/to/phpunit.xml', $xPath);
+            $this->configManipulator->validate(
+                '9.6',
+                '/path/to/phpunit.xml',
+                $xPath,
+            );
 
             $this->fail('Expected exception to be thrown');
         } catch (InvalidPhpUnitConfiguration $exception) {
@@ -1099,6 +1114,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $this->configManipulator->validate(
+            '9.6',
             '/path/to/phpunit.xml',
             $xPath,
         );
@@ -1123,7 +1139,46 @@ final class XmlConfigurationManipulatorTest extends TestCase
             XML_WRAP
         );
 
-        $configManipulator->validate('/path/to/phpunit.xml', $xPath);
+        $configManipulator->validate(
+            '9.6',
+            '/path/to/phpunit.xml',
+            $xPath,
+        );
+    }
+
+    #[DataProvider('modernPhpUnitVersionProvider')]
+    public function test_it_does_not_resolve_the_declared_schema_for_phpunit_10_or_newer(string $version): void
+    {
+        $xPath = $this->createXPath(<<<'XML'
+            <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="https://unreachable.invalid/phpunit.xsd"
+                     foo="bar">
+                <invalid/>
+            </phpunit>
+            XML
+        );
+
+        $this->expectNotToPerformAssertions();
+
+        $this->configManipulator->validate(
+            $version,
+            '/path/to/phpunit.xml',
+            $xPath,
+        );
+    }
+
+    public static function rootValidationVersionProvider(): iterable
+    {
+        yield 'PHPUnit 9' => ['9.6'];
+
+        yield 'PHPUnit 10' => ['10.0'];
+    }
+
+    public static function modernPhpUnitVersionProvider(): iterable
+    {
+        yield 'PHPUnit 10 boundary' => ['10.0'];
+
+        yield 'PHPUnit 11' => ['11.0'];
     }
 
     public function test_it_removes_default_test_suite(): void

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config;
 
 use function array_filter;
+use function array_key_exists;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
@@ -219,8 +220,11 @@ final readonly class XmlConfigurationManipulator
     /**
      * @throws InvalidPhpUnitConfiguration
      */
-    public function validate(string $configPath, SafeDOMXPath $xPath): void
-    {
+    public function validate(
+        string $version,
+        string $configPath,
+        SafeDOMXPath $xPath,
+    ): void {
         if ($xPath->queryCount('/phpunit') === 0) {
             throw InvalidPhpUnitConfiguration::byRootNode($configPath);
         }
@@ -229,10 +233,10 @@ final readonly class XmlConfigurationManipulator
             return;
         }
 
-        $this->validateAgainstSchema(
+        $this->validateAgainstSchemaIfNecessary(
+            $version,
             $configPath,
-            $xPath->document,
-            $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue,
+            $xPath,
         );
     }
 
@@ -252,6 +256,43 @@ final readonly class XmlConfigurationManipulator
 
         $this->addAttributeIfNotSet('failOnRisky', 'true', $xPath);
         $this->addAttributeIfNotSet('failOnWarning', 'true', $xPath);
+    }
+
+    /**
+     * @throws InvalidPhpUnitConfiguration
+     */
+    private function validateAgainstSchemaIfNecessary(
+        string $version,
+        string $configPath,
+        SafeDOMXPath $xPath,
+    ): void {
+        // PHPUnit 9 and older only print schema errors and can exit successfully even with
+        // failOnWarning enabled. PHPUnit 10+ reports them as test runner warnings, which
+        // fail Infection's initial run, so avoid resolving external schemas for those versions.
+        if (self::isPhpUnit10OrHigher($version)) {
+            return;
+        }
+
+        $this->validateAgainstSchema(
+            $configPath,
+            $xPath->document,
+            $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue,
+        );
+    }
+
+    private static function isPhpUnit10OrHigher(string $version): bool
+    {
+        static $versions = [];
+
+        if (!array_key_exists($version, $versions)) {
+            $versions[$version] = version_compare(
+                $version,
+                '10.0',
+                '>=',
+            );
+        }
+
+        return $versions[$version];
     }
 
     /**
