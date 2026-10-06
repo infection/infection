@@ -37,40 +37,120 @@ namespace Infection\Tests\Process;
 
 use Infection\Process\ForkedProcess;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
-use function Safe\file_put_contents;
-use function Safe\unlink;
-use function sys_get_temp_dir;
-use function uniqid;
+use function Safe\json_decode;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Process;
 use function usleep;
 
 #[CoversClass(ForkedProcess::class)]
-#[Group('integration')]
 #[RequiresPhpExtension('pcntl')]
 #[RequiresPhpExtension('posix')]
 final class ForkedProcessTest extends TestCase
 {
+    private const string FIXTURES = __DIR__ . '/../Fixtures/ForkWorker';
+
+    public function test_it_is_available(): void
+    {
+        $this->assertTrue(ForkedProcess::isAvailable());
+    }
+
+    #[WithEnvironmentVariable('INFECTION_FORK', '0')]
+    public function test_it_is_not_available_if_disabled(): void
+    {
+        $this->assertFalse(ForkedProcess::isAvailable());
+    }
+
     public function test_it_runs_a_script_in_a_fork_of_the_worker(): void
     {
-        $script = sys_get_temp_dir() . '/' . uniqid('infection-fork-', true) . '.php';
-        file_put_contents($script, '<?php echo getenv("FOO"); exit(3);');
-
-        $process = new ForkedProcess([$script], ['FOO' => 'bar'], 10.0, __DIR__ . '/../../../vendor/autoload.php', __FILE__);
+        $process = new ForkedProcess([self::FIXTURES . '/report.php'], ['FOO' => 'bar'], 10.0);
 
         $this->assertFalse($process->isStarted());
+        $this->assertSame(Process::STATUS_READY, $process->getStatus());
+        $this->assertFalse($process->isRunning());
 
         $process->start();
 
-        while ($process->isRunning()) {
-            usleep(1000);
-        }
+        $this->assertTrue($process->isStarted());
 
-        unlink($script);
+        self::wait($process);
 
         $this->assertTrue($process->isTerminated());
-        $this->assertSame('bar', $process->getOutput());
+        $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
+        $this->assertSame('bar', json_decode($process->getOutput(), true)['foo']);
+        $this->assertSame('error output', $process->getErrorOutput());
         $this->assertSame(3, $process->getExitCode());
+        $this->assertGreaterThan(0.0, $process->getStartTime());
+    }
+
+    public function test_a_thread_keeps_its_worker(): void
+    {
+        $this->assertSame(self::runReport('1')['worker'], self::runReport('1')['worker']);
+        $this->assertNotSame(self::runReport('1')['worker'], self::runReport('2')['worker']);
+    }
+
+    public function test_it_stops_the_script_at_the_timeout(): void
+    {
+        $process = new ForkedProcess([self::FIXTURES . '/sleep.php'], [], 0.2);
+        $process->start(env: ['TEST_TOKEN' => 'timeout']);
+
+        try {
+            self::wait($process);
+
+            $this->fail('The process must report the timeout.');
+        } catch (ProcessTimedOutException $exception) {
+            $this->assertSame($process, $exception->getProcess());
+        }
+
+        $this->assertFalse($process->isRunning());
+        $this->assertSame(137, $process->getExitCode());
+
+        $process->checkTimeout();
+
+        $this->assertIsInt(self::runReport('timeout')['worker'], 'The thread must run the next script');
+    }
+
+    public function test_stop_stops_the_script(): void
+    {
+        $process = new ForkedProcess([self::FIXTURES . '/sleep.php'], [], 10.0);
+        $process->start();
+
+        $this->assertSame(Process::STATUS_STARTED, $process->getStatus());
+        $this->assertSame(137, $process->stop());
+        $this->assertFalse($process->isRunning());
+    }
+
+    public function test_stop_keeps_the_exit_code_of_a_complete_run(): void
+    {
+        $process = new ForkedProcess([self::FIXTURES . '/report.php'], [], 10.0);
+        $process->start();
+
+        self::wait($process);
+
+        $this->assertSame(3, $process->stop());
+    }
+
+    /**
+     * @return array{worker: int}
+     */
+    private static function runReport(string $thread): array
+    {
+        $process = new ForkedProcess([self::FIXTURES . '/report.php'], [], 10.0);
+        $process->start(env: ['TEST_TOKEN' => $thread]);
+
+        self::wait($process);
+
+        return json_decode($process->getOutput(), true);
+    }
+
+    private static function wait(ForkedProcess $process): void
+    {
+        while ($process->isRunning()) {
+            $process->checkTimeout();
+
+            usleep(1000);
+        }
     }
 }

@@ -35,75 +35,62 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use function feof;
+use function array_filter;
+use function function_exists;
+use function getenv;
 use function microtime;
 use Override;
-use const PHP_BINARY;
-use function proc_open;
 use function register_shutdown_function;
-use function Safe\fclose;
-use function Safe\fwrite;
-use function Safe\json_encode;
-use function Safe\preg_match;
-use function Safe\stream_get_contents;
-use function Safe\stream_set_blocking;
-use function sprintf;
-use function strlen;
-use function substr;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
-use function var_export;
-use Webmozart\Assert\Assert;
 
 /**
- * This process runs a PHP script in a fork of a long-lived worker (see resources/fork-worker.php).
- * Each thread has a worker. A worker loads the vendor code a single time, thus a run
- * does not start a new PHP process and does not compile the test framework again.
+ * This process runs a PHP script in a fork of a long-lived worker: a run does not start a new PHP process.
+ * Each thread has a worker. This class measures the timeout, and stops the worker at the timeout.
  *
  * @internal
  */
 final class ForkedProcess extends Process
 {
-    private const string WORKER = __DIR__ . '/../../resources/fork-worker.php';
-
-    private const int WORKER_FAILURE_EXIT_CODE = 255;
+    private const int KILLED_EXIT_CODE = 137;
 
     private const float STOP_TIMEOUT = 10.0;
 
     /**
-     * @var array<int|string, array{resource, resource, resource}> the process, its input and its output for each thread
+     * @var array<int|string, ForkWorker> the worker of each thread
      */
     private static array $workers = [];
 
-    /**
-     * @var resource|null
-     */
-    private $workerOutput;
+    private ?ForkWorker $worker = null;
 
     private string $output = '';
 
+    private string $errorOutput = '';
+
     private ?int $exitCode = null;
-
-    private bool $timedOut = false;
-
-    private bool $timeoutReported = false;
 
     private float $startTime = 0.0;
 
     /**
      * @param array<string> $command the PHP script with its arguments
      * @param array<string, string|int> $forkEnv
-     * @param string $autoloadFile the file that the worker loads a single time, before the first fork
-     * @param string $sourceFile the original file of the mutant; it must not be in the worker
      */
     public function __construct(
         private readonly array $command,
         private readonly array $forkEnv,
         private readonly float $forkTimeout,
-        private readonly string $autoloadFile,
-        private readonly string $sourceFile,
     ) {
         parent::__construct($command, env: $forkEnv, timeout: $forkTimeout);
+    }
+
+    /**
+     * To disable the fork: INFECTION_FORK=0.
+     */
+    public static function isAvailable(): bool
+    {
+        return getenv('INFECTION_FORK') !== '0'
+            && function_exists('pcntl_fork')
+            && function_exists('posix_kill');
     }
 
     /**
@@ -112,59 +99,63 @@ final class ForkedProcess extends Process
     #[Override]
     public function start(?callable $callback = null, array $env = []): void
     {
-        [, $input, $this->workerOutput] = self::$workers[$env['TEST_TOKEN'] ?? 0] ??= self::startWorker();
+        if (self::$workers === []) {
+            register_shutdown_function(self::killWorkers(...));
+        }
 
         $this->startTime = microtime(true);
 
-        fwrite($input, json_encode([
-            'argv' => $this->command,
-            'env' => $env + $this->forkEnv,
-            'timeout' => $this->forkTimeout,
-            'autoload' => $this->autoloadFile,
-            'source' => $this->sourceFile,
-        ]) . "\n");
+        $this->worker = self::$workers[$env['TEST_TOKEN'] ?? 0] ??= ForkWorker::start();
+        $this->worker->run($this->command, $env + $this->forkEnv);
     }
 
-    /**
-     * A run with a timeout stays in the running state until checkTimeout() reports the timeout.
-     * Otherwise a result that arrives between checkTimeout() and isRunning() loses its timeout.
-     */
     #[Override]
     public function isRunning(): bool
     {
-        if ($this->workerOutput === null) {
+        if ($this->worker === null || $this->exitCode !== null) {
             return false;
         }
 
-        $this->readResult();
+        // The exit code first: after it, the output is complete.
+        $this->exitCode = $this->worker->readExitCode();
+        $this->output .= $this->worker->readOutput();
+        $this->errorOutput .= $this->worker->readErrorOutput();
 
-        return $this->exitCode === null || ($this->timedOut && !$this->timeoutReported);
+        return $this->exitCode === null;
     }
 
     #[Override]
     public function checkTimeout(): void
     {
-        $this->readResult();
-
-        if (!$this->timedOut || $this->timeoutReported) {
+        if (!$this->isRunning() || microtime(true) - $this->startTime < $this->forkTimeout) {
             return;
         }
 
-        $this->timeoutReported = true;
+        $this->stop();
 
         throw new ProcessTimedOutException($this, ProcessTimedOutException::TYPE_GENERAL);
     }
 
+    /**
+     * Stops the script together with the worker. The next run of the thread starts a new worker.
+     */
     #[Override]
     public function stop(float $timeout = self::STOP_TIMEOUT, ?int $signal = null): ?int
     {
+        if ($this->worker !== null && $this->isRunning()) {
+            $this->worker->kill();
+            self::$workers = array_filter(self::$workers, fn (ForkWorker $worker): bool => $worker !== $this->worker);
+
+            $this->exitCode = self::KILLED_EXIT_CODE;
+        }
+
         return $this->exitCode;
     }
 
     #[Override]
     public function isStarted(): bool
     {
-        return $this->workerOutput !== null;
+        return $this->worker !== null;
     }
 
     #[Override]
@@ -186,7 +177,7 @@ final class ForkedProcess extends Process
     #[Override]
     public function getOutput(): string
     {
-        $this->readResult();
+        $this->isRunning();
 
         return $this->output;
     }
@@ -194,13 +185,15 @@ final class ForkedProcess extends Process
     #[Override]
     public function getErrorOutput(): string
     {
-        return '';
+        $this->isRunning();
+
+        return $this->errorOutput;
     }
 
     #[Override]
     public function getExitCode(): ?int
     {
-        $this->readResult();
+        $this->isRunning();
 
         return $this->exitCode;
     }
@@ -211,85 +204,12 @@ final class ForkedProcess extends Process
         return $this->startTime;
     }
 
-    /**
-     * Reads the available output of the worker, and the result if the run is complete.
-     */
-    private function readResult(): void
+    private static function killWorkers(): void
     {
-        if ($this->workerOutput === null || $this->exitCode !== null) {
-            return;
+        foreach (self::$workers as $worker) {
+            $worker->kill();
         }
 
-        $this->output .= stream_get_contents($this->workerOutput);
-
-        $matches = [];
-
-        preg_match('/\0FORK (\d+) (\d)\n$/', $this->output, $matches);
-
-        if ($matches !== []) {
-            $this->output = substr($this->output, 0, -strlen($matches[0]));
-            $this->exitCode = (int) $matches[1];
-            $this->timedOut = $matches[2] === '1';
-
-            return;
-        }
-
-        if (feof($this->workerOutput)) {
-            $this->exitCode = self::WORKER_FAILURE_EXIT_CODE;
-            self::forgetWorker($this->workerOutput);
-        }
-    }
-
-    /**
-     * @return array{resource, resource, resource}
-     */
-    private static function startWorker(): array
-    {
-        if (self::$workers === []) {
-            register_shutdown_function(self::stopWorkers(...));
-        }
-
-        $pipes = [];
-
-        // The worker inherits the environment as is, with the PHP configuration of this process.
-        // @phpstan-ignore theCodingMachineSafe.function (Safe\proc_open() does not accept a list of arguments.)
-        $process = proc_open(
-            // PHP's CLI does not accept a phar:// path as the script.
-            [PHP_BINARY, '-r', sprintf('require %s;', var_export(self::WORKER, true))],
-            // The requests use descriptor 3: a script that reads STDIN must get an end of file, not the next request.
-            // @phpstan-ignore argument.type (The stub does not know the "redirect" descriptor.)
-            [['file', '/dev/null', 'r'], ['pipe', 'w'], ['redirect', 1], ['pipe', 'r']],
-            $pipes,
-        );
-
-        Assert::resource($process, message: 'Could not start the fork worker.');
-
-        stream_set_blocking($pipes[1], false);
-
-        return [$process, $pipes[3], $pipes[1]];
-    }
-
-    private static function stopWorkers(): void
-    {
-        foreach (self::$workers as [, , $output]) {
-            self::forgetWorker($output);
-        }
-    }
-
-    /**
-     * @param resource $workerOutput
-     */
-    private static function forgetWorker($workerOutput): void
-    {
-        foreach (self::$workers as $index => [, $input, $output]) {
-            if ($output !== $workerOutput) {
-                continue;
-            }
-
-            unset(self::$workers[$index]);
-
-            fclose($input);
-            fclose($output);
-        }
+        self::$workers = [];
     }
 }

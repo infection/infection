@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Process\Factory;
 
-use function function_exists;
-use function getenv;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
@@ -45,7 +43,6 @@ use Infection\Process\DryRunProcess;
 use Infection\Process\ForkedProcess;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
-use Infection\TestFramework\Contracts\ProvidesForkAutoloadFile;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use function min;
 use Symfony\Component\Process\Process;
@@ -87,12 +84,8 @@ class MutantProcessContainerFactory
         );
         $env = ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY];
 
-        $autoloadFile = $testFrameworkAdapter instanceof ProvidesForkAutoloadFile && self::canFork()
-            ? $testFrameworkAdapter->getForkAutoloadFile($command)
-            : null;
-
-        $process = $autoloadFile !== null
-            ? new ForkedProcess($command, $env, $timeout, $autoloadFile, $mutant->getMutation()->getOriginalFilePath())
+        $process = ForkedProcess::isAvailable()
+            ? new ForkedProcess($command, $env, $timeout)
             : new Process(command: $command, env: $env, timeout: $timeout);
 
         if ($this->configuration->isDryRun) {
@@ -107,15 +100,5 @@ class MutantProcessContainerFactory
             ),
             $this->lazyMutantProcessCreators,
         );
-    }
-
-    /**
-     * To disable the fork: INFECTION_FORK=0.
-     */
-    private static function canFork(): bool
-    {
-        return getenv('INFECTION_FORK') !== '0'
-            && function_exists('pcntl_fork')
-            && function_exists('posix_kill');
     }
 }

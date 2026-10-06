@@ -3,204 +3,122 @@
 declare(strict_types=1);
 
 /*
- * This worker runs a PHP script, such as vendor/bin/phpunit, in a forked child for each request.
+ * This worker runs a command, such as vendor/bin/phpunit, in a forked child for each request.
+ * A child requires a PHP script, and executes any other command. The worker loads no other code:
+ * each child starts with a clean PHP state, without the start of a new PHP process.
  *
- * Before the first fork the worker loads the Composer autoload file of the script, as the script
- * itself does before the test framework bootstrap. After each run the child reports the vendor
- * files it loaded, and the worker loads these files before the next fork.
+ * Descriptors:
+ *   0     /dev/null
+ *   1, 2  the output of the child
+ *   3     requests, a JSON line each: {"argv": ["/path/to/vendor/bin/phpunit", "--configuration", "..."], "env": {"TEST_TOKEN": 1}}
+ *   4     results, a line each: the exit code of the child, or 128 plus the number of the signal that stopped the child
  *
- * Request, one line on file descriptor 3 (STDIN stays free for the script):
- *   {"argv": ["/path/to/vendor/bin/phpunit", "--configuration", "..."], "env": {"TEST_TOKEN": 1}, "timeout": 5.0,
- *    "autoload": "/path/to/vendor/autoload.php", "source": "/path/to/src/Mutated.php"}
- * Response on STDOUT: the output of the child, then "\0FORK <exit code> <timed out>\n"
+ * The worker runs a single request at a time. SIGTERM stops the worker together with its current child.
  */
 
 namespace Infection\ForkWorker;
 
-use function array_diff;
-use function array_filter;
-use function array_values;
+use function array_slice;
 use function count;
-use function dirname;
 use function fclose;
-use function feof;
 use function fgets;
+use function file_get_contents;
 use function fopen;
-use function fread;
 use function fwrite;
-use function get_included_files;
-use function in_array;
+use function is_file;
 use function json_decode;
-use function json_encode;
-use function max;
-use function microtime;
+use function pcntl_async_signals;
 use function pcntl_exec;
 use function pcntl_fork;
+use function pcntl_signal;
 use function pcntl_waitpid;
 use function pcntl_wexitstatus;
 use function pcntl_wifexited;
 use function pcntl_wtermsig;
-use const PHP_BINARY;
 use function posix_kill;
-use function printf;
+use function preg_match;
 use function putenv;
-use function realpath;
-use function register_shutdown_function;
+use const SIG_DFL;
 use const SIGKILL;
-use function str_ends_with;
-use function str_starts_with;
-use function stream_select;
-use function stream_socket_pair;
-use const STREAM_PF_UNIX;
-use const STREAM_SOCK_STREAM;
+use const SIGTERM;
+use const STDERR;
 
-const KILLED_EXIT_CODE_BASE = 128;
+const SIGNAL_EXIT_CODE_BASE = 128;
+
+const COMMAND_NOT_FOUND_EXIT_CODE = 127;
+
+const FIRST_LINE_LENGTH = 80;
 
 /**
- * @param array<string, string|int> $env
+ * Sets the environment and the arguments of the requested script in the current (child) process.
+ *
+ * @param array{argv: list<string>, env: array<string, string|int>} $request
  */
-function set_environment(array $env): void
+function prepare(array $request): void
 {
-    foreach ($env as $name => $value) {
+    foreach ($request['env'] as $name => $value) {
         putenv($name . '=' . $value);
         $_ENV[$name] = $_SERVER[$name] = (string) $value;
     }
+
+    $GLOBALS['argv'] = $_SERVER['argv'] = $request['argv'];
+    $GLOBALS['argc'] = $_SERVER['argc'] = count($request['argv']);
 }
 
-/**
- * @param list<string> $known
- * @return list<string> the vendor files that the current process loaded and the worker did not
- */
-function new_vendor_files(string $vendorDir, array $known): array
+function is_php_script(string $file): bool
 {
-    $files = array_filter(
-        array_diff(get_included_files(), $known),
-        static fn (string $file) => str_starts_with($file, $vendorDir . '/') && str_ends_with($file, '.php'),
-    );
-
-    return array_values($files);
+    return is_file($file)
+        && preg_match('/^(#!.*\\bphp\\b|<\\?php)/', (string) file_get_contents($file, length: FIRST_LINE_LENGTH)) === 1;
 }
 
-/**
- * Runs the requested script in the current (child) process.
- *
- * @param array{argv: list<string>, env: array<string, string|int>, source: string} $request
- * @param resource $report
- */
-function run_script(array $request, string $vendorDir, $report): never
+function exit_code(int $status): int
 {
-    $arguments = $request['argv'];
-    $known = get_included_files();
-
-    set_environment($request['env']);
-
-    // A file that the worker loaded cannot be replaced with its mutant: run the script in a new PHP process.
-    if (in_array(realpath($request['source']), $known, true)) {
-        pcntl_exec(PHP_BINARY, $arguments);
-    }
-
-    register_shutdown_function(static function () use ($vendorDir, $known, $report): void {
-        fwrite($report, (string) json_encode(new_vendor_files($vendorDir, $known)));
-    });
-
-    $GLOBALS['argv'] = $_SERVER['argv'] = $arguments;
-    $GLOBALS['argc'] = $_SERVER['argc'] = count($arguments);
-
-    require $arguments[0];
-
-    exit(0);
+    return pcntl_wifexited($status)
+        ? pcntl_wexitstatus($status)
+        : SIGNAL_EXIT_CODE_BASE + pcntl_wtermsig($status);
 }
-
-/**
- * Reads the report of a child until the child exits. Kills the child at the deadline.
- *
- * @param resource $report
- * @return array{string, bool} the report and the timeout flag
- */
-function await_child(int $pid, $report, float $deadline): array
-{
-    $data = '';
-
-    while (!feof($report)) {
-        $remaining = max(0, $deadline - microtime(true));
-        $read = [$report];
-        $write = $except = null;
-
-        if (stream_select($read, $write, $except, (int) $remaining, (int) (($remaining - (int) $remaining) * 1e6)) < 1) {
-            posix_kill($pid, SIGKILL);
-
-            return ['', true];
-        }
-
-        $data .= fread($report, 65536);
-    }
-
-    return [$data, false];
-}
-
-/**
- * @param array{argv: list<string>, env: array<string, string|int>, timeout: float, source: string} $request
- * @return list<string> the vendor files to load before the next request
- */
-function handle(array $request, string $vendorDir): array
-{
-    [$reader, $writer] = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, 0);
-
-    $pid = pcntl_fork();
-
-    if ($pid === 0) {
-        fclose($reader);
-        run_script($request, $vendorDir, $writer);
-    }
-
-    fclose($writer);
-
-    [$report, $timedOut] = await_child($pid, $reader, microtime(true) + $request['timeout']);
-
-    pcntl_waitpid($pid, $status);
-
-    printf(
-        "\0FORK %d %d\n",
-        pcntl_wifexited($status) ? pcntl_wexitstatus($status) : KILLED_EXIT_CODE_BASE + pcntl_wtermsig($status),
-        $timedOut,
-    );
-
-    return json_decode($report, true) ?? [];
-}
-
-/**
- * Loads the autoload file the same way the script does, with the environment of a run.
- *
- * @param array{env: array<string, string|int>, autoload: string} $request
- * @return string the vendor directory
- */
-function load_autoload_file(array $request): string
-{
-    set_environment($request['env']);
-
-    require $request['autoload'];
-
-    return dirname((string) realpath($request['autoload']));
-}
-
-/**
- * @param list<string> $files
- */
-function preload(array $files): void
-{
-    foreach ($files as $file) {
-        require_once $file;
-    }
-}
-
-$vendorDir = null;
 
 $requests = fopen('php://fd/3', 'r');
+$results = fopen('php://fd/4', 'w');
+$child = 0;
+
+pcntl_async_signals(true);
+
+// The handler must interrupt pcntl_waitpid(), thus no restart of system calls.
+pcntl_signal(SIGTERM, static function () use (&$child): never {
+    if ($child > 0) {
+        posix_kill($child, SIGKILL);
+    }
+
+    exit(0);
+}, false);
 
 while (false !== $line = fgets($requests)) {
-    $request = json_decode($line, true);
+    $child = pcntl_fork();
 
-    $vendorDir ??= load_autoload_file($request);
+    if ($child === 0) {
+        pcntl_signal(SIGTERM, SIG_DFL);
+        fclose($requests);
+        fclose($results);
 
-    preload(handle($request, $vendorDir));
+        prepare(json_decode($line, true));
+
+        if (!is_php_script($argv[0])) {
+            pcntl_exec($argv[0], array_slice($argv, 1));
+            fwrite(STDERR, 'Could not execute ' . $argv[0]);
+
+            exit(COMMAND_NOT_FOUND_EXIT_CODE);
+        }
+
+        // The script runs in the global scope, as the main script of a PHP process does.
+        unset($requests, $results, $child, $line, $status);
+
+        require $argv[0];
+
+        exit(0);
+    }
+
+    pcntl_waitpid($child, $status);
+
+    fwrite($results, exit_code($status) . "\n");
 }
