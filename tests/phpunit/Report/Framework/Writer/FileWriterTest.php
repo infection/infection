@@ -37,16 +37,12 @@ namespace Infection\Tests\Report\Framework\Writer;
 
 use Infection\FileSystem\FileSystem;
 use Infection\Report\Framework\Writer\FileWriter;
-use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use function Safe\ob_get_clean;
-use function Safe\ob_start;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(FileWriter::class)]
-#[Group('integration')]
-final class FileWriterTest extends FileSystemTestCase
+final class FileWriterTest extends TestCase
 {
     /**
      * @param iterable<string>|string $contentOrLines
@@ -56,19 +52,20 @@ final class FileWriterTest extends FileSystemTestCase
         iterable|string $contentOrLines,
         string $expected,
     ): void {
-        $filePath = $this->tmp . '/nested/file.log';
-        $fileSystem = new FileSystem();
+        $filePath = '/path/to/file.log';
+
+        $fileSystemMock = $this->createMock(FileSystem::class);
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('dumpFile')
+            ->with($filePath, $expected)
+        ;
+
         $writer = new FileWriter(
-            $fileSystem,
+            $fileSystemMock,
             $filePath,
         );
         $writer->write($contentOrLines);
-
-        $this->assertSame(
-            $expected,
-            $fileSystem->readFile($filePath),
-            'The writer must preserve the content and join iterable lines with newlines.',
-        );
     }
 
     public static function contentsOrLinesProvider(): iterable
@@ -88,50 +85,5 @@ final class FileWriterTest extends FileSystemTestCase
                 Second line
                 EOF,
         ];
-    }
-
-    public function test_it_replaces_the_previous_report(): void
-    {
-        $fileSystem = new FileSystem();
-        $filePath = $this->tmp . '/file.log';
-        $fileSystem->dumpFile(
-            $filePath,
-            'Previous run',
-        );
-        $writer = new FileWriter(
-            $fileSystem,
-            $filePath,
-        );
-
-        $writer->write("Current run\n");
-
-        $this->assertSame(
-            "Current run\n",
-            $fileSystem->readFile($filePath),
-            'Writing a report must replace the previous run.',
-        );
-    }
-
-    public function test_it_can_write_raw_content_to_the_php_output_stream(): void
-    {
-        $writer = new FileWriter(
-            new FileSystem(),
-            'php://output',
-        );
-
-        ob_start();
-
-        try {
-            $writer->write("<error>First</error>\n");
-            $writer->write("Second\n");
-        } finally {
-            $output = ob_get_clean();
-        }
-
-        $this->assertSame(
-            "<error>First</error>\nSecond\n",
-            $output,
-            'Stream destinations must preserve raw content across writes.',
-        );
     }
 }

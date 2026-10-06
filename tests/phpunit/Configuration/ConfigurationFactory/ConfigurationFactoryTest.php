@@ -342,31 +342,26 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
-        foreach ([
-            'relative path' => ['var/debug-events.jsonl', '/path/to/var/debug-events.jsonl'],
-            'absolute path' => ['/var/debug-events.jsonl', '/var/debug-events.jsonl'],
-            'output stream' => ['php://output', 'php://output'],
-        ] as $name => [$configuredPath, $expectedPath]) {
-            yield 'debug events ' . $name => [
-                $defaultScenario
-                    ->withSchema(
-                        $defaultSchemaBuilder->withLogs(
-                            LogsBuilder::withMinimalTestData()
-                                ->withDebugEventsLogFilePath($configuredPath)
-                                ->build(),
-                        ),
-                    )
-                    ->withExpected(
-                        $defaultConfigurationBuilder
-                            ->withLogs(
-                                LogsBuilder::from($defaultLogs)
-                                    ->withDebugEventsLogFilePath($expectedPath)
-                                    ->build(),
-                            )
-                            ->build(),
-                    ),
-            ];
-        }
+        yield 'debug events relative path' => [
+            $defaultScenario->forValueForDebugEventsLogFilePath(
+                'var/debug-events.jsonl',
+                '/path/to/var/debug-events.jsonl',
+            ),
+        ];
+
+        yield 'debug events absolute path' => [
+            $defaultScenario->forValueForDebugEventsLogFilePath(
+                '/var/debug-events.jsonl',
+                '/var/debug-events.jsonl',
+            ),
+        ];
+
+        yield 'debug events output stream' => [
+            $defaultScenario->forValueForDebugEventsLogFilePath(
+                'php://output',
+                'php://output',
+            ),
+        ];
 
         yield 'null html file log path' => [
             $defaultScenario->forValueForHtmlLogFilePath(

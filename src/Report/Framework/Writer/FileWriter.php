@@ -36,12 +36,8 @@ declare(strict_types=1);
 namespace Infection\Report\Framework\Writer;
 
 use function implode;
-use function in_array;
-use Infection\Reporter\FileReporter;
 use function is_string;
 use function iterator_to_array;
-use Override;
-use function Safe\file_put_contents;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -59,7 +55,6 @@ final readonly class FileWriter implements ReportWriter
     /**
      * @throws IOException
      */
-    #[Override]
     public function write(iterable|string $contentOrLines): void
     {
         $contents = is_string($contentOrLines)
@@ -69,18 +64,6 @@ final readonly class FileWriter implements ReportWriter
                 iterator_to_array($contentOrLines),
             );
 
-        if (in_array($this->filePath, FileReporter::ALLOWED_PHP_STREAMS, true)) {
-            file_put_contents(
-                $this->filePath,
-                $contents,
-            );
-
-            return;
-        }
-
-        $this->filesystem->dumpFile(
-            $this->filePath,
-            $contents,
-        );
+        $this->filesystem->dumpFile($this->filePath, $contents);
     }
 }

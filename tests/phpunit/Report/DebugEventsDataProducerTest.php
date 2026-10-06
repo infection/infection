@@ -280,6 +280,9 @@ final class DebugEventsDataProducerTest extends TestCase
         });
     }
 
+    /**
+     * @param object[] $events
+     */
     private function createEventDispatcher(array $events): EventCollectingEventDispatcher
     {
         $eventDispatcher = new EventCollectingEventDispatcher(
