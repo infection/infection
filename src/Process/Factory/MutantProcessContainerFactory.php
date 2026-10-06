@@ -84,7 +84,7 @@ class MutantProcessContainerFactory
         );
         $env = ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY];
 
-        $process = ForkedProcess::isAvailable()
+        $process = ForkedProcess::supports($command)
             ? new ForkedProcess($command, $env, $timeout)
             : new Process(command: $command, env: $env, timeout: $timeout);
 

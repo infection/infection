@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 /*
- * This worker runs a command, such as vendor/bin/phpunit, in a forked child for each request.
- * A child requires a PHP script, and executes any other command. The worker loads no other code:
+ * This worker runs a PHP script, such as vendor/bin/phpunit, in a forked child for each request.
+ * The caller makes sure that the script is a PHP script. The worker loads no other code:
  * each child starts with a clean PHP state, without the start of a new PHP process.
  *
  * Descriptors:
@@ -19,16 +19,12 @@ declare(strict_types=1);
 
 namespace Infection\ForkWorker;
 
-use function array_slice;
 use function count;
 use function fclose;
 use function fgets;
-use function file_get_contents;
 use function fopen;
 use function fwrite;
-use function is_file;
 use function json_decode;
-use function pcntl_exec;
 use function pcntl_fork;
 use function pcntl_sigprocmask;
 use function pcntl_sigwaitinfo;
@@ -38,7 +34,6 @@ use function pcntl_wifexited;
 use function pcntl_wtermsig;
 use function posix_kill;
 use function posix_setpgid;
-use function preg_match;
 use function putenv;
 use const SIG_BLOCK;
 use const SIG_SETMASK;
@@ -47,13 +42,8 @@ use const SIGCHLD;
 use const SIGINT;
 use const SIGKILL;
 use const SIGTERM;
-use const STDERR;
 
 const SIGNAL_EXIT_CODE_BASE = 128;
-
-const COMMAND_NOT_FOUND_EXIT_CODE = 127;
-
-const FIRST_LINE_LENGTH = 80;
 
 /**
  * Sets the environment and the arguments of the requested script in the current (child) process.
@@ -69,12 +59,6 @@ function prepare(array $request): void
 
     $GLOBALS['argv'] = $_SERVER['argv'] = $request['argv'];
     $GLOBALS['argc'] = $_SERVER['argc'] = count($request['argv']);
-}
-
-function is_php_script(string $file): bool
-{
-    return is_file($file)
-        && preg_match('/^(#!.*\\bphp\\b|<\\?php)/', (string) file_get_contents($file, length: FIRST_LINE_LENGTH)) === 1;
 }
 
 function exit_code(int $status): int
@@ -102,12 +86,6 @@ while (false !== $line = fgets($requests)) {
         fclose($results);
 
         prepare(json_decode($line, true));
-
-        if (!is_php_script($argv[0])) {
-            pcntl_exec($argv[0], array_slice($argv, 1));
-            fwrite(STDERR, 'Could not execute ' . $argv[0]);
-            exit(COMMAND_NOT_FOUND_EXIT_CODE);
-        }
 
         // The script runs in the global scope, as the main script of a PHP process does.
         unset($requests, $results, $child, $line);

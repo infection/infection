@@ -39,8 +39,11 @@ use function array_filter;
 use DuoClock\DuoClock;
 use function function_exists;
 use function getenv;
+use function is_file;
 use Override;
 use function register_shutdown_function;
+use function Safe\file_get_contents;
+use function Safe\preg_match;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
@@ -55,6 +58,8 @@ final class ForkedProcess extends Process
     private const int KILLED_EXIT_CODE = 137;
 
     private const float STOP_TIMEOUT = 10.0;
+
+    private const int FIRST_LINE_LENGTH = 80;
 
     /**
      * @var array<int|string, ForkWorker> the worker of each thread
@@ -85,13 +90,17 @@ final class ForkedProcess extends Process
     }
 
     /**
-     * To disable the fork: INFECTION_FORK=0.
+     * The worker requires the first element of the command: it must be a PHP script. To disable the fork: INFECTION_FORK=0.
+     *
+     * @param array<string> $command
      */
-    public static function isAvailable(): bool
+    public static function supports(array $command): bool
     {
         return getenv('INFECTION_FORK') !== '0'
             && function_exists('pcntl_fork')
-            && function_exists('posix_kill');
+            && function_exists('posix_kill')
+            && is_file($command[0])
+            && preg_match('/^(#!.*\bphp\b|<\?php)/', file_get_contents($command[0], length: self::FIRST_LINE_LENGTH)) === 1;
     }
 
     /**

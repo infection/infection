@@ -38,6 +38,8 @@ namespace Infection\Tests\Process;
 use DuoClock\TimeSpy;
 use Infection\Process\ForkedProcess;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
@@ -47,21 +49,34 @@ use Symfony\Component\Process\Process;
 use function usleep;
 
 #[CoversClass(ForkedProcess::class)]
+#[Group('integration')]
 #[RequiresPhpExtension('pcntl')]
 #[RequiresPhpExtension('posix')]
 final class ForkedProcessTest extends TestCase
 {
     private const string FIXTURES = __DIR__ . '/../Fixtures/ForkWorker';
 
-    public function test_it_is_available(): void
+    public static function commandProvider(): iterable
     {
-        $this->assertTrue(ForkedProcess::isAvailable());
+        yield 'PHP script' => [self::FIXTURES . '/report.php', true];
+
+        yield 'PHP script with an interpreter line' => [__DIR__ . '/../../../bin/infection', true];
+
+        yield 'shell script' => [self::FIXTURES . '/wrapper.sh', false];
+
+        yield 'no such file' => [self::FIXTURES . '/unknown', false];
+    }
+
+    #[DataProvider('commandProvider')]
+    public function test_it_supports_php_scripts_only(string $script, bool $expected): void
+    {
+        $this->assertSame($expected, ForkedProcess::supports([$script, '--option']));
     }
 
     #[WithEnvironmentVariable('INFECTION_FORK', '0')]
-    public function test_it_is_not_available_if_disabled(): void
+    public function test_it_does_not_support_a_command_if_disabled(): void
     {
-        $this->assertFalse(ForkedProcess::isAvailable());
+        $this->assertFalse(ForkedProcess::supports([self::FIXTURES . '/report.php']));
     }
 
     public function test_it_runs_a_script_in_a_fork_of_the_worker(): void

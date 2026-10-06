@@ -92,10 +92,6 @@ final class ForkWorkerTest extends TestCase
         yield 'output that resembles a result' => ['result_line.php', 4, "0\n"];
 
         yield 'script stopped by a signal' => ['signal.php', 137, ''];
-
-        yield 'shell script' => ['wrapper.sh', 5, "shell --option\n"];
-
-        yield 'no such file' => ['unknown', 127, ''];
     }
 
     #[DataProvider('exitCodeProvider')]
