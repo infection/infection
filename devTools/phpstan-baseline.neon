@@ -73,6 +73,12 @@ parameters:
 			path: ../src/Config/Guesser/SourceDirGuesser.php
 
 		-
+			rawMessage: 'Only booleans are allowed in a negated boolean, string given.'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: ../src/Config/ValueProvider/ExcludeDirsProvider.php
+
+		-
 			rawMessage: Infection\Configuration\Entry\Logs should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
@@ -161,6 +167,30 @@ parameters:
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/Differ/Tokens.php
+
+		-
+			rawMessage: Value assigned to variable $fromRange only flows into values that are never used.
+			identifier: assign.unusedFlow
+			count: 2
+			path: ../src/Differ/UnifiedDiffOutputBuilder.php
+
+		-
+			rawMessage: Value assigned to variable $toRange only flows into values that are never used.
+			identifier: assign.unusedFlow
+			count: 2
+			path: ../src/Differ/UnifiedDiffOutputBuilder.php
+
+		-
+			rawMessage: Value of variable $fromRange after ++ only flows into values that are never used.
+			identifier: postInc.unusedFlow
+			count: 2
+			path: ../src/Differ/UnifiedDiffOutputBuilder.php
+
+		-
+			rawMessage: Value of variable $toRange after ++ only flows into values that are never used.
+			identifier: postInc.unusedFlow
+			count: 2
+			path: ../src/Differ/UnifiedDiffOutputBuilder.php
 
 		-
 			rawMessage: 'Call to method maybe() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
@@ -1117,6 +1147,23 @@ parameters:
 			path: ../src/Testing/TestFramework/Debug/DebugTestFrameworkAdapter.php
 
 		-
+			rawMessage: '''
+				Class Infection\Tests\Architecture\PHPStan\ResultCache\PHPatArchitectureResultCacheMetaExtension implements deprecated interface PHPStan\Analyser\ResultCache\ResultCacheMetaExtension:
+				Use value tracking or file tracking instead. See:
+				  https://phpstan.org/developing-extensions/result-cache-meta-extensions#tracking-dependencies-on-values
+				  https://phpstan.org/developing-extensions/result-cache-meta-extensions#tracking-dependencies-on-files
+			'''
+			identifier: class.implementsDeprecatedInterface
+			count: 1
+			path: ../tests/Architecture/PHPStan/ResultCache/PHPatArchitectureResultCacheMetaExtension.php
+
+		-
+			rawMessage: Value assigned to variable $oldStart is never read before being overwritten.
+			identifier: assign.overwritten
+			count: 1
+			path: ../tests/benchmark/ParseGitDiff/generator.php
+
+		-
 			rawMessage: Infection\Tests\AutoReview\ConcreteClassReflector should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -1195,6 +1242,12 @@ parameters:
 			path: ../tests/phpunit/Console/E2ETest.php
 
 		-
+			rawMessage: Value assigned to variable $prepend is never read.
+			identifier: assign.unused
+			count: 1
+			path: ../tests/phpunit/Console/E2ETest.php
+
+		-
 			rawMessage: 'assertNotEmpty() is not allowed. Use more strict assertion.'
 			identifier: phpunit.assertEmpty
 			count: 2
@@ -1217,6 +1270,12 @@ parameters:
 			identifier: classConstant.deprecated
 			count: 1
 			path: ../tests/phpunit/Console/LogVerbosityTest.php
+
+		-
+			rawMessage: Foreach value variable $trace is never read.
+			identifier: foreach.unusedValue
+			count: 1
+			path: ../tests/phpunit/Container/ContainerTest.php
 
 		-
 			rawMessage: Variable method call on Infection\Container\Container.
@@ -1283,36 +1342,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Logger/MutationAnalysis/MutationAnalysisLoggerFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #4 $mutantDiff of class Infection\Mutant\MutantExecutionResult constructor expects Later\Interfaces\Deferred<string>, Later\Interfaces\Deferred<non-falsy-string> given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Metrics/FilteringResultsCollectorFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #4 $mutantDiff of class Infection\Mutant\MutantExecutionResult constructor expects Later\Interfaces\Deferred<string>, Later\Interfaces\Deferred<non-falsy-string> given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Metrics/FilteringResultsCollectorTest.php
-
-		-
-			rawMessage: 'Parameter #4 $mutantDiff of class Infection\Mutant\MutantExecutionResult constructor expects Later\Interfaces\Deferred<string>, Later\Interfaces\Deferred<non-falsy-string> given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Metrics/MetricsCalculatorTest.php
-
-		-
-			rawMessage: 'Parameter #4 $mutantDiff of class Infection\Mutant\MutantExecutionResult constructor expects Later\Interfaces\Deferred<string>, Later\Interfaces\Deferred<non-falsy-string> given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Metrics/ResultsCollectorTest.php
-
-		-
-			rawMessage: 'Parameter #4 $mutantDiff of class Infection\Mutant\MutantExecutionResult constructor expects Later\Interfaces\Deferred<string>, Later\Interfaces\Deferred<lowercase-string&non-falsy-string&uppercase-string> given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Metrics/SortableMutantExecutionResultsTest.php
 
 		-
 			rawMessage: Infection\Tests\MockedContainer should not exist
@@ -1519,6 +1548,12 @@ parameters:
 			path: ../tests/phpunit/Mutator/ProfileListProvider.php
 
 		-
+			rawMessage: Variable $filePath is never read.
+			identifier: variable.unused
+			count: 1
+			path: ../tests/phpunit/Mutator/ProfileListProvider.php
+
+		-
 			rawMessage: 'Parameter #1 $kind (array<int|string>|int|string) of method Infection\Tests\PhpParser\FakeToken::is() should be contravariant with parameter $kind (array|int|string) of method PhpToken::is()'
 			identifier: method.childParameterType
 			count: 1
@@ -1553,6 +1588,30 @@ parameters:
 			identifier: phpunit.assertEmpty
 			count: 1
 			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/VisitorTestCaseTest.php
+
+		-
+			rawMessage: Variable $mutantDiff is never read.
+			identifier: variable.unused
+			count: 1
+			path: ../tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php
+
+		-
+			rawMessage: Variable $originalStartingLine is never read.
+			identifier: variable.unused
+			count: 1
+			path: ../tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php
+
+		-
+			rawMessage: Foreach value variable $item is never read.
+			identifier: foreach.unusedValue
+			count: 1
+			path: ../tests/phpunit/Process/Runner/DryProcessRunnerTest.php
+
+		-
+			rawMessage: Foreach value variable $value is never read.
+			identifier: foreach.unusedValue
+			count: 1
+			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
 
 		-
 			rawMessage: 'assertNotEmpty() is not allowed. Use more strict assertion.'
@@ -1661,6 +1720,36 @@ parameters:
 			identifier: argument.templateType
 			count: 1
 			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
+
+		-
+			rawMessage: Variable $mutantDiff is never read.
+			identifier: variable.unused
+			count: 1
+			path: ../tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
+
+		-
+			rawMessage: Variable $mutatorName is never read.
+			identifier: variable.unused
+			count: 1
+			path: ../tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
+
+		-
+			rawMessage: Variable $originalFilePath is never read.
+			identifier: variable.unused
+			count: 1
+			path: ../tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
+
+		-
+			rawMessage: Variable $originalStartingLine is never read.
+			identifier: variable.unused
+			count: 1
+			path: ../tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
+
+		-
+			rawMessage: Variable $processCommandLine is never read.
+			identifier: variable.unused
+			count: 1
+			path: ../tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
 
 		-
 			rawMessage: Infection\Tests\TestFramework\Coverage\Locator\BaseReportLocator\DemoReportLocator should not exist
@@ -1806,6 +1895,12 @@ parameters:
 		-
 			rawMessage: 'Only numeric types are allowed in /, float|null given on the right side.'
 			identifier: div.rightNonNumeric
+			count: 1
+			path: ../tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php
+
+		-
+			rawMessage: Variable $dummy is never read.
+			identifier: variable.unused
 			count: 1
 			path: ../tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php
 
