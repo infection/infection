@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
+use DuoClock\TimeSpy;
 use Infection\Process\ForkedProcess;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -65,7 +66,7 @@ final class ForkedProcessTest extends TestCase
 
     public function test_it_runs_a_script_in_a_fork_of_the_worker(): void
     {
-        $process = new ForkedProcess([self::FIXTURES . '/report.php'], ['FOO' => 'bar'], 10.0);
+        $process = new ForkedProcess([self::FIXTURES . '/report.php'], ['FOO' => 'bar'], 10.0, new TimeSpy(100.0));
 
         $this->assertFalse($process->isStarted());
         $this->assertSame(Process::STATUS_READY, $process->getStatus());
@@ -82,7 +83,7 @@ final class ForkedProcessTest extends TestCase
         $this->assertSame('bar', json_decode($process->getOutput(), true)['foo']);
         $this->assertSame('error output', $process->getErrorOutput());
         $this->assertSame(3, $process->getExitCode());
-        $this->assertGreaterThan(0.0, $process->getStartTime());
+        $this->assertSame(100.0, $process->getStartTime());
     }
 
     public function test_a_thread_keeps_its_worker(): void
@@ -93,11 +94,19 @@ final class ForkedProcessTest extends TestCase
 
     public function test_it_stops_the_script_at_the_timeout(): void
     {
-        $process = new ForkedProcess([self::FIXTURES . '/sleep.php'], [], 0.2);
+        $clock = new TimeSpy(100.0);
+        $process = new ForkedProcess([self::FIXTURES . '/sleep.php'], [], 0.2, $clock);
         $process->start(env: ['TEST_TOKEN' => 'timeout']);
 
+        $clock->usleep(199_999);
+        $process->checkTimeout();
+
+        $this->assertTrue($process->isRunning(), 'The script must run before the deadline');
+
+        $clock->usleep(1);
+
         try {
-            self::wait($process);
+            $process->checkTimeout();
 
             $this->fail('The process must report the timeout.');
         } catch (ProcessTimedOutException $exception) {

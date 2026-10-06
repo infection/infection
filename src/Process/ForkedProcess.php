@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use function array_filter;
+use DuoClock\DuoClock;
 use function function_exists;
 use function getenv;
-use function microtime;
 use Override;
 use function register_shutdown_function;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -79,6 +79,7 @@ final class ForkedProcess extends Process
         private readonly array $command,
         private readonly array $forkEnv,
         private readonly float $forkTimeout,
+        private readonly DuoClock $clock = new DuoClock(),
     ) {
         parent::__construct($command, env: $forkEnv, timeout: $forkTimeout);
     }
@@ -103,7 +104,7 @@ final class ForkedProcess extends Process
             register_shutdown_function(self::killWorkers(...));
         }
 
-        $this->startTime = microtime(true);
+        $this->startTime = $this->clock->microtime();
 
         $this->worker = self::$workers[$env['TEST_TOKEN'] ?? 0] ??= ForkWorker::start();
         $this->worker->run($this->command, $env + $this->forkEnv);
@@ -127,7 +128,7 @@ final class ForkedProcess extends Process
     #[Override]
     public function checkTimeout(): void
     {
-        if (!$this->isRunning() || microtime(true) - $this->startTime < $this->forkTimeout) {
+        if (!$this->isRunning() || $this->clock->microtime() - $this->startTime < $this->forkTimeout) {
             return;
         }
 
