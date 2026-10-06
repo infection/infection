@@ -65,6 +65,8 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
 {
     public const string COVERAGE_DIR = 'coverage-xml';
 
+    private const int CONFIGURATION_VALIDATION_TIMEOUT_IN_SECONDS = 2;
+
     public function __construct(
         private readonly string $testFrameworkExecutable,
         private readonly string $tmpDir,
@@ -326,7 +328,7 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
                         '--validate-configuration',
                     ],
                 ),
-                timeout: 2,
+                timeout: self::CONFIGURATION_VALIDATION_TIMEOUT_IN_SECONDS,
             );
         } catch (SymfonyProcessRuntimeException $processFailed) {
             throw new InvalidPhpUnitConfiguration(
