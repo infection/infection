@@ -134,6 +134,30 @@ final class ForkWorkerTest extends TestCase
         $this->assertTrue($this->waitFor(static fn (): bool => !self::isRunning($pid)));
     }
 
+    public function test_kill_stops_the_descendants_of_the_script(): void
+    {
+        $this->worker->run([self::FIXTURES . '/spawn.php', 'wait'], []);
+
+        $grandchild = (int) $this->waitFor($this->worker->readOutput(...));
+
+        $this->assertTrue(self::isRunning($grandchild), 'The grandchild must run before the kill');
+
+        $this->worker->kill();
+
+        $this->assertTrue($this->waitFor(static fn (): bool => !self::isRunning($grandchild)));
+    }
+
+    public function test_it_stops_the_descendants_of_a_complete_script(): void
+    {
+        $this->worker->run([self::FIXTURES . '/spawn.php'], []);
+
+        $this->assertSame(0, $this->waitForExitCode(), 'A grandchild with the output descriptors must not delay the result');
+
+        $grandchild = (int) $this->worker->readOutput();
+
+        $this->assertTrue($this->waitFor(static fn (): bool => !self::isRunning($grandchild)));
+    }
+
     public function test_it_fails_if_the_worker_stops_without_a_result(): void
     {
         $this->worker->run([self::FIXTURES . '/kill_worker.php'], []);

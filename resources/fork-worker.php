@@ -13,7 +13,8 @@ declare(strict_types=1);
  *   3     requests, a JSON line each: {"argv": ["/path/to/vendor/bin/phpunit", "--configuration", "..."], "env": {"TEST_TOKEN": 1}}
  *   4     results, a line each: the exit code of the child, or 128 plus the number of the signal that stopped the child
  *
- * The worker runs a single request at a time. SIGTERM stops the worker together with its current child.
+ * The worker runs a single request at a time. Each child runs in its own process group. SIGTERM or SIGINT stops the worker
+ * together with the process group of its current child. After a child exits, the worker kills the rest of its process group.
  */
 
 namespace Infection\ForkWorker;
@@ -27,18 +28,23 @@ use function fopen;
 use function fwrite;
 use function is_file;
 use function json_decode;
-use function pcntl_async_signals;
 use function pcntl_exec;
 use function pcntl_fork;
-use function pcntl_signal;
+use function pcntl_sigprocmask;
+use function pcntl_sigwaitinfo;
 use function pcntl_waitpid;
 use function pcntl_wexitstatus;
 use function pcntl_wifexited;
 use function pcntl_wtermsig;
 use function posix_kill;
+use function posix_setpgid;
 use function preg_match;
 use function putenv;
-use const SIG_DFL;
+use const SIG_BLOCK;
+use const SIG_SETMASK;
+use const SIG_UNBLOCK;
+use const SIGCHLD;
+use const SIGINT;
 use const SIGKILL;
 use const SIGTERM;
 use const STDERR;
@@ -78,26 +84,20 @@ function exit_code(int $status): int
         : SIGNAL_EXIT_CODE_BASE + pcntl_wtermsig($status);
 }
 
+const SIGNALS = [SIGCHLD, SIGTERM, SIGINT];
+
 $requests = fopen('php://fd/3', 'r');
 $results = fopen('php://fd/4', 'w');
-$child = 0;
-
-pcntl_async_signals(true);
-
-// The handler must interrupt pcntl_waitpid(), thus no restart of system calls.
-pcntl_signal(SIGTERM, static function () use (&$child): never {
-    if ($child > 0) {
-        posix_kill($child, SIGKILL);
-    }
-
-    exit(0);
-}, false);
 
 while (false !== $line = fgets($requests)) {
+    // The worker consumes the signals with pcntl_sigwaitinfo() until the child is reaped.
+    pcntl_sigprocmask(SIG_BLOCK, SIGNALS);
+
     $child = pcntl_fork();
 
     if ($child === 0) {
-        pcntl_signal(SIGTERM, SIG_DFL);
+        pcntl_sigprocmask(SIG_SETMASK, []);
+        posix_setpgid(0, 0);
         fclose($requests);
         fclose($results);
 
@@ -106,19 +106,29 @@ while (false !== $line = fgets($requests)) {
         if (!is_php_script($argv[0])) {
             pcntl_exec($argv[0], array_slice($argv, 1));
             fwrite(STDERR, 'Could not execute ' . $argv[0]);
-
             exit(COMMAND_NOT_FOUND_EXIT_CODE);
         }
 
         // The script runs in the global scope, as the main script of a PHP process does.
-        unset($requests, $results, $child, $line, $status);
+        unset($requests, $results, $child, $line);
 
         require $argv[0];
 
         exit(0);
     }
 
+    // Both processes set the group, so the group exists before any kill and before the script starts.
+    posix_setpgid($child, $child);
+
+    if (pcntl_sigwaitinfo(SIGNALS) !== SIGCHLD) {
+        posix_kill(-$child, SIGKILL);
+        exit(0);
+    }
+
     pcntl_waitpid($child, $status);
+    posix_kill(-$child, SIGKILL);
+
+    pcntl_sigprocmask(SIG_UNBLOCK, SIGNALS);
 
     fwrite($results, exit_code($status) . "\n");
 }
