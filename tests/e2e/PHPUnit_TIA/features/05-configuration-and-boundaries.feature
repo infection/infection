@@ -1,6 +1,7 @@
 Feature: Respect TIA configuration and selection boundaries
     Infection can enable observed-execution TIA for projects without explicit settings.
-    Explicit opt-outs and test selections must remain effective.
+    Only an explicit impact-recording opt-out disables automatic TIA by policy.
+    Missing prerequisites and explicit test selections can also prevent its use.
 
     Background:
         Given PHPUnit is configured to record test impact data from executed code without deriving it from coverage targets
@@ -22,11 +23,11 @@ Feature: Respect TIA configuration and selection boundaries
             | detection statuses  |
             | MSI                 |
 
-    Scenario Outline: The CLI opt-out <option> disables automatic impact selection
+    Scenario Outline: Infection runs without TIA when <condition>
         When I run Infection on "src/Calculator.php"
         Then the initial test run executes all tests
         When I run Infection on "src/Calculator.php" with the following options:
-            | --test-framework-options=<option> |
+            | --test-framework-extra-args=<option> |
         Then the effective PHPUnit configuration includes:
             | recordTestImpactData | false |
             | impactedByFile       | null  |
@@ -38,23 +39,21 @@ Feature: Respect TIA configuration and selection boundaries
             | src/Calculator.php | Plus    | killed by tests |
 
         Examples:
-            | option                           |
-            | --do-not-record-test-impact-data |
-            | --do-not-record-test-run-history |
+            | condition                               | option                           |
+            | impact recording is explicitly disabled | --do-not-record-test-impact-data |
+            | test-run history is unavailable         | --do-not-record-test-run-history |
 
-    # Blocker: ../../../../doc/TIA/infection/xml-opt-outs.md
-    @skip
-    Scenario Outline: The XML opt-out <attribute> disables automatic impact selection
-        When I run Infection on "src/Calculator.php"
-        Then the initial test run executes all tests
+    Scenario Outline: Infection enables reusable TIA despite <attribute> being disabled in XML
         Given the PHPUnit configuration has these attributes:
             | <attribute> | false |
         When I run Infection on "src/Calculator.php"
         Then the effective PHPUnit configuration includes:
-            | <attribute>          | false |
-            | recordTestImpactData | false |
-            | impactedByFile       | null  |
+            | recordTestImpactData | true |
+            | recordTestRunHistory | true |
         And the initial test run executes all tests
+        When I run Infection again with the same options and unchanged source, tests, and configuration
+        Then the initial test run executes only the following tests:
+            | CalculatorTest::test_calculate |
         And the mutants that were evaluated are:
             | file               | mutator | outcome         |
             | src/Calculator.php | Plus    | killed by tests |

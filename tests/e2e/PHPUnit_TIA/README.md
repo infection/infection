@@ -106,10 +106,11 @@ The previous script is retained as `run_legacy_tests.bash`; the runner does not 
 
 ## Current blockers
 
-At the current pin, all 22 examples in the default suite pass. All 14 examples selected
-by the `blocked` profile fail when run explicitly. These include sharing recordings in
-both directions and the unrecorded-source scenario, which falls back with a different
-explanation. See the
+The 2026-10-05 verification recorded 22 passing default examples and 14 failing blocked
+examples. The two XML opt-out examples now verify Infection's decision to enable TIA
+despite XML opt-outs and run in the default profile. Remaining blocked scenarios include
+sharing recordings in both directions and the unrecorded-source scenario, which falls
+back with a different explanation. See the
 [current verification results](../../../doc/TIA/README.md).
 
 The cold-start scenario passes. The PHPUnit-seeded scenario is tagged `@skip` and
@@ -123,8 +124,8 @@ covering Calculator after a test-body or data-provider change. PHPUnit's explici
 query omits that test because its previous recording does not depend on Calculator.
 See [the reproductions and PHPUnit feedback](../../../doc/TIA/phpunit/changed-tests.md).
 
-The remaining features reproduce XML opt-outs being overridden, runtime-setting changes
-being missed, the wrong lock file being tracked when XML is outside the project, changed
+The remaining features reproduce runtime-setting changes being missed, the wrong lock
+file being tracked when XML is outside the project, changed
 external fixtures being omitted, and cache write failures stopping mutation testing.
 An empty-selection outcome remains a proposal under `@decision_pending`.
 See [the findings and open questions](../../../doc/TIA/README.md).

@@ -110,11 +110,23 @@ final class InitialConfigBuilderTest extends TestCase
             $expected = [...$expected, '--impacted-by-file', $path];
         }
 
-        $this->assertSame($expected, $builder->configureTestImpactAnalysis($options, $version, $collectCoverage));
-        $this->assertSame($selects, $this->filesystem->isReadableFile($path));
+        $this->assertSame(
+            $expected,
+            $builder->configureTestImpactAnalysis($options, $version, $collectCoverage),
+            'The initial-run options do not match the expected impact-selection policy.',
+        );
+        $this->assertSame(
+            $selects,
+            $this->filesystem->isReadableFile($path),
+            'The source-path list must be written only when Infection adds an impact query.',
+        );
 
         if ($selects) {
-            $this->assertSame("/src/A.php\n/src/B.php\n", $this->filesystem->readFile($path));
+            $this->assertSame(
+                "/src/A.php\n/src/B.php\n",
+                $this->filesystem->readFile($path),
+                'The impact query must include every source file selected for mutation.',
+            );
         }
     }
 
@@ -137,6 +149,27 @@ final class InitialConfigBuilderTest extends TestCase
         yield 'history disabled' => ['--do-not-record-test-run-history', '--do-not-record-test-run-history --do-not-record-test-impact-data'];
 
         yield 'opt out removes impact selection' => ['--only-impacted --do-not-record-test-impact-data', '--do-not-record-test-impact-data'];
+
+        foreach ([
+            'enabled in XML' => '<phpunit recordTestImpactData="true" recordTestRunHistory="true"/>',
+            'recording disabled in XML' => '<phpunit recordTestImpactData="false"/>',
+            'history disabled in XML' => '<phpunit recordTestRunHistory="false"/>',
+            'recording and history disabled in XML' => '<phpunit recordTestImpactData="false" recordTestRunHistory="false"/>',
+            'numeric XML opt-outs' => '<phpunit recordTestImpactData="0" recordTestRunHistory="0"/>',
+        ] as $name => $xml) {
+            yield $name => [
+                'extraArgs' => '',
+                'expectedExtraArgs' => '',
+                'selects' => true,
+                'xml' => $xml,
+            ];
+
+            yield 'explicit opt-out with TIA ' . $name => [
+                'extraArgs' => '--do-not-record-test-impact-data',
+                'expectedExtraArgs' => '--do-not-record-test-impact-data',
+                'xml' => $xml,
+            ];
+        }
 
         yield 'declared targets' => ['--derive-test-impact-data-from-coverage-targets', '--derive-test-impact-data-from-coverage-targets', true, '<phpunit requireCoverageMetadata="true"/>'];
 
@@ -199,18 +232,41 @@ final class InitialConfigBuilderTest extends TestCase
     }
 
     #[DataProvider('impactConfigurationProvider')]
-    public function test_it_configures_impact_recording(string $version, bool $collectCoverage, bool $expected): void
-    {
-        $builder = $this->createConfigBuilder('<phpunit/>');
+    public function test_it_configures_impact_recording(
+        string $version,
+        bool $collectCoverage,
+        bool $expected,
+        string $xml = '<phpunit/>',
+    ): void {
+        $builder = $this->createConfigBuilder($xml);
         $path = $builder->build($version, $collectCoverage);
         $xml = SafeDOMXPath::fromString($this->filesystem->readFile($path));
         $phpunit = $xml->getElement('/phpunit');
 
-        $this->assertSame($expected ? 'true' : '', $phpunit->getAttribute('recordTestImpactData'));
-        $this->assertSame($expected ? 'false' : '', $phpunit->getAttribute('deriveTestImpactDataFromCoverageTargets'));
-        $this->assertSame($expected ? 'true' : 'false', $phpunit->getAttribute('recordTestRunHistory'));
-        $this->assertSame($expected ? $this->projectPath . '/.infection/phpunit' : '', $phpunit->getAttribute('cacheDirectory'));
-        $this->assertFalse($phpunit->hasAttribute('requireCoverageMetadata'));
+        $this->assertSame(
+            $expected ? 'true' : '',
+            $phpunit->getAttribute('recordTestImpactData'),
+            'Impact recording must follow Infection defaults regardless of the original XML setting.',
+        );
+        $this->assertSame(
+            $expected ? 'false' : '',
+            $phpunit->getAttribute('deriveTestImpactDataFromCoverageTargets'),
+            'Infection must default to observed-execution recording.',
+        );
+        $this->assertSame(
+            $expected ? 'true' : 'false',
+            $phpunit->getAttribute('recordTestRunHistory'),
+            'Test-run history must be enabled when Infection enables TIA.',
+        );
+        $this->assertSame(
+            $expected ? $this->projectPath . '/.infection/phpunit' : '',
+            $phpunit->getAttribute('cacheDirectory'),
+            'Automatic TIA must use Infection\'s persistent cache directory.',
+        );
+        $this->assertFalse(
+            $phpunit->hasAttribute('requireCoverageMetadata'),
+            'Automatic TIA must not impose mandatory coverage metadata.',
+        );
     }
 
     public static function impactConfigurationProvider(): iterable
@@ -218,6 +274,27 @@ final class InitialConfigBuilderTest extends TestCase
         yield 'released PHPUnit without TIA' => ['13.3', true, false];
 
         yield 'reviewed TIA snapshot' => ['13.5-dev', true, true];
+
+        yield 'TIA explicitly enabled in XML' => [
+            'version' => '13.5-dev',
+            'collectCoverage' => true,
+            'expected' => true,
+            'xml' => '<phpunit recordTestImpactData="true" recordTestRunHistory="true"/>',
+        ];
+
+        yield 'TIA explicitly disabled in XML' => [
+            'version' => '13.5-dev',
+            'collectCoverage' => true,
+            'expected' => true,
+            'xml' => '<phpunit recordTestImpactData="false" recordTestRunHistory="false"/>',
+        ];
+
+        yield 'TIA explicitly disabled numerically in XML' => [
+            'version' => '13.5-dev',
+            'collectCoverage' => true,
+            'expected' => true,
+            'xml' => '<phpunit recordTestImpactData="0" recordTestRunHistory="0"/>',
+        ];
 
         yield 'no initial coverage collection' => ['13.5-dev', false, false];
 

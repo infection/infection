@@ -14,6 +14,9 @@ the fixture's Composer dependencies. PHPUnit remained at the pinned commit:
 | Default | All 22 examples passed. |
 | `blocked` | All 14 examples failed when run explicitly, including one proposed outcome. |
 
+The two XML opt-out examples were subsequently revised to verify the current design:
+Infection enables TIA despite XML opt-outs. They now run in the default profile.
+
 Only scenarios with failing assertions are tagged `@skip` and excluded from the default
 profile. These include both shared-recording scenarios and the unknown-source scenario,
 which runs the full suite but reports a different explanation from the one expected.
@@ -36,6 +39,19 @@ A cold run executes the full suite and prepares later runs; it does not reduce i
 initial test run. Retain XML coverage and JUnit reports for mutation generation,
 covering-test selection and timings. The proof of concept requires no replacement of
 Infection's coverage or mutation pipeline.
+
+The current design is to try to enable TIA whether the user explicitly enabled it,
+left it unspecified, or explicitly disabled it in PHPUnit XML. Overriding XML recording
+and history settings for Infection's initial run is intentional. This policy remains
+open for discussion, but is the decision for this proof of concept.
+
+The explicit Infection opt-out is `--do-not-record-test-impact-data`, passed through
+`--test-framework-extra-args=--do-not-record-test-impact-data` or the top-level
+`testFrameworkExtraArgs` setting in `infection.json5`. This allows users to disable TIA
+for Infection without changing ordinary PHPUnit runs. Disabling declared-target derivation
+alone changes the recording strategy; it does not opt out of TIA. Missing prerequisites,
+including disabled test-run history, are separate constraints on whether TIA can operate.
+The implementation also currently treats `--do-not-record-test-run-history` as an opt-out.
 
 Select declared targets with `--test-framework-extra-args=--derive-test-impact-data-from-coverage-targets`
 or `testFrameworkExtraArgs`; Behat currently uses the older `--test-framework-options` option.
@@ -75,7 +91,7 @@ explicit-query contract. Usability and API requests have no dedicated failing sc
 These documents distinguish reproduced gaps from proposed policies and untested follow-ups.
 
 - [Reusing the project's configured cache](infection/project-cache.md).
-- [Respecting explicit XML opt-outs](infection/xml-opt-outs.md).
+- [Earlier XML opt-out proposal](infection/xml-opt-outs.md), superseded by the current policy above; the scenarios now verify that Infection enables TIA despite XML opt-outs.
 - [Continuing without TIA when the cache is unusable](infection/cache-fallback.md).
 - [Using supplied coverage reports](infection/supplied-coverage.md).
 - [Handling explicit test selection](infection/explicit-test-selection.md).
