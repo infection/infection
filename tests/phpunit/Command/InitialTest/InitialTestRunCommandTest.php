@@ -36,6 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Command\InitialTest;
 
 use Infection\Command\InitialTest\InitialTestRunCommand;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\SourceFileFilter;
 use Infection\Console\Application;
 use Infection\Container\Container;
 use Infection\Event\EventDispatcher\EventDispatcher;
@@ -51,6 +54,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\chdir;
 use function Safe\getcwd;
@@ -171,18 +175,89 @@ final class InitialTestRunCommandTest extends TestCase
         ];
     }
 
-    private function createCommandTester(?InitialTestsFailed $failure = null): CommandTester
-    {
-        $gitMock = $this->createMock(Git::class);
-        $gitMock
-            ->method('getBaseReference')
-            ->willReturn('<refinedGitReference>')
-        ;
+    /**
+     * @param array<string, string|bool|list<string>> $arguments
+     */
+    #[DataProvider('sourceFilterProvider')]
+    public function test_it_uses_the_requested_source_filter(
+        array $arguments,
+        ?SourceFileFilter $expected,
+        string $expectedGitBase = 'main',
+    ): void {
+        $tester = $this->createCommandTester(
+            expectedSourceFilter: $expected,
+            expectedGitBase: $expectedGitBase,
+        );
 
-        $testFrameworkMock = $this->createMock(TestFramework::class);
-        $testFrameworkMock->method('getName')->willReturn('DemoTestFramework');
-        $testFrameworkMock->method('getVersion')->willReturn('1.0');
+        $tester->execute($arguments);
+
+        $tester->assertCommandIsSuccessful('The initial test run should accept the requested source filter.');
+    }
+
+    public static function sourceFilterProvider(): iterable
+    {
+        yield 'the filter option selects source files' => [
+            ['--filter' => 'Foo.php,Bar.php'],
+            new PlainFilter([
+                'Foo.php',
+                'Bar.php',
+            ]),
+        ];
+
+        yield 'positional paths select source files' => [
+            ['paths' => [
+                'Foo.php',
+                'Bar.php',
+            ]],
+            new PlainFilter([
+                'Foo.php',
+                'Bar.php',
+            ]),
+        ];
+
+        yield 'Git filtering resolves the default base' => [
+            ['--git-diff-filter' => 'AM'],
+            new GitDiffFilter(
+                'AM',
+                '<refinedGitReference>',
+            ),
+        ];
+
+        yield 'Git filtering uses the requested base' => [
+            [
+                '--git-diff-filter' => 'A',
+                '--git-diff-base' => 'feature-base',
+            ],
+            new GitDiffFilter(
+                'A',
+                '<refinedGitReference>',
+            ),
+            'feature-base',
+        ];
+
+        yield 'Git line filtering uses the default Git filter' => [
+            [
+                '--git-diff-lines' => true,
+                '--git-diff-base' => 'main',
+            ],
+            new GitDiffFilter(
+                Git::DEFAULT_GIT_DIFF_FILTER,
+                '<refinedGitReference>',
+            ),
+        ];
+    }
+
+    private function createCommandTester(
+        ?InitialTestsFailed $failure = null,
+        ?SourceFileFilter $expectedSourceFilter = null,
+        string $expectedGitBase = 'main',
+    ): CommandTester {
+        $gitMock = $this->createGitMock($expectedSourceFilter, $expectedGitBase);
+
+        $testFrameworkMock = $this->createTestFrameworkMock();
+
         $eventDispatcher = new SyncEventDispatcher();
+
         $executeInitialRunExpectation = $testFrameworkMock
             ->expects($this->once())
             ->method('executeInitialRun')
@@ -203,8 +278,20 @@ final class InitialTestRunCommandTest extends TestCase
         $container = Container::create()
             ->cloneWithService(Git::class, $gitMock)
             ->cloneWithService(EventDispatcher::class, $eventDispatcher)
-            ->cloneWithService(TestFramework::class, $testFrameworkMock)
         ;
+
+        $container->set(
+            TestFramework::class,
+            function (Container $container) use ($testFrameworkMock, $expectedSourceFilter): TestFramework {
+                $this->assertEquals(
+                    $expectedSourceFilter,
+                    $container->getConfiguration()->sourceFilter,
+                    'The initial test run should use the requested source filter.',
+                );
+
+                return $testFrameworkMock;
+            },
+        );
 
         $application = new Application($container);
 
@@ -250,5 +337,46 @@ final class InitialTestRunCommandTest extends TestCase
             $stderr,
             $display,
         ];
+    }
+
+    private function createGitMock(
+        ?SourceFileFilter $expectedSourceFilter,
+        string $expectedGitBase,
+    ): Git&MockObject {
+        $gitMock = $this->createMock(Git::class);
+
+        $gitMock
+            ->method('getDefaultBase')
+            ->willReturn('main')
+        ;
+
+        $gitMock
+            ->expects(
+                $expectedSourceFilter instanceof GitDiffFilter
+                    ? $this->once()
+                    : $this->never(),
+            )
+            ->method('getBaseReference')
+            ->with($expectedGitBase)
+            ->willReturn('<refinedGitReference>')
+        ;
+
+        return $gitMock;
+    }
+
+    private function createTestFrameworkMock(): TestFramework&MockObject
+    {
+        $testFrameworkMock = $this->createMock(TestFramework::class);
+
+        $testFrameworkMock
+            ->method('getName')
+            ->willReturn('DemoTestFramework')
+        ;
+        $testFrameworkMock
+            ->method('getVersion')
+            ->willReturn('1.0')
+        ;
+
+        return $testFrameworkMock;
     }
 }

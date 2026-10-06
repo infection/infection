@@ -36,14 +36,13 @@ declare(strict_types=1);
 namespace Infection\Command\InitialTest;
 
 use Infection\Command\BaseCommand;
-use Infection\Command\Git\Option\BaseOption;
-use Infection\Command\Git\Option\FilterOption;
 use Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\DebugOption;
+use Infection\Command\Option\PathsArgument;
+use Infection\Command\Option\SourceFilterOptions;
 use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Command\Option\TestFrameworkOption;
-use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
@@ -66,8 +65,8 @@ final class InitialTestRunCommand extends BaseCommand
         );
 
         ConfigurationOption::addOption($this);
-        BaseOption::addOption($this);
-        FilterOption::addOption($this);
+        PathsArgument::addArgument($this);
+        SourceFilterOptions::addOption($this);
         InitialTestsPhpOptionsOption::addOption($this);
         TestFrameworkOption::addOption($this);
         TestFrameworkExtraArgsOption::addOption($this);
@@ -78,9 +77,6 @@ final class InitialTestRunCommand extends BaseCommand
     {
         $logger = new ConsoleLogger($io);
 
-        $inputBase = BaseOption::get($io);
-        $inputFilter = FilterOption::get($io);
-
         $container = $this->getApplication()->getContainer()->withValues(
             logger: $logger,
             output: $io->getOutput(),
@@ -89,7 +85,10 @@ final class InitialTestRunCommand extends BaseCommand
             initialTestsPhpOptions: InitialTestsPhpOptionsOption::get($io),
             testFramework: TestFrameworkOption::get($io),
             testFrameworkExtraArgs: TestFrameworkExtraArgsOption::get($io),
-            sourceFilter: new IncompleteGitDiffFilter($inputFilter, $inputBase),
+            sourceFilter: SourceFilterOptions::get(
+                $io,
+                PathsArgument::get($io),
+            ),
         );
 
         // TODO: this is not very elegant but done this way for now to keep the same behaviour
