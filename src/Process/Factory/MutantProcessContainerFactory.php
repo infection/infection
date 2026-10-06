@@ -40,6 +40,7 @@ use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
+use Infection\Process\ForkedProcess;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
@@ -74,17 +75,18 @@ class MutantProcessContainerFactory
         // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
         $timeout = min(self::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (self::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime()), $this->timeout);
 
-        $process = new Process(
-            command: $testFrameworkAdapter->getMutantCommandLine(
-                $mutant->getTests(),
-                $mutant->getFilePath(),
-                $mutant->getMutation()->getHash(),
-                $mutant->getMutation()->getOriginalFilePath(),
-                $testFrameworkExtraOptions,
-            ),
-            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
-            timeout: $timeout,
+        $command = $testFrameworkAdapter->getMutantCommandLine(
+            $mutant->getTests(),
+            $mutant->getFilePath(),
+            $mutant->getMutation()->getHash(),
+            $mutant->getMutation()->getOriginalFilePath(),
+            $testFrameworkExtraOptions,
         );
+        $env = ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY];
+
+        $process = ForkedProcess::supports($command)
+            ? new ForkedProcess($command, $env, $timeout)
+            : new Process(command: $command, env: $env, timeout: $timeout);
 
         if ($this->configuration->isDryRun) {
             $process = DryRunProcess::fromProcess($process);
