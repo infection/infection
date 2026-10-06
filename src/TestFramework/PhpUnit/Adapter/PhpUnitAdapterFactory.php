@@ -96,10 +96,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
-        Assert::notEmpty(
-            $sourceDirectories,
-            'The source directories cannot be empty. This indicates that an invalid configuration reached the test framework adapter factory.',
-        );
 
         $legacyAdapter = self::createLegacy(
             $testFrameworkExecutable,
