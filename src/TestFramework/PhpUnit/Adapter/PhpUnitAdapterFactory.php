@@ -213,6 +213,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
+            $testFrameworkConfigPath,
         );
     }
 
