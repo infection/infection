@@ -3487,12 +3487,6 @@ message = "Argument #1 of method `DOMNode::appendChild` is possibly `false`, but
 count = 4
 
 [[issues]]
-file = "src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration` in `Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator::validate`.'
-count = 1
-
-[[issues]]
 file = "src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider::provide`: expected `string`, but found `null|string`.'
