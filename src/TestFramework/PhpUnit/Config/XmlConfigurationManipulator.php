@@ -47,6 +47,7 @@ use function implode;
 use function in_array;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\XML\SafeDOMXPath;
+use function libxml_clear_errors;
 use const LIBXML_ERR_ERROR;
 use const LIBXML_ERR_FATAL;
 use const LIBXML_ERR_WARNING;
@@ -305,17 +306,22 @@ final readonly class XmlConfigurationManipulator
     ): void {
         $original = libxml_use_internal_errors(true);
 
-        if (
-            $schema !== null
-            && !$document->schemaValidate($this->buildSchemaPath($schema))
-        ) {
-            throw InvalidPhpUnitConfiguration::byXsdSchema(
-                $configPath,
-                $this->getXmlErrorsString(),
-            );
-        }
+        try {
+            libxml_clear_errors();
 
-        libxml_use_internal_errors($original);
+            if (
+                $schema !== null
+                && !$document->schemaValidate($this->buildSchemaPath($schema))
+            ) {
+                throw InvalidPhpUnitConfiguration::byXsdSchema(
+                    $configPath,
+                    $this->getXmlErrorsString(),
+                );
+            }
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($original);
+        }
     }
 
     /**
