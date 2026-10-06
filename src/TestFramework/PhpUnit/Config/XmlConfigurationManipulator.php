@@ -216,19 +216,17 @@ final readonly class XmlConfigurationManipulator
         $this->addOrUpdateCoverageNodes('source', 'include', $xPath, $srcDirs, $filteredSourceFilesToMutate);
     }
 
-    // TODO: fix return type... There is no point in returning true if we
-    //   never return false.
     /**
      * @throws InvalidPhpUnitConfiguration
      */
-    public function validate(string $configPath, SafeDOMXPath $xPath): true
+    public function validate(string $configPath, SafeDOMXPath $xPath): void
     {
         if ($xPath->queryCount('/phpunit') === 0) {
             throw InvalidPhpUnitConfiguration::byRootNode($configPath);
         }
 
         if ($xPath->queryCount('namespace::xsi') === 0) {
-            return true;
+            return;
         }
 
         $this->validateAgainstSchema(
@@ -236,8 +234,6 @@ final readonly class XmlConfigurationManipulator
             $xPath->document,
             $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue,
         );
-
-        return true;
     }
 
     public function removeDefaultTestSuite(SafeDOMXPath $xPath): void
