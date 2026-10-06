@@ -517,7 +517,7 @@ class ConfigurationFactory
             $logs->getStrykerConfig(),
             self::pathToAbsolute($logs->getSummaryJsonLogFilePath(), $configDir),
             self::pathToAbsolute(
-                $logs->getDebugEventsLogFilePath(),
+                $logs->debugEventsLogFilePath,
                 $configDir,
             ),
         );

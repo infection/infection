@@ -93,7 +93,7 @@
                 },
                 "debugEvents": {
                     "type": "string",
-                    "description": "JSONL trace of all dispatched events, intended for debugging Infection's execution. Event names and payloads are internal details and may change between versions."
+                    "description": "JSONL trace of dispatched events up to mutation-testing completion, intended for debugging Infection's execution. Event names and payloads are internal details and may change between versions."
                 },
                 "perMutator": {
                     "type": "string",

@@ -36,10 +36,19 @@ declare(strict_types=1);
 namespace Infection\Tests\Container;
 
 use Error;
+use Infection\Configuration\Configuration;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\FileSystem\FileSystem;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\Testing\SingletonContainer;
+use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Reflection\ContainerReflection;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -49,6 +58,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\InvalidArgumentException as AssertException;
 
 #[CoversNothing]
@@ -144,6 +154,60 @@ final class ContainerTest extends TestCase
             noProgress: true,
             forceProgress: true,
         );
+    }
+
+    public function test_it_uses_the_standard_dispatcher_when_event_collection_is_disabled(): void
+    {
+        $container = Container::create()->cloneWithService(
+            Configuration::class,
+            ConfigurationBuilder::withMinimalTestData()->build(),
+        );
+
+        $this->assertInstanceOf(
+            SyncEventDispatcher::class,
+            $container->getEventDispatcher(),
+            'Disabled event collection must use the standard event dispatcher.',
+        );
+    }
+
+    public function test_it_writes_the_debug_trace_with_the_other_reports(): void
+    {
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withDebug(true)
+            ->withNoProgress(true)
+            ->withLogs(
+                LogsBuilder::withMinimalTestData()
+                    ->withDebugEventsLogFilePath('/events.jsonl')
+                    ->build(),
+            )
+            ->build()
+        ;
+        $started = new ApplicationExecutionWasStarted();
+        $mutationTestingFinished = new MutationTestingWasFinished();
+        $fileSystem = $this->createMock(FileSystem::class);
+        $fileSystem
+            ->expects($this->once())
+            ->method('dumpFile')
+            ->with(
+                '/events.jsonl',
+                '{"sequence":1,"event":"Infection\\\\Event\\\\Events\\\\Application\\\\ApplicationExecutionWasStarted","data":{}}' . "\n"
+                . '{"sequence":2,"event":"Infection\\\\Event\\\\Events\\\\MutationAnalysis\\\\MutationTestingWasFinished","data":{}}',
+            )
+        ;
+        $container = Container::create()
+            ->cloneWithService(Configuration::class, $configuration)
+            ->cloneWithService(OutputInterface::class, new NullOutput())
+            ->cloneWithService(FileSystem::class, $fileSystem)
+            ->cloneWithService(TestFramework::class, $this->createStub(TestFramework::class))
+        ;
+
+        $container->getSubscriberRegisterer()->registerSubscribers();
+        $dispatcher = $container->getEventDispatcher();
+
+        $dispatcher->dispatch($started);
+        $dispatcher->dispatch($mutationTestingFinished);
+
+        $dispatcher->dispatch(new ApplicationExecutionWasFinished());
     }
 
     public static function provideServicesWithReflection(): iterable

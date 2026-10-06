@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Report;
 
+use Infection\Event\EventDispatcher\EventCollectingEventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
@@ -50,36 +51,33 @@ use const JSON_THROW_ON_ERROR;
 use Override;
 
 /**
- * Serializes events when received, without retaining mutation objects or forcing
- * their lazy code and diffs. Each report consumes the pending JSONL records.
+ * Produces a JSONL trace from the collected events.
  *
  * @internal
  */
-final class DebugEventsDataProducer implements DataProducer
+final readonly class DebugEventsDataProducer implements DataProducer
 {
-    private int $sequence = 0;
-
-    private string $records = '';
-
-    public function recordEvent(object $event): void
-    {
-        $this->records .= json_encode(
-            [
-                'sequence' => ++$this->sequence,
-                'event' => $event::class,
-                'data' => (object) self::getData($event),
-            ],
-            JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE,
-        ) . "\n";
+    public function __construct(
+        private EventCollectingEventDispatcher $dispatcher,
+    ) {
     }
 
+    /**
+     * @return iterable<string>
+     */
     #[Override]
-    public function produce(): string
+    public function produce(): iterable
     {
-        $records = $this->records;
-        $this->records = '';
-
-        return $records;
+        foreach ($this->dispatcher->getEvents() as $index => $event) {
+            yield json_encode(
+                [
+                    'sequence' => $index + 1,
+                    'event' => $event::class,
+                    'data' => (object) self::getData($event),
+                ],
+                JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE,
+            );
+        }
     }
 
     /**
@@ -88,7 +86,7 @@ final class DebugEventsDataProducer implements DataProducer
     private static function getData(object $event): array
     {
         // Serialize selected values explicitly: ASTs, process runners and lazy code
-        // must not be traversed or forced just to record an event. Custom events are
+        // must not be traversed or forced just to report an event. Custom events are
         // recorded by name; their payloads have no known serialization contract.
         return match (true) {
             $event instanceof InitialTestSuiteWasStarted => [

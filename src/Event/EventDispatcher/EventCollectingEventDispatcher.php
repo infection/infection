@@ -33,54 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Container\Builder;
+namespace Infection\Event\EventDispatcher;
 
-use DIContainer\Builder;
-use Infection\Configuration\Configuration;
-use Infection\Event\EventDispatcher\DebugEventDispatcher;
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\FileSystem\FileSystem;
-use Infection\Report\ComposableReporter;
-use Infection\Report\DebugEventsDataProducer;
-use Infection\Report\Framework\Writer\FileWriter;
+use Infection\Event\Subscriber\EventSubscriber;
 use Override;
 
 /**
+ * Decorates an event dispatcher and retains the dispatched events in order.
+ *
  * @internal
- * @implements Builder<EventDispatcher>
  */
-final readonly class EventDispatcherBuilder implements Builder
+final class EventCollectingEventDispatcher implements EventDispatcher
 {
+    /**
+     * @var list<object>
+     */
+    private array $events = [];
+
     public function __construct(
-        private Configuration $configuration,
-        private FileSystem $fileSystem,
+        private readonly EventDispatcher $dispatcher,
     ) {
     }
 
     #[Override]
-    public function build(): EventDispatcher
+    public function dispatch(object $event): void
     {
-        $dispatcher = new SyncEventDispatcher();
-        $filePath = $this->configuration->logs->getDebugEventsLogFilePath();
+        // Record before invoking subscribers, which may fail or dispatch other events.
+        $this->events[] = $event;
 
-        if ($filePath === null) {
-            return $dispatcher;
-        }
+        $this->dispatcher->dispatch($event);
+    }
 
-        $dataProducer = new DebugEventsDataProducer();
+    #[Override]
+    public function addSubscriber(EventSubscriber $eventSubscriber): void
+    {
+        $this->dispatcher->addSubscriber($eventSubscriber);
+    }
 
-        return new DebugEventDispatcher(
-            $dispatcher,
-            $dataProducer,
-            new ComposableReporter(
-                $dataProducer,
-                new FileWriter(
-                    $this->fileSystem,
-                    $filePath,
-                    append: true,
-                ),
-            ),
-        );
+    /**
+     * @return list<object>
+     */
+    public function getEvents(): array
+    {
+        return $this->events;
     }
 }

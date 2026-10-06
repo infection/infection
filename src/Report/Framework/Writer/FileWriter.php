@@ -48,15 +48,11 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @internal
  */
-final class FileWriter implements ReportWriter
+final readonly class FileWriter implements ReportWriter
 {
-    private bool $appendNextWrite = false;
-
     public function __construct(
-        private readonly Filesystem $filesystem,
-        private readonly string $filePath,
-        // Appending still replaces the previous run on the first write.
-        private readonly bool $append,
+        private Filesystem $filesystem,
+        private string $filePath,
     ) {
     }
 
@@ -82,19 +78,9 @@ final class FileWriter implements ReportWriter
             return;
         }
 
-        if ($this->appendNextWrite) {
-            $this->filesystem->appendToFile(
-                $this->filePath,
-                $contents,
-            );
-
-            return;
-        }
-
         $this->filesystem->dumpFile(
             $this->filePath,
             $contents,
         );
-        $this->appendNextWrite = $this->append;
     }
 }

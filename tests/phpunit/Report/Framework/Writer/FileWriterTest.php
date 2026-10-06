@@ -61,7 +61,6 @@ final class FileWriterTest extends FileSystemTestCase
         $writer = new FileWriter(
             $fileSystem,
             $filePath,
-            append: false,
         );
         $writer->write($contentOrLines);
 
@@ -91,11 +90,8 @@ final class FileWriterTest extends FileSystemTestCase
         ];
     }
 
-    #[DataProvider('writeModesProvider')]
-    public function test_it_replaces_the_previous_run_and_applies_the_write_mode(
-        bool $append,
-        string $expected,
-    ): void {
+    public function test_it_replaces_the_previous_report(): void
+    {
         $fileSystem = new FileSystem();
         $filePath = $this->tmp . '/file.log';
         $fileSystem->dumpFile(
@@ -105,38 +101,15 @@ final class FileWriterTest extends FileSystemTestCase
         $writer = new FileWriter(
             $fileSystem,
             $filePath,
-            $append,
         );
 
-        $writer->write("First\n");
+        $writer->write("Current run\n");
 
         $this->assertSame(
-            "First\n",
+            "Current run\n",
             $fileSystem->readFile($filePath),
-            'The first write must replace data from the previous run in either mode.',
+            'Writing a report must replace the previous run.',
         );
-
-        $writer->write("Second\n");
-        $writer->write("Third\n");
-
-        $this->assertSame(
-            $expected,
-            $fileSystem->readFile($filePath),
-            'Later writes must follow the selected append or replace mode.',
-        );
-    }
-
-    public static function writeModesProvider(): iterable
-    {
-        yield 'replace on each write' => [
-            false,
-            "Third\n",
-        ];
-
-        yield 'append after the first write' => [
-            true,
-            "First\nSecond\nThird\n",
-        ];
     }
 
     public function test_it_can_write_raw_content_to_the_php_output_stream(): void
@@ -144,7 +117,6 @@ final class FileWriterTest extends FileSystemTestCase
         $writer = new FileWriter(
             new FileSystem(),
             'php://output',
-            append: true,
         );
 
         ob_start();

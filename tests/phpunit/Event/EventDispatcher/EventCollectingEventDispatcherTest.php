@@ -35,18 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\EventDispatcher;
 
-use Infection\Event\EventDispatcher\DebugEventDispatcher;
+use Infection\Event\EventDispatcher\EventCollectingEventDispatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
-use Infection\Report\DebugEventsDataProducer;
-use Infection\Reporter\Reporter;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Tests\Fixtures\Event\UserEventSubscriber;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use stdClass;
 
-#[CoversClass(DebugEventDispatcher::class)]
-final class DebugEventDispatcherTest extends TestCase
+#[CoversClass(EventCollectingEventDispatcher::class)]
+final class EventCollectingEventDispatcherTest extends TestCase
 {
     public function test_it_forwards_subscriber_registration(): void
     {
@@ -58,10 +59,8 @@ final class DebugEventDispatcherTest extends TestCase
             ->with($subscriber)
         ;
 
-        $dispatcher = new DebugEventDispatcher(
+        $dispatcher = new EventCollectingEventDispatcher(
             $inner,
-            new DebugEventsDataProducer(),
-            $this->createStub(Reporter::class),
         );
 
         $dispatcher->addSubscriber($subscriber);
@@ -70,30 +69,16 @@ final class DebugEventDispatcherTest extends TestCase
     public function test_it_records_the_event_before_a_subscriber_fails(): void
     {
         $event = new ApplicationExecutionWasStarted();
-        $recorded = false;
-        $dataProducer = new DebugEventsDataProducer();
-        $reporter = $this->createMock(Reporter::class);
-        $reporter
-            ->expects($this->once())
-            ->method('report')
-            ->willReturnCallback(function () use ($dataProducer, &$recorded): void {
-                $this->assertSame(
-                    '{"sequence":1,"event":"Infection\\\\Event\\\\Events\\\\Application\\\\ApplicationExecutionWasStarted","data":{}}' . "\n",
-                    $dataProducer->produce(),
-                    'The event must be recorded before the reporter publishes it.',
-                );
-                $recorded = true;
-            })
-        ;
-
         $inner = $this->createMock(EventDispatcher::class);
+        $dispatcher = new EventCollectingEventDispatcher($inner);
         $inner
             ->expects($this->once())
             ->method('dispatch')
             ->with($event)
-            ->willReturnCallback(function () use (&$recorded): never {
-                $this->assertTrue(
-                    $recorded,
+            ->willReturnCallback(function () use ($dispatcher, $event): never {
+                $this->assertSame(
+                    [$event],
+                    $dispatcher->getEvents(),
                     'The trace must record the event before invoking subscribers.',
                 );
 
@@ -101,15 +86,38 @@ final class DebugEventDispatcherTest extends TestCase
             })
         ;
 
-        $dispatcher = new DebugEventDispatcher(
-            $inner,
-            $dataProducer,
-            $reporter,
-        );
-
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Subscriber failed');
 
         $dispatcher->dispatch($event);
+    }
+
+    public function test_it_collects_the_original_events_in_dispatch_order(): void
+    {
+        $dispatcher = new EventCollectingEventDispatcher(
+            new SyncEventDispatcher(),
+        );
+
+        $this->assertSame(
+            [],
+            $dispatcher->getEvents(),
+            'The collecting dispatcher must start with no events.',
+        );
+
+        $started = new ApplicationExecutionWasStarted();
+        $finished = new InitialTestSuiteWasFinished('Test output');
+        $custom = new stdClass();
+        $custom->payload = 'Custom event payload';
+
+        $dispatcher->dispatch($started);
+        $dispatcher->dispatch($finished);
+        $dispatcher->dispatch($custom);
+        $dispatcher->dispatch($started);
+
+        $this->assertSame(
+            [$started, $finished, $custom, $started],
+            $dispatcher->getEvents(),
+            'The collecting dispatcher must preserve event identity, dispatch order, and repeated dispatches.',
+        );
     }
 }

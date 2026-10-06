@@ -68,7 +68,7 @@ final class LogsBuilder
             $logs->getUseGitHubAnnotationsLogger(),
             $logs->getStrykerConfig(),
             $logs->getSummaryJsonLogFilePath(),
-            $logs->getDebugEventsLogFilePath(),
+            $logs->debugEventsLogFilePath,
         );
     }
 

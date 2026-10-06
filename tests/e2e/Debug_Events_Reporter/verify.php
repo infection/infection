@@ -43,13 +43,12 @@ $expectedEventNames = [
     'MutationGenerationWasFinished',
     'MutantProcessWasFinished',
     'MutationTestingWasFinished',
-    'ApplicationExecutionWasFinished',
 ];
 
 if ($eventNames !== $expectedEventNames) {
     throw new RuntimeException(
         sprintf(
-            'The event trace must cover the whole execution in dispatch order. Got: %s',
+            'The event trace must cover execution through mutation-testing completion in dispatch order. Got: %s',
             json_encode($eventNames),
         ),
     );

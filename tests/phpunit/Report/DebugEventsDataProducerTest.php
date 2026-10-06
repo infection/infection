@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Report;
 
+use Infection\Event\EventDispatcher\EventCollectingEventDispatcher;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
 use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
@@ -60,6 +62,7 @@ use function Later\later;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 use function Safe\json_decode;
 use stdClass;
 
@@ -67,35 +70,68 @@ use stdClass;
 final class DebugEventsDataProducerTest extends TestCase
 {
     /**
-     * @param array<string, mixed> $expectedData
+     * @param list<object> $events
+     * @param list<array<string, mixed>> $expected
      */
-    #[DataProvider('eventsProvider')]
-    public function test_it_records_events_with_explicit_payloads(
-        object $event,
-        array $expectedData,
+    #[DataProvider('tracesProvider')]
+    public function test_it_produces_the_complete_trace_in_dispatch_order(
+        array $events,
+        array $expected,
     ): void {
-        $producer = new DebugEventsDataProducer();
-        $producer->recordEvent($event);
+        $collectingDispatcher = $this->createEventDispatcher($events);
+        $producer = new DebugEventsDataProducer($collectingDispatcher);
 
-        $line = $producer->produce();
+        $actual = take($producer->produce())
+            ->cast(
+                static fn (string $record) => json_decode(
+                    $record,
+                    true,
+                ),
+            )
+            ->toList()
+        ;
 
-        $this->assertStringEndsWith(
-            "\n",
-            $line,
-            'Each event must be a complete JSONL record.',
-        );
-        $this->assertEquals(
-            (object) [
-                'sequence' => 1,
-                'event' => $event::class,
-                'data' => (object) $expectedData,
-            ],
-            json_decode($line),
-            'The trace must identify the event and serialize its debugging payload.',
-        );
+        $this->assertSame($expected, $actual);
     }
 
-    public static function eventsProvider(): iterable
+    public static function tracesProvider(): iterable
+    {
+        yield 'no events' => [[], []];
+
+        yield 'application events in dispatch order' => [
+            [
+                new ApplicationExecutionWasStarted(),
+                new ApplicationExecutionWasFinished(),
+            ],
+            [
+                [
+                    'sequence' => 1,
+                    'event' => ApplicationExecutionWasStarted::class,
+                    'data' => [],
+                ],
+                [
+                    'sequence' => 2,
+                    'event' => ApplicationExecutionWasFinished::class,
+                    'data' => [],
+                ],
+            ],
+        ];
+
+        foreach (self::eventsProvider() as $name => [$event, $expectedData]) {
+            yield $name => [
+                [$event],
+                [
+                    [
+                        'sequence' => 1,
+                        'event' => $event::class,
+                        'data' => $expectedData,
+                    ],
+                ],
+            ];
+        }
+    }
+
+    private static function eventsProvider(): iterable
     {
         foreach ([
             new ApplicationExecutionWasStarted(),
@@ -120,9 +156,19 @@ final class DebugEventsDataProducerTest extends TestCase
             ['outputText' => "Tests: 2\nOK"],
         ];
 
+        yield 'initial test output with invalid UTF-8' => [
+            new InitialTestSuiteWasFinished("output: \xFF"),
+            ['outputText' => "output: \u{FFFD}"],
+        ];
+
         yield 'initial static analysis output' => [
             new InitialStaticAnalysisRunWasFinished('No errors'),
             ['outputText' => 'No errors'],
+        ];
+
+        yield 'initial static analysis output with invalid UTF-8' => [
+            new InitialStaticAnalysisRunWasFinished("output: \xFF"),
+            ['outputText' => "output: \u{FFFD}"],
         ];
 
         yield 'mutation generation count' => [
@@ -159,12 +205,12 @@ final class DebugEventsDataProducerTest extends TestCase
                     ->build(),
             ),
             [
-                'mutation' => (object) [
+                'mutation' => [
                     'hash' => 'mutation-id',
                     'mutatorClass' => For_::class,
                     'mutatorName' => 'For_',
                     'originalFilePath' => 'src/Foo.php',
-                    'attributes' => (object) [
+                    'attributes' => [
                         'startLine' => 10,
                         'endLine' => 15,
                         'startTokenPos' => 0,
@@ -177,12 +223,36 @@ final class DebugEventsDataProducerTest extends TestCase
             ],
         ];
 
-        yield 'mutant execution result' => [
+        yield 'mutant execution result without forcing lazy code or diffs' => self::createMutantExecutionResultScenario(
+            processOutput: '',
+            expectedProcessOutput: '',
+        );
+
+        yield 'mutant execution result with invalid UTF-8' => self::createMutantExecutionResultScenario(
+            processOutput: "output: \xFF",
+            expectedProcessOutput: "output: \u{FFFD}",
+        );
+    }
+
+    /**
+     * @return array{MutantProcessWasFinished, array<string, mixed>}
+     */
+    private static function createMutantExecutionResultScenario(
+        string $processOutput,
+        string $expectedProcessOutput,
+    ): array {
+        $deferred = self::createDeferredThatMustNotBeEvaluated();
+
+        return [
             new MutantProcessWasFinished(
-                MutantExecutionResultBuilder::withMinimalTestData()->build(),
+                MutantExecutionResultBuilder::withMinimalTestData()
+                    ->withProcessOutput($processOutput)
+                    ->withMutantDiff($deferred)
+                    ->withMutatedCode($deferred)
+                    ->build(),
             ),
             [
-                'executionResult' => (object) [
+                'executionResult' => [
                     'mutantHash' => 'abc123def456',
                     'mutatorClass' => For_::class,
                     'mutatorName' => 'For_',
@@ -191,65 +261,35 @@ final class DebugEventsDataProducerTest extends TestCase
                     'originalEndingLine' => 15,
                     'detectionStatus' => 'killed by tests',
                     'processCommandLine' => 'vendor/bin/phpunit --configuration phpunit.xml',
-                    'processOutput' => '',
+                    'processOutput' => $expectedProcessOutput,
                     'processRuntime' => 0.123,
                 ],
             ],
         ];
-
-        yield 'invalid UTF-8 in process output' => [
-            new InitialTestSuiteWasFinished("output: \xFF"),
-            ['outputText' => "output: \u{FFFD}"],
-        ];
     }
 
-    public function test_it_consumes_pending_records_and_keeps_the_sequence_between_reports(): void
+    /**
+     * @return Deferred<string>
+     */
+    private static function createDeferredThatMustNotBeEvaluated(): Deferred
     {
-        $producer = new DebugEventsDataProducer();
-        $producer->recordEvent(new ApplicationExecutionWasStarted());
-        $producer->recordEvent(new ApplicationExecutionWasFinished());
-
-        $this->assertSame(
-            '{"sequence":1,"event":"Infection\\\\Event\\\\Events\\\\Application\\\\ApplicationExecutionWasStarted","data":{}}' . "\n"
-            . '{"sequence":2,"event":"Infection\\\\Event\\\\Events\\\\Application\\\\ApplicationExecutionWasFinished","data":{}}' . "\n",
-            $producer->produce(),
-            'Pending events must be serialized in the order they were received.',
-        );
-        $this->assertSame(
-            '',
-            $producer->produce(),
-            'Producing a report must consume its pending records.',
-        );
-
-        $producer->recordEvent(new ApplicationExecutionWasStarted());
-
-        $this->assertSame(
-            '{"sequence":3,"event":"Infection\\\\Event\\\\Events\\\\Application\\\\ApplicationExecutionWasStarted","data":{}}' . "\n",
-            $producer->produce(),
-            'The sequence must continue across reports without replaying consumed events.',
-        );
-    }
-
-    public function test_it_does_not_force_lazy_code_or_diffs(): void
-    {
-        $evaluated = false;
-
-        /** @var Deferred<string> $deferred */
-        $deferred = later(static function () use (&$evaluated): iterable {
-            $evaluated = true;
-
-            yield 'Lazy code or diff';
+        return later(static function (): iterable {
+            yield self::fail(
+                'Producing a report must leave lazy mutant code and diffs unevaluated.',
+            );
         });
+    }
 
-        $result = MutantExecutionResultBuilder::withMinimalTestData()
-            ->withMutantDiff($deferred)
-            ->withMutatedCode($deferred)
-            ->build()
-        ;
-        $producer = new DebugEventsDataProducer();
-        $producer->recordEvent(new MutantProcessWasFinished($result));
-        $producer->produce();
+    private function createEventDispatcher(array $events): EventCollectingEventDispatcher
+    {
+        $eventDispatcher = new EventCollectingEventDispatcher(
+            new SyncEventDispatcher(),
+        );
 
-        $this->assertFalse($evaluated);
+        foreach ($events as $event) {
+            $eventDispatcher->dispatch($event);
+        }
+
+        return $eventDispatcher;
     }
 }
