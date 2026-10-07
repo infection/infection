@@ -46,6 +46,7 @@ use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
 use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
+use Infection\Config\ValueProvider\TimeoutProvider;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\IO;
 use Infection\FileSystem\FileSystem;
@@ -168,6 +169,13 @@ final class ConfigureCommand extends BaseCommand
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper, $this->fileSystem);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($io);
 
+        $timeoutProvider = new TimeoutProvider(
+            $consoleHelper,
+            $questionHelper,
+            $container->getLogger(),
+        );
+        $timeout = $timeoutProvider->get($io);
+
         $textLogFileProvider = new TextLogFileProvider($consoleHelper, $questionHelper);
         $textLogFilePath = $textLogFileProvider->get($io, $dirsInCurrentDir);
 
@@ -177,6 +185,7 @@ final class ConfigureCommand extends BaseCommand
             $phpUnitConfigPath,
             $phpUnitCustomExecutablePath,
             $textLogFilePath,
+            $timeout,
         );
 
         $io->newLine();
@@ -199,6 +208,7 @@ final class ConfigureCommand extends BaseCommand
         ?string $phpUnitConfigPath = null,
         ?string $phpUnitCustomExecutablePath = null,
         ?string $textLogFilePath = null,
+        ?float $timeout = null,
     ): void {
         $configObject = new stdClass();
 
@@ -212,6 +222,10 @@ final class ConfigureCommand extends BaseCommand
 
         if ($excludedDirs !== []) {
             $configObject->source->excludes = $excludedDirs;
+        }
+
+        if ($timeout !== null) {
+            $configObject->timeout = $timeout;
         }
 
         if ($phpUnitConfigPath !== null) {
