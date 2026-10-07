@@ -35,9 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Config\ValueProvider;
 
-use Closure;
 use Infection\Config\ConsoleHelper;
+use Infection\Configuration\ConfigurationFactory;
 use Infection\Console\IO;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
@@ -48,61 +49,61 @@ use Webmozart\Assert\Assert;
  */
 final readonly class TimeoutProvider
 {
-    public const int DEFAULT_TIMEOUT = 10;
+    private const int DEFAULT_TIMEOUT = ConfigurationFactory::DEFAULT_TIMEOUT;
 
-    private const array TIMEOUT_NOTICE = [
+    private const array TIMEOUT_EXPLANATION = [
         '',
-        'Infection limits how long each mutant test process is allowed to run.',
-        'Any mutant process that exceeds this timeout will be killed and considered timed out.',
-        'Make sure to set it to a higher value than your tests are executed in seconds to avoid false-positives.',
+        'Infection limits how long the tests may run for each mutant.',
+        'If this limit is exceeded, Infection stops the process and marks the mutant as timed out.',
+        'Allow enough time for the tests to finish normally to avoid misleading mutation scores.',
         '',
     ];
 
     public function __construct(
         private ConsoleHelper $consoleHelper,
         private QuestionHelper $questionHelper,
+        private LoggerInterface $logger,
     ) {
     }
 
-    public function get(IO $io): int|float
+    public function get(IO $io): float
     {
-        $io->writeln(self::TIMEOUT_NOTICE);
+        $io->writeln(self::TIMEOUT_EXPLANATION);
 
         $questionText = $this->consoleHelper->getQuestion(
             'What is the maximum allowed time in seconds for each mutant process?',
             (string) self::DEFAULT_TIMEOUT,
         );
 
-        $question = new Question($questionText, self::DEFAULT_TIMEOUT);
-        $question->setValidator($this->getValidator());
+        $question = new Question($questionText, (float) self::DEFAULT_TIMEOUT);
+        $question->setValidator($this->validate(...));
 
         try {
-            /** @var int|float $answer */
+            /** @var float $answer */
             $answer = $this->questionHelper->ask(
                 $io->getInput(),
                 $io->getOutput(),
                 $question,
             );
 
+            Assert::float($answer, 'Expected timeout to be a float.');
+
             return $answer;
-        } catch (SymfonyRuntimeException) {
-            return self::DEFAULT_TIMEOUT;
+        } catch (SymfonyRuntimeException $exception) {
+            $this->logger->debug('Failed to get timeout, falling back to default.', ['exception' => $exception]);
+
+            return (float) self::DEFAULT_TIMEOUT;
         }
     }
 
-    /**
-     * @return Closure(mixed): (int|float)
-     */
-    private function getValidator(): Closure
+    private function validate(mixed $value): float
     {
-        return static function (mixed $value): int|float {
-            Assert::numeric($value, 'The timeout must be a positive number.');
+        Assert::numeric($value, 'The timeout must be a positive number.');
 
-            $floatValue = (float) $value;
+        $timeout = (float) $value;
 
-            Assert::greaterThan($floatValue, 0, 'The timeout must be a positive number.');
+        Assert::greaterThan($timeout, 0, 'The timeout must be a positive number.');
 
-            return (float) (int) $floatValue === $floatValue ? (int) $floatValue : $floatValue;
-        };
+        return $timeout;
     }
 }

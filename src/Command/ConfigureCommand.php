@@ -169,7 +169,11 @@ final class ConfigureCommand extends BaseCommand
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper, $this->fileSystem);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($io);
 
-        $timeoutProvider = new TimeoutProvider($consoleHelper, $questionHelper);
+        $timeoutProvider = new TimeoutProvider(
+            $consoleHelper,
+            $questionHelper,
+            $container->getLogger(),
+        );
         $timeout = $timeoutProvider->get($io);
 
         $textLogFileProvider = new TextLogFileProvider($consoleHelper, $questionHelper);
@@ -204,7 +208,7 @@ final class ConfigureCommand extends BaseCommand
         ?string $phpUnitConfigPath = null,
         ?string $phpUnitCustomExecutablePath = null,
         ?string $textLogFilePath = null,
-        int|float|null $timeout = null,
+        ?float $timeout = null,
     ): void {
         $configObject = new stdClass();
 

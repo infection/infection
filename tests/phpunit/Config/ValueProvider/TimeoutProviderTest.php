@@ -37,10 +37,13 @@ namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TimeoutProvider;
+use Infection\Configuration\ConfigurationFactory;
 use Infection\Console\IO;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Psr\Log\LogLevel;
+use Psr\Log\Test\TestLogger;
 use function Safe\rewind;
 use function Safe\stream_get_contents;
 use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
@@ -51,13 +54,17 @@ use Symfony\Component\Console\Input\StringInput;
 #[CoversClass(TimeoutProvider::class)]
 final class TimeoutProviderTest extends BaseProviderTestCase
 {
+    private TestLogger $logger;
+
     private TimeoutProvider $provider;
 
     protected function setUp(): void
     {
+        $this->logger = new TestLogger();
         $this->provider = new TimeoutProvider(
             $this->createStub(ConsoleHelper::class),
             $this->getQuestionHelper(),
+            $this->logger,
         );
     }
 
@@ -72,14 +79,14 @@ final class TimeoutProviderTest extends BaseProviderTestCase
             ),
         );
 
-        $this->assertSame(TimeoutProvider::DEFAULT_TIMEOUT, $timeout);
+        $this->assertSame((float) ConfigurationFactory::DEFAULT_TIMEOUT, $timeout);
 
         $stream = $output->getStream();
         rewind($stream);
         $display = stream_get_contents($stream);
 
         $this->assertStringContainsString(
-            'Infection limits how long each mutant test process is allowed to run.',
+            'Infection limits how long the tests may run for each mutant.',
             $display,
         );
     }
@@ -93,7 +100,7 @@ final class TimeoutProviderTest extends BaseProviderTestCase
             ),
         );
 
-        $this->assertSame(TimeoutProvider::DEFAULT_TIMEOUT, $timeout);
+        $this->assertSame((float) ConfigurationFactory::DEFAULT_TIMEOUT, $timeout);
     }
 
     public function test_it_uses_typed_integer(): void
@@ -105,7 +112,7 @@ final class TimeoutProviderTest extends BaseProviderTestCase
             ),
         );
 
-        $this->assertSame(15, $timeout);
+        $this->assertSame(15.0, $timeout);
     }
 
     public function test_it_uses_typed_float(): void
@@ -132,7 +139,7 @@ final class TimeoutProviderTest extends BaseProviderTestCase
             ),
         );
 
-        $this->assertSame(15, $timeout);
+        $this->assertSame(15.0, $timeout);
 
         $stream = $output->getStream();
         rewind($stream);
@@ -152,7 +159,7 @@ final class TimeoutProviderTest extends BaseProviderTestCase
             ),
         );
 
-        $this->assertSame(TimeoutProvider::DEFAULT_TIMEOUT, $timeout);
+        $this->assertSame((float) ConfigurationFactory::DEFAULT_TIMEOUT, $timeout);
 
         $stream = $output->getStream();
         rewind($stream);
@@ -170,22 +177,40 @@ final class TimeoutProviderTest extends BaseProviderTestCase
         yield 'negative' => ['-5'];
     }
 
-    public function test_it_returns_default_when_question_helper_throws_runtime_exception(): void
+    public function test_it_returns_default_and_logs_when_question_helper_throws_runtime_exception(): void
     {
+        $exception = new SymfonyRuntimeException('Something went wrong');
+
         $questionHelperMock = $this->createMock(QuestionHelper::class);
         $questionHelperMock
             ->expects($this->once())
             ->method('ask')
-            ->willThrowException(new SymfonyRuntimeException())
+            ->willThrowException($exception)
         ;
 
         $provider = new TimeoutProvider(
             $this->createStub(ConsoleHelper::class),
             $questionHelperMock,
+            $this->logger,
         );
 
-        $timeout = $provider->get(new IO(new StringInput(''), $this->createStreamOutput()));
+        $timeout = $provider->get(
+            new IO(
+                new StringInput(''),
+                $this->createStreamOutput(),
+            ),
+        );
 
-        $this->assertSame(TimeoutProvider::DEFAULT_TIMEOUT, $timeout);
+        $this->assertSame((float) ConfigurationFactory::DEFAULT_TIMEOUT, $timeout);
+        $this->assertEquals(
+            [
+                [
+                    'level' => LogLevel::DEBUG,
+                    'message' => 'Failed to get timeout, falling back to default.',
+                    'context' => ['exception' => $exception],
+                ],
+            ],
+            $this->logger->records,
+        );
     }
 }
