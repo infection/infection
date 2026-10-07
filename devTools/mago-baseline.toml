@@ -835,18 +835,6 @@ message = 'Could not infer a precise return type for function `Infection\Configu
 count = 1
 
 [[issues]]
-file = "src/Configuration/Schema/SchemaConfigurationFile.php"
-code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$decodedContents` (null|stdClass)."
-count = 1
-
-[[issues]]
-file = "src/Configuration/Schema/SchemaConfigurationFile.php"
-code = "mixed-return-statement"
-message = 'Could not infer a precise return type for function `Infection\Configuration\Schema\SchemaConfigurationFile::getDecodedContents`. Saw type `mixed`.'
-count = 1
-
-[[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFileLoader.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Configuration\Schema\InvalidFile` in `Infection\Configuration\Schema\SchemaConfigurationFileLoader::loadFile`.'

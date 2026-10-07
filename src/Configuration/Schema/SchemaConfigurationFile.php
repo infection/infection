@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Configuration\Schema;
 
 use ColinODell\Json5\SyntaxError;
+use function get_debug_type;
 use function is_file;
 use function is_readable;
 use function json5_decode;
@@ -85,9 +86,21 @@ final class SchemaConfigurationFile
         $contents = file_get_contents($this->pathname);
 
         try {
-            return $this->decodedContents = json5_decode($contents);
+            return $this->decodedContents = $this->getObjectContents(json5_decode($contents));
         } catch (SyntaxError $exception) {
             throw InvalidFile::createForInvalidJson($this, $exception->getMessage(), $exception);
         }
+    }
+
+    /**
+     * @throws InvalidFile
+     */
+    private function getObjectContents(mixed $decodedContents): stdClass
+    {
+        if ($decodedContents instanceof stdClass) {
+            return $decodedContents;
+        }
+
+        throw InvalidFile::createForNonObjectContents($this, get_debug_type($decodedContents));
     }
 }

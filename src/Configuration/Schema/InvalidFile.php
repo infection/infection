@@ -83,4 +83,15 @@ final class InvalidFile extends UnexpectedValueException
             $previous,
         );
     }
+
+    public static function createForNonObjectContents(
+        SchemaConfigurationFile $config,
+        string $contentsType,
+    ): self {
+        return new self(sprintf(
+            'The JSON file "%s" must contain an object, %s given.',
+            $config->getPathname(),
+            $contentsType,
+        ));
+    }
 }
