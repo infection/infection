@@ -88,10 +88,12 @@ final class InvalidFile extends UnexpectedValueException
         SchemaConfigurationFile $config,
         string $contentsType,
     ): self {
-        return new self(sprintf(
-            'The JSON file "%s" must contain an object, %s given.',
-            $config->getPathname(),
-            $contentsType,
-        ));
+        return new self(
+            sprintf(
+                'The JSON file "%s" must contain an object, %s given.',
+                $config->getPathname(),
+                $contentsType,
+            ),
+        );
     }
 }

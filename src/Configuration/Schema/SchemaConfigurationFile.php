@@ -85,18 +85,20 @@ final class SchemaConfigurationFile
 
         $contents = file_get_contents($this->pathname);
 
-        try {
-            return $this->decodedContents = $this->getObjectContents(json5_decode($contents));
-        } catch (SyntaxError $exception) {
-            throw InvalidFile::createForInvalidJson($this, $exception->getMessage(), $exception);
-        }
+        return $this->decodedContents = $this->decodeContents($contents);
     }
 
     /**
      * @throws InvalidFile
      */
-    private function getObjectContents(mixed $decodedContents): stdClass
+    private function decodeContents(string $contents): stdClass
     {
+        try {
+            $decodedContents = json5_decode($contents);
+        } catch (SyntaxError $exception) {
+            throw InvalidFile::createForInvalidJson($this, $exception->getMessage(), $exception);
+        }
+
         if ($decodedContents instanceof stdClass) {
             return $decodedContents;
         }
