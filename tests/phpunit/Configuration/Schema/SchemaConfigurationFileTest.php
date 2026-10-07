@@ -164,5 +164,13 @@ final class SchemaConfigurationFileTest extends TestCase
                 new SyntaxError('Unexpected EOF', 1, 1),
             ),
         ];
+
+        yield 'JSON contents that are not an object' => [
+            self::FIXTURES_DIR . '/non-object-json',
+            new InvalidFile(sprintf(
+                'The JSON file "%s" must contain an object, array given.',
+                self::FIXTURES_DIR . '/non-object-json',
+            )),
+        ];
     }
 }
