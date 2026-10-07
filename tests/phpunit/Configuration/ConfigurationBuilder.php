@@ -223,6 +223,7 @@ final class ConfigurationBuilder
                 useGitHubAnnotationsLogger: true,
                 strykerConfig: StrykerConfig::forBadge('master'),
                 summaryJsonLogFilePath: 'summary.json',
+                debugEventsLogFilePath: null,
             ),
             logVerbosity: 'default',
             tmpDir: '/tmp/infection-test',

@@ -36,10 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\Container;
 
 use Error;
+use Infection\Configuration\Configuration;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
+use Infection\Event\EventDispatcher\EventCollectingEventDispatcher;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\Testing\SingletonContainer;
+use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Reflection\ContainerReflection;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -143,6 +148,41 @@ final class ContainerTest extends TestCase
             new NullOutput(),
             noProgress: true,
             forceProgress: true,
+        );
+    }
+
+    public function test_it_uses_the_standard_dispatcher_when_event_collection_is_disabled(): void
+    {
+        $container = Container::create()->cloneWithService(
+            Configuration::class,
+            ConfigurationBuilder::withMinimalTestData()->build(),
+        );
+
+        $this->assertInstanceOf(
+            SyncEventDispatcher::class,
+            $container->getEventDispatcher(),
+        );
+    }
+
+    public function test_it_uses_the_collecting_dispatcher_when_event_collection_is_enabled(): void
+    {
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withLogs(
+                LogsBuilder::withMinimalTestData()
+                    ->withDebugEventsLogFilePath('/events.jsonl')
+                    ->build(),
+            )
+            ->build()
+        ;
+
+        $container = Container::create()->cloneWithService(
+            Configuration::class,
+            $configuration,
+        );
+
+        $this->assertInstanceOf(
+            EventCollectingEventDispatcher::class,
+            $container->getEventDispatcher(),
         );
     }
 
