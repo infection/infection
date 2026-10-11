@@ -39,6 +39,7 @@ use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use SplFileInfo;
@@ -54,6 +55,7 @@ interface TestFrameworkFactory
     /**
      * @param string[] $sourceDirectories
      * @param SplFileInfo[] $filteredSourceFilesToMutate
+     * @param Tracer $tracer Default XML coverage tracer. Frameworks with other artefacts can provide their own.
      */
     public static function create(
         string $testFrameworkExecutable,
@@ -77,6 +79,7 @@ interface TestFrameworkFactory
         Configuration $configuration,
         MutantProcessContainerFactory $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        Tracer $tracer,
     ): TestFramework;
 
     /**

@@ -48,6 +48,7 @@ use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
@@ -92,6 +93,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         Configuration $configuration,
         MutantProcessContainerFactory $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        Tracer $tracer,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
         Assert::notEmpty(
@@ -160,6 +162,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $configuration,
             $processFactory,
             $testFrameworkExtraOptionsFilter,
+            $tracer,
         );
     }
 

@@ -37,7 +37,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\Tracing\JUnit;
 
 use Exception;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\Tracing\Trace\ProxyTrace;
 use Infection\TestFramework\Contracts\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Contracts\Tracing\Trace\Trace;
@@ -59,47 +58,35 @@ use SplFileInfo;
 #[CoversClass(JUnitTestExecutionInfoAdder::class)]
 final class JUnitTestExecutionInfoAdderTest extends TestCase
 {
-    private TestFramework&MockObject $testFrameworkMock;
-
     private TestFileDataProvider&MockObject $testFileDataProviderMock;
 
     private JUnitTestExecutionInfoAdder $infoAdder;
 
     protected function setUp(): void
     {
-        $this->testFrameworkMock = $this->createMock(TestFramework::class);
         $this->testFileDataProviderMock = $this->createMock(TestFileDataProvider::class);
 
         $this->infoAdder = new JUnitTestExecutionInfoAdder(
-            $this->testFrameworkMock,
+            true,
             $this->testFileDataProviderMock,
         );
     }
 
     public function test_it_does_not_add_if_junit_is_not_provided(): void
     {
-        $this->testFrameworkMock
-            ->expects($this->once())
-            ->method('hasJUnitReport')
-            ->willReturn(false)
-        ;
-
         $this->testFileDataProviderMock
             ->expects($this->never())
             ->method($this->anything())
         ;
 
-        $this->infoAdder->addTestExecutionInfo([new FakeTrace()]);
+        $traces = [new FakeTrace()];
+        $infoAdder = new JUnitTestExecutionInfoAdder(false, $this->testFileDataProviderMock);
+
+        $this->assertSame($traces, $infoAdder->addTestExecutionInfo($traces));
     }
 
     public function test_it_adds_if_junit_is_provided(): void
     {
-        $this->testFrameworkMock
-            ->expects($this->once())
-            ->method('hasJUnitReport')
-            ->willReturn(true)
-        ;
-
         $this->testFileDataProviderMock
             ->expects($this->once())
             ->method('getTestFileInfo')
@@ -158,12 +145,6 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
 
     public function test_it_does_not_load_the_trace_tests_until_necessary(): void
     {
-        $this->testFrameworkMock
-            ->expects($this->once())
-            ->method('hasJUnitReport')
-            ->willReturn(true)
-        ;
-
         $sourceFile = new SplFileInfo(__FILE__);
 
         $proxyTrace = new ProxyTrace(

@@ -37,7 +37,6 @@ namespace Infection\TestFramework\PhpUnit\Tracing\JUnit;
 
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\Tracing\Trace\ProxyTrace;
 use Infection\TestFramework\Contracts\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Contracts\Tracing\Trace\Trace;
@@ -54,7 +53,7 @@ class JUnitTestExecutionInfoAdder
     private const int MAX_EXPLODE_PARTS = 2;
 
     public function __construct(
-        private readonly TestFramework $testFramework,
+        private readonly bool $hasJUnitReport,
         private readonly TestFileDataProvider $testFileDataProvider,
     ) {
     }
@@ -68,7 +67,7 @@ class JUnitTestExecutionInfoAdder
      */
     public function addTestExecutionInfo(iterable $traces): iterable
     {
-        if (!$this->testFramework->hasJUnitReport()) {
+        if (!$this->hasJUnitReport) {
             return $traces;
         }
 

@@ -165,19 +165,13 @@ use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
-use Infection\TestFramework\Contracts\Tracing\TestFrameworkTracerFactory;
 use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Factory;
-use Infection\TestFramework\PhpUnit\Tracing\CoveredTraceProvider;
 use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitReportLocator;
-use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\PhpUnit\Tracing\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\PhpUnit\Tracing\JUnit\TestFileDataProvider;
-use Infection\TestFramework\PhpUnit\Tracing\PhpUnitTracer;
-use Infection\TestFramework\PhpUnit\Tracing\TraceProvider;
-use Infection\TestFramework\PhpUnit\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Tracing\XmlReport\PhpUnitXmlCoverageTraceProvider;
@@ -280,29 +274,7 @@ final class Container extends DIContainer
     {
         $container = new self([
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
-            FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
-                $container->getFileParser(),
-                $container->getNodeTraverserFactory(),
-                $container->getTracer(),
-                $container->getFileStore(),
-            ),
-            Tracer::class => static fn (self $container): Tracer => $container->getTestFrameworkTracerFactory()->create(
-                $container->getTestFramework(),
-            ),
-            TestFrameworkTracerFactory::class => static fn (self $container): TestFrameworkTracerFactory => new TestFrameworkTracerFactory(
-                $container->getPhpUnitTracer(),
-                new TraceProviderAdapterTracer(
-                    $container->getTraceProvider(),
-                ),
-            ),
-            PhpUnitTracer::class => static fn (self $container): PhpUnitTracer => new PhpUnitTracer(
-                $container->getPhpUnitXmlCoverageTraceProvider(),
-                $container->getJUnitTestExecutionInfoAdder(),
-            ),
-            TraceProvider::class => static fn (self $container): TraceProvider => new CoveredTraceProvider(
-                $container->getPhpUnitXmlCoverageTraceProvider(),
-                $container->getJUnitTestExecutionInfoAdder(),
-            ),
+            Tracer::class => static fn (self $container): Tracer => $container->getTestFramework()->getTracer(),
             PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
                 $container->getIndexXmlCoverageLocator(),
                 $container->getIndexXmlCoverageParser(),
@@ -340,6 +312,8 @@ final class Container extends DIContainer
                     $container->getInitialTestsRunner(),
                     $container->getMutantProcessContainerFactory(),
                     $container->getTestFrameworkExtraOptionsFilter(),
+                    $container->getPhpUnitXmlCoverageTraceProvider(),
+                    $container->getTestFileDataProvider(),
                 );
             },
             StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
@@ -852,21 +826,6 @@ final class Container extends DIContainer
         return $this->get(Tracer::class);
     }
 
-    public function getTestFrameworkTracerFactory(): TestFrameworkTracerFactory
-    {
-        return $this->get(TestFrameworkTracerFactory::class);
-    }
-
-    public function getPhpUnitTracer(): PhpUnitTracer
-    {
-        return $this->get(PhpUnitTracer::class);
-    }
-
-    public function getTraceProvider(): TraceProvider
-    {
-        return $this->get(TraceProvider::class);
-    }
-
     public function getDiffColorizer(): DiffColorizer
     {
         return $this->get(DiffColorizer::class);
@@ -1269,9 +1228,9 @@ final class Container extends DIContainer
         return $this->get(StaticAnalysisToolFactory::class);
     }
 
-    private function getJUnitTestExecutionInfoAdder(): JUnitTestExecutionInfoAdder
+    private function getTestFileDataProvider(): TestFileDataProvider
     {
-        return $this->get(JUnitTestExecutionInfoAdder::class);
+        return $this->get(MemoizedTestFileDataProvider::class);
     }
 
     private function getPhpUnitXmlCoverageTraceProvider(): PhpUnitXmlCoverageTraceProvider

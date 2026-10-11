@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Tracing\Tracer;
 
 use Infection\FileSystem\FileSystem;
-use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\Tracing\Trace\Trace;
 use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\PhpUnit\Locator\FixedLocator;
@@ -120,12 +119,6 @@ final class TracerIntegrationTest extends TestCase
         string $indexXmlPath,
         ?string $junitXmlPath,
     ): Tracer {
-        $testFrameworkStub = $this->createStub(TestFramework::class);
-        $testFrameworkStub
-            ->method('hasJUnitReport')
-            ->willReturn($junitXmlPath !== null)
-        ;
-
         $junitFileDataProvider = $junitXmlPath === null
             ? new FakeTestFileDataProvider()
             : new MemoizedTestFileDataProvider(
@@ -149,7 +142,7 @@ final class TracerIntegrationTest extends TestCase
                     ),
                 ),
                 new JUnitTestExecutionInfoAdder(
-                    $testFrameworkStub,
+                    $junitXmlPath !== null,
                     $junitFileDataProvider,
                 ),
             ),

@@ -40,6 +40,7 @@ use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 
 /**
  * A test framework is the tool that will be used to evaluate mutations to check if they are
@@ -61,6 +62,11 @@ interface TestFramework
      * @throws InvalidVersion
      */
     public function getVersion(): string;
+
+    /**
+     * Returns the tracer that maps source files to tests for this framework.
+     */
+    public function getTracer(): Tracer;
 
     /**
      * Checks that the version of the tool used is compatible with the adapter.
@@ -88,9 +94,4 @@ interface TestFramework
      * is interpreted.
      */
     public function test(Mutant $mutant): MutantProcessContainer;
-
-    /**
-     * @deprecated This is only for making the migration easier, to be removed.
-     */
-    public function hasJUnitReport(): bool;
 }

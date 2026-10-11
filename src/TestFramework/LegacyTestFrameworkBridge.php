@@ -47,7 +47,9 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use Override;
 
 /**
  * @internal
@@ -64,7 +66,14 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         private Configuration $config,
         private MutantProcessContainerFactory $processFactory,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private Tracer $tracer,
     ) {
+    }
+
+    #[Override]
+    public function getTracer(): Tracer
+    {
+        return $this->tracer;
     }
 
     public function getName(): string
@@ -129,11 +138,6 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
             $mutant,
             $this->getFilteredExtraOptionsForMutant(),
         );
-    }
-
-    public function hasJUnitReport(): bool
-    {
-        return $this->adapter->hasJUnitReport();
     }
 
     /**

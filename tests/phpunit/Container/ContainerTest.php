@@ -41,6 +41,8 @@ use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
 use Infection\Event\EventDispatcher\EventCollectingEventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\PhpUnit\Locator\Throwable\ReportLocationThrowable;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -52,6 +54,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use SplFileInfo;
 use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Webmozart\Assert\InvalidArgumentException as AssertException;
@@ -110,6 +113,17 @@ final class ContainerTest extends TestCase
         $container->getTestFrameworkFinder();
     }
 
+    public function test_it_uses_the_selected_framework_tracer(): void
+    {
+        $tracer = $this->createStub(Tracer::class);
+        $framework = $this->createMock(TestFramework::class);
+        $framework->expects($this->once())->method('getTracer')->willReturn($tracer);
+        $container = Container::create();
+        $container->set(TestFramework::class, static fn (): TestFramework => $framework);
+
+        $this->assertSame($tracer, $container->getTracer());
+    }
+
     public function test_it_can_be_instantiated_with_the_project_services(): void
     {
         $this->expectNotToPerformAssertions();
@@ -119,7 +133,7 @@ final class ContainerTest extends TestCase
         $container->getFileSystem();
     }
 
-    public function test_it_can_build_lazy_source_file_data_factory_that_fails_on_use(): void
+    public function test_it_can_build_a_tracer_that_loads_coverage_on_use(): void
     {
         $newContainer = SingletonContainer::getContainer()->withValues(
             new NullLogger(),
@@ -127,13 +141,11 @@ final class ContainerTest extends TestCase
             existingCoveragePath: '/path/to/coverage',
         );
 
-        $traces = $newContainer->getTraceProvider()->provideTraces();
+        $tracer = $newContainer->getTracer();
 
         $this->expectException(ReportLocationThrowable::class);
 
-        foreach ($traces as $trace) {
-            $this->fail();
-        }
+        $tracer->trace(new SplFileInfo(__FILE__));
     }
 
     public function test_it_provides_a_friendly_error_when_attempting_to_configure_it_with_both_no_progress_and_force_progress(): void
