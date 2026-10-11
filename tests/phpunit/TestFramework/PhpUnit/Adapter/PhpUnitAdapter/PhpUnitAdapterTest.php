@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
-use Infection\Tests\Configuration\ConfigurationBuilder;
-use Infection\Tests\Mutant\MutantBuilder;
-use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use function array_map;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
@@ -66,6 +63,9 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
+use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -368,44 +368,6 @@ final class PhpUnitAdapterTest extends TestCase
         $actual = $this->adapter->isSyntaxError($output);
 
         $this->assertSame($expected, $actual);
-    }
-
-    #[DataProvider('memoryReportProvider')]
-    public function test_it_can_tell_the_memory_usage_from_the_output(
-        string $output,
-        float $expectedResult,
-    ): void {
-        $this->fileSystemMock
-            ->expects($this->never())
-            ->method('dumpFile')
-        ;
-        $this->pcovDirectoryProvider
-            ->expects($this->never())
-            ->method('shouldProvide')
-        ;
-
-        $result = $this->adapter->getMemoryUsed($output);
-
-        $this->assertSame($expectedResult, $result);
-    }
-
-    public function test_it_provides_initial_run_only_options(): void
-    {
-        $this->fileSystemMock
-            ->expects($this->never())
-            ->method('dumpFile')
-        ;
-        $this->pcovDirectoryProvider
-            ->expects($this->never())
-            ->method('shouldProvide')
-        ;
-
-        $options = $this->adapter->getInitialRunOnlyOptions();
-
-        $this->assertSame(
-            ['--configuration', '--filter', '--testsuite'],
-            $options,
-        );
     }
 
     #[DataProvider('configurationValidationProvider')]

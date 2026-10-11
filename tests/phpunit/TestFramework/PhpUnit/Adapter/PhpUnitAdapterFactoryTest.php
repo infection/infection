@@ -88,11 +88,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             testFrameworkExtraOptionsFilter: $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 
-        $this->assertInstanceOf(
-            PhpUnitAdapter::class,
-            $adapter,
-            'PHPUnit must implement TestFramework directly without a legacy bridge.',
-        );
+        $this->assertInstanceOf(PhpUnitAdapter::class, $adapter);
         $this->assertSame('PHPUnit', $adapter->getName());
     }
 

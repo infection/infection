@@ -153,13 +153,13 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
+            $testFrameworkConfigPath,
             $consoleOutput,
             $coverageCheckerFactory,
             $initialTestsRunner,
             $configuration,
             $processFactory,
             $testFrameworkExtraOptionsFilter,
-            $testFrameworkConfigPath,
         );
     }
 

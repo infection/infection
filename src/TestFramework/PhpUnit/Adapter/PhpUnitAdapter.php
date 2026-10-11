@@ -35,13 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use function explode;
 use function array_key_exists;
-use Infection\AbstractTestFramework\InvalidVersion;
-use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
+use function explode;
 use function implode;
-use Infection\AbstractTestFramework\MemoryUsageAware;
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
@@ -62,7 +59,8 @@ use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
-use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
+use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Override;
 use function Safe\preg_match;
 use function sprintf;
