@@ -41,7 +41,6 @@ use const PHP_BINARY;
 use function proc_close;
 use function proc_open;
 use function proc_terminate;
-use RuntimeException;
 use function Safe\fwrite;
 use function Safe\json_encode;
 use function Safe\stream_get_contents;
@@ -61,6 +60,13 @@ final class ForkWorker
     private const string SCRIPT = __DIR__ . '/../../resources/fork-worker.php';
 
     private const int REQUESTS = 3;
+
+    /**
+     * The exit code of a run whose worker died before it returned a result. It is above
+     * TestFrameworkMutantExecutionResultFactory::PROCESS_MIN_ERROR_CODE, so the run is an error and
+     * not a mutation killed by the tests.
+     */
+    private const int LOST_EXIT_CODE = 143;
 
     private const int RESULTS = 4;
 
@@ -108,6 +114,10 @@ final class ForkWorker
 
     /**
      * Returns null while the script runs. Read the exit code before the last read of the output.
+     *
+     * An end of file without a result means the worker died. It is reported as a stopped script
+     * rather than as an exception: the exception would stop the whole analysis on the way through
+     * the poll loop of the runner, while the runner already knows how to report a stopped process.
      */
     public function readExitCode(): ?int
     {
@@ -117,11 +127,7 @@ final class ForkWorker
             return (int) $line;
         }
 
-        if (feof($this->pipes[self::RESULTS])) {
-            throw new RuntimeException('The fork worker stopped before it returned a result.');
-        }
-
-        return null;
+        return feof($this->pipes[self::RESULTS]) ? self::LOST_EXIT_CODE : null;
     }
 
     public function readOutput(): string

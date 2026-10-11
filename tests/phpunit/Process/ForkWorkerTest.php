@@ -42,7 +42,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use Safe\Exceptions\PosixException;
 use function Safe\json_decode;
 use function Safe\posix_kill;
@@ -154,14 +153,12 @@ final class ForkWorkerTest extends TestCase
         $this->assertTrue($this->waitFor(static fn (): bool => !self::isRunning($grandchild)));
     }
 
-    public function test_it_fails_if_the_worker_stops_without_a_result(): void
+    public function test_it_reports_a_worker_that_stops_without_a_result(): void
     {
         $this->worker->run([self::FIXTURES . '/kill_worker.php'], []);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The fork worker stopped before it returned a result.');
-
-        $this->waitForExitCode();
+        // The worker is gone: the run is an error, but the analysis must go on with the other mutants.
+        $this->assertSame(143, $this->waitForExitCode());
     }
 
     private static function isRunning(int $pid): bool

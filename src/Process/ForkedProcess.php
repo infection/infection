@@ -35,13 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use function array_filter;
 use DuoClock\DuoClock;
 use function function_exists;
 use function getenv;
 use function is_file;
 use Override;
-use function register_shutdown_function;
 use function Safe\file_get_contents;
 use function Safe\preg_match;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -61,12 +59,9 @@ final class ForkedProcess extends Process
 
     private const int FIRST_LINE_LENGTH = 80;
 
-    /**
-     * @var array<int|string, ForkWorker> the worker of each thread
-     */
-    private static array $workers = [];
-
     private ?ForkWorker $worker = null;
+
+    private int|string $threadToken = 0;
 
     private string $output = '';
 
@@ -81,6 +76,7 @@ final class ForkedProcess extends Process
      * @param array<string, string|int> $forkEnv
      */
     public function __construct(
+        private readonly ForkWorkerPool $workers,
         private readonly array $command,
         private readonly array $forkEnv,
         private readonly float $forkTimeout,
@@ -92,11 +88,19 @@ final class ForkedProcess extends Process
     /**
      * The worker requires the first element of the command: it must be a PHP script. To disable the fork: INFECTION_FORK=0.
      *
+     * A preloaded file is compiled before the worker starts, so every fork of that worker finds it
+     * in the OPcache and never opens it. The mutant is substituted when the file is opened, so the
+     * fork would run the original code, the tests would pass, and Infection would report the mutation
+     * as escaped. A run with a preloaded file cannot tell that apart from a real escape, so the fork
+     * is refused. The same is why the worker must never preload the source under test itself.
+     *
      * @param array<string> $command
+     * @param string|false $preloadedSource the "opcache.preload" setting: false when OPcache is not loaded
      */
-    public static function supports(array $command): bool
+    public static function supports(array $command, string|false $preloadedSource): bool
     {
-        return getenv('INFECTION_FORK') !== '0'
+        return ($preloadedSource === false || $preloadedSource === '')
+            && getenv('INFECTION_FORK') !== '0'
             && function_exists('pcntl_fork')
             && function_exists('posix_kill')
             && is_file($command[0])
@@ -109,13 +113,10 @@ final class ForkedProcess extends Process
     #[Override]
     public function start(?callable $callback = null, array $env = []): void
     {
-        if (self::$workers === []) {
-            register_shutdown_function(self::killWorkers(...));
-        }
-
         $this->startTime = $this->clock->microtime();
+        $this->threadToken = $env['TEST_TOKEN'] ?? 0;
 
-        $this->worker = self::$workers[$env['TEST_TOKEN'] ?? 0] ??= ForkWorker::start();
+        $this->worker = $this->workers->workerFor($this->threadToken);
         $this->worker->run($this->command, $env + $this->forkEnv);
     }
 
@@ -154,7 +155,7 @@ final class ForkedProcess extends Process
     {
         if ($this->worker !== null && $this->isRunning()) {
             $this->worker->kill();
-            self::$workers = array_filter(self::$workers, fn (ForkWorker $worker): bool => $worker !== $this->worker);
+            $this->workers->forget($this->threadToken);
 
             $this->exitCode = self::KILLED_EXIT_CODE;
         }
@@ -212,14 +213,5 @@ final class ForkedProcess extends Process
     public function getStartTime(): float
     {
         return $this->startTime;
-    }
-
-    private static function killWorkers(): void
-    {
-        foreach (self::$workers as $worker) {
-            $worker->kill();
-        }
-
-        self::$workers = [];
     }
 }

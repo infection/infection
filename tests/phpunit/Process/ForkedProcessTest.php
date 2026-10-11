@@ -37,6 +37,7 @@ namespace Infection\Tests\Process;
 
 use DuoClock\TimeSpy;
 use Infection\Process\ForkedProcess;
+use Infection\Process\ForkWorkerPool;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -58,30 +59,43 @@ final class ForkedProcessTest extends TestCase
 
     public static function commandProvider(): iterable
     {
-        yield 'PHP script' => [self::FIXTURES . '/report.php', true];
+        yield 'PHP script' => [self::FIXTURES . '/report.php', '', true];
 
-        yield 'PHP script with an interpreter line' => [__DIR__ . '/../../../bin/infection', true];
+        yield 'PHP script with an interpreter line' => [__DIR__ . '/../../../bin/infection', '', true];
 
-        yield 'shell script' => [self::FIXTURES . '/wrapper.sh', false];
+        // Without OPcache, ini_get() returns false for the setting instead of an empty string.
+        yield 'PHP script without OPcache' => [self::FIXTURES . '/report.php', false, true];
 
-        yield 'no such file' => [self::FIXTURES . '/unknown', false];
+        yield 'shell script' => [self::FIXTURES . '/wrapper.sh', '', false];
+
+        yield 'no such file' => [self::FIXTURES . '/unknown', '', false];
     }
 
     #[DataProvider('commandProvider')]
-    public function test_it_supports_php_scripts_only(string $script, bool $expected): void
+    public function test_it_supports_php_scripts_only(string $script, string|false $preloadedSource, bool $expected): void
     {
-        $this->assertSame($expected, ForkedProcess::supports([$script, '--option']));
+        $this->assertSame($expected, ForkedProcess::supports([$script, '--option'], $preloadedSource));
+    }
+
+    /**
+     * A preloaded file is compiled before the worker starts, so a fork of that worker finds it in the
+     * OPcache and never opens it. The mutant is substituted on open, so the fork would run the
+     * original code and the tests would pass: a mutation in a preloaded file must not be forked.
+     */
+    public function test_it_does_not_support_a_preloaded_script(): void
+    {
+        $this->assertFalse(ForkedProcess::supports([self::FIXTURES . '/report.php'], '/project/preload.php'));
     }
 
     #[WithEnvironmentVariable('INFECTION_FORK', '0')]
     public function test_it_does_not_support_a_command_if_disabled(): void
     {
-        $this->assertFalse(ForkedProcess::supports([self::FIXTURES . '/report.php']));
+        $this->assertFalse(ForkedProcess::supports([self::FIXTURES . '/report.php'], ''));
     }
 
     public function test_it_runs_a_script_in_a_fork_of_the_worker(): void
     {
-        $process = new ForkedProcess([self::FIXTURES . '/report.php'], ['FOO' => 'bar'], 10.0, new TimeSpy(100.0));
+        $process = new ForkedProcess(new ForkWorkerPool(), [self::FIXTURES . '/report.php'], ['FOO' => 'bar'], 10.0, new TimeSpy(100.0));
 
         $this->assertFalse($process->isStarted());
         $this->assertSame(Process::STATUS_READY, $process->getStatus());
@@ -103,14 +117,17 @@ final class ForkedProcessTest extends TestCase
 
     public function test_a_thread_keeps_its_worker(): void
     {
-        $this->assertSame(self::runReport('1')['worker'], self::runReport('1')['worker']);
-        $this->assertNotSame(self::runReport('1')['worker'], self::runReport('2')['worker']);
+        $pool = new ForkWorkerPool();
+
+        $this->assertSame(self::runReport($pool, '1')['worker'], self::runReport($pool, '1')['worker']);
+        $this->assertNotSame(self::runReport($pool, '1')['worker'], self::runReport($pool, '2')['worker']);
     }
 
     public function test_it_stops_the_script_at_the_timeout(): void
     {
         $clock = new TimeSpy(100.0);
-        $process = new ForkedProcess([self::FIXTURES . '/sleep.php'], [], 0.2, $clock);
+        $pool = new ForkWorkerPool();
+        $process = new ForkedProcess($pool, [self::FIXTURES . '/sleep.php'], [], 0.2, $clock);
         $process->start(env: ['TEST_TOKEN' => 'timeout']);
 
         $clock->usleep(199_999);
@@ -133,12 +150,12 @@ final class ForkedProcessTest extends TestCase
 
         $process->checkTimeout();
 
-        $this->assertIsInt(self::runReport('timeout')['worker'], 'The thread must run the next script');
+        $this->assertIsInt(self::runReport($pool, 'timeout')['worker'], 'The thread must run the next script on a new worker');
     }
 
     public function test_stop_stops_the_script(): void
     {
-        $process = new ForkedProcess([self::FIXTURES . '/sleep.php'], [], 10.0);
+        $process = new ForkedProcess(new ForkWorkerPool(), [self::FIXTURES . '/sleep.php'], [], 10.0);
         $process->start();
 
         $this->assertSame(Process::STATUS_STARTED, $process->getStatus());
@@ -148,7 +165,7 @@ final class ForkedProcessTest extends TestCase
 
     public function test_stop_keeps_the_exit_code_of_a_complete_run(): void
     {
-        $process = new ForkedProcess([self::FIXTURES . '/report.php'], [], 10.0);
+        $process = new ForkedProcess(new ForkWorkerPool(), [self::FIXTURES . '/report.php'], [], 10.0);
         $process->start();
 
         self::wait($process);
@@ -159,9 +176,9 @@ final class ForkedProcessTest extends TestCase
     /**
      * @return array{worker: int}
      */
-    private static function runReport(string $thread): array
+    private static function runReport(ForkWorkerPool $pool, string $thread): array
     {
-        $process = new ForkedProcess([self::FIXTURES . '/report.php'], [], 10.0);
+        $process = new ForkedProcess($pool, [self::FIXTURES . '/report.php'], [], 10.0);
         $process->start(env: ['TEST_TOKEN' => $thread]);
 
         self::wait($process);

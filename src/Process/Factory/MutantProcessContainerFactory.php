@@ -41,9 +41,11 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
 use Infection\Process\ForkedProcess;
+use Infection\Process\ForkWorkerPool;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use function ini_get as ini_get_unsafe;
 use function min;
 use Symfony\Component\Process\Process;
 
@@ -57,6 +59,8 @@ class MutantProcessContainerFactory
 
     private const int TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
 
+    private const string OPCACHE_PRELOAD_SETTING = 'opcache.preload';
+
     /**
      * @param list<LazyMutantProcessFactory> $lazyMutantProcessCreators
      */
@@ -64,6 +68,7 @@ class MutantProcessContainerFactory
         private readonly float $timeout,
         private readonly array $lazyMutantProcessCreators,
         private readonly Configuration $configuration,
+        private readonly ForkWorkerPool $forkWorkerPool,
     ) {
     }
 
@@ -84,8 +89,9 @@ class MutantProcessContainerFactory
         );
         $env = ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY];
 
-        $process = ForkedProcess::supports($command)
-            ? new ForkedProcess($command, $env, $timeout)
+        // The setting is not a PHP_INI_ALL one: reading it here reads the same php.ini the worker reads.
+        $process = ForkedProcess::supports($command, ini_get_unsafe(self::OPCACHE_PRELOAD_SETTING))
+            ? new ForkedProcess($this->forkWorkerPool, $command, $env, $timeout)
             : new Process(command: $command, env: $env, timeout: $timeout);
 
         if ($this->configuration->isDryRun) {
