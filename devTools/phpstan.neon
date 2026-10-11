@@ -7,6 +7,12 @@ rules:
 
 services:
     -
+        class: Infection\Tests\Architecture\PHPStan\Rules\InvalidArgumentExceptionRule
+        arguments:
+            sourceDirectory: %currentWorkingDirectory%/src
+        tags:
+            - phpstan.rules.rule
+    -
         class: Infection\Tests\Architecture\PHPStan\ResultCache\PHPatArchitectureResultCacheMetaExtension
         tags:
             - phpstan.resultCacheMetaExtension
@@ -68,6 +74,10 @@ services:
             - phpat.test
     -
         class: Infection\Tests\Architecture\PHPat\AdapterExtractionBoundariesTest
+        tags:
+            - phpat.test
+    -
+        class: Infection\Tests\Architecture\PHPat\LegacyTestFrameworkAdaptersShouldNotBeUsedTest
         tags:
             - phpat.test
     -

@@ -66,8 +66,8 @@ use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\AdapterInstaller;
+use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\TestFrameworkTypes;
-use InvalidArgumentException;
 use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function sprintf;
@@ -105,6 +105,8 @@ final class RunCommand extends BaseCommand
     public const string OPTION_WITH_TIMEOUTS = 'with-timeouts';
 
     public const string OPTION_MAX_TIMEOUTS = 'max-timeouts';
+
+    public const string OPTION_MUTANT_ID = 'id';
 
     private const string OPTION_STATIC_ANALYSIS_TOOL = 'static-analysis-tool';
 
@@ -145,15 +147,14 @@ final class RunCommand extends BaseCommand
 
     private const string OPTION_DRY_RUN = 'dry-run';
 
-    private const string OPTION_MUTANT_ID = 'id';
-
     private const string OPTION_TEAMCITY = 'teamcity';
 
     protected function configure(): void
     {
         $this
             ->setName('run')
-            ->setDescription('Runs the mutation testing.');
+            ->setDescription('Runs the mutation testing.')
+        ;
 
         PathsArgument::addArgument($this);
 
@@ -167,7 +168,8 @@ final class RunCommand extends BaseCommand
                     implode('", "', StaticAnalysisToolTypes::getTypes()),
                 ),
                 Container::DEFAULT_STATIC_ANALYSIS_TOOL,
-            );
+            )
+        ;
 
         TestFrameworkExtraArgsOption::addOption($this);
         TestFrameworkOptionsOption::addOption($this);
@@ -218,7 +220,8 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Output progress bars and mutation count during progress even if a CI is detected',
-            );
+            )
+        ;
 
         ConfigurationOption::addOption($this)
             ->addOption(
@@ -234,7 +237,8 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf('Specify particular mutators, e.g. <comment>"--%s=Plus,PublicVisibility"</comment>', self::OPTION_MUTATORS),
                 Container::DEFAULT_MUTATORS_INPUT,
-            );
+            )
+        ;
 
         SourceFilterOptions::addOption($this)
             ->addOption(
@@ -260,7 +264,8 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 'Run only one Mutant by its ID. Can be used multiple times. If source code is changed, can be invalidated. Pass all previous options with this one.',
                 Container::DEFAULT_MUTANT_ID,
-            );
+            )
+        ;
 
         MapSourceClassToTestOption::addOption($this)
             ->addOption(
@@ -338,7 +343,8 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 '"all" - full logs format, "default" - short logs format, "none" - no logs',
                 Container::DEFAULT_LOG_VERBOSITY,
-            );
+            )
+        ;
 
         InitialTestsPhpOptionsOption::addOption($this)
             ->addOption(
@@ -353,7 +359,8 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_OPTIONAL,
                 'Ignore MSI violations with zero mutations',
                 self::OPTION_VALUE_NOT_PROVIDED,
-            );
+            )
+        ;
 
         DebugOption::addOption($this);
 
@@ -369,7 +376,8 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Changes the progress output to Teamcity.',
-            );
+            )
+        ;
     }
 
     protected function executeCommand(IO $io): bool
@@ -400,7 +408,12 @@ final class RunCommand extends BaseCommand
                 return true;
             }
 
-            throw $noSourceFoundException;
+            throw $noSourceFoundException->appendHint(
+                sprintf(
+                    'To list the source files matching your configuration, use the "%s" command.',
+                    ListSourcesCommand::NAME,
+                ),
+            );
         } catch (InitialTestsFailed|MinMsiCheckFailed|MaxTimeoutCountReached $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
@@ -431,14 +444,14 @@ final class RunCommand extends BaseCommand
         $noProgress = (bool) $input->getOption(self::OPTION_NO_PROGRESS);
         $forceProgress = (bool) $input->getOption(self::OPTION_FORCE_PROGRESS);
 
-        if ($noProgress && $forceProgress) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Cannot pass both "%s" and "%s" option: use none or only one of them',
-                    self::OPTION_NO_PROGRESS,
-                    self::OPTION_FORCE_PROGRESS),
-            );
-        }
+        Assert::false(
+            $noProgress && $forceProgress,
+            sprintf(
+                'Cannot pass both "%s" and "%s" option: use none or only one of them',
+                self::OPTION_NO_PROGRESS,
+                self::OPTION_FORCE_PROGRESS,
+            ),
+        );
 
         self::assertTestFrameworkOptionsAreNotBothProvided($io);
 
@@ -495,18 +508,15 @@ final class RunCommand extends BaseCommand
 
     private static function assertTestFrameworkOptionsAreNotBothProvided(IO $io): void
     {
-        if (
+        Assert::false(
             TestFrameworkOptionsOption::isProvided($io)
-            && TestFrameworkExtraArgsOption::isProvided($io)
-        ) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Cannot pass both the legacy option "--%s" and "--%s".',
-                    TestFrameworkOptionsOption::NAME,
-                    TestFrameworkExtraArgsOption::NAME,
-                ),
-            );
-        }
+                && TestFrameworkExtraArgsOption::isProvided($io),
+            sprintf(
+                'Cannot pass both the legacy option "--%s" and "--%s".',
+                TestFrameworkOptionsOption::NAME,
+                TestFrameworkExtraArgsOption::NAME,
+            ),
+        );
     }
 
     /**
@@ -540,6 +550,7 @@ final class RunCommand extends BaseCommand
      *
      * @throws ProcessTimedOutException
      * @throws ProcessException
+     * @throws RequirementChecksFailed
      */
     private function startUp(
         Container $container,
@@ -576,8 +587,6 @@ final class RunCommand extends BaseCommand
 
             $consoleOutput->logNotInControlOfExitCodes();
         }
-
-        $container->getCoverageChecker()->checkCoverageRequirements();
 
         $config = $container->getConfiguration();
 

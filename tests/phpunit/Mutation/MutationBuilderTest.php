@@ -66,7 +66,8 @@ final class MutationBuilderTest extends TestCase
     {
         $mutation = MutationBuilder::withMinimalTestData()
             ->withHash('MyHash!')
-            ->build();
+            ->build()
+        ;
 
         $this->assertSame('MyHash!', $mutation->getHash());
     }

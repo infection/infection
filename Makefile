@@ -36,7 +36,7 @@ PHPBENCH_REPORTS=--report=aggregate --report=bar_chart_iteration
 INFECTION=./dist/infection.phar
 
 DOCKER_RUN=docker compose run --rm
-DOCKER_RUN_82=$(DOCKER_RUN) php82 $(FLOCK) Makefile
+DOCKER_RUN_83=$(DOCKER_RUN) php83 $(FLOCK) Makefile
 DOCKER_FILE_IMAGE=devTools/Dockerfile.json
 
 FLOCK=./devTools/flock
@@ -67,7 +67,7 @@ compile:
 .PHONY: compile-docker
 compile-docker:	 	## Bundles Infection into a PHAR using docker
 compile-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_82) make compile
+	$(DOCKER_RUN_83) make compile
 
 .PHONY: sbx-create
 sbx-create:	## Drops the existing PHP sbx image and create it anew
@@ -129,10 +129,8 @@ cs: $(PHP_CS_FIXER)
 
 .PHONY: cs-docker
 cs-docker:		## Runs PHP-CS-Fixer in docker
-cs-docker: $(DOCKER_FILE_IMAGE) $(PHP_CS_FIXER)
-	$(DOCKER_RUN_82) $(PHP_CS_FIXER) fix -v --diff
-	LC_ALL=C sort -u .gitignore -o .gitignore
-	$(MAKE) check_trailing_whitespaces
+cs-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_83) make cs
 
 .PHONY: cs-check
 cs-check:		## Runs PHP-CS-Fixer in dry-run mode
@@ -152,7 +150,7 @@ phpstan-baseline: vendor $(PHPSTAN)
 
 .PHONY: mago
 mago: vendor $(MAGO)
-	$(MAGO) analyze
+	$(MAGO) analyze --fail-on-out-of-sync-baseline
 
 .PHONY: mago-baseline
 mago-baseline:		## Regenerates the Mago baseline
@@ -261,7 +259,17 @@ benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COV
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions check-agents-adr-list $(if $(CI),,zizmor)
+autoreview: _autoreview $(if $(CI),,zizmor)
+
+.PHONY: _autoreview
+_autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions check-agents-adr-list
+
+.PHONY: autoreview-docker
+autoreview-docker:	## Runs various checks in docker (static analysis & AutoReview test suite)
+autoreview-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_83) make _autoreview
+	# Zizmor is already executed via a docker image.
+	$(MAKE) zizmor
 
 .PHONY: test
 test:		 	## Runs all the tests
@@ -269,7 +277,7 @@ test: autoreview test-unit test-benchmark test-e2e test-infection
 
 .PHONY: test-docker
 test-docker:		## Runs all the tests on the different Docker platforms
-test-docker: autoreview test-unit-docker test-e2e-docker test-infection-docker
+test-docker: autoreview-docker test-unit-docker test-e2e-docker test-infection-docker
 
 .PHONY: test-autoreview
 test-autoreview: $(PHPUNIT_BIN) vendor
@@ -287,10 +295,8 @@ test-unit-parallel: $(PARATEST) vendor
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
-test-unit-docker: test-unit-82-docker
-
-test-unit-82-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT_BIN)
-	$(DOCKER_RUN_82) $(PHPUNIT) --group $(PHPUNIT_GROUP)
+test-unit-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_83) make test-unit
 
 .PHONY: test-benchmark
 test-benchmark:	 	## Runs the benchmark tests
@@ -320,12 +326,12 @@ test-e2e-docker: 	## Runs the end-to-end tests on the different Docker platforms
 test-e2e-docker: test-e2e-xdebug-docker
 
 .PHONY: test-e2e-xdebug-docker
-test-e2e-xdebug-docker: test-e2e-xdebug-82-docker
+test-e2e-xdebug-docker: test-e2e-xdebug-83-docker
 
-.PHONY: test-e2e-xdebug-82-docker
-test-e2e-xdebug-82-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_82) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
-	$(DOCKER_RUN_82) ./tests/e2e_tests $(INFECTION)
+.PHONY: test-e2e-xdebug-83-docker
+test-e2e-xdebug-83-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_83) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
+	$(DOCKER_RUN_83) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-infection
 test-infection:		## Runs Infection against itself
@@ -337,11 +343,11 @@ test-infection-docker:	## Runs Infection against itself on the different Docker 
 test-infection-docker: test-infection-xdebug-docker
 
 .PHONY: test-infection-xdebug-docker
-test-infection-xdebug-docker: test-infection-xdebug-82-docker
+test-infection-xdebug-docker: test-infection-xdebug-83-docker
 
-.PHONY: test-infection-xdebug-82-docker
-test-infection-xdebug-82-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_82) ./bin/infection --threads=max
+.PHONY: test-infection-xdebug-83-docker
+test-infection-xdebug-83-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_83) ./bin/infection --threads=max
 
 #
 # Rules from files (non-phony targets)
@@ -395,8 +401,8 @@ phpunit.xml.dist:
 	touch -c $@
 
 $(DOCKER_FILE_IMAGE): devTools/Dockerfile
-	docker compose build php82
-	docker image inspect infection-php82 >> $(DOCKER_FILE_IMAGE)
+	docker compose build php83
+	docker image inspect infection-php83 >> $(DOCKER_FILE_IMAGE)
 	touch -c $@
 
 $(BENCHMARK_MUTATION_GENERATOR_SOURCES): tests/benchmark/MutationGenerator/sources.tar.gz

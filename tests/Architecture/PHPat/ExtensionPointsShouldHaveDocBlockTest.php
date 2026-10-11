@@ -56,6 +56,7 @@ final class ExtensionPointsShouldHaveDocBlockTest
             )
             ->shouldNot()
             ->exist()
-            ->because('Extension points should have a PHP doc-block to improve usability.');
+            ->because('Extension points should have a PHP doc-block to improve usability.')
+        ;
     }
 }

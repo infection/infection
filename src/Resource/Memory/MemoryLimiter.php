@@ -35,8 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Resource\Memory;
 
-use Infection\AbstractTestFramework\MemoryUsageAware;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\Contracts\InitialRunResults;
 use const PHP_EOL;
 use function sprintf;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -55,9 +54,11 @@ class MemoryLimiter
     ) {
     }
 
-    public function limitMemory(string $processOutput, TestFrameworkAdapter $adapter): void
+    public function limitMemory(?InitialRunResults $initialRunResults): void
     {
-        if (!$adapter instanceof MemoryUsageAware
+        $memoryUsage = $initialRunResults?->memoryUsage;
+
+        if ($memoryUsage === null
             || $this->environment->hasMemoryLimitSet()
             || $this->environment->isUsingSystemIni()
         ) {
@@ -76,7 +77,7 @@ class MemoryLimiter
             return;
         }
 
-        $memoryLimit = $adapter->getMemoryUsed($processOutput);
+        $memoryLimit = $memoryUsage;
 
         if ($memoryLimit === -1.) {
             // Cannot detect memory used, not setting any limits

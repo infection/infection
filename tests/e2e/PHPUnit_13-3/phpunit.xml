@@ -5,7 +5,7 @@
          colors="true"
          testdoxSummary="true"
          cacheDirectory="var/phpunit-cache"
-         executionOrder="depends,defects"
+         executionOrder="depends,defects,duration-ascending"
          failOnPhpunitDeprecation="true"
 >
     <testsuites>

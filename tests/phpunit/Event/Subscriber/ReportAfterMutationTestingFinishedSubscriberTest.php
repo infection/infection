@@ -50,7 +50,8 @@ final class ReportAfterMutationTestingFinishedSubscriberTest extends TestCase
         $reporter = $this->createMock(Reporter::class);
         $reporter
             ->expects($this->once())
-            ->method('report');
+            ->method('report')
+        ;
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new ReportAfterMutationTestingFinishedSubscriber($reporter));

@@ -123,7 +123,8 @@ final class IndexXmlCoverageLocator extends BaseReportLocator implements ReportL
             // In the other scenario, this gives a more consistent result to the
             // user for a failing scenario.
             // This also makes testing easier.
-            ->sortByName();
+            ->sortByName()
+        ;
     }
 
     private static function createPHPUnitDefaultCoverageXmlIndexPathname(string $coverageDirectory): string

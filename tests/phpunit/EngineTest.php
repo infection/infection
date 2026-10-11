@@ -35,9 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
 use Infection\Engine;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
@@ -48,34 +46,27 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
 use Infection\Process\Runner\InitialStaticAnalysis;
-use Infection\Process\Runner\InitialTestsFailed;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
+use RuntimeException;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(Engine::class)]
 final class EngineTest extends TestCase
 {
-    private MockObject&TestFrameworkAdapter $adapter;
-
-    private MockObject&CoverageChecker $coverageChecker;
+    private MockObject&TestFramework $testFramework;
 
     private MockObject&EventDispatcher $eventDispatcher;
-
-    private MockObject&InitialTestsRunner $initialTestsRunner;
 
     private MockObject&MemoryLimiter $memoryLimiter;
 
@@ -87,134 +78,111 @@ final class EngineTest extends TestCase
 
     private MockObject&MaxTimeoutsChecker $maxTimeoutsChecker;
 
-    private MockObject&ConsoleOutput $consoleOutput;
-
     private MockObject&MetricsCalculator $metricsCalculator;
-
-    private Stub&TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter;
 
     private PreloadedSourceChecker $preloadedSourceChecker;
 
     protected function setUp(): void
     {
-        $this->adapter = $this->createMock(TestFrameworkAdapter::class);
-        $this->coverageChecker = $this->createMock(CoverageChecker::class);
+        $this->testFramework = $this->createMock(TestFramework::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
-        $this->initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $this->memoryLimiter = $this->createMock(MemoryLimiter::class);
         $this->mutationGenerator = $this->createMock(MutationGenerator::class);
         $this->mutationTestingRunner = $this->createMock(MutationTestingRunner::class);
         $this->minMsiChecker = $this->createMock(MinMsiChecker::class);
         $this->maxTimeoutsChecker = $this->createMock(MaxTimeoutsChecker::class);
-        $this->consoleOutput = $this->createMock(ConsoleOutput::class);
         $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
-        $this->testFrameworkExtraOptionsFilter = $this->createStub(TestFrameworkExtraOptionsFilter::class);
         $this->preloadedSourceChecker = new PreloadedSourceChecker('');
     }
 
     public function test_initial_test_run_fails(): void
     {
-        $config = ConfigurationBuilder::withMinimalTestData()
-            ->withSkipInitialTests(false)
-            ->build();
+        $exception = new RuntimeException('Initial run failed');
 
-        $this->adapter
+        $this->testFramework
             ->expects($this->once())
-            ->method('getName')
-            ->willReturn('foo');
-        $this->adapter
-            ->expects($this->once())
-            ->method('getInitialTestsFailRecommendations')
-            ->willReturn('Run tests to see what failed');
+            ->method('checkRequirements')
+        ;
 
-        $process = $this->createInitialTestProcess(false, '');
-        $process
+        $this->testFramework
             ->expects($this->once())
-            ->method('getExitCode')
-            ->willReturn(1);
-        $process
-            ->expects($this->atLeastOnce())
-            ->method('getErrorOutput')
-            ->willReturn('');
+            ->method('executeInitialRun')
+            ->willThrowException($exception)
+        ;
 
-        $this->initialTestsRunner
-            ->expects($this->once())
-            ->method('run')
-            ->willReturn($process);
-
-        $this->coverageChecker->expects($this->never())->method($this->anything());
-        $this->eventDispatcher->expects($this->never())->method($this->anything());
         $this->memoryLimiter->expects($this->never())->method($this->anything());
         $this->mutationGenerator->expects($this->never())->method($this->anything());
         $this->mutationTestingRunner->expects($this->never())->method($this->anything());
-        $this->minMsiChecker->expects($this->never())->method($this->anything());
-        $this->metricsCalculator->expects($this->never())->method($this->anything());
-        $this->maxTimeoutsChecker->expects($this->never())->method($this->anything());
+        $this->eventDispatcher->expects($this->never())->method($this->anything());
 
-        $this->expectException(InitialTestsFailed::class);
+        $this->expectExceptionObject($exception);
 
-        $this->createEngine($config)->execute();
+        $this->createEngine()->execute();
     }
 
     public function test_initial_test_run_succeeds(): void
     {
-        $config = ConfigurationBuilder::withMinimalTestData()
-            ->withSkipInitialTests(false)
-            ->withUncovered(true)
-            ->build();
+        $initialRunResults = new InitialRunResults('testing', 10.0);
 
-        $process = $this->createInitialTestProcess(true, 'testing');
-
-        $this->initialTestsRunner
+        $this->testFramework
             ->expects($this->once())
-            ->method('run')
-            ->willReturn($process);
+            ->method('checkRequirements')
+        ;
 
-        $this->coverageChecker
+        $this->testFramework
             ->expects($this->once())
-            ->method('checkCoverageHasBeenGenerated')
-            ->with('/tmp/bar', 'testing');
+            ->method('executeInitialRun')
+            ->willReturn($initialRunResults)
+        ;
 
         $this->memoryLimiter
             ->expects($this->once())
             ->method('limitMemory')
-            ->with('testing', $this->adapter);
+            ->with($initialRunResults)
+        ;
 
         $this->mutationGenerator
             ->expects($this->once())
             ->method('generate')
             ->with(false)
-            ->willReturn([]);
+            ->willReturn([])
+        ;
 
         $this->mutationTestingRunner
             ->expects($this->once())
             ->method('run')
-            ->with([], '');
+            ->with([])
+        ;
 
         $this->minMsiChecker
             ->expects($this->once())
             ->method('checkMetrics')
-            ->with(1000, 2.0, 3.0);
+            ->with(1000, 2.0, 3.0)
+        ;
 
         $this->metricsCalculator
             ->expects($this->once())
             ->method('getTestedMutantsCount')
-            ->willReturn(1000);
+            ->willReturn(1000)
+        ;
         $this->metricsCalculator
             ->expects($this->once())
             ->method('getMutationScoreIndicator')
-            ->willReturn(2.0);
+            ->willReturn(2.0)
+        ;
         $this->metricsCalculator
             ->expects($this->once())
             ->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn(3.0);
+            ->willReturn(3.0)
+        ;
 
         $this->eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(ApplicationExecutionWasFinished::class));
+            ->with($this->isInstanceOf(ApplicationExecutionWasFinished::class))
+        ;
 
-        $this->createEngine($config)->execute();
+        $this->createEngine()->execute();
     }
 
     public function test_memory_limiter_is_applied_after_static_analysis_when_enabled(): void
@@ -223,19 +191,16 @@ final class EngineTest extends TestCase
             ->withSkipInitialTests(false)
             ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
             ->withUncovered(true)
-            ->build();
+            ->build()
+        ;
 
+        $initialRunResults = new InitialRunResults('test output', 20.0);
         $callOrder = [];
 
-        $this->initialTestsRunner
-            ->expects($this->once())
-            ->method('run')
-            ->willReturn($this->createInitialTestProcess(true, 'test output'));
-
-        $this->coverageChecker
-            ->expects($this->once())
-            ->method('checkCoverageHasBeenGenerated')
-            ->with('/tmp/bar', 'test output');
+        $this->testFramework
+            ->method('executeInitialRun')
+            ->willReturn($initialRunResults)
+        ;
 
         $initialStaticAnalysis = $this->createMock(InitialStaticAnalysis::class);
         $initialStaticAnalysis
@@ -243,50 +208,52 @@ final class EngineTest extends TestCase
             ->method('run')
             ->willReturnCallback(static function () use (&$callOrder): void {
                 $callOrder[] = 'staticAnalysis';
-            });
+            })
+        ;
 
         $this->memoryLimiter
             ->expects($this->once())
             ->method('limitMemory')
-            ->with('test output', $this->adapter)
+            ->with($initialRunResults)
             ->willReturnCallback(static function () use (&$callOrder): void {
                 $callOrder[] = 'limitMemory';
-            });
+            })
+        ;
 
         $this->mutationGenerator
             ->expects($this->once())
             ->method('generate')
-            ->with(false)
             ->willReturnCallback(static function () use (&$callOrder): array {
                 $callOrder[] = 'generate';
 
                 return [];
-            });
+            })
+        ;
 
         $this->mutationTestingRunner
             ->expects($this->once())
             ->method('run')
-            ->with([], '');
+            ->with([])
+        ;
 
         $this->minMsiChecker
             ->expects($this->once())
             ->method('checkMetrics')
-            ->with(100, 80.0, 85.0);
+            ->with(100, 80.0, 85.0)
+        ;
 
         $this->metricsCalculator
             ->method('getTestedMutantsCount')
-            ->willReturn(100);
+            ->willReturn(100)
+        ;
         $this->metricsCalculator
             ->method('getMutationScoreIndicator')
-            ->willReturn(80.0);
+            ->willReturn(80.0)
+        ;
         $this->metricsCalculator
             ->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn(85.0);
-
-        $this->eventDispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with($this->isInstanceOf(ApplicationExecutionWasFinished::class));
+            ->willReturn(85.0)
+        ;
 
         $engine = $this->createEngine(
             $config,
@@ -298,56 +265,47 @@ final class EngineTest extends TestCase
         $this->assertSame(['staticAnalysis', 'limitMemory', 'generate'], $callOrder);
     }
 
-    public function test_memory_limiter_is_not_applied_when_initial_tests_are_skipped(): void
+    public function test_memory_limiter_receives_null_when_initial_tests_are_skipped(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
             ->withSkipInitialTests(true)
             ->withUncovered(true)
-            ->build();
+            ->build()
+        ;
 
-        $this->coverageChecker
+        $this->testFramework
             ->expects($this->once())
-            ->method('checkCoverageExists');
+            ->method('checkRequirements')
+        ;
 
-        $this->consoleOutput
+        $this->testFramework
+            ->expects($this->never())
+            ->method('executeInitialRun')
+        ;
+
+        $this->memoryLimiter
             ->expects($this->once())
-            ->method('logSkippingInitialTests');
-
-        $this->initialTestsRunner->expects($this->never())->method($this->anything());
-        $this->memoryLimiter->expects($this->never())->method('limitMemory');
+            ->method('limitMemory')
+            ->with(null)
+        ;
 
         $this->mutationGenerator
-            ->expects($this->once())
             ->method('generate')
-            ->with(false)
-            ->willReturn([]);
-
-        $this->mutationTestingRunner
-            ->expects($this->once())
-            ->method('run')
-            ->with([], '');
-
-        $this->minMsiChecker
-            ->expects($this->once())
-            ->method('checkMetrics');
+            ->willReturn([])
+        ;
 
         $this->metricsCalculator
-            ->expects($this->once())
             ->method('getTestedMutantsCount')
-            ->willReturn(0);
+            ->willReturn(0)
+        ;
         $this->metricsCalculator
-            ->expects($this->once())
             ->method('getMutationScoreIndicator')
-            ->willReturn(0.0);
+            ->willReturn(0.0)
+        ;
         $this->metricsCalculator
-            ->expects($this->once())
             ->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn(0.0);
-
-        $this->eventDispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with($this->isInstanceOf(ApplicationExecutionWasFinished::class));
+            ->willReturn(0.0)
+        ;
 
         $this->createEngine($config)->execute();
     }
@@ -357,58 +315,37 @@ final class EngineTest extends TestCase
         $config = ConfigurationBuilder::withMinimalTestData()
             ->withSkipInitialTests(true)
             ->withUncovered(true)
-            ->build();
-
-        $this->coverageChecker
-            ->expects($this->once())
-            ->method('checkCoverageExists');
-
-        $this->consoleOutput
-            ->expects($this->once())
-            ->method('logSkippingInitialTests');
-
-        $this->initialTestsRunner->expects($this->never())->method($this->anything());
-        $this->memoryLimiter->expects($this->never())->method('limitMemory');
+            ->build()
+        ;
 
         $this->mutationGenerator
-            ->expects($this->once())
             ->method('generate')
-            ->with(false)
-            ->willReturn([]);
-
-        $this->mutationTestingRunner
-            ->expects($this->once())
-            ->method('run')
-            ->with([], '');
-
-        $this->minMsiChecker->expects($this->once())->method('checkMetrics');
+            ->willReturn([])
+        ;
 
         $this->metricsCalculator
             ->expects($this->once())
             ->method('getTimedOutCount')
-            ->willReturn(42);
+            ->willReturn(42)
+        ;
         $this->metricsCalculator
-            ->expects($this->once())
             ->method('getTestedMutantsCount')
-            ->willReturn(0);
+            ->willReturn(0)
+        ;
         $this->metricsCalculator
-            ->expects($this->once())
             ->method('getMutationScoreIndicator')
-            ->willReturn(0.0);
+            ->willReturn(0.0)
+        ;
         $this->metricsCalculator
-            ->expects($this->once())
             ->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn(0.0);
+            ->willReturn(0.0)
+        ;
 
         $this->maxTimeoutsChecker
             ->expects($this->once())
             ->method('checkTimeouts')
-            ->with(42);
-
-        $this->eventDispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with($this->isInstanceOf(ApplicationExecutionWasFinished::class));
+            ->with(42)
+        ;
 
         $this->createEngine($config)->execute();
     }
@@ -418,47 +355,29 @@ final class EngineTest extends TestCase
         $config = ConfigurationBuilder::withMinimalTestData()
             ->withSkipInitialTests(true)
             ->withUncovered(true)
-            ->build();
-
-        $this->coverageChecker
-            ->expects($this->once())
-            ->method('checkCoverageExists');
-
-        $this->consoleOutput
-            ->expects($this->once())
-            ->method('logSkippingInitialTests');
-
-        $this->initialTestsRunner->expects($this->never())->method($this->anything());
-        $this->memoryLimiter->expects($this->never())->method('limitMemory');
+            ->build()
+        ;
 
         $this->mutationGenerator
-            ->expects($this->once())
             ->method('generate')
-            ->with(false)
-            ->willReturn([]);
-
-        $this->mutationTestingRunner
-            ->expects($this->once())
-            ->method('run')
-            ->with([], '');
-
-        $this->minMsiChecker->expects($this->never())->method($this->anything());
+            ->willReturn([])
+        ;
 
         $this->metricsCalculator
-            ->expects($this->once())
             ->method('getTimedOutCount')
-            ->willReturn(100);
+            ->willReturn(100)
+        ;
 
         $this->maxTimeoutsChecker
-            ->expects($this->once())
             ->method('checkTimeouts')
-            ->with(100)
-            ->willThrowException(MaxTimeoutCountReached::create(10, 100));
+            ->willThrowException(MaxTimeoutCountReached::create(10, 100))
+        ;
 
         $this->eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(ApplicationExecutionWasFinished::class));
+            ->with($this->isInstanceOf(ApplicationExecutionWasFinished::class))
+        ;
 
         $this->expectException(MaxTimeoutCountReached::class);
 
@@ -470,82 +389,52 @@ final class EngineTest extends TestCase
         $config = ConfigurationBuilder::withMinimalTestData()
             ->withSkipInitialTests(true)
             ->withUncovered(true)
-            ->build();
-
-        $this->coverageChecker
-            ->expects($this->once())
-            ->method('checkCoverageExists');
-
-        $this->consoleOutput
-            ->expects($this->once())
-            ->method('logSkippingInitialTests');
-
-        $this->initialTestsRunner->expects($this->never())->method($this->anything());
-        $this->memoryLimiter->expects($this->never())->method('limitMemory');
+            ->build()
+        ;
 
         $this->mutationGenerator
-            ->expects($this->once())
             ->method('generate')
-            ->with(false)
-            ->willReturn([]);
+            ->willReturn([])
+        ;
 
         $this->mutationTestingRunner
             ->expects($this->once())
             ->method('run')
-            ->with([], '');
+            ->with([])
+        ;
 
         $this->minMsiChecker
             ->expects($this->once())
             ->method('checkMetrics')
             ->with(100, 50.0, 55.0)
-            ->willThrowException(MinMsiCheckFailed::createForMsi(80.0, 50.0));
-
+            ->willThrowException(MinMsiCheckFailed::createForMsi(80.0, 50.0))
+        ;
         $this->metricsCalculator
-            ->expects($this->once())
             ->method('getTimedOutCount')
-            ->willReturn(0);
+            ->willReturn(0)
+        ;
         $this->metricsCalculator
-            ->expects($this->once())
             ->method('getTestedMutantsCount')
-            ->willReturn(100);
+            ->willReturn(100)
+        ;
         $this->metricsCalculator
-            ->expects($this->once())
             ->method('getMutationScoreIndicator')
-            ->willReturn(50.0);
+            ->willReturn(50.0)
+        ;
         $this->metricsCalculator
-            ->expects($this->once())
             ->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn(55.0);
-        $this->maxTimeoutsChecker
-            ->expects($this->once())
-            ->method('checkTimeouts')
-            ->with(0);
+            ->willReturn(55.0)
+        ;
 
         $this->eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(ApplicationExecutionWasFinished::class));
+            ->with($this->isInstanceOf(ApplicationExecutionWasFinished::class))
+        ;
 
         $this->expectException(MinMsiCheckFailed::class);
 
         $this->createEngine($config)->execute();
-    }
-
-    private function createInitialTestProcess(bool $successful, string $output): MockObject&Process
-    {
-        $process = $this->createMock(Process::class);
-        $process
-            ->expects($this->once())
-            ->method('isSuccessful')
-            ->willReturn($successful);
-        $process
-            ->method('getCommandLine')
-            ->willReturn('/tmp/bar');
-        $process
-            ->method('getOutput')
-            ->willReturn($output);
-
-        return $process;
     }
 
     private function createEngine(
@@ -557,18 +446,14 @@ final class EngineTest extends TestCase
                 ->withSkipInitialTests(false)
                 ->withUncovered(true)
                 ->build(),
-            adapter: $this->adapter,
-            coverageChecker: $this->coverageChecker,
+            testFramework: $this->testFramework,
             eventDispatcher: $this->eventDispatcher,
-            initialTestsRunner: $this->initialTestsRunner,
             memoryLimiter: $this->memoryLimiter,
             mutationGenerator: $this->mutationGenerator,
             mutationTestingRunner: $this->mutationTestingRunner,
             minMsiChecker: $this->minMsiChecker,
             maxTimeoutsChecker: $this->maxTimeoutsChecker,
-            consoleOutput: $this->consoleOutput,
             metricsCalculator: $this->metricsCalculator,
-            testFrameworkExtraOptionsFilter: $this->testFrameworkExtraOptionsFilter,
             preloadedSourceChecker: $this->preloadedSourceChecker,
             initialStaticAnalysis: $initialStaticAnalysis ?? new NullInitialStaticAnalysisRunner(),
         );

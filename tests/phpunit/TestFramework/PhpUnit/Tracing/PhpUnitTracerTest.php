@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Tracing;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\FileSystem;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\Tracing\Trace\Trace;
 use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\PhpUnit\Locator\FixedLocator;
@@ -114,10 +114,11 @@ final class PhpUnitTracerTest extends TestCase
         string $indexXmlPath,
         ?string $junitXmlPath,
     ): Tracer {
-        $testFrameworkAdapterStub = $this->createStub(TestFrameworkAdapter::class);
+        $testFrameworkAdapterStub = $this->createStub(TestFramework::class);
         $testFrameworkAdapterStub
             ->method('hasJUnitReport')
-            ->willReturn($junitXmlPath !== null);
+            ->willReturn($junitXmlPath !== null)
+        ;
 
         $junitFileDataProvider = $junitXmlPath === null
             ? new FakeTestFileDataProvider()
@@ -152,13 +153,16 @@ final class PhpUnitTracerTest extends TestCase
         $fileSystemStub = $this->createStub(FileSystem::class);
         $fileSystemStub
             ->method('isReadableFile')
-            ->willReturnCallback($fileSystem->isReadableFile(...));
+            ->willReturnCallback($fileSystem->isReadableFile(...))
+        ;
         $fileSystemStub
             ->method('readFile')
-            ->willReturnCallback($fileSystem->readFile(...));
+            ->willReturnCallback($fileSystem->readFile(...))
+        ;
         $fileSystemStub
             ->method('realPath')
-            ->willReturnCallback(static fn (string $path): string => $path);
+            ->willReturnCallback(static fn (string $path): string => $path)
+        ;
 
         return $fileSystemStub;
     }

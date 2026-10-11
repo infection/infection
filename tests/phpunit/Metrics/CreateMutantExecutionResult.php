@@ -97,7 +97,7 @@ trait CreateMutantExecutionResult
             10 + $id,
             $id,
             10 + $id,
-            now('<?php $a = 1;'),
+            '<?php $a = 1;',
             now('<?php $a = 1;'),
             [],
             0.0,

@@ -47,6 +47,21 @@ vendor/bin/phpunit                                   # Run tests
 vendor/bin/phpunit --filter=MutatorGenerator        # Run specific test (replace MutatorGenerator with any file name)
 ```
 
+### Running checks in Docker
+
+Most `make` targets have a `-docker` twin (`make cs-docker`, `make autoreview-docker`,
+`make test-unit-docker`, `make test-e2e-docker`, `make test-infection-docker`) that runs the
+same target inside the `php83` service from `docker-compose.yml`.
+
+The image pins the settings the suite needs (`memory_limit = 512M`, Xdebug mode off, PHP 8.3),
+so the `-docker` twin runs a known-good configuration regardless of the host. Switch to it when
+the host PHP is not 8.3 (CI runs `cs` and `autoreview` on 8.3 only), when the host has no Xdebug
+or PCOV (`test-e2e` and `test-infection` need a coverage driver), when there is no working local
+PHP, or when the suite dies with `Premature end of PHP process`.
+
+Call the `-docker` targets rather than `docker compose run` by hand: they also rebuild the image
+when `devTools/Dockerfile` changes and keep zizmor out of the PHP container.
+
 ### Key Configuration Files
 - `infection.json5` - Infection's own configuration
 - `phpunit.xml.dist` - PHPUnit configuration

@@ -237,7 +237,8 @@ return static function (int $maxCount, float $percentage = 1.): Closure {
 
             $traverserFactory
                 ->createEnrichmentTraverser($sourceFile, $trace)
-                ->traverse($initialStatements);
+                ->traverse($initialStatements)
+            ;
 
             $remainingNodeCount = $maxCount - $count;
             Assert::positiveInteger($remainingNodeCount);
@@ -246,7 +247,8 @@ return static function (int $maxCount, float $percentage = 1.): Closure {
 
             $traverserFactory
                 ->createMutationTraverser($nodeCountingVisitor)
-                ->traverse($initialStatements);
+                ->traverse($initialStatements)
+            ;
 
             $count += $nodeCountingVisitor->getCount();
 

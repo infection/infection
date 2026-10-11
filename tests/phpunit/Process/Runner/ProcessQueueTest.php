@@ -85,10 +85,12 @@ final class ProcessQueueTest extends TestCase
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $iterator->expects($this->never())
-            ->method('current');
+            ->method('current')
+        ;
 
         $result = $queue->enqueueFrom($iterator);
 
@@ -104,12 +106,15 @@ final class ProcessQueueTest extends TestCase
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $iterator->expects($this->once())
             ->method('current')
-            ->willReturn($container);
+            ->willReturn($container)
+        ;
         $iterator->expects($this->once())
-            ->method('next');
+            ->method('next')
+        ;
 
         $result = $queue->enqueueFrom($iterator);
 
@@ -128,9 +133,11 @@ final class ProcessQueueTest extends TestCase
 
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->never())
-            ->method('valid');
+            ->method('valid')
+        ;
         $iterator->expects($this->never())
-            ->method('current');
+            ->method('current')
+        ;
 
         $result = $queue->enqueueFrom($iterator, maxQueueDepth: 2);
 
@@ -148,9 +155,11 @@ final class ProcessQueueTest extends TestCase
 
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->never())
-            ->method('valid');
+            ->method('valid')
+        ;
         $iterator->expects($this->never())
-            ->method('current');
+            ->method('current')
+        ;
 
         $result = $queue->enqueueFrom($iterator, maxQueueDepth: 2);
 
@@ -168,12 +177,15 @@ final class ProcessQueueTest extends TestCase
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $iterator->expects($this->once())
             ->method('current')
-            ->willReturn($container);
+            ->willReturn($container)
+        ;
         $iterator->expects($this->once())
-            ->method('next');
+            ->method('next')
+        ;
 
         $result = $queue->enqueueFrom($iterator, maxQueueDepth: 2);
 
@@ -189,17 +201,21 @@ final class ProcessQueueTest extends TestCase
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $iterator->expects($this->once())
             ->method('current')
-            ->willReturn($container);
+            ->willReturn($container)
+        ;
         $iterator->expects($this->once())
-            ->method('next');
+            ->method('next')
+        ;
 
         // Mock two sequential calls to microtime()
         $clockMock->expects($this->exactly(2))
             ->method('microtime')
-            ->willReturnOnConsecutiveCalls(1000.0, 1001.0); // 1 second difference
+            ->willReturnOnConsecutiveCalls(1000.0, 1001.0) // 1 second difference
+        ;
 
         $result = $queue->enqueueFrom($iterator);
 
@@ -220,16 +236,20 @@ final class ProcessQueueTest extends TestCase
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $iterator->expects($this->once())
             ->method('current')
-            ->willReturn($container);
+            ->willReturn($container)
+        ;
         $iterator->expects($this->once())
-            ->method('next');
+            ->method('next')
+        ;
 
         $clockMock->expects($this->exactly(2))
             ->method('microtime')
-            ->willReturnOnConsecutiveCalls(1000.0, 1001.0);
+            ->willReturnOnConsecutiveCalls(1000.0, 1001.0)
+        ;
 
         $result = $queue->enqueueFrom($iterator);
 
@@ -246,12 +266,15 @@ final class ProcessQueueTest extends TestCase
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $iterator->expects($this->once())
             ->method('current')
-            ->willReturn($container);
+            ->willReturn($container)
+        ;
         $iterator->expects($this->once())
-            ->method('next'); // This is the critical assertion
+            ->method('next') // This is the critical assertion
+        ;
 
         $queue->enqueueFrom($iterator);
     }
@@ -264,12 +287,15 @@ final class ProcessQueueTest extends TestCase
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $iterator->expects($this->once())
             ->method('current')
-            ->willReturn($container);
+            ->willReturn($container)
+        ;
         $iterator->expects($this->once())
-            ->method('next');
+            ->method('next')
+        ;
 
         // Call without specifying maxQueueDepth - should use default of 1
         $queue->enqueueFrom($iterator);
@@ -279,7 +305,8 @@ final class ProcessQueueTest extends TestCase
         // Second call should respect capacity
         $iterator2 = $this->createMock(Iterator::class);
         $iterator2->expects($this->never())
-            ->method('valid');
+            ->method('valid')
+        ;
 
         $result = $queue->enqueueFrom($iterator2); // Default maxQueueDepth = 1, queue has 1 item
 

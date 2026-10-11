@@ -247,6 +247,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     null,
                     null,
+                    null,
                 ),
             ]),
         ];
@@ -273,6 +274,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     false,
+                    null,
                     null,
                     null,
                 ),
@@ -303,6 +305,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     null,
                     null,
+                    null,
                 ),
             ]),
         ];
@@ -329,6 +332,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     false,
+                    null,
                     null,
                     null,
                 ),
@@ -359,6 +363,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     null,
                     null,
+                    null,
                 ),
             ]),
         ];
@@ -387,6 +392,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     null,
                     null,
+                    null,
                 ),
             ]),
         ];
@@ -413,6 +419,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     null,
                     'perMutator.log',
                     false,
+                    null,
                     null,
                     null,
                 ),
@@ -445,6 +452,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     StrykerConfig::forBadge('master'),
                     null,
+                    null,
                 ),
             ]),
         ];
@@ -474,6 +482,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     null,
                     false,
                     StrykerConfig::forFullReport('master'),
+                    null,
                     null,
                 ),
             ]),
@@ -505,6 +514,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     StrykerConfig::forBadge('/^foo$/'),
                     null,
+                    null,
                 ),
             ]),
         ];
@@ -535,6 +545,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     StrykerConfig::forFullReport('/^foo$/'),
                     null,
+                    null,
                 ),
             ]),
         ];
@@ -563,6 +574,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     false,
                     null,
                     'summary.json',
+                    null,
                 ),
             ]),
         ];
@@ -585,7 +597,8 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "stryker": {
                             "badge": "master"
                         },
-                        "summaryJson": "summary.json"
+                        "summaryJson": "summary.json",
+                        "debugEvents": "debug-events.jsonl"
                     }
                 }
                 JSON,
@@ -602,6 +615,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     true,
                     StrykerConfig::forBadge('master'),
                     'summary.json',
+                    'debug-events.jsonl',
                 ),
             ]),
         ];
@@ -616,6 +630,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "text": "",
                         "summary": "",
                         "debug": "",
+                        "debugEvents": "",
                         "perMutator": "",
                         "stryker": {
                             "report": ""
@@ -639,6 +654,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "text": "",
                         "summary": "",
                         "debug": "",
+                        "debugEvents": "",
                         "perMutator": "",
                         "stryker": {
                             "badge": ""
@@ -670,7 +686,8 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "stryker": {
                             "badge": " master "
                         },
-                        "summaryJson": " summary.json "
+                        "summaryJson": " summary.json ",
+                        "debugEvents": " debug-events.jsonl "
                     }
                 }
                 JSON,
@@ -687,6 +704,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     true,
                     StrykerConfig::forBadge('master'),
                     'summary.json',
+                    'debug-events.jsonl',
                 ),
             ]),
         ];
@@ -2334,7 +2352,8 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "stryker": {
                             "badge": "master"
                         },
-                        "summaryJson": "summary.json"
+                        "summaryJson": "summary.json",
+                        "debugEvents": "debug-events.jsonl"
                     },
                     "tmpDir": "custom-tmp",
                     "phpUnit": {
@@ -2572,6 +2591,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     true,
                     StrykerConfig::forBadge('master'),
                     'summary.json',
+                    'debug-events.jsonl',
                 ),
                 'tmpDir' => 'custom-tmp',
                 'phpunit' => new PhpUnit(

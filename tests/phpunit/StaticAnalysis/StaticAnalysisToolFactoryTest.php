@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis;
 
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
@@ -56,6 +57,7 @@ final class StaticAnalysisToolFactoryTest extends TestCase
             $this->createStub(TestFrameworkConfigLocatorInterface::class),
             $this->createStub(ShellCommandRunner::class),
             $this->createStub(PhpExecutableFinder::class),
+            $this->createStub(FileSystem::class),
         );
 
         $this->expectException(InvalidArgumentException::class);

@@ -69,7 +69,7 @@
         "symfony/finder": "^6.4 || ^7.4 || ^8.0",
         "symfony/polyfill-php85": "^1.33",
         "symfony/process": "^6.4 || ^7.4 || ^8.0",
-        "thecodingmachine/safe": "^v3.0",
+        "thecodingmachine/safe": "^v3.4",
         "webmozart/assert": "^1.11 || ^2.0"
     },
     "conflict": {

@@ -55,6 +55,13 @@ final class NoSourceFound extends RuntimeException
         parent::__construct($message, $code, $previous);
     }
 
+    public function appendHint(string $hint): self
+    {
+        $this->message = $this->getMessage() . ' ' . $hint;
+
+        return $this;
+    }
+
     public static function noFilesForGitDiff(string $diffFilter, string $base): self
     {
         return new self(
@@ -64,6 +71,22 @@ final class NoSourceFound extends RuntimeException
                 $diffFilter,
                 $base,
             ),
+        );
+    }
+
+    public static function noSourceFileFoundForGitDiff(
+        string $diffFilter,
+        string $base,
+        self $previous,
+    ): self {
+        return new self(
+            isSourceFiltered: true,
+            message: sprintf(
+                'No source file found for the filter applied to the configured sources. The git filter used was: "%s" with the base "%s".',
+                $diffFilter,
+                $base,
+            ),
+            previous: $previous,
         );
     }
 

@@ -42,7 +42,6 @@ use function array_unique;
 use function array_values;
 use function dirname;
 use function explode;
-use function file_exists;
 use function implode;
 use function in_array;
 use Infection\Configuration\Entry\Logs;
@@ -55,7 +54,8 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalPathsFilter;
-use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\Configuration\SourceFilter\SourceFileFilter;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
@@ -68,7 +68,6 @@ use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
-use InvalidArgumentException;
 use function is_numeric;
 use function ltrim;
 use function max;
@@ -90,7 +89,7 @@ class ConfigurationFactory
     /**
      * Default allowed timeout (on a test basis) in seconds
      */
-    private const int DEFAULT_TIMEOUT = 10;
+    public const int DEFAULT_TIMEOUT = 10;
 
     private const int DEFAULT_DOTS_PER_ROW = 50;
 
@@ -104,6 +103,7 @@ class ConfigurationFactory
         private readonly ProjectDirectoryProvider $projectDirectoryProvider,
         private readonly CpuCoresCountProvider $cpuCoresCountProvider,
         private readonly PositionalPathsClassifier $positionalPathsClassifier,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
@@ -240,7 +240,7 @@ class ConfigurationFactory
             return;
         }
 
-        if (!file_exists($bootstrap)) {
+        if (!$this->fileSystem->exists($bootstrap)) {
             throw FileOrDirectoryNotFound::fromFileName($bootstrap, [__DIR__]);
         }
 
@@ -444,11 +444,10 @@ class ConfigurationFactory
             : null;
 
         if ($classified->testPaths !== []) {
-            if ($testFrameworkExtraArgs !== null) {
-                throw new InvalidArgumentException(
-                    'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
-                );
-            }
+            Assert::null(
+                $testFrameworkExtraArgs,
+                'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
+            );
 
             $testFrameworkExtraArgs = implode(' ', $classified->testPaths);
         }
@@ -457,7 +456,7 @@ class ConfigurationFactory
     }
 
     /**
-     * @return array{0: SourceFilter|null, 1: string|null}
+     * @return array{0: SourceFileFilter|null, 1: string|null}
      */
     private function refineFilterIfNecessary(
         PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
@@ -484,9 +483,7 @@ class ConfigurationFactory
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath, ?string $summaryJsonLogFilePath): Logs
     {
-        if ($useGitHubLogger === null) {
-            $useGitHubLogger = $this->detectCiGithubActions();
-        }
+        $useGitHubLogger ??= $this->detectCiGithubActions();
 
         if ($useGitHubLogger) {
             $logs->setUseGitHubAnnotationsLogger($useGitHubLogger);
@@ -519,6 +516,10 @@ class ConfigurationFactory
             $logs->getUseGitHubAnnotationsLogger(),
             $logs->getStrykerConfig(),
             self::pathToAbsolute($logs->getSummaryJsonLogFilePath(), $configDir),
+            self::pathToAbsolute(
+                $logs->debugEventsLogFilePath,
+                $configDir,
+            ),
         );
     }
 

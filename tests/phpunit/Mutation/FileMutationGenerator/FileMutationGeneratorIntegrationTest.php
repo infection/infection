@@ -65,7 +65,8 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
         $tracerMock
             ->method('trace')
             ->with($fileInfoMock)
-            ->willReturn($traceStub);
+            ->willReturn($traceStub)
+        ;
 
         $mutators = [new Plus()];
 
@@ -74,7 +75,8 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
                 Tracer::class,
                 $tracerMock,
             )
-            ->getFileMutationGenerator();
+            ->getFileMutationGenerator()
+        ;
 
         $mutations = $mutationGenerator->generate(
             $fileInfoMock,
@@ -109,7 +111,8 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
                     '/path/to/test.php',
                     0.23,
                 ),
-            ]);
+            ])
+        ;
 
         return $traceStub;
     }

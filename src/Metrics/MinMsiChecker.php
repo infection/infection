@@ -61,6 +61,12 @@ class MinMsiChecker
         float $msi,
         float $coveredCodeMsi,
     ): void {
+        if ($this->hasNoMinimumMsiThresholds()) {
+            $this->consoleOutput->logMsiChecksSkippedWithNoThresholds();
+
+            return;
+        }
+
         $this->checkMinMsi($totalMutantCount, $msi, $coveredCodeMsi);
         $this->checkIfMinMsiCanBeIncreased($msi, $coveredCodeMsi);
     }
@@ -70,6 +76,8 @@ class MinMsiChecker
         if ($this->ignoreMsiWithNoMutations
             && $totalMutantCount === 0
         ) {
+            $this->consoleOutput->logMsiChecksSkippedWithNoMutations();
+
             return;
         }
 
@@ -103,6 +111,13 @@ class MinMsiChecker
                 $coveredCodeMsi,
             );
         }
+    }
+
+    private function hasNoMinimumMsiThresholds(): bool
+    {
+        return $this->minMsi !== 0.0
+            ? false
+            : $this->minCoveredCodeMsi === 0.0;
     }
 
     private function isMsiInsufficient(float $msi): bool

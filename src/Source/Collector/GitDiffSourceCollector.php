@@ -49,6 +49,7 @@ final readonly class GitDiffSourceCollector implements SourceCollector
 {
     public function __construct(
         private SourceCollector $innerCollector,
+        private GitDiffFilter $filter,
     ) {
     }
 
@@ -76,12 +77,21 @@ final readonly class GitDiffSourceCollector implements SourceCollector
                     $configurationPathname,
                 ),
             ),
+            $filter,
         );
     }
 
     public function collect(): array
     {
-        return $this->innerCollector->collect();
+        try {
+            return $this->innerCollector->collect();
+        } catch (NoSourceFound $exception) {
+            throw NoSourceFound::noSourceFileFoundForGitDiff(
+                $this->filter->value,
+                $this->filter->base,
+                $exception,
+            );
+        }
     }
 
     /**

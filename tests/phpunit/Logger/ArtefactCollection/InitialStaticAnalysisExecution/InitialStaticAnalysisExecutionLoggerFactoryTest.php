@@ -59,14 +59,16 @@ final class InitialStaticAnalysisExecutionLoggerFactoryTest extends TestCase
         $this->staticAnalysisAdapterMock = $this->createMock(StaticAnalysisToolAdapter::class);
         $this->staticAnalysisAdapterMock
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $this->outputMock = $this->createMock(OutputInterface::class);
         // We don't explicitly rely on this; this is only necessary for the
         // ProgressBar used internally.
         $this->outputMock
             ->method('isDecorated')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
     }
 
     #[DataProvider('debugProvider')]

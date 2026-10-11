@@ -35,14 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Command\Option;
 
-use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
-use InvalidArgumentException;
 use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -95,11 +94,9 @@ final class MapSourceClassToTestOption implements CommandOption
      */
     private static function assertIsValid(string $inputValue): void
     {
-        if (in_array($inputValue, MapSourceClassToTestStrategy::getAll(), true)) {
-            return;
-        }
-
-        throw new InvalidArgumentException(
+        Assert::inArray(
+            $inputValue,
+            MapSourceClassToTestStrategy::getAll(),
             sprintf(
                 'Cannot pass "%s" to "--%s": only "%s" or no argument is supported',
                 $inputValue,

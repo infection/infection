@@ -66,7 +66,8 @@ final class PerformanceLoggerSubscriberTest extends TestCase
                 $expectedOutput = 'Time: 5s. Memory: 2.00KB. Threads: 1';
 
                 return is_array($parameter) && $parameter[0] === '' && $parameter[1] === $expectedOutput;
-            }));
+            }))
+        ;
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(

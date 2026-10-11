@@ -73,7 +73,8 @@ final class SourceDirsProviderTest extends BaseProviderTestCase
 
         $this->sourceDirGuesser
             ->method('guess')
-            ->willReturn(['src']);
+            ->willReturn(['src'])
+        ;
 
         $sourceDirs = $this->provider->get(
             new IO(
@@ -90,7 +91,8 @@ final class SourceDirsProviderTest extends BaseProviderTestCase
     {
         $this->sourceDirGuesser
             ->method('guess')
-            ->willReturn(['src/Namespace']);
+            ->willReturn(['src/Namespace'])
+        ;
 
         $sourceDirs = $this->provider->get(
             new IO(
@@ -107,7 +109,8 @@ final class SourceDirsProviderTest extends BaseProviderTestCase
     {
         $this->sourceDirGuesser
             ->method('guess')
-            ->willReturn(['foo', 'bar']);
+            ->willReturn(['foo', 'bar'])
+        ;
 
         $sourceDirs = $this->provider->get(
             new IO(
@@ -124,7 +127,8 @@ final class SourceDirsProviderTest extends BaseProviderTestCase
     {
         $this->sourceDirGuesser
             ->method('guess')
-            ->willReturn(['src']);
+            ->willReturn(['src'])
+        ;
 
         $sourceDirs = $this->provider->get(
             new IO(
@@ -141,7 +145,8 @@ final class SourceDirsProviderTest extends BaseProviderTestCase
     {
         $this->sourceDirGuesser
             ->method('guess')
-            ->willReturn(['src']);
+            ->willReturn(['src'])
+        ;
 
         $this->expectException(LogicException::class);
 

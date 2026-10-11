@@ -71,7 +71,8 @@ final class GitProjectDirectoryProviderTest extends TestCase
         $this->gitMock
             ->expects($this->once())
             ->method('getProjectDirectory')
-            ->willReturn($expected);
+            ->willReturn($expected)
+        ;
 
         $actual = $this->provider->provide();
 
@@ -86,7 +87,8 @@ final class GitProjectDirectoryProviderTest extends TestCase
         $this->gitMock
             ->expects($this->once())
             ->method('getProjectDirectory')
-            ->willThrowException($exception);
+            ->willThrowException($exception)
+        ;
 
         $actual = $this->provider->provide();
 

@@ -69,7 +69,8 @@ final class InitialStaticAnalysisExecutionLoggerSubscriberTest extends TestCase
     {
         $this->loggerMock
             ->expects($this->once())
-            ->method('start');
+            ->method('start')
+        ;
 
         $this->dispatcher->dispatch(
             new InitialStaticAnalysisRunWasStarted(),
@@ -80,7 +81,8 @@ final class InitialStaticAnalysisExecutionLoggerSubscriberTest extends TestCase
     {
         $this->loggerMock
             ->expects($this->once())
-            ->method('advance');
+            ->method('advance')
+        ;
 
         $this->dispatcher->dispatch(
             new InitialStaticAnalysisSubStepWasCompleted(),
@@ -92,7 +94,8 @@ final class InitialStaticAnalysisExecutionLoggerSubscriberTest extends TestCase
         $this->loggerMock
             ->expects($this->once())
             ->method('finish')
-            ->with($this->identicalTo('output'));
+            ->with($this->identicalTo('output'))
+        ;
 
         $this->dispatcher->dispatch(
             new InitialStaticAnalysisRunWasFinished(

@@ -37,6 +37,7 @@ namespace Infection\StaticAnalysis;
 
 use function implode;
 use Infection\Configuration\Configuration;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
@@ -61,6 +62,7 @@ final readonly class StaticAnalysisToolFactory
         private TestFrameworkConfigLocatorInterface $staticAnalysisConfigLocator,
         private ShellCommandRunner $shellCommandRunner,
         private PhpExecutableFinder $phpExecutableFinder,
+        private FileSystem $fileSystem,
     ) {
     }
 
@@ -88,6 +90,7 @@ final readonly class StaticAnalysisToolFactory
                 $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
                 $this->shellCommandRunner,
+                $this->fileSystem,
             );
         }
 
@@ -113,6 +116,7 @@ final readonly class StaticAnalysisToolFactory
             StaticAnalysisToolTypes::DEBUG,
         ];
 
+        // @phpstan-ignore infection.invalidArgumentException (Keep the fallback after the adapter-specific returns.)
         throw new InvalidArgumentException(sprintf(
             'Invalid name of static analysis tool "%s". Available names are: %s',
             $adapterName,

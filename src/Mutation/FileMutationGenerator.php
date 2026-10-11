@@ -148,7 +148,8 @@ class FileMutationGenerator
 
         $this->traverserFactory
             ->createEnrichmentTraverser($sourceFile, $trace)
-            ->traverse($initialStatements);
+            ->traverse($initialStatements)
+        ;
 
         return [$initialStatements, $originalFileTokens];
     }

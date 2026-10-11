@@ -35,20 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Command\InitialTest;
 
-use function explode;
 use Infection\Command\BaseCommand;
-use Infection\Command\Git\Option\BaseOption;
-use Infection\Command\Git\Option\FilterOption;
 use Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\DebugOption;
+use Infection\Command\Option\PathsArgument;
+use Infection\Command\Option\SourceFilterOptions;
 use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Command\Option\TestFrameworkOption;
-use Infection\Configuration\Configuration;
-use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
 use Infection\Logger\Console\ConsoleLogger;
-use Infection\Process\Runner\InitialTestsFailed;
 
 /**
  * @internal
@@ -67,8 +65,8 @@ final class InitialTestRunCommand extends BaseCommand
         );
 
         ConfigurationOption::addOption($this);
-        BaseOption::addOption($this);
-        FilterOption::addOption($this);
+        PathsArgument::addArgument($this);
+        SourceFilterOptions::addOption($this);
         InitialTestsPhpOptionsOption::addOption($this);
         TestFrameworkOption::addOption($this);
         TestFrameworkExtraArgsOption::addOption($this);
@@ -79,9 +77,6 @@ final class InitialTestRunCommand extends BaseCommand
     {
         $logger = new ConsoleLogger($io);
 
-        $inputBase = BaseOption::get($io);
-        $inputFilter = FilterOption::get($io);
-
         $container = $this->getApplication()->getContainer()->withValues(
             logger: $logger,
             output: $io->getOutput(),
@@ -90,57 +85,37 @@ final class InitialTestRunCommand extends BaseCommand
             initialTestsPhpOptions: InitialTestsPhpOptionsOption::get($io),
             testFramework: TestFrameworkOption::get($io),
             testFrameworkExtraArgs: TestFrameworkExtraArgsOption::get($io),
-            sourceFilter: new IncompleteGitDiffFilter($inputFilter, $inputBase),
+            sourceFilter: SourceFilterOptions::get(
+                $io,
+                PathsArgument::get($io),
+            ),
         );
 
+        // TODO: this is not very elegant but done this way for now to keep the same behaviour
+        //   as we migrate to the new test framework API.
+        $container->getEventDispatcher()->addSubscriber(
+            new readonly class($io) implements InitialTestSuiteWasStartedSubscriber {
+                public function __construct(
+                    private IO $io,
+                ) {
+                }
+
+                public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
+                {
+                    $this->io->writeln([
+                        'Command executed:',
+                        $event->commandLine,
+                    ]);
+                }
+            },
+        );
         $container->getSubscriberRegisterer()->registerSubscribers();
 
-        $configuration = $container->getConfiguration();
-        $initialTestsPhpOptions = self::getInitialTestsPhpOptions($configuration);
-
-        $initialTestSuiteInnerProcess = $container
-            ->getInitialTestsRunProcessFactory()
-            ->createProcess(
-                $configuration->testFrameworkExtraOptions,
-                $initialTestsPhpOptions,
-                $configuration->skipCoverage,
-            );
-
-        $io->writeln([
-            'Command executed:',
-            $initialTestSuiteInnerProcess->getCommandLine(),
-        ]);
-
-        $initialTestSuiteProcess = $container
-            ->getInitialTestsRunner()
-            ->run(
-                $configuration->testFrameworkExtraOptions,
-                $initialTestsPhpOptions,
-                $configuration->skipCoverage,
-            );
-
-        if (!$initialTestSuiteProcess->isSuccessful()) {
-            throw InitialTestsFailed::fromProcessAndAdapter(
-                $initialTestSuiteProcess,
-                $container->getTestFrameworkAdapter(),
-            );
-        }
+        $container->getTestFramework()->executeInitialRun();
 
         $io->newLine();
         $io->success('Initial test run successfully executed.');
 
         return true;
-    }
-
-    /**
-     * @return string[]
-     */
-    private static function getInitialTestsPhpOptions(Configuration $configuration): array
-    {
-        // Copied from Engine::getInitialTestsPhpOptionsArray
-        // The implementation looks a bit weird (will return [''] for an empty string),
-        // and the engine may not be the place where this should be done either...
-        // But to address at a later stage.
-        return explode(' ', (string) $configuration->initialTestsPhpOptions);
     }
 }

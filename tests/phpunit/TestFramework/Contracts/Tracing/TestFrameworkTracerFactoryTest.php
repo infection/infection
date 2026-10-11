@@ -36,18 +36,32 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Contracts\Tracing;
 
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Console\ConsoleOutput;
+use Infection\FileSystem\FileSystem as InfectionFileSystem;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
-use Infection\TestFramework\Config\InitialConfigBuilder;
-use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\Tracing\TestFrameworkTracerFactory;
 use Infection\TestFramework\Contracts\Tracing\Tracer;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
-use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
+use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitReportLocator;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\TestFramework\Tracing\TestRunOrderResolver;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 #[CoversClass(TestFrameworkTracerFactory::class)]
@@ -81,23 +95,34 @@ final class TestFrameworkTracerFactoryTest extends TestCase
 
         $this->assertSame(
             $fallbackTracer,
-            $factory->create(new DummyTestFrameworkAdapter()),
+            $factory->create($this->createStub(TestFramework::class)),
         );
     }
 
     private function createPhpUnitAdapter(): PhpUnitAdapter
     {
+        $config = ConfigurationBuilder::withMinimalTestData()->build();
+        $filesystem = $this->createStub(Filesystem::class);
+        $manipulator = new XmlConfigurationManipulator(new PathReplacer($filesystem), '/tmp');
+
         return new PhpUnitAdapter(
             'phpunit',
             '/tmp',
             '/tmp/junit.xml',
             new PCOVDirectoryProvider(['/tmp/src'], ''),
-            $this->createStub(InitialConfigBuilder::class),
-            $this->createStub(MutationConfigBuilder::class),
+            new InitialConfigBuilder('/tmp', '<phpunit/>', $manipulator, new XmlConfigurationVersionProvider(), $filesystem, [], []),
+            new MutationConfigBuilder('/tmp', '<phpunit/>', $manipulator, '/tmp', new TestRunOrderResolver(), $filesystem),
             $this->createStub(CommandLineArgumentsAndOptionsBuilder::class),
             $this->createStub(ShellCommandRunner::class),
             new VersionParser(),
             new CommandLineBuilder(new PhpExecutableFinder()),
+            '/tmp/phpunit.xml',
+            $this->createStub(ConsoleOutput::class),
+            new CoverageCheckerFactory($config, JUnitReportLocator::create($this->createStub(InfectionFileSystem::class), '/tmp'), IndexXmlCoverageLocator::create($this->createStub(InfectionFileSystem::class), '/tmp')),
+            $this->createStub(InitialTestsRunner::class),
+            $config,
+            $this->createStub(MutantProcessContainerFactory::class),
+            new TestFrameworkExtraOptionsFilter(),
             '12.5.0',
         );
     }

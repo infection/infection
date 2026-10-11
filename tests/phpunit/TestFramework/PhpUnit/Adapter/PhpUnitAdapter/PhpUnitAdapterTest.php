@@ -38,31 +38,50 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use function array_map;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Configuration\Configuration;
+use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitReportLocator;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
+use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
+use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(PhpUnitAdapter::class)]
 final class PhpUnitAdapterTest extends TestCase
 {
+    use ExpectsThrowables;
+
     private const string DEFAULT_PHPUNIT_VERSION = '9.0';
 
     private const string PHP_EXECUTABLE = '/path/to/php';
@@ -82,7 +101,8 @@ final class PhpUnitAdapterTest extends TestCase
         $this->phpExecutableFinderMock = $this->createMock(PhpExecutableFinder::class);
         $this->phpExecutableFinderMock
             ->method('find')
-            ->willReturn(self::PHP_EXECUTABLE);
+            ->willReturn(self::PHP_EXECUTABLE)
+        ;
 
         $this->adapter = $this->createAdapter(
             <<<'XML'
@@ -96,10 +116,12 @@ final class PhpUnitAdapterTest extends TestCase
     {
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shouldProvide');
+            ->method('shouldProvide')
+        ;
 
         $this->assertSame('PHPUnit', $this->adapter->getName());
     }
@@ -108,12 +130,180 @@ final class PhpUnitAdapterTest extends TestCase
     {
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shouldProvide');
+            ->method('shouldProvide')
+        ;
 
         $this->assertTrue($this->adapter->hasJUnitReport());
+    }
+
+    #[DataProvider('initialRunOutputProvider')]
+    public function test_it_executes_the_initial_run(
+        string $output,
+        ?float $memoryUsage,
+    ): void {
+        $process = $this->createStub(Process::class);
+        $process
+            ->method('isSuccessful')
+            ->willReturn(true)
+        ;
+        $process
+            ->method('getOutput')
+            ->willReturn($output)
+        ;
+
+        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withInitialTestsPhpOptions('-d memory_limit=1G')
+            ->withTestFrameworkExtraOptions('--verbose')
+            ->withSkipCoverage(true)
+            ->build()
+        ;
+        $adapter = $this->createAdapter(
+            '<phpunit/>',
+            configuration: $configuration,
+            initialTestsRunner: $initialTestsRunner,
+        );
+
+        $initialTestsRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with(
+                $adapter,
+                '--verbose',
+                ['-d', 'memory_limit=1G'],
+                true,
+            )
+            ->willReturn($process)
+        ;
+        $this->fileSystemMock
+            ->expects($this->exactly(2))
+            ->method('isReadableFile')
+            ->willReturn(true)
+        ;
+
+        $this->assertEquals(
+            new InitialRunResults(
+                $output,
+                $memoryUsage,
+            ),
+            $adapter->executeInitialRun(),
+            'The initial run must preserve the output and normalize unknown memory usage.',
+        );
+    }
+
+    public static function initialRunOutputProvider(): iterable
+    {
+        yield 'single-digit memory usage' => ['Memory: 8.00MB', 8.0];
+
+        yield 'multiple-digit memory usage' => ['Memory: 68.00MB', 68.0];
+
+        yield 'space before the unit' => ['Memory: 68.00 MB', 68.0];
+
+        yield 'unknown memory usage' => ['Time: 2.51 seconds', null];
+    }
+
+    public function test_it_throws_when_the_initial_run_fails(): void
+    {
+        $process = $this->createStub(Process::class);
+        $process
+            ->method('isSuccessful')
+            ->willReturn(false)
+        ;
+        $process
+            ->method('getExitCode')
+            ->willReturn(1)
+        ;
+
+        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
+        $adapter = $this->createAdapter(
+            '<phpunit/>',
+            initialTestsRunner: $initialTestsRunner,
+        );
+        $initialTestsRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with(
+                $adapter,
+                '',
+                [''],
+                false,
+            )
+            ->willReturn($process)
+        ;
+        $this->fileSystemMock
+            ->expects($this->never())
+            ->method('isReadableFile')
+        ;
+
+        $this->expectException(InitialTestsFailed::class);
+
+        $adapter->executeInitialRun();
+    }
+
+    public function test_it_filters_initial_run_only_options_from_mutant_evaluation(): void
+    {
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+        $processContainer = $this->createStub(MutantProcessContainer::class);
+        $processFactory = $this->createMock(MutantProcessContainerFactory::class);
+        $adapter = $this->createAdapter(
+            '<phpunit/>',
+            configuration: ConfigurationBuilder::withMinimalTestData()
+                ->withTestFrameworkExtraOptions('--configuration phpunit.xml --filter Foo --testsuite unit --verbose')
+                ->build(),
+            processFactory: $processFactory,
+        );
+        $processFactory
+            ->expects($this->once())
+            ->method('create')
+            ->with(
+                $adapter,
+                $mutant,
+                '--verbose',
+            )
+            ->willReturn($processContainer)
+        ;
+
+        $this->assertSame(
+            $processContainer,
+            $adapter->test($mutant),
+            'Mutant evaluation must use the process factory with initial-run options removed.',
+        );
+    }
+
+    #[DataProvider('skipInitialTestsProvider')]
+    public function test_it_checks_requirements(bool $skipInitialTests): void
+    {
+        $consoleOutput = $this->createMock(ConsoleOutput::class);
+        $consoleOutput
+            ->expects($this->exactly($skipInitialTests ? 1 : 0))
+            ->method('logSkippingInitialTests')
+        ;
+        $this->fileSystemMock
+            ->expects($this->exactly($skipInitialTests ? 2 : 0))
+            ->method('isReadableFile')
+            ->willReturn(true)
+        ;
+        $adapter = $this->createAdapter(
+            '<phpunit/>',
+            configuration: ConfigurationBuilder::withMinimalTestData()
+                ->withSkipCoverage(true)
+                ->withSkipInitialTests($skipInitialTests)
+                ->build(),
+            consoleOutput: $consoleOutput,
+        );
+
+        $adapter->checkRequirements();
+    }
+
+    public static function skipInitialTestsProvider(): iterable
+    {
+        yield 'initial tests are run' => [false];
+
+        yield 'initial tests are skipped' => [true];
     }
 
     public function test_it_retrieves_version(): void
@@ -123,7 +313,8 @@ final class PhpUnitAdapterTest extends TestCase
             ->expects($this->once())
             ->method('mustRun')
             ->with([self::PHP_EXECUTABLE, '/path/to/phpunit', '--version'])
-            ->willReturn('PHPUnit 10.5.1 by Sebastian Bergmann and contributors.');
+            ->willReturn('PHPUnit 10.5.1 by Sebastian Bergmann and contributors.')
+        ;
 
         $expected = '10.5.1';
 
@@ -148,10 +339,12 @@ final class PhpUnitAdapterTest extends TestCase
     ): void {
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shouldProvide');
+            ->method('shouldProvide')
+        ;
 
         $actual = $this->adapter->testsPass($output);
 
@@ -165,48 +358,121 @@ final class PhpUnitAdapterTest extends TestCase
     ): void {
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shouldProvide');
+            ->method('shouldProvide')
+        ;
 
         $actual = $this->adapter->isSyntaxError($output);
 
         $this->assertSame($expected, $actual);
     }
 
-    #[DataProvider('memoryReportProvider')]
-    public function test_it_can_tell_the_memory_usage_from_the_output(
-        string $output,
-        float $expectedResult,
+    #[DataProvider('configurationValidationProvider')]
+    public function test_it_validates_configuration_only_when_supported(
+        string $version,
+        bool $supportsValidation,
     ): void {
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->expects($supportsValidation ? $this->once() : $this->never())
+            ->method('mustRun')
+            ->with([
+                self::PHP_EXECUTABLE,
+                '-d',
+                'memory_limit=512M',
+                '/path/to/phpunit',
+                '--configuration',
+                '/path/to/project/tools/phpunit/phpunit.xml',
+                '--validate-configuration',
+            ])
+            ->willReturn('Configuration is valid.')
+        ;
+
         $this->fileSystemMock
-            ->expects($this->never())
-            ->method('dumpFile');
-        $this->pcovDirectoryProvider
-            ->expects($this->never())
-            ->method('shouldProvide');
+            ->expects($this->once())
+            ->method('dumpFile')
+        ;
 
-        $result = $this->adapter->getMemoryUsed($output);
+        $adapter = $this->createAdapter(
+            '<phpunit/>',
+            version: $version,
+            shellCommandRunner: $shellCommandRunner,
+        );
 
-        $this->assertSame($expectedResult, $result);
+        $command = $adapter->getInitialTestRunCommandLine(
+            extraOptions: '',
+            phpExtraArgs: ['-d', 'memory_limit=512M'],
+            skipCoverage: true,
+        );
+
+        $this->assertNotContains(
+            '--validate-configuration',
+            $command,
+            'The initial test command must run tests after the separate validation command.',
+        );
     }
 
-    public function test_it_provides_initial_run_only_options(): void
+    public function test_it_stops_before_building_the_initial_configuration_when_validation_fails(): void
     {
+        $failure = new SymfonyProcessRuntimeException(
+            'The configuration does not validate against the PHPUnit schema.',
+            42,
+        );
+
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->expects($this->once())
+            ->method('mustRun')
+            ->with([
+                self::PHP_EXECUTABLE,
+                '/path/to/phpunit',
+                '--configuration',
+                '/path/to/project/tools/phpunit/phpunit.xml',
+                '--validate-configuration',
+            ])
+            ->willThrowException($failure)
+        ;
+
         $this->fileSystemMock
             ->expects($this->never())
-            ->method('dumpFile');
-        $this->pcovDirectoryProvider
-            ->expects($this->never())
-            ->method('shouldProvide');
+            ->method('dumpFile')
+        ;
 
-        $options = $this->adapter->getInitialRunOnlyOptions();
-
-        $this->assertSame(
-            ['--configuration', '--filter', '--testsuite'],
-            $options,
+        $adapter = $this->createAdapter(
+            '<phpunit/>',
+            version: '13.2.0',
+            shellCommandRunner: $shellCommandRunner,
         );
+
+        $exception = $this->expectToThrow(
+            static fn () => $adapter->getInitialTestRunCommandLine(
+                extraOptions: '',
+                phpExtraArgs: [],
+                skipCoverage: true,
+            ),
+        );
+
+        $this->assertInstanceOf(InvalidPhpUnitConfiguration::class, $exception);
+        $this->assertSame(
+            'Could not validate the PHPUnit configuration file "/path/to/project/tools/phpunit/phpunit.xml".',
+            $exception->getMessage(),
+        );
+        $this->assertSame(42, $exception->getCode());
+        $this->assertSame($failure, $exception->getPrevious());
+    }
+
+    public static function configurationValidationProvider(): iterable
+    {
+        yield 'older major' => ['12.5.37', false];
+
+        yield 'previous minor' => ['13.1.9', false];
+
+        yield 'first supported version' => ['13.2.0', true];
+
+        yield 'later version' => ['13.3.0', true];
     }
 
     #[DataProvider('initialTestRunProvider')]
@@ -217,16 +483,19 @@ final class PhpUnitAdapterTest extends TestCase
             ->expects($this->once())
             // Checking the content of the dumped XML is out of the scope of this test.
             // It is doable, but would be unnecessarily verbose.
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
 
         $this->pcovDirectoryProvider
             ->expects($scenario->skipCoverage ? $this->never() : $this->once())
             ->method('shouldProvide')
-            ->willReturn($scenario->pcovDirectory !== '');
+            ->willReturn($scenario->pcovDirectory !== '')
+        ;
         $this->pcovDirectoryProvider
             ->expects($this->atMost(1))
             ->method('getDirectory')
-            ->willReturn($scenario->pcovDirectory);
+            ->willReturn($scenario->pcovDirectory)
+        ;
 
         $adapter = $this->createAdapter(
             testFrameworkConfigContent: $scenario->testFrameworkConfigContent,
@@ -255,11 +524,13 @@ final class PhpUnitAdapterTest extends TestCase
         $this->fileSystemMock
             ->expects($this->exactly(2))
             // Checking the content of the dumped XML and generated autoload file is out of the scope of this test.
-            ->method('dumpFile');
+            ->method('dumpFile')
+        ;
 
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shouldProvide');
+            ->method('shouldProvide')
+        ;
 
         $adapter = $this->createAdapter(
             testFrameworkConfigContent: $scenario->testFrameworkConfigContent,
@@ -299,17 +570,6 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['OK, but incomplete, skipped, or risky tests!', false];
 
         yield ['ParseError: syntax error, unexpected ">"', true];
-    }
-
-    public static function memoryReportProvider(): iterable
-    {
-        yield ['Memory: 8.00MB', 8.0];
-
-        yield ['Memory: 68.00MB', 68.0];
-
-        yield ['Memory: 68.00 MB', 68.0];
-
-        yield ['Time: 2.51 seconds', -1.0];
     }
 
     #[DataProvider('executionOrderProvider')]
@@ -1625,7 +1885,12 @@ final class PhpUnitAdapterTest extends TestCase
         bool $executeOnlyCoveringTestCases = false,
         ?string $mapSourceClassToTestStrategy = null,
         ?ShellCommandRunner $shellCommandRunner = null,
+        ?Configuration $configuration = null,
+        ?InitialTestsRunner $initialTestsRunner = null,
+        ?MutantProcessContainerFactory $processFactory = null,
+        ?ConsoleOutput $consoleOutput = null,
     ): PhpUnitAdapter {
+        $configuration ??= ConfigurationBuilder::withMinimalTestData()->build();
         $tmpDir = '/tmp';
         $projectDir = '/path/to/project';
         $testFrameworkConfigDir = '/path/to/project/tools/phpunit';
@@ -1673,6 +1938,23 @@ final class PhpUnitAdapterTest extends TestCase
             $shellCommandRunner ?? $this->createStub(ShellCommandRunner::class),
             new VersionParser(),    // won't be used since we pass the version
             new CommandLineBuilder($this->phpExecutableFinderMock),
+            '/path/to/project/tools/phpunit/phpunit.xml',
+            $consoleOutput ?? $this->createStub(ConsoleOutput::class),
+            new CoverageCheckerFactory(
+                $configuration,
+                JUnitReportLocator::create(
+                    $this->fileSystemMock,
+                    '',
+                ),
+                IndexXmlCoverageLocator::create(
+                    $this->fileSystemMock,
+                    '',
+                ),
+            ),
+            $initialTestsRunner ?? $this->createStub(InitialTestsRunner::class),
+            $configuration,
+            $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
+            new TestFrameworkExtraOptionsFilter(),
             $version,
         );
     }

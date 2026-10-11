@@ -187,7 +187,8 @@ final class MockTeamCityCommandTest extends FileSystemTestCase
             ->cloneWithService(
                 SchemaConfiguration::class,
                 SchemaConfigurationBuilder::withMinimalTestData()->build(),
-            );
+            )
+        ;
 
         $application = new Application($container);
 

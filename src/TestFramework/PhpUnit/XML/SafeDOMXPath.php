@@ -158,6 +158,7 @@ final readonly class SafeDOMXPath
         try {
             $nodes = @$this->xPath->query($query, $contextNode);
         } catch (Error) {
+            // @phpstan-ignore infection.invalidArgumentException (Translate the XPath error directly.)
             throw new InvalidArgumentException(
                 sprintf(
                     'The context node passed for the query "%s" is invalid.',

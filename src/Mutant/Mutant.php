@@ -48,14 +48,13 @@ class Mutant
     /**
      * @param Deferred<string> $mutatedCode
      * @param Deferred<string> $diff
-     * @param Deferred<string> $prettyPrintedOriginalCode
      */
     public function __construct(
         private readonly string $mutantFilePath,
         private readonly Mutation $mutation,
         private readonly Deferred $mutatedCode,
         private readonly Deferred $diff,
-        private readonly Deferred $prettyPrintedOriginalCode,
+        private readonly string $prettyPrintedOriginalCode,
     ) {
     }
 
@@ -77,10 +76,7 @@ class Mutant
         return $this->mutatedCode;
     }
 
-    /**
-     * @return Deferred<string>
-     */
-    public function getPrettyPrintedOriginalCode(): Deferred
+    public function getPrettyPrintedOriginalCode(): string
     {
         return $this->prettyPrintedOriginalCode;
     }

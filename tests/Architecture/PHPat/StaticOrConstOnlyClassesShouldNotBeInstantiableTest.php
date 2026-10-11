@@ -55,6 +55,7 @@ final class StaticOrConstOnlyClassesShouldNotBeInstantiableTest
             ->should()
             ->include()
             ->classes(Selector::classname(CannotBeInstantiated::class))
-            ->because('Const-only and static utility classes should make their non-instantiability explicit.');
+            ->because('Const-only and static utility classes should make their non-instantiability explicit.')
+        ;
     }
 }

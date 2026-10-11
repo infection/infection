@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts\Tracing;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
 /**
- * TODO: this should rather be part of TestFrameworkAdapter.
+ * TODO: this should rather be part of TestFramework.
  *
  * Selects the tracer owned by Infection's built-in adapter implementations.
  *
@@ -56,9 +56,9 @@ final readonly class TestFrameworkTracerFactory
     ) {
     }
 
-    public function create(TestFrameworkAdapter $adapter): Tracer
+    public function create(TestFramework $testFramework): Tracer
     {
-        if ($adapter instanceof PhpUnitAdapter) {
+        if ($testFramework instanceof PhpUnitAdapter) {
             return $this->phpUnitTracer;
         }
 

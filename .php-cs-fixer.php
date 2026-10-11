@@ -136,6 +136,9 @@ return (new Config())
         ],
         'logical_operators' => true,
         'modernize_strpos' => true,
+        'multiline_whitespace_before_semicolons' => [
+            'strategy' => 'new_line_for_chained_calls',
+        ],
         'native_constant_invocation' => true,
         'native_function_invocation' => [
             'include' => ['@internal'],

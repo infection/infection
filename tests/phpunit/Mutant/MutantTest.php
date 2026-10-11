@@ -62,7 +62,7 @@ final class MutantTest extends TestCase
             mutation: $mutation,
             mutatedCode: now($mutatedCode),
             diff: now($diff),
-            prettyPrintedOriginalCode: now($originalCode),
+            prettyPrintedOriginalCode: $originalCode,
         );
 
         $this->assertMutantStateIs(

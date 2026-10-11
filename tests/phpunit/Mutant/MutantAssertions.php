@@ -54,7 +54,7 @@ trait MutantAssertions
             expectedMutation: $expected->getMutation(),
             expectedMutatedCode: $expected->getMutatedCode()->get(),
             expectedDiff: $expected->getDiff()->get(),
-            expectedPrettyPrintedOriginalCode: $expected->getPrettyPrintedOriginalCode()->get(),
+            expectedPrettyPrintedOriginalCode: $expected->getPrettyPrintedOriginalCode(),
         );
     }
 
@@ -70,6 +70,6 @@ trait MutantAssertions
         $this->assertEquals($expectedMutation, $mutant->getMutation());
         $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
         $this->assertSame($expectedDiff, $mutant->getDiff()->get());
-        $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode()->get());
+        $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode());
     }
 }

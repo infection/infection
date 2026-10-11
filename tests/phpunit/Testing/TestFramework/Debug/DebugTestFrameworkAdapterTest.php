@@ -56,7 +56,8 @@ final class DebugTestFrameworkAdapterTest extends TestCase
         $phpExecutableFinder = $this->createStub(PhpExecutableFinder::class);
         $phpExecutableFinder
             ->method('find')
-            ->willReturn('/php');
+            ->willReturn('/php')
+        ;
 
         $this->adapter = new DebugTestFrameworkAdapter(
             '/debug.php',

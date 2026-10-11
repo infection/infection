@@ -1,0 +1,3 @@
+<?php
+
+new \InvalidArgumentException('Expected exception in a test');

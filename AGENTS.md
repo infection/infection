@@ -48,7 +48,7 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
 5. **Artefact collection** - initial test run with coverage
    (`src/Process/OriginalPhpProcess.php` re-enables xdebug/pcov for exactly this child).
    Then coverage-xml + junit.xml are ingested into lazy `Trace` objects
-   (`src/TestFramework/Coverage/`, `src/TestFramework/Tracing/`).
+   (`src/TestFramework/PhpUnit/Tracing/`, `src/TestFramework/Contracts/Tracing/`).
 6. **AST parsing + enrichment** - `src/PhpParser/NodeTraverserFactory.php` runs a single
    ordered visitor stack. It labels eligibility, resolves names, connects parents and next
    statements, attaches reflection and lazy covering-test lookups, and marks unchanged,
@@ -137,6 +137,7 @@ Current ADRs:
 - [`adr/0011-use-phpunit-environment-variable-attribute.md`](adr/0011-use-phpunit-environment-variable-attribute.md) - Use PHPUnit attributes for test environment variables
 - [`adr/0012-final-classes-over-final-docblock.md`](adr/0012-final-classes-over-final-docblock.md) - Prefer `final` to `@final` where possible
 - [`adr/0013-public-api-extension-point-registry.md`](adr/0013-public-api-extension-point-registry.md) - Define the public API through an extension-point registry
+- [`adr/0014-prefer-webmozart-assert-for-argument-validation.md`](adr/0014-prefer-webmozart-assert-for-argument-validation.md) - Prefer Webmozart Assert for argument validation
 <!-- adr-list:end -->
 
 ## Commands
@@ -163,6 +164,51 @@ vendor/phpunit/phpunit/phpunit --filter test_method_name           # one method
 `make autoreview` green is the definition of done - maintainers repeat this verbatim to AI
 contributors. PHP floor is 8.3 (`composer.json` platform); Psalm is gone (2026), the static
 analysers are PHPStan and Mago.
+
+### Docker: when the host toolchain is not enough
+
+Most targets have a `-docker` twin that runs the same target inside the `php83` service from
+`docker-compose.yml` - PHP 8.3 with pcntl and Xdebug, repo bind-mounted at `/opt/infection`:
+
+```bash
+make cs-docker              # = make cs
+make autoreview-docker      # = make _autoreview in php83, then zizmor on the host
+make test-unit-docker       # = make test-unit
+make test-e2e-docker        # e2e with a real coverage driver
+make test-infection-docker  # dogfood with a real coverage driver
+make test-docker            # all of the above
+```
+
+The image pins the settings the suite needs, so the `-docker` twin runs a known-good
+configuration regardless of the host. Reach for the `-docker` twin when:
+
+- **the host `php.ini` may differ from `devTools/`.** The image sets `memory_limit = 512M`
+  (`devTools/memory-limit.ini`) and Xdebug mode off (`devTools/xdebug.ini`). A lower
+  `memory_limit` is not enough for the unit suite - it dies in `justinrainbow/json-schema`,
+  and PHPUnit reports it as `Premature end of PHP process`, which reads like a test bug and is
+  not one. CI never hits this because `setup-php` sets `memory_limit=-1`.
+- **the host PHP is not 8.3.** `cs` and `autoreview` run on 8.3 ONLY in CI, so a check that is
+  green on a newer host can still fail there. PHPStan is the exception - it reads
+  `config.platform.php` from `composer.json` and analyses at 8.3 whatever binary runs it, so
+  the drift is in the runtime: tests, Rector, CS tokenizer edge cases. The test count differs
+  between PHP versions too, because some tests are version-gated.
+- **the host has no Xdebug or PCOV.** `test-e2e` and `test-infection` need a coverage driver;
+  the image ships Xdebug with its mode off, so it costs nothing until Infection turns it on
+  per subprocess via `XDEBUG_MODE=coverage` (`OriginalPhpProcess`).
+- **the host has no PHP at all,** or `composer install` cannot satisfy the platform.
+- **you are reproducing a CI failure** and want the CI PHP version exactly.
+
+`vendor/` is bind-mounted, not rebuilt: dependencies installed by the host work as-is inside
+the container, because `config.platform.php` pins resolution to 8.3.
+
+Do NOT hand-roll `docker compose run --rm php83 make <target>`. The `-docker` targets also
+rebuild the image when `devTools/Dockerfile` changes (via the `devTools/Dockerfile.json`
+stamp), wrap the run in `devTools/flock`, and keep zizmor out of the PHP container. Raw
+`docker compose run --rm php83 <cmd>` is for one-offs with no `-docker` twin only, such as a
+single test file.
+
+Docker is not optional for `make autoreview` either way: zizmor runs as its own compose
+service. `php84` and `php85` services exist for manual version checks; no target uses them.
 
 ## Project coding rules
 
@@ -226,7 +272,7 @@ See `adr/0006`.
 
 Expensive values use `sanmai/later`: `lazy(generatorFn())` returns a memoized `Deferred`.
 It is safe to call `->get()` repeatedly. A raw generator silently yields nothing the second
-time (`src/TestFramework/Coverage/XmlReport/XmlCoverageParser.php`).
+time (`src/TestFramework/PhpUnit/Tracing/XmlReport/XmlCoverageParser.php`).
 Collection flows use `sanmai/pipeline`: `take($x)->filter(...)->cast(...)->toList()`.
 Mind the naming - it can invert your expectation: `cast()` is the strict 1:1 mapper
 (`array_map`); `map()` is 1:N - its callback may yield any number of values per input,
@@ -339,7 +385,7 @@ NodeConnectingVisitor: "next" means next executable statement in the same functi
 `IndexXmlCoverageParser` yields `SourceFileInfoProvider`s (nothing parsed yet); each provider
 lazily loads its per-file XML; test-location extraction defers again behind `later`. All
 coverage XPath queries need the `p:` namespace prefix and go through `SafeDOMXPath`
-(`src/TestFramework/XML/`), which converts libxml false-returns into `InvalidXml`. Format
+(`src/TestFramework/PhpUnit/XML/`), which converts libxml false-returns into `InvalidXml`. Format
 tolerance is ordered fallback ladders with version comments (PHPUnit <6 percentage strings,
 trait vs class methods, four junit XPath shapes for PHPUnit/Codeception/PhpSpec/Behat) - the
 comments citing versions are what keep the next cleanup from deleting a live branch.
@@ -378,9 +424,10 @@ is packaged, not inlined.
 ### 5. Mutant code generation - token positions and an untouched original AST
 
 `MutatorVisitor` matches the target node by `startTokenPos`/`endTokenPos` + node class -
-not file positions, not object identity. `MutantCodeFactory` runs `CloningVisitor` as its
-own pass BEFORE adding `MutatorVisitor` (the original AST must remain byte-identical; a test
-dumps and compares it). Printing is `printFormatPreserving()` against original tokens;
+not file positions, not object identity. `MutantCodeFactory` registers `CloningVisitor`
+BEFORE `MutatorVisitor` in one traversal, so the mutation only replaces nodes of the clone
+(the original AST must remain byte-identical; a test dumps and compares it). Printing is
+`printFormatPreserving()` against original tokens;
 `InfectionPrettyPrinter` overrides exactly one method to stop php-parser canonicalizing
 backslash escapes in single-quoted strings - mutation diffs must be minimal and faithful to
 the original bytes. `Mutation::getHash()` is
@@ -583,7 +630,9 @@ Notes for review:
 - The MSI gate on changed files aims at ~100% but is soft: genuinely unkillable mutants can
   be bypassed BY DISCUSSION - say so in the thread rather than writing a contrived test.
 - Before finishing any task: `make cs`, then `make autoreview`, then the relevant test
-  groups. If CS is wrong, run `make cs` - never hand-edit style.
+  groups. If CS is wrong, run `make cs` - never hand-edit style. If the host PHP is not 8.3,
+  has no coverage driver, or dies with `Premature end of PHP process` (that is an OOM, not a
+  test bug), run the `-docker` twins instead (see Commands).
 
 ## Common high-cost mistakes (Gotchas)
 

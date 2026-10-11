@@ -55,7 +55,8 @@ final class AdapterExtractionBoundariesTest
                 // here, otherwise we would need to be stricter.
                 InfectionSelector::nonSourceCode(),
             )
-            ->because('A future Mago package should stay within its package boundary: the adapter itself, the test framework contracts, shared adapter utilities, and external packages.');
+            ->because('A future Mago package should stay within its package boundary: the adapter itself, the test framework contracts, shared adapter utilities, and external packages.')
+        ;
     }
 
     public function testPHPStanAdapterStaysWithinFuturePackageBoundary(): Rule
@@ -72,7 +73,8 @@ final class AdapterExtractionBoundariesTest
                 // here, otherwise we would need to be stricter.
                 InfectionSelector::nonSourceCode(),
             )
-            ->because('A future PHPStan package should stay within its package boundary: the adapter itself, the test framework contracts, shared adapter utilities, and external packages.');
+            ->because('A future PHPStan package should stay within its package boundary: the adapter itself, the test framework contracts, shared adapter utilities, and external packages.')
+        ;
     }
 
     public function testTestFrameworkContractsStayWithinFuturePackageBoundary(): Rule
@@ -87,7 +89,8 @@ final class AdapterExtractionBoundariesTest
                 // here, otherwise we would need to be stricter.
                 InfectionSelector::nonSourceCode(),
             )
-            ->because('The future test framework contracts package should stay within its package boundary: the contracts themselves and external packages.');
+            ->because('The future test framework contracts package should stay within its package boundary: the contracts themselves and external packages.')
+        ;
     }
 
     public function testPHPUnitAdapterStaysWithinFuturePackageBoundary(): Rule
@@ -104,7 +107,8 @@ final class AdapterExtractionBoundariesTest
                 // here, otherwise we would need to be stricter.
                 InfectionSelector::nonSourceCode(),
             )
-            ->because('A future PHPUnit package should stay within its package boundary: the adapter itself, the test framework contracts, shared adapter utilities, infection/abstract-testframework-adapter, and external packages.');
+            ->because('A future PHPUnit package should stay within its package boundary: the adapter itself, the test framework contracts, shared adapter utilities, infection/abstract-testframework-adapter, and external packages.')
+        ;
     }
 
     public function testTestFrameworkCommonUtilitiesStayWithinFuturePackageBoundary(): Rule
@@ -120,6 +124,7 @@ final class AdapterExtractionBoundariesTest
                 // here, otherwise we would need to be stricter.
                 InfectionSelector::nonSourceCode(),
             )
-            ->because('A future test framework common package should stay within its package boundary: the common utilities themselves, the test framework contracts, and external packages.');
+            ->because('A future test framework common package should stay within its package boundary: the common utilities themselves, the test framework contracts, and external packages.')
+        ;
     }
 }

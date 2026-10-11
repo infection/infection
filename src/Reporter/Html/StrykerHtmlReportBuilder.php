@@ -159,12 +159,14 @@ final readonly class StrykerHtmlReportBuilder
         }, []);
 
         foreach ($uniqueTests as $testLocation) {
-            if (!array_key_exists($testLocation->getFilePath(), $testFiles)) {
-                $testFiles[$testLocation->getFilePath()] = [
+            $filePath = $testLocation->getFilePath() ?? '';
+
+            if (!array_key_exists($filePath, $testFiles)) {
+                $testFiles[$filePath] = [
                     'tests' => [$this->buildTest($testLocation)],
                 ];
             } else {
-                $testFiles[$testLocation->getFilePath()]['tests'][] = $this->buildTest($testLocation);
+                $testFiles[$filePath]['tests'][] = $this->buildTest($testLocation);
             }
         }
 

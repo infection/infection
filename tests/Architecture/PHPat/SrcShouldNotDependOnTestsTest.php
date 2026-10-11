@@ -48,6 +48,7 @@ final class SrcShouldNotDependOnTestsTest
             ->shouldNot()
             ->dependOn()
             ->classes(InfectionSelector::testCode())
-            ->because('Production code under src/ must not depend on tests/ or benchmarks code.');
+            ->because('Production code under src/ must not depend on tests/ or benchmarks code.')
+        ;
     }
 }

@@ -78,7 +78,7 @@ class TestFrameworkFinder
     {
         if (!array_key_exists($testFrameworkName, $this->cachedPath)) {
             if (!$this->shouldUseCustomPath($testFrameworkName, $customPath)) {
-                $this->addVendorBinToPath();
+                $this->addComposerBinToPath();
             }
 
             $this->cachedPath[$testFrameworkName] = realpath($this->findTestFramework($testFrameworkName, $customPath));
@@ -106,27 +106,13 @@ class TestFrameworkFinder
         throw FinderException::testCustomPathDoesNotExist($testFrameworkName, $customPath);
     }
 
-    private function addVendorBinToPath(): void
+    private function addComposerBinToPath(): void
     {
-        $vendorPath = null;
+        $composerBinDir = $this->getComposerBinDir();
 
-        try {
-            $vendorPath = $this->shellCommandRunner->mustRun([
-                ...$this->findComposer(),
-                'config',
-                'bin-dir',
-            ]);
-        } catch (RuntimeException) {
-            $candidate = getcwd() . '/vendor/bin';
-
-            if (file_exists($candidate)) {
-                $vendorPath = $candidate;
-            }
-        }
-
-        if ($vendorPath !== null) {
+        if ($composerBinDir !== null) {
             $pathName = getenv('PATH') !== false ? 'PATH' : 'Path';
-            putenv($pathName . '=' . $vendorPath . PATH_SEPARATOR . getenv($pathName));
+            putenv($pathName . '=' . $composerBinDir . PATH_SEPARATOR . getenv($pathName));
         }
     }
 
@@ -205,5 +191,30 @@ class TestFrameworkFinder
         }
 
         return $path;
+    }
+
+    private function getComposerBinDir(): ?string
+    {
+        try {
+            $binDir = $this->shellCommandRunner->mustRun([
+                ...$this->findComposer(),
+                'config',
+                'bin-dir',
+            ]);
+
+            if ($binDir !== '') {
+                return $binDir;
+            }
+        } catch (RuntimeException) {
+            // Continue
+        }
+
+        $candidate = getcwd() . '/vendor/bin';
+
+        if (file_exists($candidate)) {
+            return $candidate;
+        }
+
+        return null;
     }
 }

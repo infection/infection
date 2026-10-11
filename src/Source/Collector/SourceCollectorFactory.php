@@ -39,7 +39,7 @@ use function get_debug_type;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\Configuration\SourceFilter\SourceFileFilter;
 use Infection\Git\Git;
 use InvalidArgumentException;
 use function sprintf;
@@ -61,7 +61,7 @@ final readonly class SourceCollectorFactory
     public function create(
         string $configurationPathname,
         Source $source,
-        ?SourceFilter $sourceFilter,
+        ?SourceFileFilter $sourceFilter,
     ): SourceCollector {
         return match (true) {
             $sourceFilter instanceof GitDiffFilter => GitDiffSourceCollector::create(
@@ -77,6 +77,7 @@ final readonly class SourceCollectorFactory
                 $source->excludes,
                 $sourceFilter,
             ),
+            // @phpstan-ignore infection.invalidArgumentException (Keep the exhaustive match expression.)
             default => throw new InvalidArgumentException(
                 sprintf(
                     'Unknown source filter "%s".',

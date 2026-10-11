@@ -83,7 +83,7 @@ final class PregQuote implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        if ($node->args[0] instanceof Node\VariadicPlaceholder) {
+        if (!$node->args[0] instanceof Node\Arg) {
             return [];
         }
 

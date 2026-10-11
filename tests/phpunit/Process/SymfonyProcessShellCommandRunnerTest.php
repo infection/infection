@@ -221,7 +221,8 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
             ->withCommand($command)
             ->withStdout('stdout content')
             ->withStderr('stderr content')
-            ->build();
+            ->build()
+        ;
 
         $actual = $this->runner->run($command);
 
@@ -246,7 +247,8 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
         $expected = CompletedProcessBuilder::withMinimalTestData()
             ->withCommand($command)
             ->withStdout(__DIR__ . '|environment|input')
-            ->build();
+            ->build()
+        ;
 
         $this->assertEquals($expected, $result);
     }
@@ -266,7 +268,8 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
             ->withExitCode(7)
             ->withStdout('stdout content')
             ->withStderr('stderr content')
-            ->build();
+            ->build()
+        ;
 
         $this->assertEquals($expected, $result);
     }
@@ -277,7 +280,8 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
 
         $expected = CompletedProcessBuilder::withMinimalTestData()
             ->withCommand($command)
-            ->build();
+            ->build()
+        ;
 
         $this->assertEquals($expected, $this->runner->run($command));
     }

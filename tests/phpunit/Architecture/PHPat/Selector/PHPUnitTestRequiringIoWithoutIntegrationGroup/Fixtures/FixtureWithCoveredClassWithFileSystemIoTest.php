@@ -48,7 +48,8 @@ final class FixtureWithCoveredClassWithFileSystemIoTest extends TestCase
         $fileSystem
             ->method('exists')
             ->with('/path')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
 
         $this->assertTrue(
             (new CoveredClassWithFileSystemIo($fileSystem))->exists('/path'),

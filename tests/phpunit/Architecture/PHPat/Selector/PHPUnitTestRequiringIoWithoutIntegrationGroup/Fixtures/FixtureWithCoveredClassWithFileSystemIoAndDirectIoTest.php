@@ -48,7 +48,8 @@ final class FixtureWithCoveredClassWithFileSystemIoAndDirectIoTest extends TestC
         $fileSystem
             ->method('exists')
             ->with('/path')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $this->assertSame(
             '',

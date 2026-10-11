@@ -61,7 +61,8 @@ final class MakeCustomMutatorCommand extends BaseCommand
         $this
             ->setName('make:mutator')
             ->setDescription('Creates a custom mutator')
-            ->addArgument(self::MUTATOR_NAME_ARGUMENT, InputArgument::REQUIRED);
+            ->addArgument(self::MUTATOR_NAME_ARGUMENT, InputArgument::REQUIRED)
+        ;
     }
 
     protected function interact(InputInterface $input, OutputInterface $output): void
