@@ -48,7 +48,7 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
 5. **Artefact collection** - initial test run with coverage
    (`src/Process/OriginalPhpProcess.php` re-enables xdebug/pcov for exactly this child).
    Then coverage-xml + junit.xml are ingested into lazy `Trace` objects
-   (`src/TestFramework/Coverage/`, `src/TestFramework/Tracing/`).
+   (`src/TestFramework/PhpUnit/Tracing/`, `src/TestFramework/Contracts/Tracing/`).
 6. **AST parsing + enrichment** - `src/PhpParser/NodeTraverserFactory.php` runs a single
    ordered visitor stack. It labels eligibility, resolves names, connects parents and next
    statements, attaches reflection and lazy covering-test lookups, and marks unchanged,
@@ -272,7 +272,7 @@ See `adr/0006`.
 
 Expensive values use `sanmai/later`: `lazy(generatorFn())` returns a memoized `Deferred`.
 It is safe to call `->get()` repeatedly. A raw generator silently yields nothing the second
-time (`src/TestFramework/Coverage/XmlReport/XmlCoverageParser.php`).
+time (`src/TestFramework/PhpUnit/Tracing/XmlReport/XmlCoverageParser.php`).
 Collection flows use `sanmai/pipeline`: `take($x)->filter(...)->cast(...)->toList()`.
 Mind the naming - it can invert your expectation: `cast()` is the strict 1:1 mapper
 (`array_map`); `map()` is 1:N - its callback may yield any number of values per input,
@@ -385,7 +385,7 @@ NodeConnectingVisitor: "next" means next executable statement in the same functi
 `IndexXmlCoverageParser` yields `SourceFileInfoProvider`s (nothing parsed yet); each provider
 lazily loads its per-file XML; test-location extraction defers again behind `later`. All
 coverage XPath queries need the `p:` namespace prefix and go through `SafeDOMXPath`
-(`src/TestFramework/XML/`), which converts libxml false-returns into `InvalidXml`. Format
+(`src/TestFramework/PhpUnit/XML/`), which converts libxml false-returns into `InvalidXml`. Format
 tolerance is ordered fallback ladders with version comments (PHPUnit <6 percentage strings,
 trait vs class methods, four junit XPath shapes for PHPUnit/Codeception/PhpSpec/Behat) - the
 comments citing versions are what keep the next cleanup from deleting a live branch.

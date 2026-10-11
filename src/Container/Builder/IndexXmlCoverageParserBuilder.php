@@ -38,7 +38,7 @@ namespace Infection\Container\Builder;
 use DIContainer\Builder;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\FileSystem;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageParser;
 
 /**
  * @internal

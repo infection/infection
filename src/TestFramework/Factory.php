@@ -52,8 +52,13 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitTestExecutionInfoAdder;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\TestFileDataProvider;
+use Infection\TestFramework\PhpUnit\Tracing\PhpUnitTracer;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
 use InvalidArgumentException;
@@ -89,6 +94,8 @@ final readonly class Factory
         private InitialTestsRunner $initialTestsRunner,
         private MutantProcessContainerFactory $containerFactory,
         private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
+        private PhpUnitXmlCoverageTraceProvider $coverageTraceProvider,
+        private TestFileDataProvider $testFileDataProvider,
     ) {
     }
 
@@ -106,7 +113,19 @@ final readonly class Factory
                 $this->infectionConfig,
                 $this->containerFactory,
                 $this->extraOptionsFilter,
+                $this->createTracer($testFramework->hasJUnitReport()),
             );
+    }
+
+    private function createTracer(bool $hasJUnitReport): Tracer
+    {
+        return new PhpUnitTracer(
+            $this->coverageTraceProvider,
+            new JUnitTestExecutionInfoAdder(
+                $hasJUnitReport,
+                $this->testFileDataProvider,
+            ),
+        );
     }
 
     private function createTestFramework(string $adapterName, bool $skipCoverage): TestFramework|TestFrameworkAdapter
@@ -174,6 +193,7 @@ final readonly class Factory
                         $configuration,
                         $this->containerFactory,
                         $this->extraOptionsFilter,
+                        $this->createTracer(true),
                     )
                     : $factory::create(
                         $this->testFrameworkFinder->find($executableName),

@@ -37,7 +37,7 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use Infection\Configuration\ClassifiedPaths;
 use Infection\Engine;
-use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\TestFileTimeData;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use PHPUnit\Framework\Attributes\CoversClass;

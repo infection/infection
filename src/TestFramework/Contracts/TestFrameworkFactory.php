@@ -39,6 +39,7 @@ use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use SplFileInfo;
@@ -77,6 +78,7 @@ interface TestFrameworkFactory
         Configuration $configuration,
         MutantProcessContainerFactory $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        Tracer $tracer,
     ): TestFramework;
 
     /**

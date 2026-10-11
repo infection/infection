@@ -47,9 +47,13 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitReportLocator;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\TestFileDataProvider;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageParser;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\PhpUnitXmlCoverageTraceProvider;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
@@ -180,6 +184,12 @@ final class FactoryTest extends TestCase
             $this->createStub(InitialTestsRunner::class),
             $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            new PhpUnitXmlCoverageTraceProvider(
+                IndexXmlCoverageLocator::create($fileSystem, ''),
+                new IndexXmlCoverageParser(false, $fileSystem),
+                new XmlCoverageParser($fileSystem),
+            ),
+            $this->createStub(TestFileDataProvider::class),
         );
     }
 }

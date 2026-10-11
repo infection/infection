@@ -37,8 +37,8 @@ namespace Infection\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitReportLocator;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageLocator;
 
 /**
  * @internal

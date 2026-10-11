@@ -44,11 +44,11 @@ use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\TestFramework\Coverage\JUnit\TestNotFound;
-use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
-use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
-use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
-use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use Infection\TestFramework\PhpUnit\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\PhpUnit\Locator\Throwable\ReportLocationThrowable;
+use Infection\TestFramework\PhpUnit\Locator\Throwable\TooManyReportsFound;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\TestNotFound;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\InvalidCoverage;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
 

@@ -43,7 +43,7 @@ use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
 use Infection\FileSystem\FakeFileSystem;
 use Infection\Mutator\Mutator;
-use Infection\TestFramework\Coverage\Locator\FakeLocator;
+use Infection\TestFramework\PhpUnit\Locator\FakeLocator;
 use Infection\Tests\EngineTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

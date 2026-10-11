@@ -41,9 +41,10 @@ use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitReportLocator;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use InvalidArgumentException;
@@ -179,6 +180,7 @@ final class ConfigurableTestFrameworkFactoryTest extends TestCase
             $configuration,
             $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            $this->createStub(Tracer::class),
         );
     }
 }

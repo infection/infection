@@ -165,23 +165,19 @@ use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
-use Infection\TestFramework\Coverage\CoveredTraceProvider;
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
-use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
-use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
-use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitReportLocator;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitTestFileDataProvider;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\MemoizedTestFileDataProvider;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\TestFileDataProvider;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageParser;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\PhpUnitXmlCoverageTraceProvider;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
-use Infection\TestFramework\Tracing\TraceProvider;
-use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
-use Infection\TestFramework\Tracing\Tracer;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
@@ -278,13 +274,7 @@ final class Container extends DIContainer
     {
         $container = new self([
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
-            Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
-                $container->getTraceProvider(),
-            ),
-            TraceProvider::class => static fn (self $container): TraceProvider => new CoveredTraceProvider(
-                $container->getPhpUnitXmlCoverageTraceProvider(),
-                $container->getJUnitTestExecutionInfoAdder(),
-            ),
+            Tracer::class => static fn (self $container): Tracer => $container->getTestFramework()->getTracer(),
             PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
                 $container->getIndexXmlCoverageLocator(),
                 $container->getIndexXmlCoverageParser(),
@@ -322,6 +312,8 @@ final class Container extends DIContainer
                     $container->getInitialTestsRunner(),
                     $container->getMutantProcessContainerFactory(),
                     $container->getTestFrameworkExtraOptionsFilter(),
+                    $container->getPhpUnitXmlCoverageTraceProvider(),
+                    $container->getTestFileDataProvider(),
                 );
             },
             StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
@@ -834,11 +826,6 @@ final class Container extends DIContainer
         return $this->get(Tracer::class);
     }
 
-    public function getTraceProvider(): TraceProvider
-    {
-        return $this->get(TraceProvider::class);
-    }
-
     public function getDiffColorizer(): DiffColorizer
     {
         return $this->get(DiffColorizer::class);
@@ -1241,9 +1228,9 @@ final class Container extends DIContainer
         return $this->get(StaticAnalysisToolFactory::class);
     }
 
-    private function getJUnitTestExecutionInfoAdder(): JUnitTestExecutionInfoAdder
+    private function getTestFileDataProvider(): TestFileDataProvider
     {
-        return $this->get(JUnitTestExecutionInfoAdder::class);
+        return $this->get(MemoizedTestFileDataProvider::class);
     }
 
     private function getPhpUnitXmlCoverageTraceProvider(): PhpUnitXmlCoverageTraceProvider

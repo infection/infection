@@ -44,7 +44,7 @@ use Infection\Framework\Str;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
-use Infection\TestFramework\XML\SafeDOMXPath;
+use Infection\TestFramework\PhpUnit\XML\SafeDOMXPath;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use InvalidArgumentException;
 use function libxml_clear_errors;

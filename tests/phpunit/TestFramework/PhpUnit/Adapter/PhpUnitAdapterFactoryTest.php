@@ -40,11 +40,12 @@ use Infection\FileSystem\FileSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\SymfonyProcessShellCommandRunner;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitReportLocator;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -59,6 +60,8 @@ final class PhpUnitAdapterFactoryTest extends TestCase
     {
         $configuration = ConfigurationBuilder::withMinimalTestData()->build();
         $fileSystem = $this->createStub(FileSystem::class);
+
+        $tracer = $this->createStub(Tracer::class);
 
         $adapter = PhpUnitAdapterFactory::create(
             '/path/to/phpunit',
@@ -86,10 +89,12 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             configuration: $configuration,
             processFactory: $this->createStub(MutantProcessContainerFactory::class),
             testFrameworkExtraOptionsFilter: $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            tracer: $tracer,
         );
 
         $this->assertInstanceOf(PhpUnitAdapter::class, $adapter);
         $this->assertSame('PHPUnit', $adapter->getName());
+        $this->assertSame($tracer, $adapter->getTracer());
     }
 
     public function test_it_has_a_name(): void

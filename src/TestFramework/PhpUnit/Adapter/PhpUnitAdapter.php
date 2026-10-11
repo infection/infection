@@ -55,6 +55,7 @@ use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
@@ -98,6 +99,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         private readonly Configuration $config,
         private readonly MutantProcessContainerFactory $processFactory,
         private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private readonly Tracer $tracer,
         private ?string $version = null,
     ) {
         $this->coverageChecker = $coverageCheckerFactory->create($this);
@@ -290,6 +292,12 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
     public function isSyntaxError(string $output): bool
     {
         return preg_match('/ParseError: syntax error/i', $output) === 1;
+    }
+
+    #[Override]
+    public function getTracer(): Tracer
+    {
+        return $this->tracer;
     }
 
     public function getName(): string

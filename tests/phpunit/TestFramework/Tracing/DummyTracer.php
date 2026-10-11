@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing;
 
-use Infection\TestFramework\Tracing\Trace\EmptyTrace;
-use Infection\TestFramework\Tracing\Trace\Trace;
-use Infection\TestFramework\Tracing\Tracer;
+use Infection\TestFramework\Contracts\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Contracts\Tracing\Trace\Trace;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use SplFileInfo;
 
 final class DummyTracer implements Tracer

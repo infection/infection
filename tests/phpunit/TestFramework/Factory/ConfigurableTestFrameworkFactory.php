@@ -43,6 +43,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Symfony\Component\Filesystem\Filesystem;
@@ -106,6 +107,7 @@ final class ConfigurableTestFrameworkFactory implements TestFrameworkFactory
         Configuration $configuration,
         MutantProcessContainerFactory $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        Tracer $tracer,
     ): TestFramework {
         $testFramework = self::$testFramework;
         Assert::notNull($testFramework, self::NOT_CONFIGURED_MESSAGE);

@@ -40,7 +40,7 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
 use Infection\Source\MatcherLine\NullSourceLineMatcher;
 use Infection\Source\MatcherLine\SourceLineMatcher;
-use Infection\TestFramework\Tracing\Tracer;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\TestFramework\Tracing\DummyTracer;

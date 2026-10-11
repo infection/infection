@@ -42,6 +42,8 @@ use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
@@ -313,6 +315,14 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $this->assertSame($processContainer, $actual);
     }
 
+    public function test_it_provides_its_tracer(): void
+    {
+        $tracer = $this->createStub(Tracer::class);
+        $framework = $this->createTestFramework(tracer: $tracer);
+
+        $this->assertSame($tracer, $framework->getTracer());
+    }
+
     private function createTestFramework(
         ?TestFrameworkAdapter $adapter = null,
         ?ConsoleOutput $consoleOutput = null,
@@ -324,7 +334,8 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         ?string $initialTestsPhpOptions = null,
         string $testFrameworkExtraOptions = '',
         bool $skipCoverage = false,
-    ): LegacyTestFrameworkBridge {
+        ?Tracer $tracer = null,
+    ): TestFramework {
         return new LegacyTestFrameworkBridge(
             adapter: $adapter ?? new FakeAwareAdapter(1.0),
             consoleOutput: $consoleOutput ?? $this->createStub(ConsoleOutput::class),
@@ -338,6 +349,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
                 ->build(),
             processFactory: $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter ?? $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            tracer: $tracer ?? $this->createStub(Tracer::class),
         );
     }
 

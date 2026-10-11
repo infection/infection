@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
-use Infection\TestFramework\XML\SafeDOMXPath;
+use Infection\TestFramework\PhpUnit\XML\SafeDOMXPath;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

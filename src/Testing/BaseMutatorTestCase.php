@@ -47,7 +47,7 @@ use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
-use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Contracts\Tracing\Trace\EmptyTrace;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use const PHP_EOL;
 use PhpParser\Node;

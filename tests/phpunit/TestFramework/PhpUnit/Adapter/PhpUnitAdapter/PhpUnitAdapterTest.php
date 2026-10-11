@@ -49,9 +49,8 @@ use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\Tracing\Tracer;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
@@ -61,6 +60,8 @@ use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\PhpUnit\Tracing\JUnit\JUnitReportLocator;
+use Infection\TestFramework\PhpUnit\Tracing\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -110,6 +111,14 @@ final class PhpUnitAdapterTest extends TestCase
                 <phpunit/>
                 XML,
         );
+    }
+
+    public function test_it_provides_its_tracer(): void
+    {
+        $tracer = $this->createStub(Tracer::class);
+        $adapter = $this->createAdapter('<phpunit/>', tracer: $tracer);
+
+        $this->assertSame($tracer, $adapter->getTracer());
     }
 
     public function test_it_has_a_name(): void
@@ -1889,6 +1898,7 @@ final class PhpUnitAdapterTest extends TestCase
         ?InitialTestsRunner $initialTestsRunner = null,
         ?MutantProcessContainerFactory $processFactory = null,
         ?ConsoleOutput $consoleOutput = null,
+        ?Tracer $tracer = null,
     ): PhpUnitAdapter {
         $configuration ??= ConfigurationBuilder::withMinimalTestData()->build();
         $tmpDir = '/tmp';
@@ -1955,6 +1965,7 @@ final class PhpUnitAdapterTest extends TestCase
             $configuration,
             $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
             new TestFrameworkExtraOptionsFilter(),
+            $tracer ?? $this->createStub(Tracer::class),
             $version,
         );
     }

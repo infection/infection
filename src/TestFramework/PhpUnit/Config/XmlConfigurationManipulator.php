@@ -46,7 +46,7 @@ use function filter_var;
 use function implode;
 use function in_array;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use Infection\TestFramework\XML\SafeDOMXPath;
+use Infection\TestFramework\PhpUnit\XML\SafeDOMXPath;
 use function libxml_clear_errors;
 use const LIBXML_ERR_ERROR;
 use const LIBXML_ERR_FATAL;
