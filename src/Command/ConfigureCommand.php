@@ -37,7 +37,6 @@ namespace Infection\Command;
 
 use Composer\InstalledVersions;
 use function count;
-use function file_exists;
 use const GLOB_ONLYDIR;
 use function implode;
 use Infection\Config\ConsoleHelper;
@@ -47,8 +46,10 @@ use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
 use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
+use Infection\Config\ValueProvider\TimeoutProvider;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\IO;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\InfectionVersion;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -57,7 +58,6 @@ use const JSON_PRETTY_PRINT;
 use const JSON_UNESCAPED_SLASHES;
 use OutOfBoundsException;
 use RuntimeException;
-use function Safe\file_get_contents;
 use function Safe\glob;
 use function Safe\json_decode;
 use function Safe\json_encode;
@@ -67,7 +67,6 @@ use function str_starts_with;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -77,6 +76,12 @@ final class ConfigureCommand extends BaseCommand
     public const string NONINTERACTIVE_MODE_ERROR = 'Infection config generator requires an interactive mode.';
 
     private const string OPTION_TEST_FRAMEWORK = 'test-framework';
+
+    public function __construct(
+        private readonly FileSystem $fileSystem,
+    ) {
+        parent::__construct();
+    }
 
     protected function configure(): void
     {
@@ -92,7 +97,8 @@ final class ConfigureCommand extends BaseCommand
                     implode('", "', TestFrameworkTypes::getTypes()),
                 ),
                 TestFrameworkTypes::PHPUNIT,
-            );
+            )
+        ;
     }
 
     protected function executeCommand(IO $io): bool
@@ -117,13 +123,13 @@ final class ConfigureCommand extends BaseCommand
         $io->newLine();
 
         $dirsInCurrentDir = glob('*', GLOB_ONLYDIR);
-        $testFrameworkConfigLocator = new TestFrameworkConfigLocator('.');
+        $testFrameworkConfigLocator = new TestFrameworkConfigLocator('.', $this->fileSystem);
 
         /** @var QuestionHelper $questionHelper */
         $questionHelper = $this->getHelper('question');
 
-        if (file_exists('composer.json')) {
-            $content = json_decode(file_get_contents('composer.json'));
+        if ($this->fileSystem->exists('composer.json')) {
+            $content = json_decode($this->fileSystem->readFile('composer.json'));
 
             $sourceDirGuesser = new SourceDirGuesser($content);
         } else {
@@ -139,41 +145,47 @@ final class ConfigureCommand extends BaseCommand
             $this->abort();
         }
 
-        $container = $this->getApplication()->getContainer();
-        $fileSystem = $container->getFileSystem();
-
         $excludeDirsProvider = new ExcludeDirsProvider(
             $consoleHelper,
             $questionHelper,
-            $fileSystem,
+            $this->fileSystem,
         );
 
         $excludedDirs = $excludeDirsProvider->get($io, $dirsInCurrentDir, $sourceDirs);
 
-        $phpUnitConfigPathProvider = new TestFrameworkConfigPathProvider($testFrameworkConfigLocator, $consoleHelper, $questionHelper);
+        $phpUnitConfigPathProvider = new TestFrameworkConfigPathProvider($testFrameworkConfigLocator, $consoleHelper, $questionHelper, $this->fileSystem);
         $phpUnitConfigPath = $phpUnitConfigPathProvider->get(
             $io,
             $dirsInCurrentDir,
             $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK),
         );
 
+        $container = $this->getApplication()->getContainer();
+
         $phpUnitExecutableFinder = new TestFrameworkFinder(
             $container->getComposerExecutableFinder(),
             $container->getShellCommandRunner(),
         );
-        $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper);
+        $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper, $this->fileSystem);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($io);
+
+        $timeoutProvider = new TimeoutProvider(
+            $consoleHelper,
+            $questionHelper,
+            $container->getLogger(),
+        );
+        $timeout = $timeoutProvider->get($io);
 
         $textLogFileProvider = new TextLogFileProvider($consoleHelper, $questionHelper);
         $textLogFilePath = $textLogFileProvider->get($io, $dirsInCurrentDir);
 
         $this->saveConfig(
-            $fileSystem,
             $sourceDirs,
             $excludedDirs,
             $phpUnitConfigPath,
             $phpUnitCustomExecutablePath,
             $textLogFilePath,
+            $timeout,
         );
 
         $io->newLine();
@@ -191,12 +203,12 @@ final class ConfigureCommand extends BaseCommand
      * @param string[] $excludedDirs
      */
     private function saveConfig(
-        Filesystem $filesystem,
         array $sourceDirs,
         array $excludedDirs,
         ?string $phpUnitConfigPath = null,
         ?string $phpUnitCustomExecutablePath = null,
         ?string $textLogFilePath = null,
+        ?float $timeout = null,
     ): void {
         $configObject = new stdClass();
 
@@ -212,15 +224,17 @@ final class ConfigureCommand extends BaseCommand
             $configObject->source->excludes = $excludedDirs;
         }
 
+        if ($timeout !== null) {
+            $configObject->timeout = $timeout;
+        }
+
         if ($phpUnitConfigPath !== null) {
             $configObject->phpUnit = new stdClass();
             $configObject->phpUnit->configDir = $phpUnitConfigPath;
         }
 
         if ($phpUnitCustomExecutablePath !== null) {
-            if (!isset($configObject->phpUnit)) {
-                $configObject->phpUnit = new stdClass();
-            }
+            $configObject->phpUnit ??= new stdClass();
 
             $configObject->phpUnit->customPath = $phpUnitCustomExecutablePath;
         }
@@ -239,7 +253,7 @@ final class ConfigureCommand extends BaseCommand
             '@default' => true,
         ];
 
-        $filesystem->dumpFile(
+        $this->fileSystem->dumpFile(
             SchemaConfigurationLoader::DEFAULT_JSON5_CONFIG_FILE,
             json_encode($configObject, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
         );
@@ -254,7 +268,7 @@ final class ConfigureCommand extends BaseCommand
     {
         $fileName = 'vendor/infection/infection/resources/schema.json';
 
-        if (file_exists($fileName)) {
+        if ($this->fileSystem->exists($fileName)) {
             return $fileName;
         }
 

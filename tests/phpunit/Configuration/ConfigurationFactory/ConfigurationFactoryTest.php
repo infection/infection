@@ -209,7 +209,8 @@ final class ConfigurationFactoryTest extends TestCase
     public static function valueProvider(): iterable
     {
         $defaultLogsBuilder = LogsBuilder::withMinimalTestData()
-            ->withUseGitHubAnnotationsLogger(true);
+            ->withUseGitHubAnnotationsLogger(true)
+        ;
         $defaultLogs = $defaultLogsBuilder->build();
 
         $defaultSchema = new SchemaConfiguration(
@@ -339,6 +340,27 @@ final class ConfigurationFactoryTest extends TestCase
                         ->withDebugTestFrameworkLogFile('/path/to/var/processes.jsonl')
                         ->build(),
                 ),
+        ];
+
+        yield 'debug events relative path' => [
+            $defaultScenario->forValueForDebugEventsLogFilePath(
+                'var/debug-events.jsonl',
+                '/path/to/var/debug-events.jsonl',
+            ),
+        ];
+
+        yield 'debug events absolute path' => [
+            $defaultScenario->forValueForDebugEventsLogFilePath(
+                '/var/debug-events.jsonl',
+                '/var/debug-events.jsonl',
+            ),
+        ];
+
+        yield 'debug events output stream' => [
+            $defaultScenario->forValueForDebugEventsLogFilePath(
+                'php://output',
+                'php://output',
+            ),
         ];
 
         yield 'null html file log path' => [
@@ -1511,6 +1533,7 @@ final class ConfigurationFactoryTest extends TestCase
                             ->withUseGitHubAnnotationsLogger(true)
                             ->withStrykerConfig(StrykerConfig::forFullReport('master'))
                             ->withSummaryJsonLogFilePath('/summary.json')
+                            ->withDebugEventsLogFilePath('/debug-events.jsonl')
                             ->build(),
                     )
                     ->withTmpDir('config/tmp')
@@ -1586,6 +1609,7 @@ final class ConfigurationFactoryTest extends TestCase
                             ->withUseGitHubAnnotationsLogger(true)
                             ->withStrykerConfig(StrykerConfig::forFullReport('master'))
                             ->withSummaryJsonLogFilePath('/summary.json')
+                            ->withDebugEventsLogFilePath('/debug-events.jsonl')
                             ->build(),
                     )
                     ->withLogVerbosity(LogVerbosity::NONE)
@@ -1656,17 +1680,15 @@ final class ConfigurationFactoryTest extends TestCase
      */
     private static function getDefaultMutators(): array
     {
-        if (self::$mutators === null) {
-            self::$mutators = SingletonContainer::getContainer()
-                ->getMutatorFactory()
-                ->create(
-                    SingletonContainer::getContainer()
-                        ->getMutatorResolver()
-                        ->resolve(['@default' => true]),
-                    false,
-                )
-            ;
-        }
+        self::$mutators ??= SingletonContainer::getContainer()
+            ->getMutatorFactory()
+            ->create(
+                SingletonContainer::getContainer()
+                    ->getMutatorResolver()
+                    ->resolve(['@default' => true]),
+                false,
+            )
+        ;
 
         return self::$mutators;
     }
@@ -1683,7 +1705,8 @@ final class ConfigurationFactoryTest extends TestCase
         $projectDirectoryProviderStub = $this->createStub(ProjectDirectoryProvider::class);
         $projectDirectoryProviderStub
             ->method('provide')
-            ->willReturn($projectDirectory);
+            ->willReturn($projectDirectory)
+        ;
 
         // Report paths living under a "tests" directory as existing on disk so that the
         // positional-paths scenarios can classify them as test paths, while bare values
@@ -1705,6 +1728,7 @@ final class ConfigurationFactoryTest extends TestCase
             $projectDirectoryProviderStub,
             $cpuCoresCountProvider,
             new PositionalPathsClassifier($fileSystem),
+            new FileSystem(),
         );
     }
 }

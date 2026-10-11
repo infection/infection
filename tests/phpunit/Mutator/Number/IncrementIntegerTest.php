@@ -239,6 +239,19 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
             ),
         ];
 
+        yield 'It does increment a minus one limit argument of a function other than preg_split' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    explode('//', 'string', -1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    explode('//', 'string', -0);
+                    PHP,
+            ),
+        ];
+
         $maxInt = PHP_INT_MAX;
 
         yield 'It does not increment max int' => [

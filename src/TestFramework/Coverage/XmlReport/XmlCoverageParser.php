@@ -83,7 +83,8 @@ class XmlCoverageParser
     {
         $percentage = $xPath
             ->getElement('/p:phpunit/p:file/p:totals/p:lines')
-            ->getAttribute('percent');
+            ->getAttribute('percent')
+        ;
 
         if (self::percentageToFloat($percentage) === .0) {
             return new TestLocations();

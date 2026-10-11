@@ -56,7 +56,8 @@ final class MemoryLimiterTest extends TestCase
         $this->environment
             ->expects($this->once())
             ->method('hasMemoryLimitSet')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $limiter = new MemoryLimiter($this->environment);
         $limiter->recordInitialRunMemoryUsage(20.);
@@ -68,7 +69,8 @@ final class MemoryLimiterTest extends TestCase
     {
         $this->environment
             ->expects($this->never())
-            ->method($this->anything());
+            ->method($this->anything())
+        ;
 
         $limiter = new MemoryLimiter($this->environment);
 
@@ -80,7 +82,8 @@ final class MemoryLimiterTest extends TestCase
         $this->environment
             ->expects($this->once())
             ->method('hasMemoryLimitSet')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
 
         $limiter = new MemoryLimiter($this->environment);
         $limiter->recordInitialRunMemoryUsage(20.);

@@ -57,6 +57,7 @@ final readonly class PHPUnitTestsNotRequiringIoShouldNotBelongToIntegrationGroup
             )
             ->shouldNot()
             ->exist()
-            ->because('PHPUnit tests covering code without detected I/O should not be marked with the integration group.');
+            ->because('PHPUnit tests covering code without detected I/O should not be marked with the integration group.')
+        ;
     }
 }

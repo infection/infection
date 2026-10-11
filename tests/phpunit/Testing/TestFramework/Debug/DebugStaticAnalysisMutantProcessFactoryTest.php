@@ -56,7 +56,8 @@ final class DebugStaticAnalysisMutantProcessFactoryTest extends TestCase
 
         $process = $factory
             ->create(MutantBuilder::withMinimalTestData()->build())
-            ->getProcess();
+            ->getProcess()
+        ;
 
         $this->assertSame(['SHELL_VERBOSITY' => '0'], $process->getEnv());
     }

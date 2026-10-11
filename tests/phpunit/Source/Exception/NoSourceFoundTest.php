@@ -44,6 +44,21 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(NoSourceFound::class)]
 final class NoSourceFoundTest extends TestCase
 {
+    public function test_it_appends_a_hint_to_the_same_exception(): void
+    {
+        $exception = NoSourceFound::noExecutableSourceCode();
+        $trace = $exception->getTrace();
+
+        $actual = $exception->appendHint('Check the configured sources.');
+
+        $this->assertSame($exception, $actual);
+        $this->assertSame(
+            'No source code was executed by the test framework. Check the configured sources.',
+            $actual->getMessage(),
+        );
+        $this->assertSame($trace, $actual->getTrace());
+    }
+
     public function test_it_can_be_created_for_when_no_source_file_was_found_for_a_git_diff(): void
     {
         $expected = new NoSourceFound(
@@ -54,6 +69,24 @@ final class NoSourceFoundTest extends TestCase
         $actual = NoSourceFound::noFilesForGitDiff('AM', '5bb63416f37ab06705b3ff2decdc96051b2989de');
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function test_it_can_be_created_when_modified_files_contain_no_source_file(): void
+    {
+        $previous = NoSourceFound::noSourceFileFound(
+            new PlainFilter(['src/README.md']),
+        );
+
+        $expected = new NoSourceFound(
+            isSourceFiltered: true,
+            message: 'No source file found for the filter applied to the configured sources. The git filter used was: "AM" with the base "main".',
+            previous: $previous,
+        );
+
+        $actual = NoSourceFound::noSourceFileFoundForGitDiff('AM', 'main', $previous);
+
+        $this->assertEquals($expected, $actual);
+        $this->assertSame($previous, $actual->getPrevious());
     }
 
     #[DataProvider('changedLinesDiffProvider')]

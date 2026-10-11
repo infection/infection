@@ -33,62 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\Tests\AutoReview\Rector;
 
-use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Phar;
-use function sprintf;
-use function str_replace;
-use function str_starts_with;
-use function strstr;
-use Webmozart\Assert\Assert;
+use Iterator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
-/**
- * @internal
- */
-abstract class MutationConfigBuilder
+#[CoversClass(VarTagOnParameterToParamTagRector::class)]
+#[Group('integration')]
+final class VarTagOnParameterToParamTagRectorTest extends AbstractRectorTestCase
 {
-    /**
-     * @param TestLocation[] $tests
-     */
-    abstract public function build(
-        array $tests,
-        string $mutantFilePath,
-        string $mutationHash,
-        string $mutationOriginalFilePath,
-        string $version,
-    ): string;
-
-    protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutantFilePath): string
+    #[DataProvider('provideFixtures')]
+    public function test_it_moves_var_tags_to_the_method(string $fixture): void
     {
-        $infectionPhar = '';
-
-        if (str_starts_with(__FILE__, 'phar:')) {
-            $infectionPhar = sprintf(
-                '\Phar::loadPhar("%s", "%s");',
-                str_replace('phar://', '', Phar::running(true)),
-                'infection.phar',
-            );
-        }
-
-        $namespacePrefix = $this->getInterceptorNamespacePrefix();
-
-        return <<<CONTENT
-            {$infectionPhar}
-            require_once '{$interceptorPath}';
-
-            use {$namespacePrefix}Infection\StreamWrapper\IncludeInterceptor;
-
-            IncludeInterceptor::intercept('{$originalFilePath}', '{$mutantFilePath}');
-            IncludeInterceptor::enable();
-            CONTENT;
+        $this->doTestFile($fixture);
     }
 
-    private function getInterceptorNamespacePrefix(): string
+    public static function provideFixtures(): Iterator
     {
-        $prefix = strstr(__NAMESPACE__, 'Infection', true);
-        Assert::string($prefix);
+        return self::yieldFilesFromDirectory(__DIR__ . '/Fixture');
+    }
 
-        return $prefix;
+    public function provideConfigFilePath(): string
+    {
+        return __DIR__ . '/config/configured_rule.php';
     }
 }

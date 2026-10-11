@@ -7,7 +7,7 @@ namespace Infection\Tests\Fixtures\TestFramework;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\UnsupportedTestFrameworkVersion;
 
-final class DummyTestFrameworkAdapter implements TestFrameworkAdapter
+class DummyTestFrameworkAdapter implements TestFrameworkAdapter
 {
     public function getName(): string
     {

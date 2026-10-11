@@ -69,10 +69,11 @@ final class InitialTestsExecutionLoggerSubscriberTest extends TestCase
     {
         $this->loggerMock
             ->expects($this->once())
-            ->method('start');
+            ->method('start')
+        ;
 
         $this->dispatcher->dispatch(
-            new InitialTestSuiteWasStarted(),
+            new InitialTestSuiteWasStarted('<command line>'),
         );
     }
 
@@ -80,7 +81,8 @@ final class InitialTestsExecutionLoggerSubscriberTest extends TestCase
     {
         $this->loggerMock
             ->expects($this->once())
-            ->method('advance');
+            ->method('advance')
+        ;
 
         $this->dispatcher->dispatch(
             new InitialTestCaseWasCompleted(),
@@ -92,7 +94,8 @@ final class InitialTestsExecutionLoggerSubscriberTest extends TestCase
         $this->loggerMock
             ->expects($this->once())
             ->method('finish')
-            ->with($this->identicalTo('output'));
+            ->with($this->identicalTo('output'))
+        ;
 
         $this->dispatcher->dispatch(
             new InitialTestSuiteWasFinished(

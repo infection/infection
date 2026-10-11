@@ -47,6 +47,7 @@ final class SourceClassesShouldNotExposePublicPropertiesTest
             ->classes(InfectionSelector::sourceClassWithPublicNonReadonlyProperty())
             ->shouldNot()
             ->exist()
-            ->because('Source classes should use getters instead of public properties.');
+            ->because('Source classes should use getters instead of public properties.')
+        ;
     }
 }

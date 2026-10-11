@@ -61,7 +61,8 @@ final class ConsoleProgressBarLoggerTest extends TestCase
         $this->outputMock
             ->expects($this->once())
             ->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+            ->willReturn(OutputInterface::VERBOSITY_QUIET)
+        ;
         $this->outputMock
             ->expects($this->once())
             ->method('writeln')
@@ -69,7 +70,8 @@ final class ConsoleProgressBarLoggerTest extends TestCase
                 '',
                 'Generate mutants...',
                 '',
-            ]);
+            ])
+        ;
 
         $this->logger->start(10);
     }

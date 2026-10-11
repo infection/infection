@@ -146,7 +146,8 @@ final class Analyser
                 $ioCodeDetectorVisitor,
                 $environmentVariableUsageVisitor,
             )
-            ->traverse($nodes);
+            ->traverse($nodes)
+        ;
 
         return new AnalysisResult(
             hasTrivialImplementation: !($meaningfulImplementationVisitor?->hasMeaningfulImplementation() ?? true),

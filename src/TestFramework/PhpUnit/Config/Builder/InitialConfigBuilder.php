@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
-use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\XML\SafeDOMXPath;
@@ -48,7 +48,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final readonly class InitialConfigBuilder implements ConfigBuilder
+final readonly class InitialConfigBuilder
 {
     private string $originalXmlConfigContent;
 
@@ -72,6 +72,9 @@ final readonly class InitialConfigBuilder implements ConfigBuilder
         $this->originalXmlConfigContent = $originalXmlConfigContent;
     }
 
+    /**
+     * @throws InvalidPhpUnitConfiguration
+     */
     public function build(string $version): string
     {
         $path = $this->buildPath();
@@ -82,7 +85,11 @@ final readonly class InitialConfigBuilder implements ConfigBuilder
             formatOutput: true,
         );
 
-        $this->configManipulator->validate($path, $xPath);
+        $this->configManipulator->validate(
+            $version,
+            $path,
+            $xPath,
+        );
 
         $this->addCoverageNodes($version, $xPath);
         $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);
@@ -174,7 +181,8 @@ final readonly class InitialConfigBuilder implements ConfigBuilder
         if ($count === 0) {
             $xPath
                 ->getElement('/phpunit')
-                ->setAttribute($attribute, $value);
+                ->setAttribute($attribute, $value)
+            ;
 
             return true;
         }

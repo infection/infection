@@ -46,17 +46,13 @@ use Symfony\Component\Process\Process;
  */
 class InitialTestsRunProcessFactory
 {
-    public function __construct(
-        private readonly TestFrameworkAdapter $testFrameworkAdapter,
-    ) {
-    }
-
     /**
      * Creates process with enabled debugger as test framework is going to use in the code coverage.
      *
      * @param string[] $phpExtraOptions
      */
     public function createProcess(
+        TestFrameworkAdapter $testFrameworkAdapter,
         string $testFrameworkExtraOptions,
         array $phpExtraOptions,
         bool $skipCoverage,
@@ -65,7 +61,7 @@ class InitialTestsRunProcessFactory
         $processClass = $skipCoverage ? Process::class : OriginalPhpProcess::class;
 
         return new $processClass(
-            command: $this->testFrameworkAdapter->getInitialTestRunCommandLine(
+            command: $testFrameworkAdapter->getInitialTestRunCommandLine(
                 $testFrameworkExtraOptions,
                 $phpExtraOptions,
                 $skipCoverage,

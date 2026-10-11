@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing\Tracer;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\FileSystem;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
@@ -121,10 +121,11 @@ final class TracerIntegrationTest extends TestCase
         string $indexXmlPath,
         ?string $junitXmlPath,
     ): Tracer {
-        $testFrameworkAdapterStub = $this->createStub(TestFrameworkAdapter::class);
-        $testFrameworkAdapterStub
+        $testFrameworkStub = $this->createStub(TestFramework::class);
+        $testFrameworkStub
             ->method('hasJUnitReport')
-            ->willReturn($junitXmlPath !== null);
+            ->willReturn($junitXmlPath !== null)
+        ;
 
         $junitFileDataProvider = $junitXmlPath === null
             ? new FakeTestFileDataProvider()
@@ -149,7 +150,7 @@ final class TracerIntegrationTest extends TestCase
                     ),
                 ),
                 new JUnitTestExecutionInfoAdder(
-                    $testFrameworkAdapterStub,
+                    $testFrameworkStub,
                     $junitFileDataProvider,
                 ),
             ),
@@ -163,10 +164,12 @@ final class TracerIntegrationTest extends TestCase
         $fileSystemStub = $this->createStub(FileSystem::class);
         $fileSystemStub
             ->method('isReadableFile')
-            ->willReturnCallback($fileSystem->isReadableFile(...));
+            ->willReturnCallback($fileSystem->isReadableFile(...))
+        ;
         $fileSystemStub
             ->method('readFile')
-            ->willReturnCallback($fileSystem->readFile(...));
+            ->willReturnCallback($fileSystem->readFile(...))
+        ;
 
         // We are only interested in mocking the realPath check!
         // In this test, we do not ~~need~~ want to check that the source file exists as this
@@ -176,7 +179,8 @@ final class TracerIntegrationTest extends TestCase
         // source file is the one we expect.
         $fileSystemStub
             ->method('realPath')
-            ->willReturnCallback(static fn (string $path): string => $path);
+            ->willReturnCallback(static fn (string $path): string => $path)
+        ;
 
         return $fileSystemStub;
     }

@@ -48,7 +48,6 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
 /**
  * @internal
@@ -82,6 +81,8 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
     {
         // TODO: check supported version
 
+        $this->coverageChecker->checkCoverageRequirements();
+
         if ($this->config->skipInitialTests) {
             $this->consoleOutput->logSkippingInitialTests();
             $this->coverageChecker->checkCoverageExists();
@@ -91,6 +92,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
     public function executeInitialRun(): InitialRunResults
     {
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
+            $this->adapter,
             $this->config->testFrameworkExtraOptions,
             $this->getInitialTestsPhpOptionsArray(),
             $this->config->skipCoverage,
@@ -114,28 +116,24 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
             ? $this->adapter->getMemoryUsed($output)
             : null;
 
-        $results = new InitialRunResults(
+        return new InitialRunResults(
             output: $output,
             memoryUsage: $memoryUsage === -1. ? null : $memoryUsage,
         );
-
-        // TODO: this can be removed once we migrated the PHPUnitAdapter to TestFramework.
-        //  Indeed, it is only used by PHPUnit and the counter part (setting the memory limit
-        //  of the mutant process) can only be done within the adapter.
-        //  Third-party test frameworks like PhpSpec cannot leverage this feature anymore.
-        if ($this->adapter instanceof PhpUnitAdapter) {
-            $this->adapter->recordInitialRunMemoryUsage($results->memoryUsage);
-        }
-
-        return $results;
     }
 
     public function test(Mutant $mutant): MutantProcessContainer
     {
         return $this->processFactory->create(
+            $this->adapter,
             $mutant,
             $this->getFilteredExtraOptionsForMutant(),
         );
+    }
+
+    public function hasJUnitReport(): bool
+    {
+        return $this->adapter->hasJUnitReport();
     }
 
     /**

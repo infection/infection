@@ -38,6 +38,7 @@ namespace Infection\Tests\Config\ValueProvider;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
 use Infection\Console\IO;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -46,26 +47,29 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
 use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(PhpUnitCustomExecutablePathProvider::class)]
 final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
 {
-    private const string VALID_PHPUNIT_EXECUTABLE = __DIR__ . '/../../../../vendor/bin/phpunit';
+    private const string CUSTOM_PHPUNIT_EXECUTABLE = '/path/to/vendor/bin/phpunit';
 
     private MockObject&TestFrameworkFinder $finderMock;
+
+    private MockObject&FileSystem $fileSystemMock;
 
     private PhpUnitCustomExecutablePathProvider $provider;
 
     protected function setUp(): void
     {
         $this->finderMock = $this->createMock(TestFrameworkFinder::class);
+        $this->fileSystemMock = $this->createMock(FileSystem::class);
 
         $this->provider = new PhpUnitCustomExecutablePathProvider(
             $this->finderMock,
             $this->createStub(ConsoleHelper::class),
             $this->getQuestionHelper(),
+            $this->fileSystemMock,
         );
     }
 
@@ -74,7 +78,13 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
         $this->finderMock
             ->expects($this->once())
             ->method('find')
-            ->with(TestFrameworkTypes::PHPUNIT);
+            ->with(TestFrameworkTypes::PHPUNIT)
+        ;
+
+        $this->fileSystemMock
+            ->expects($this->never())
+            ->method('exists')
+        ;
 
         $this->assertNull(
             $this->provider->get(new IO(
@@ -90,16 +100,22 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
             ->expects($this->once())
             ->method('find')
             ->with(TestFrameworkTypes::PHPUNIT)
-            ->willThrowException(new FinderException());
+            ->willThrowException(new FinderException())
+        ;
 
-        $customExecutable = Path::canonicalize(self::VALID_PHPUNIT_EXECUTABLE);
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('exists')
+            ->with(self::CUSTOM_PHPUNIT_EXECUTABLE)
+            ->willReturn(true)
+        ;
 
         $path = $this->provider->get(new IO(
-            $this->createStreamableInput($this->getInputStream("{$customExecutable}\n")),
+            $this->createStreamableInput($this->getInputStream(self::CUSTOM_PHPUNIT_EXECUTABLE . "\n")),
             $this->createStreamOutput(),
         ));
 
-        $this->assertSame($customExecutable, $path);
+        $this->assertSame(self::CUSTOM_PHPUNIT_EXECUTABLE, $path);
     }
 
     public function test_validates_incorrect_dir(): void
@@ -112,7 +128,15 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
             ->expects($this->once())
             ->method('find')
             ->with(TestFrameworkTypes::PHPUNIT)
-            ->willThrowException(new FinderException());
+            ->willThrowException(new FinderException())
+        ;
+
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('exists')
+            ->with('abc')
+            ->willReturn(false)
+        ;
 
         $this->expectException(SymfonyRuntimeException::class);
 

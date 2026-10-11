@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+namespace InfectionRuleFixture;
+
+use InvalidArgumentException;
+use InvalidArgumentException as InvalidArgument;
+
+new InvalidArgumentException('Imported');
+new \InvalidArgumentException('Fully qualified');
+new InvalidArgument('Aliased');
+new \RuntimeException('Other exception');
+new DomainError('Domain exception');
+new class extends InvalidArgumentException {};
+
+interface DomainFailure extends \Throwable {}
+
+// Assert would lose the marker interface that callers can catch.
+final class DomainError extends InvalidArgumentException implements DomainFailure {}

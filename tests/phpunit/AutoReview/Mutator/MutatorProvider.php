@@ -74,23 +74,19 @@ final class MutatorProvider
 
     public static function provideMutatorClasses(): iterable
     {
-        if (self::$mutatorClasses === null) {
-            self::$mutatorClasses = array_column(
-                iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), true),
-                1,
-            );
-        }
+        self::$mutatorClasses ??= array_column(
+            iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), true),
+            1,
+        );
 
         yield from self::$mutatorClasses;
     }
 
     public static function provideConcreteMutatorClasses(): iterable
     {
-        if (self::$concreteMutatorClasses === null) {
-            self::$concreteMutatorClasses = ConcreteClassReflector::filterByConcreteClasses(
-                iterator_to_array(self::provideMutatorClasses(), false),
-            );
-        }
+        self::$concreteMutatorClasses ??= ConcreteClassReflector::filterByConcreteClasses(
+            iterator_to_array(self::provideMutatorClasses(), false),
+        );
 
         yield from self::$concreteMutatorClasses;
     }

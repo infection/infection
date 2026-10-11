@@ -33,12 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\Source\MatcherLine;
+
+use Infection\Source\Exception\NoSourceFound;
 
 /**
+ * Determines whether a specific line range in a file matches certain criteria.
+ *
  * @internal
  */
-interface InitialConfigBuilder
+interface SourceLineMatcher
 {
-    public function build(string $version): string;
+    /**
+     * Checks whether the specified line range in the given file matches the
+     * criteria defined by this matcher.
+     *
+     * @param string $fileRealPath Absolute path to the file to check.
+     * @param positive-int $startLine Starting line number of the range (inclusive).
+     * @param positive-int $endLine Ending line number of the range (inclusive).
+     *
+     * @throws NoSourceFound
+     */
+    public function touches(string $fileRealPath, int $startLine, int $endLine): bool;
 }

@@ -159,6 +159,7 @@ final class Scenario
         return SchemaConfigurationBuilder::withMinimalTestData()
             ->withPathname('/project/infection.json5')
             ->withSource(new Source($sourceDirectories, []))
-            ->build();
+            ->build()
+        ;
     }
 }

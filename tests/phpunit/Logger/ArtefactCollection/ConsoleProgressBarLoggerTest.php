@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\ArtefactCollection;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
+use Infection\TestFramework\Contracts\TestFramework;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -51,23 +51,25 @@ final class ConsoleProgressBarLoggerTest extends TestCase
 {
     private OutputInterface&MockObject $outputMock;
 
-    private TestFrameworkAdapter&MockObject $testFrameworkMock;
+    private TestFramework&MockObject $testFrameworkMock;
 
     protected function setUp(): void
     {
         $this->outputMock = $this->createMock(OutputInterface::class);
-        $this->testFrameworkMock = $this->createMock(TestFrameworkAdapter::class);
+        $this->testFrameworkMock = $this->createMock(TestFramework::class);
     }
 
     public function test_it_logs_the_start(): void
     {
         $this->outputMock
             ->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+            ->willReturn(OutputInterface::VERBOSITY_QUIET)
+        ;
 
         $this->testFrameworkMock
             ->expects($this->once())
-            ->method('getVersion');
+            ->method('getVersion')
+        ;
 
         $this->createLogger(debug: false)->start();
     }
@@ -81,18 +83,22 @@ final class ConsoleProgressBarLoggerTest extends TestCase
                 '',
                 'Running initial tests with PHPUnit version unknown',
                 '',
-            ]);
+            ])
+        ;
         $this->outputMock
             ->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+            ->willReturn(OutputInterface::VERBOSITY_QUIET)
+        ;
 
         $this->testFrameworkMock
             ->expects($this->once())
             ->method('getName')
-            ->willReturn('PHPUnit');
+            ->willReturn('PHPUnit')
+        ;
         $this->testFrameworkMock
             ->method('getVersion')
-            ->willThrowException(new InvalidArgumentException());
+            ->willThrowException(new InvalidArgumentException())
+        ;
 
         $this->createLogger(debug: false)->start();
     }
@@ -104,11 +110,13 @@ final class ConsoleProgressBarLoggerTest extends TestCase
         $this->outputMock
             ->expects($this->once())
             ->method('writeln')
-            ->with('');
+            ->with('')
+        ;
 
         $this->outputMock
             ->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+            ->willReturn(OutputInterface::VERBOSITY_QUIET)
+        ;
 
         $this->createLogger(debug: false)->finish($testOutput);
     }
@@ -119,11 +127,13 @@ final class ConsoleProgressBarLoggerTest extends TestCase
 
         $this->outputMock
             ->expects($this->exactly(2))
-            ->method('writeln');
+            ->method('writeln')
+        ;
 
         $this->outputMock
             ->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+            ->willReturn(OutputInterface::VERBOSITY_QUIET)
+        ;
 
         $this->createLogger(debug: true)->finish($testOutput);
     }

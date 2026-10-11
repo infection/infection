@@ -58,7 +58,8 @@ final class FileWriterTest extends TestCase
         $fileSystemMock
             ->expects($this->once())
             ->method('dumpFile')
-            ->with($filePath, $expected);
+            ->with($filePath, $expected)
+        ;
 
         $writer = new FileWriter(
             $fileSystemMock,

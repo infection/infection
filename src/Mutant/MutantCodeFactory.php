@@ -56,12 +56,9 @@ class MutantCodeFactory
         $traverser = new NodeTraverser();
 
         $traverser->addVisitor(new CloningVisitor());
-
-        $newStatements = $traverser->traverse($mutation->getOriginalFileAst());
-
         $traverser->addVisitor(new MutatorVisitor($mutation));
 
-        $mutatedStatements = $traverser->traverse($newStatements);
+        $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
 
         return $this->mutatedCodePrinter->print($mutatedStatements, $mutation);
     }

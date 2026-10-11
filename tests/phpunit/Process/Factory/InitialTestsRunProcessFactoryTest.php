@@ -53,7 +53,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
     {
         $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
 
-        $this->factory = new InitialTestsRunProcessFactory($this->testFrameworkAdapterMock);
+        $this->factory = new InitialTestsRunProcessFactory();
     }
 
     public function test_it_creates_a_process_with_coverage_skipped(): void
@@ -68,6 +68,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
         ;
 
         $process = $this->factory->createProcess(
+            $this->testFrameworkAdapterMock,
             $testFrameworkExtraOptions,
             $phpExtraOptions,
             true,
@@ -97,6 +98,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
         ;
 
         $process = $this->factory->createProcess(
+            $this->testFrameworkAdapterMock,
             $testFrameworkExtraOptions,
             $phpExtraOptions,
             false,

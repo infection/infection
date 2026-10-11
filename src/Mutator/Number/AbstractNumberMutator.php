@@ -79,8 +79,7 @@ abstract class AbstractNumberMutator implements Mutator
         return $node instanceof Node\Expr\BinaryOp\Greater
             || $node instanceof Node\Expr\BinaryOp\GreaterOrEqual
             || $node instanceof Node\Expr\BinaryOp\Smaller
-            || $node instanceof Node\Expr\BinaryOp\SmallerOrEqual
-        ;
+            || $node instanceof Node\Expr\BinaryOp\SmallerOrEqual;
     }
 
     private function isComparison(?Node $node): bool
@@ -97,7 +96,6 @@ abstract class AbstractNumberMutator implements Mutator
             || $node instanceof Node\Expr\BinaryOp\NotIdentical
             || $node instanceof Node\Expr\BinaryOp\Equal
             || $node instanceof Node\Expr\BinaryOp\NotEqual
-            || $this->isSizeNode($node)
-        ;
+            || $this->isSizeNode($node);
     }
 }

@@ -131,7 +131,7 @@ final class Application extends BaseApplication
         return array_merge(
             parent::getDefaultCommands(),
             [
-                new ConfigureCommand(),
+                new ConfigureCommand($fileSystem),
                 new MockTeamCityCommand($fileSystem),
                 new DumpAstCommand($fileSystem),
                 new GitBaseReferenceCommand(),

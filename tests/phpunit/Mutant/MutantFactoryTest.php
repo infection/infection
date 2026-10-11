@@ -78,7 +78,8 @@ final class MutantFactoryTest extends TestCase
     {
         $mutation = MutationBuilder::withMinimalTestData()
             ->withOriginalFileContent('original code')
-            ->build();
+            ->build()
+        ;
 
         $expectedMutantFilePath = sprintf(
             '/path/to/tmp/mutant.%s.infection.php',

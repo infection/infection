@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config;
 
 use function array_filter;
+use function array_key_exists;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
@@ -43,8 +44,10 @@ use function explode;
 use const FILTER_VALIDATE_URL;
 use function filter_var;
 use function implode;
+use function in_array;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\XML\SafeDOMXPath;
+use function libxml_clear_errors;
 use const LIBXML_ERR_ERROR;
 use const LIBXML_ERR_FATAL;
 use const LIBXML_ERR_WARNING;
@@ -61,6 +64,20 @@ use Webmozart\Assert\Assert;
  */
 final readonly class XmlConfigurationManipulator
 {
+    /**
+     * The `executionOrder` components PHPUnit 13.3+ reports a test runner warning for when the
+     * recording of the test run history is disabled https://github.com/sebastianbergmann/phpunit/blob/13.3.0/src/TextUI/Application.php.
+     * `duration` is the deprecated alias of `duration-ascending`.
+     *
+     * @var list<non-empty-string>
+     */
+    private const array EXECUTION_ORDERS_REQUIRING_TEST_RUN_HISTORY = [
+        'defects',
+        'duration',
+        'duration-ascending',
+        'duration-descending',
+    ];
+
     public function __construct(
         private PathReplacer $pathReplacer,
         private string $phpUnitConfigDir,
@@ -108,8 +125,7 @@ final readonly class XmlConfigurationManipulator
 
         $this->setAttributeValue($xPath, 'recordTestRunHistory', 'false');
 
-        // Ordering tests by defects requires the test run history which is deactivated right above. PHPUnit ignored that combination silently until 13.3 turned it into a test runner warning, which aborts the initial run because of failOnWarning https://github.com/sebastianbergmann/phpunit/blob/13.3.0/src/TextUI/Application.php
-        $this->removeDefectsFromExecutionOrder($xPath);
+        $this->removeExecutionOrdersRequiringTestRunHistory($xPath);
     }
 
     public function handleResultCacheAndExecutionOrder(string $version, SafeDOMXPath $xPath, string $mutationHash, string $tmpDir): void
@@ -202,32 +218,27 @@ final readonly class XmlConfigurationManipulator
         $this->addOrUpdateCoverageNodes('source', 'include', $xPath, $srcDirs, $filteredSourceFilesToMutate);
     }
 
-    // TODO: fix return type... There is no point in returning true if we
-    //   never return false.
-    public function validate(string $configPath, SafeDOMXPath $xPath): true
-    {
+    /**
+     * @throws InvalidPhpUnitConfiguration
+     */
+    public function validate(
+        string $version,
+        string $configPath,
+        SafeDOMXPath $xPath,
+    ): void {
         if ($xPath->queryCount('/phpunit') === 0) {
             throw InvalidPhpUnitConfiguration::byRootNode($configPath);
         }
 
         if ($xPath->queryCount('namespace::xsi') === 0) {
-            return true;
+            return;
         }
 
-        $schema = $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue;
-
-        $original = libxml_use_internal_errors(true);
-
-        if ($schema !== null && !$xPath->document->schemaValidate($this->buildSchemaPath($schema))) {
-            throw InvalidPhpUnitConfiguration::byXsdSchema(
-                $configPath,
-                $this->getXmlErrorsString(),
-            );
-        }
-
-        libxml_use_internal_errors($original);
-
-        return true;
+        $this->validateAgainstSchemaIfNecessary(
+            $version,
+            $configPath,
+            $xPath,
+        );
     }
 
     public function removeDefaultTestSuite(SafeDOMXPath $xPath): void
@@ -246,6 +257,71 @@ final readonly class XmlConfigurationManipulator
 
         $this->addAttributeIfNotSet('failOnRisky', 'true', $xPath);
         $this->addAttributeIfNotSet('failOnWarning', 'true', $xPath);
+    }
+
+    /**
+     * @throws InvalidPhpUnitConfiguration
+     */
+    private function validateAgainstSchemaIfNecessary(
+        string $version,
+        string $configPath,
+        SafeDOMXPath $xPath,
+    ): void {
+        // PHPUnit 9 and older only print schema errors and can exit successfully even with
+        // failOnWarning enabled. PHPUnit 10+ reports them as test runner warnings, which
+        // fail Infection's initial run, so avoid resolving external schemas for those versions.
+        if (self::isPhpUnit10OrHigher($version)) {
+            return;
+        }
+
+        $this->validateAgainstSchema(
+            $configPath,
+            $xPath->document,
+            $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue,
+        );
+    }
+
+    private static function isPhpUnit10OrHigher(string $version): bool
+    {
+        static $versions = [];
+
+        if (!array_key_exists($version, $versions)) {
+            $versions[$version] = version_compare(
+                $version,
+                '10.0',
+                '>=',
+            );
+        }
+
+        return $versions[$version];
+    }
+
+    /**
+     * @throws InvalidPhpUnitConfiguration
+     */
+    private function validateAgainstSchema(
+        string $configPath,
+        DOMDocument $document,
+        ?string $schema,
+    ): void {
+        $original = libxml_use_internal_errors(true);
+
+        try {
+            libxml_clear_errors();
+
+            if (
+                $schema !== null
+                && !$document->schemaValidate($this->buildSchemaPath($schema))
+            ) {
+                throw InvalidPhpUnitConfiguration::byXsdSchema(
+                    $configPath,
+                    $this->getXmlErrorsString(),
+                );
+            }
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($original);
+        }
     }
 
     /**
@@ -345,10 +421,18 @@ final readonly class XmlConfigurationManipulator
     }
 
     /**
-     * The `defects` component of `executionOrder` is orthogonal to the other ones, so dropping it
-     * leaves the meaning of the remaining components untouched.
+     * Ordering tests by defects or by duration requires the test run history, which the initial run
+     * configuration disables since there is nothing to order by before the first run. PHPUnit ignored
+     * that combination silently until 13.3 turned it into a test runner warning, which aborts the
+     * initial run because of failOnWarning https://github.com/sebastianbergmann/phpunit/blob/13.3.0/src/TextUI/Application.php
+     *
+     * Dropping these components is safe because PHPUnit parses the components of `executionOrder`
+     * independently from each other: `defects` only sets the defects-first flag, `depends`/`no-depends`
+     * only set the dependency resolution and the remaining ones set the order itself. The meaning of
+     * the other components is hence untouched; without an order component PHPUnit falls back to its
+     * default order.
      */
-    private function removeDefectsFromExecutionOrder(SafeDOMXPath $xPath): void
+    private function removeExecutionOrdersRequiringTestRunHistory(SafeDOMXPath $xPath): void
     {
         $node = $xPath->queryAttribute('/phpunit/@executionOrder');
 
@@ -358,7 +442,7 @@ final readonly class XmlConfigurationManipulator
 
         $orders = array_filter(
             explode(',', (string) $node->nodeValue),
-            static fn (string $order): bool => $order !== 'defects',
+            static fn (string $order): bool => !in_array($order, self::EXECUTION_ORDERS_REQUIRING_TEST_RUN_HISTORY, true),
         );
 
         $node->nodeValue = $orders === [] ? 'default' : implode(',', $orders);
@@ -386,14 +470,16 @@ final readonly class XmlConfigurationManipulator
                     '/phpunit/@%s',
                     $name,
                 ),
-            );
+            )
+        ;
 
         if ($node !== null) {
             $node->nodeValue = $value;
         } else {
             $xPath
                 ->getElement('/phpunit')
-                ->setAttribute($name, $value);
+                ->setAttribute($name, $value)
+            ;
         }
     }
 
@@ -443,7 +529,8 @@ final readonly class XmlConfigurationManipulator
 
         $xPath
             ->getElement('/phpunit')
-            ->setAttribute($attribute, $value);
+            ->setAttribute($attribute, $value)
+        ;
 
         return true;
     }

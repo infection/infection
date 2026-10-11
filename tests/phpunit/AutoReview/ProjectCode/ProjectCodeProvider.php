@@ -96,7 +96,8 @@ final class ProjectCodeProvider
 
         self::$sourceClasses = take($finder)
             ->cast(self::castSplFileInfoToFQCN(...))
-            ->toList();
+            ->toList()
+        ;
 
         sort(self::$sourceClasses, SORT_STRING);
 

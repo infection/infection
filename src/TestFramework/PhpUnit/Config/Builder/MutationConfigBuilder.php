@@ -40,18 +40,21 @@ use DOMNode;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
-use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\TestFramework\XML\SafeDOMXPath;
+use Phar;
 use function sprintf;
+use function str_replace;
+use function str_starts_with;
+use function strstr;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-class MutationConfigBuilder extends ConfigBuilder
+final class MutationConfigBuilder
 {
     private ?string $originalBootstrapFile = null;
 
@@ -83,9 +86,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $originalBootstrapFile = $this->originalBootstrapFile;
 
-        if ($originalBootstrapFile === null) {
-            $originalBootstrapFile = $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
-        }
+        $originalBootstrapFile ??= $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
 
         // activate PHPUnit's result cache and order tests by running defects first, then sorted by fastest first
         $this->configManipulator->handleResultCacheAndExecutionOrder($version, $xPath, $mutationHash, $this->tmpDir);
@@ -127,13 +128,11 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function getXPath(): SafeDOMXPath
     {
-        if ($this->xPath === null) {
-            $this->xPath = SafeDOMXPath::fromString(
-                $this->originalXmlConfigContent,
-                preserveWhiteSpace: false,
-                formatOutput: true,
-            );
-        }
+        $this->xPath ??= SafeDOMXPath::fromString(
+            $this->originalXmlConfigContent,
+            preserveWhiteSpace: false,
+            formatOutput: true,
+        );
 
         return $this->xPath;
     }
@@ -161,6 +160,33 @@ class MutationConfigBuilder extends ConfigBuilder
         );
     }
 
+    private function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutantFilePath): string
+    {
+        $infectionPhar = '';
+
+        if (str_starts_with(__FILE__, 'phar:')) {
+            $infectionPhar = sprintf(
+                '\\Phar::loadPhar("%s", "%s");',
+                str_replace('phar://', '', Phar::running(true)),
+                'infection.phar',
+            );
+        }
+
+        $prefix = strstr(__NAMESPACE__, 'Infection', true);
+
+        Assert::string($prefix);
+
+        return <<<CONTENT
+            {$infectionPhar}
+            require_once '{$interceptorPath}';
+
+            use {$prefix}Infection\StreamWrapper\IncludeInterceptor;
+
+            IncludeInterceptor::intercept('{$originalFilePath}', '{$mutantFilePath}');
+            IncludeInterceptor::enable();
+            CONTENT;
+    }
+
     private function buildPath(string $mutationHash): string
     {
         return sprintf(
@@ -179,7 +205,8 @@ class MutationConfigBuilder extends ConfigBuilder
         } else {
             $xPath
                 ->getElement('/phpunit')
-                ->setAttribute('bootstrap', $customAutoloadFilePath);
+                ->setAttribute('bootstrap', $customAutoloadFilePath)
+            ;
         }
     }
 
@@ -231,9 +258,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $nodeToAppendTestSuite = $xPath->queryElement('/phpunit/testsuites');
 
         // If there is no `testsuites` node, append to root
-        if ($nodeToAppendTestSuite === null) {
-            $nodeToAppendTestSuite = $xPath->queryElement('/phpunit');
-        }
+        $nodeToAppendTestSuite ??= $xPath->queryElement('/phpunit');
 
         $testSuite = $xPath->document->createElement('testsuite');
         $testSuite->setAttribute('name', 'Infection testsuite with filtered tests');

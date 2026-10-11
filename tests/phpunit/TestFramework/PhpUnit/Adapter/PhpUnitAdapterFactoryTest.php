@@ -35,8 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
+use Infection\Console\ConsoleOutput;
+use Infection\FileSystem\FileSystem;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\SymfonyProcessShellCommandRunner;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -47,6 +57,9 @@ final class PhpUnitAdapterFactoryTest extends TestCase
 {
     public function test_it_can_create_an_adapter(): void
     {
+        $configuration = ConfigurationBuilder::withMinimalTestData()->build();
+        $fileSystem = $this->createStub(FileSystem::class);
+
         $adapter = PhpUnitAdapterFactory::create(
             '/path/to/phpunit',
             '/tmp',
@@ -56,10 +69,26 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             '/path/to/project',
             ['src'],
             true,
+            executeOnlyCoveringTestCases: false,
+            filteredSourceFilesToMutate: [],
+            mapSourceClassToTestStrategy: null,
             shellCommandRunner: new SymfonyProcessShellCommandRunner(),
             sourceDirectoryBasePath: '/path/to/project',
+            useWindowsFilterLimit: false,
+            fileSystem: new FileSystem(),
+            consoleOutput: $this->createStub(ConsoleOutput::class),
+            coverageCheckerFactory: new CoverageCheckerFactory(
+                $configuration,
+                JUnitReportLocator::create($fileSystem, ''),
+                IndexXmlCoverageLocator::create($fileSystem, ''),
+            ),
+            initialTestsRunner: $this->createStub(InitialTestsRunner::class),
+            configuration: $configuration,
+            processFactory: $this->createStub(MutantProcessContainerFactory::class),
+            testFrameworkExtraOptionsFilter: $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 
+        $this->assertInstanceOf(PhpUnitAdapter::class, $adapter);
         $this->assertSame('PHPUnit', $adapter->getName());
     }
 

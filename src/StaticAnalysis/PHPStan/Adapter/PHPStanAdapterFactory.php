@@ -44,6 +44,7 @@ use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -62,9 +63,12 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
         string $tmpDir,
         array $staticAnalysisToolOptions,
         ShellCommandRunner $shellCommandRunner,
+        ?Filesystem $fileSystem = null,
     ): StaticAnalysisToolAdapter {
+        Assert::notNull($fileSystem);
+
         return new PHPStanAdapter(
-            new Filesystem(),
+            $fileSystem,
             new PHPStanMutantExecutionResultFactory(),
             $staticAnalysisConfigPath,
             $staticAnalysisToolExecutable,

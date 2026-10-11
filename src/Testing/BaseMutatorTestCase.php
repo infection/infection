@@ -47,13 +47,10 @@ use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
-use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use const PHP_EOL;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\CloningVisitor;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use Psr\Log\NullLogger;
@@ -161,7 +158,8 @@ abstract class BaseMutatorTestCase extends TestCase
             ->getMutatorFactory()
             ->create([
                 $mutatorClassName => ['settings' => $settings],
-            ], false);
+            ], false)
+        ;
 
         $mutator = array_shift($mutators);
         Assert::isInstanceOf($mutator, Mutator::class);
@@ -197,21 +195,12 @@ abstract class BaseMutatorTestCase extends TestCase
     {
         $mutations = $this->getMutationsFromCode($code, $settings);
 
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new CloningVisitor());
+        $mutantCodeFactory = SingletonContainer::getContainer()->getMutantCodeFactory();
 
         $mutants = [];
 
         foreach ($mutations as $mutation) {
-            $mutatorVisitor = new MutatorVisitor($mutation);
-
-            $traverser->addVisitor($mutatorVisitor);
-
-            $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
-
-            $mutants[] = SingletonContainer::getPrinter()->print($mutatedStatements, $mutation);
-
-            $traverser->removeVisitor($mutatorVisitor);
+            $mutants[] = $mutantCodeFactory->createCode($mutation);
         }
 
         return $mutants;
@@ -263,7 +252,8 @@ abstract class BaseMutatorTestCase extends TestCase
                 output: new NullOutput(),
                 withUncovered: true,
             )
-            ->getNodeTraverserFactory();
+            ->getNodeTraverserFactory()
+        ;
 
         $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
 
@@ -272,11 +262,13 @@ abstract class BaseMutatorTestCase extends TestCase
                 $sourceFile,
                 new EmptyTrace($sourceFile),
             )
-            ->traverse($nodes);
+            ->traverse($nodes)
+        ;
 
         $factory
             ->createMutationTraverser($mutationsCollectorVisitor)
-            ->traverse($nodes);
+            ->traverse($nodes)
+        ;
 
         return take($mutationsCollectorVisitor->getMutations())->toList();
     }

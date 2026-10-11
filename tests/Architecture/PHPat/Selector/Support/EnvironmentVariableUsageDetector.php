@@ -119,6 +119,7 @@ final readonly class EnvironmentVariableUsageDetector
 
         return $this->analyser
             ->analyse($classReflection, analyseNonConcreteClasses: true)
-            ->environmentVariables;
+            ->environmentVariables
+        ;
     }
 }

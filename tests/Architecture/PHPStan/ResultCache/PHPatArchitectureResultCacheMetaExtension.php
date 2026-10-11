@@ -60,7 +60,8 @@ final class PHPatArchitectureResultCacheMetaExtension implements ResultCacheMeta
             ->files()
             ->name('*.php')
             ->in(self::SELECTOR_DIRECTORY)
-            ->sortByName();
+            ->sortByName()
+        ;
 
         foreach ($selectorFiles as $selectorFile) {
             $filePath = $selectorFile->getPathname();

@@ -33,36 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\Matcher;
+namespace Infection\Event\EventDispatcher;
 
-use Infection\Differ\ChangedLinesRange;
+use Infection\Event\Subscriber\EventSubscriber;
+use Override;
 
 /**
- * Simple implementation that will tell if any configured line ranges matches
- * the given criteria.
- *
- * This can be useful for testing purposes.
+ * Decorates an event dispatcher and retains the dispatched events in order.
  *
  * @internal
  */
-final readonly class SimpleSourceLineMatcher implements SourceLineMatcher
+final class EventCollectingEventDispatcher implements EventDispatcher
 {
     /**
-     * @param list<ChangedLinesRange> $changedLinesRanges
+     * @var list<object>
      */
+    private array $events = [];
+
     public function __construct(
-        private array $changedLinesRanges,
+        private readonly EventDispatcher $dispatcher,
     ) {
     }
 
-    public function touches(string $fileRealPath, int $startLine, int $endLine): bool
+    #[Override]
+    public function dispatch(object $event): void
     {
-        foreach ($this->changedLinesRanges as $changedLinesRange) {
-            if ($changedLinesRange->touches($startLine, $endLine)) {
-                return true;
-            }
-        }
+        // Record before invoking subscribers, which may fail or dispatch other events.
+        $this->events[] = $event;
 
-        return false;
+        $this->dispatcher->dispatch($event);
+    }
+
+    #[Override]
+    public function addSubscriber(EventSubscriber $eventSubscriber): void
+    {
+        $this->dispatcher->addSubscriber($eventSubscriber);
+    }
+
+    /**
+     * @return list<object>
+     */
+    public function getEvents(): array
+    {
+        return $this->events;
     }
 }

@@ -35,16 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use function array_merge;
 use function dirname;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
+use Infection\Console\ConsoleOutput;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\TestFrameworkFactory;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
@@ -75,10 +83,33 @@ final readonly class Factory
         private SourceCollector $sourceCollector,
         private array $installedExtensions,
         private ShellCommandRunner $shellCommandRunner,
+        private FileSystem $fileSystem,
+        private ConsoleOutput $consoleOutput,
+        private CoverageCheckerFactory $coverageCheckerFactory,
+        private InitialTestsRunner $initialTestsRunner,
+        private MutantProcessContainerFactory $containerFactory,
+        private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
     ) {
     }
 
-    public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
+    public function create(string $adapterName, bool $skipCoverage): TestFramework
+    {
+        $testFramework = $this->createTestFramework($adapterName, $skipCoverage);
+
+        return $testFramework instanceof TestFramework
+            ? $testFramework
+            : new LegacyTestFrameworkBridge(
+                $testFramework,
+                $this->consoleOutput,
+                $this->coverageCheckerFactory->create($testFramework),
+                $this->initialTestsRunner,
+                $this->infectionConfig,
+                $this->containerFactory,
+                $this->extraOptionsFilter,
+            );
+    }
+
+    private function createTestFramework(string $adapterName, bool $skipCoverage): TestFramework|TestFrameworkAdapter
     {
         if ($adapterName === TestFrameworkTypes::DEBUG) {
             return new DebugTestFrameworkAdapter(
@@ -88,38 +119,22 @@ final readonly class Factory
             );
         }
 
-        if ($adapterName === TestFrameworkTypes::PHPUNIT) {
-            $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
+        $availableTestFrameworks = [TestFrameworkTypes::DEBUG];
 
-            return PhpUnitAdapterFactory::create(
-                $this->testFrameworkFinder->find(
-                    TestFrameworkTypes::PHPUNIT,
-                    (string) $this->infectionConfig->phpUnit->customPath,
-                ),
-                $this->tmpDir,
-                $phpUnitConfigPath,
-                (string) $this->infectionConfig->phpUnit->configDir,
-                $this->jUnitFilePath,
-                $this->projectDir,
-                $this->infectionConfig->source->directories,
-                $skipCoverage,
-                $this->infectionConfig->executeOnlyCoveringTestCases,
-                $this->getFilteredSourceFilesToMutate(),
-                $this->infectionConfig->mapSourceClassToTestStrategy,
-                $this->shellCommandRunner,
-                sourceDirectoryBasePath: dirname($this->infectionConfig->configurationPathname),
-                useWindowsFilterLimit: OperatingSystem::isWindows(),
-            );
-        }
+        $installedExtensions = array_merge(
+            [['extra' => ['class' => PhpUnitAdapterFactory::class]]],
+            $this->installedExtensions,
+        );
 
-        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::DEBUG];
-
-        foreach ($this->installedExtensions as $installedExtension) {
+        foreach ($installedExtensions as $installedExtension) {
             $factory = $installedExtension['extra']['class'];
 
             Assert::classExists($factory);
 
-            if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
+            if (
+                !is_a($factory, TestFrameworkFactory::class, true)
+                && !is_a($factory, TestFrameworkAdapterFactory::class, true)
+            ) {
                 continue;
             }
 
@@ -127,20 +142,53 @@ final readonly class Factory
 
             if ($adapterName === $factory::getAdapterName()) {
                 $configuration = $this->infectionConfig;
+                $executableName = $factory::getExecutableName();
+                $isPhpUnit = $factory === PhpUnitAdapterFactory::class;
+                $configPath = $this->configLocator->locate($factory::getAdapterName());
+                $customPath = $isPhpUnit ? (string) $configuration->phpUnit->customPath : '';
+                $configDir = $isPhpUnit ? (string) $configuration->phpUnit->configDir : null;
 
-                return $factory::create(
-                    $this->testFrameworkFinder->find($factory::getExecutableName()),
-                    $this->tmpDir,
-                    $this->configLocator->locate($factory::getAdapterName()),
-                    null,
-                    $this->jUnitFilePath,
-                    $this->projectDir,
-                    $configuration->source->directories,
-                    $skipCoverage,
-                );
+                return is_a($factory, TestFrameworkFactory::class, true)
+                    ? $factory::create(
+                        $this->testFrameworkFinder->find(
+                            $executableName,
+                            $customPath,
+                        ),
+                        $this->tmpDir,
+                        $configPath,
+                        $configDir,
+                        $this->jUnitFilePath,
+                        $this->projectDir,
+                        $configuration->source->directories,
+                        $skipCoverage,
+                        $configuration->executeOnlyCoveringTestCases,
+                        $this->getFilteredSourceFilesToMutate(),
+                        $configuration->mapSourceClassToTestStrategy,
+                        $this->shellCommandRunner,
+                        dirname($configuration->configurationPathname),
+                        OperatingSystem::isWindows(),
+                        $this->fileSystem,
+                        $this->consoleOutput,
+                        $this->coverageCheckerFactory,
+                        $this->initialTestsRunner,
+                        $configuration,
+                        $this->containerFactory,
+                        $this->extraOptionsFilter,
+                    )
+                    : $factory::create(
+                        $this->testFrameworkFinder->find($executableName),
+                        $this->tmpDir,
+                        $configPath,
+                        null,
+                        $this->jUnitFilePath,
+                        $this->projectDir,
+                        $configuration->source->directories,
+                        $skipCoverage,
+                    );
             }
         }
 
+        // @phpstan-ignore infection.invalidArgumentException (Keep the fallback after the adapter-specific returns.)
         throw new InvalidArgumentException(sprintf(
             'Invalid name of test framework "%s". Available names are: %s',
             $adapterName,

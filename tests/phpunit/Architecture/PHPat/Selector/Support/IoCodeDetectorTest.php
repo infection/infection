@@ -218,7 +218,8 @@ final class IoCodeDetectorTest extends SelectorTestCase
             // 3 tests cases + their respective covered classes, with one covered class reused
             ->expects($this->exactly(5))
             ->method('readFile')
-            ->willReturn('contents');
+            ->willReturn('contents')
+        ;
 
         $ioCodeDetector = new IoCodeDetector(
             new Analyser(

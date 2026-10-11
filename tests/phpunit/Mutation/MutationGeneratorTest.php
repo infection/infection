@@ -88,7 +88,8 @@ final class MutationGeneratorTest extends TestCase
             ->willReturnOnConsecutiveCalls(
                 [$mutation0, $mutation1],
                 [$mutation1, $mutation2],
-            );
+            )
+        ;
 
         $expectedMutations = [
             $mutation0,

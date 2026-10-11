@@ -54,9 +54,7 @@ final class MemoizedSourceCollector implements SourceCollector
 
     public function collect(): array
     {
-        if ($this->sourceFiles === null) {
-            $this->sourceFiles = $this->decoratedCollector->collect();
-        }
+        $this->sourceFiles ??= $this->decoratedCollector->collect();
 
         return $this->sourceFiles;
     }

@@ -43,10 +43,12 @@ namespace Infection\Configuration;
  */
 final readonly class ClassifiedPaths
 {
+    /**
+     * @param list<non-empty-string> $sourcePaths
+     * @param list<non-empty-string> $testPaths
+     */
     public function __construct(
-        /** @var list<non-empty-string> */
         public array $sourcePaths,
-        /** @var list<non-empty-string> */
         public array $testPaths,
     ) {
     }

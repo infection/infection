@@ -33,14 +33,55 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
+namespace Infection\Tests\Architecture\PHPStan\Rules;
+
+use Override;
+use PHPStan\Testing\RuleTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
- * @internal
- *
- * Represents a filter to apply to the configured source to reduce the scope of the eligible files and/or code
- * to mutate.
+ * @extends RuleTestCase<InvalidArgumentExceptionRule>
  */
-interface SourceFilter
+#[CoversClass(InvalidArgumentExceptionRule::class)]
+final class InvalidArgumentExceptionRuleTest extends RuleTestCase
 {
+    /**
+     * @param list<array{string, int}> $expected
+     */
+    #[DataProvider('fileProvider')]
+    public function test_it_reports_direct_invalid_argument_exception_construction(
+        string $file,
+        array $expected,
+    ): void {
+        $fixturePath = __DIR__ . '/Fixtures/' . $file;
+
+        $this->analyse(
+            files: [$fixturePath],
+            expectedErrors: $expected,
+        );
+    }
+
+    public static function fileProvider(): iterable
+    {
+        yield 'production code' => [
+            'Source/exceptions.php.fixture',
+            [
+                ['Use Webmozart\\Assert\\Assert instead of instantiating InvalidArgumentException.', 10],
+                ['Use Webmozart\\Assert\\Assert instead of instantiating InvalidArgumentException.', 11],
+                ['Use Webmozart\\Assert\\Assert instead of instantiating InvalidArgumentException.', 12],
+            ],
+        ];
+
+        yield 'outside source, with a shared directory prefix' => [
+            'SourceOutside/exceptions.php.fixture',
+            [],
+        ];
+    }
+
+    #[Override]
+    protected function getRule(): InvalidArgumentExceptionRule
+    {
+        return new InvalidArgumentExceptionRule(__DIR__ . '/Fixtures/Source');
+    }
 }

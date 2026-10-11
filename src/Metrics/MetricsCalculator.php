@@ -35,13 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Metrics;
 
-use function array_key_exists;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use InvalidArgumentException;
 use function is_nan;
 use Pipeline\Helper\RunningVariance;
 use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -83,12 +82,14 @@ class MetricsCalculator implements Collector
         foreach ($executionResults as $executionResult) {
             $detectionStatus = $executionResult->getDetectionStatus();
 
-            if (!array_key_exists($detectionStatus->value, $this->countByStatus)) {
-                throw new InvalidArgumentException(sprintf(
+            Assert::keyExists(
+                $this->countByStatus,
+                $detectionStatus->value,
+                sprintf(
                     'Unknown execution result process result code "%s"',
                     $executionResult->getDetectionStatus()->value,
-                ));
-            }
+                ),
+            );
 
             ++$this->totalMutantsCount;
             ++$this->countByStatus[$detectionStatus->value];
