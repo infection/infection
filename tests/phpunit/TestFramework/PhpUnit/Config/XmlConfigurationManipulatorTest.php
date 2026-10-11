@@ -36,14 +36,20 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Closure;
+use DOMDocument;
 use const E_ALL;
+use Exception;
 use Infection\Framework\OperatingSystem;
 use Infection\Framework\Str;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\XML\SafeDOMXPath;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use InvalidArgumentException;
+use function libxml_clear_errors;
+use function libxml_get_errors;
+use function libxml_use_internal_errors;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -59,6 +65,8 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(XmlConfigurationManipulator::class)]
 final class XmlConfigurationManipulatorTest extends TestCase
 {
+    use ExpectsThrowables;
+
     private XmlConfigurationManipulator $configManipulator;
 
     protected function setUp(): void
@@ -1120,6 +1128,149 @@ final class XmlConfigurationManipulatorTest extends TestCase
         );
     }
 
+    /**
+     * @param class-string<Exception>|null $expectedException
+     */
+    #[DataProvider('libxmlErrorHandlingProvider')]
+    public function test_it_restores_libxml_error_handling_after_validation(
+        bool $initialInternalErrors,
+        string $xml,
+        ?string $expectedException,
+    ): void {
+        $xPath = $this->createXPath($xml);
+
+        if ($expectedException !== null) {
+            $this->expectException($expectedException);
+        }
+
+        $restoreOriginalLibxmlInternalErrors = self::setLibxmlInternalErrors($initialInternalErrors);
+
+        try {
+            $this->configManipulator->validate(
+                '9.6',
+                '/path/to/phpunit.xml',
+                $xPath,
+            );
+        } finally {
+            $actual = libxml_use_internal_errors();
+            $errors = libxml_get_errors();
+
+            $restoreOriginalLibxmlInternalErrors();
+
+            $this->assertSame(
+                $initialInternalErrors,
+                $actual,
+                'Schema validation must restore the caller\'s libxml error-handling setting, even when it throws.',
+            );
+            $this->assertSame(
+                [],
+                $errors,
+                'Schema validation must not leave errors in the shared libxml buffer.',
+            );
+        }
+    }
+
+    public function test_it_does_not_include_previous_libxml_errors_in_validation_failures(): void
+    {
+        $schema = __DIR__ . '/../../../../../vendor/phpunit/phpunit/phpunit.xsd';
+        $xPath = $this->createXPath(<<<XML
+            <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="$schema"
+                     foo="bar"/>
+            XML
+        );
+
+        $restoreOriginalLibxmlInternalErrors = self::setLibxmlInternalErrors(true);
+
+        try {
+            $document = new DOMDocument();
+
+            $this->assertFalse(
+                $document->loadXML('<previous-operation>'),
+                'The malformed XML must seed the libxml buffer with an error from a previous operation.',
+            );
+
+            $exception = $this->expectToThrow(
+                fn () => $this->configManipulator->validate(
+                    '9.6',
+                    '/path/to/phpunit.xml',
+                    $xPath,
+                ),
+            );
+
+            $this->assertInstanceOf(InvalidPhpUnitConfiguration::class, $exception);
+            $this->assertStringContainsString("attribute 'foo'", $exception->getMessage());
+            $this->assertStringNotContainsString(
+                'previous-operation',
+                $exception->getMessage(),
+                'The validation failure must not report errors from a previous XML operation.',
+            );
+        } finally {
+            $restoreOriginalLibxmlInternalErrors();
+        }
+    }
+
+    public static function libxmlErrorHandlingProvider(): iterable
+    {
+        $schema = __DIR__ . '/../../../../../vendor/phpunit/phpunit/phpunit.xsd';
+
+        yield 'valid configuration with internal errors disabled' => [
+            false,
+            <<<XML
+                <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:noNamespaceSchemaLocation="$schema"/>
+                XML,
+            'expectedException' => null,
+        ];
+
+        yield 'valid configuration with internal errors enabled' => [
+            true,
+            <<<XML
+                <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:noNamespaceSchemaLocation="$schema"/>
+                XML,
+            'expectedException' => null,
+        ];
+
+        yield 'invalid configuration with internal errors disabled' => [
+            false,
+            <<<XML
+                <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:noNamespaceSchemaLocation="$schema"
+                         foo="bar"/>
+                XML,
+            'expectedException' => InvalidPhpUnitConfiguration::class,
+        ];
+
+        yield 'invalid configuration with internal errors enabled' => [
+            true,
+            <<<XML
+                <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:noNamespaceSchemaLocation="$schema"
+                         foo="bar"/>
+                XML,
+            'expectedException' => InvalidPhpUnitConfiguration::class,
+        ];
+
+        yield 'empty schema path with internal errors disabled' => [
+            false,
+            <<<'XML'
+                <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:noNamespaceSchemaLocation=""/>
+                XML,
+            'expectedException' => InvalidArgumentException::class,
+        ];
+
+        yield 'empty schema path with internal errors enabled' => [
+            true,
+            <<<'XML'
+                <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:noNamespaceSchemaLocation=""/>
+                XML,
+            'expectedException' => InvalidArgumentException::class,
+        ];
+    }
+
     public function test_it_uses_the_configured_phpunit_config_dir_to_build_schema_paths(): void
     {
         $this->expectNotToPerformAssertions();
@@ -1251,6 +1402,19 @@ final class XmlConfigurationManipulatorTest extends TestCase
                     EOF,
             ],
         ];
+    }
+
+    /**
+     * @return Closure():void
+     */
+    private static function setLibxmlInternalErrors(bool $internalErrors): Closure
+    {
+        $original = libxml_use_internal_errors($internalErrors);
+
+        return static function () use ($original): void {
+            libxml_clear_errors();
+            libxml_use_internal_errors($original);
+        };
     }
 
     private function assertItChangesPostPHPUnit93Configuration(Closure $changeXml, string $expectedXml): void
