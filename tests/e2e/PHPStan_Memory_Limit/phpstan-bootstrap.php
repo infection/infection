@@ -2,17 +2,9 @@
 
 declare(strict_types=1);
 
-$isMutantAnalysis = false;
+$isMutantProcess = getenv('TEST_TOKEN') !== false;
 
-foreach ($_SERVER['argv'] ?? [] as $argument) {
-    if (str_starts_with((string) $argument, '--tmp-file=')) {
-        $isMutantAnalysis = true;
-
-        break;
-    }
-}
-
-if (!$isMutantAnalysis) {
+if (!$isMutantProcess) {
     return;
 }
 
@@ -21,7 +13,7 @@ $iniPath = php_ini_loaded_file();
 if ($iniPath !== false && $iniPath !== '') {
     $iniContents = file_get_contents($iniPath);
 
-    if ($iniContents === false || preg_match('/^memory_limit\s*=\s*32M$/m', $iniContents) === 1) {
+    if ($iniContents === false|| preg_match('/^memory_limit\s*=\s*32M$/m', $iniContents) === 1) {
         fwrite(STDERR, "Mutant PHPStan must not inherit PHPUnit's derived memory limit.\n");
 
         exit(255);

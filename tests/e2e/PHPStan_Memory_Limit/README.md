@@ -1,11 +1,11 @@
-This e2e covers the regression where PHPStan mutant processes inherited the PHP memory limit derived from the initial PHPUnit run.
+This end-to-end test covers a regression where PHPStan mutant processes inherited the PHP memory limit derived from the initial PHPUnit run.
 
-The PHPUnit test prints `Memory: 16.00 MB` during the initial test run. PHPUnit's own final memory line may vary between environments, but Infection reads the first matching memory line from the process output. The PHPUnit adapter consequently adds `-d memory_limit=32M` only to its mutant commands.
+The PHPUnit test outputs `Memory: 16.00 MB` during the initial test run. The PHPUnit adapter therefore adds `-d memory_limit=32M` only to its mutant commands.
 
-`phpstan-bootstrap.php` is loaded by PHPStan. It is a no-op for the initial PHPStan run. For mutant PHPStan runs, identified by `--tmp-file=...`, it asserts the regression setup:
+PHPStan loads `phpstan-bootstrap.php`, which does nothing during the initial run. During mutant runs, it asserts that:
 
-- the loaded `php.ini`, when there is one, does not contain PHPUnit's derived `memory_limit = 32M` cap;
-- the effective PHP memory limit is still `-1`.
+- The loaded `php.ini`, if any, does not contain PHPUnit's derived `memory_limit = 32M` limit.
+- The effective PHP memory limit remains `-1`.
 
 The expected summary proves that PHPStan can evaluate its mutants without inheriting PHPUnit's derived limit:
 
