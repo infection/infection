@@ -55,7 +55,6 @@ interface TestFrameworkFactory
     /**
      * @param string[] $sourceDirectories
      * @param SplFileInfo[] $filteredSourceFilesToMutate
-     * @param Tracer $tracer Default XML coverage tracer. Frameworks with other artefacts can provide their own.
      */
     public static function create(
         string $testFrameworkExecutable,

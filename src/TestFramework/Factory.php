@@ -121,7 +121,10 @@ final readonly class Factory
     {
         return new PhpUnitTracer(
             $this->coverageTraceProvider,
-            new JUnitTestExecutionInfoAdder($hasJUnitReport, $this->testFileDataProvider),
+            new JUnitTestExecutionInfoAdder(
+                $hasJUnitReport,
+                $this->testFileDataProvider,
+            ),
         );
     }
 
