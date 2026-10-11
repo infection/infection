@@ -1,0 +1,17 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^12.5"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Debug_Events_Reporter\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Debug_Events_Reporter\\Tests\\": "tests/"
+        }
+    }
+}
