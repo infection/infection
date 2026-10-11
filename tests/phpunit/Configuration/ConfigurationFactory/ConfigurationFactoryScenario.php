@@ -210,6 +210,38 @@ final class ConfigurationFactoryScenario
         ;
     }
 
+    public function forValueForDebugEventsLogFilePath(
+        ?string $debugEventsLogFilePathInConfig,
+        ?string $expectedDebugEventsLogFilePath,
+    ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf(
+            $previousExpected,
+            Configuration::class,
+            'A log-path scenario must start with an expected configuration.',
+        );
+
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withLogs(
+                        LogsBuilder::withMinimalTestData()
+                            ->withDebugEventsLogFilePath($debugEventsLogFilePathInConfig)
+                            ->build(),
+                    ),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($previousExpected)
+                    ->withLogs(
+                        LogsBuilder::from($previousExpected->logs)
+                            ->withDebugEventsLogFilePath($expectedDebugEventsLogFilePath)
+                            ->build(),
+                    )
+                    ->build(),
+            )
+        ;
+    }
+
     public function forValueForGitlabLogger(
         ?string $gitlabFileLogPathInConfig,
         ?string $gitlabFileLogPathFromCliOption,
