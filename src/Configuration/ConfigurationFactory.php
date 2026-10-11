@@ -89,7 +89,7 @@ class ConfigurationFactory
     /**
      * Default allowed timeout (on a test basis) in seconds
      */
-    private const int DEFAULT_TIMEOUT = 10;
+    public const int DEFAULT_TIMEOUT = 10;
 
     private const int DEFAULT_DOTS_PER_ROW = 50;
 
