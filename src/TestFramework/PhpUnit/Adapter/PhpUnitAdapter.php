@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use function array_key_exists;
 use function implode;
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -46,10 +48,12 @@ use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Override;
 use function Safe\preg_match;
 use function sprintf;
+use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use function trim;
 use function version_compare;
 use Webmozart\Assert\Assert;
@@ -60,6 +64,8 @@ use Webmozart\Assert\Assert;
 final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware, TestFrameworkAdapter
 {
     public const string COVERAGE_DIR = 'coverage-xml';
+
+    private const int CONFIGURATION_VALIDATION_TIMEOUT_IN_SECONDS = 2;
 
     public function __construct(
         private readonly string $testFrameworkExecutable,
@@ -72,6 +78,7 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
         private readonly ShellCommandRunner $shellCommandRunner,
         private readonly VersionParser $versionParser,
         private readonly CommandLineBuilder $commandLineBuilder,
+        private readonly string $testFrameworkConfigPath,
         private ?string $version = null,
     ) {
     }
@@ -82,9 +89,12 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
     }
 
     /**
-     * Returns array of arguments to pass them into the Initial Run Process
+     * Validates the original configuration when supported, then returns the initial run command.
      *
      * @param string[] $phpExtraArgs
+     *
+     * @throws InvalidPhpUnitConfiguration
+     * @throws InvalidVersion
      *
      * @return string[]
      */
@@ -94,6 +104,8 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
         array $phpExtraArgs,
         bool $skipCoverage,
     ): array {
+        $this->validateConfigurationIfSupported($phpExtraArgs);
+
         if ($skipCoverage === false) {
             $generatedOptions = [];
 
@@ -288,5 +300,56 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
     private function createInitialTestsFailRecommendations(string $commandLine): string
     {
         return sprintf('Check the executed command to identify the problem: %s', $commandLine);
+    }
+
+    /**
+     * @param string[] $phpExtraArgs
+     *
+     * @throws InvalidPhpUnitConfiguration
+     * @throws InvalidVersion
+     */
+    private function validateConfigurationIfSupported(array $phpExtraArgs): void
+    {
+        // PHPUnit 13.2 introduced validation against its bundled schema, without
+        // resolving the schema URL declared in the configuration.
+        // https://github.com/sebastianbergmann/phpunit/commit/e85b58eda9e750763f3b26fb416612d5931299aa
+        if (!$this->isPhpUnit132OrHigher($this->getVersion())) {
+            return;
+        }
+
+        try {
+            $this->shellCommandRunner->mustRun(
+                $this->commandLineBuilder->build(
+                    $this->testFrameworkExecutable,
+                    $phpExtraArgs,
+                    [
+                        '--configuration',
+                        $this->testFrameworkConfigPath,
+                        '--validate-configuration',
+                    ],
+                ),
+                timeout: self::CONFIGURATION_VALIDATION_TIMEOUT_IN_SECONDS,
+            );
+        } catch (SymfonyProcessRuntimeException $processFailed) {
+            throw new InvalidPhpUnitConfiguration(
+                sprintf(
+                    'Could not validate the PHPUnit configuration file "%s".',
+                    $this->testFrameworkConfigPath,
+                ),
+                (int) $processFailed->getCode(),
+                previous: $processFailed,
+            );
+        }
+    }
+
+    private function isPhpUnit132OrHigher(string $testFrameworkVersion): bool
+    {
+        static $versions = [];
+
+        if (!array_key_exists($testFrameworkVersion, $versions)) {
+            $versions[$testFrameworkVersion] = version_compare($testFrameworkVersion, '13.2.0', '>=');
+        }
+
+        return $versions[$testFrameworkVersion];
     }
 }

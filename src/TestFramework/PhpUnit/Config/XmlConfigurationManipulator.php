@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config;
 
 use function array_filter;
+use function array_key_exists;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
@@ -216,32 +217,27 @@ final readonly class XmlConfigurationManipulator
         $this->addOrUpdateCoverageNodes('source', 'include', $xPath, $srcDirs, $filteredSourceFilesToMutate);
     }
 
-    // TODO: fix return type... There is no point in returning true if we
-    //   never return false.
-    public function validate(string $configPath, SafeDOMXPath $xPath): true
-    {
+    /**
+     * @throws InvalidPhpUnitConfiguration
+     */
+    public function validate(
+        string $version,
+        string $configPath,
+        SafeDOMXPath $xPath,
+    ): void {
         if ($xPath->queryCount('/phpunit') === 0) {
             throw InvalidPhpUnitConfiguration::byRootNode($configPath);
         }
 
         if ($xPath->queryCount('namespace::xsi') === 0) {
-            return true;
+            return;
         }
 
-        $schema = $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue;
-
-        $original = libxml_use_internal_errors(true);
-
-        if ($schema !== null && !$xPath->document->schemaValidate($this->buildSchemaPath($schema))) {
-            throw InvalidPhpUnitConfiguration::byXsdSchema(
-                $configPath,
-                $this->getXmlErrorsString(),
-            );
-        }
-
-        libxml_use_internal_errors($original);
-
-        return true;
+        $this->validateAgainstSchemaIfNecessary(
+            $version,
+            $configPath,
+            $xPath,
+        );
     }
 
     public function removeDefaultTestSuite(SafeDOMXPath $xPath): void
@@ -260,6 +256,66 @@ final readonly class XmlConfigurationManipulator
 
         $this->addAttributeIfNotSet('failOnRisky', 'true', $xPath);
         $this->addAttributeIfNotSet('failOnWarning', 'true', $xPath);
+    }
+
+    /**
+     * @throws InvalidPhpUnitConfiguration
+     */
+    private function validateAgainstSchemaIfNecessary(
+        string $version,
+        string $configPath,
+        SafeDOMXPath $xPath,
+    ): void {
+        // PHPUnit 9 and older only print schema errors and can exit successfully even with
+        // failOnWarning enabled. PHPUnit 10+ reports them as test runner warnings, which
+        // fail Infection's initial run, so avoid resolving external schemas for those versions.
+        if (self::isPhpUnit10OrHigher($version)) {
+            return;
+        }
+
+        $this->validateAgainstSchema(
+            $configPath,
+            $xPath->document,
+            $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue,
+        );
+    }
+
+    private static function isPhpUnit10OrHigher(string $version): bool
+    {
+        static $versions = [];
+
+        if (!array_key_exists($version, $versions)) {
+            $versions[$version] = version_compare(
+                $version,
+                '10.0',
+                '>=',
+            );
+        }
+
+        return $versions[$version];
+    }
+
+    /**
+     * @throws InvalidPhpUnitConfiguration
+     */
+    private function validateAgainstSchema(
+        string $configPath,
+        DOMDocument $document,
+        ?string $schema,
+    ): void {
+        $original = libxml_use_internal_errors(true);
+
+        if (
+            $schema !== null
+            && !$document->schemaValidate($this->buildSchemaPath($schema))
+        ) {
+            throw InvalidPhpUnitConfiguration::byXsdSchema(
+                $configPath,
+                $this->getXmlErrorsString(),
+            );
+        }
+
+        libxml_use_internal_errors($original);
     }
 
     /**
