@@ -3285,12 +3285,6 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter::getInitialTestRunCommandLine`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter::getInitialTestsFailRecommendations`.'
 count = 1
 
@@ -3485,12 +3479,6 @@ file = "src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php"
 code = "possibly-false-argument"
 message = "Argument #1 of method `DOMNode::appendChild` is possibly `false`, but parameter type `DOMNode` does not accept it."
 count = 4
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration` in `Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator::validate`.'
-count = 1
 
 [[issues]]
 file = "src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php"

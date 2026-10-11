@@ -159,6 +159,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $configuration,
             $processFactory,
             $testFrameworkExtraOptionsFilter,
+            $testFrameworkConfigPath,
         );
     }
 
