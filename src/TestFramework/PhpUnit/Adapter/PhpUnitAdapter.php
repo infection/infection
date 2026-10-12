@@ -60,6 +60,7 @@ use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
+use Infection\TestFramework\PhpUnit\MemoryLimiter;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Override;
 use function Safe\preg_match;
@@ -98,6 +99,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         private readonly Configuration $config,
         private readonly MutantProcessContainerFactory $processFactory,
         private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private readonly MemoryLimiter $memoryLimiter,
         private ?string $version = null,
     ) {
         $this->coverageChecker = $coverageCheckerFactory->create($this);
@@ -145,10 +147,14 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
 
         $memoryUsage = $this->getMemoryUsed($output);
 
-        return new InitialRunResults(
+        $results = new InitialRunResults(
             output: $output,
             memoryUsage: $memoryUsage === -1. ? null : $memoryUsage,
         );
+
+        $this->memoryLimiter->recordInitialRunMemoryUsage($results->memoryUsage);
+
+        return $results;
     }
 
     #[Override]
@@ -233,7 +239,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         string $extraOptions,
     ): array {
         return $this->getCommandLine(
-            [],
+            $this->memoryLimiter->getPhpExtraArguments(),
             $this->argumentsAndOptionsBuilder->buildForMutant(
                 $this->mutationConfigBuilder->build(
                     $coverageTests,

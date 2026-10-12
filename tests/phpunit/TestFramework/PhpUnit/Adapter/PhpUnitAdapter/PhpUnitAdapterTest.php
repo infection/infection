@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
 use function array_map;
+use function array_slice;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
@@ -61,6 +62,8 @@ use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\PhpUnit\MemoryLimiter;
+use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -550,6 +553,40 @@ final class PhpUnitAdapterTest extends TestCase
             $scenario->expected,
             $actual,
         );
+    }
+
+    public function test_it_applies_the_initial_run_memory_usage_to_mutant_commands(): void
+    {
+        $process = $this->createStub(Process::class);
+        $process->method('isSuccessful')->willReturn(true);
+        $process->method('getOutput')->willReturn('Memory: 12.50MB');
+        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
+        $configuration = ConfigurationBuilder::withMinimalTestData()->withSkipCoverage(true)->build();
+        $this->fileSystemMock->expects($this->exactly(2))->method('isReadableFile')->willReturn(true);
+        $this->fileSystemMock->expects($this->exactly(2))->method('dumpFile');
+        $environment = $this->createMock(MemoryLimiterEnvironment::class);
+        $environment->expects($this->once())->method('hasMemoryLimitSet')->willReturn(false);
+        $memoryLimiter = new MemoryLimiter($environment);
+        $adapter = $this->createAdapter(
+            testFrameworkConfigContent: <<<'XML'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <phpunit/>
+                XML,
+            memoryLimiter: $memoryLimiter,
+            configuration: $configuration,
+            initialTestsRunner: $initialTestsRunner,
+        );
+        $initialTestsRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with($adapter, $configuration->testFrameworkExtraOptions, [''], true)
+            ->willReturn($process)
+        ;
+        $adapter->executeInitialRun();
+
+        $command = $adapter->getMutantCommandLine([], '/mutant.php', 'hash', '/original.php', '');
+
+        $this->assertSame(['-d', 'memory_limit=25M'], array_slice($command, 1, 2));
     }
 
     public static function passOutputProvider(): iterable
@@ -1885,6 +1922,7 @@ final class PhpUnitAdapterTest extends TestCase
         bool $executeOnlyCoveringTestCases = false,
         ?string $mapSourceClassToTestStrategy = null,
         ?ShellCommandRunner $shellCommandRunner = null,
+        ?MemoryLimiter $memoryLimiter = null,
         ?Configuration $configuration = null,
         ?InitialTestsRunner $initialTestsRunner = null,
         ?MutantProcessContainerFactory $processFactory = null,
@@ -1955,6 +1993,7 @@ final class PhpUnitAdapterTest extends TestCase
             $configuration,
             $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
             new TestFrameworkExtraOptionsFilter(),
+            $memoryLimiter ?? new MemoryLimiter($this->createStub(MemoryLimiterEnvironment::class)),
             $version,
         );
     }
