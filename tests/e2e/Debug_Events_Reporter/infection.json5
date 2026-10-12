@@ -1,0 +1,15 @@
+{
+    "$schema": "../../../resources/schema.json",
+    "timeout": 20,
+    "threads": 1,
+    "tmpDir": "var",
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "debugEvents": "var/events.jsonl"
+    },
+    "mutators": {
+        "Plus": true
+    }
+}

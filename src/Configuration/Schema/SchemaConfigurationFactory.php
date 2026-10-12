@@ -156,8 +156,8 @@ class SchemaConfigurationFactory
 
     private static function createLogs(stdClass $logs): Logs
     {
-        /** @var string|null $executionPath Schema validation has checked its type. */
-        $executionPath = $logs->execution ?? null;
+        /** @var string|null $debugEvents */
+        $debugEvents = $logs->debugEvents ?? null;
 
         return new Logs(
             self::normalizeString($logs->text ?? null),
@@ -170,7 +170,7 @@ class SchemaConfigurationFactory
             $logs->github ?? false,
             self::createStrykerConfig($logs->stryker ?? null),
             self::normalizeString($logs->summaryJson ?? null),
-            self::normalizeString($executionPath),
+            self::normalizeString($debugEvents),
         );
     }
 

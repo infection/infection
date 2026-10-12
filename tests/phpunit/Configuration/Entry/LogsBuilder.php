@@ -51,7 +51,7 @@ final class LogsBuilder
         private bool $useGitHubAnnotationsLogger,
         private ?StrykerConfig $strykerConfig,
         private ?string $summaryJsonLogFilePath,
-        private ?string $executionLogFilePath,
+        private ?string $debugEventsLogFilePath,
     ) {
     }
 
@@ -68,7 +68,7 @@ final class LogsBuilder
             $logs->getUseGitHubAnnotationsLogger(),
             $logs->getStrykerConfig(),
             $logs->getSummaryJsonLogFilePath(),
-            $logs->getExecutionLogFilePath(),
+            $logs->debugEventsLogFilePath,
         );
     }
 
@@ -85,7 +85,7 @@ final class LogsBuilder
             useGitHubAnnotationsLogger: false,
             strykerConfig: null,
             summaryJsonLogFilePath: null,
-            executionLogFilePath: null,
+            debugEventsLogFilePath: null,
         );
     }
 
@@ -102,7 +102,7 @@ final class LogsBuilder
             useGitHubAnnotationsLogger: true,
             strykerConfig: StrykerConfig::forFullReport('master'),
             summaryJsonLogFilePath: '/var/log/infection/summary.json',
-            executionLogFilePath: null,
+            debugEventsLogFilePath: '/var/log/infection/debug-events.jsonl',
         );
     }
 
@@ -186,10 +186,10 @@ final class LogsBuilder
         return $clone;
     }
 
-    public function withExecutionLogFilePath(?string $path): self
+    public function withDebugEventsLogFilePath(?string $debugEventsLogFilePath): self
     {
         $clone = clone $this;
-        $clone->executionLogFilePath = $path;
+        $clone->debugEventsLogFilePath = $debugEventsLogFilePath;
 
         return $clone;
     }
@@ -207,7 +207,7 @@ final class LogsBuilder
             $this->useGitHubAnnotationsLogger,
             $this->strykerConfig,
             $this->summaryJsonLogFilePath,
-            $this->executionLogFilePath,
+            $this->debugEventsLogFilePath,
         );
     }
 }

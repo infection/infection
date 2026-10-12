@@ -159,7 +159,7 @@ final class SchemaConfigurationBuilder
                 useGitHubAnnotationsLogger: true,
                 strykerConfig: StrykerConfig::forBadge('master'),
                 summaryJsonLogFilePath: 'summary.json',
-                executionLogFilePath: null,
+                debugEventsLogFilePath: null,
             ),
             tmpDir: '/tmp/infection',
             phpUnit: new PhpUnit('/config/phpunit', '/custom/phpunit'),

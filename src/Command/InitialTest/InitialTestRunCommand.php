@@ -85,7 +85,10 @@ final class InitialTestRunCommand extends BaseCommand
             initialTestsPhpOptions: InitialTestsPhpOptionsOption::get($io),
             testFramework: TestFrameworkOption::get($io),
             testFrameworkExtraArgs: TestFrameworkExtraArgsOption::get($io),
-            sourceFilter: SourceFilterOptions::get($io, PathsArgument::get($io)),
+            sourceFilter: SourceFilterOptions::get(
+                $io,
+                PathsArgument::get($io),
+            ),
         );
 
         // TODO: this is not very elegant but done this way for now to keep the same behaviour

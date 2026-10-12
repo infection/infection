@@ -43,6 +43,7 @@ use function explode;
 use function implode;
 use function in_array;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
@@ -85,6 +86,9 @@ final readonly class InitialConfigBuilder
         $this->originalXmlConfigContent = $originalXmlConfigContent;
     }
 
+    /**
+     * @throws InvalidPhpUnitConfiguration
+     */
     public function build(string $version, bool $collectCoverage = true): string
     {
         $path = $this->buildPath();
@@ -95,7 +99,11 @@ final readonly class InitialConfigBuilder
             formatOutput: true,
         );
 
-        $this->configManipulator->validate($path, $xPath);
+        $this->configManipulator->validate(
+            $version,
+            $path,
+            $xPath,
+        );
 
         $this->addCoverageNodes($version, $xPath);
         $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);

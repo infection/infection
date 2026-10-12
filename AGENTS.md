@@ -495,11 +495,10 @@ everywhere instead. `OriginalPhpProcess` brackets `parent::start()` with
 `PhpConfig::useOriginal()` / `usePersistent()` and injects `XDEBUG_MODE=coverage` unless
 pcov/phpdbg is the better driver. `CoverageChecker` decides upfront via seven signals -
 including regexing `--initial-tests-php-options` for drivers only the child will load - and
-throws `CoverageNotFound` with a heredoc listing copy-pasteable remedies. `MemoryLimiter`
-appends `memory_limit = 2x observed` to the xdebug-handler TEMP ini only - guarded by
-`MemoryLimiterEnvironment::isUsingSystemIni()`; and it must run AFTER static analysis
-(PHPStan OOMs otherwise, #2427). Every step is best-effort: early-return guards for six
-can't-do-this conditions, swallowed `IOException`.
+throws `CoverageNotFound` with a heredoc listing copy-pasteable remedies. `TestFramework\PhpUnit\MemoryLimiter`
+adds `-d memory_limit=2x observed` only to PHPUnit mutant commands when initial memory usage
+is known and no user memory limit is set. It leaves shared PHP configuration and static-analysis
+processes unchanged (#2427).
 
 ## Adding a mutator
 
