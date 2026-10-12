@@ -85,6 +85,7 @@ final readonly class Factory
         private array $installedExtensions,
         private ShellCommandRunner $shellCommandRunner,
         private FileSystem $fileSystem,
+        private ConsoleOutput $consoleOutput,
         private LoggerInterface $logger,
         private CoverageCheckerFactory $coverageCheckerFactory,
         private InitialTestsRunner $initialTestsRunner,
@@ -101,7 +102,7 @@ final readonly class Factory
             ? $testFramework
             : new LegacyTestFrameworkBridge(
                 $testFramework,
-                new ConsoleOutput($this->logger),
+                $this->consoleOutput,
                 $this->coverageCheckerFactory->create($testFramework),
                 $this->initialTestsRunner,
                 $this->infectionConfig,
