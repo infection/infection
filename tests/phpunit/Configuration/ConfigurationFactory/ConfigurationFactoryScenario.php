@@ -52,6 +52,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
+use Infection\Tests\Fixtures\Resource\Processor\DummyCpuCoresCountProvider;
 use Webmozart\Assert\Assert;
 
 final class ConfigurationFactoryScenario
@@ -829,11 +830,15 @@ final class ConfigurationFactoryScenario
         string|int|null $schemaThreads,
         ?int $inputThreadCount,
         int $expectedThreadCount,
+        int $cpuCoresCount = 1,
     ): self {
         $previousExpected = $this->expected;
         Assert::isInstanceOf($previousExpected, Configuration::class);
 
         return $this
+            ->withCpuCoresCountProvider(
+                new DummyCpuCoresCountProvider($cpuCoresCount),
+            )
             ->withSchema(
                 $this->schemaBuilder
                     ->withThreads($schemaThreads),
