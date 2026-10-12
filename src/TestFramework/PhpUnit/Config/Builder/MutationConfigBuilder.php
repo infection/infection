@@ -84,6 +84,10 @@ final class MutationConfigBuilder
 
         $this->configManipulator->replaceWithAbsolutePaths($xPath);
 
+        // Even metadata-derived recording must stay out of mutant execution.
+        $xPath->getElement('/phpunit')->removeAttribute('recordTestImpactData');
+        $xPath->getElement('/phpunit')->removeAttribute('deriveTestImpactDataFromCoverageTargets');
+
         $originalBootstrapFile = $this->originalBootstrapFile;
 
         $originalBootstrapFile ??= $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);

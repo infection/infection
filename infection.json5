@@ -57,7 +57,7 @@
                 // BaseReportLocatorTest and its DemoReportLocator implementation.
                 // However, it is a tested extension point already hence making those tests more
                 // complicated for this is not worth.
-                "Infection\\TestFramework\\Coverage\\Locator\\BaseReportLocator",
+                "Infection\\TestFramework\\Coverage\\Locator\\BaseReportLocator"
             ]
         },
         "UnwrapArrayMap": {

@@ -1,0 +1,14 @@
+# Replacing the experimental version gate and planning migration
+
+The proof of concept pins PHPUnit PR #6919 at `01507e39`, reporting `13.5-dev`.
+The current support gate matches only that version string, which does not identify the
+pinned commit. A release needs a gate based on the TIA behaviour actually supported.
+
+This update changes the impact-data format from version 9 to 10. Recordings from
+`e21b72d4` are incompatible and must be rebuilt by a full run.
+
+The intended way to select the recording strategy is through PHPUnit extra arguments.
+Migration from `mapSourceClassToTestStrategy` remains unspecified.
+
+There is no release or migration scenario. These are open integration tasks, not failures
+reproduced by the current Behat suite.

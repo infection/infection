@@ -1,0 +1,40 @@
+default:
+    formatters:
+        progress: true
+    testers:
+        strict: true
+    suites:
+        initial_run:
+            paths:
+                - features/01-initial-run.feature
+                - features/02-development-cycle.feature
+                - features/03-mutant-isolation.feature
+                - features/04-cache-and-dependencies.feature
+                - features/05-configuration-and-boundaries.feature
+            services:
+                filesystem: Symfony\Component\Filesystem\Filesystem
+                shellCommandRunner: Infection\E2ETests\PHPUnitTIA\Behat\ShellCommandRunner
+                scenarioState: Infection\E2ETests\PHPUnitTIA\Behat\ScenarioState
+            contexts:
+                -   Infection\E2ETests\PHPUnitTIA\Behat\ScenarioStateContext:
+                        scenarioState: '@scenarioState'
+                -   Infection\E2ETests\PHPUnitTIA\Behat\ScenarioProjectContext:
+                        filesystem: '@filesystem'
+                        shellCommandRunner: '@shellCommandRunner'
+                        scenarioState: '@scenarioState'
+                -   Infection\E2ETests\PHPUnitTIA\Behat\InfectionContext:
+                        filesystem: '@filesystem'
+                        shellCommandRunner: '@shellCommandRunner'
+                        scenarioState: '@scenarioState'
+                -   Infection\E2ETests\PHPUnitTIA\Behat\PhpUnitContext:
+                        filesystem: '@filesystem'
+                        shellCommandRunner: '@shellCommandRunner'
+                        scenarioState: '@scenarioState'
+            filters:
+                tags: "~@skip"
+
+blocked:
+    suites:
+        initial_run:
+            filters:
+                tags: "@skip"

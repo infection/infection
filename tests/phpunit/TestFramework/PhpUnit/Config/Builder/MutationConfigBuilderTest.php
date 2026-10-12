@@ -44,6 +44,7 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -103,6 +104,17 @@ final class MutationConfigBuilderTest extends TestCase
 
         $actualXml = $this->filesystem->readFile($actualConfigurationPath);
         $this->assertSame($expectedXml, $actualXml);
+    }
+
+    public function test_mutants_do_not_record_test_impact_data(): void
+    {
+        $builder = $this->createBuilder('<phpunit recordTestImpactData="true" deriveTestImpactDataFromCoverageTargets="true"/>');
+        $path = $builder->build([], self::MUTATED_FILE_PATH, self::HASH, self::ORIGINAL_FILE_PATH, '13.5-dev');
+        $xml = SafeDOMXPath::fromString($this->filesystem->readFile($path));
+        $phpunit = $xml->getElement('/phpunit');
+
+        $this->assertFalse($phpunit->hasAttribute('recordTestImpactData'));
+        $this->assertFalse($phpunit->hasAttribute('deriveTestImpactDataFromCoverageTargets'));
     }
 
     #[DataProvider('autoloadProvider')]

@@ -40,7 +40,6 @@ use function array_slice;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
@@ -62,6 +61,7 @@ use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\PhpUnit\Log\PhpUnitLogger;
 use Infection\TestFramework\PhpUnit\MemoryLimiter;
 use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -280,8 +280,8 @@ final class PhpUnitAdapterTest extends TestCase
     #[DataProvider('skipInitialTestsProvider')]
     public function test_it_checks_requirements(bool $skipInitialTests): void
     {
-        $consoleOutput = $this->createMock(ConsoleOutput::class);
-        $consoleOutput
+        $logger = $this->createMock(PhpUnitLogger::class);
+        $logger
             ->expects($this->exactly($skipInitialTests ? 1 : 0))
             ->method('logSkippingInitialTests')
         ;
@@ -296,7 +296,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ->withSkipCoverage(true)
                 ->withSkipInitialTests($skipInitialTests)
                 ->build(),
-            consoleOutput: $consoleOutput,
+            logger: $logger,
         );
 
         $adapter->checkRequirements();
@@ -1926,9 +1926,10 @@ final class PhpUnitAdapterTest extends TestCase
         ?Configuration $configuration = null,
         ?InitialTestsRunner $initialTestsRunner = null,
         ?MutantProcessContainerFactory $processFactory = null,
-        ?ConsoleOutput $consoleOutput = null,
+        ?PhpUnitLogger $logger = null,
     ): PhpUnitAdapter {
         $configuration ??= ConfigurationBuilder::withMinimalTestData()->build();
+        $logger ??= $this->createStub(PhpUnitLogger::class);
         $tmpDir = '/tmp';
         $projectDir = '/path/to/project';
         $testFrameworkConfigDir = '/path/to/project/tools/phpunit';
@@ -1958,6 +1959,8 @@ final class PhpUnitAdapterTest extends TestCase
                 $this->fileSystemMock,
                 ['bin', 'src'],
                 $filteredSourceFilePathsToMutate,
+                $projectDir,
+                $logger,
             ),
             new MutationConfigBuilder(
                 $tmpDir,
@@ -1977,7 +1980,7 @@ final class PhpUnitAdapterTest extends TestCase
             new VersionParser(),    // won't be used since we pass the version
             new CommandLineBuilder($this->phpExecutableFinderMock),
             '/path/to/project/tools/phpunit/phpunit.xml',
-            $consoleOutput ?? $this->createStub(ConsoleOutput::class),
+            $logger,
             new CoverageCheckerFactory(
                 $configuration,
                 JUnitReportLocator::create(

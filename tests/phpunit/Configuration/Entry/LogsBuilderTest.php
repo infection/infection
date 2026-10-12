@@ -48,13 +48,23 @@ final class LogsBuilderTest extends TestCase
     {
         $actual = LogsBuilder::from($logs)->build();
 
-        $this->assertEquals($logs, $actual);
+        $this->assertEquals(
+            $logs,
+            $actual,
+            'Rebuilding logs from an existing instance must preserve every configured destination.',
+        );
     }
 
     public static function logsProvider(): iterable
     {
         yield 'minimal test data' => [
             LogsBuilder::withMinimalTestData()->build(),
+        ];
+
+        yield 'debug event report' => [
+            LogsBuilder::withMinimalTestData()
+                ->withDebugEventsLogFilePath('/report.jsonl')
+                ->build(),
         ];
 
         yield 'complete test data' => [
