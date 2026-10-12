@@ -55,6 +55,7 @@ final readonly class Test
         public string $locationHint,
         public string $nodeId,
         public string $parentNodeId,
+        public string $sourceFilePath,
     ) {
     }
 
@@ -69,6 +70,7 @@ final readonly class Test
             // The Mutation hash is too long to be suitable to be a nodeId.
             nodeId: NodeIdFactory::create($mutation->getHash()),
             parentNodeId: $parentNodeId,
+            sourceFilePath: $mutation->getOriginalFilePath(),
         );
     }
 
@@ -92,6 +94,7 @@ final readonly class Test
             'message' => self::createMutationMessage($executionResult),
             'details' => $executionResult->getMutantDiff(),
             'duration' => self::getExecutionDurationInMs($executionResult),
+            'expectedFile' => $this->sourceFilePath,
         ];
     }
 

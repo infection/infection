@@ -73,6 +73,7 @@ final class TestTest extends TestCase
                 'infection:///path/to/project/src/Infrastructure/Http/Action/Greet.php::7-42',
                 '2b4aa030e4a6eead',
                 'a93f8006e20d02d1',
+                '/path/to/project/src/Infrastructure/Http/Action/Greet.php',
             ),
         ];
     }
