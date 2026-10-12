@@ -64,6 +64,10 @@ class SchemaConfigurationFactory
         /** @var stdClass $mago */
         $mago = $rawConfig->mago ?? new stdClass();
 
+        // The threads value has already been validated against resources/schema.json.
+        /** @var positive-int|'max'|null $threads */
+        $threads = $rawConfig->threads ?? null;
+
         self::assertTestFrameworkOptionsAreNotBothConfigured($rawConfig);
 
         return new SchemaConfiguration(
@@ -87,7 +91,7 @@ class SchemaConfigurationFactory
             testFrameworkExtraOptions: self::normalizeString($rawConfig->testFrameworkOptions ?? null),
             testFrameworkExtraArgs: self::normalizeString($rawConfig->testFrameworkExtraArgs ?? null),
             staticAnalysisToolOptions: self::normalizeString($rawConfig->staticAnalysisToolOptions ?? null),
-            threads: $rawConfig->threads ?? null,
+            threads: $threads,
             dotsPerRow: $rawConfig->dotsPerRow ?? null,
             staticAnalysisTool: self::getStaticAnalysisTool($rawConfig),
             debugTestFrameworkLogFile: self::normalizeString($rawConfig->debug->logFile ?? null),

@@ -789,12 +789,6 @@ count = 1
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #21 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `int|null|string`, but found `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
-code = "mixed-argument"
 message = '''Invalid argument type for argument #22 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `null|positive-int|string('max')`, but found `mixed`.'''
 count = 1
 
