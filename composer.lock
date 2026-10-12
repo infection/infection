@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "122e891b32ac3e99e490892b1e44c600",
+    "content-hash": "147fcb8910febb0a283295e2d963f1bb",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -4070,12 +4070,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "e21b72d4ac3a9d9351eaa065638dd5e6259879bd"
+                "reference": "01507e39d03eb593d6d1888cca763b766526220d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/e21b72d4ac3a9d9351eaa065638dd5e6259879bd",
-                "reference": "e21b72d4ac3a9d9351eaa065638dd5e6259879bd",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/01507e39d03eb593d6d1888cca763b766526220d",
+                "reference": "01507e39d03eb593d6d1888cca763b766526220d",
                 "shasum": ""
             },
             "require": {
@@ -4154,7 +4154,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-10-04T06:39:11+00:00"
+            "time": "2026-10-06T13:18:29+00:00"
         },
         {
             "name": "psr/cache",

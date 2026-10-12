@@ -2,7 +2,7 @@
 
 This overview describes the pinned snapshot of
 [PHPUnit PR #6919](https://github.com/sebastianbergmann/phpunit/pull/6919), commit
-[`e21b72d4ac3a9d9351eaa065638dd5e6259879bd`](https://github.com/sebastianbergmann/phpunit/tree/e21b72d4ac3a9d9351eaa065638dd5e6259879bd),
+[`01507e39d03eb593d6d1888cca763b766526220d`](https://github.com/sebastianbergmann/phpunit/tree/01507e39d03eb593d6d1888cca763b766526220d),
 which reports `13.5-dev`. The feature is not merged; these options are experimental.
 
 The options cover three steps: build a dependency map, select tests from it, and explain
@@ -98,8 +98,8 @@ paths read from a list file.
 
 Explicit paths replace automatic change detection; they do not supplement it. Supplying
 only `src/A.php` can therefore omit an existing test that changed to cover A after the
-recording, or one whose fixture changed. Adding `--only-impacted` does not combine the
-two modes. Existing suite, group, and filter restrictions still apply.
+recording, or one whose fixture changed. Combining `--only-impacted` with either explicit-path
+option is now an error. Existing suite, group, and filter restrictions still apply.
 
 ## Inspect the decision
 
@@ -136,6 +136,13 @@ Automatic detection also falls back when source or watched files are new or chan
 ways no recorded dependency explains. Recorded code executed outside any test is treated as a
 dependency of every test. An explicit query for an unknown path also triggers a fallback.
 PHPUnit reports the reason in its impact summary and explanation output.
+
+The optional `<testImpactAnalysis><addedFilesAreReachedThroughChanges>` XML setting
+can declare included files or directories where a newly added file can affect tests only
+through another file changed to use it. Such additions do not force a full-suite fallback;
+the changed referring files select the affected tests. This is a project assumption,
+and changing its include/exclude configuration invalidates the recording. The existing
+Infection scenarios do not exercise this new setting.
 
 Missing prerequisites are errors: selection requires a configured cache directory and
 enabled test-run history even when it cannot reuse impact data.

@@ -1,14 +1,13 @@
 # PHPUnit TIA integration
 
-These findings were checked against [PHPUnit PR #6919 at `e21b72d4`](https://github.com/sebastianbergmann/phpunit/tree/e21b72d4ac3a9d9351eaa065638dd5e6259879bd)
+These findings were checked against [PHPUnit PR #6919 at `01507e39`](https://github.com/sebastianbergmann/phpunit/tree/01507e39d03eb593d6d1888cca763b766526220d)
 (`13.5-dev`) and Infection's current proof of concept. The feature has not been merged.
 Both the root and Behat fixture Composer projects pin this commit.
 This directory describes the integration approach, verified behaviour and remaining work.
 See [the option overview](../phpunit-tia-options.md) for the PHPUnit API.
 
-The findings were rechecked on 2026-10-12 with PHP 8.4.22 and Xdebug 3.5.3 after repairing
-the merge integration and migrating the fixture to debug events. PHPUnit remained at
-the pinned commit:
+The findings were rechecked on 2026-10-12 with PHP 8.4.22 and Xdebug 3.5.3 after updating
+both Composer projects from `e21b72d4` to `01507e39`:
 
 | Behat profile | Result |
 | --- | --- |

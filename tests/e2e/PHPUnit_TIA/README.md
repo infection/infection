@@ -50,7 +50,7 @@ There are two test layers: Behat runs the scenarios, while PHPUnit runs the smal
 PHP project that Infection mutates. This fixture has its own Composer dependencies,
 including Behat and a pinned PHPUnit build with TIA support. The Infection executable
 comes from the repository (or the path passed to the runner), not the fixture's `vendor/`.
-The fixture pins PHPUnit PR #6919 at `e21b72d4ac3a9d9351eaa065638dd5e6259879bd`
+The fixture pins PHPUnit PR #6919 at `01507e39d03eb593d6d1888cca763b766526220d`
 until a release includes TIA.
 
 The execution flow is:
