@@ -11,6 +11,7 @@ use function dirname;
 use function getcwd;
 use function json_encode;
 use function preg_match;
+use function register_shutdown_function;
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 use const PHP_BINARY;
@@ -49,6 +50,25 @@ final class RecordExecutionExtension implements Extension
 
         if ($mutantId === null) {
             $this->removePreviousMutantRecordings($recordingPaths);
+
+            // PHPUnit persists impact data after its execution events. Snapshot at
+            // shutdown, when recording is complete and no mutant has started yet.
+            register_shutdown_function(
+                function () use ($configuration, $recordingPaths): void {
+                    $this->filesystem->dumpFile(
+                        $recordingPaths['configuration'] . '.cache.json',
+                        json_encode(
+                            (new CacheSnapshot($this->filesystem))->read([
+                                'test-impact-data' => $configuration->hasCacheDirectory()
+                                    ? $configuration->cacheDirectory() . '/test-impact-data'
+                                    : null,
+                                'test-run-history' => $configuration->testRunHistoryFile(),
+                            ]),
+                            JSON_THROW_ON_ERROR,
+                        ),
+                    );
+                },
+            );
         }
 
         $this->recordConfiguration(
@@ -126,6 +146,9 @@ final class RecordExecutionExtension implements Extension
             : null;
 
         $record = [
+            'configurationFile' => $this->makePathRelativeToRoot(
+                $configuration->configurationFile(),
+            ),
             'command' => [
                 PHP_BINARY,
                 ...$_SERVER['argv'],

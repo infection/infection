@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
-use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\InMemoryFileSystem;
 use Infection\Framework\OperatingSystem;
@@ -45,6 +44,8 @@ use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\PhpUnit\Log\PhpUnitLogger;
+use Infection\TestFramework\PhpUnit\Log\PsrLogger;
 use Infection\TestFramework\XML\SafeDOMXPath;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -95,12 +96,12 @@ final class InitialConfigBuilderTest extends TestCase
         bool $warns = false,
         array $sources = ['/src/A.php', '/src/B.php'],
     ): void {
-        $consoleOutput = $this->createMock(ConsoleOutput::class);
-        $consoleOutput->expects($warns ? $this->once() : $this->never())
+        $logger = $this->createMock(PhpUnitLogger::class);
+        $logger->expects($warns ? $this->once() : $this->never())
             ->method('logSkippingTestImpactAnalysis')
             ->with('Deriving dependencies from coverage targets requires requireCoverageMetadata="true" without disabling it for any test size.')
         ;
-        $builder = $this->createConfigBuilder($xml, $sources, $consoleOutput);
+        $builder = $this->createConfigBuilder($xml, $sources, $logger);
         $baseOptions = ['--configuration', '/initial.xml'];
         $options = [...$baseOptions, ...TestFrameworkExtraArgs::parseRawTokens($extraArgs)];
         $expected = [...$baseOptions, ...TestFrameworkExtraArgs::parseRawTokens($expectedExtraArgs)];
@@ -1106,7 +1107,7 @@ final class InitialConfigBuilderTest extends TestCase
     private function createConfigBuilder(
         string $originalPhpUnitXmlConfig,
         array $filteredSourceFilesToMutate = [],
-        ?ConsoleOutput $consoleOutput = null,
+        ?PhpUnitLogger $logger = null,
     ): InitialConfigBuilder {
         $srcDirs = ['src', 'app'];
 
@@ -1124,7 +1125,7 @@ final class InitialConfigBuilderTest extends TestCase
             $srcDirs,
             $filteredSourceFilesToMutate,
             $this->projectPath,
-            ($consoleOutput ?? new ConsoleOutput(new NullLogger()))->logSkippingTestImpactAnalysis(...),
+            $logger ?? new PsrLogger(new NullLogger()),
         );
     }
 }

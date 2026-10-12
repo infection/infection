@@ -52,7 +52,6 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Mutator\ProfileList;
 use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Tests\Configuration\Entry\LogsBuilder;
 use InvalidArgumentException;
 use JsonSchema\Validator;
 use const PHP_EOL;
@@ -221,14 +220,6 @@ final class SchemaConfigurationFactoryTest extends TestCase
             self::createConfig([
                 'timeout' => 100,
                 'source' => new Source(['src'], []),
-            ]),
-        ];
-
-        yield '[logs][execution] nominal' => [
-            '{"source":{"directories":["src"]},"logs":{"execution":"var/execution.jsonl"}}',
-            self::createConfig([
-                'source' => new Source(['src'], []),
-                'logs' => LogsBuilder::withMinimalTestData()->withExecutionLogFilePath('var/execution.jsonl')->build(),
             ]),
         ];
 

@@ -74,7 +74,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 use SplFileInfo;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -1930,6 +1929,7 @@ final class PhpUnitAdapterTest extends TestCase
         ?PhpUnitLogger $logger = null,
     ): PhpUnitAdapter {
         $configuration ??= ConfigurationBuilder::withMinimalTestData()->build();
+        $logger ??= $this->createStub(PhpUnitLogger::class);
         $tmpDir = '/tmp';
         $projectDir = '/path/to/project';
         $testFrameworkConfigDir = '/path/to/project/tools/phpunit';
@@ -1960,7 +1960,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ['bin', 'src'],
                 $filteredSourceFilePathsToMutate,
                 $projectDir,
-                (new ConsoleOutput(new NullLogger()))->logSkippingTestImpactAnalysis(...),
+                $logger,
             ),
             new MutationConfigBuilder(
                 $tmpDir,
@@ -1980,7 +1980,7 @@ final class PhpUnitAdapterTest extends TestCase
             new VersionParser(),    // won't be used since we pass the version
             new CommandLineBuilder($this->phpExecutableFinderMock),
             '/path/to/project/tools/phpunit/phpunit.xml',
-            $logger ?? $this->createStub(PhpUnitLogger::class),
+            $logger,
             new CoverageCheckerFactory(
                 $configuration,
                 JUnitReportLocator::create(

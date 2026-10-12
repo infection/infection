@@ -66,6 +66,7 @@ final readonly class PsrLogger implements PhpUnitLogger
         );
     }
 
+    #[Override]
     public function logSkippingTestImpactAnalysis(string $reason): void
     {
         $this->logger->notice(

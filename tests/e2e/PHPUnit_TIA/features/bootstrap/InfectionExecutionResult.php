@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Infection\E2ETests\PHPUnitTIA\Behat;
 
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
 use Webmozart\Assert\Assert;
 use function array_filter;
 use function array_flip;
@@ -20,41 +23,56 @@ final readonly class InfectionExecutionResult
 {
     /**
      * @param list<string> $command
-     * @param list<array<string, mixed>> $executionEvents
+     * @param list<array<string, mixed>> $events
      * @param array<string, mixed> $report
+     * @param array<string, list<array{line: int, tests: list<string>}>> $coverageBySource
+     * @param array<string, string|null> $initialCache
+     * @param array<string, string|null> $finalCache
      */
     public function __construct(
         public array $command,
         public string $output,
-        public array $executionEvents,
+        public array $events,
         public array $report,
+        public array $coverageBySource,
+        public array $initialCache,
+        public array $finalCache,
     ) {
     }
 
     /**
      * @param list<string> $command
+     * @param array<string, list<array{line: int, tests: list<string>}>> $coverageBySource
+     * @param array<string, string|null> $initialCache
+     * @param array<string, string|null> $finalCache
      */
     public static function fromRecordings(
         array $command,
         string $output,
-        string $executionReportJsonLines,
+        string $debugEventsJsonLines,
         string $infectionReportJson,
+        array $coverageBySource,
+        array $initialCache,
+        array $finalCache,
     ): self {
-        $executionReport = trim($executionReportJsonLines);
+        $debugEvents = trim($debugEventsJsonLines);
 
         return new self(
             command: $command,
             output: $output,
-            executionEvents: array_map(
+            events: array_map(
                 Json::decode(...),
-                $executionReport === ''
+                $debugEvents === ''
                     ? []
                     : explode(
                         "\n",
-                        $executionReport,
+                        $debugEvents,
                     ),
             ),
             report: Json::decode($infectionReportJson),
+            coverageBySource: $coverageBySource,
+            initialCache: $initialCache,
+            finalCache: $finalCache,
         );
     }
 
@@ -63,13 +81,21 @@ final readonly class InfectionExecutionResult
      */
     public function getSources(): array
     {
-        return $this->selectEvents(
-            'source_processed',
-            [
-                'file',
-                'mutationHashes',
-                'coverage',
-            ],
+        return array_map(
+            function (array $source): array {
+                Assert::keyExists(
+                    $this->coverageBySource,
+                    $source['sourceFilePath'],
+                    'Every processed source must have an entry in the XML coverage report.',
+                );
+
+                return [
+                    'file' => $source['sourceFilePath'],
+                    'mutationHashes' => $source['mutationHashes'],
+                    'coverage' => $this->coverageBySource[$source['sourceFilePath']],
+                ];
+            },
+            $this->getEvents(MutableFileWasProcessed::class),
         );
     }
 
@@ -78,17 +104,36 @@ final readonly class InfectionExecutionResult
      */
     public function getMutations(): array
     {
-        return $this->selectEvents(
-            'mutant_finished',
-            [
-                'hash',
-                'file',
-                'mutator',
-                'startLine',
-                'endLine',
-                'diff',
-                'status',
+        return array_map(
+            static fn (array $event): array => [
+                'hash' => $event['executionResult']['mutantHash'],
+                'file' => $event['executionResult']['originalFilePath'],
+                'mutator' => $event['executionResult']['mutatorName'],
+                'startLine' => $event['executionResult']['originalStartingLine'],
+                'endLine' => $event['executionResult']['originalEndingLine'],
+                'status' => $event['executionResult']['detectionStatus'],
             ],
+            $this->getEvents(MutantProcessWasFinished::class),
+        );
+    }
+
+    /**
+     * @return array<string, list<array<string, mixed>>>
+     */
+    public function getMutationDiffs(): array
+    {
+        $groups = $this->report;
+        unset($groups['stats']);
+
+        return array_map(
+            static fn (array $mutants): array => array_map(
+                static fn (array $mutant): array => array_intersect_key(
+                    $mutant,
+                    array_flip(['mutator', 'diff']),
+                ),
+                $mutants,
+            ),
+            $groups,
         );
     }
 
@@ -99,10 +144,7 @@ final readonly class InfectionExecutionResult
 
     public function getInitialPhpUnitOutput(): string
     {
-        $initialTestResults = $this->selectEvents(
-            'initial_tests_finished',
-            ['output'],
-        );
+        $initialTestResults = $this->getEvents(InitialTestSuiteWasFinished::class);
 
         Assert::count(
             $initialTestResults,
@@ -110,34 +152,19 @@ final readonly class InfectionExecutionResult
             'Expected exactly one completed initial PHPUnit execution in the Infection report.',
         );
 
-        return $initialTestResults[0]['output'];
-    }
-
-    /**
-     * @param list<string> $fields
-     *
-     * @return list<array<string, mixed>>
-     */
-    private function selectEvents(string $type, array $fields): array
-    {
-        $selectFields = static fn (array $event): array => array_intersect_key(
-            $event,
-            array_flip($fields),
-        );
-
-        return array_map(
-            $selectFields,
-            $this->getEvents($type),
-        );
+        return $initialTestResults[0]['outputText'];
     }
 
     /** @return list<array<string, mixed>> */
     public function getEvents(string $type): array
     {
-        return array_values(
-            array_filter(
-                $this->executionEvents,
-                static fn (array $event): bool => $event['event'] === $type,
+        return array_map(
+            static fn (array $event): array => $event['data'],
+            array_values(
+                array_filter(
+                    $this->events,
+                    static fn (array $event): bool => $event['event'] === $type,
+                ),
             ),
         );
     }

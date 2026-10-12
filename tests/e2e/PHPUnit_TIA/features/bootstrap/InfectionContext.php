@@ -9,6 +9,9 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Step\Then;
 use Behat\Step\When;
 use DOMDocument;
+use DOMElement;
+use Infection\E2ETests\PHPUnitTIA\PHPUnit\CacheSnapshot;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
@@ -19,6 +22,9 @@ use function array_keys;
 use function array_filter;
 use function array_map;
 use function array_values;
+use function array_unique;
+use function iterator_to_array;
+use function trim;
 use function count;
 use function dirname;
 use function sort;
@@ -30,7 +36,8 @@ final class InfectionContext implements Context
     private const string PHPUNIT_CONFIGURATION_RECORDING_PATH = 'var/phpunit/configuration.json';
     private const string PHPUNIT_LOADED_TESTS_RECORDING_PATH = 'var/phpunit/loaded-tests.json';
     private const string PHPUNIT_EXECUTED_TESTS_RECORDING_PATH = 'var/phpunit/executed-tests.jsonl';
-    private const string EXECUTION_REPORT_PATH = 'var/infection/execution.jsonl';
+    private const string DEBUG_EVENTS_PATH = 'var/infection/events.jsonl';
+    private const string COVERAGE_NAMESPACE = 'https://schema.phpunit.de/coverage/1.0';
     private const string INFECTION_REPORT_PATH = 'var/infection/infection.json';
     private const string OUTPUT_PATH_FORMAT = 'var/infection/output-%d.log';
 
@@ -194,6 +201,11 @@ final class InfectionContext implements Context
             $this->scenarioState->getFirstInfectionExecutionResult()->getMutations(),
             'The evaluated mutations or their detection statuses differ from the first Infection run.',
         );
+        Assert::same(
+            $this->scenarioState->getLastInfectionExecutionResult()->getMutationDiffs(),
+            $this->scenarioState->getFirstInfectionExecutionResult()->getMutationDiffs(),
+            'The mutation diffs differ from the first Infection run.',
+        );
     }
 
     #[Then('the reported MSI is unchanged from the first Infection run')]
@@ -266,7 +278,10 @@ final class InfectionContext implements Context
                 'mutationHashes',
                 'file',
             ),
-            'detection statuses' => static fn (InfectionExecutionResult $result): array => $result->getMutations(),
+            'detection statuses' => static fn (InfectionExecutionResult $result): array => [
+                $result->getMutations(),
+                $result->getMutationDiffs(),
+            ],
             'MSI' => static fn (InfectionExecutionResult $result): float => $result->getMsi(),
         ];
         $requestedResults = $results->getColumn(0);
@@ -390,33 +405,17 @@ final class InfectionContext implements Context
     public function assertSharedCacheIsUnchanged(): void
     {
         $result = $this->scenarioState->getLastInfectionExecutionResult();
-        $initialEvents = $result->getEvents('initial_tests_finished');
-        $finalEvents = $result->getEvents('mutation_testing_finished');
-
-        Assert::count(
-            $initialEvents,
-            1,
-            'Expected one completed initial run.',
-        );
-        Assert::count(
-            $finalEvents,
-            1,
-            'Expected one completed mutation run.',
-        );
-
-        $initialCache = $initialEvents[0]['configuredCache'];
-
         Assert::notNull(
-            $initialCache['test-impact-data'],
+            $result->initialCache['test-impact-data'],
             'The initial run must record impact data before checking mutant isolation.',
         );
         Assert::notNull(
-            $initialCache['test-run-history'],
+            $result->initialCache['test-run-history'],
             'The initial run must record test history before checking mutant isolation.',
         );
         Assert::same(
-            $finalEvents[0]['configuredCache'],
-            $initialCache,
+            $result->finalCache,
+            $result->initialCache,
             'Mutants changed the initial run\'s shared cache.',
         );
     }
@@ -451,7 +450,23 @@ final class InfectionContext implements Context
      */
     private function getEvaluatedMutants(): array
     {
-        $mutants = $this->scenarioState->getLastInfectionExecutionResult()->getEvents('mutant_finished');
+        $configurationDirectory = $this->getInitialConfigurationDirectory();
+        $mutants = array_map(
+            fn (array $event): array => [
+                'hash' => $event['executionResult']['mutantHash'],
+                'commandLine' => $event['executionResult']['processCommandLine'],
+                'output' => $event['executionResult']['processOutput'],
+                'configuration' => $this->filesystem->readFile(
+                    $configurationDirectory
+                        . '/phpunitConfiguration.'
+                        . $event['executionResult']['mutantHash']
+                        . '.infection.xml',
+                ),
+            ],
+            $this->scenarioState->getLastInfectionExecutionResult()->getEvents(
+                MutantProcessWasFinished::class,
+            ),
+        );
 
         Assert::notEmpty(
             $mutants,
@@ -482,16 +497,115 @@ final class InfectionContext implements Context
      */
     private function createExecutionResult(array $command, string $logPath): InfectionExecutionResult
     {
+        $project = $this->scenarioState->scenarioProjectDirectory;
+        $configurationPath = $project . '/' . self::PHPUNIT_CONFIGURATION_RECORDING_PATH;
+        $configuration = Json::decode(
+            $this->filesystem->readFile($configurationPath),
+        );
+
         return InfectionExecutionResult::fromRecordings(
             command: $command,
             output: $this->filesystem->readFile($logPath),
-            executionReportJsonLines: $this->filesystem->readFile(
-                $this->scenarioState->scenarioProjectDirectory . '/' . self::EXECUTION_REPORT_PATH,
+            debugEventsJsonLines: $this->filesystem->readFile(
+                $project . '/' . self::DEBUG_EVENTS_PATH,
             ),
             infectionReportJson: $this->filesystem->readFile(
-                $this->scenarioState->scenarioProjectDirectory . '/' . self::INFECTION_REPORT_PATH,
+                $project . '/' . self::INFECTION_REPORT_PATH,
+            ),
+            coverageBySource: $this->readCoverage(),
+            initialCache: Json::decode(
+                $this->filesystem->readFile($configurationPath . '.cache.json'),
+            ),
+            finalCache: (new CacheSnapshot($this->filesystem))->read([
+                'test-impact-data' => $configuration['testImpactDataFile'] === null
+                    ? null
+                    : Path::makeAbsolute(
+                        $configuration['testImpactDataFile'],
+                        $project,
+                    ),
+                'test-run-history' => Path::makeAbsolute(
+                    $configuration['testRunHistoryFile'],
+                    $project,
+                ),
+            ]),
+        );
+    }
+
+    private function getInitialConfigurationDirectory(): string
+    {
+        $configuration = Json::decode(
+            $this->filesystem->readFile(
+                $this->scenarioState->scenarioProjectDirectory
+                    . '/' . self::PHPUNIT_CONFIGURATION_RECORDING_PATH,
             ),
         );
+
+        return dirname(
+            Path::makeAbsolute(
+                $configuration['configurationFile'],
+                $this->scenarioState->scenarioProjectDirectory,
+            ),
+        );
+    }
+
+    /**
+     * @return array<string, list<array{line: int, tests: list<string>}>>
+     */
+    private function readCoverage(): array
+    {
+        $directory = $this->getInitialConfigurationDirectory() . '/coverage-xml';
+        $index = new DOMDocument();
+        $index->loadXML($this->filesystem->readFile($directory . '/index.xml'));
+        $project = $index->getElementsByTagNameNS(self::COVERAGE_NAMESPACE, 'project')->item(0);
+        Assert::isInstanceOf(
+            $project,
+            DOMElement::class,
+            'The XML coverage index must identify the project source directory.',
+        );
+        $coverage = [];
+
+        foreach ($project->getElementsByTagNameNS(self::COVERAGE_NAMESPACE, 'file') as $file) {
+            $document = new DOMDocument();
+            $document->loadXML(
+                $this->filesystem->readFile($directory . '/' . $file->getAttribute('href')),
+            );
+            $source = $document->getElementsByTagNameNS(self::COVERAGE_NAMESPACE, 'file')->item(0);
+            Assert::isInstanceOf(
+                $source,
+                DOMElement::class,
+                'Each XML coverage report must identify its source file.',
+            );
+            $path = Path::join(
+                $project->getAttribute('source'),
+                trim($source->getAttribute('path'), '/'),
+                $source->getAttribute('name'),
+            );
+            $coverage[$path] = array_map(
+                static function (DOMElement $line): array {
+                    $tests = array_values(
+                        array_unique(
+                            array_map(
+                                static fn (DOMElement $test): string => $test->getAttribute('by'),
+                                iterator_to_array(
+                                    $line->getElementsByTagNameNS(self::COVERAGE_NAMESPACE, 'covered'),
+                                ),
+                            ),
+                        ),
+                    );
+                    sort($tests);
+
+                    return [
+                        'line' => (int) $line->getAttribute('nr'),
+                        'tests' => $tests,
+                    ];
+                },
+                iterator_to_array(
+                    $document->getElementsByTagNameNS(self::COVERAGE_NAMESPACE, 'line'),
+                ),
+            );
+        }
+
+        return $coverage;
     }
 
     /**

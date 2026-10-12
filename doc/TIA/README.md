@@ -6,15 +6,16 @@ Both the root and Behat fixture Composer projects pin this commit.
 This directory describes the integration approach, verified behaviour and remaining work.
 See [the option overview](../phpunit-tia-options.md) for the PHPUnit API.
 
-The findings were rechecked on 2026-10-05 with PHP 8.4.22 and Xdebug 3.5.3 after updating
-the fixture's Composer dependencies. PHPUnit remained at the pinned commit:
+The findings were rechecked on 2026-10-12 with PHP 8.4.22 and Xdebug 3.5.3 after repairing
+the merge integration and migrating the fixture to debug events. PHPUnit remained at
+the pinned commit:
 
 | Behat profile | Result |
 | --- | --- |
-| Default | All 22 examples passed. |
-| `blocked` | All 14 examples failed when run explicitly, including one proposed outcome. |
+| Default | All 24 examples and 254 steps passed. |
+| `blocked` | All 12 examples failed when run explicitly, including one proposed outcome. |
 
-The two XML opt-out examples were subsequently revised to verify the current design:
+The two XML opt-out examples verify the current design:
 Infection enables TIA despite XML opt-outs. They now run in the default profile.
 
 Only scenarios with failing assertions are tagged `@skip` and excluded from the default
@@ -106,7 +107,8 @@ The following command-line fixes should be handled separately from TIA:
 - [General --no-coverage validation](infection/no-coverage-validation.md).
 - [PHPUnit configuration overrides](infection/configuration-overrides.md).
 - [Legacy short-option parsing](infection/legacy-option-parsing.md).
-- [The initial-test command's source filtering](infection/initial-test-source-filtering.md).
+The [initial-test command's source-filter fix](infection/initial-test-source-filtering.md)
+was merged upstream as PR #3645 and is included in this branch.
 
 Earlier notes mentioned “security issues” without a threat, finding or reproduction.
 This remains an unspecified review question rather than a confirmed vulnerability.
@@ -215,9 +217,11 @@ The intended matrix includes projects with and without TIA, a single run (such a
 stronger tests after an escaped mutant, and added source/tests. [01][f01]–[05][f05] cover these
 categories, but do not form a complete cross-product or a CI-environment test.
 
-`logs.execution` captures initial identities, line-to-test coverage, generated/evaluated
-mutations, commands, XML, and cache snapshots; see [the report contract](../execution-report.md).
-The PHPUnit extension adds actual loaded/executed identities and effective configuration.
+`logs.debugEvents` captures initial output, processed source files, generated mutation hashes
+and evaluated mutation results; see [the debug log and fixture evidence](../debug-events-log.md).
+The fixture reads coverage XML, mutation diffs and MSI from existing reports. Its PHPUnit
+extension records loaded/executed identities, effective configuration and initial cache hashes;
+Behat reads generated mutant XML and snapshots the cache again after Infection exits.
 Passing development-cycle controls compare coverage, mutation hashes/statuses, and MSI in
 the same project directory, using snapshots and `--do-not-record-test-impact-data` to disable
 recording and automatic selection. This avoids path/hash normalisation; timings are excluded.

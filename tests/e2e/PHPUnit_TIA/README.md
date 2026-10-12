@@ -90,13 +90,14 @@ The PHPUnit extension records loaded tests, executed tests, and effective config
 for both direct PHPUnit runs and Infection's initial test runs. When `TEST_TOKEN` is
 present, it scopes all three recording paths under `var/phpunit/mutants/<hash>/`,
 preserving the initial-run evidence and keeping each mutant's recordings separate.
-Infection's execution report supplies coverage and mutation results; its JSON summary
-supplies MSI. The result snapshots preserve earlier evidence when later runs overwrite
-the report files. See [the execution report contract](../../../doc/execution-report.md)
+Infection's debug events log supplies initial output, generated mutation hashes and mutant
+results. The fixture reads line-to-test coverage from PHPUnit XML and mutation diffs and
+MSI from Infection's JSON report. The result snapshots preserve earlier evidence when later
+runs overwrite the report files. See [the evidence sources](../../../doc/debug-events-log.md)
 and [the PHPUnit recording details below](#phpunit-execution-recording).
 
 For debugging, start inside the generated scenario project. Its `var/infection/`
-contains `infection.json`, `execution.jsonl`, numbered `output-<run>.log` files, and
+contains `infection.json`, `events.jsonl`, numbered `output-<run>.log` files, and
 temporary execution files under `tmp/`. Its `var/phpunit/` contains the extension's
 recordings and direct PHPUnit output in `output.log`. Add new prepared PHPUnit
 configurations under `configurations/`; the active setup does not copy the fixture-root
@@ -106,8 +107,8 @@ The previous script is retained as `run_legacy_tests.bash`; the runner does not 
 
 ## Current blockers
 
-The 2026-10-05 verification recorded 22 passing default examples and 14 failing blocked
-examples. The two XML opt-out examples now verify Infection's decision to enable TIA
+The 2026-10-12 verification recorded 24 passing default examples and 12 failing blocked
+examples. The two XML opt-out examples verify Infection's decision to enable TIA
 despite XML opt-outs and run in the default profile. Remaining blocked scenarios include
 sharing recordings in both directions and the unrecorded-source scenario, which falls
 back with a different explanation. See the
@@ -171,8 +172,11 @@ setup succeeds, immediately before the test method is invoked; data-set names ar
 part of the ID. Tests skipped or failing during preparation do not appear.
 
 Each initial PHPUnit run resets the recording, including a run that selects no
-tests, and removes previous mutant recordings. Every PHPUnit execution records its
-effective configuration, loaded tests, and executed tests through the same extension
+tests, and removes previous mutant recordings. At process shutdown, the extension writes
+`configuration.json.cache.json` with hashes of the configured impact data and test-run
+history, after PHPUnit has persisted them. Mutants leave this snapshot untouched.
+Every PHPUnit execution records its effective configuration, loaded tests, and executed
+tests through the same extension
 and subscribers. Initial and direct runs use the configured paths unchanged:
 
 ```text

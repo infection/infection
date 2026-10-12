@@ -419,6 +419,7 @@ final class PhpUnitContext implements Context
         $this->filesystem->copy(
             $phpunitConfiguration,
             $this->scenarioState->scenarioProjectDirectory . '/phpunit.xml',
+            overwriteNewerFiles: true,
         );
     }
 

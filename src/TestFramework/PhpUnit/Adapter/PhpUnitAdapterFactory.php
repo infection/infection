@@ -109,6 +109,8 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $testFrameworkConfigDir,
         );
 
+        $phpUnitLogger = new PsrLogger($logger);
+
         return new PhpUnitAdapter(
             $testFrameworkExecutable,
             $tmpDir,
@@ -137,6 +139,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
                     $filteredSourceFilesToMutate,
                 ),
                 $projectDir,
+                $phpUnitLogger,
             ),
             new MutationConfigBuilder(
                 $tmpDir,
@@ -158,7 +161,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
                 new PhpExecutableFinder(),
             ),
             $testFrameworkConfigPath,
-            new PsrLogger($logger),
+            $phpUnitLogger,
             $coverageCheckerFactory,
             $initialTestsRunner,
             $configuration,

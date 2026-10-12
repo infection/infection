@@ -12,7 +12,7 @@
     },
     "logs": {
         "json": "var/infection/infection.json",
-        "execution": "var/infection/execution.jsonl"
+        "debugEvents": "var/infection/events.jsonl"
     },
     "tmpDir": "var/infection/tmp"
 }

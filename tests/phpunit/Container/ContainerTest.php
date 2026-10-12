@@ -121,7 +121,7 @@ final class ContainerTest extends TestCase
 
     public function test_it_can_build_lazy_source_file_data_factory_that_fails_on_use(): void
     {
-        $newContainer = SingletonContainer::getContainer()->withValues(
+        $newContainer = Container::create()->withValues(
             new NullLogger(),
             new NullOutput(),
             existingCoveragePath: '/path/to/coverage',
@@ -132,7 +132,7 @@ final class ContainerTest extends TestCase
         $this->expectException(ReportLocationThrowable::class);
 
         foreach ($traces as $trace) {
-            $this->fail();
+            $this->fail('Missing coverage must fail before yielding any trace.');
         }
     }
 
