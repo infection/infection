@@ -57,14 +57,14 @@ abstract class CommandOptionTestCase extends TestCase
             new NullOutput(),
         );
 
+        if ($expected instanceof Exception) {
+            $this->expectExceptionObject($expected);
+        }
+
         TestOptionCommand::bind(
             $commandOptionClassName,
             $io,
         );
-
-        if ($expected instanceof Exception) {
-            $this->expectExceptionObject($expected);
-        }
 
         $io->getInput()->validate();
 
