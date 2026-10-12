@@ -36,17 +36,17 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use function array_slice;
-use Closure;
 use DOMDocument;
 use DOMElement;
 use function explode;
 use function implode;
 use function in_array;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
-use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
+use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\PhpUnit\Log\PhpUnitLogger;
 use Infection\TestFramework\XML\SafeDOMXPath;
 use function sprintf;
 use function str_starts_with;
@@ -64,7 +64,6 @@ final readonly class InitialConfigBuilder
     private string $originalXmlConfigContent;
 
     /**
-     * @param Closure(string): void $logSkippedTestImpactAnalysis
      * @param string[] $srcDirs
      * @param string[] $filteredSourceFilesToMutate
      */
@@ -77,7 +76,7 @@ final readonly class InitialConfigBuilder
         private array $srcDirs,
         private array $filteredSourceFilesToMutate,
         private string $projectDir,
-        private Closure $logSkippedTestImpactAnalysis,
+        private PhpUnitLogger $logger,
     ) {
         Assert::notEmpty(
             $originalXmlConfigContent,
@@ -196,7 +195,7 @@ final readonly class InitialConfigBuilder
         }
 
         if ($deriveFromTargets && !$this->requiresCoverageMetadataForAllTests()) {
-            ($this->logSkippedTestImpactAnalysis)(
+            $this->logger->logSkippingTestImpactAnalysis(
                 'Deriving dependencies from coverage targets requires requireCoverageMetadata="true" without disabling it for any test size.',
             );
 

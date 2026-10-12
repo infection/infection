@@ -37,12 +37,9 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
 use function array_values;
-use Closure;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
@@ -57,10 +54,12 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\PhpUnit\Log\PsrLogger;
 use Infection\TestFramework\PhpUnit\MemoryLimiter;
 use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
+use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
@@ -90,13 +89,12 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         string $sourceDirectoryBasePath,
         bool $useWindowsFilterLimit,
         Filesystem $fileSystem,
-        ConsoleOutput $consoleOutput,
+        LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
         InitialTestsRunner $initialTestsRunner,
         Configuration $configuration,
         MutantProcessContainerFactory $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
-        Closure $logSkippedTestImpactAnalysis,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
         Assert::notEmpty(
@@ -139,7 +137,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
                     $filteredSourceFilesToMutate,
                 ),
                 $projectDir,
-                $logSkippedTestImpactAnalysis,
             ),
             new MutationConfigBuilder(
                 $tmpDir,
@@ -161,7 +158,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
                 new PhpExecutableFinder(),
             ),
             $testFrameworkConfigPath,
-            $consoleOutput,
+            new PsrLogger($logger),
             $coverageCheckerFactory,
             $initialTestsRunner,
             $configuration,
