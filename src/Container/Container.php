@@ -314,7 +314,7 @@ final class Container extends DIContainer
                     GeneratedExtensionsConfig::EXTENSIONS,
                     $container->getShellCommandRunner(),
                     $container->getFileSystem(),
-                    $container->get(ConsoleOutput::class),
+                    $container->getLogger(),
                     $container->getCoverageCheckerFactory(),
                     $container->getInitialTestsRunner(),
                     $container->getMutantProcessContainerFactory(),

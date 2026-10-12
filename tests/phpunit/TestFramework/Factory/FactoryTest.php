@@ -37,7 +37,6 @@ namespace Infection\Tests\TestFramework\Factory;
 
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Process\Factory\MutantProcessContainerFactory;
@@ -54,9 +53,12 @@ use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use InvalidArgumentException;
+use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 #[Group('integration')]
 #[CoversClass(Factory::class)]
@@ -147,6 +149,51 @@ final class FactoryTest extends TestCase
         $this->assertSame('PHPUnit', $factory->create('phpunit', false)->getName());
     }
 
+    #[DataProvider('frameworksProvider')]
+    public function test_it_passes_the_logger_to_the_test_framework(string $adapterName): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger
+            ->expects($this->once())
+            ->method('warning')
+            ->with(
+                'Skipping the initial test run can be very dangerous.'
+                . PHP_EOL
+                . 'It is your responsibility to ensure the tests are in a passing state to begin.'
+                . PHP_EOL
+                . 'If this is not done then mutations may report as caught when they are not.',
+            )
+        ;
+
+        $factory = $this->createFactory(
+            installedExtensions: [
+                'infection/dummy-adapter' => [
+                    'extra' => ['class' => DummyTestFrameworkFactory::class],
+                ],
+            ],
+            configuration: ConfigurationBuilder::withMinimalTestData()
+                ->withSourceDirectories('src')
+                ->withSkipCoverage(true)
+                ->withSkipInitialTests(true)
+                ->build(),
+            logger: $logger,
+        );
+
+        $testFramework = $factory->create(
+            $adapterName,
+            true,
+        );
+
+        $testFramework->checkRequirements();
+    }
+
+    public static function frameworksProvider(): iterable
+    {
+        yield 'PHPUnit test framework' => ['phpunit'];
+
+        yield 'legacy test framework adapter' => ['dummy'];
+    }
+
     /**
      * @param array<string, array<string, mixed>> $installedExtensions
      */
@@ -155,10 +202,12 @@ final class FactoryTest extends TestCase
         ?Configuration $configuration = null,
         ?TestFrameworkConfigLocatorInterface $configLocator = null,
         ?TestFrameworkFinder $testFrameworkFinder = null,
+        ?LoggerInterface $logger = null,
     ): Factory {
         $configuration ??= ConfigurationBuilder::withMinimalTestData()->build();
         $fileSystem = $this->createStub(FileSystem::class);
         $fileSystem->method('readFile')->willReturn('<phpunit/>');
+        $fileSystem->method('isReadableFile')->willReturn(true);
 
         return new Factory(
             '',
@@ -171,7 +220,7 @@ final class FactoryTest extends TestCase
             $installedExtensions,
             $this->createStub(ShellCommandRunner::class),
             $fileSystem,
-            $this->createStub(ConsoleOutput::class),
+            $logger ?? $this->createStub(LoggerInterface::class),
             new CoverageCheckerFactory(
                 $configuration,
                 JUnitReportLocator::create($fileSystem, ''),

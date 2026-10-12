@@ -58,6 +58,7 @@ use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
 use InvalidArgumentException;
 use function is_a;
+use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use function sprintf;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -84,7 +85,7 @@ final readonly class Factory
         private array $installedExtensions,
         private ShellCommandRunner $shellCommandRunner,
         private FileSystem $fileSystem,
-        private ConsoleOutput $consoleOutput,
+        private LoggerInterface $logger,
         private CoverageCheckerFactory $coverageCheckerFactory,
         private InitialTestsRunner $initialTestsRunner,
         private MutantProcessContainerFactory $containerFactory,
@@ -100,7 +101,7 @@ final readonly class Factory
             ? $testFramework
             : new LegacyTestFrameworkBridge(
                 $testFramework,
-                $this->consoleOutput,
+                new ConsoleOutput($this->logger),
                 $this->coverageCheckerFactory->create($testFramework),
                 $this->initialTestsRunner,
                 $this->infectionConfig,
@@ -168,7 +169,7 @@ final readonly class Factory
                         dirname($configuration->configurationPathname),
                         OperatingSystem::isWindows(),
                         $this->fileSystem,
-                        $this->consoleOutput,
+                        $this->logger,
                         $this->coverageCheckerFactory,
                         $this->initialTestsRunner,
                         $configuration,

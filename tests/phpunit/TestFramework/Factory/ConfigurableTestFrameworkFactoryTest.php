@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Factory;
 
-use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
@@ -50,6 +49,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 #[CoversClass(ConfigurableTestFrameworkFactory::class)]
 final class ConfigurableTestFrameworkFactoryTest extends TestCase
@@ -169,7 +169,7 @@ final class ConfigurableTestFrameworkFactoryTest extends TestCase
             '',
             false,
             $fileSystem,
-            $this->createStub(ConsoleOutput::class),
+            $this->createStub(LoggerInterface::class),
             new CoverageCheckerFactory(
                 $configuration,
                 JUnitReportLocator::create($fileSystem, ''),
