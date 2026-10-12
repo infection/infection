@@ -130,32 +130,7 @@ final class ConfigurationFactoryTest extends TestCase
 
     public function test_it_throws_exception_when_not_known_static_analysis_tool_used_as_input(): void
     {
-        $schema = new SchemaConfiguration(
-            pathname: '/path/to/infection.json',
-            timeout: null,
-            source: new Source([], []),
-            logs: Logs::createEmpty(),
-            tmpDir: '',
-            phpUnit: new PhpUnit(null, null),
-            phpStan: new PhpStan(null, null),
-            mago: new Mago(null, null),
-            ignoreMsiWithNoMutations: null,
-            minMsi: null,
-            minCoveredMsi: null,
-            timeoutsAsEscaped: null,
-            maxTimeouts: null,
-            mutators: [],
-            testFramework: TestFrameworkTypes::PHPUNIT,
-            bootstrap: null,
-            initialTestsPhpOptions: null,
-            testFrameworkExtraOptions: null,
-            testFrameworkExtraArgs: null,
-            staticAnalysisToolOptions: null,
-            threads: null,
-            dotsPerRow: null,
-            staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
-            debugTestFrameworkLogFile: null,
-        );
+        $schema = SchemaConfigurationBuilder::withMinimalTestData()->build();
 
         $this->expectExceptionMessage('Expected one of: "phpstan", "mago", "debug". Got: "non-supported-static-analysis-tool"');
 
@@ -216,7 +191,7 @@ final class ConfigurationFactoryTest extends TestCase
         $defaultSchema = new SchemaConfiguration(
             pathname: '/path/to/infection.json',
             timeout: null,
-            source: new Source([], []),
+            source: new Source(['src'], []),
             logs: Logs::createEmpty(),
             tmpDir: '',
             phpUnit: new PhpUnit(null, null),
@@ -280,7 +255,7 @@ final class ConfigurationFactoryTest extends TestCase
 
         $defaultConfiguration = new Configuration(
             processTimeout: 10,
-            source: new Source(),
+            source: new Source(['src'], []),
             sourceFilter: new GitDiffFilter('AM', 'reference(master)'),
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
