@@ -38,9 +38,7 @@ namespace Infection\Command\Option;
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
 use Infection\Container\Container;
-use Infection\Resource\Processor\CpuCoresCountProvider;
 use function is_numeric;
-use function max;
 use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
@@ -74,10 +72,11 @@ final class ThreadsOption implements CommandOption
         return $command;
     }
 
-    public static function get(
-        IO $io,
-        CpuCoresCountProvider $cpuCoresCountProvider = new CpuCoresCountProvider(),
-    ): ?int {
+    /**
+     * @return positive-int|'max'|null
+     */
+    public static function get(IO $io): int|string|null
+    {
         /** @var string|null $threads */
         $threads = $io->getInput()->getOption(self::NAME);
 
@@ -88,7 +87,13 @@ final class ThreadsOption implements CommandOption
 
         // user passed `--threads=<int>` option
         if (is_numeric($threads)) {
-            return (int) $threads;
+            return Assert::positiveInteger(
+                (int) $threads,
+                sprintf(
+                    'The value of option `--threads` must be a positive integer. String "%s" provided.',
+                    $threads,
+                ),
+            );
         }
 
         // user passed `--threads=max` option
@@ -101,10 +106,6 @@ final class ThreadsOption implements CommandOption
             ),
         );
 
-        // we subtract 1 here to not use all the available cores by Infection
-        return max(
-            1,
-            $cpuCoresCountProvider->provide() - 1,
-        );
+        return 'max';
     }
 }

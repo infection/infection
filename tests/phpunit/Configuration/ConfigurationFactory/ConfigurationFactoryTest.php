@@ -187,7 +187,7 @@ final class ConfigurationFactoryTest extends TestCase
                 testFrameworkExtraArgs: null,
                 staticAnalysisToolOptions: null,
                 sourceFilter: null,
-                threadCount: 0,
+                threadCount: 1,
                 dotsPerRow: null,
                 dryRun: false,
                 useGitHubLogger: false,
@@ -829,6 +829,42 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'thread count not specified in schema and not specified in input, auto-detected from 8 CPU cores is 7' => [
             $defaultScenario->forValueForThreadCount(
                 schemaThreads: null,
+                inputThreadCount: null,
+                expectedThreadCount: 7,
+                cpuCoresCount: 8,
+            ),
+        ];
+
+        yield 'max thread count in input with 1 CPU core overrides schema' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: 4,
+                inputThreadCount: 'max',
+                expectedThreadCount: 1,
+                cpuCoresCount: 1,
+            ),
+        ];
+
+        yield 'max thread count in input with 2 CPU cores overrides schema' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: 4,
+                inputThreadCount: 'max',
+                expectedThreadCount: 1,
+                cpuCoresCount: 2,
+            ),
+        ];
+
+        yield 'max thread count in input with 8 CPU cores overrides schema' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: 4,
+                inputThreadCount: 'max',
+                expectedThreadCount: 7,
+                cpuCoresCount: 8,
+            ),
+        ];
+
+        yield 'max thread count in schema with 8 CPU cores is 7' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: 'max',
                 inputThreadCount: null,
                 expectedThreadCount: 7,
                 cpuCoresCount: 8,

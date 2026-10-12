@@ -35,63 +35,26 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command\Option;
 
-use Exception;
 use Infection\Command\Option\ThreadsOption;
-use Infection\Console\IO;
-use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Tests\Command\CommandOptionTestCase;
-use Infection\Tests\TestingUtility\Console\Command\TestOptionCommand;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\NullOutput;
 
 #[CoversClass(ThreadsOption::class)]
 final class ThreadsOptionTest extends CommandOptionTestCase
 {
-    // TODO: this is necessary because we need to inject CpuCoresCountProvider (for now).
-    //  This will be addressed in a follow up PR.
-    #[DataProvider('cpuDetectionProvider')]
-    public function test_it_only_detects_cpu_cores_for_max(
-        string $input,
-        int $cpuCoresCount,
-        int|Exception|null $expected,
-    ): void {
-        $io = new IO(
-            new StringInput($input),
-            new NullOutput(),
-        );
-
-        $cpuCoresCountProvider = $this->createMock(CpuCoresCountProvider::class);
-        $cpuCoresCountProvider
-            ->expects(
-                $input === '--threads=max' ? $this->once() : $this->never(),
-            )
-            ->method('provide')
-            ->willReturn($cpuCoresCount)
-        ;
-
-        TestOptionCommand::bind(
-            ThreadsOption::class,
-            $io,
-        );
-
-        if ($expected instanceof Exception) {
-            $this->expectExceptionObject($expected);
-        }
-
-        $actual = ThreadsOption::get($io, $cpuCoresCountProvider);
-
-        $this->assertSame($expected, $actual);
-    }
-
     public static function optionProvider(): iterable
     {
         yield 'not provided' => [
             new StringInput(''),
             null,
+        ];
+
+        yield 'max is preserved' => [
+            new StringInput('--threads=max'),
+            'max',
         ];
 
         yield 'numeric string' => [
@@ -104,14 +67,30 @@ final class ThreadsOptionTest extends CommandOptionTestCase
             5,
         ];
 
-        yield 'zero is preserved' => [
-            new StringInput('--threads=0'),
-            0,
+        yield 'one is accepted' => [
+            new StringInput('--threads=1'),
+            1,
         ];
 
-        yield 'negative value is preserved' => [
+        yield 'zero is rejected' => [
+            new StringInput('--threads=0'),
+            new InvalidArgumentException(
+                'The value of option `--threads` must be a positive integer. String "0" provided.',
+            ),
+        ];
+
+        yield 'negative value is rejected' => [
             new StringInput('--threads=-1'),
-            -1,
+            new InvalidArgumentException(
+                'The value of option `--threads` must be a positive integer. String "-1" provided.',
+            ),
+        ];
+
+        yield 'float truncated to zero is rejected' => [
+            new StringInput('--threads=0.5'),
+            new InvalidArgumentException(
+                'The value of option `--threads` must be a positive integer. String "0.5" provided.',
+            ),
         ];
 
         yield 'float is truncated to an integer' => [
@@ -160,47 +139,6 @@ final class ThreadsOptionTest extends CommandOptionTestCase
         yield 'missing value' => [
             new StringInput('--threads'),
             new RuntimeException('The "--threads" option requires a value.'),
-        ];
-    }
-
-    public static function cpuDetectionProvider(): iterable
-    {
-        yield '1 CPU core stays at minimum of 1' => [
-            '--threads=max',
-            1,
-            1,
-        ];
-
-        yield '2 CPU cores is 1' => [
-            '--threads=max',
-            2,
-            1,
-        ];
-
-        yield '8 CPU cores is 7' => [
-            '--threads=max',
-            8,
-            7,
-        ];
-
-        yield 'not provided does not detect CPU cores' => [
-            '',
-            8,
-            null,
-        ];
-
-        yield 'numeric value does not detect CPU cores' => [
-            '--threads=5',
-            8,
-            5,
-        ];
-
-        yield 'invalid value does not detect CPU cores' => [
-            '--threads=abc',
-            8,
-            new InvalidArgumentException(
-                'The value of option `--threads` must be of type integer or string "max". String "abc" provided.',
-            ),
         ];
     }
 

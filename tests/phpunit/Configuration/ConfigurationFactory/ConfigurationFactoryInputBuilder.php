@@ -44,6 +44,7 @@ final class ConfigurationFactoryInputBuilder
 {
     /**
      * @param non-empty-string|null $projectDirectory
+     * @param positive-int|'max'|null $threadCount
      * @param positive-int|'max'|null $dotsPerRow
      */
     public function __construct(
@@ -67,7 +68,7 @@ final class ConfigurationFactoryInputBuilder
         private ?string $testFrameworkExtraArgs,
         private ?string $staticAnalysisToolOptions,
         private PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
-        private ?int $threadCount,
+        private int|string|null $threadCount,
         private string|int|null $dotsPerRow,
         private bool $dryRun,
         private ?bool $useGitHubLogger,
@@ -244,7 +245,10 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
-    public function withThreadCount(?int $threadCount): self
+    /**
+     * @param positive-int|'max'|null $threadCount
+     */
+    public function withThreadCount(int|string|null $threadCount): self
     {
         $clone = clone $this;
         $clone->threadCount = $threadCount;
@@ -385,7 +389,7 @@ final class ConfigurationFactoryInputBuilder
      *     18: string|null,
      *     19: string|null,
      *     20: PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null,
-     *     21: int|null,
+     *     21: positive-int|'max'|null,
      *     22: positive-int|'max'|null,
      *     23: bool,
      *     24: bool|null,

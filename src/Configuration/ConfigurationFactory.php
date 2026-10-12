@@ -68,7 +68,7 @@ use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
-use function is_numeric;
+use function is_int;
 use function ltrim;
 use function max;
 use OndraM\CiDetector\CiDetector;
@@ -109,6 +109,7 @@ class ConfigurationFactory
 
     /**
      * @param non-empty-string|null $projectDirectory Absolute path.
+     * @param positive-int|'max'|null $threadCount
      * @param positive-int|'max'|null $dotsPerRow
      *
      * @throws FileOrDirectoryNotFound
@@ -136,7 +137,7 @@ class ConfigurationFactory
         ?string $testFrameworkExtraArgs,
         ?string $staticAnalysisToolOptions,
         PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
-        ?int $threadCount,
+        int|string|null $threadCount,
         string|int|null $dotsPerRow,
         bool $dryRun,
         ?bool $useGitHubLogger,
@@ -553,31 +554,22 @@ class ConfigurationFactory
         return sprintf('%s/%s', $configDir, $path);
     }
 
-    private function retrieveThreadCount(?int $threadCount, SchemaConfiguration $schema): int
+    /**
+     * @param positive-int|'max'|null $threadCount
+     */
+    private function retrieveThreadCount(int|string|null $threadCount, SchemaConfiguration $schema): int
     {
-        // user passed `--threads` option, already validated
-        if ($threadCount !== null) {
+        $threadCount ??= $schema->threads;
+
+        if (is_int($threadCount)) {
             return $threadCount;
         }
 
-        $threadsFromSchema = $schema->threads;
-
         // we subtract 1 here to not use all the available cores by Infection
-        $maxThreads = max(1, $this->cpuCoresCountProvider->provide() - 1);
-
-        if ($threadsFromSchema === null) {
-            return $maxThreads;
-        }
-
-        // config has numeric string or integer value
-        if (is_numeric($threadsFromSchema)) {
-            return (int) $threadsFromSchema;
-        }
-
-        // config has `max` thread count
-        Assert::same($threadsFromSchema, 'max', sprintf('The value of key `threads` in configuration file must be of type integer or string "max". String "%s" provided.', $threadsFromSchema));
-
-        return $maxThreads;
+        return max(
+            1,
+            $this->cpuCoresCountProvider->provide() - 1,
+        );
     }
 
     /**

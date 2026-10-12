@@ -825,10 +825,11 @@ final class ConfigurationFactoryScenario
 
     /**
      * @param positive-int|'max'|null $schemaThreads
+     * @param positive-int|'max'|null $inputThreadCount
      */
     public function forValueForThreadCount(
         string|int|null $schemaThreads,
-        ?int $inputThreadCount,
+        int|string|null $inputThreadCount,
         int $expectedThreadCount,
         int $cpuCoresCount = 1,
     ): self {
