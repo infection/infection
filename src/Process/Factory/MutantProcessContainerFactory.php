@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Factory;
 
+use function extension_loaded;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
@@ -45,8 +46,8 @@ use Infection\Process\ForkWorkerPool;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
-use function ini_get as ini_get_unsafe;
 use function min;
+use function Safe\ini_get;
 use Symfony\Component\Process\Process;
 
 /**
@@ -58,6 +59,8 @@ class MutantProcessContainerFactory
     private const int TIMEOUT_FACTOR = 5;
 
     private const int TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
+
+    private const string OPCACHE_EXTENSION = 'Zend OPcache';
 
     private const string OPCACHE_PRELOAD_SETTING = 'opcache.preload';
 
@@ -89,8 +92,11 @@ class MutantProcessContainerFactory
         );
         $env = ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY];
 
-        // The setting is not a PHP_INI_ALL one: reading it here reads the same php.ini the worker reads.
-        $process = ForkedProcess::supports($command, ini_get_unsafe(self::OPCACHE_PRELOAD_SETTING))
+        // Without OPcache the setting does not exist, and the safe variant would throw. The setting is
+        // not a PHP_INI_ALL one: reading it here reads the same php.ini the worker reads.
+        $preloadedSource = extension_loaded(self::OPCACHE_EXTENSION) ? ini_get(self::OPCACHE_PRELOAD_SETTING) : '';
+
+        $process = ForkedProcess::supports($command, $preloadedSource)
             ? new ForkedProcess($this->forkWorkerPool, $command, $env, $timeout)
             : new Process(command: $command, env: $env, timeout: $timeout);
 

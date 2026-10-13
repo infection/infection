@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
+use Infection\Process\ForkWorker;
 use Infection\Process\ForkWorkerPool;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -42,6 +43,8 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ForkWorkerPool::class)]
+// The pool starts real workers, so the test covers the worker it starts as well as the pool.
+#[CoversClass(ForkWorker::class)]
 #[Group('integration')]
 #[RequiresPhpExtension('pcntl')]
 #[RequiresPhpExtension('posix')]
@@ -61,39 +64,38 @@ final class ForkWorkerPoolTest extends TestCase
 
     public function test_it_starts_the_worker_of_a_thread_once(): void
     {
-        $this->assertSame($this->pool->workerFor(1), $this->pool->workerFor(1));
+        $this->assertSame($this->pool->workerFor('1'), $this->pool->workerFor('1'));
     }
 
     public function test_it_starts_a_worker_per_thread(): void
     {
-        $this->assertNotSame($this->pool->workerFor(1), $this->pool->workerFor(2));
         $this->assertNotSame($this->pool->workerFor('1'), $this->pool->workerFor('2'));
     }
 
     public function test_it_starts_a_new_worker_for_a_forgotten_thread(): void
     {
-        $first = $this->pool->workerFor(1);
+        $first = $this->pool->workerFor('1');
 
-        $this->pool->forget(1);
+        $this->pool->forget('1');
 
-        $this->assertNotSame($first, $this->pool->workerFor(1));
+        $this->assertNotSame($first, $this->pool->workerFor('1'));
     }
 
     public function test_forgetting_a_thread_without_a_worker_changes_nothing(): void
     {
-        $first = $this->pool->workerFor(1);
+        $first = $this->pool->workerFor('1');
 
-        $this->pool->forget(2);
+        $this->pool->forget('2');
 
-        $this->assertSame($first, $this->pool->workerFor(1));
+        $this->assertSame($first, $this->pool->workerFor('1'));
     }
 
     public function test_it_starts_a_new_worker_after_it_killed_them_all(): void
     {
-        $first = $this->pool->workerFor(1);
+        $first = $this->pool->workerFor('1');
 
         $this->pool->killAll();
 
-        $this->assertNotSame($first, $this->pool->workerFor(1));
+        $this->assertNotSame($first, $this->pool->workerFor('1'));
     }
 }

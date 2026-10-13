@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
+use function in_array;
 use Infection\Process\ForkWorker;
 use function microtime;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -84,6 +85,7 @@ final class ForkWorkerTest extends TestCase
         $this->assertSame($argv, $report['server_argv']);
         $this->assertSame('bar', $report['foo']);
         $this->assertSame('', $report['stdin'], 'A script must get an end of file on STDIN');
+        $this->assertFalse($this->worker->isLost(), 'A worker that returned a result is still usable');
     }
 
     public static function exitCodeProvider(): iterable
@@ -100,6 +102,20 @@ final class ForkWorkerTest extends TestCase
 
         $this->assertSame($expectedExitCode, $this->waitForExitCode());
         $this->assertSame($expectedOutput, $this->worker->readOutput());
+    }
+
+    /**
+     * The output of a script whose worker died explains why it died. The exit code is read first, and it
+     * is what notices the death, so the output has to survive it: only kill() closes the pipes.
+     */
+    public function test_it_returns_the_output_of_a_worker_that_died(): void
+    {
+        $this->worker->run([self::FIXTURES . '/kill_worker_after_output.php'], []);
+
+        $this->assertSame(143, $this->waitForExitCode());
+        $this->assertTrue($this->worker->isLost(), 'A dead worker must not take another script');
+        $this->assertSame('the output of a script that stopped its worker', $this->worker->readOutput());
+        $this->assertSame('the error output of a script that stopped its worker', $this->worker->readErrorOutput());
     }
 
     public function test_it_runs_each_script_in_a_new_child_of_the_same_worker(): void
@@ -127,6 +143,7 @@ final class ForkWorkerTest extends TestCase
         $this->worker->kill();
 
         $this->assertTrue($this->waitFor(static fn (): bool => !self::isRunning($pid)));
+        $this->assertTrue($this->worker->isLost(), 'A killed worker must not take another script');
     }
 
     public function test_kill_stops_the_descendants_of_the_script(): void
@@ -159,6 +176,7 @@ final class ForkWorkerTest extends TestCase
 
         // The worker is gone: the run is an error, but the analysis must go on with the other mutants.
         $this->assertSame(143, $this->waitForExitCode());
+        $this->assertTrue($this->worker->isLost());
     }
 
     private static function isRunning(int $pid): bool
@@ -191,7 +209,7 @@ final class ForkWorkerTest extends TestCase
         while (microtime(true) < $deadline) {
             $value = $read();
 
-            if ($value !== null && $value !== false && $value !== '') {
+            if (!in_array($value, [null, false, ''], true)) {
                 return $value;
             }
 

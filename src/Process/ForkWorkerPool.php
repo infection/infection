@@ -47,22 +47,25 @@ use function register_shutdown_function;
 final class ForkWorkerPool
 {
     /**
-     * @var array<int|string, ForkWorker>
+     * @var array<string, ForkWorker>
      */
     private array $workers = [];
 
     public function __construct()
     {
-        // The workers are the only processes of a run that Infection does not stop on its own: a
-        // thread that never runs a mutant leaves its worker behind. They also stop when this process
-        // exits and their STDIN closes, but that is at exit and not here.
+        // The workers are the only processes of a run that outlive the process that asked for them:
+        // a thread keeps its worker from its first mutant to the end of the run. The registered
+        // handler is what stops them, because the shutdown of this process is the end of the run -
+        // Infection runs one Engine per process. A pool that ends its run early calls killAll().
         register_shutdown_function($this->killAll(...));
     }
 
     /**
      * Returns the worker of a thread, and starts one the first time the thread asks for it.
+     *
+     * @param string $threadToken the TEST_TOKEN of the thread, as an environment value
      */
-    public function workerFor(int|string $threadToken): ForkWorker
+    public function workerFor(string $threadToken): ForkWorker
     {
         return $this->workers[$threadToken] ??= ForkWorker::start();
     }
@@ -71,7 +74,7 @@ final class ForkWorkerPool
      * Forgets the worker of a thread. A killed worker is not reusable, so the next run of the thread
      * starts a new one.
      */
-    public function forget(int|string $threadToken): void
+    public function forget(string $threadToken): void
     {
         unset($this->workers[$threadToken]);
     }

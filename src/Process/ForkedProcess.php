@@ -61,7 +61,9 @@ final class ForkedProcess extends Process
 
     private ?ForkWorker $worker = null;
 
-    private int|string $threadToken = 0;
+    private bool $started = false;
+
+    private string $threadToken = '';
 
     private string $output = '';
 
@@ -95,11 +97,11 @@ final class ForkedProcess extends Process
      * is refused. The same is why the worker must never preload the source under test itself.
      *
      * @param array<string> $command
-     * @param string|false $preloadedSource the "opcache.preload" setting: false when OPcache is not loaded
+     * @param string $preloadedSource the "opcache.preload" setting, empty when there is none
      */
-    public static function supports(array $command, string|false $preloadedSource): bool
+    public static function supports(array $command, string $preloadedSource): bool
     {
-        return ($preloadedSource === false || $preloadedSource === '')
+        return $preloadedSource === ''
             && getenv('INFECTION_FORK') !== '0'
             && function_exists('pcntl_fork')
             && function_exists('posix_kill')
@@ -114,7 +116,10 @@ final class ForkedProcess extends Process
     public function start(?callable $callback = null, array $env = []): void
     {
         $this->startTime = $this->clock->microtime();
-        $this->threadToken = $env['TEST_TOKEN'] ?? 0;
+        // Every environment value is a string, so a thread without a token shares the workers of the
+        // other threads without a token.
+        $this->threadToken = (string) ($env['TEST_TOKEN'] ?? '');
+        $this->started = true;
 
         $this->worker = $this->workers->workerFor($this->threadToken);
         $this->worker->run($this->command, $env + $this->forkEnv);
@@ -132,7 +137,16 @@ final class ForkedProcess extends Process
         $this->output .= $this->worker->readOutput();
         $this->errorOutput .= $this->worker->readErrorOutput();
 
-        return $this->exitCode === null;
+        if ($this->exitCode === null) {
+            return true;
+        }
+
+        if ($this->worker->isLost()) {
+            // A dead worker cannot take another request, so the thread must not get it back.
+            $this->workers->forget($this->threadToken);
+        }
+
+        return false;
     }
 
     #[Override]
@@ -148,7 +162,9 @@ final class ForkedProcess extends Process
     }
 
     /**
-     * Stops the script together with the worker. The next run of the thread starts a new worker.
+     * Stops the script together with the worker: a killed worker cannot run the next script of the
+     * thread, so the thread gets a new one. Both arguments of the parent are ignored: stopping a
+     * worker is a single SIGTERM, and there is nothing to wait for afterwards.
      */
     #[Override]
     public function stop(float $timeout = self::STOP_TIMEOUT, ?int $signal = null): ?int
@@ -166,7 +182,7 @@ final class ForkedProcess extends Process
     #[Override]
     public function isStarted(): bool
     {
-        return $this->worker !== null;
+        return $this->started;
     }
 
     #[Override]

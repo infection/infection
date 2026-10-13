@@ -51,7 +51,9 @@ use Webmozart\Assert\Assert;
 
 /**
  * This class starts a fork worker (see resources/fork-worker.php) and exchanges requests and results with it.
- * A worker runs a single script at a time.
+ * The worker takes a request on descriptor 3 and returns the exit code of the script on descriptor 4. Its
+ * own STDIN is /dev/null, so a script that reads STDIN gets an end of file. A worker runs a single script at
+ * a time, in a fork of its own.
  *
  * @internal
  */
@@ -69,6 +71,11 @@ final class ForkWorker
     private const int LOST_EXIT_CODE = 143;
 
     private const int RESULTS = 4;
+
+    /**
+     * Whether the worker died and cannot run another script.
+     */
+    private bool $lost = false;
 
     /**
      * @param resource|null $process
@@ -121,23 +128,42 @@ final class ForkWorker
      */
     public function readExitCode(): ?int
     {
+        if ($this->hasClosedPipes()) {
+            return self::LOST_EXIT_CODE;
+        }
+
         $line = fgets($this->pipes[self::RESULTS]);
 
         if ($line !== false) {
             return (int) $line;
         }
 
-        return feof($this->pipes[self::RESULTS]) ? self::LOST_EXIT_CODE : null;
+        if (!feof($this->pipes[self::RESULTS])) {
+            return null;
+        }
+
+        $this->lost = true;
+
+        return self::LOST_EXIT_CODE;
+    }
+
+    /**
+     * Whether the worker died without returning a result, and must not run another script. A script
+     * stopped by SIGTERM reports the same exit code, so the death is tracked apart from the code.
+     */
+    public function isLost(): bool
+    {
+        return $this->lost;
     }
 
     public function readOutput(): string
     {
-        return stream_get_contents($this->pipes[1]);
+        return $this->hasClosedPipes() ? '' : stream_get_contents($this->pipes[1]);
     }
 
     public function readErrorOutput(): string
     {
-        return stream_get_contents($this->pipes[2]);
+        return $this->hasClosedPipes() ? '' : stream_get_contents($this->pipes[2]);
     }
 
     /**
@@ -145,14 +171,28 @@ final class ForkWorker
      */
     public function kill(): void
     {
-        if ($this->process === null) {
+        $process = $this->process;
+
+        if ($process === null) {
             return;
         }
 
-        proc_terminate($this->process);
+        $this->lost = true;
+
+        proc_terminate($process);
         // @phpstan-ignore theCodingMachineSafe.function (Safe\proc_close() rejects the status of a worker that a signal stopped.)
-        proc_close($this->process);
+        proc_close($process);
 
         $this->process = null;
+    }
+
+    /**
+     * Whether kill() closed the pipes of the worker together with the worker itself. A worker that died
+     * on its own keeps its pipes open, so the output it wrote stays readable, and that output is often
+     * the only explanation of its death.
+     */
+    private function hasClosedPipes(): bool
+    {
+        return $this->process === null;
     }
 }
