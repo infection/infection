@@ -44,7 +44,15 @@ use Infection\Framework\OperatingSystem;
  */
 class CpuCoresCountProvider
 {
-    public function provide(float $loadLimit): int
+    /**
+     * Element of [0., 1.]. Percentage representing the amount of cores that should be used among the available resources.
+     * Leave some CPU capacity available for other processes.
+     *
+     * @see CpuCoreCounter::getAvailableForParallelisation()
+     */
+    protected const float CPU_USAGE_RATIO = 0.8;
+
+    public function provide(float $loadLimit = self::CPU_USAGE_RATIO): int
     {
         if (OperatingSystem::isWindows()) {
             return 1;

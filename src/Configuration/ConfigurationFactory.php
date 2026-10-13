@@ -92,8 +92,6 @@ class ConfigurationFactory
 
     private const int DEFAULT_DOTS_PER_ROW = 50;
 
-    private const float CPU_USAGE_RATIO = 0.8;
-
     public function __construct(
         private readonly TmpDirProvider $tmpDirProvider,
         private readonly MutatorResolver $mutatorResolver,
@@ -562,12 +560,9 @@ class ConfigurationFactory
     {
         $threadCount ??= $schema->threads;
 
-        if (is_int($threadCount)) {
-            return $threadCount;
-        }
-
-        // Leave some CPU capacity available for other processes.
-        return $this->cpuCoresCountProvider->provide(self::CPU_USAGE_RATIO);
+        return is_int($threadCount)
+            ? $threadCount
+            : $this->cpuCoresCountProvider->provide();
     }
 
     /**

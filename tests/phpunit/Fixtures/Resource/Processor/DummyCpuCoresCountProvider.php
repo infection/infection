@@ -50,7 +50,7 @@ final class DummyCpuCoresCountProvider extends CpuCoresCountProvider
     }
 
     #[\Override]
-    public function provide(float $loadLimit): int
+    public function provide(float $loadLimit = self::CPU_USAGE_RATIO): int
     {
         $counter = new CpuCoreCounter(
             finders: [new DummyCpuCoreFinder($this->count)],
