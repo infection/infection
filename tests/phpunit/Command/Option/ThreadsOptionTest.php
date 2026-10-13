@@ -72,19 +72,25 @@ final class ThreadsOptionTest extends CommandOptionTestCase
             1,
         ];
 
-        yield 'zero is preserved' => [
+        yield 'zero is rejected' => [
             new StringInput('--threads=0'),
-            0,
+            new InvalidArgumentException(
+                'The value of option `--threads` must be a positive integer. String "0" provided.',
+            ),
         ];
 
-        yield 'negative value is preserved' => [
+        yield 'negative value is rejected' => [
             new StringInput('--threads=-1'),
-            -1,
+            new InvalidArgumentException(
+                'The value of option `--threads` must be a positive integer. String "-1" provided.',
+            ),
         ];
 
-        yield 'float is truncated to zero' => [
+        yield 'float truncated to zero is rejected' => [
             new StringInput('--threads=0.5'),
-            0,
+            new InvalidArgumentException(
+                'The value of option `--threads` must be a positive integer. String "0.5" provided.',
+            ),
         ];
 
         yield 'float is truncated to an integer' => [

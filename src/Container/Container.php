@@ -684,7 +684,7 @@ final class Container extends DIContainer
     /**
      * @param non-empty-string|null $configFile
      * @param non-empty-string|null $projectDirectory Absolute path.
-     * @param int|'max'|null $threadCount
+     * @param positive-int|'max'|null $threadCount
      * @param positive-int|'max'|null $dotsPerRow
      */
     public function withValues(
