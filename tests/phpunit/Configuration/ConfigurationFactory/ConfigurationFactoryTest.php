@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
 use Exception;
+use Fidry\CpuCoreCounter\CpuCoreCounter;
+use Fidry\CpuCoreCounter\Finder\DummyCpuCoreFinder;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
@@ -74,12 +76,12 @@ use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
-use Infection\Tests\Fixtures\Resource\Processor\DummyCpuCoresCountProvider;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use function str_contains;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
@@ -164,7 +166,12 @@ final class ConfigurationFactoryTest extends TestCase
                 ciDetected: false,
                 githubActionsDetected: false,
                 projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
-                cpuCoresCountProvider: new CpuCoresCountProvider(),
+                cpuCoresCountProvider: new CpuCoresCountProvider(
+                    new CpuCoreCounter([
+                        new DummyCpuCoreFinder(1),
+                    ]),
+                    new NullLogger(),
+                ),
             )
             ->create(
                 schema: $schema,
@@ -188,7 +195,7 @@ final class ConfigurationFactoryTest extends TestCase
                 testFrameworkExtraArgs: null,
                 staticAnalysisToolOptions: null,
                 sourceFilter: null,
-                threadCount: 0,
+                threadCount: 1,
                 dotsPerRow: null,
                 dryRun: false,
                 useGitHubLogger: false,
@@ -810,33 +817,75 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'thread count not specified in schema and not specified in input, auto-detected from 1 CPU core stays at minimum of 1' => [
-            $defaultScenario
-                ->forValueForThreadCount(
-                    schemaThreads: null,
-                    inputThreadCount: null,
-                    expectedThreadCount: 1,
-                )
-                ->withCpuCoresCountProvider(new DummyCpuCoresCountProvider(1)),
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: null,
+                inputThreadCount: null,
+                expectedThreadCount: 1,
+                cpuCoresCount: 1,
+            ),
         ];
 
         yield 'thread count not specified in schema and not specified in input, auto-detected from 2 CPU cores is 1' => [
-            $defaultScenario
-                ->forValueForThreadCount(
-                    schemaThreads: null,
-                    inputThreadCount: null,
-                    expectedThreadCount: 1,
-                )
-                ->withCpuCoresCountProvider(new DummyCpuCoresCountProvider(2)),
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: null,
+                inputThreadCount: null,
+                expectedThreadCount: 1,
+                cpuCoresCount: 2,
+            ),
         ];
 
-        yield 'thread count not specified in schema and not specified in input, auto-detected from 8 CPU cores is 7' => [
-            $defaultScenario
-                ->forValueForThreadCount(
-                    schemaThreads: null,
-                    inputThreadCount: null,
-                    expectedThreadCount: 7,
-                )
-                ->withCpuCoresCountProvider(new DummyCpuCoresCountProvider(8)),
+        yield 'thread count not specified in schema and not specified in input, 80% of 5 CPU cores is 4' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: null,
+                inputThreadCount: null,
+                expectedThreadCount: 4,
+                cpuCoresCount: 5,
+            ),
+        ];
+
+        yield 'thread count not specified in schema and not specified in input, 80% of 8 CPU cores rounds down to 6' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: null,
+                inputThreadCount: null,
+                expectedThreadCount: 6,
+                cpuCoresCount: 8,
+            ),
+        ];
+
+        yield 'max thread count in input with 1 CPU core overrides schema' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: 4,
+                inputThreadCount: 'max',
+                expectedThreadCount: 1,
+                cpuCoresCount: 1,
+            ),
+        ];
+
+        yield 'max thread count in input with 2 CPU cores overrides schema' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: 4,
+                inputThreadCount: 'max',
+                expectedThreadCount: 1,
+                cpuCoresCount: 2,
+            ),
+        ];
+
+        yield 'max thread count in input with 8 CPU cores overrides schema' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: 4,
+                inputThreadCount: 'max',
+                expectedThreadCount: 6,
+                cpuCoresCount: 8,
+            ),
+        ];
+
+        yield 'max thread count in schema with 8 CPU cores is 6' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: 'max',
+                inputThreadCount: null,
+                expectedThreadCount: 6,
+                cpuCoresCount: 8,
+            ),
         ];
 
         yield 'thread count specified in schema and not specified in input' => [

@@ -684,6 +684,7 @@ final class Container extends DIContainer
     /**
      * @param non-empty-string|null $configFile
      * @param non-empty-string|null $projectDirectory Absolute path.
+     * @param positive-int|'max'|null $threadCount
      * @param positive-int|'max'|null $dotsPerRow
      */
     public function withValues(
@@ -712,7 +713,7 @@ final class Container extends DIContainer
         ?string $testFrameworkExtraArgs = null,
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
         PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter = null,
-        ?int $threadCount = self::DEFAULT_THREAD_COUNT,
+        int|string|null $threadCount = self::DEFAULT_THREAD_COUNT,
         string|int|null $dotsPerRow = self::DEFAULT_DOTS_PER_ROW,
         bool $dryRun = self::DEFAULT_DRY_RUN,
         ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,

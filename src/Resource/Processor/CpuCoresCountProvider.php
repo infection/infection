@@ -36,28 +36,44 @@ declare(strict_types=1);
 namespace Infection\Resource\Processor;
 
 use Fidry\CpuCoreCounter\CpuCoreCounter;
-use Fidry\CpuCoreCounter\NumberOfCpuCoreNotFound;
-use Infection\Framework\OperatingSystem;
+use Psr\Log\LoggerInterface;
 
 /**
  * @internal
- * @final
  */
-class CpuCoresCountProvider
+final readonly class CpuCoresCountProvider
 {
     /**
-     * Copied and adapter from Psalm project: https://github.com/vimeo/psalm/blob/4.x/src/Psalm/Internal/Analyzer/ProjectAnalyzer.php#L1454
+     * Element of [0., 1.]. Percentage representing the amount of cores that should be used among the available resources.
+     * Leave some CPU capacity available for other processes.
+     *
+     * @see CpuCoreCounter::getAvailableForParallelisation()
      */
-    public function provide(): int
-    {
-        if (OperatingSystem::isWindows()) {
-            return 1;
-        }
+    private const float CPU_USAGE_RATIO = 0.8;
 
-        try {
-            return (new CpuCoreCounter())->getCount();
-        } catch (NumberOfCpuCoreNotFound) {
-            return 1;
-        }
+    public function __construct(
+        private CpuCoreCounter $cpuCoreCounter,
+        private LoggerInterface $logger,
+    ) {
+    }
+
+    /**
+     * @return positive-int
+     */
+    public function provide(float $loadLimit = self::CPU_USAGE_RATIO): int
+    {
+        $result = $this->cpuCoreCounter->getAvailableForParallelisation(loadLimit: $loadLimit);
+
+        $this->logger->debug(
+            'CPU core count: {cores}; CPU usage ratio: {ratio}; CPU count limit: {limit}; available CPUs used: {available}.',
+            [
+                'cores' => $result->totalCoresCount,
+                'ratio' => $result->passedLoadLimit,
+                'limit' => $result->correctedCountLimit ?? 'none',
+                'available' => $result->availableCpus,
+            ],
+        );
+
+        return $result->availableCpus;
     }
 }

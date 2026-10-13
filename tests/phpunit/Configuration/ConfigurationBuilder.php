@@ -61,6 +61,7 @@ final class ConfigurationBuilder
     /**
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param positive-int $threadCount
      * @param positive-int|'max' $dotsPerRow
      * @param non-empty-string $configPathname
      * @param non-empty-string $projectDirectory
@@ -525,6 +526,9 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param positive-int $threadCount
+     */
     public function withThreadCount(int $threadCount): self
     {
         $clone = clone $this;
