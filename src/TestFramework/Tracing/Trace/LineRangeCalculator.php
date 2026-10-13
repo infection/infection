@@ -47,7 +47,7 @@ final class LineRangeCalculator
     public function calculateRange(Node $originalNode): NodeLineRangeData
     {
         if ($originalNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false) === true) {
-            // ClassMethod::getStartLine() includes attribute groups, while php-code-coverage
+            // ClassMethod::getStartLine() includes attribute groups, while `phpunit/php-code-coverage`
             // (>= 14.1.5) starts the method range at its name: use the name line, which is
             // within the method range for every php-code-coverage version
             $startLine = $originalNode instanceof Node\Stmt\ClassMethod
