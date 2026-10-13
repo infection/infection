@@ -50,6 +50,7 @@ final class TestFrameworkMutantProcessFactoryTest extends TestCase
     {
         $mutant = MutantBuilder::withMinimalTestData()->build();
         $process = $this->createStub(MutantProcess::class);
+
         $testFramework = $this->createMock(TestFramework::class);
         $testFramework
             ->expects($this->once())
