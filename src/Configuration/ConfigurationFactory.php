@@ -108,7 +108,7 @@ class ConfigurationFactory
 
     /**
      * @param non-empty-string|null $projectDirectory Absolute path.
-     * @param int|'max'|null $threadCount
+     * @param positive-int|'max'|null $threadCount
      * @param positive-int|'max'|null $dotsPerRow
      *
      * @throws FileOrDirectoryNotFound
@@ -554,7 +554,9 @@ class ConfigurationFactory
     }
 
     /**
-     * @param int|'max'|null $threadCount
+     * @param positive-int|'max'|null $threadCount
+     *
+     * @return positive-int
      */
     private function retrieveThreadCount(int|string|null $threadCount, SchemaConfiguration $schema): int
     {

@@ -73,7 +73,7 @@ final class ThreadsOption implements CommandOption
     }
 
     /**
-     * @return int|'max'|null
+     * @return positive-int|'max'|null
      */
     public static function get(IO $io): int|string|null
     {
