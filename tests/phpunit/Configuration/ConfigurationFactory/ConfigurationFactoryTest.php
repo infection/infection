@@ -187,7 +187,7 @@ final class ConfigurationFactoryTest extends TestCase
                 testFrameworkExtraArgs: null,
                 staticAnalysisToolOptions: null,
                 sourceFilter: null,
-                threadCount: 1,
+                threadCount: 0,
                 dotsPerRow: null,
                 dryRun: false,
                 useGitHubLogger: false,

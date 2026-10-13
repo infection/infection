@@ -825,7 +825,7 @@ final class ConfigurationFactoryScenario
 
     /**
      * @param positive-int|'max'|null $schemaThreads
-     * @param positive-int|'max'|null $inputThreadCount
+     * @param int|'max'|null $inputThreadCount
      */
     public function forValueForThreadCount(
         string|int|null $schemaThreads,

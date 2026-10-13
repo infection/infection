@@ -44,7 +44,7 @@ final class ConfigurationFactoryInputBuilder
 {
     /**
      * @param non-empty-string|null $projectDirectory
-     * @param positive-int|'max'|null $threadCount
+     * @param int|'max'|null $threadCount
      * @param positive-int|'max'|null $dotsPerRow
      */
     public function __construct(
@@ -246,7 +246,7 @@ final class ConfigurationFactoryInputBuilder
     }
 
     /**
-     * @param positive-int|'max'|null $threadCount
+     * @param int|'max'|null $threadCount
      */
     public function withThreadCount(int|string|null $threadCount): self
     {
@@ -389,7 +389,7 @@ final class ConfigurationFactoryInputBuilder
      *     18: string|null,
      *     19: string|null,
      *     20: PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null,
-     *     21: positive-int|'max'|null,
+     *     21: int|'max'|null,
      *     22: positive-int|'max'|null,
      *     23: bool,
      *     24: bool|null,

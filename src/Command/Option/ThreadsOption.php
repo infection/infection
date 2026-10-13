@@ -73,7 +73,7 @@ final class ThreadsOption implements CommandOption
     }
 
     /**
-     * @return positive-int|'max'|null
+     * @return int|'max'|null
      */
     public static function get(IO $io): int|string|null
     {
@@ -87,13 +87,7 @@ final class ThreadsOption implements CommandOption
 
         // user passed `--threads=<int>` option
         if (is_numeric($threads)) {
-            return Assert::positiveInteger(
-                (int) $threads,
-                sprintf(
-                    'The value of option `--threads` must be a positive integer. String "%s" provided.',
-                    $threads,
-                ),
-            );
+            return (int) $threads;
         }
 
         // user passed `--threads=max` option
