@@ -826,11 +826,20 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
-        yield 'thread count not specified in schema and not specified in input, auto-detected from 8 CPU cores is 7' => [
+        yield 'thread count not specified in schema and not specified in input, 80% of 5 CPU cores is 4' => [
             $defaultScenario->forValueForThreadCount(
                 schemaThreads: null,
                 inputThreadCount: null,
-                expectedThreadCount: 7,
+                expectedThreadCount: 4,
+                cpuCoresCount: 5,
+            ),
+        ];
+
+        yield 'thread count not specified in schema and not specified in input, 80% of 8 CPU cores rounds down to 6' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: null,
+                inputThreadCount: null,
+                expectedThreadCount: 6,
                 cpuCoresCount: 8,
             ),
         ];
@@ -857,16 +866,16 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario->forValueForThreadCount(
                 schemaThreads: 4,
                 inputThreadCount: 'max',
-                expectedThreadCount: 7,
+                expectedThreadCount: 6,
                 cpuCoresCount: 8,
             ),
         ];
 
-        yield 'max thread count in schema with 8 CPU cores is 7' => [
+        yield 'max thread count in schema with 8 CPU cores is 6' => [
             $defaultScenario->forValueForThreadCount(
                 schemaThreads: 'max',
                 inputThreadCount: null,
-                expectedThreadCount: 7,
+                expectedThreadCount: 6,
                 cpuCoresCount: 8,
             ),
         ];

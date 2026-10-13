@@ -70,7 +70,6 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_int;
 use function ltrim;
-use function max;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
@@ -92,6 +91,8 @@ class ConfigurationFactory
     public const int DEFAULT_TIMEOUT = 10;
 
     private const int DEFAULT_DOTS_PER_ROW = 50;
+
+    private const float CPU_USAGE_RATIO = 0.8;
 
     public function __construct(
         private readonly TmpDirProvider $tmpDirProvider,
@@ -565,10 +566,8 @@ class ConfigurationFactory
             return $threadCount;
         }
 
-        // we subtract 1 here to not use all the available cores by Infection
-        $maxThreads = $this->cpuCoresCountProvider->provide() - 1;
-
-        return max(1, $maxThreads);
+        // Leave some CPU capacity available for other processes.
+        return $this->cpuCoresCountProvider->provide(self::CPU_USAGE_RATIO);
     }
 
     /**

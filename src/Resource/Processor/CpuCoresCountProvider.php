@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Resource\Processor;
 
 use Fidry\CpuCoreCounter\CpuCoreCounter;
-use Fidry\CpuCoreCounter\NumberOfCpuCoreNotFound;
 use Infection\Framework\OperatingSystem;
 
 /**
@@ -45,19 +44,15 @@ use Infection\Framework\OperatingSystem;
  */
 class CpuCoresCountProvider
 {
-    /**
-     * Copied and adapter from Psalm project: https://github.com/vimeo/psalm/blob/4.x/src/Psalm/Internal/Analyzer/ProjectAnalyzer.php#L1454
-     */
-    public function provide(): int
+    public function provide(float $loadLimit): int
     {
         if (OperatingSystem::isWindows()) {
             return 1;
         }
 
-        try {
-            return (new CpuCoreCounter())->getCount();
-        } catch (NumberOfCpuCoreNotFound) {
-            return 1;
-        }
+        return (new CpuCoreCounter())
+            ->getAvailableForParallelisation(loadLimit: $loadLimit)
+            ->availableCpus
+        ;
     }
 }

@@ -35,17 +35,30 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\Resource\Processor;
 
+use Fidry\CpuCoreCounter\CpuCoreCounter;
+use Fidry\CpuCoreCounter\Finder\DummyCpuCoreFinder;
+use Fidry\CpuCoreCounter\Finder\NullCpuCoreFinder;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 
 final class DummyCpuCoresCountProvider extends CpuCoresCountProvider
 {
+    /**
+     * @param positive-int $count
+     */
     public function __construct(private readonly int $count)
     {
     }
 
     #[\Override]
-    public function provide(): int
+    public function provide(float $loadLimit): int
     {
-        return $this->count;
+        $counter = new CpuCoreCounter(
+            finders: [new DummyCpuCoreFinder($this->count)],
+            countLimitFinder: new NullCpuCoreFinder(),
+        );
+
+        return $counter
+            ->getAvailableForParallelisation(loadLimit: $loadLimit)
+            ->availableCpus;
     }
 }
