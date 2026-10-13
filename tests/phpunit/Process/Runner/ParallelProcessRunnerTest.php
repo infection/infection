@@ -158,7 +158,8 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturnCallback(static function () use (&$callSequence): bool {
                 $callSequence[] = 'isEmpty';
 
-                return false;
+                // Exit loop immediately
+                return true;
             })
         ;
 
