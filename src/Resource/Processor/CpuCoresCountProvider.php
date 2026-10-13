@@ -71,7 +71,7 @@ final readonly class CpuCoresCountProvider
     }
 
     /**
-     * Uses all the cores but one (works for extra beefy machines or when tests are IO-bound).
+     * Uses all the cores but one (works for dedicated machines or when tests are IO-bound).
      *
      * @return positive-int
      */
