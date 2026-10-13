@@ -555,23 +555,19 @@ final class Container extends DIContainer
                 );
             },
             // Autowiring also matches StaticAnalysisTestFramework when resolving TestFramework.
-            Engine::class => (/**
-             * @throws FileOrDirectoryNotFound
-             * @throws NoSourceFound
-             */
-                static fn (self $container): Engine => new Engine(
-                    $container->getConfiguration(),
-                    $container->getTestFramework(),
-                    $container->getEventDispatcher(),
-                    $container->getMemoryLimiter(),
-                    $container->getMutationGenerator(),
-                    $container->getMutationTestingRunner(),
-                    $container->getMinMsiChecker(),
-                    $container->getMaxTimeoutsChecker(),
-                    $container->getMetricsCalculator(),
-                    $container->getPreloadedSourceChecker(),
-                    $container->getStaticAnalysisTestFramework(),
-                )),
+            Engine::class => static fn (self $container): Engine => new Engine(
+                $container->getConfiguration(),
+                $container->getTestFramework(),
+                $container->getEventDispatcher(),
+                $container->getMemoryLimiter(),
+                $container->getMutationGenerator(),
+                $container->getMutationTestingRunner(),
+                $container->getMinMsiChecker(),
+                $container->getMaxTimeoutsChecker(),
+                $container->getMetricsCalculator(),
+                $container->getPreloadedSourceChecker(),
+                $container->getStaticAnalysisTestFramework(),
+            ),
             JUnitTestExecutionInfoAdder::class => static fn (self $container): JUnitTestExecutionInfoAdder => new JUnitTestExecutionInfoAdder(
                 $container->getTestFramework(),
                 $container->get(MemoizedTestFileDataProvider::class),
