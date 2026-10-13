@@ -81,7 +81,6 @@ final readonly class Engine
     /**
      * @throws InitialTestsFailed
      * @throws InitialStaticAnalysisRunFailed
-     * @throws \Infection\TestFramework\Contracts\Throwable\InitialTestsFailed
      * @throws MinMsiCheckFailed
      * @throws MaxTimeoutCountReached
      * @throws UnparsableFile

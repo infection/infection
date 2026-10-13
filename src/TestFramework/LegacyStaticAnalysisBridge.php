@@ -37,14 +37,10 @@ namespace Infection\TestFramework;
 
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
-use Symfony\Component\Process\Exception\ProcessSignaledException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * Compatibility layer for the built-in static-analysis adapters. No third-party adapter
@@ -77,12 +73,6 @@ final readonly class LegacyStaticAnalysisBridge implements StaticAnalysisTestFra
         $this->staticAnalysisToolAdapter->assertMinimumVersionSatisfied();
     }
 
-    /**
-     * @throws InitialStaticAnalysisRunFailed
-     * @throws RuntimeException
-     * @throws ProcessTimedOutException
-     * @throws ProcessSignaledException
-     */
     public function executeInitialRun(): InitialRunResults
     {
         $this->initialStaticAnalysisRunner->run();

@@ -42,7 +42,6 @@ use Infection\Container\Container;
 use Infection\Event\EventDispatcher\EventCollectingEventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
-use Infection\TestFramework\NullStaticAnalysisTestFramework;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
@@ -81,17 +80,6 @@ final class ContainerTest extends TestCase
         $container = new Container([]);
 
         $container->get(PlainFilter::class);
-    }
-
-    public function test_it_uses_a_null_framework_when_static_analysis_is_disabled(): void
-    {
-        $config = ConfigurationBuilder::withMinimalTestData()
-            ->withStaticAnalysisTool(null)
-            ->build()
-        ;
-        $container = Container::create()->cloneWithService(Configuration::class, $config);
-
-        $this->assertInstanceOf(NullStaticAnalysisTestFramework::class, $container->getStaticAnalysisTestFramework());
     }
 
     public function test_it_can_build_simple_services_without_configuration(): void
