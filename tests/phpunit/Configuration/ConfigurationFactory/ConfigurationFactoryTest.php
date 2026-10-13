@@ -835,6 +835,42 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
+        yield 'max thread count in input with 1 CPU core overrides schema' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: 4,
+                inputThreadCount: 'max',
+                expectedThreadCount: 1,
+                cpuCoresCount: 1,
+            ),
+        ];
+
+        yield 'max thread count in input with 2 CPU cores overrides schema' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: 4,
+                inputThreadCount: 'max',
+                expectedThreadCount: 1,
+                cpuCoresCount: 2,
+            ),
+        ];
+
+        yield 'max thread count in input with 8 CPU cores overrides schema' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: 4,
+                inputThreadCount: 'max',
+                expectedThreadCount: 7,
+                cpuCoresCount: 8,
+            ),
+        ];
+
+        yield 'max thread count in schema with 8 CPU cores is 7' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: 'max',
+                inputThreadCount: null,
+                expectedThreadCount: 7,
+                cpuCoresCount: 8,
+            ),
+        ];
+
         yield 'thread count specified in schema and not specified in input' => [
             $defaultScenario->forValueForThreadCount(
                 schemaThreads: 4,
