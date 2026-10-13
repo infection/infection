@@ -1383,15 +1383,6 @@ parameters:
 			path: ../tests/phpunit/Console/LogVerbosityTest.php
 
 		-
-			rawMessage: '''
-				Access to constant on deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
-				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/Container/ContainerTest.php
-
-		-
 			rawMessage: Foreach value variable $trace is never read.
 			identifier: foreach.unusedValue
 			count: 1
@@ -2092,56 +2083,11 @@ parameters:
 
 		-
 			rawMessage: '''
-				Call to method checkRequirements() of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
-				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
-			'''
-			identifier: method.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
-
-		-
-			rawMessage: '''
-				Call to method executeInitialRun() of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
-				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
-			'''
-			identifier: method.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
-
-		-
-			rawMessage: '''
-				Call to method getName() of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
-				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
-			'''
-			identifier: method.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
-
-		-
-			rawMessage: '''
-				Call to method getVersion() of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
-				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
-			'''
-			identifier: method.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
-
-		-
-			rawMessage: '''
-				Call to method test() of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
-				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
-			'''
-			identifier: method.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
-
-		-
-			rawMessage: '''
 				Instantiation of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
 				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
 			'''
 			identifier: new.deprecatedClass
-			count: 2
+			count: 1
 			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
 
 		-

@@ -423,12 +423,6 @@ count = 1
 [[issues]]
 file = "src/Command/RunCommand.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Contracts\Throwable\InitialTestsFailed` in `Infection\Command\RunCommand::executeCommand`.'
-count = 1
-
-[[issues]]
-file = "src/Command/RunCommand.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed` in `Infection\Command\RunCommand::executeCommand`.'
 count = 1
 
@@ -1504,6 +1498,12 @@ count = 3
 file = "src/Differ/UnifiedDiffOutputBuilder.php"
 code = "redundant-comparison"
 message = "Redundant `===` comparison: left-hand side is never identical to right-hand side."
+count = 1
+
+[[issues]]
+file = "src/Engine.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\Contracts\Throwable\InitialTestsFailed` in `Infection\Engine::execute`.'
 count = 1
 
 [[issues]]
@@ -5188,7 +5188,7 @@ count = 1
 file = "tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php"
 code = "deprecated-class"
 message = 'Class `Infection\TestFramework\NullStaticAnalysisTestFramework` is deprecated and should no longer be used.'
-count = 2
+count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
