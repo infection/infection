@@ -42,6 +42,8 @@ use Infection\Resource\Processor\CpuCoresCountProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
+use Psr\Log\Test\TestLogger;
 
 #[CoversClass(CpuCoresCountProvider::class)]
 final class CpuCoresCountProviderTest extends TestCase
@@ -51,12 +53,26 @@ final class CpuCoresCountProviderTest extends TestCase
      * @param positive-int|null $limit
      */
     #[DataProvider('cpuCountProvider')]
-    public function test_it_provides_the_available_cpu_count(
+    public function test_it_provides_and_logs_the_available_cpu_count(
         int $coreCount,
         ?int $limit,
         float $loadLimit,
         int $expected,
     ): void {
+        $expectedRecords = [
+            [
+                'level' => LogLevel::DEBUG,
+                'message' => 'CPU core count: {cores}; CPU usage ratio: {ratio}; CPU count limit: {limit}; available CPUs used: {available}.',
+                'context' => [
+                    'cores' => $coreCount,
+                    'ratio' => $loadLimit,
+                    'limit' => $limit ?? 'none',
+                    'available' => $expected,
+                ],
+            ],
+        ];
+
+        $logger = new TestLogger();
         $provider = new CpuCoresCountProvider(
             new CpuCoreCounter(
                 finders: [
@@ -66,11 +82,13 @@ final class CpuCoresCountProviderTest extends TestCase
                     ? new NullCpuCoreFinder()
                     : new DummyCpuCoreFinder($limit),
             ),
+            $logger,
         );
 
         $actual = $provider->provide($loadLimit);
 
         $this->assertSame($expected, $actual);
+        $this->assertSame($expectedRecords, $logger->records);
     }
 
     public static function cpuCountProvider(): iterable

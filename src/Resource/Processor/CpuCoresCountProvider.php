@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Resource\Processor;
 
 use Fidry\CpuCoreCounter\CpuCoreCounter;
+use Psr\Log\LoggerInterface;
 
 /**
  * @internal
@@ -52,14 +53,24 @@ final readonly class CpuCoresCountProvider
 
     public function __construct(
         private CpuCoreCounter $cpuCoreCounter,
+        private LoggerInterface $logger,
     ) {
     }
 
     public function provide(float $loadLimit = self::CPU_USAGE_RATIO): int
     {
-        return $this->cpuCoreCounter
-            ->getAvailableForParallelisation(loadLimit: $loadLimit)
-            ->availableCpus
-        ;
+        $result = $this->cpuCoreCounter->getAvailableForParallelisation(loadLimit: $loadLimit);
+
+        $this->logger->debug(
+            'CPU core count: {cores}; CPU usage ratio: {ratio}; CPU count limit: {limit}; available CPUs used: {available}.',
+            [
+                'cores' => $result->totalCoresCount,
+                'ratio' => $result->passedLoadLimit,
+                'limit' => $result->correctedCountLimit ?? 'none',
+                'available' => $result->availableCpus,
+            ],
+        );
+
+        return $result->availableCpus;
     }
 }
