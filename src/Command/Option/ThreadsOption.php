@@ -87,7 +87,17 @@ final class ThreadsOption implements CommandOption
 
         // user passed `--threads=<int>` option
         if (is_numeric($threads)) {
-            return (int) $threads;
+            $threadCount = (int) $threads;
+
+            Assert::positiveInteger(
+                $threadCount,
+                sprintf(
+                    'The value of option `--threads` must be a positive integer. String "%s" provided.',
+                    $threads,
+                ),
+            );
+
+            return $threadCount;
         }
 
         // user passed `--threads=max` option
