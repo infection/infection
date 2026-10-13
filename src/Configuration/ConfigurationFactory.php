@@ -70,7 +70,6 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_int;
 use function ltrim;
-use function max;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
@@ -561,14 +560,9 @@ class ConfigurationFactory
     {
         $threadCount ??= $schema->threads;
 
-        if (is_int($threadCount)) {
-            return $threadCount;
-        }
-
-        // we subtract 1 here to not use all the available cores by Infection
-        $maxThreads = $this->cpuCoresCountProvider->provide() - 1;
-
-        return max(1, $maxThreads);
+        return is_int($threadCount)
+            ? $threadCount
+            : $this->cpuCoresCountProvider->provide();
     }
 
     /**
