@@ -108,7 +108,7 @@ class ConfigurationFactory
 
     /**
      * @param non-empty-string|null $projectDirectory Absolute path.
-     * @param positive-int|'max'|null $threadCount
+     * @param positive-int|'auto'|'max'|null $threadCount
      * @param positive-int|'max'|null $dotsPerRow
      *
      * @throws FileOrDirectoryNotFound
@@ -554,7 +554,7 @@ class ConfigurationFactory
     }
 
     /**
-     * @param positive-int|'max'|null $threadCount
+     * @param positive-int|'auto'|'max'|null $threadCount
      *
      * @return positive-int
      */
@@ -562,9 +562,15 @@ class ConfigurationFactory
     {
         $threadCount ??= $schema->threads;
 
-        return is_int($threadCount)
-            ? $threadCount
-            : $this->cpuCoresCountProvider->provide();
+        if (is_int($threadCount)) {
+            return $threadCount;
+        }
+
+        if ($threadCount === 'max') {
+            return $this->cpuCoresCountProvider->provideMax();
+        }
+
+        return $this->cpuCoresCountProvider->provide();
     }
 
     /**

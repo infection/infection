@@ -65,7 +65,7 @@ final class ThreadsOption implements CommandOption
             self::NAME,
             'j',
             InputOption::VALUE_REQUIRED,
-            'Number of threads to use by the runner when executing the mutations. Use "max" to auto calculate it.',
+            'Number of threads to use by the runner when executing the mutations. Use "auto" (default) for 80% of the available CPU cores, or "max" for all of them but one.',
             Container::DEFAULT_THREAD_COUNT,
         );
 
@@ -73,7 +73,7 @@ final class ThreadsOption implements CommandOption
     }
 
     /**
-     * @return positive-int|'max'|null
+     * @return positive-int|'auto'|'max'|null
      */
     public static function get(IO $io): int|string|null
     {
@@ -100,12 +100,16 @@ final class ThreadsOption implements CommandOption
             return $threadCount;
         }
 
+        if ($threads === 'auto') {
+            return 'auto';
+        }
+
         // user passed `--threads=max` option
         Assert::same(
             $threads,
             'max',
             sprintf(
-                'The value of option `--threads` must be of type integer or string "max". String "%s" provided.',
+                'The value of option `--threads` must be of type integer or string "auto" or "max". String "%s" provided.',
                 $threads,
             ),
         );

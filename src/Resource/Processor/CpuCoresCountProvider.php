@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Resource\Processor;
 
 use Fidry\CpuCoreCounter\CpuCoreCounter;
+use Fidry\CpuCoreCounter\ParallelisationResult;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -51,6 +52,8 @@ final readonly class CpuCoresCountProvider
      */
     private const float CPU_USAGE_RATIO = 0.8;
 
+    private const int RESERVED_CPUS = 1;
+
     public function __construct(
         private CpuCoreCounter $cpuCoreCounter,
         private LoggerInterface $logger,
@@ -62,13 +65,33 @@ final readonly class CpuCoresCountProvider
      */
     public function provide(float $loadLimit = self::CPU_USAGE_RATIO): int
     {
-        $result = $this->cpuCoreCounter->getAvailableForParallelisation(loadLimit: $loadLimit);
+        return $this->log(
+            $this->cpuCoreCounter->getAvailableForParallelisation(loadLimit: $loadLimit),
+        );
+    }
 
+    /**
+     * Uses all the cores but one for machines dedicated to mutation testing.
+     *
+     * @return positive-int
+     */
+    public function provideMax(): int
+    {
+        return $this->log(
+            $this->cpuCoreCounter->getAvailableForParallelisation(reservedCpus: self::RESERVED_CPUS),
+        );
+    }
+
+    /**
+     * @return positive-int
+     */
+    private function log(ParallelisationResult $result): int
+    {
         $this->logger->debug(
             'CPU core count: {cores}; CPU usage ratio: {ratio}; CPU count limit: {limit}; available CPUs used: {available}.',
             [
                 'cores' => $result->totalCoresCount,
-                'ratio' => $result->passedLoadLimit,
+                'ratio' => $result->passedLoadLimit ?? 'none',
                 'limit' => $result->correctedCountLimit ?? 'none',
                 'available' => $result->availableCpus,
             ],

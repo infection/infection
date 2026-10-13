@@ -53,7 +53,7 @@ final readonly class SchemaConfiguration
      * @param non-empty-string $pathname
      * @param array<string, mixed> $mutators
      * @param TestFrameworkTypes::*|null $testFramework
-     * @param positive-int|'max'|null $threads
+     * @param positive-int|'auto'|'max'|null $threads
      * @param positive-int|'max'|null $dotsPerRow
      * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
