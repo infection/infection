@@ -36,6 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
 use Exception;
+use Fidry\CpuCoreCounter\CpuCoreCounter;
+use Fidry\CpuCoreCounter\Finder\DummyCpuCoreFinder;
+use Fidry\CpuCoreCounter\Finder\NullCpuCoreFinder;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
@@ -52,6 +55,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
+use Psr\Log\NullLogger;
 use Webmozart\Assert\Assert;
 
 final class ConfigurationFactoryScenario
@@ -69,7 +73,10 @@ final class ConfigurationFactoryScenario
         public ConfigurationFactoryInputBuilder $inputBuilder,
         public Configuration|Exception $expected,
     ) {
-        $this->cpuCoresCountProvider = new CpuCoresCountProvider();
+        $this->cpuCoresCountProvider = new CpuCoresCountProvider(
+            new CpuCoreCounter(),
+            new NullLogger(),
+        );
     }
 
     /**
@@ -822,15 +829,33 @@ final class ConfigurationFactoryScenario
         return $clone;
     }
 
+    /**
+     * @param positive-int|'max'|null $schemaThreads
+     * @param positive-int|'max'|null $inputThreadCount
+     * @param positive-int $expectedThreadCount
+     * @param positive-int $cpuCoresCount
+     */
     public function forValueForThreadCount(
         string|int|null $schemaThreads,
-        ?int $inputThreadCount,
+        int|string|null $inputThreadCount,
         int $expectedThreadCount,
+        int $cpuCoresCount = 1,
     ): self {
         $previousExpected = $this->expected;
         Assert::isInstanceOf($previousExpected, Configuration::class);
 
         return $this
+            ->withCpuCoresCountProvider(
+                new CpuCoresCountProvider(
+                    new CpuCoreCounter(
+                        finders: [
+                            new DummyCpuCoreFinder($cpuCoresCount),
+                        ],
+                        countLimitFinder: new NullCpuCoreFinder(),
+                    ),
+                    new NullLogger(),
+                ),
+            )
             ->withSchema(
                 $this->schemaBuilder
                     ->withThreads($schemaThreads),
