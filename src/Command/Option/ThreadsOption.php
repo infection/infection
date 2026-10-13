@@ -65,7 +65,7 @@ final class ThreadsOption implements CommandOption
             self::NAME,
             'j',
             InputOption::VALUE_REQUIRED,
-            'Number of threads to use by the runner when executing the mutations. Use "auto" (default) for 80% of the available CPU cores, or "max" for all of them but one.',
+            'Number of threads to use by the runner when executing the mutations. Use "auto" (default) to let Infection select the count, or "max" to use all the available CPU cores but one.',
             Container::DEFAULT_THREAD_COUNT,
         );
 

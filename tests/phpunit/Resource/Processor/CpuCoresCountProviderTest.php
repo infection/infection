@@ -73,17 +73,7 @@ final class CpuCoresCountProviderTest extends TestCase
         ];
 
         $logger = new TestLogger();
-        $provider = new CpuCoresCountProvider(
-            new CpuCoreCounter(
-                finders: [
-                    new DummyCpuCoreFinder($coreCount),
-                ],
-                countLimitFinder: $limit === null
-                    ? new NullCpuCoreFinder()
-                    : new DummyCpuCoreFinder($limit),
-            ),
-            $logger,
-        );
+        $provider = self::createProvider($coreCount, $limit, $logger);
 
         $actual = $provider->provide($loadLimit);
 
@@ -136,17 +126,7 @@ final class CpuCoresCountProviderTest extends TestCase
         ];
 
         $logger = new TestLogger();
-        $provider = new CpuCoresCountProvider(
-            new CpuCoreCounter(
-                finders: [
-                    new DummyCpuCoreFinder($coreCount),
-                ],
-                countLimitFinder: $limit === null
-                    ? new NullCpuCoreFinder()
-                    : new DummyCpuCoreFinder($limit),
-            ),
-            $logger,
-        );
+        $provider = self::createProvider($coreCount, $limit, $logger);
 
         $actual = $provider->provideMax();
 
@@ -197,5 +177,24 @@ final class CpuCoresCountProviderTest extends TestCase
             'loadLimit' => 1.0,
             'expected' => 8,
         ];
+    }
+
+    /**
+     * @param positive-int $coreCount
+     * @param positive-int|null $limit
+     */
+    private static function createProvider(int $coreCount, ?int $limit, TestLogger $logger): CpuCoresCountProvider
+    {
+        return new CpuCoresCountProvider(
+            new CpuCoreCounter(
+                finders: [
+                    new DummyCpuCoreFinder($coreCount),
+                ],
+                countLimitFinder: $limit === null
+                    ? new NullCpuCoreFinder()
+                    : new DummyCpuCoreFinder($limit),
+            ),
+            $logger,
+        );
     }
 }
