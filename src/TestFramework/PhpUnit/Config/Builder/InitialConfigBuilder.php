@@ -85,7 +85,11 @@ final readonly class InitialConfigBuilder
             formatOutput: true,
         );
 
-        $this->configManipulator->validate($path, $xPath);
+        $this->configManipulator->validate(
+            $version,
+            $path,
+            $xPath,
+        );
 
         $this->addCoverageNodes($version, $xPath);
         $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);

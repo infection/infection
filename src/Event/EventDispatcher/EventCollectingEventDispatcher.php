@@ -33,29 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Memory;
+namespace Infection\Event\EventDispatcher;
 
-use Composer\XdebugHandler\XdebugHandler;
-use const PHP_SAPI;
-use function Safe\ini_get;
+use Infection\Event\Subscriber\EventSubscriber;
+use Override;
 
 /**
+ * Decorates an event dispatcher and retains the dispatched events in order.
+ *
  * @internal
- * @final
  */
-class MemoryLimiterEnvironment
+final class EventCollectingEventDispatcher implements EventDispatcher
 {
-    public function hasMemoryLimitSet(): bool
-    {
-        // -1 means no memory limit. Anything else means the user has set their own limits, which we
-        // don't want to mess with
-        return ini_get('memory_limit') !== '-1';
+    /**
+     * @var list<object>
+     */
+    private array $events = [];
+
+    public function __construct(
+        private readonly EventDispatcher $dispatcher,
+    ) {
     }
 
-    public function isUsingSystemIni(): bool
+    #[Override]
+    public function dispatch(object $event): void
     {
-        // Under phpdbg we're using a system php.ini and we can't add a memory limit there. If there
-        // is no skipped version of xdebug handler we are also using the system php ini
-        return PHP_SAPI === 'phpdbg' || XdebugHandler::getSkippedVersion() === '';
+        // Record before invoking subscribers, which may fail or dispatch other events.
+        $this->events[] = $event;
+
+        $this->dispatcher->dispatch($event);
+    }
+
+    #[Override]
+    public function addSubscriber(EventSubscriber $eventSubscriber): void
+    {
+        $this->dispatcher->addSubscriber($eventSubscriber);
+    }
+
+    /**
+     * @return list<object>
+     */
+    public function getEvents(): array
+    {
+        return $this->events;
     }
 }

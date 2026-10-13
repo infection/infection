@@ -131,6 +131,39 @@ final class InitialConfigBuilderTest extends TestCase
         }
     }
 
+    #[DataProvider('schemaValidationVersionProvider')]
+    public function test_it_only_delegates_schema_validation_to_phpunit_10_or_newer(
+        string $version,
+        bool $delegatesValidation,
+    ): void {
+        $builder = $this->createConfigBuilder(<<<'XML'
+            <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+                     foo="bar"/>
+            XML
+        );
+
+        if (!$delegatesValidation) {
+            $this->expectException(InvalidPhpUnitConfiguration::class);
+            $this->expectExceptionMessage("Element 'phpunit', attribute 'foo': The attribute 'foo' is not allowed.");
+        }
+
+        $path = $builder->build($version);
+
+        $this->assertStringContainsString(
+            'foo="bar"',
+            $this->filesystem->readFile($path),
+            'Schema violations must be preserved for PHPUnit 10 or newer to report during the initial run.',
+        );
+    }
+
+    public static function schemaValidationVersionProvider(): iterable
+    {
+        yield 'PHPUnit 9 requires Infection to validate the schema' => ['9.6', false];
+
+        yield 'PHPUnit 10 reports schema violations itself' => ['10.0', true];
+    }
+
     /**
      * @param list<string> $filteredSourceFilesToMutate
      */

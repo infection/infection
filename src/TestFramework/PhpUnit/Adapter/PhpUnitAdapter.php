@@ -35,22 +35,37 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use function array_key_exists;
+use function explode;
 use function implode;
-use Infection\AbstractTestFramework\MemoryUsageAware;
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Configuration\Configuration;
+use Infection\Console\ConsoleOutput;
+use Infection\Mutant\Mutant;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
-use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
+use Infection\TestFramework\PhpUnit\MemoryLimiter;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Override;
 use function Safe\preg_match;
 use function sprintf;
+use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use function trim;
 use function version_compare;
 use Webmozart\Assert\Assert;
@@ -58,9 +73,13 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware, TestFrameworkAdapter
+final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrameworkAdapter
 {
     public const string COVERAGE_DIR = 'coverage-xml';
+
+    private const int CONFIGURATION_VALIDATION_TIMEOUT_IN_SECONDS = 2;
+
+    private readonly CoverageChecker $coverageChecker;
 
     public function __construct(
         private readonly string $testFrameworkExecutable,
@@ -73,8 +92,82 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
         private readonly ShellCommandRunner $shellCommandRunner,
         private readonly VersionParser $versionParser,
         private readonly CommandLineBuilder $commandLineBuilder,
+        private readonly string $testFrameworkConfigPath,
+        private readonly ConsoleOutput $consoleOutput,
+        CoverageCheckerFactory $coverageCheckerFactory,
+        private readonly InitialTestsRunner $initialTestsRunner,
+        private readonly Configuration $config,
+        private readonly MutantProcessContainerFactory $processFactory,
+        private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private readonly MemoryLimiter $memoryLimiter,
         private ?string $version = null,
     ) {
+        $this->coverageChecker = $coverageCheckerFactory->create($this);
+    }
+
+    #[Override]
+    public function checkRequirements(): void
+    {
+        // TODO: check supported version
+
+        $this->coverageChecker->checkCoverageRequirements();
+
+        if ($this->config->skipInitialTests) {
+            $this->consoleOutput->logSkippingInitialTests();
+            $this->coverageChecker->checkCoverageExists();
+        }
+    }
+
+    #[Override]
+    public function executeInitialRun(): InitialRunResults
+    {
+        $initialTestSuiteProcess = $this->initialTestsRunner->run(
+            $this,
+            $this->config->testFrameworkExtraOptions,
+            explode(
+                ' ',
+                (string) $this->config->initialTestsPhpOptions,
+            ),
+            $this->config->skipCoverage,
+        );
+
+        if (!$initialTestSuiteProcess->isSuccessful()) {
+            throw InitialTestsFailed::fromProcessAndAdapter(
+                $initialTestSuiteProcess,
+                $this,
+            );
+        }
+
+        $output = $initialTestSuiteProcess->getOutput();
+
+        $this->coverageChecker->checkCoverageHasBeenGenerated(
+            $initialTestSuiteProcess->getCommandLine(),
+            $output,
+        );
+
+        $memoryUsage = $this->getMemoryUsed($output);
+
+        $results = new InitialRunResults(
+            output: $output,
+            memoryUsage: $memoryUsage === -1. ? null : $memoryUsage,
+        );
+
+        $this->memoryLimiter->recordInitialRunMemoryUsage($results->memoryUsage);
+
+        return $results;
+    }
+
+    #[Override]
+    public function test(Mutant $mutant): MutantProcessContainer
+    {
+        return $this->processFactory->create(
+            $this,
+            $mutant,
+            $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
+                $this->config->testFrameworkExtraOptions,
+                $this->getInitialRunOnlyOptions(),
+            ),
+        );
     }
 
     public function hasJUnitReport(): bool
@@ -83,11 +176,12 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
     }
 
     /**
-     * Returns array of arguments to pass them into the Initial Run Process
+     * Validates the original configuration when supported, then returns the initial run command.
      *
      * @param string[] $phpExtraArgs
      *
      * @throws InvalidPhpUnitConfiguration
+     * @throws InvalidVersion
      *
      * @return string[]
      */
@@ -97,6 +191,8 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
         array $phpExtraArgs,
         bool $skipCoverage,
     ): array {
+        $this->validateConfigurationIfSupported($phpExtraArgs);
+
         if ($skipCoverage === false) {
             $generatedOptions = [];
 
@@ -143,7 +239,7 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
         string $extraOptions,
     ): array {
         return $this->getCommandLine(
-            [],
+            $this->memoryLimiter->getPhpExtraArguments(),
             $this->argumentsAndOptionsBuilder->buildForMutant(
                 $this->mutationConfigBuilder->build(
                     $coverageTests,
@@ -202,17 +298,6 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
         return preg_match('/ParseError: syntax error/i', $output) === 1;
     }
 
-    public function getMemoryUsed(string $output): float
-    {
-        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match) === 1) {
-            Assert::keyExists($match, 1);
-
-            return (float) $match[1];
-        }
-
-        return -1.;
-    }
-
     public function getName(): string
     {
         return 'PHPUnit';
@@ -268,9 +353,20 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
     /**
      * @return string[]
      */
-    public function getInitialRunOnlyOptions(): array
+    private function getInitialRunOnlyOptions(): array
     {
         return ['--configuration', '--filter', '--testsuite'];
+    }
+
+    private function getMemoryUsed(string $output): float
+    {
+        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match) === 1) {
+            Assert::keyExists($match, 1);
+
+            return (float) $match[1];
+        }
+
+        return -1.;
     }
 
     /**
@@ -291,5 +387,56 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
     private function createInitialTestsFailRecommendations(string $commandLine): string
     {
         return sprintf('Check the executed command to identify the problem: %s', $commandLine);
+    }
+
+    /**
+     * @param string[] $phpExtraArgs
+     *
+     * @throws InvalidPhpUnitConfiguration
+     * @throws InvalidVersion
+     */
+    private function validateConfigurationIfSupported(array $phpExtraArgs): void
+    {
+        // PHPUnit 13.2 introduced validation against its bundled schema, without
+        // resolving the schema URL declared in the configuration.
+        // https://github.com/sebastianbergmann/phpunit/commit/e85b58eda9e750763f3b26fb416612d5931299aa
+        if (!$this->isPhpUnit132OrHigher($this->getVersion())) {
+            return;
+        }
+
+        try {
+            $this->shellCommandRunner->mustRun(
+                $this->commandLineBuilder->build(
+                    $this->testFrameworkExecutable,
+                    $phpExtraArgs,
+                    [
+                        '--configuration',
+                        $this->testFrameworkConfigPath,
+                        '--validate-configuration',
+                    ],
+                ),
+                timeout: self::CONFIGURATION_VALIDATION_TIMEOUT_IN_SECONDS,
+            );
+        } catch (SymfonyProcessRuntimeException $processFailed) {
+            throw new InvalidPhpUnitConfiguration(
+                sprintf(
+                    'Could not validate the PHPUnit configuration file "%s".',
+                    $this->testFrameworkConfigPath,
+                ),
+                (int) $processFailed->getCode(),
+                previous: $processFailed,
+            );
+        }
+    }
+
+    private function isPhpUnit132OrHigher(string $testFrameworkVersion): bool
+    {
+        static $versions = [];
+
+        if (!array_key_exists($testFrameworkVersion, $versions)) {
+            $versions[$testFrameworkVersion] = version_compare($testFrameworkVersion, '13.2.0', '>=');
+        }
+
+        return $versions[$testFrameworkVersion];
     }
 }
