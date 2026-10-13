@@ -55,6 +55,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
+use Psr\Log\NullLogger;
 use Webmozart\Assert\Assert;
 
 final class ConfigurationFactoryScenario
@@ -74,6 +75,7 @@ final class ConfigurationFactoryScenario
     ) {
         $this->cpuCoresCountProvider = new CpuCoresCountProvider(
             new CpuCoreCounter(),
+            new NullLogger(),
         );
     }
 
@@ -850,6 +852,7 @@ final class ConfigurationFactoryScenario
                         ],
                         countLimitFinder: new NullCpuCoreFinder(),
                     ),
+                    new NullLogger(),
                 ),
             )
             ->withSchema(

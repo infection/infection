@@ -81,6 +81,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use function str_contains;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
@@ -169,6 +170,7 @@ final class ConfigurationFactoryTest extends TestCase
                     new CpuCoreCounter([
                         new DummyCpuCoreFinder(1),
                     ]),
+                    new NullLogger(),
                 ),
             )
             ->create(
