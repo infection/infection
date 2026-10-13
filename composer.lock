@@ -5782,21 +5782,21 @@
         },
         {
             "name": "webmozarts/strict-phpunit",
-            "version": "7.25.0",
+            "version": "7.25.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/strict-phpunit.git",
-                "reference": "f060d33194dbd54f5ff0beaffe24a6464961e9f3"
+                "reference": "ff73b8ff3da86f68b4f1ca6a058723b7385623a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/strict-phpunit/zipball/f060d33194dbd54f5ff0beaffe24a6464961e9f3",
-                "reference": "f060d33194dbd54f5ff0beaffe24a6464961e9f3",
+                "url": "https://api.github.com/repos/webmozarts/strict-phpunit/zipball/ff73b8ff3da86f68b4f1ca6a058723b7385623a4",
+                "reference": "ff73b8ff3da86f68b4f1ca6a058723b7385623a4",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.3",
-                "phpunit/phpunit": "^10.3 || ^11.0 || ^12.0"
+                "phpunit/phpunit": "^10.3 || ^11.0 || ^12.0 || ^13.0"
             },
             "require-dev": {
                 "ergebnis/composer-normalize": "^2.28",
@@ -5826,9 +5826,9 @@
             "description": "Enables type-safe comparisons of objects in PHPUnit",
             "support": {
                 "issues": "https://github.com/webmozarts/strict-phpunit/issues",
-                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.25.0"
+                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.25.1"
             },
-            "time": "2026-07-03T15:09:51+00:00"
+            "time": "2026-10-07T09:55:43+00:00"
         }
     ],
     "aliases": [],
