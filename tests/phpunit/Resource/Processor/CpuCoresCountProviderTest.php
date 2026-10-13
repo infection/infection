@@ -48,6 +48,51 @@ use Psr\Log\Test\TestLogger;
 #[CoversClass(CpuCoresCountProvider::class)]
 final class CpuCoresCountProviderTest extends TestCase
 {
+    /**
+     * @param positive-int $coreCount
+     * @param positive-int|null $limit
+     */
+    #[DataProvider('cpuCountProvider')]
+    public function test_it_provides_and_logs_the_available_cpu_count(
+        int $coreCount,
+        ?int $limit,
+        int $expected,
+        ?float $loadLimit = null,
+    ): void {
+        $expectedRecords = [
+            [
+                'level' => LogLevel::DEBUG,
+                'message' => 'CPU core count: {cores}; CPU usage ratio: {ratio}; CPU count limit: {limit}; available CPUs used: {available}.',
+                'context' => [
+                    'cores' => $coreCount,
+                    'ratio' => $loadLimit ?? 'none',
+                    'limit' => $limit ?? 'none',
+                    'available' => $expected,
+                ],
+            ],
+        ];
+
+        $logger = new TestLogger();
+        $provider = new CpuCoresCountProvider(
+            new CpuCoreCounter(
+                finders: [
+                    new DummyCpuCoreFinder($coreCount),
+                ],
+                countLimitFinder: $limit === null
+                    ? new NullCpuCoreFinder()
+                    : new DummyCpuCoreFinder($limit),
+            ),
+            $logger,
+        );
+
+        $actual = $loadLimit === null
+            ? $provider->provideMax()
+            : $provider->provide($loadLimit);
+
+        $this->assertSame($expected, $actual);
+        $this->assertSame($expectedRecords, $logger->records);
+    }
+
     public static function cpuCountProvider(): iterable
     {
         yield 'rounding down after applying the load limit' => [
@@ -109,50 +154,5 @@ final class CpuCoresCountProviderTest extends TestCase
             'limit' => null,
             'expected' => 1,
         ];
-    }
-
-    /**
-     * @param positive-int $coreCount
-     * @param positive-int|null $limit
-     */
-    #[DataProvider('cpuCountProvider')]
-    public function test_it_provides_and_logs_the_available_cpu_count(
-        int $coreCount,
-        ?int $limit,
-        int $expected,
-        ?float $loadLimit = null,
-    ): void {
-        $expectedRecords = [
-            [
-                'level' => LogLevel::DEBUG,
-                'message' => 'CPU core count: {cores}; CPU usage ratio: {ratio}; CPU count limit: {limit}; available CPUs used: {available}.',
-                'context' => [
-                    'cores' => $coreCount,
-                    'ratio' => $loadLimit ?? 'none',
-                    'limit' => $limit ?? 'none',
-                    'available' => $expected,
-                ],
-            ],
-        ];
-
-        $logger = new TestLogger();
-        $provider = new CpuCoresCountProvider(
-            new CpuCoreCounter(
-                finders: [
-                    new DummyCpuCoreFinder($coreCount),
-                ],
-                countLimitFinder: $limit === null
-                    ? new NullCpuCoreFinder()
-                    : new DummyCpuCoreFinder($limit),
-            ),
-            $logger,
-        );
-
-        $actual = $loadLimit === null
-            ? $provider->provideMax()
-            : $provider->provide($loadLimit);
-
-        $this->assertSame($expected, $actual);
-        $this->assertSame($expectedRecords, $logger->records);
     }
 }
