@@ -822,6 +822,9 @@ final class ConfigurationFactoryScenario
         return $clone;
     }
 
+    /**
+     * @param positive-int|'max'|null $schemaThreads
+     */
     public function forValueForThreadCount(
         string|int|null $schemaThreads,
         ?int $inputThreadCount,
