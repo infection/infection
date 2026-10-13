@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Resource\Processor;
 
 use Fidry\CpuCoreCounter\CpuCoreCounter;
-use Infection\Framework\OperatingSystem;
 
 /**
  * @internal
@@ -54,10 +53,6 @@ class CpuCoresCountProvider
 
     public function provide(float $loadLimit = self::CPU_USAGE_RATIO): int
     {
-        if (OperatingSystem::isWindows()) {
-            return 1;
-        }
-
         return (new CpuCoreCounter())
             ->getAvailableForParallelisation(loadLimit: $loadLimit)
             ->availableCpus
