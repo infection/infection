@@ -455,9 +455,9 @@ implements Builder` under `src/Container/Builder/` and register the class-string
 `ConfigurationFactory::create()` takes ~35 flat scalars (mirrored by the test input builder).
 Tri-state options are `?bool`/`?float` merged with `??`; flags either source may force ON are
 non-nullable and merged with `||` (`noProgress || ciDetected`) - unifying these is a silent
-bug. `'auto'` threads (the default) use
-`CpuCoreCounter::getAvailableForParallelisation(loadLimit: 0.8)`: round down with a minimum
-of 1. `'max'` threads use all cores but one (`reservedCpus: 1`). Both apply CPU quota
+bug. `'auto'` threads (the default) use round down with a minimum of 1 from
+`CpuCoreCounter::getAvailableForParallelisation(loadLimit: 0.8)`. `'max'` threads use all
+cores but one (`reservedCpus: 1`) for IO-bound tests or dedicated machines. Both apply CPU quota
 limits. Log paths absolutize against the CONFIG FILE dir (a 2025 BC break, #2455) except the
 `FileReporter::ALLOWED_PHP_STREAMS` allowlist - reuse it, do not hand-roll `php://` checks.
 `refineGitBase()` runs `git merge-base` so only the user's own commits get mutated. Private
