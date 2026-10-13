@@ -100,6 +100,7 @@ final class ThreadsOption implements CommandOption
             return $threadCount;
         }
 
+        // user passed `--threads=auto` option
         if ($threads === 'auto') {
             return 'auto';
         }
