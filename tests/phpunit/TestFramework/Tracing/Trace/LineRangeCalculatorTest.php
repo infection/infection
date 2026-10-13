@@ -155,6 +155,70 @@ final class LineRangeCalculatorTest extends TestCase
                 PHP,
             [4],
         ];
+
+        yield 'function signature with an attribute on its own line' => [
+            <<<'PHP'
+                <?php
+
+                class Test {
+                    #[Route]
+                    public function findMe() // line 5
+                    {
+                        // ...
+                    }
+                }
+                PHP,
+            [5],
+        ];
+
+        yield 'function signature with several attribute lines' => [
+            <<<'PHP'
+                <?php
+
+                class Test {
+                    #[Route(
+                        path: '/',
+                        methods: ['GET'],
+                    )]
+                    #[IsGranted('ROLE_USER')]
+                    public function findMe() // line 9
+                    {
+                        // ...
+                    }
+                }
+                PHP,
+            [9],
+        ];
+
+        yield 'function signature with an attribute on the same line' => [
+            <<<'PHP'
+                <?php
+
+                class Test {
+                    #[Route] public function findMe() // line 4
+                    {
+                        // ...
+                    }
+                }
+                PHP,
+            [4],
+        ];
+
+        yield 'function signature with the name on its own line' => [
+            <<<'PHP'
+                <?php
+
+                class Test {
+                    #[Route]
+                    public function
+                    findMe() // line 6
+                    {
+                        // ...
+                    }
+                }
+                PHP,
+            [6],
+        ];
     }
 
     private function createSpyTraverser(): NodeVisitor
