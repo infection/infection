@@ -36,6 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
 use Exception;
+use Fidry\CpuCoreCounter\CpuCoreCounter;
+use Fidry\CpuCoreCounter\Finder\DummyCpuCoreFinder;
+use Fidry\CpuCoreCounter\Finder\NullCpuCoreFinder;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
@@ -52,7 +55,6 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
-use Infection\Tests\Fixtures\Resource\Processor\DummyCpuCoresCountProvider;
 use Webmozart\Assert\Assert;
 
 final class ConfigurationFactoryScenario
@@ -70,7 +72,9 @@ final class ConfigurationFactoryScenario
         public ConfigurationFactoryInputBuilder $inputBuilder,
         public Configuration|Exception $expected,
     ) {
-        $this->cpuCoresCountProvider = new CpuCoresCountProvider();
+        $this->cpuCoresCountProvider = new CpuCoresCountProvider(
+            new CpuCoreCounter(),
+        );
     }
 
     /**
@@ -839,7 +843,14 @@ final class ConfigurationFactoryScenario
 
         return $this
             ->withCpuCoresCountProvider(
-                new DummyCpuCoresCountProvider($cpuCoresCount),
+                new CpuCoresCountProvider(
+                    new CpuCoreCounter(
+                        finders: [
+                            new DummyCpuCoreFinder($cpuCoresCount),
+                        ],
+                        countLimitFinder: new NullCpuCoreFinder(),
+                    ),
+                ),
             )
             ->withSchema(
                 $this->schemaBuilder

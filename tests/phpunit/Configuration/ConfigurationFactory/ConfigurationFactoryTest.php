@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
 use Exception;
+use Fidry\CpuCoreCounter\CpuCoreCounter;
+use Fidry\CpuCoreCounter\Finder\DummyCpuCoreFinder;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
@@ -163,7 +165,11 @@ final class ConfigurationFactoryTest extends TestCase
                 ciDetected: false,
                 githubActionsDetected: false,
                 projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
-                cpuCoresCountProvider: new CpuCoresCountProvider(),
+                cpuCoresCountProvider: new CpuCoresCountProvider(
+                    new CpuCoreCounter([
+                        new DummyCpuCoreFinder(1),
+                    ]),
+                ),
             )
             ->create(
                 schema: $schema,

@@ -39,9 +39,8 @@ use Fidry\CpuCoreCounter\CpuCoreCounter;
 
 /**
  * @internal
- * @final
  */
-class CpuCoresCountProvider
+final readonly class CpuCoresCountProvider
 {
     /**
      * Element of [0., 1.]. Percentage representing the amount of cores that should be used among the available resources.
@@ -49,11 +48,16 @@ class CpuCoresCountProvider
      *
      * @see CpuCoreCounter::getAvailableForParallelisation()
      */
-    protected const float CPU_USAGE_RATIO = 0.8;
+    private const float CPU_USAGE_RATIO = 0.8;
+
+    public function __construct(
+        private CpuCoreCounter $cpuCoreCounter,
+    ) {
+    }
 
     public function provide(float $loadLimit = self::CPU_USAGE_RATIO): int
     {
-        return (new CpuCoreCounter())
+        return $this->cpuCoreCounter
             ->getAvailableForParallelisation(loadLimit: $loadLimit)
             ->availableCpus
         ;
