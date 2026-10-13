@@ -159,6 +159,8 @@ final class ParallelProcessRunnerTest extends TestCase
                 $callSequence[] = 'isEmpty';
 
                 return true; // Exit loop immediately
+
+                return false;
             })
         ;
 
