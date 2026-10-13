@@ -566,10 +566,9 @@ class ConfigurationFactory
         }
 
         // we subtract 1 here to not use all the available cores by Infection
-        return max(
-            1,
-            $this->cpuCoresCountProvider->provide() - 1,
-        );
+        $maxThreads = $this->cpuCoresCountProvider->provide() - 1;
+
+        return max(1, $maxThreads);
     }
 
     /**
