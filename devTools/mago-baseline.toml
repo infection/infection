@@ -932,6 +932,12 @@ count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
+code = "deprecated-class"
+message = 'Class `Infection\TestFramework\NullStaticAnalysisTestFramework` is deprecated and should no longer be used.'
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
 code = "invalid-argument"
 message = 'Invalid argument type for argument #5 of `Infection\Engine::__construct`: expected `Infection\Process\Runner\MutationTestingRunner`, but found `Infection\Mutation\MutationGenerator`.'
 count = 1
@@ -2821,6 +2827,30 @@ message = 'Parameter `$env` of `Infection\Process\OriginalPhpProcess::start()` e
 count = 1
 
 [[issues]]
+file = "src/Process/Runner/InitialStaticAnalysisRunner.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Process\Runner\InitialStaticAnalysisRunFailed` in `Infection\Process\Runner\InitialStaticAnalysisRunner::run`.'
+count = 1
+
+[[issues]]
+file = "src/Process/Runner/InitialStaticAnalysisRunner.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Process\Runner\InitialStaticAnalysisRunner::run`.'
+count = 1
+
+[[issues]]
+file = "src/Process/Runner/InitialStaticAnalysisRunner.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Process\Runner\InitialStaticAnalysisRunner::run`.'
+count = 1
+
+[[issues]]
+file = "src/Process/Runner/InitialStaticAnalysisRunner.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Process\Runner\InitialStaticAnalysisRunner::run`.'
+count = 1
+
+[[issues]]
 file = "src/Process/Runner/InitialTestsRunner.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Process\Runner\InitialTestsRunner::run`.'
@@ -4298,6 +4328,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
+code = "deprecated-class"
+message = 'Class `Infection\TestFramework\NullStaticAnalysisTestFramework` is deprecated and should no longer be used.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/EngineTest.php"
 code = "method-access-on-null"
 message = "Attempting to call a method on `null`."
 count = 1
@@ -5147,6 +5183,12 @@ file = "tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\Tests\TestFramework\LegacyTestFrameworkBridgeTest::createInitialRunOnlyOptionsAdapter`: expected `Infection\AbstractTestFramework\TestFrameworkAdapter&Infection\TestFramework\ProvidesInitialRunOnlyOptions`, but found `PHPUnit\Framework\MockObject\MockObject`.'
 count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php"
+code = "deprecated-class"
+message = 'Class `Infection\TestFramework\NullStaticAnalysisTestFramework` is deprecated and should no longer be used.'
+count = 2
 
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"

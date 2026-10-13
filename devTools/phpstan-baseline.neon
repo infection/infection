@@ -148,6 +148,12 @@ parameters:
 			path: ../src/Container/Container.php
 
 		-
+			rawMessage: 'Call to an undefined method Infection\Container\Container::getMemoryLimiter().'
+			identifier: method.notFound
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 1
@@ -163,11 +169,62 @@ parameters:
 			path: ../src/Container/Container.php
 
 		-
+			rawMessage: 'Class Infection\Engine constructor invoked with 11 parameters, 10 required.'
+			identifier: arguments.count
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
 			rawMessage: '''
 				Instantiation of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
 				Remove once the built-in static-analysis adapters implement TestFramework directly.
 			'''
 			identifier: new.deprecatedClass
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: 'Parameter #10 $staticAnalysisTestFramework of class Infection\Engine constructor expects Infection\TestFramework\Contracts\StaticAnalysisTestFramework, Infection\Source\PreloadedSourceChecker given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: 'Parameter #5 $mutationTestingRunner of class Infection\Engine constructor expects Infection\Process\Runner\MutationTestingRunner, Infection\Mutation\MutationGenerator given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: 'Parameter #6 $minMsiChecker of class Infection\Engine constructor expects Infection\Metrics\MinMsiChecker, Infection\Process\Runner\MutationTestingRunner given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: 'Parameter #7 $maxTimeoutsChecker of class Infection\Engine constructor expects Infection\Metrics\MaxTimeoutsChecker, Infection\Metrics\MinMsiChecker given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: 'Parameter #8 $metricsCalculator of class Infection\Engine constructor expects Infection\Metrics\MetricsCalculator, Infection\Metrics\MaxTimeoutsChecker given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: 'Parameter #9 $preloadedSourceChecker of class Infection\Engine constructor expects Infection\Source\PreloadedSourceChecker, Infection\Metrics\MetricsCalculator given.'
+			identifier: argument.type
 			count: 1
 			path: ../src/Container/Container.php
 
@@ -203,6 +260,30 @@ parameters:
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/Differ/Tokens.php
+
+		-
+			rawMessage: Value assigned to variable $fromRange only flows into values that are never used.
+			identifier: assign.unusedFlow
+			count: 2
+			path: ../src/Differ/UnifiedDiffOutputBuilder.php
+
+		-
+			rawMessage: Value assigned to variable $toRange only flows into values that are never used.
+			identifier: assign.unusedFlow
+			count: 2
+			path: ../src/Differ/UnifiedDiffOutputBuilder.php
+
+		-
+			rawMessage: Value of variable $fromRange after ++ only flows into values that are never used.
+			identifier: postInc.unusedFlow
+			count: 2
+			path: ../src/Differ/UnifiedDiffOutputBuilder.php
+
+		-
+			rawMessage: Value of variable $toRange after ++ only flows into values that are never used.
+			identifier: postInc.unusedFlow
+			count: 2
+			path: ../src/Differ/UnifiedDiffOutputBuilder.php
 
 		-
 			rawMessage: '''
@@ -928,15 +1009,6 @@ parameters:
 			path: ../src/TestFramework/Factory.php
 
 		-
-			rawMessage: '''
-				Class Infection\TestFramework\NullStaticAnalysisTestFramework implements deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
-				Remove once CombinedTestFramework composes static analysis with the test suite.
-			'''
-			identifier: class.implementsDeprecatedInterface
-			count: 1
-			path: ../src/TestFramework/NullStaticAnalysisTestFramework.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
 			count: 1
@@ -1311,6 +1383,15 @@ parameters:
 			path: ../tests/phpunit/Console/LogVerbosityTest.php
 
 		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/Container/ContainerTest.php
+
+		-
 			rawMessage: Foreach value variable $trace is never read.
 			identifier: foreach.unusedValue
 			count: 1
@@ -1323,11 +1404,26 @@ parameters:
 			path: ../tests/phpunit/Container/ContainerTest.php
 
 		-
+			rawMessage: Access to an undefined property Infection\Tests\EngineTest::$memoryLimiter.
+			identifier: property.notFound
+			count: 1
+			path: ../tests/phpunit/EngineTest.php
+
+		-
 			rawMessage: '''
 				Access to constant on deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
 				Remove once CombinedTestFramework composes static analysis with the test suite.
 			'''
 			identifier: classConstant.deprecatedInterface
+			count: 1
+			path: ../tests/phpunit/EngineTest.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
+			'''
+			identifier: new.deprecatedClass
 			count: 1
 			path: ../tests/phpunit/EngineTest.php
 
@@ -1984,6 +2080,69 @@ parameters:
 			identifier: return.deprecatedClass
 			count: 1
 			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
+
+		-
+			rawMessage: '''
+				Call to method checkRequirements() of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
+
+		-
+			rawMessage: '''
+				Call to method executeInitialRun() of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
+
+		-
+			rawMessage: '''
+				Call to method getName() of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
+
+		-
+			rawMessage: '''
+				Call to method getVersion() of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
+
+		-
+			rawMessage: '''
+				Call to method test() of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
+			'''
+			identifier: new.deprecatedClass
+			count: 2
+			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
 
 		-
 			rawMessage: '''

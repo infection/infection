@@ -43,8 +43,8 @@ use LogicException;
 
 /**
  * Takes the place of the static-analysis framework when no analyser is configured.
- * TODO: to be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
  *
+ * @deprecated To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
  * @internal
  */
 final readonly class NullStaticAnalysisTestFramework implements StaticAnalysisTestFramework

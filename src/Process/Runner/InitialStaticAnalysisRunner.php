@@ -41,9 +41,6 @@ use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStati
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Symfony\Component\Process\Exception\ProcessSignaledException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * This is needed for 2 purposes:
@@ -63,12 +60,6 @@ readonly class InitialStaticAnalysisRunner
     ) {
     }
 
-    /**
-     * @throws InitialStaticAnalysisRunFailed
-     * @throws RuntimeException
-     * @throws ProcessSignaledException
-     * @throws ProcessTimedOutException
-     */
     public function run(): void
     {
         $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
