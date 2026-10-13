@@ -60,20 +60,16 @@ final class ThreadsOptionTest extends CommandOptionTestCase
             new NullOutput(),
         );
 
+        $cpuCoresCountProvider = new DummyCpuCoresCountProvider($cpuCoresCount);
+
         TestOptionCommand::bind(
             ThreadsOption::class,
             $io,
         );
 
-        $actual = ThreadsOption::get(
-            $io,
-            new DummyCpuCoresCountProvider($cpuCoresCount),
-        );
+        $actual = ThreadsOption::get($io, $cpuCoresCountProvider);
 
-        $this->assertSame(
-            $expected,
-            $actual,
-        );
+        $this->assertSame($expected, $actual);
     }
 
     public static function optionProvider(): iterable
