@@ -48,6 +48,51 @@ use Psr\Log\Test\TestLogger;
 #[CoversClass(CpuCoresCountProvider::class)]
 final class CpuCoresCountProviderTest extends TestCase
 {
+    public static function cpuCountProvider(): iterable
+    {
+        yield 'rounding down after applying the load limit' => [
+            'coreCount' => 8,
+            'limit' => null,
+            'loadLimit' => 0.8,
+            'expected' => 6,
+        ];
+
+        yield 'custom load limit' => [
+            'coreCount' => 8,
+            'limit' => null,
+            'loadLimit' => 0.5,
+            'expected' => 4,
+        ];
+
+        yield 'CPU count limit below the available count' => [
+            'coreCount' => 8,
+            'limit' => 4,
+            'loadLimit' => 0.8,
+            'expected' => 4,
+        ];
+
+        yield 'CPU count limit above the available count' => [
+            'coreCount' => 8,
+            'limit' => 16,
+            'loadLimit' => 0.8,
+            'expected' => 6,
+        ];
+
+        yield 'minimum of one CPU' => [
+            'coreCount' => 1,
+            'limit' => null,
+            'loadLimit' => 0.8,
+            'expected' => 1,
+        ];
+
+        yield 'all CPUs available with a load limit of one' => [
+            'coreCount' => 8,
+            'limit' => null,
+            'loadLimit' => 1.0,
+            'expected' => 8,
+        ];
+    }
+
     /**
      * @param positive-int $coreCount
      * @param positive-int|null $limit
@@ -132,51 +177,6 @@ final class CpuCoresCountProviderTest extends TestCase
 
         $this->assertSame($expected, $actual);
         $this->assertSame($expectedRecords, $logger->records);
-    }
-
-    public static function cpuCountProvider(): iterable
-    {
-        yield 'rounding down after applying the load limit' => [
-            'coreCount' => 8,
-            'limit' => null,
-            'loadLimit' => 0.8,
-            'expected' => 6,
-        ];
-
-        yield 'custom load limit' => [
-            'coreCount' => 8,
-            'limit' => null,
-            'loadLimit' => 0.5,
-            'expected' => 4,
-        ];
-
-        yield 'CPU count limit below the available count' => [
-            'coreCount' => 8,
-            'limit' => 4,
-            'loadLimit' => 0.8,
-            'expected' => 4,
-        ];
-
-        yield 'CPU count limit above the available count' => [
-            'coreCount' => 8,
-            'limit' => 16,
-            'loadLimit' => 0.8,
-            'expected' => 6,
-        ];
-
-        yield 'minimum of one CPU' => [
-            'coreCount' => 1,
-            'limit' => null,
-            'loadLimit' => 0.8,
-            'expected' => 1,
-        ];
-
-        yield 'all CPUs available with a load limit of one' => [
-            'coreCount' => 8,
-            'limit' => null,
-            'loadLimit' => 1.0,
-            'expected' => 8,
-        ];
     }
 
     /**
