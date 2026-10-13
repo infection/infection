@@ -91,56 +91,20 @@ final class CpuCoresCountProviderTest extends TestCase
             'loadLimit' => 1.0,
             'expected' => 8,
         ];
-    }
 
-    /**
-     * @param positive-int $coreCount
-     * @param positive-int|null $limit
-     */
-    #[DataProvider('cpuCountProvider')]
-    public function test_it_provides_and_logs_the_available_cpu_count(
-        int $coreCount,
-        ?int $limit,
-        float $loadLimit,
-        int $expected,
-    ): void {
-        $expectedRecords = [
-            [
-                'level' => LogLevel::DEBUG,
-                'message' => 'CPU core count: {cores}; CPU usage ratio: {ratio}; CPU count limit: {limit}; available CPUs used: {available}.',
-                'context' => [
-                    'cores' => $coreCount,
-                    'ratio' => $loadLimit,
-                    'limit' => $limit ?? 'none',
-                    'available' => $expected,
-                ],
-            ],
-        ];
-
-        $logger = new TestLogger();
-        $provider = self::createProvider($coreCount, $limit, $logger);
-
-        $actual = $provider->provide($loadLimit);
-
-        $this->assertSame($expected, $actual);
-        $this->assertSame($expectedRecords, $logger->records);
-    }
-
-    public static function maxCpuCountProvider(): iterable
-    {
-        yield 'all CPUs but one' => [
+        yield 'max uses all CPUs but one' => [
             'coreCount' => 8,
             'limit' => null,
             'expected' => 7,
         ];
 
-        yield 'CPU count limit below the available count' => [
+        yield 'max with a CPU count limit below the available count' => [
             'coreCount' => 8,
             'limit' => 4,
             'expected' => 4,
         ];
 
-        yield 'minimum of one CPU' => [
+        yield 'max with a minimum of one CPU' => [
             'coreCount' => 1,
             'limit' => null,
             'expected' => 1,
@@ -151,11 +115,12 @@ final class CpuCoresCountProviderTest extends TestCase
      * @param positive-int $coreCount
      * @param positive-int|null $limit
      */
-    #[DataProvider('maxCpuCountProvider')]
-    public function test_it_provides_and_logs_the_max_cpu_count(
+    #[DataProvider('cpuCountProvider')]
+    public function test_it_provides_and_logs_the_available_cpu_count(
         int $coreCount,
         ?int $limit,
         int $expected,
+        ?float $loadLimit = null,
     ): void {
         $expectedRecords = [
             [
@@ -163,7 +128,7 @@ final class CpuCoresCountProviderTest extends TestCase
                 'message' => 'CPU core count: {cores}; CPU usage ratio: {ratio}; CPU count limit: {limit}; available CPUs used: {available}.',
                 'context' => [
                     'cores' => $coreCount,
-                    'ratio' => 'none',
+                    'ratio' => $loadLimit ?? 'none',
                     'limit' => $limit ?? 'none',
                     'available' => $expected,
                 ],
@@ -171,21 +136,7 @@ final class CpuCoresCountProviderTest extends TestCase
         ];
 
         $logger = new TestLogger();
-        $provider = self::createProvider($coreCount, $limit, $logger);
-
-        $actual = $provider->provideMax();
-
-        $this->assertSame($expected, $actual);
-        $this->assertSame($expectedRecords, $logger->records);
-    }
-
-    /**
-     * @param positive-int $coreCount
-     * @param positive-int|null $limit
-     */
-    private static function createProvider(int $coreCount, ?int $limit, TestLogger $logger): CpuCoresCountProvider
-    {
-        return new CpuCoresCountProvider(
+        $provider = new CpuCoresCountProvider(
             new CpuCoreCounter(
                 finders: [
                     new DummyCpuCoreFinder($coreCount),
@@ -196,5 +147,12 @@ final class CpuCoresCountProviderTest extends TestCase
             ),
             $logger,
         );
+
+        $actual = $loadLimit === null
+            ? $provider->provideMax()
+            : $provider->provide($loadLimit);
+
+        $this->assertSame($expected, $actual);
+        $this->assertSame($expectedRecords, $logger->records);
     }
 }
