@@ -68,7 +68,6 @@ use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
-use function is_int;
 use function ltrim;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
@@ -562,15 +561,11 @@ class ConfigurationFactory
     {
         $threadCount ??= $schema->threads;
 
-        if (is_int($threadCount)) {
-            return $threadCount;
-        }
-
-        if ($threadCount === 'max') {
-            return $this->cpuCoresCountProvider->provideMax();
-        }
-
-        return $this->cpuCoresCountProvider->provideAuto();
+        return match ($threadCount) {
+            null, 'auto' => $this->cpuCoresCountProvider->provideAuto(),
+            'max' => $this->cpuCoresCountProvider->provideMax(),
+            default => $threadCount,
+        };
     }
 
     /**
