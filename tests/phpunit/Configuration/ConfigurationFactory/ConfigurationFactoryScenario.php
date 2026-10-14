@@ -830,8 +830,8 @@ final class ConfigurationFactoryScenario
     }
 
     /**
-     * @param positive-int|'max'|null $schemaThreads
-     * @param positive-int|'max'|null $inputThreadCount
+     * @param positive-int|'auto'|'max'|null $schemaThreads
+     * @param positive-int|'auto'|'max'|null $inputThreadCount
      * @param positive-int $expectedThreadCount
      * @param positive-int $cpuCoresCount
      */

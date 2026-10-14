@@ -68,7 +68,6 @@ use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
-use function is_int;
 use function ltrim;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
@@ -108,7 +107,7 @@ class ConfigurationFactory
 
     /**
      * @param non-empty-string|null $projectDirectory Absolute path.
-     * @param positive-int|'max'|null $threadCount
+     * @param positive-int|'auto'|'max'|null $threadCount
      * @param positive-int|'max'|null $dotsPerRow
      *
      * @throws FileOrDirectoryNotFound
@@ -554,7 +553,7 @@ class ConfigurationFactory
     }
 
     /**
-     * @param positive-int|'max'|null $threadCount
+     * @param positive-int|'auto'|'max'|null $threadCount
      *
      * @return positive-int
      */
@@ -562,9 +561,11 @@ class ConfigurationFactory
     {
         $threadCount ??= $schema->threads;
 
-        return is_int($threadCount)
-            ? $threadCount
-            : $this->cpuCoresCountProvider->provide();
+        return match ($threadCount) {
+            null, 'auto' => $this->cpuCoresCountProvider->provideAuto(),
+            'max' => $this->cpuCoresCountProvider->provideMax(),
+            default => $threadCount,
+        };
     }
 
     /**

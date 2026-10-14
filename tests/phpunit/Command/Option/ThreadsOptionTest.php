@@ -52,6 +52,11 @@ final class ThreadsOptionTest extends CommandOptionTestCase
             null,
         ];
 
+        yield 'auto is preserved' => [
+            new StringInput('--threads=auto'),
+            'auto',
+        ];
+
         yield 'max is preserved' => [
             new StringInput('--threads=max'),
             'max',
@@ -111,28 +116,28 @@ final class ThreadsOptionTest extends CommandOptionTestCase
         yield 'invalid value' => [
             new StringInput('--threads=abc'),
             new InvalidArgumentException(
-                'The value of option `--threads` must be of type integer or string "max". String "abc" provided.',
+                'The value of option `--threads` must be of type integer or string "auto" or "max". String "abc" provided.',
             ),
         ];
 
         yield 'empty value' => [
             new StringInput('--threads='),
             new InvalidArgumentException(
-                'The value of option `--threads` must be of type integer or string "max". String "" provided.',
+                'The value of option `--threads` must be of type integer or string "auto" or "max". String "" provided.',
             ),
         ];
 
         yield 'max is case-sensitive' => [
             new StringInput('--threads=MAX'),
             new InvalidArgumentException(
-                'The value of option `--threads` must be of type integer or string "max". String "MAX" provided.',
+                'The value of option `--threads` must be of type integer or string "auto" or "max". String "MAX" provided.',
             ),
         ];
 
         yield 'max with surrounding whitespace is rejected' => [
             new StringInput('--threads=" max "'),
             new InvalidArgumentException(
-                'The value of option `--threads` must be of type integer or string "max". String " max " provided.',
+                'The value of option `--threads` must be of type integer or string "auto" or "max". String " max " provided.',
             ),
         ];
 

@@ -65,7 +65,7 @@ class SchemaConfigurationFactory
         $mago = $rawConfig->mago ?? new stdClass();
 
         // The threads value has already been validated against resources/schema.json.
-        /** @var positive-int|'max'|null $threads */
+        /** @var positive-int|'auto'|'max'|null $threads */
         $threads = $rawConfig->threads ?? null;
 
         self::assertTestFrameworkOptionsAreNotBothConfigured($rawConfig);

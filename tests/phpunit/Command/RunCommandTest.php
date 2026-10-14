@@ -57,7 +57,7 @@ final class RunCommandTest extends TestCase
     public function test_it_fails_when_threads_value_is_string_but_not_max(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The value of option `--threads` must be of type integer or string "max". String "abc" provided.');
+        $this->expectExceptionMessage('The value of option `--threads` must be of type integer or string "auto" or "max". String "abc" provided.');
 
         $app = new Application(SingletonContainer::getContainer());
 
