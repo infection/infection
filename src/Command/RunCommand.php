@@ -46,6 +46,7 @@ use Infection\Command\Option\SourceFilterOptions;
 use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Command\Option\TestFrameworkOption;
 use Infection\Command\Option\TestFrameworkOptionsOption;
+use Infection\Command\Option\ThreadsOption;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
@@ -62,7 +63,6 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
-use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\AdapterInstaller;
@@ -84,8 +84,6 @@ use Webmozart\Assert\Assert;
  */
 final class RunCommand extends BaseCommand
 {
-    public const string OPTION_THREADS = 'threads';
-
     public const string OPTION_DOTS_PER_ROW = 'dots-per-row';
 
     public const string OPTION_LOGGER_GITHUB = 'logger-github';
@@ -182,13 +180,9 @@ final class RunCommand extends BaseCommand
                 'Options to be passed to the static analysis tool',
                 Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
             )
-            ->addOption(
-                self::OPTION_THREADS,
-                'j',
-                InputOption::VALUE_REQUIRED,
-                'Number of threads to use by the runner when executing the mutations. Use "max" to auto calculate it.',
-                Container::DEFAULT_THREAD_COUNT,
-            )
+        ;
+
+        ThreadsOption::addOption($this)
             ->addOption(
                 self::OPTION_DOTS_PER_ROW,
                 null,
@@ -432,7 +426,7 @@ final class RunCommand extends BaseCommand
         LoggerInterface $logger,
     ): Container {
         $input = $io->getInput();
-        $commandHelper = new RunCommandHelper($input, new CpuCoresCountProvider());
+        $commandHelper = new RunCommandHelper($input);
 
         /** @var string|null $minMsi */
         $minMsi = $input->getOption(self::OPTION_MIN_MSI);
@@ -488,7 +482,7 @@ final class RunCommand extends BaseCommand
             testFrameworkExtraArgs: TestFrameworkExtraArgsOption::get($io),
             staticAnalysisToolOptions: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS, Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS),
             sourceFilter: SourceFilterOptions::get($io, PathsArgument::get($io)),
-            threadCount: $commandHelper->getThreadCount(),
+            threadCount: ThreadsOption::get($io),
             dotsPerRow: $commandHelper->getDotsPerRow(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             dryRun: (bool) $input->getOption(self::OPTION_DRY_RUN),

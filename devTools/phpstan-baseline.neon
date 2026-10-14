@@ -571,12 +571,6 @@ parameters:
 			path: ../src/Reporter/Http/StrykerDashboardClient.php
 
 		-
-			rawMessage: Infection\Resource\Processor\CpuCoresCountProvider should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Resource/Processor/CpuCoresCountProvider.php
-
-		-
 			rawMessage: Infection\Source\Collector\FixedSourceCollector should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1

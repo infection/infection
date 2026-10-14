@@ -472,13 +472,13 @@ count = 1
 file = "src/Command/RunCommandHelper.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #2 of `sprintf`: expected `Stringable|null|scalar`, but found `nonnull`."
-count = 4
+count = 3
 
 [[issues]]
 file = "src/Command/RunCommandHelper.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 5
+count = 4
 
 [[issues]]
 file = "src/Command/RunCommandHelper.php"
@@ -784,12 +784,6 @@ count = 1
 file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #13 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `int|null`, but found `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #21 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `int|null|string`, but found `mixed`.'
 count = 1
 
 [[issues]]
@@ -2972,12 +2966,6 @@ count = 1
 
 [[issues]]
 file = "src/TestFramework/AdapterInstallationDecider.php"
-code = "mixed-argument"
-message = "Invalid argument type for argument #1 of `class_exists`: expected `string`, but found `mixed`."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/AdapterInstallationDecider.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `Infection\TestFramework\AdapterInstallationDecider::shouldBeInstalled`. Saw type `mixed`.'
 count = 1
@@ -3962,12 +3950,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/AutoReview/Makefile/MakefileTest.php"
-code = "mixed-assignment"
-message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/AutoReview/Makefile/MakefileTest.php"
 code = "possible-method-access-on-null"
 message = "Attempting to call a method on `null`."
 count = 2
@@ -4234,7 +4216,7 @@ count = 2
 file = "tests/phpunit/Container/ContainerTest.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 1
+count = 2
 
 [[issues]]
 file = "tests/phpunit/Container/ContainerTest.php"
@@ -4550,12 +4532,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutator/MutatorFactoryTest.php"
-code = "mixed-method-access"
-message = "Attempting to access a method on a non-object type (`mixed`)."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/Mutator/MutatorFactoryTest.php"
 code = "non-existent-method"
 message = 'Method `expects` does not exist on type `Infection\Reflection\ClassReflection`.'
 count = 1
@@ -4803,7 +4779,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Tests\PhpParser\NodeTraverserFactoryTest::getVisitorClassNames`: expected `list<class-string<PhpParser\NodeVisitor>>`, but found `list<string>`.'
+message = 'Invalid return type for function `Infection\Tests\PhpParser\NodeTraverserFactoryTest::getVisitorClassNames`: expected `list<class-string<PhpParser\NodeVisitor>>`, but found `list<class-string>`.'
 count = 1
 
 [[issues]]
@@ -4897,9 +4873,9 @@ message = "Invalid argument type for argument #1 of `iterator_count`: expected `
 count = 2
 
 [[issues]]
-file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
-code = "redundant-comparison"
-message = "Redundant `<=` comparison: left-hand side is always less than or equal to right-hand side."
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
+code = "mixed-operand"
+message = "Invalid left operand: type `mixed` cannot be reliably used in string concatenation."
 count = 2
 
 [[issues]]
@@ -5283,7 +5259,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestingUtility/Iterable/TrackableIteratorTest.php"
 code = "less-specific-argument"
-message = 'Argument type mismatch for argument #1 of `Infection\Tests\TestingUtility\Iterable\TrackableIteratorTest::assertIteratorStateIs`: expected `Infection\Tests\TestingUtility\Iterable\TrackableIterator<array-key, mixed>`, but provided type `Infection\Tests\TestingUtility\Iterable\TrackableIterator<string|string|string, string|string|string>` is less specific.'
+message = 'Argument type mismatch for argument #1 of `Infection\Tests\TestingUtility\Iterable\TrackableIteratorTest::assertIteratorStateIs`: expected `Infection\Tests\TestingUtility\Iterable\TrackableIterator<array-key, mixed>`, but provided type `Infection\Tests\TestingUtility\Iterable\TrackableIterator<string, string>` is less specific.'
 count = 12
 
 [[issues]]

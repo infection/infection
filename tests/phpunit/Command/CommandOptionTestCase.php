@@ -49,7 +49,7 @@ abstract class CommandOptionTestCase extends TestCase
     #[DataProvider('optionProvider')]
     public function test_it_maps_the_option(
         InputInterface $input,
-        bool|string|Exception|null $expected,
+        bool|int|string|Exception|null $expected,
     ): void {
         $commandOptionClassName = $this->getOptionClassName();
         $io = new IO(
@@ -57,14 +57,14 @@ abstract class CommandOptionTestCase extends TestCase
             new NullOutput(),
         );
 
+        if ($expected instanceof Exception) {
+            $this->expectExceptionObject($expected);
+        }
+
         TestOptionCommand::bind(
             $commandOptionClassName,
             $io,
         );
-
-        if ($expected instanceof Exception) {
-            $this->expectExceptionObject($expected);
-        }
 
         $io->getInput()->validate();
 
