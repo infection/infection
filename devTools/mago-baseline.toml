@@ -4333,24 +4333,6 @@ message = 'Class `Infection\TestFramework\NullStaticAnalysisTestFramework` is de
 count = 1
 
 [[issues]]
-file = "tests/phpunit/EngineTest.php"
-code = "method-access-on-null"
-message = "Attempting to call a method on `null`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/EngineTest.php"
-code = "mixed-method-access"
-message = "Attempting to access a method on a non-object type (`mixed`)."
-count = 3
-
-[[issues]]
-file = "tests/phpunit/EngineTest.php"
-code = "non-existent-property"
-message = 'Property `$memoryLimiter` does not exist on class `Infection\Tests\EngineTest`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/Environment/StrykerApiKeyResolverTest.php"
 code = "possibly-invalid-argument"
 message = '''Possible argument type mismatch for argument #1 of `Infection\Environment\StrykerApiKeyResolver::resolve`: expected `array<string, string>`, but possibly received `array{'API_KEY': string('foo'), 'INFECTION_DASHBOARD_API_KEY': int(9000), 'STRYKER_DASHBOARD_API_KEY': stdClass}`.'''

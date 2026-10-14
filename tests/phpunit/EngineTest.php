@@ -46,8 +46,6 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Resource\Memory\MemoryLimiter;
-use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -206,15 +204,6 @@ final class EngineTest extends TestCase
             })
         ;
 
-        $this->memoryLimiter
-            ->expects($this->once())
-            ->method('limitMemory')
-            ->with($skipInitialTests ? null : $initialRunResults)
-            ->willReturnCallback(static function () use (&$callOrder): void {
-                $callOrder[] = 'limitMemory';
-            })
-        ;
-
         $this->mutationGenerator
             ->expects($this->once())
             ->method('generate')
@@ -257,7 +246,11 @@ final class EngineTest extends TestCase
 
         $engine->execute();
 
-        $this->assertSame(['staticAnalysis', 'generate'], $callOrder);
+        $this->assertSame(
+            ['staticAnalysis', 'generate'],
+            $callOrder,
+            'Static analysis must run before mutation generation, even when initial tests are skipped.',
+        );
     }
 
     public static function skipInitialTestsProvider(): iterable

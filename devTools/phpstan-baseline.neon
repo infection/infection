@@ -1395,12 +1395,6 @@ parameters:
 			path: ../tests/phpunit/Container/ContainerTest.php
 
 		-
-			rawMessage: Access to an undefined property Infection\Tests\EngineTest::$memoryLimiter.
-			identifier: property.notFound
-			count: 1
-			path: ../tests/phpunit/EngineTest.php
-
-		-
 			rawMessage: '''
 				Access to constant on deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
 				Remove once CombinedTestFramework composes static analysis with the test suite.

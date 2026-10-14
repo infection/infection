@@ -50,7 +50,6 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\PreloadedSourceChecker;
-use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\JUnit\TestNotFound;
