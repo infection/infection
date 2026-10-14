@@ -54,7 +54,7 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
-use Infection\TestFramework\PhpUnit\Log\PsrLogger;
+use Infection\TestFramework\PhpUnit\Log\PsrPhpUnitLogger;
 use Infection\TestFramework\PhpUnit\MemoryLimiter;
 use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -157,7 +157,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
                 new PhpExecutableFinder(),
             ),
             $testFrameworkConfigPath,
-            new PsrLogger($logger),
+            new PsrPhpUnitLogger($logger),
             $coverageCheckerFactory,
             $initialTestsRunner,
             $configuration,

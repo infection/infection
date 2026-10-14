@@ -33,35 +33,39 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Log;
+namespace Infection\Tests\TestFramework\PhpUnit\Log;
 
-use function implode;
-use Override;
+use Infection\TestFramework\PhpUnit\Log\PsrPhpUnitLogger;
 use const PHP_EOL;
-use Psr\Log\LoggerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
+use Psr\Log\Test\TestLogger;
 
-/**
- * @internal
- */
-final readonly class PsrLogger implements PhpUnitLogger
+#[CoversClass(PsrPhpUnitLogger::class)]
+final class PsrPhpUnitLoggerTest extends TestCase
 {
-    public function __construct(
-        private LoggerInterface $logger,
-    ) {
-    }
-
-    #[Override]
-    public function logSkippingInitialTests(): void
+    public function test_it_warns_about_skipping_initial_tests(): void
     {
-        $this->logger->warning(
-            implode(
-                PHP_EOL,
-                [
-                    'Skipping the initial test run can be very dangerous.',
-                    'It is your responsibility to ensure the tests are in a passing state to begin.',
-                    'If this is not done then mutations may report as caught when they are not.',
-                ],
-            ),
-        );
+        $logger = new TestLogger();
+        $phpUnitLogger = new PsrPhpUnitLogger($logger);
+
+        $phpUnitLogger->logSkippingInitialTests();
+
+        $expected = [
+            [
+                'level' => LogLevel::WARNING,
+                'message' => 'Skipping the initial test run can be very dangerous.'
+                    . PHP_EOL
+                    . 'It is your responsibility to ensure the tests are in a passing state to begin.'
+                    . PHP_EOL
+                    . 'If this is not done then mutations may report as caught when they are not.',
+                'context' => [],
+            ],
+        ];
+
+        $actual = $logger->records;
+
+        $this->assertSame($expected, $actual);
     }
 }
