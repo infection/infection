@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
-use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
@@ -50,6 +49,7 @@ use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 #[Group('integration')]
 #[CoversClass(PhpUnitAdapterFactory::class)]
@@ -76,7 +76,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             sourceDirectoryBasePath: '/path/to/project',
             useWindowsFilterLimit: false,
             fileSystem: new FileSystem(),
-            consoleOutput: $this->createStub(ConsoleOutput::class),
+            logger: $this->createStub(LoggerInterface::class),
             coverageCheckerFactory: new CoverageCheckerFactory(
                 $configuration,
                 JUnitReportLocator::create($fileSystem, ''),

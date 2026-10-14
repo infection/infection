@@ -37,7 +37,6 @@ namespace Infection\Tests\TestFramework\Factory;
 
 use Infection\CannotBeInstantiated;
 use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
@@ -45,6 +44,7 @@ use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
@@ -100,7 +100,7 @@ final class ConfigurableTestFrameworkFactory implements TestFrameworkFactory
         string $sourceDirectoryBasePath,
         bool $useWindowsFilterLimit,
         Filesystem $fileSystem,
-        ConsoleOutput $consoleOutput,
+        LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
         InitialTestsRunner $initialTestsRunner,
         Configuration $configuration,
