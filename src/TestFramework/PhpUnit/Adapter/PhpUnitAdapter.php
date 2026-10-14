@@ -36,20 +36,32 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function array_key_exists;
+use function explode;
 use function implode;
 use Infection\AbstractTestFramework\InvalidVersion;
-use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Configuration\Configuration;
+use Infection\Mutant\Mutant;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
-use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
+use Infection\TestFramework\PhpUnit\Log\PhpUnitLogger;
+use Infection\TestFramework\PhpUnit\MemoryLimiter;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Override;
 use function Safe\preg_match;
 use function sprintf;
@@ -61,11 +73,13 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware, TestFrameworkAdapter
+final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrameworkAdapter
 {
     public const string COVERAGE_DIR = 'coverage-xml';
 
     private const int CONFIGURATION_VALIDATION_TIMEOUT_IN_SECONDS = 2;
+
+    private readonly CoverageChecker $coverageChecker;
 
     public function __construct(
         private readonly string $testFrameworkExecutable,
@@ -79,8 +93,81 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
         private readonly VersionParser $versionParser,
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly string $testFrameworkConfigPath,
+        private readonly PhpUnitLogger $logger,
+        CoverageCheckerFactory $coverageCheckerFactory,
+        private readonly InitialTestsRunner $initialTestsRunner,
+        private readonly Configuration $config,
+        private readonly MutantProcessContainerFactory $processFactory,
+        private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private readonly MemoryLimiter $memoryLimiter,
         private ?string $version = null,
     ) {
+        $this->coverageChecker = $coverageCheckerFactory->create($this);
+    }
+
+    #[Override]
+    public function checkRequirements(): void
+    {
+        // TODO: check supported version
+
+        $this->coverageChecker->checkCoverageRequirements();
+
+        if ($this->config->skipInitialTests) {
+            $this->logger->logSkippingInitialTests();
+            $this->coverageChecker->checkCoverageExists();
+        }
+    }
+
+    #[Override]
+    public function executeInitialRun(): InitialRunResults
+    {
+        $initialTestSuiteProcess = $this->initialTestsRunner->run(
+            $this,
+            $this->config->testFrameworkExtraOptions,
+            explode(
+                ' ',
+                (string) $this->config->initialTestsPhpOptions,
+            ),
+            $this->config->skipCoverage,
+        );
+
+        if (!$initialTestSuiteProcess->isSuccessful()) {
+            throw InitialTestsFailed::fromProcessAndAdapter(
+                $initialTestSuiteProcess,
+                $this,
+            );
+        }
+
+        $output = $initialTestSuiteProcess->getOutput();
+
+        $this->coverageChecker->checkCoverageHasBeenGenerated(
+            $initialTestSuiteProcess->getCommandLine(),
+            $output,
+        );
+
+        $memoryUsage = $this->getMemoryUsed($output);
+
+        $results = new InitialRunResults(
+            output: $output,
+            memoryUsage: $memoryUsage === -1. ? null : $memoryUsage,
+        );
+
+        $this->memoryLimiter->recordInitialRunMemoryUsage($results->memoryUsage);
+
+        return $results;
+    }
+
+    #[Override]
+    public function test(Mutant $mutant): MutantProcessContainer
+    {
+        return $this->processFactory->create(
+            $this,
+            $mutant,
+            $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
+                $this->config->testFrameworkExtraOptions,
+                $this->getInitialRunOnlyOptions(),
+            ),
+        );
     }
 
     public function hasJUnitReport(): bool
@@ -152,7 +239,7 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
         string $extraOptions,
     ): array {
         return $this->getCommandLine(
-            [],
+            $this->memoryLimiter->getPhpExtraArguments(),
             $this->argumentsAndOptionsBuilder->buildForMutant(
                 $this->mutationConfigBuilder->build(
                     $coverageTests,
@@ -211,17 +298,6 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
         return preg_match('/ParseError: syntax error/i', $output) === 1;
     }
 
-    public function getMemoryUsed(string $output): float
-    {
-        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match) === 1) {
-            Assert::keyExists($match, 1);
-
-            return (float) $match[1];
-        }
-
-        return -1.;
-    }
-
     public function getName(): string
     {
         return 'PHPUnit';
@@ -277,9 +353,20 @@ final class PhpUnitAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOp
     /**
      * @return string[]
      */
-    public function getInitialRunOnlyOptions(): array
+    private function getInitialRunOnlyOptions(): array
     {
         return ['--configuration', '--filter', '--testsuite'];
+    }
+
+    private function getMemoryUsed(string $output): float
+    {
+        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match) === 1) {
+            Assert::keyExists($match, 1);
+
+            return (float) $match[1];
+        }
+
+        return -1.;
     }
 
     /**

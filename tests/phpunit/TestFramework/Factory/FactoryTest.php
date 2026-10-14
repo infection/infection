@@ -57,6 +57,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 #[Group('integration')]
 #[CoversClass(Factory::class)]
@@ -172,6 +173,7 @@ final class FactoryTest extends TestCase
             $this->createStub(ShellCommandRunner::class),
             $fileSystem,
             $this->createStub(ConsoleOutput::class),
+            $this->createStub(LoggerInterface::class),
             new CoverageCheckerFactory(
                 $configuration,
                 JUnitReportLocator::create($fileSystem, ''),

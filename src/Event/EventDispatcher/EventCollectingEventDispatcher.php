@@ -33,19 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Fixtures\Resource\Processor;
+namespace Infection\Event\EventDispatcher;
 
-use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\Event\Subscriber\EventSubscriber;
+use Override;
 
-final class DummyCpuCoresCountProvider extends CpuCoresCountProvider
+/**
+ * Decorates an event dispatcher and retains the dispatched events in order.
+ *
+ * @internal
+ */
+final class EventCollectingEventDispatcher implements EventDispatcher
 {
-    public function __construct(private readonly int $count)
-    {
+    /**
+     * @var list<object>
+     */
+    private array $events = [];
+
+    public function __construct(
+        private readonly EventDispatcher $dispatcher,
+    ) {
     }
 
-    #[\Override]
-    public function provide(): int
+    #[Override]
+    public function dispatch(object $event): void
     {
-        return $this->count;
+        // Record before invoking subscribers, which may fail or dispatch other events.
+        $this->events[] = $event;
+
+        $this->dispatcher->dispatch($event);
+    }
+
+    #[Override]
+    public function addSubscriber(EventSubscriber $eventSubscriber): void
+    {
+        $this->dispatcher->addSubscriber($eventSubscriber);
+    }
+
+    /**
+     * @return list<object>
+     */
+    public function getEvents(): array
+    {
+        return $this->events;
     }
 }

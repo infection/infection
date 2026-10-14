@@ -455,8 +455,10 @@ implements Builder` under `src/Container/Builder/` and register the class-string
 `ConfigurationFactory::create()` takes ~35 flat scalars (mirrored by the test input builder).
 Tri-state options are `?bool`/`?float` merged with `??`; flags either source may force ON are
 non-nullable and merged with `||` (`noProgress || ciDetected`) - unifying these is a silent
-bug. `'max'` threads = `max(1, cores - 1)` - one core is deliberately left free. Log paths
-absolutize against the CONFIG FILE dir (a 2025 BC break, #2455) except the
+bug. `'auto'` threads (the default) use round down with a minimum of 1 from
+`CpuCoreCounter::getAvailableForParallelisation(loadLimit: 0.8)`. `'max'` threads use all
+cores but one (`reservedCpus: 1`) for IO-bound tests or dedicated machines. Both apply CPU quota
+limits. Log paths absolutize against the CONFIG FILE dir (a 2025 BC break, #2455) except the
 `FileReporter::ALLOWED_PHP_STREAMS` allowlist - reuse it, do not hand-roll `php://` checks.
 `refineGitBase()` runs `git merge-base` so only the user's own commits get mutated. Private
 helpers are named `retrieve*` (merge/default) and `refine*` (transform).
@@ -494,11 +496,10 @@ everywhere instead. `OriginalPhpProcess` brackets `parent::start()` with
 `PhpConfig::useOriginal()` / `usePersistent()` and injects `XDEBUG_MODE=coverage` unless
 pcov/phpdbg is the better driver. `CoverageChecker` decides upfront via seven signals -
 including regexing `--initial-tests-php-options` for drivers only the child will load - and
-throws `CoverageNotFound` with a heredoc listing copy-pasteable remedies. `MemoryLimiter`
-appends `memory_limit = 2x observed` to the xdebug-handler TEMP ini only - guarded by
-`MemoryLimiterEnvironment::isUsingSystemIni()`; and it must run AFTER static analysis
-(PHPStan OOMs otherwise, #2427). Every step is best-effort: early-return guards for six
-can't-do-this conditions, swallowed `IOException`.
+throws `CoverageNotFound` with a heredoc listing copy-pasteable remedies. `TestFramework\PhpUnit\MemoryLimiter`
+adds `-d memory_limit=2x observed` only to PHPUnit mutant commands when initial memory usage
+is known and no user memory limit is set. It leaves shared PHP configuration and static-analysis
+processes unchanged (#2427).
 
 ## Adding a mutator
 

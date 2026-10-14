@@ -68,9 +68,7 @@ use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
-use function is_numeric;
 use function ltrim;
-use function max;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
@@ -89,7 +87,7 @@ class ConfigurationFactory
     /**
      * Default allowed timeout (on a test basis) in seconds
      */
-    private const int DEFAULT_TIMEOUT = 10;
+    public const int DEFAULT_TIMEOUT = 10;
 
     private const int DEFAULT_DOTS_PER_ROW = 50;
 
@@ -109,6 +107,7 @@ class ConfigurationFactory
 
     /**
      * @param non-empty-string|null $projectDirectory Absolute path.
+     * @param positive-int|'auto'|'max'|null $threadCount
      * @param positive-int|'max'|null $dotsPerRow
      *
      * @throws FileOrDirectoryNotFound
@@ -136,7 +135,7 @@ class ConfigurationFactory
         ?string $testFrameworkExtraArgs,
         ?string $staticAnalysisToolOptions,
         PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
-        ?int $threadCount,
+        int|string|null $threadCount,
         string|int|null $dotsPerRow,
         bool $dryRun,
         ?bool $useGitHubLogger,
@@ -516,6 +515,10 @@ class ConfigurationFactory
             $logs->getUseGitHubAnnotationsLogger(),
             $logs->getStrykerConfig(),
             self::pathToAbsolute($logs->getSummaryJsonLogFilePath(), $configDir),
+            self::pathToAbsolute(
+                $logs->debugEventsLogFilePath,
+                $configDir,
+            ),
         );
     }
 
@@ -549,31 +552,20 @@ class ConfigurationFactory
         return sprintf('%s/%s', $configDir, $path);
     }
 
-    private function retrieveThreadCount(?int $threadCount, SchemaConfiguration $schema): int
+    /**
+     * @param positive-int|'auto'|'max'|null $threadCount
+     *
+     * @return positive-int
+     */
+    private function retrieveThreadCount(int|string|null $threadCount, SchemaConfiguration $schema): int
     {
-        // user passed `--threads` option, already validated
-        if ($threadCount !== null) {
-            return $threadCount;
-        }
+        $threadCount ??= $schema->threads;
 
-        $threadsFromSchema = $schema->threads;
-
-        // we subtract 1 here to not use all the available cores by Infection
-        $maxThreads = max(1, $this->cpuCoresCountProvider->provide() - 1);
-
-        if ($threadsFromSchema === null) {
-            return $maxThreads;
-        }
-
-        // config has numeric string or integer value
-        if (is_numeric($threadsFromSchema)) {
-            return (int) $threadsFromSchema;
-        }
-
-        // config has `max` thread count
-        Assert::same($threadsFromSchema, 'max', sprintf('The value of key `threads` in configuration file must be of type integer or string "max". String "%s" provided.', $threadsFromSchema));
-
-        return $maxThreads;
+        return match ($threadCount) {
+            null, 'auto' => $this->cpuCoresCountProvider->provideAuto(),
+            'max' => $this->cpuCoresCountProvider->provideMax(),
+            default => $threadCount,
+        };
     }
 
     /**

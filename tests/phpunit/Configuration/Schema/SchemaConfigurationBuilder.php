@@ -51,6 +51,7 @@ final class SchemaConfigurationBuilder
      * @param non-empty-string $pathname
      * @param array<string, mixed> $mutators
      * @param TestFrameworkTypes::*|null $testFramework
+     * @param positive-int|'auto'|'max'|null $threads
      * @param positive-int|'max'|null $dotsPerRow
      * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
@@ -159,6 +160,7 @@ final class SchemaConfigurationBuilder
                 useGitHubAnnotationsLogger: true,
                 strykerConfig: StrykerConfig::forBadge('master'),
                 summaryJsonLogFilePath: 'summary.json',
+                debugEventsLogFilePath: null,
             ),
             tmpDir: '/tmp/infection',
             phpUnit: new PhpUnit('/config/phpunit', '/custom/phpunit'),
@@ -344,6 +346,9 @@ final class SchemaConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param positive-int|'auto'|'max'|null $threads
+     */
     public function withThreads(string|int|null $threads): self
     {
         $clone = clone $this;

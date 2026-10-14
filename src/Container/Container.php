@@ -64,6 +64,7 @@ use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Differ\UnifiedDiffOutputBuilder;
 use Infection\Engine;
+use Infection\Event\EventDispatcher\EventCollectingEventDispatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
@@ -130,6 +131,9 @@ use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\SymfonyProcessShellCommandRunner;
+use Infection\Report\ComposableReporter;
+use Infection\Report\DebugEventsDataProducer;
+use Infection\Report\Framework\Writer\FileWriter;
 use Infection\Reporter\AdvisoryReporter;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileLocationReporter;
@@ -141,8 +145,6 @@ use Infection\Reporter\ShowMutationsReporter;
 use Infection\Reporter\StrykerReporterFactory;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
 use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Memory\MemoryLimiter;
-use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Collector\LazySourceCollector;
@@ -180,7 +182,6 @@ use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
 use OndraM\CiDetector\CiDetector;
-use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinterAbstract;
@@ -314,7 +315,8 @@ final class Container extends DIContainer
                     GeneratedExtensionsConfig::EXTENSIONS,
                     $container->getShellCommandRunner(),
                     $container->getFileSystem(),
-                    $container->get(ConsoleOutput::class),
+                    $container->getConsoleOutput(),
+                    $container->getLogger(),
                     $container->getCoverageCheckerFactory(),
                     $container->getInitialTestsRunner(),
                     $container->getMutantProcessContainerFactory(),
@@ -339,7 +341,11 @@ final class Container extends DIContainer
                 $container->getMutantCodeFactory(),
             ),
             Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder())),
-            EventDispatcher::class => SyncEventDispatcher::class,
+            EventDispatcher::class => static fn (self $container): EventDispatcher => $container->getConfiguration()->logs->debugEventsLogFilePath === null
+                ? new SyncEventDispatcher()
+                : new EventCollectingEventDispatcher(
+                    new SyncEventDispatcher(),
+                ),
             ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner(
                 $container->getConfiguration()->threadCount,
             ),
@@ -359,11 +365,6 @@ final class Container extends DIContainer
             MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator(
                 $container->getConfiguration()->msiPrecision,
                 $container->getConfiguration()->timeoutsAsEscaped,
-            ),
-            MemoryLimiter::class => static fn (self $container): MemoryLimiter => new MemoryLimiter(
-                $container->getFileSystem(),
-                (string) php_ini_loaded_file(),
-                new MemoryLimiterEnvironment(),
             ),
             SchemaConfigurationLoader::class => static fn (self $container): SchemaConfigurationLoader => new SchemaConfigurationLoader(
                 $container->getRootsFileLocator(),
@@ -484,6 +485,7 @@ final class Container extends DIContainer
             Reporter::class => static function (self $container): Reporter {
                 $output = $container->getOutput();
                 $config = $container->getConfiguration();
+                $debugEventsFilePath = $config->logs->debugEventsLogFilePath;
 
                 $reporter = new FederatedReporter(
                     ...array_filter([
@@ -511,6 +513,17 @@ final class Container extends DIContainer
                         $container->getStrykerLoggerFactory()->createFromLogEntries(
                             $container->getConfiguration()->logs,
                         ),
+                        $debugEventsFilePath === null
+                            ? null
+                            : new ComposableReporter(
+                                new DebugEventsDataProducer(
+                                    $container->getEventCollectingEventDispatcher(),
+                                ),
+                                new FileWriter(
+                                    $container->getFileSystem(),
+                                    $debugEventsFilePath,
+                                ),
+                            ),
                     ]),
                 );
 
@@ -675,6 +688,7 @@ final class Container extends DIContainer
     /**
      * @param non-empty-string|null $configFile
      * @param non-empty-string|null $projectDirectory Absolute path.
+     * @param positive-int|'auto'|'max'|null $threadCount
      * @param positive-int|'max'|null $dotsPerRow
      */
     public function withValues(
@@ -703,7 +717,7 @@ final class Container extends DIContainer
         ?string $testFrameworkExtraArgs = null,
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
         PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter = null,
-        ?int $threadCount = self::DEFAULT_THREAD_COUNT,
+        int|string|null $threadCount = self::DEFAULT_THREAD_COUNT,
         string|int|null $dotsPerRow = self::DEFAULT_DOTS_PER_ROW,
         bool $dryRun = self::DEFAULT_DRY_RUN,
         ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
@@ -845,11 +859,6 @@ final class Container extends DIContainer
     public function getResultsCollector(): ResultsCollector
     {
         return $this->get(ResultsCollector::class);
-    }
-
-    public function getMemoryLimiter(): MemoryLimiter
-    {
-        return $this->get(MemoryLimiter::class);
     }
 
     public function getMutatorResolver(): MutatorResolver
@@ -1095,6 +1104,19 @@ final class Container extends DIContainer
     public function getCoverageCheckerFactory(): CoverageCheckerFactory
     {
         return $this->get(CoverageCheckerFactory::class);
+    }
+
+    public function getEventCollectingEventDispatcher(): EventCollectingEventDispatcher
+    {
+        $dispatcher = $this->getEventDispatcher();
+
+        Assert::isInstanceOf(
+            $dispatcher,
+            EventCollectingEventDispatcher::class,
+            'Event collection must be enabled to retrieve the collecting event dispatcher.',
+        );
+
+        return $dispatcher;
     }
 
     public function getEventDispatcher(): EventDispatcher
