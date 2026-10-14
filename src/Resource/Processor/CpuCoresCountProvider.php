@@ -67,9 +67,11 @@ final readonly class CpuCoresCountProvider
      */
     public function provideAuto(float $loadLimit = self::CPU_USAGE_RATIO): int
     {
-        return $this->log(
-            $this->cpuCoreCounter->getAvailableForParallelisation(loadLimit: $loadLimit),
-        );
+        $result = $this->cpuCoreCounter->getAvailableForParallelisation(loadLimit: $loadLimit);
+
+        $this->log($result);
+
+        return $result->availableCpus;
     }
 
     /**
@@ -79,15 +81,14 @@ final readonly class CpuCoresCountProvider
      */
     public function provideMax(): int
     {
-        return $this->log(
-            $this->cpuCoreCounter->getAvailableForParallelisation(reservedCpus: self::RESERVED_CPUS),
-        );
+        $result = $this->cpuCoreCounter->getAvailableForParallelisation(reservedCpus: self::RESERVED_CPUS);
+
+        $this->log($result);
+
+        return $result->availableCpus;
     }
 
-    /**
-     * @return positive-int
-     */
-    private function log(ParallelisationResult $result): int
+    private function log(ParallelisationResult $result): void
     {
         $this->logger->debug(
             'CPU core count: {cores}; CPU usage ratio: {ratio}; CPU count limit: {limit}; available CPUs used: {available}.',
@@ -98,7 +99,5 @@ final readonly class CpuCoresCountProvider
                 'available' => $result->availableCpus,
             ],
         );
-
-        return $result->availableCpus;
     }
 }
