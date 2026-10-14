@@ -61,6 +61,8 @@ final readonly class CpuCoresCountProvider
     }
 
     /**
+     * Uses a share of the available cores to leave some CPU cores for other things.
+     *
      * @return positive-int
      */
     public function provideAuto(float $loadLimit = self::CPU_USAGE_RATIO): int
