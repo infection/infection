@@ -43,7 +43,6 @@ use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
@@ -60,6 +59,7 @@ use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
+use Infection\TestFramework\PhpUnit\Log\PhpUnitLogger;
 use Infection\TestFramework\PhpUnit\MemoryLimiter;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Override;
@@ -93,7 +93,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         private readonly VersionParser $versionParser,
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly string $testFrameworkConfigPath,
-        private readonly ConsoleOutput $consoleOutput,
+        private readonly PhpUnitLogger $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
         private readonly InitialTestsRunner $initialTestsRunner,
         private readonly Configuration $config,
@@ -113,7 +113,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         $this->coverageChecker->checkCoverageRequirements();
 
         if ($this->config->skipInitialTests) {
-            $this->consoleOutput->logSkippingInitialTests();
+            $this->logger->logSkippingInitialTests();
             $this->coverageChecker->checkCoverageExists();
         }
     }

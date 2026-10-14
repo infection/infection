@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Contracts;
 
 use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -71,7 +71,7 @@ interface TestFrameworkFactory
         string $sourceDirectoryBasePath,
         bool $useWindowsFilterLimit,
         Filesystem $fileSystem,
-        ConsoleOutput $consoleOutput,
+        LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
         InitialTestsRunner $initialTestsRunner,
         Configuration $configuration,
