@@ -63,7 +63,7 @@ final readonly class CpuCoresCountProvider
     /**
      * @return positive-int
      */
-    public function provide(float $loadLimit = self::CPU_USAGE_RATIO): int
+    public function provideAuto(float $loadLimit = self::CPU_USAGE_RATIO): int
     {
         return $this->log(
             $this->cpuCoreCounter->getAvailableForParallelisation(loadLimit: $loadLimit),

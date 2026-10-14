@@ -100,21 +100,23 @@ final class ThreadsOption implements CommandOption
             return $threadCount;
         }
 
-        // user passed `--threads=auto` option
-        if ($threads === 'auto') {
-            return 'auto';
-        }
+        self::assertIsAutoOrMax($threads);
 
-        // user passed `--threads=max` option
-        Assert::same(
+        return $threads;
+    }
+
+    /**
+     * @phpstan-assert 'auto'|'max' $threads
+     */
+    private static function assertIsAutoOrMax(string $threads): void
+    {
+        Assert::oneOf(
             $threads,
-            'max',
+            ['auto', 'max'],
             sprintf(
                 'The value of option `--threads` must be of type integer or string "auto" or "max". String "%s" provided.',
                 $threads,
             ),
         );
-
-        return 'max';
     }
 }

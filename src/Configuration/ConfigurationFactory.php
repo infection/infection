@@ -570,7 +570,7 @@ class ConfigurationFactory
             return $this->cpuCoresCountProvider->provideMax();
         }
 
-        return $this->cpuCoresCountProvider->provide();
+        return $this->cpuCoresCountProvider->provideAuto();
     }
 
     /**
