@@ -3260,12 +3260,6 @@ count = 1
 
 [[issues]]
 file = "src/TestFramework/LegacyTestFrameworkBridge.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\Console\ConsoleOutput::logSkippingInitialTests`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/LegacyTestFrameworkBridge.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Process\Runner\InitialTestsFailed` in `Infection\TestFramework\LegacyTestFrameworkBridge::executeInitialRun`.'
 count = 1
