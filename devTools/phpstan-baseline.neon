@@ -148,12 +148,6 @@ parameters:
 			path: ../src/Container/Container.php
 
 		-
-			rawMessage: 'Call to an undefined method Infection\Container\Container::getMemoryLimiter().'
-			identifier: method.notFound
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 1
@@ -165,12 +159,6 @@ parameters:
 				Remove once the built-in static-analysis adapters implement TestFramework directly.
 			'''
 			identifier: method.deprecatedClass
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: 'Class Infection\Engine constructor invoked with 11 parameters, 10 required.'
-			identifier: arguments.count
 			count: 1
 			path: ../src/Container/Container.php
 
@@ -189,42 +177,6 @@ parameters:
 				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
 			'''
 			identifier: new.deprecatedClass
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: 'Parameter #10 $staticAnalysisTestFramework of class Infection\Engine constructor expects Infection\TestFramework\Contracts\StaticAnalysisTestFramework, Infection\Source\PreloadedSourceChecker given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: 'Parameter #5 $mutationTestingRunner of class Infection\Engine constructor expects Infection\Process\Runner\MutationTestingRunner, Infection\Mutation\MutationGenerator given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: 'Parameter #6 $minMsiChecker of class Infection\Engine constructor expects Infection\Metrics\MinMsiChecker, Infection\Process\Runner\MutationTestingRunner given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: 'Parameter #7 $maxTimeoutsChecker of class Infection\Engine constructor expects Infection\Metrics\MaxTimeoutsChecker, Infection\Metrics\MinMsiChecker given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: 'Parameter #8 $metricsCalculator of class Infection\Engine constructor expects Infection\Metrics\MetricsCalculator, Infection\Metrics\MaxTimeoutsChecker given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: 'Parameter #9 $preloadedSourceChecker of class Infection\Engine constructor expects Infection\Source\PreloadedSourceChecker, Infection\Metrics\MetricsCalculator given.'
-			identifier: argument.type
 			count: 1
 			path: ../src/Container/Container.php
 

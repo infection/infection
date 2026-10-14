@@ -559,7 +559,6 @@ final class Container extends DIContainer
                 $container->getConfiguration(),
                 $container->getTestFramework(),
                 $container->getEventDispatcher(),
-                $container->getMemoryLimiter(),
                 $container->getMutationGenerator(),
                 $container->getMutationTestingRunner(),
                 $container->getMinMsiChecker(),
