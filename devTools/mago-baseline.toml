@@ -890,6 +890,24 @@ count = 1
 
 [[issues]]
 file = "src/Console/LogVerbosity.php"
+code = "deprecated-class-constant"
+message = 'Use of deprecated class constant `Infection\Console\LogVerbosity::DEBUG_INTEGER`.'
+count = 1
+
+[[issues]]
+file = "src/Console/LogVerbosity.php"
+code = "deprecated-class-constant"
+message = 'Use of deprecated class constant `Infection\Console\LogVerbosity::NONE_INTEGER`.'
+count = 1
+
+[[issues]]
+file = "src/Console/LogVerbosity.php"
+code = "deprecated-class-constant"
+message = 'Use of deprecated class constant `Infection\Console\LogVerbosity::NORMAL_INTEGER`.'
+count = 1
+
+[[issues]]
+file = "src/Console/LogVerbosity.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 1
@@ -3325,30 +3343,6 @@ message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\
 count = 1
 
 [[issues]]
-file = "src/TestFramework/PhpUnit/CommandLine/ArgumentsAndOptionsBuilder.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder::createFilterString`: expected `non-empty-string`, but found `null|truthy-string`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/CommandLine/ArgumentsAndOptionsBuilder.php"
-code = "nullable-return-statement"
-message = 'Function `Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder::createFilterString` is declared to return `non-empty-string` but possibly returns a nullable value (inferred as `null|truthy-string`).'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/CommandLine/ArgumentsAndOptionsBuilder.php"
-code = "redundant-comparison"
-message = "Redundant `!==` comparison: left-hand side is always not identical to right-hand side."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/CommandLine/ArgumentsAndOptionsBuilder.php"
-code = "redundant-condition"
-message = "This condition (type `true`) will always evaluate to true."
-count = 1
-
-[[issues]]
 file = "src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder::splitMethodNameFromProviderKey`: expected `array{0: string, 1: string}`, but found `non-empty-list<string>`.'
@@ -4199,6 +4193,24 @@ file = "tests/phpunit/Console/E2ETest.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 9
+
+[[issues]]
+file = "tests/phpunit/Console/LogVerbosityTest.php"
+code = "deprecated-class-constant"
+message = 'Use of deprecated class constant `Infection\Console\LogVerbosity::DEBUG_INTEGER`.'
+count = 2
+
+[[issues]]
+file = "tests/phpunit/Console/LogVerbosityTest.php"
+code = "deprecated-class-constant"
+message = 'Use of deprecated class constant `Infection\Console\LogVerbosity::NONE_INTEGER`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Console/LogVerbosityTest.php"
+code = "deprecated-class-constant"
+message = 'Use of deprecated class constant `Infection\Console\LogVerbosity::NORMAL_INTEGER`.'
+count = 1
 
 [[issues]]
 file = "tests/phpunit/Container/Builder/IndexXmlCoverageParserBuilderTest.php"
