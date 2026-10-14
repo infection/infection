@@ -121,6 +121,7 @@ use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\ForkWorkerPool;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialStaticAnalysis;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
@@ -561,6 +562,7 @@ final class Container extends DIContainer
 
                 return $container->getInitialStaticAnalysisRunner();
             },
+            ForkWorkerPool::class => static fn (): ForkWorkerPool => new ForkWorkerPool(),
             MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
                 $config = $container->getConfiguration();
 
@@ -576,6 +578,7 @@ final class Container extends DIContainer
                     $configuration->processTimeout,
                     $mutantProcessKillerFactories,
                     $container->getConfiguration(),
+                    $container->getForkWorkerPool(),
                 );
             },
             MutationGenerator::class => static function (self $container): MutationGenerator {
@@ -961,6 +964,11 @@ final class Container extends DIContainer
     public function getMutantProcessContainerFactory(): MutantProcessContainerFactory
     {
         return $this->get(MutantProcessContainerFactory::class);
+    }
+
+    public function getForkWorkerPool(): ForkWorkerPool
+    {
+        return $this->get(ForkWorkerPool::class);
     }
 
     public function getMutationGenerator(): MutationGenerator

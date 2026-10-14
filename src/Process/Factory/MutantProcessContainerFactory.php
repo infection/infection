@@ -35,15 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Process\Factory;
 
+use function extension_loaded;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
+use Infection\Process\ForkedProcess;
+use Infection\Process\ForkWorkerPool;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use function min;
+use function Safe\ini_get;
 use Symfony\Component\Process\Process;
 
 /**
@@ -56,6 +60,10 @@ class MutantProcessContainerFactory
 
     private const int TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
 
+    private const string OPCACHE_EXTENSION = 'Zend OPcache';
+
+    private const string OPCACHE_PRELOAD_SETTING = 'opcache.preload';
+
     /**
      * @param list<LazyMutantProcessFactory> $lazyMutantProcessCreators
      */
@@ -63,6 +71,7 @@ class MutantProcessContainerFactory
         private readonly float $timeout,
         private readonly array $lazyMutantProcessCreators,
         private readonly Configuration $configuration,
+        private readonly ForkWorkerPool $forkWorkerPool,
     ) {
     }
 
@@ -74,17 +83,22 @@ class MutantProcessContainerFactory
         // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
         $timeout = min(self::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (self::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime()), $this->timeout);
 
-        $process = new Process(
-            command: $testFrameworkAdapter->getMutantCommandLine(
-                $mutant->getTests(),
-                $mutant->getFilePath(),
-                $mutant->getMutation()->getHash(),
-                $mutant->getMutation()->getOriginalFilePath(),
-                $testFrameworkExtraOptions,
-            ),
-            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
-            timeout: $timeout,
+        $command = $testFrameworkAdapter->getMutantCommandLine(
+            $mutant->getTests(),
+            $mutant->getFilePath(),
+            $mutant->getMutation()->getHash(),
+            $mutant->getMutation()->getOriginalFilePath(),
+            $testFrameworkExtraOptions,
         );
+        $env = ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY];
+
+        // Without OPcache the setting does not exist, and the safe variant would throw. The setting is
+        // not a PHP_INI_ALL one: reading it here reads the same php.ini the worker reads.
+        $preloadedSource = extension_loaded(self::OPCACHE_EXTENSION) ? ini_get(self::OPCACHE_PRELOAD_SETTING) : '';
+
+        $process = ForkedProcess::supports($command, $preloadedSource)
+            ? new ForkedProcess($this->forkWorkerPool, $command, $env, $timeout)
+            : new Process(command: $command, env: $env, timeout: $timeout);
 
         if ($this->configuration->isDryRun) {
             $process = DryRunProcess::fromProcess($process);

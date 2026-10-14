@@ -41,6 +41,8 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\ForkedProcess;
+use Infection\Process\ForkWorkerPool;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
@@ -49,12 +51,17 @@ use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(MutantProcessContainerFactory::class)]
 final class MutantProcessContainerFactoryTest extends TestCase
 {
+    private const string FIXTURES = __DIR__ . '/../../Fixtures/ForkWorker';
+
     #[DataProvider('timeoutDataProvider')]
     public function test_it_creates_a_process_with_timeout(float $expectedProcessTimeout, float $testLocationExecutionTime, int $processFactoryTimeout): void
     {
@@ -126,6 +133,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
             $processFactoryTimeout,
             [],
             $configuration,
+            new ForkWorkerPool(),
         );
 
         $mutantProcess = $factory->create($testFrameworkAdapterMock, $mutant, $testFrameworkExtraOptions);
@@ -156,5 +164,54 @@ final class MutantProcessContainerFactoryTest extends TestCase
         yield 'allows 5x more time than test-execution' => [30.0, 5.0, 90];
 
         yield 'slow tests do not get more time than factory-timeout' => [40.0, 10.0, 40];
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[RequiresPhpExtension('posix')]
+    public function test_it_runs_a_php_script_in_a_fork_of_a_worker(): void
+    {
+        $process = $this->createProcess([self::FIXTURES . '/report.php']);
+
+        $this->assertInstanceOf(ForkedProcess::class, $process);
+        $this->assertFalse($process->isStarted());
+    }
+
+    #[WithEnvironmentVariable('INFECTION_FORK', '0')]
+    #[RequiresPhpExtension('pcntl')]
+    #[RequiresPhpExtension('posix')]
+    public function test_it_starts_a_new_process_for_a_php_script_when_the_fork_is_disabled(): void
+    {
+        $this->assertNotInstanceOf(ForkedProcess::class, $this->createProcess([self::FIXTURES . '/report.php']));
+    }
+
+    public function test_it_starts_a_new_process_for_a_command_that_is_not_a_php_script(): void
+    {
+        $this->assertNotInstanceOf(ForkedProcess::class, $this->createProcess(['/usr/bin/php', 'bin/phpunit']));
+    }
+
+    /**
+     * @param array<string> $command
+     */
+    private function createProcess(array $command): Process
+    {
+        $testFrameworkAdapter = $this->createMock(TestFrameworkAdapter::class);
+        $testFrameworkAdapter
+            ->method('getMutantCommandLine')
+            ->willReturn($command)
+        ;
+
+        $factory = new MutantProcessContainerFactory(
+            10.0,
+            [],
+            ConfigurationBuilder::withMinimalTestData()
+                ->withDryRun(false)
+                ->build(),
+            new ForkWorkerPool(),
+        );
+
+        return $factory->create(
+            $testFrameworkAdapter,
+            MutantBuilder::withMinimalTestData()->build(),
+        )->getCurrent()->getProcess();
     }
 }
