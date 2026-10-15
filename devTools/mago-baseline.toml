@@ -920,18 +920,6 @@ count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
-code = "deprecated-class"
-message = 'Class `Infection\TestFramework\LegacyStaticAnalysisBridge` is deprecated and should no longer be used.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "deprecated-class"
-message = 'Class `Infection\TestFramework\NullStaticAnalysisTestFramework` is deprecated and should no longer be used.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
 code = "less-specific-nested-argument-type"
 message = '''Argument type mismatch for argument #2 of `Infection\Container\Container::offsetSet`: expected `(closure(Infection\Container\Container): ('T.infection\container\container::clonewithservice() extends object))`, but provided type `('T.infection\container\container::clonewithservice() extends Closure)|(closure(infection\container\container): ('T.infection\container\container::clonewithservice() extends object))` is less specific.'''
 count = 1
@@ -957,211 +945,205 @@ count = 1
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:291:47}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:288:47}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:299:46}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:296:46}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:304:31}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:301:31}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:326:49}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:323:49}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:338:37}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:336:37}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:344:39}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:342:39}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:349:45}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:347:45}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:352:50}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:350:50}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:356:51}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:354:51}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:365:41}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:363:41}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:377:42}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:375:42}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:381:37}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:379:37}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:391:42}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:389:42}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:394:46}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:392:46}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:413:76}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:411:76}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:422:58}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:420:58}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:433:67}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:431:67}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:445:55}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:443:55}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:457:51}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:455:51}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:464:44}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:462:44}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:469:43}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:467:43}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:485:32}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:483:32}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:536:55}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:534:55}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:547:49}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:546:30}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:558:30}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:562:51}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:574:51}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:566:53}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:580:53}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:583:41}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:597:41}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:593:45}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:607:45}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:617:41}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:631:41}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:632:17}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:646:17}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:645:32}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:659:32}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:649:53}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:663:53}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:671:37}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:685:37}`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:783:13}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:769:13}`.'
 count = 1
 
 [[issues]]
@@ -1173,211 +1155,205 @@ count = 1
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:291:47}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:288:47}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:299:46}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:296:46}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:304:31}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:301:31}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:326:49}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:323:49}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:338:37}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:336:37}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:344:39}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:342:39}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:349:45}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:347:45}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:352:50}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:350:50}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:356:51}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:354:51}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:365:41}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:363:41}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:377:42}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:375:42}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:381:37}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:379:37}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:391:42}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:389:42}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:394:46}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:392:46}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:413:76}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:411:76}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:422:58}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:420:58}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:433:67}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:431:67}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:445:55}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:443:55}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:457:51}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:455:51}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:464:44}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:462:44}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:469:43}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:467:43}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:485:32}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:483:32}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:536:55}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:534:55}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:547:49}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:546:30}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:558:30}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:562:51}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:574:51}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:566:53}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:580:53}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:583:41}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:597:41}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:593:45}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:607:45}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:617:41}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:631:41}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:632:17}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:646:17}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:645:32}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:659:32}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:649:53}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:663:53}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:671:37}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:685:37}`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:783:13}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:769:13}`.'
 count = 1
 
 [[issues]]
@@ -3010,6 +2986,18 @@ count = 1
 file = "src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php"
 code = "possibly-null-operand"
 message = "Left operand in `>` comparison might be `null` (type `int|null`)."
+count = 1
+
+[[issues]]
+file = "src/StaticAnalysis/StaticAnalysisToolFactory.php"
+code = "deprecated-class"
+message = 'Class `Infection\TestFramework\LegacyStaticAnalysisBridge` is deprecated and should no longer be used.'
+count = 1
+
+[[issues]]
+file = "src/StaticAnalysis/StaticAnalysisToolFactory.php"
+code = "deprecated-class"
+message = 'Class `Infection\TestFramework\NullStaticAnalysisTestFramework` is deprecated and should no longer be used.'
 count = 1
 
 [[issues]]
