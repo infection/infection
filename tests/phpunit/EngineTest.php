@@ -45,16 +45,17 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
-use Infection\Process\Runner\InitialStaticAnalysis;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\NullStaticAnalysisTestFramework;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -174,10 +175,11 @@ final class EngineTest extends TestCase
         $this->createEngine()->execute();
     }
 
-    public function test_it_executes_static_analysis_before_mutation_generation(): void
+    #[DataProvider('skipInitialTestsProvider')]
+    public function test_it_executes_static_analysis_before_mutation_generation(bool $skipInitialTests): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
-            ->withSkipInitialTests(false)
+            ->withSkipInitialTests($skipInitialTests)
             ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
             ->withUncovered(true)
             ->build()
@@ -191,12 +193,14 @@ final class EngineTest extends TestCase
             ->willReturn($initialRunResults)
         ;
 
-        $initialStaticAnalysis = $this->createMock(InitialStaticAnalysis::class);
+        $initialStaticAnalysis = $this->createMock(StaticAnalysisTestFramework::class);
         $initialStaticAnalysis
             ->expects($this->once())
-            ->method('run')
-            ->willReturnCallback(static function () use (&$callOrder): void {
+            ->method('executeInitialRun')
+            ->willReturnCallback(static function () use (&$callOrder): InitialRunResults {
                 $callOrder[] = 'staticAnalysis';
+
+                return new InitialRunResults('static analysis output', null);
             })
         ;
 
@@ -242,7 +246,18 @@ final class EngineTest extends TestCase
 
         $engine->execute();
 
-        $this->assertSame(['staticAnalysis', 'generate'], $callOrder);
+        $this->assertSame(
+            ['staticAnalysis', 'generate'],
+            $callOrder,
+            'Static analysis must run before mutation generation, even when initial tests are skipped.',
+        );
+    }
+
+    public static function skipInitialTestsProvider(): iterable
+    {
+        yield 'initial tests run' => [false];
+
+        yield 'initial tests skipped' => [true];
     }
 
     public function test_it_runs_mutation_testing_when_initial_tests_are_skipped(): void
@@ -413,7 +428,7 @@ final class EngineTest extends TestCase
 
     private function createEngine(
         ?Configuration $config = null,
-        ?InitialStaticAnalysis $initialStaticAnalysis = null,
+        ?StaticAnalysisTestFramework $staticAnalysisTestFramework = null,
     ): Engine {
         return new Engine(
             config: $config ?? ConfigurationBuilder::withMinimalTestData()
@@ -428,7 +443,7 @@ final class EngineTest extends TestCase
             maxTimeoutsChecker: $this->maxTimeoutsChecker,
             metricsCalculator: $this->metricsCalculator,
             preloadedSourceChecker: $this->preloadedSourceChecker,
-            initialStaticAnalysis: $initialStaticAnalysis ?? new NullInitialStaticAnalysisRunner(),
+            staticAnalysisTestFramework: $staticAnalysisTestFramework ?? new NullStaticAnalysisTestFramework(),
         );
     }
 }

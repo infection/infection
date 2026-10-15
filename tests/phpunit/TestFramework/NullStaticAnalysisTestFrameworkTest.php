@@ -33,17 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\Tests\TestFramework;
 
-/**
- * Takes the place of the process-backed runner when no static analysis tool is
- * configured: the initial static analysis phase then has nothing to do.
- *
- * @internal
- */
-final readonly class NullInitialStaticAnalysisRunner implements InitialStaticAnalysis
+use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\NullStaticAnalysisTestFramework;
+use Infection\Tests\Mutant\MutantBuilder;
+use LogicException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(NullStaticAnalysisTestFramework::class)]
+final class NullStaticAnalysisTestFrameworkTest extends TestCase
 {
-    public function run(): void
+    private TestFramework $testFramework;
+
+    protected function setUp(): void
     {
+        $this->testFramework = new NullStaticAnalysisTestFramework();
+    }
+
+    public function test_it_has_no_initial_analysis_to_run(): void
+    {
+        $this->testFramework->checkRequirements();
+
+        $this->assertSame('None', $this->testFramework->getName());
+        $this->assertSame('', $this->testFramework->getVersion());
+        $this->assertEquals(new InitialRunResults('', null), $this->testFramework->executeInitialRun());
+    }
+
+    public function test_it_cannot_create_a_mutant_process(): void
+    {
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->build()
+        ;
+
+        $this->expectExceptionObject(
+            new LogicException('Cannot create a mutant process when static analysis is disabled.'),
+        );
+
+        $this->testFramework->test($mutant);
     }
 }

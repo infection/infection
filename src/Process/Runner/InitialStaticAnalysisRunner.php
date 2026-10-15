@@ -51,7 +51,7 @@ use Infection\TestFramework\Contracts\ShellCommandRunner;
  * @internal
  * @final
  */
-readonly class InitialStaticAnalysisRunner implements InitialStaticAnalysis
+readonly class InitialStaticAnalysisRunner
 {
     public function __construct(
         private ShellCommandRunner $shellCommandRunner,
