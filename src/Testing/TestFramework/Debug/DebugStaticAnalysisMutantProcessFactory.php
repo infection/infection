@@ -38,8 +38,8 @@ namespace Infection\Testing\TestFramework\Debug;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
-use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Symfony\Component\Process\Process;
 
 /**
