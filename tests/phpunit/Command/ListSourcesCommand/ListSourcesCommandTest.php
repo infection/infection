@@ -106,8 +106,29 @@ final class ListSourcesCommandTest extends TestCase
         $tester->assertCommandIsSuccessful();
     }
 
+    public function test_it_lists_source_files_in_an_absolute_directory_with_a_trailing_slash(): void
+    {
+        $tester = $this->runCommand([
+            'paths' => [self::FIXTURES_DIR . '/'],
+        ]);
+
+        $this->assertSame(
+            "File1.php\nFile2.php\n",
+            Str::toUnixLineEndings($tester->getDisplay()),
+            'An absolute source directory ending in / should list its source files.',
+        );
+        $this->assertSame(
+            '',
+            $tester->getErrorOutput(normalize: true),
+            'An absolute directory filter should not emit diagnostics.',
+        );
+        $tester->assertCommandIsSuccessful(
+            'Listing an absolute source directory ending in / should succeed.',
+        );
+    }
+
     /**
-     * @param array<string, string> $input
+     * @param array<string, string|list<string>> $input
      */
     private function runCommand(array $input): CommandTester
     {
