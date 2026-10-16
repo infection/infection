@@ -43,6 +43,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
 #[Group('integration')]
@@ -56,50 +57,91 @@ final class DumpAstCommandTest extends FileSystemTestCase
     public function test_it_outputs_the_ast_of_a_file(
         array $command,
         string $expected,
+        string $expectedLogs = '',
     ): void {
         $tester = $this->createCommandTester();
 
-        $tester->execute($command);
+        $tester->execute(
+            $command,
+            [
+                'verbosity' => OutputInterface::VERBOSITY_NORMAL,
+                'interactive' => false,
+                'capture_stderr_separately' => true,
+            ],
+        );
 
         $actual = $tester->getDisplay();
 
         $tester->assertCommandIsSuccessful();
         $this->assertSame($expected, $actual);
+        $this->assertStringMatchesFormat(
+            $expectedLogs,
+            $tester->getErrorOutput(normalize: true),
+        );
     }
 
     public static function astProvider(): iterable
     {
-        yield [
-            [
-                'file' => __DIR__ . '/Greeter.php',
-                '--configuration' => __DIR__ . '/infection.json5',
-            ],
-            <<<'AST'
-                array(
-                    0: Stmt_Declare(
-                        declares: array(
-                            0: DeclareItem(
-                                key: Identifier
-                                value: Scalar_Int
-                            )
+        $greeterAst = <<<'AST'
+            array(
+                0: Stmt_Declare(
+                    declares: array(
+                        0: DeclareItem(
+                            key: Identifier
+                            value: Scalar_Int
                         )
                     )
-                    1: Stmt_Namespace(
-                        name: Name
-                        stmts: array(
-                            0: Stmt_Interface(
-                                name: Identifier
-                                stmts: array(
-                                    0: Stmt_ClassMethod(
-                                        name: Identifier
-                                        returnType: Identifier
-                                    )
+                )
+                1: Stmt_Namespace(
+                    name: Name
+                    stmts: array(
+                        0: Stmt_Interface(
+                            name: Identifier
+                            stmts: array(
+                                0: Stmt_ClassMethod(
+                                    name: Identifier
+                                    returnType: Identifier
                                 )
                             )
                         )
                     )
                 )
-                AST,
+            )
+            AST;
+
+        yield [
+            [
+                'file' => __DIR__ . '/Greeter.php',
+                '--configuration' => __DIR__ . '/infection.json5',
+            ],
+            $greeterAst,
+        ];
+
+        yield 'with a deprecated file filter' => [
+            [
+                'file' => __DIR__ . '/Greeter.php',
+                '--configuration' => __DIR__ . '/infection.json5',
+                '--filter' => 'EchoGreeter.php',
+            ],
+            $greeterAst,
+            <<<'STDERR'
+                %w[WARNING] The "--filter" option is deprecated since 0.34.0 and will be removed in future versions.%wUse positional arguments instead: infection <filter>%w[warning] Source file filters are ignored by debug:dump-ast: only the file argument determines which file is dumped.
+
+                STDERR,
+        ];
+
+        yield 'with a Git file filter' => [
+            [
+                'file' => __DIR__ . '/Greeter.php',
+                '--configuration' => __DIR__ . '/infection.json5',
+                '--git-diff-filter' => 'AM',
+                '--git-diff-base' => 'HEAD',
+            ],
+            $greeterAst,
+            <<<'STDERR'
+                [warning] Source file filters are ignored by debug:dump-ast: only the file argument determines which file is dumped.
+
+                STDERR,
         ];
 
         yield [

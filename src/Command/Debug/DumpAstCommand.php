@@ -38,16 +38,19 @@ namespace Infection\Command\Debug;
 use function array_map;
 use function explode;
 use Infection\Command\BaseCommand;
+use Infection\Command\Git\LoggerFactory;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\SourceFilterOptions;
+use Infection\Configuration\Configuration;
 use Infection\Console\IO;
 use Infection\Container\Container;
 use Infection\Differ\ChangedLinesRange;
 use Infection\FileSystem\FileSystem;
-use Infection\Logger\Console\ConsoleLogger;
+use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\MatcherLine\SimpleSourceLineMatcher;
 use Infection\Source\MatcherLine\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
@@ -59,6 +62,7 @@ use function sprintf;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Filesystem\Path;
 use function trim;
 use Webmozart\Assert\Assert;
@@ -68,6 +72,8 @@ use Webmozart\Assert\Assert;
  */
 final class DumpAstCommand extends BaseCommand
 {
+    private const string NAME = 'debug:dump-ast';
+
     private const string FILE_PATH_ARGUMENT = 'file';
 
     private const string SHOW_ATTRIBUTES = 'show-attributes';
@@ -79,7 +85,7 @@ final class DumpAstCommand extends BaseCommand
     public function __construct(
         private readonly FileSystem $fileSystem,
     ) {
-        parent::__construct('debug:dump-ast');
+        parent::__construct(self::NAME);
     }
 
     protected function configure(): void
@@ -118,6 +124,10 @@ final class DumpAstCommand extends BaseCommand
         BaseOption::addOption($this);
     }
 
+    /**
+     * @throws FileOrDirectoryNotFound
+     * @throws NoSourceFound
+     */
     protected function executeCommand(IO $io): bool
     {
         $file = $this->getFile($io);
@@ -125,7 +135,7 @@ final class DumpAstCommand extends BaseCommand
         $changedLinesRanges = self::getChangedLinesRanges($io);
         $hasChangedLines = $changedLinesRanges !== null;
         $configFile = ConfigurationOption::get($io);
-        $logger = new ConsoleLogger($io);
+        $logger = LoggerFactory::create($io->getOutput());
         self::configureFormatter($io);
 
         $container = $this->createContainer(
@@ -133,6 +143,11 @@ final class DumpAstCommand extends BaseCommand
             $io,
             $configFile,
             $changedLinesRanges,
+        );
+
+        self::logIgnoredFilters(
+            $container->getConfiguration(),
+            $logger,
         );
 
         $nodes = $this->createAst($container, $file);
@@ -211,6 +226,33 @@ final class DumpAstCommand extends BaseCommand
         return (bool) $io->getInput()->getOption(self::SHOW_ATTRIBUTES);
     }
 
+    private static function logIgnoredFilters(
+        Configuration $configuration,
+        LoggerInterface $logger,
+    ): void {
+        if ($configuration->sourceFilter !== null) {
+            $logger->warning(
+                'Source file filters are ignored by {command}: only the file argument determines which file is dumped.',
+                ['command' => self::NAME],
+            );
+        }
+    }
+
+    // The --filter warning uses IO directly and bypasses the logger.
+    // Route it to stderr here until diagnostic logging is centralized.
+    private static function createDiagnosticIo(IO $io): IO
+    {
+        $output = $io->getOutput();
+        $errorOutput = $output instanceof ConsoleOutputInterface
+            ? $output->getErrorOutput()
+            : $output;
+
+        return new IO(
+            $io->getInput(),
+            $errorOutput,
+        );
+    }
+
     /**
      * @return list<ChangedLinesRange>|null
      */
@@ -287,7 +329,9 @@ final class DumpAstCommand extends BaseCommand
                 output: $io->getOutput(),
                 configFile: $configFile,
                 withUncovered: true,
-                sourceFilter: SourceFilterOptions::get($io),
+                sourceFilter: SourceFilterOptions::get(
+                    self::createDiagnosticIo($io),
+                ),
             )
         ;
 

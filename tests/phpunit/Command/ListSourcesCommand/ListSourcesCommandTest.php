@@ -44,6 +44,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\chdir;
 use function Safe\getcwd;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
 #[Group('integration')]
@@ -76,6 +77,12 @@ final class ListSourcesCommandTest extends TestCase
 
                 STDOUT,
             Str::toUnixLineEndings($tester->getDisplay()),
+            'Stdout should contain only the collected source paths.',
+        );
+        $this->assertSame(
+            '',
+            $tester->getErrorOutput(normalize: true),
+            'Listing all sources should not emit diagnostics.',
         );
         $tester->assertCommandIsSuccessful();
     }
@@ -86,9 +93,16 @@ final class ListSourcesCommandTest extends TestCase
 
         $actual = $tester->getDisplay();
 
-        $this->assertStringContainsString('File1.php', $actual);
-        $this->assertStringNotContainsString('File2.php', $actual);
-        $this->assertStringContainsString('The "--filter" option is deprecated', $actual);
+        $this->assertSame(
+            "File1.php\n",
+            Str::toUnixLineEndings($actual),
+            'Stdout should contain only the selected source paths.',
+        );
+        $this->assertStringContainsString(
+            'The "--filter" option is deprecated',
+            $tester->getErrorOutput(normalize: true),
+            'The deprecation warning should be written to stderr.',
+        );
         $tester->assertCommandIsSuccessful();
     }
 
@@ -100,7 +114,14 @@ final class ListSourcesCommandTest extends TestCase
         $application = new Application(Container::create());
         $tester = new CommandTester($application->find('config:list-sources'));
 
-        $tester->execute($input);
+        $tester->execute(
+            $input,
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE,
+                'interactive' => false,
+                'capture_stderr_separately' => true,
+            ],
+        );
 
         return $tester;
     }
