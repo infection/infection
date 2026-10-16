@@ -53,7 +53,16 @@ final class PlainFilterTest extends TestCase
     ): void {
         $actual = PlainFilter::tryToCreate($value);
 
-        $this->assertEqualsCanonicalizing($expected, $actual);
+        $this->assertEquals(
+            $expected,
+            $actual,
+            'String filters should contain each normalized non-empty value only once.',
+        );
+        $this->assertSame(
+            $expected?->toString(),
+            $actual?->toString(),
+            'Normalized filters should preserve the order of first occurrence.',
+        );
     }
 
     public static function valueProvider(): iterable
@@ -69,6 +78,23 @@ final class PlainFilterTest extends TestCase
         yield 'blank like string' => [
             ',',
             null,
+        ];
+
+        yield 'repeated values' => [
+            'src/Foo.php,src/Bar.php,src/Foo.php,src/Bar.php',
+            new PlainFilter([
+                'src/Foo.php',
+                'src/Bar.php',
+            ]),
+        ];
+
+        yield 'whitespace-equivalent values with empty entries preserve first occurrence order' => [
+            ' src/Bar.php, ,src/Bar.php , src/Foo.php,, src/Foo.php ,src/Baz.php, src/Bar.php ',
+            new PlainFilter([
+                'src/Bar.php',
+                3 => 'src/Foo.php',
+                6 => 'src/Baz.php',
+            ]),
         ];
 
         yield 'spaces & untrimmed string' => [
