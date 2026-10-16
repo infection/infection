@@ -55,7 +55,7 @@ final readonly class IndexXmlCoverageParserBuilder implements Builder
     public function build(): IndexXmlCoverageParser
     {
         return new IndexXmlCoverageParser(
-            isSourceFiltered: $this->configuration->sourceFilter !== null,
+            isSourceFiltered: $this->configuration->sourceFilter->filtersFiles(),
             fileSystem: $this->fileSystem,
         );
     }

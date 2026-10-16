@@ -41,6 +41,7 @@ use Infection\Console\Application;
 use Infection\Container\Container;
 use Infection\Framework\OperatingSystem;
 use Infection\Framework\Str;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -108,6 +109,24 @@ final class ListSourcesCommandTest extends TestCase
             '',
         ];
 
+        yield 'ambiguous short name' => [
+            ['File'],
+            $expectedStdout,
+            '',
+        ];
+
+        yield 'method selector with a source path' => [
+            ['File1.php', 'SomeClass::method'],
+            "File1.php\n",
+            '',
+        ];
+
+        yield 'method selector with a test path' => [
+            ['../ListSourcesCommandTest.php', 'SomeClass::method'],
+            $expectedStdout,
+            '',
+        ];
+
         $directory = self::FIXTURES_DIR . DIRECTORY_SEPARATOR . 'SubDir';
         $expectedFilteredStdout = "SubDir/File3.php\n";
 
@@ -157,6 +176,32 @@ final class ListSourcesCommandTest extends TestCase
             'The deprecation warning should be written to stderr.',
         );
         $tester->assertCommandIsSuccessful();
+    }
+
+    /**
+     * @param list<string> $paths
+     */
+    #[DataProvider('symbolSelectorsProvider')]
+    public function test_it_rejects_source_symbol_selectors(array $paths): void
+    {
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The config:list-sources command requires source or test paths when source symbol selectors are provided.',
+            ),
+        );
+
+        $this->runCommand(['paths' => $paths]);
+    }
+
+    public static function symbolSelectorsProvider(): iterable
+    {
+        yield 'explicit short class selector' => [
+            ['SomeClass\\'],
+        ];
+
+        yield 'method selector alone' => [
+            ['SomeClass::method'],
+        ];
     }
 
     /**
