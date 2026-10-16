@@ -43,19 +43,26 @@ use Infection\Command\Option\PathsArgument;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Command\Option\TestFrameworkOption;
+use Infection\Configuration\Configuration;
 use Infection\Console\IO;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
+use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\Logger\Console\ConsoleLogger;
+use Infection\Source\Exception\NoSourceFound;
+use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 final class InitialTestRunCommand extends BaseCommand
 {
+    private const string NAME = 'initial-test:run';
+
     public function __construct()
     {
-        parent::__construct('initial-test:run');
+        parent::__construct(self::NAME);
     }
 
     protected function configure(): void
@@ -73,6 +80,10 @@ final class InitialTestRunCommand extends BaseCommand
         DebugOption::addOption($this, default: true);
     }
 
+    /**
+     * @throws FileOrDirectoryNotFound
+     * @throws NoSourceFound
+     */
     protected function executeCommand(IO $io): bool
     {
         $logger = new ConsoleLogger($io);
@@ -90,6 +101,8 @@ final class InitialTestRunCommand extends BaseCommand
                 PathsArgument::get($io),
             ),
         );
+
+        self::assertNoSymbolSelectors($container->getConfiguration());
 
         // TODO: this is not very elegant but done this way for now to keep the same behaviour
         //   as we migrate to the new test framework API.
@@ -117,5 +130,23 @@ final class InitialTestRunCommand extends BaseCommand
         $io->success('Initial test run successfully executed.');
 
         return true;
+    }
+
+    private static function assertNoSymbolSelectors(Configuration $configuration): void
+    {
+        if (
+            $configuration->sourceFilter->filtersFiles()
+            || $configuration->testFrameworkExtraOptions !== ''
+        ) {
+            return;
+        }
+
+        Assert::isEmpty(
+            $configuration->sourceFilter->symbolSelectors,
+            sprintf(
+                'The %s command requires source or test paths when source symbol selectors are provided.',
+                self::NAME,
+            ),
+        );
     }
 }

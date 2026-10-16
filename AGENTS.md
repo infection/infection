@@ -43,8 +43,8 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
    closure factories plus a typed getter per service. It is built on `sanmai/di-container`.
 3. **Engine** - `src/Engine.php` orchestrates everything below.
 4. **Source collection** - `src/Source/` (`SourceCollector` implementations, including the
-   git-diff collector); `src/Configuration/PositionalPathsClassifier.php` classifies
-   positional CLI paths into source vs test files.
+   git-diff collector); `src/Configuration/PositionalArgumentsClassifier.php` classifies
+   positional CLI arguments into source paths, test paths, and source symbol selectors.
 5. **Artefact collection** - initial test run with coverage
    (`src/Process/OriginalPhpProcess.php` re-enables xdebug/pcov for exactly this child).
    Then coverage-xml + junit.xml are ingested into lazy `Trace` objects
@@ -138,6 +138,7 @@ Current ADRs:
 - [`adr/0012-final-classes-over-final-docblock.md`](adr/0012-final-classes-over-final-docblock.md) - Prefer `final` to `@final` where possible
 - [`adr/0013-public-api-extension-point-registry.md`](adr/0013-public-api-extension-point-registry.md) - Define the public API through an extension-point registry
 - [`adr/0014-prefer-webmozart-assert-for-argument-validation.md`](adr/0014-prefer-webmozart-assert-for-argument-validation.md) - Prefer Webmozart Assert for argument validation
+- [`adr/0015-disambiguate-positional-source-selectors.md`](adr/0015-disambiguate-positional-source-selectors.md) - Disambiguate positional source selectors
 <!-- adr-list:end -->
 
 ## Commands
