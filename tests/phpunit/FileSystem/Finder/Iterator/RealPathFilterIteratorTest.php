@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder\Iterator;
 
+use ArrayIterator;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
+use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Tests\Fixtures\Finder\MockRealPathFinder;
 use Infection\Tests\Fixtures\Finder\MockRelativePathFinder;
+use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -45,6 +48,65 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(RealPathFilterIterator::class)]
 final class RealPathFilterIteratorTest extends TestCase
 {
+    #[DataProvider('pathFilterProvider')]
+    public function test_it_distinguishes_paths_from_regexes(
+        string $pattern,
+        string $path,
+        bool $expected,
+    ): void {
+        $file = new MockSplFileInfo(realPath: $path);
+        $iterator = new RealPathFilterIterator(
+            new ArrayIterator([$file]),
+            [$pattern],
+            [],
+        );
+
+        $this->assertSame(
+            $expected ? [$file] : [],
+            iterator_to_array($iterator),
+            'Absolute directory paths must be matched literally while valid regex filters remain supported.',
+        );
+    }
+
+    public static function pathFilterProvider(): iterable
+    {
+        yield 'absolute directory with trailing slash' => [
+            '/project/src/Differ/',
+            '/project/src/Differ/File.php',
+            true,
+        ];
+
+        yield 'absolute directory excludes a sibling with the same prefix' => [
+            '/project/src/Differ/',
+            '/project/src/Different/File.php',
+            false,
+        ];
+
+        yield 'absolute directory with regex metacharacters' => [
+            '/project/src/Differ[2]/',
+            '/project/src/Differ[2]/File.php',
+            true,
+        ];
+
+        yield 'relative directory fragment' => [
+            'Differ/',
+            '/project/src/Differ/File.php',
+            true,
+        ];
+
+        yield 'valid slash-delimited regex with escaped separators' => [
+            '/\/differ\/.*\.php$/i',
+            '/project/src/Differ/File.php',
+            true,
+        ];
+
+        yield 'valid regex with another delimiter' => [
+            '#/Differ/.*\.php$#',
+            '/project/src/Differ/File.php',
+            true,
+        ];
+    }
+
     #[DataProvider('providesFinders')]
     public function test_it_differs_from_relative_path(string $finder, int $expectedFilecount): void
     {

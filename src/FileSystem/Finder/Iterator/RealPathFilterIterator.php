@@ -37,6 +37,8 @@ namespace Infection\FileSystem\Finder\Iterator;
 
 use Infection\Framework\OperatingSystem;
 use function preg_quote;
+use Safe\Exceptions\PcreException;
+use function Safe\preg_match;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 
@@ -77,8 +79,17 @@ final class RealPathFilterIterator extends MultiplePcreFilterIterator
      */
     protected function toRegex(string $str): string
     {
-        return $this->isRegex($str)
-            ? $str
-            : '/' . preg_quote($str, '/') . '/';
+        if ($this->isRegex($str)) {
+            try {
+                // Safe throws on invalid patterns but does not suppress PHP's compilation warning.
+                @preg_match($str, '');
+
+                return $str;
+            } catch (PcreException) {
+                // Absolute directories ending in / can resemble regexes; match those paths literally.
+            }
+        }
+
+        return '/' . preg_quote($str, '/') . '/';
     }
 }
