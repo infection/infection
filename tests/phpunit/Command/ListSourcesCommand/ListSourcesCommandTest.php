@@ -40,6 +40,7 @@ use Infection\Console\Application;
 use Infection\Container\Container;
 use Infection\Framework\Str;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\chdir;
@@ -66,16 +67,18 @@ final class ListSourcesCommandTest extends TestCase
         chdir($this->cwd);
     }
 
-    public function test_it_lists_all_source_files(): void
-    {
-        $tester = $this->runCommand([]);
-
-        $expectedStdout = <<<'STDOUT'
-            File1.php
-            File2.php
-
-            STDOUT;
-        $expectedStderr = '';
+    /**
+     * @param list<non-empty-string> $paths
+     */
+    #[DataProvider('sourcePathsProvider')]
+    public function test_it_lists_all_source_files(
+        array $paths,
+        string $expectedStdout,
+        string $expectedStderr,
+    ): void {
+        $tester = $this->runCommand([
+            'paths' => $paths,
+        ]);
 
         $actualStdout = Str::toUnixLineEndings($tester->getDisplay());
         $actualStderr = $tester->getErrorOutput(normalize: true);
@@ -83,6 +86,33 @@ final class ListSourcesCommandTest extends TestCase
         $this->assertSame($expectedStdout, $actualStdout);
         $this->assertSame($expectedStderr, $actualStderr);
         $tester->assertCommandIsSuccessful();
+    }
+
+    public static function sourcePathsProvider(): iterable
+    {
+        $expectedStdout = <<<'STDOUT'
+            File1.php
+            File2.php
+
+            STDOUT;
+
+        yield 'without filtering' => [
+            [],
+            $expectedStdout,
+            '',
+        ];
+
+        yield 'absolute directory without a trailing slash' => [
+            [self::FIXTURES_DIR],
+            $expectedStdout,
+            '',
+        ];
+
+        yield 'absolute directory with a trailing slash' => [
+            [self::FIXTURES_DIR . '/'],
+            $expectedStdout,
+            '',
+        ];
     }
 
     public function test_it_lists_filtered_source_files_and_warns_about_the_deprecated_filter_option(): void
@@ -98,27 +128,6 @@ final class ListSourcesCommandTest extends TestCase
         $this->assertSame($expectedStdout, $actualStdout);
         $this->assertStringContainsString($expectedStderr, $actualStderr);
         $tester->assertCommandIsSuccessful();
-    }
-
-    public function test_it_lists_source_files_in_an_absolute_directory_with_a_trailing_slash(): void
-    {
-        $tester = $this->runCommand([
-            'paths' => [self::FIXTURES_DIR . '/'],
-        ]);
-
-        $this->assertSame(
-            "File1.php\nFile2.php\n",
-            Str::toUnixLineEndings($tester->getDisplay()),
-            'An absolute source directory ending in / should list its source files.',
-        );
-        $this->assertSame(
-            '',
-            $tester->getErrorOutput(normalize: true),
-            'An absolute directory filter should not emit diagnostics.',
-        );
-        $tester->assertCommandIsSuccessful(
-            'Listing an absolute source directory ending in / should succeed.',
-        );
     }
 
     /**

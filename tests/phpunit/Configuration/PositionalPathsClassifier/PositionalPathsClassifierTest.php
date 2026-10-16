@@ -397,6 +397,19 @@ final class PositionalPathsClassifierTest extends TestCase
                 ->withExpected(new InvalidArgumentException('Invalid path argument "scr/Foo.php": multiple paths must be passed as separate arguments.')),
         ];
 
+        yield 'nonexistent absolute directory is not a project-relative source path' => [
+            $baseScenario
+                ->withSourceDirectories(['src'])
+                ->withPaths(['/src/Differ'])
+                ->withExistingFiles(['/project/src/Differ/File.php'])
+                ->withExpected(
+                    // TODO: to improve the error message here.
+                    new InvalidArgumentException(
+                        'Invalid path argument "/src/Differ": multiple paths must be passed as separate arguments.',
+                    ),
+                ),
+        ];
+
         yield 'digit-starting name' => [
             $baseScenario
                 ->withPaths(['1Foo.php'])
