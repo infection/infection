@@ -52,7 +52,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 final class DumpAstCommandTest extends FileSystemTestCase
 {
     /**
-     * @param array<string, string|null> $command
+     * @param array<string, string|list<string>|null> $command
      */
     #[DataProvider('astProvider')]
     // CI detection disables progress independently and would hide buffered warnings.
@@ -530,13 +530,13 @@ final class DumpAstCommandTest extends FileSystemTestCase
                 AST,
         ];
 
-        yield 'with explicit a changed line touching a mutation candidate' => [
-            [
+        $fullyEligibleScenario = [
+            'command' => [
                 'file' => __DIR__ . '/EchoGreeter.php',
                 '--configuration' => __DIR__ . '/infection.json5',
                 '--changed-lines-ranges' => '42:42,40:42',
             ],
-            <<<'AST'
+            'expected' => <<<'AST'
                 array(
                     0: Stmt_Declare(
                         declares: array(
@@ -700,10 +700,56 @@ final class DumpAstCommandTest extends FileSystemTestCase
                 )
                 AST,
         ];
+
+        yield 'with explicit a changed line touching a mutation candidate' => $fullyEligibleScenario;
+
+        yield 'with multiple source symbol selectors' => [
+            [
+                'file' => __DIR__ . '/EchoGreeter.php',
+                '--configuration' => __DIR__ . '/infection.json5',
+                'paths' => [
+                    'OtherClass::method',
+                    'EchoGreeter::greet',
+                ],
+            ],
+            $fullyEligibleScenario['expected'],
+        ];
+
+        yield 'with a source symbol selector and another source file' => [
+            [
+                'file' => __DIR__ . '/EchoGreeter.php',
+                '--configuration' => __DIR__ . '/infection.json5',
+                'paths' => [
+                    'EchoGreeter::greet',
+                    __DIR__ . '/Greeter.php',
+                ],
+            ],
+            $fullyEligibleScenario['expected'],
+            <<<'STDERR'
+                [warning] Source file filters are ignored by debug:dump-ast: only the file argument determines which file is dumped.
+
+                STDERR,
+        ];
+
+        yield 'with a source symbol selector and a test file' => [
+            [
+                'file' => __DIR__ . '/EchoGreeter.php',
+                '--configuration' => __DIR__ . '/infection.json5',
+                'paths' => [
+                    'EchoGreeter::greet',
+                    __DIR__ . '/../../Option/PathsArgumentTest.php',
+                ],
+            ],
+            $fullyEligibleScenario['expected'],
+            <<<'STDERR'
+                [warning] Test paths and test framework options are ignored by debug:dump-ast because it does not run tests.
+
+                STDERR,
+        ];
     }
 
     /**
-     * @param array<string, string|null> $options
+     * @param array<string, string|list<string>|null> $options
      */
     #[DataProvider('invalidFileProvider')]
     public function test_it_rejects_invalid_files(
@@ -732,6 +778,18 @@ final class DumpAstCommandTest extends FileSystemTestCase
         yield 'non-existent file' => [
             'file' => 'non-existent-file',
             'expectedMessage' => 'Expected "non-existent-file" to be a readable file path.',
+        ];
+
+        yield 'non-existent positional path' => [
+            'file' => __DIR__ . '/EchoGreeter.php',
+            'expectedMessage' => 'Invalid path argument "./Missing.php": multiple paths must be passed as separate arguments.',
+            'options' => [
+                '--configuration' => __DIR__ . '/infection.json5',
+                'paths' => [
+                    'EchoGreeter::greet',
+                    './Missing.php',
+                ],
+            ],
         ];
 
         yield 'invalid changed-lines-ranges format (invalid count)' => [
