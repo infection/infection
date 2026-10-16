@@ -205,6 +205,14 @@ final class InitialTestRunCommandTest extends TestCase
             ]),
         ];
 
+        yield 'the filter option deduplicates normalized source paths' => [
+            ['--filter' => ' Bar.php, , Bar.php , Foo.php,,Foo.php '],
+            new PlainFilter([
+                'Bar.php',
+                3 => 'Foo.php',
+            ]),
+        ];
+
         yield 'positional paths select source files' => [
             ['paths' => [
                 'Foo.php',
