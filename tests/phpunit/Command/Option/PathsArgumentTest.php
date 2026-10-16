@@ -62,6 +62,24 @@ final class PathsArgumentTest extends TestCase
         $this->assertTrue($argument->isArray());
     }
 
+    public function test_it_adds_the_argument_with_a_custom_description(): void
+    {
+        $command = new Command('test');
+
+        PathsArgument::addArgument(
+            $command,
+            'Custom argument description.',
+        );
+
+        $argument = $command->getDefinition()->getArgument(PathsArgument::NAME);
+
+        $this->assertSame(
+            'Custom argument description.',
+            $argument->getDescription(),
+            'The supplied description should replace the default paths description.',
+        );
+    }
+
     /**
      * @param array<string, list<string>> $arguments
      * @param list<non-empty-string> $expected

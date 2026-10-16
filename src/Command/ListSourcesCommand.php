@@ -40,14 +40,18 @@ use Infection\Command\Git\LoggerFactory;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\PathsArgument;
 use Infection\Command\Option\SourceFilterOptions;
+use Infection\Configuration\Configuration;
 use Infection\Console\IO;
+use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
 use function Safe\getcwd;
 use function sort;
 use SplFileInfo;
+use function sprintf;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -73,6 +77,10 @@ final class ListSourcesCommand extends BaseCommand
         );
     }
 
+    /**
+     * @throws FileOrDirectoryNotFound
+     * @throws NoSourceFound
+     */
     protected function executeCommand(IO $io): bool
     {
         $diagnosticIo = self::createDiagnosticIo($io);
@@ -86,6 +94,8 @@ final class ListSourcesCommand extends BaseCommand
                 PathsArgument::get($io),
             ),
         );
+
+        self::assertNoSymbolSelectors($container->getConfiguration());
 
         $filePaths = self::collectPaths(
             getcwd(),
@@ -109,6 +119,24 @@ final class ListSourcesCommand extends BaseCommand
         return new IO(
             $io->getInput(),
             $errorOutput,
+        );
+    }
+
+    private static function assertNoSymbolSelectors(Configuration $configuration): void
+    {
+        if (
+            $configuration->sourceFilter->filtersFiles()
+            || $configuration->testFrameworkExtraOptions !== ''
+        ) {
+            return;
+        }
+
+        Assert::isEmpty(
+            $configuration->sourceFilter->symbolSelectors,
+            sprintf(
+                'The %s command requires source or test paths when source symbol selectors are provided.',
+                self::NAME,
+            ),
         );
     }
 
