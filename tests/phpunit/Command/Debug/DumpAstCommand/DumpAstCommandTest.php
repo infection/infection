@@ -64,11 +64,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
         $actual = $tester->getDisplay();
 
         $tester->assertCommandIsSuccessful();
-        $this->assertSame(
-            $expected,
-            $actual,
-            'The dumped AST should match the command input.',
-        );
+        $this->assertSame($expected, $actual);
     }
 
     public static function astProvider(): iterable
