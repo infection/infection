@@ -125,8 +125,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
             ],
             $greeterAst,
             <<<'STDERR'
-                %w[WARNING] The "--filter" option is deprecated since 0.34.0 and will be removed in future versions.%wUse positional arguments instead: infection <filter>%w[warning] Source file filters are ignored by debug:dump-ast: only the file argument determines which file is dumped.
-
+                %w[WARNING] The "--filter" option is deprecated since 0.34.0 and will be removed in future versions.%wUse positional arguments instead: infection <filter>%w
                 STDERR,
         ];
 
@@ -138,10 +137,6 @@ final class DumpAstCommandTest extends FileSystemTestCase
                 '--git-diff-base' => 'HEAD',
             ],
             $greeterAst,
-            <<<'STDERR'
-                [warning] Source file filters are ignored by debug:dump-ast: only the file argument determines which file is dumped.
-
-                STDERR,
         ];
 
         yield [

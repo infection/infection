@@ -42,15 +42,12 @@ use Infection\Command\Git\LoggerFactory;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\SourceFilterOptions;
-use Infection\Configuration\Configuration;
 use Infection\Console\IO;
 use Infection\Container\Container;
 use Infection\Differ\ChangedLinesRange;
 use Infection\FileSystem\FileSystem;
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
-use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\MatcherLine\SimpleSourceLineMatcher;
 use Infection\Source\MatcherLine\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
@@ -124,10 +121,6 @@ final class DumpAstCommand extends BaseCommand
         BaseOption::addOption($this);
     }
 
-    /**
-     * @throws FileOrDirectoryNotFound
-     * @throws NoSourceFound
-     */
     protected function executeCommand(IO $io): bool
     {
         $file = $this->getFile($io);
@@ -136,6 +129,7 @@ final class DumpAstCommand extends BaseCommand
         $hasChangedLines = $changedLinesRanges !== null;
         $configFile = ConfigurationOption::get($io);
         $logger = LoggerFactory::create($io->getOutput());
+
         self::configureFormatter($io);
 
         $container = $this->createContainer(
@@ -143,11 +137,6 @@ final class DumpAstCommand extends BaseCommand
             $io,
             $configFile,
             $changedLinesRanges,
-        );
-
-        self::logIgnoredFilters(
-            $container->getConfiguration(),
-            $logger,
         );
 
         $nodes = $this->createAst($container, $file);
@@ -224,18 +213,6 @@ final class DumpAstCommand extends BaseCommand
     private static function shouldShowAttributes(IO $io): bool
     {
         return (bool) $io->getInput()->getOption(self::SHOW_ATTRIBUTES);
-    }
-
-    private static function logIgnoredFilters(
-        Configuration $configuration,
-        LoggerInterface $logger,
-    ): void {
-        if ($configuration->sourceFilter !== null) {
-            $logger->warning(
-                'Source file filters are ignored by {command}: only the file argument determines which file is dumped.',
-                ['command' => self::NAME],
-            );
-        }
     }
 
     // The --filter warning uses IO directly and bypasses the logger.
