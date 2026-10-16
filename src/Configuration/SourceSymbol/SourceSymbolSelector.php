@@ -33,23 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration;
+namespace Infection\Configuration\SourceSymbol;
 
 /**
- * Result of positional path classification: source paths (equivalent to --filter)
- * and test paths (equivalent to --test-framework-extra-args, space-joined).
+ * Identifies a class, optionally narrowed to a method and/or source line, to select code for mutation.
  *
  * @internal
  */
-final readonly class ClassifiedPaths
+final readonly class SourceSymbolSelector
 {
     /**
-     * @param list<non-empty-string> $sourcePaths
-     * @param list<non-empty-string> $testPaths
+     * @param string $className A leading namespace separator is preserved so global classes can be selected without matching short names.
+     * @param positive-int|null $line Line number counted from the beginning of the source file, starting at 1.
+     *                                For example, Invoice::calculateTotal::42 selects line 42 of the file
+     *                                containing Invoice::calculateTotal, not the 42nd line of the method.
      */
     public function __construct(
-        public array $sourcePaths,
-        public array $testPaths,
+        public string $className,
+        public ?string $methodName,
+        public ?int $line,
     ) {
     }
 }

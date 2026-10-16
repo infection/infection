@@ -36,12 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser;
 
 use function array_map;
+use function array_slice;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\Logger\MutationGeneration\PsrMutationGenerationDiagnosticLogger;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
+use Infection\PhpParser\Visitor\ExcludeNonSelectedSourceNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
 use Infection\PhpParser\Visitor\ExcludeUntestedNodesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
@@ -87,6 +90,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 false,
             ),
             knownMutatorNames: ['CustomAlias'],
+            sourceSymbolSelectors: [],
         );
         $nodes = SingletonContainer::getContainer()->getParser()->parse(<<<'PHP'
             <?php
@@ -177,6 +181,54 @@ final class NodeTraverserFactoryTest extends TestCase
         );
     }
 
+    public function test_it_places_source_selection_after_enrichment_and_before_tests(): void
+    {
+        $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
+        $traverser = (new NodeTraverserFactory(
+            sourceLineMatcher: new NullSourceLineMatcher(),
+            lineRangeCalculator: new LineRangeCalculator(),
+            onlyCovered: false,
+            diagnosticLogger: new PsrMutationGenerationDiagnosticLogger(
+                new NullLogger(),
+                false,
+            ),
+            knownMutatorNames: [],
+            sourceSymbolSelectors: [
+                new SourceSymbolSelector(
+                    'Vendor\\Package\\ClassName',
+                    'method',
+                    42,
+                ),
+            ],
+        ))->createEnrichmentTraverser(
+            $sourceFile,
+            new EmptyTrace($sourceFile),
+        );
+
+        $this->assertInstanceOf(
+            NodeTraverser::class,
+            $traverser,
+            'Enrichment must use the PHP parser node traverser.',
+        );
+
+        $visitors = self::getVisitorClassNames($traverser);
+
+        $this->assertSame(
+            [
+                ExcludeNonMutableCodeVisitor::class,
+                ExcludeUnchangedLinesVisitor::class,
+                ExcludeNonSelectedSourceNodesVisitor::class,
+                AddTestsVisitor::class,
+            ],
+            array_slice(
+                $visitors,
+                8,
+                4,
+            ),
+            'Symbol selection must follow name resolution and precede covering-test lookup.',
+        );
+    }
+
     /**
      * @param list<class-string<NodeVisitor>> $expected
      */
@@ -223,6 +275,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 false,
             ),
             knownMutatorNames: [],
+            sourceSymbolSelectors: [],
         );
     }
 }
