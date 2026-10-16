@@ -439,9 +439,7 @@ class ConfigurationFactory
             $schema,
         );
 
-        $resolvedFilter = $classified->sourcePaths !== []
-            ? new PlainFilter(array_values(array_unique($classified->sourcePaths)))
-            : null;
+        $resolvedFilter = PlainFilter::tryToCreate($classified->sourcePaths);
 
         if ($classified->testPaths !== []) {
             Assert::null(
