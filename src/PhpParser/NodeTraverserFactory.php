@@ -35,11 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\Logger\MutationGeneration\MutationGenerationDiagnosticLogger;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
+use Infection\PhpParser\Visitor\ExcludeNonSelectedSourceNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
 use Infection\PhpParser\Visitor\ExcludeUntestedNodesVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
@@ -49,6 +51,7 @@ use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
+use Infection\Source\Matcher\SourceSymbolMatcher;
 use Infection\Source\MatcherLine\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
@@ -64,8 +67,11 @@ use SplFileInfo;
  */
 readonly class NodeTraverserFactory
 {
+    private SourceSymbolMatcher $sourceSymbolMatcher;
+
     /**
      * @param list<string> $knownMutatorNames
+     * @param list<SourceSymbolSelector> $sourceSymbolSelectors
      */
     public function __construct(
         private SourceLineMatcher $sourceLineMatcher,
@@ -73,7 +79,9 @@ readonly class NodeTraverserFactory
         private bool $onlyCovered,
         private MutationGenerationDiagnosticLogger $diagnosticLogger,
         private array $knownMutatorNames,
+        array $sourceSymbolSelectors,
     ) {
+        $this->sourceSymbolMatcher = new SourceSymbolMatcher($sourceSymbolSelectors);
     }
 
     /**
@@ -106,11 +114,18 @@ readonly class NodeTraverserFactory
                 $this->sourceLineMatcher,
                 $sourceFile->getRealPath(),
             ),
-            new AddTestsVisitor(
-                $trace,
-                $this->lineRangeCalculator,
-            ),
         ];
+
+        if ($this->sourceSymbolMatcher->hasSelectors()) {
+            $visitors[] = new ExcludeNonSelectedSourceNodesVisitor(
+                $this->sourceSymbolMatcher,
+            );
+        }
+
+        $visitors[] = new AddTestsVisitor(
+            $trace,
+            $this->lineRangeCalculator,
+        );
 
         if ($this->onlyCovered) {
             $visitors[] = new ExcludeUntestedNodesVisitor();

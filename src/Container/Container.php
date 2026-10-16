@@ -476,6 +476,7 @@ final class Container extends DIContainer
                 $container->getConfiguration()->mutateOnlyCoveredCode(),
                 $container->getMutationGenerationDiagnosticLogger(),
                 array_keys($container->getConfiguration()->mutators),
+                $container->getConfiguration()->sourceFilter->symbolSelectors,
             ),
             FileReporterFactory::class => static function (self $container): FileReporterFactory {
                 $config = $container->getConfiguration();
@@ -633,7 +634,7 @@ final class Container extends DIContainer
             ),
             SourceLineMatcher::class => static function (self $container): SourceLineMatcher {
                 $configuration = $container->getConfiguration();
-                $sourceFilter = $configuration->sourceFilter;
+                $sourceFilter = $configuration->sourceFilter->fileFilter;
 
                 return $sourceFilter instanceof GitDiffFilter
                     ? new GitDiffSourceLineMatcher(
@@ -653,7 +654,7 @@ final class Container extends DIContainer
                         $container->get(SourceCollectorFactory::class)->create(
                             $configuration->configurationPathname,
                             $configuration->source,
-                            $configuration->sourceFilter,
+                            $configuration->sourceFilter->fileFilter,
                         ),
                     );
                 },
