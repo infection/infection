@@ -50,33 +50,34 @@ use Symfony\Component\Console\Tester\CommandTester;
 final class DumpAstCommandTest extends FileSystemTestCase
 {
     /**
-     * @param array<string, string|null> $options
+     * @param array<string, string|null> $command
      */
     #[DataProvider('astProvider')]
     public function test_it_outputs_the_ast_of_a_file(
-        string $file,
-        array $options,
+        array $command,
         string $expected,
     ): void {
         $tester = $this->createCommandTester();
 
-        $tester->execute([
-            'file' => $file,
-            '--configuration' => __DIR__ . '/infection.json5',
-            ...$options,
-        ]);
+        $tester->execute($command);
 
         $actual = $tester->getDisplay();
 
         $tester->assertCommandIsSuccessful();
-        $this->assertSame($expected, $actual);
+        $this->assertSame(
+            $expected,
+            $actual,
+            'The dumped AST should match the command input.',
+        );
     }
 
     public static function astProvider(): iterable
     {
         yield [
-            __DIR__ . '/Greeter.php',
-            [],
+            [
+                'file' => __DIR__ . '/Greeter.php',
+                '--configuration' => __DIR__ . '/infection.json5',
+            ],
             <<<'AST'
                 array(
                     0: Stmt_Declare(
@@ -106,8 +107,10 @@ final class DumpAstCommandTest extends FileSystemTestCase
         ];
 
         yield [
-            __DIR__ . '/EchoGreeter.php',
-            [],
+            [
+                'file' => __DIR__ . '/EchoGreeter.php',
+                '--configuration' => __DIR__ . '/infection.json5',
+            ],
             <<<'AST'
                 array(
                     0: Stmt_Declare(
@@ -147,8 +150,11 @@ final class DumpAstCommandTest extends FileSystemTestCase
         ];
 
         yield 'with attributes' => [
-            __DIR__ . '/EchoGreeter.php',
-            ['--show-attributes' => null],
+            [
+                'file' => __DIR__ . '/EchoGreeter.php',
+                '--configuration' => __DIR__ . '/infection.json5',
+                '--show-attributes' => null,
+            ],
             <<<'AST'
                 array(
                     0: Stmt_Declare(
@@ -287,8 +293,9 @@ final class DumpAstCommandTest extends FileSystemTestCase
         ];
 
         yield 'with explicit no changed lines' => [
-            __DIR__ . '/EchoGreeter.php',
             [
+                'file' => __DIR__ . '/EchoGreeter.php',
+                '--configuration' => __DIR__ . '/infection.json5',
                 '--changed-lines-ranges' => null,
             ],
             <<<'AST'
@@ -452,8 +459,9 @@ final class DumpAstCommandTest extends FileSystemTestCase
         ];
 
         yield 'with explicit a changed line touching a mutation candidate' => [
-            __DIR__ . '/EchoGreeter.php',
             [
+                'file' => __DIR__ . '/EchoGreeter.php',
+                '--configuration' => __DIR__ . '/infection.json5',
                 '--changed-lines-ranges' => '42:42,40:42',
             ],
             <<<'AST'
