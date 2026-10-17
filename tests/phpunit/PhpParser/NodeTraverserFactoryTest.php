@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser;
 
 use function array_map;
+use function array_slice;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\Logger\MutationGeneration\PsrMutationGenerationDiagnosticLogger;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\CollectSourceSymbolsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
@@ -175,7 +177,17 @@ final class NodeTraverserFactoryTest extends TestCase
         yield 'with source selection' => [
             false,
             [
-                ...$baseVisitors,
+                NextConnectingVisitor::class,
+                LabelNodesAsEligibleVisitor::class,
+                ExcludeIgnoredNodesVisitor::class,
+                SkipIgnoredNodesVisitor::class,
+                NameResolver::class,
+                CollectSourceSymbolsVisitor::class,
+                ParentConnectingVisitor::class,
+                ExcludeIgnoredMutatorsVisitor::class,
+                ReflectionVisitor::class,
+                ExcludeNonMutableCodeVisitor::class,
+                ExcludeUnchangedLinesVisitor::class,
                 ExcludeNonSelectedSourceNodesVisitor::class,
                 AddTestsVisitor::class,
             ],
@@ -197,6 +209,39 @@ final class NodeTraverserFactoryTest extends TestCase
                 CloningVisitor::class,
                 FakeVisitor::class,
             ],
+        );
+    }
+
+    public function test_it_shares_symbol_discovery_with_the_enrichment_traverser(): void
+    {
+        $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
+        $factory = self::createTraverserFactory(
+            false,
+            [
+                new SourceSymbolSelector(
+                    'Example',
+                ),
+            ],
+        );
+        $enrichmentTraverser = $factory->createEnrichmentTraverser(
+            $sourceFile,
+            new EmptyTrace($sourceFile),
+        );
+        $symbolTraverser = NodeTraverserFactory::createSourceSymbolTraverser(
+            new CollectSourceSymbolsVisitor(),
+        );
+
+        $this->assertInstanceOf(
+            NodeTraverser::class,
+            $enrichmentTraverser,
+        );
+        $this->assertTraverserVisitorsAre(
+            $symbolTraverser,
+            array_slice(
+                self::getVisitorClassNames($enrichmentTraverser),
+                0,
+                6,
+            ),
         );
     }
 

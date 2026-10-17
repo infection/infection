@@ -39,49 +39,44 @@ use Infection\Command\Debug\ListSymbolsCommand;
 use Infection\Console\Application;
 use Infection\Container\Container;
 use Infection\Tests\FileSystem\FileSystemTestCase;
+use Infection\Tests\TestingUtility\FS;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
 #[CoversClass(ListSymbolsCommand::class)]
 final class ListSymbolsCommandTest extends FileSystemTestCase
 {
     #[DataProvider('declarationsProvider')]
-    public function test_it_lists_declarations(
-        string $php,
+    public function test_it_lists_recognized_source_symbols(
+        string $contents,
         string $expected,
     ): void {
-        (new Filesystem())->dumpFile(
-            'symbols.php',
-            $php,
-        );
+        FS::dumpFile('symbols.php', $contents);
 
         $application = new Application(
             Container::create(),
         );
-        $tester = new CommandTester(
+        $commandTester = new CommandTester(
             $application->find('debug:list-symbols'),
         );
 
-        $tester->execute(
+        $commandTester->execute(
             ['file' => './unused/../symbols.php'],
             ['capture_stderr_separately' => true],
         );
 
-        $tester->assertCommandIsSuccessful('Listing readable PHP declarations should succeed without project configuration.');
+        $commandTester->assertCommandIsSuccessful();
         $this->assertSame(
             $expected,
-            $tester->getDisplay(normalize: true),
-            'Stdout should contain only qualified declaration names in source order.',
+            $commandTester->getDisplay(normalize: true),
         );
         $this->assertSame(
             '',
-            $tester->getErrorOutput(normalize: true),
-            'Listing valid declarations should not produce diagnostics.',
+            $commandTester->getErrorOutput(normalize: true),
         );
     }
 
@@ -99,7 +94,7 @@ final class ListSymbolsCommandTest extends FileSystemTestCase
             "Example\nExample::Z\nExample::b\nExample::a\n",
         ];
 
-        yield 'all class-like declarations and directly declared methods' => [
+        yield 'production traversal skips interfaces and abstract methods' => [
             <<<'PHP'
                 <?php
                 namespace App;
@@ -122,12 +117,9 @@ final class ListSymbolsCommandTest extends FileSystemTestCase
                 }
                 PHP,
             <<<'STDOUT'
-                App\Contract
-                App\Contract::run
                 App\Behavior
                 App\Behavior::shared
                 App\ParentClass
-                App\ParentClass::abstractMethod
                 App\ParentClass::inheritedOnly
                 App\Child
                 App\Child::__construct
@@ -208,6 +200,23 @@ final class ListSymbolsCommandTest extends FileSystemTestCase
 
         yield 'empty result' => ['<?php', ''];
 
+        yield 'only unsupported declarations' => [
+            '<?php interface Contract { public function run(); }',
+            '',
+        ];
+
+        yield 'recognition does not require eligible mutation candidates' => [
+            <<<'PHP'
+                <?php
+                /** @infection-ignore-all */
+                class Ignored {
+                    public function ignored() { return 1; }
+                }
+                class EmptyClass {}
+                PHP,
+            "Ignored\nIgnored::ignored\nEmptyClass\n",
+        ];
+
         yield 'the inspected file is never executed or autoloaded' => [
             <<<'PHP'
                 <?php
@@ -228,7 +237,7 @@ final class ListSymbolsCommandTest extends FileSystemTestCase
         array $arguments,
         string $expectedDiagnostic,
     ): void {
-        (new Filesystem())->dumpFile(
+        FS::dumpFile(
             'invalid.php',
             "<?php\nclass Valid {}\nclass Broken {",
         );
