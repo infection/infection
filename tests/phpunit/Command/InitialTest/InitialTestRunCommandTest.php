@@ -221,19 +221,33 @@ final class InitialTestRunCommandTest extends TestCase
             new PlainFilter(['SomeClass']),
         ];
 
-        yield 'method selector with a source path' => [
-            ['paths' => [
+        yield 'method selector and function names with a source path' => [
+            [
+                'paths' => [
+                    'Foo.php',
+                    'SomeClass::method',
+                    'calculateInvoiceTotal',
+                    'App\Billing\calculateInvoiceTotal',
+                    '\calculateInvoiceTotal',
+                    '\App\Billing\calculateInvoiceTotal',
+                ],
+            ],
+            new PlainFilter([
                 'Foo.php',
-                'SomeClass::method',
-            ]],
-            new PlainFilter(['Foo.php']),
+                'calculateInvoiceTotal',
+            ]),
         ];
 
-        yield 'method selector with a test path' => [
-            ['paths' => [
-                '../InitialTestRunCommandTest.php',
-                'SomeClass::method',
-            ]],
+        yield 'method selector and qualified function names with a test path' => [
+            [
+                'paths' => [
+                    '../InitialTestRunCommandTest.php',
+                    'SomeClass::method',
+                    'App\Billing\calculateInvoiceTotal',
+                    '\calculateInvoiceTotal',
+                    '\App\Billing\calculateInvoiceTotal',
+                ],
+            ],
             null,
         ];
 
@@ -305,6 +319,18 @@ final class InitialTestRunCommandTest extends TestCase
 
         yield 'method selector alone' => [
             ['SomeClass::method'],
+        ];
+
+        yield 'namespaced function name alone' => [
+            ['App\Billing\calculateInvoiceTotal'],
+        ];
+
+        yield 'explicit global function name alone' => [
+            ['\calculateInvoiceTotal'],
+        ];
+
+        yield 'fully qualified function name alone' => [
+            ['\App\Billing\calculateInvoiceTotal'],
         ];
     }
 
