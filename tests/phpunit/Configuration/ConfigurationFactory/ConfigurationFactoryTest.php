@@ -52,7 +52,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\Configuration\SourceFilter\PositionalPathsFilter;
+use Infection\Configuration\SourceFilter\PositionalArgumentsFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelectorParser;
@@ -1532,7 +1532,7 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario
                 ->withInput(
                     $defaultInputBuilder->withSourceFilter(
-                        new PositionalPathsFilter(['Foo.php', 'Bar.php', 'Foo.php']),
+                        new PositionalArgumentsFilter(['Foo.php', 'Bar.php', 'Foo.php']),
                     ),
                 )
                 ->withExpected(
@@ -1546,7 +1546,7 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario
                 ->withInput(
                     $defaultInputBuilder->withSourceFilter(
-                        new PositionalPathsFilter(['tests/FooTest.php', 'tests/BarTest.php']),
+                        new PositionalArgumentsFilter(['tests/FooTest.php', 'tests/BarTest.php']),
                     ),
                 )
                 ->withExpected(
@@ -1561,7 +1561,7 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario
                 ->withInput(
                     $defaultInputBuilder->withSourceFilter(
-                        new PositionalPathsFilter(['Foo.php', 'tests/FooTest.php']),
+                        new PositionalArgumentsFilter(['Foo.php', 'tests/FooTest.php']),
                     ),
                 )
                 ->withExpected(
@@ -1576,7 +1576,7 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario
                 ->withInput(
                     $defaultInputBuilder->withSourceFilter(
-                        new PositionalPathsFilter([
+                        new PositionalArgumentsFilter([
                             'tests/FooTest.php',
                             'Differ::diff',
                             'UnifiedDiffOutputBuilder',
@@ -1601,7 +1601,7 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario
                 ->withInput(
                     $defaultInputBuilder
-                        ->withSourceFilter(new PositionalPathsFilter(['tests/FooTest.php']))
+                        ->withSourceFilter(new PositionalArgumentsFilter(['tests/FooTest.php']))
                         ->withTestFrameworkExtraArgs('--stop-on-failure'),
                 )
                 ->withExpected(

@@ -113,7 +113,7 @@ final class ExcludeNonSelectedSourceNodesVisitor extends NodeVisitorAbstract
      *
      * @return T|null
      */
-    private static function findCurrent(array $nodes): ?Node
+    private static function findLastNode(array $nodes): ?Node
     {
         $key = array_key_last($nodes);
 
@@ -126,8 +126,8 @@ final class ExcludeNonSelectedSourceNodesVisitor extends NodeVisitorAbstract
 
     private function matches(Node $node): bool
     {
-        $class = self::findCurrent($this->classStack);
-        $method = self::findCurrent($this->methodStack);
+        $class = self::findLastNode($this->classStack);
+        $method = self::findLastNode($this->methodStack);
 
         return $this->matcher->matches(
             $node,

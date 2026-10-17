@@ -36,14 +36,14 @@ declare(strict_types=1);
 namespace Infection\Configuration\SourceSymbol;
 
 /**
- * Identifies a class, optionally narrowed to a method and/or source line, to select code for mutation.
+ * Identifies a class or namespace prefix, optionally narrowed to a method and/or source line, to select code for mutation.
  *
  * @internal
  */
 final readonly class SourceSymbolSelector
 {
     /**
-     * @param string $className A leading namespace separator is preserved so global classes can be selected without matching short names.
+     * @param string $className A leading namespace separator selects a fully qualified class name; a trailing separator selects a namespace prefix.
      * @param positive-int|null $line Line number counted from the beginning of the source file, starting at 1.
      *                                For example, Invoice::calculateTotal::42 selects line 42 of the file
      *                                containing Invoice::calculateTotal, not the 42nd line of the method.

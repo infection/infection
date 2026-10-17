@@ -36,18 +36,17 @@ declare(strict_types=1);
 namespace Infection\Configuration\SourceFilter;
 
 /**
- * Wraps raw positional CLI path arguments before they are classified into source
- * and test paths. ConfigurationFactory resolves this into a PlainFilter (source
- * paths) and forwards test paths to testFrameworkExtraArgs.
+ * Holds raw positional CLI arguments until configuration resolution classifies
+ * them into source paths, test paths, and source symbol selectors.
  *
  * @internal
  */
-final readonly class PositionalPathsFilter implements SourceFileFilter
+final readonly class PositionalArgumentsFilter implements SourceFileFilter
 {
     /**
-     * @param list<non-empty-string> $paths
+     * @param list<non-empty-string> $arguments
      */
-    public function __construct(public array $paths)
+    public function __construct(public array $arguments)
     {
     }
 }
