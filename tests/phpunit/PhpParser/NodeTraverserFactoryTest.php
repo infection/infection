@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser;
 
 use function array_map;
-use function array_slice;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
@@ -73,15 +72,20 @@ final class NodeTraverserFactoryTest extends TestCase
 
     /**
      * @param list<class-string<NodeVisitor>> $expected
+     * @param list<SourceSymbolSelector> $sourceSymbolSelectors
      */
     #[DataProvider('visitorProvider')]
     public function test_it_can_create_a_traverser_for_enriching_the_ast(
         bool $onlyCovered,
         array $expected,
+        array $sourceSymbolSelectors = [],
     ): void {
         $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
 
-        $factory = self::createTraverserFactory($onlyCovered);
+        $factory = self::createTraverserFactory(
+            $onlyCovered,
+            $sourceSymbolSelectors,
+        );
 
         $traverser = $factory->createEnrichmentTraverser(
             $sourceFile,
@@ -103,19 +107,38 @@ final class NodeTraverserFactoryTest extends TestCase
             ReflectionVisitor::class,
             ExcludeNonMutableCodeVisitor::class,
             ExcludeUnchangedLinesVisitor::class,
-            AddTestsVisitor::class,
         ];
 
         yield 'without only covered' => [
             false,
-            $baseVisitors,
+            [
+                ...$baseVisitors,
+                AddTestsVisitor::class,
+            ],
         ];
 
         yield 'with only covered' => [
             true,
             [
                 ...$baseVisitors,
+                AddTestsVisitor::class,
                 ExcludeUntestedNodesVisitor::class,
+            ],
+        ];
+
+        yield 'with source selection' => [
+            false,
+            [
+                ...$baseVisitors,
+                ExcludeNonSelectedSourceNodesVisitor::class,
+                AddTestsVisitor::class,
+            ],
+            [
+                new SourceSymbolSelector(
+                    'Vendor\\Package\\ClassName',
+                    'method',
+                    42,
+                ),
             ],
         ];
     }
@@ -132,39 +155,6 @@ final class NodeTraverserFactoryTest extends TestCase
                 CloningVisitor::class,
                 FakeVisitor::class,
             ],
-        );
-    }
-
-    public function test_it_places_source_selection_after_enrichment_and_before_tests(): void
-    {
-        $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
-        $traverser = (new NodeTraverserFactory(
-            sourceLineMatcher: new NullSourceLineMatcher(),
-            lineRangeCalculator: new LineRangeCalculator(),
-            onlyCovered: false,
-            sourceSymbolSelectors: [new SourceSymbolSelector('Vendor\\Package\\ClassName', 'method', 42)],
-        ))->createEnrichmentTraverser(
-            $sourceFile,
-            new EmptyTrace($sourceFile),
-        );
-
-        $this->assertInstanceOf(
-            NodeTraverser::class,
-            $traverser,
-            'Enrichment must use the PHP parser node traverser.',
-        );
-
-        $visitors = self::getVisitorClassNames($traverser);
-
-        $this->assertSame(
-            [
-                ExcludeNonMutableCodeVisitor::class,
-                ExcludeUnchangedLinesVisitor::class,
-                ExcludeNonSelectedSourceNodesVisitor::class,
-                AddTestsVisitor::class,
-            ],
-            array_slice($visitors, 7, 4),
-            'Symbol selection must follow name resolution and precede covering-test lookup.',
         );
     }
 
@@ -203,13 +193,18 @@ final class NodeTraverserFactoryTest extends TestCase
         return self::$visitorsReflection ??= (new ReflectionClass(NodeTraverser::class))->getProperty('visitors');
     }
 
-    private static function createTraverserFactory(bool $onlyCovered): NodeTraverserFactory
-    {
+    /**
+     * @param list<SourceSymbolSelector> $sourceSymbolSelectors
+     */
+    private static function createTraverserFactory(
+        bool $onlyCovered,
+        array $sourceSymbolSelectors = [],
+    ): NodeTraverserFactory {
         return new NodeTraverserFactory(
             sourceLineMatcher: new NullSourceLineMatcher(),
             lineRangeCalculator: new LineRangeCalculator(),
             onlyCovered: $onlyCovered,
-            sourceSymbolSelectors: [],
+            sourceSymbolSelectors: $sourceSymbolSelectors,
         );
     }
 }
