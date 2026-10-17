@@ -84,28 +84,34 @@ final class PositionalPathsClassifierTest extends TestCase
         yield 'lowercase bare file filter' => [
             $baseScenario
                 ->withPaths(['mailer.php'])
-                ->withExpected(new ClassifiedPaths(
-                    ['mailer.php'],
-                    [],
-                )),
+                ->withExpected(
+                    new ClassifiedPaths(
+                        ['mailer.php'],
+                        [],
+                    ),
+                ),
         ];
 
         yield 'digit-starting bare file filter' => [
             $baseScenario
                 ->withPaths(['1Foo.php'])
-                ->withExpected(new ClassifiedPaths(
-                    ['1Foo.php'],
-                    [],
-                )),
+                ->withExpected(
+                    new ClassifiedPaths(
+                        ['1Foo.php'],
+                        [],
+                    ),
+                ),
         ];
 
         yield 'underscore-starting bare file filter' => [
             $baseScenario
                 ->withPaths(['_mailer.php'])
-                ->withExpected(new ClassifiedPaths(
-                    ['_mailer.php'],
-                    [],
-                )),
+                ->withExpected(
+                    new ClassifiedPaths(
+                        ['_mailer.php'],
+                        [],
+                    ),
+                ),
         ];
 
         yield 'single source file path' => [
@@ -253,10 +259,12 @@ final class PositionalPathsClassifierTest extends TestCase
         yield 'trailing slash accepts a partial path filter' => [
             $baseScenario
                 ->withPaths(['Differ/'])
-                ->withExpected(new ClassifiedPaths(
-                    ['Differ/'],
-                    [],
-                )),
+                ->withExpected(
+                    new ClassifiedPaths(
+                        ['Differ/'],
+                        [],
+                    ),
+                ),
         ];
 
         yield 'source directory path with trailing slash' => [
