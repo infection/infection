@@ -165,7 +165,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
             [21, 24, 25, 26, 27],
         ];
 
-        yield 'nodes outside the selected method' => [
+        yield 'nested function-like nodes follow the enclosing method selection' => [
             <<<'PHP'
                 <?php
                 namespace App;
@@ -174,11 +174,31 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                 {
                     public function send(): int
                     {
+                        $closure = static function (): int {
+                            return 1;
+                        };
+                        $arrow = static fn (): int => 2;
+
+                        function nestedInSelected(): int
+                        {
+                            return 3;
+                        }
+
                         return 1;
                     }
 
                     public function receive(): int
                     {
+                        $closure = static function (): int {
+                            return 4;
+                        };
+                        $arrow = static fn (): int => 5;
+
+                        function nestedInUnselected(): int
+                        {
+                            return 6;
+                        }
+
                         return 2;
                     }
                 }
@@ -190,7 +210,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                     null,
                 ),
             ],
-            [4, 5, 6, 7, 8],
+            [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26],
         ];
 
         yield 'a short class name selects every matching declaration' => [
@@ -372,12 +392,27 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
             <?php
             namespace {
                 class Mailer {}
+
+                function Mailer(): int
+                {
+                    return 1;
+                }
             }
             namespace App {
                 class Mailer {}
+
+                function Mailer(): int
+                {
+                    return 1;
+                }
             }
             namespace Other {
                 class Mailer {}
+
+                function Mailer(): int
+                {
+                    return 1;
+                }
             }
             PHP;
 
@@ -390,7 +425,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                     null,
                 ),
             ],
-            [1, 2, 5, 6, 9, 10],
+            [1, 2, 10, 11, 19, 20],
         ];
 
         yield 'explicit global name excludes namespaced classes' => [
@@ -414,7 +449,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                     null,
                 ),
             ],
-            [5, 6],
+            [10, 11],
         ];
 
         yield 'explicitly qualified class name' => [
@@ -426,7 +461,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                     null,
                 ),
             ],
-            [5, 6],
+            [10, 11],
         ];
 
         yield 'case insensitive explicit global name' => [
