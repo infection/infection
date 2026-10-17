@@ -41,10 +41,10 @@ use Infection\Framework\OperatingSystem;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Tests\Fixtures\Finder\MockRealPathFinder;
 use Infection\Tests\Fixtures\Finder\MockRelativePathFinder;
-use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 
 #[CoversClass(RealPathFilterIterator::class)]
 final class RealPathFilterIteratorTest extends TestCase
@@ -53,20 +53,20 @@ final class RealPathFilterIteratorTest extends TestCase
     public function test_it_distinguishes_paths_from_regexes(
         string $pattern,
         string $path,
-        bool $expected,
+        bool $shouldMatch,
     ): void {
         $file = new MockSplFileInfo(realPath: $path);
+
         $iterator = new RealPathFilterIterator(
-            new ArrayIterator([$file]),
-            [$pattern],
-            [],
+            iterator: new ArrayIterator([$file]),
+            matchPatterns: [$pattern],
+            noMatchPatterns: [],
         );
 
-        $this->assertSame(
-            $expected ? [$file] : [],
-            iterator_to_array($iterator),
-            'Absolute directory paths must be matched literally while valid regex filters remain supported.',
-        );
+        $expected = $shouldMatch ? [$file] : [];
+        $actual = take($iterator)->toList();
+
+        $this->assertSame($expected, $actual);
     }
 
     public static function pathFilterProvider(): iterable
