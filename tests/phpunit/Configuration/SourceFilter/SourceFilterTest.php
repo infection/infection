@@ -52,11 +52,9 @@ final class SourceFilterTest extends TestCase
     ): void {
         $sourceFilter = new SourceFilter($fileFilter, []);
 
-        $this->assertSame(
-            $expected,
-            $sourceFilter->filtersFiles(),
-            'Only a file filter should mark source files as filtered.',
-        );
+        $actual = $sourceFilter->filtersFiles();
+
+        $this->assertSame($expected, $actual);
     }
 
     public static function fileFilterProvider(): iterable
