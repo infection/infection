@@ -478,15 +478,48 @@ final class PositionalArgumentsClassifierTest extends TestCase
                 ),
         ];
 
-        yield 'source selector and test path' => [
+        yield 'source selector and function names with a test path' => [
             $baseScenario
-                ->withPaths(['App\Service\Mailer::send::32', 'tests/Unit/MailerTest.php'])
+                ->withPaths([
+                    'App\Service\Mailer::send::32',
+                    'calculateInvoiceTotal',
+                    'App\Billing\calculateInvoiceTotal',
+                    '\calculateInvoiceTotal',
+                    '\App\Billing\calculateInvoiceTotal',
+                    'tests/Unit/MailerTest.php',
+                ])
                 ->withExistingFiles(['/project/tests/Unit/MailerTest.php'])
                 ->withExpected(
                     new ClassifiedPositionalArguments(
-                        [],
+                        ['calculateInvoiceTotal'],
                         ['tests/Unit/MailerTest.php'],
-                        [new SourceSymbolSelector('App\Service\Mailer', 'send', 32)],
+                        [
+                            new SourceSymbolSelector(
+                                'App\Service\Mailer',
+                                'send',
+                                32,
+                            ),
+                            new SourceSymbolSelector(
+                                'calculateInvoiceTotal',
+                                null,
+                                null,
+                            ),
+                            new SourceSymbolSelector(
+                                'App\Billing\calculateInvoiceTotal',
+                                null,
+                                null,
+                            ),
+                            new SourceSymbolSelector(
+                                '\calculateInvoiceTotal',
+                                null,
+                                null,
+                            ),
+                            new SourceSymbolSelector(
+                                '\App\Billing\calculateInvoiceTotal',
+                                null,
+                                null,
+                            ),
+                        ],
                     ),
                 ),
         ];
