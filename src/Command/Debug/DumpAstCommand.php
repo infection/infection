@@ -41,13 +41,17 @@ use Infection\Command\BaseCommand;
 use Infection\Command\Git\LoggerFactory;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\PathsArgument;
 use Infection\Command\Option\SourceFilterOptions;
+use Infection\Configuration\Configuration;
 use Infection\Console\IO;
 use Infection\Container\Container;
 use Infection\Differ\ChangedLinesRange;
 use Infection\FileSystem\FileSystem;
+use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\MatcherLine\SimpleSourceLineMatcher;
 use Infection\Source\MatcherLine\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
@@ -93,6 +97,10 @@ final class DumpAstCommand extends BaseCommand
                 This command will parse the file as infection would to generate an enriched AST. It
                 will then dump it.
 
+                Pass source symbol selectors after the file to preview which nodes are eligible:
+                infection debug:dump-ast src/Differ.php 'Differ::diff' 'Differ::diff::32'
+                Selectors enable attributes and line numbers in the dump.
+
                 The dumped format is what is used by Infection for its tests.
                 HELP,
         );
@@ -101,6 +109,10 @@ final class DumpAstCommand extends BaseCommand
             self::FILE_PATH_ARGUMENT,
             InputArgument::REQUIRED,
             'Path to the file to parse.',
+        );
+        PathsArgument::addArgument(
+            $this,
+            'Limit eligible nodes to the given source selectors, for example Differ::diff or Differ::diff::32.',
         );
         $this->addOption(
             self::SHOW_ATTRIBUTES,
@@ -126,7 +138,6 @@ final class DumpAstCommand extends BaseCommand
         $file = $this->getFile($io);
         $shouldShowAttributes = self::shouldShowAttributes($io);
         $changedLinesRanges = self::getChangedLinesRanges($io);
-        $hasChangedLines = $changedLinesRanges !== null;
         $configFile = ConfigurationOption::get($io);
         $logger = LoggerFactory::create($io->getOutput());
 
@@ -139,14 +150,24 @@ final class DumpAstCommand extends BaseCommand
             $changedLinesRanges,
         );
 
+        self::logIgnoredFilters(
+            $container->getConfiguration(),
+            $logger,
+        );
+
+        $showsEligibility = self::shouldShowEligibility(
+            $container,
+            $changedLinesRanges,
+        );
+
         $nodes = $this->createAst($container, $file);
 
         $io->write(
             $container->getNodeDumper()->dump(
                 $nodes,
-                dumpOtherAttributes: $shouldShowAttributes || $hasChangedLines,
+                dumpOtherAttributes: $shouldShowAttributes || $showsEligibility,
                 decorateNodes: $io->isDecorated(),
-                showLineNumbers: $hasChangedLines,
+                showLineNumbers: $showsEligibility,
             ),
         );
 
@@ -215,6 +236,18 @@ final class DumpAstCommand extends BaseCommand
         return (bool) $io->getInput()->getOption(self::SHOW_ATTRIBUTES);
     }
 
+    private static function logIgnoredFilters(
+        Configuration $configuration,
+        LoggerInterface $logger,
+    ): void {
+        if ($configuration->testFrameworkExtraOptions !== '') {
+            $logger->warning(
+                'Test paths and test framework options are ignored by {command} because it does not run tests.',
+                ['command' => self::NAME],
+            );
+        }
+    }
+
     // The --filter warning uses IO directly and bypasses the logger.
     // Route it to stderr here until diagnostic logging is centralized.
     private static function createDiagnosticIo(IO $io): IO
@@ -228,6 +261,25 @@ final class DumpAstCommand extends BaseCommand
             $io->getInput(),
             $errorOutput,
         );
+    }
+
+    /**
+     * @param list<ChangedLinesRange>|null $changedLinesRanges
+     *
+     * @throws FileOrDirectoryNotFound
+     * @throws NoSourceFound
+     */
+    private static function shouldShowEligibility(
+        Container $container,
+        ?array $changedLinesRanges,
+    ): bool {
+        $hasSymbolSelectors = $container->getConfiguration()->sourceFilter->symbolSelectors !== [];
+
+        if ($changedLinesRanges !== null) {
+            return true;
+        }
+
+        return $hasSymbolSelectors;
     }
 
     /**
@@ -308,6 +360,7 @@ final class DumpAstCommand extends BaseCommand
                 withUncovered: true,
                 sourceFilter: SourceFilterOptions::get(
                     self::createDiagnosticIo($io),
+                    PathsArgument::get($io),
                 ),
             )
         ;
