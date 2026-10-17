@@ -70,20 +70,18 @@ final class ListSourcesCommandTest extends TestCase
     {
         $tester = $this->runCommand([]);
 
-        $this->assertSame(
-            <<<'STDOUT'
-                File1.php
-                File2.php
+        $expectedStdout = <<<'STDOUT'
+            File1.php
+            File2.php
 
-                STDOUT,
-            Str::toUnixLineEndings($tester->getDisplay()),
-            'Stdout should contain only the collected source paths.',
-        );
-        $this->assertSame(
-            '',
-            $tester->getErrorOutput(normalize: true),
-            'Listing all sources should not emit diagnostics.',
-        );
+            STDOUT;
+        $expectedStderr = '';
+
+        $actualStdout = Str::toUnixLineEndings($tester->getDisplay());
+        $actualStderr = $tester->getErrorOutput(normalize: true);
+
+        $this->assertSame($expectedStdout, $actualStdout);
+        $this->assertSame($expectedStderr, $actualStderr);
         $tester->assertCommandIsSuccessful();
     }
 
@@ -91,18 +89,14 @@ final class ListSourcesCommandTest extends TestCase
     {
         $tester = $this->runCommand(['--filter' => 'File1']);
 
-        $actual = $tester->getDisplay();
+        $expectedStdout = "File1.php\n";
+        $expectedStderr = 'The "--filter" option is deprecated';
 
-        $this->assertSame(
-            "File1.php\n",
-            Str::toUnixLineEndings($actual),
-            'Stdout should contain only the selected source paths.',
-        );
-        $this->assertStringContainsString(
-            'The "--filter" option is deprecated',
-            $tester->getErrorOutput(normalize: true),
-            'The deprecation warning should be written to stderr.',
-        );
+        $actualStdout = Str::toUnixLineEndings($tester->getDisplay());
+        $actualStderr = $tester->getErrorOutput(normalize: true);
+
+        $this->assertSame($expectedStdout, $actualStdout);
+        $this->assertStringContainsString($expectedStderr, $actualStderr);
         $tester->assertCommandIsSuccessful();
     }
 
