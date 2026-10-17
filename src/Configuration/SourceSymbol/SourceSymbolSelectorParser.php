@@ -43,6 +43,8 @@ use function str_starts_with;
 use Webmozart\Assert\Assert;
 
 /**
+ * Parses source-symbol selectors without consulting the autoloader.
+ *
  * @internal
  */
 final class SourceSymbolSelectorParser
@@ -63,9 +65,6 @@ final class SourceSymbolSelectorParser
         $}xD
         REGEX;
 
-    /**
-     * Parses the first source-selector grammar without consulting the autoloader.
-     */
     public function parse(string $value): ?SourceSymbolSelector
     {
         $matches = self::matchSelector($value);

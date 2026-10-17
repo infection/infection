@@ -357,7 +357,12 @@ final class PositionalArgumentsClassifierTest extends TestCase
             $baseScenario
                 ->withPaths(['tests/Unit/MailerTest.php', 'tests/Unit/FooTest.php'])
                 ->withExistingFiles(['/project/tests/Unit/MailerTest.php', '/project/tests/Unit/FooTest.php'])
-                ->withExpected(new ClassifiedPositionalArguments([], ['tests/Unit/MailerTest.php', 'tests/Unit/FooTest.php'], [])),
+                ->withExpected(
+                    new ClassifiedPositionalArguments([],
+                        ['tests/Unit/MailerTest.php', 'tests/Unit/FooTest.php'],
+                        [],
+                    ),
+                ),
         ];
 
         yield 'capitalized Tests directory with slash' => [
@@ -371,7 +376,13 @@ final class PositionalArgumentsClassifierTest extends TestCase
             $baseScenario
                 ->withPaths(['src/Service/Mailer.php', 'tests/Unit/Service/'])
                 ->withExistingFiles(['/project/src/Service/Mailer.php', '/project/tests/Unit/Service/MailerTest.php'])
-                ->withExpected(new ClassifiedPositionalArguments(['src/Service/Mailer.php'], ['tests/Unit/Service/'], [])),
+                ->withExpected(
+                    new ClassifiedPositionalArguments(
+                        ['src/Service/Mailer.php'],
+                        ['tests/Unit/Service/'],
+                        [],
+                    ),
+                ),
         ];
 
         yield 'source folder and test file' => [
@@ -399,17 +410,28 @@ final class PositionalArgumentsClassifierTest extends TestCase
             $baseScenario
                 ->withPaths(['Mailer', 'tests/Unit/Service/'])
                 ->withExistingFiles(['/project/tests/Unit/Service/MailerTest.php'])
-                ->withExpected(new ClassifiedPositionalArguments(['Mailer'], ['tests/Unit/Service/'], [new SourceSymbolSelector('Mailer', null, null)])),
+                ->withExpected(
+                    new ClassifiedPositionalArguments(
+                        ['Mailer'], ['tests/Unit/Service/'],
+                        [new SourceSymbolSelector('Mailer', null, null)],
+                    ),
+                ),
         ];
 
         yield 'multiple short class selectors and test folder' => [
             $baseScenario
                 ->withPaths(['Mailer', 'Plus_', 'tests/Unit/Service/'])
                 ->withExistingFiles(['/project/tests/Unit/Service/MailerTest.php'])
-                ->withExpected(new ClassifiedPositionalArguments(['Mailer', 'Plus_'], ['tests/Unit/Service/'], [
-                    new SourceSymbolSelector('Mailer', null, null),
-                    new SourceSymbolSelector('Plus_', null, null),
-                ])),
+                ->withExpected(
+                    new ClassifiedPositionalArguments(
+                        ['Mailer', 'Plus_'],
+                        ['tests/Unit/Service/'],
+                        [
+                            new SourceSymbolSelector('Mailer', null, null),
+                            new SourceSymbolSelector('Plus_', null, null),
+                        ],
+                    ),
+                ),
         ];
 
         yield 'test folder and symbolic php source in reversed order' => [
@@ -423,35 +445,50 @@ final class PositionalArgumentsClassifierTest extends TestCase
             $baseScenario
                 ->withPaths(['tests/Unit/Service/', 'Mailer'])
                 ->withExistingFiles(['/project/tests/Unit/Service/MailerTest.php'])
-                ->withExpected(new ClassifiedPositionalArguments(['Mailer'], ['tests/Unit/Service/'], [new SourceSymbolSelector('Mailer', null, null)])),
+                ->withExpected(
+                    new ClassifiedPositionalArguments(
+                        ['Mailer'], ['tests/Unit/Service/'],
+                        [new SourceSymbolSelector('Mailer', null, null)],
+                    ),
+                ),
         ];
 
         yield 'test folder and multiple short class selectors in reversed order' => [
             $baseScenario
                 ->withPaths(['tests/Unit/Service/', 'Mailer', 'Plus_'])
                 ->withExistingFiles(['/project/tests/Unit/Service/MailerTest.php'])
-                ->withExpected(new ClassifiedPositionalArguments(['Mailer', 'Plus_'], ['tests/Unit/Service/'], [
-                    new SourceSymbolSelector('Mailer', null, null),
-                    new SourceSymbolSelector('Plus_', null, null),
-                ])),
+                ->withExpected(
+                    new ClassifiedPositionalArguments(['Mailer', 'Plus_'], ['tests/Unit/Service/'], [
+                        new SourceSymbolSelector('Mailer', null, null),
+                        new SourceSymbolSelector('Plus_', null, null),
+                    ]),
+                ),
         ];
 
         yield 'multiple source files and multiple test directories' => [
             $baseScenario
                 ->withPaths(['src/Service/Mailer.php', 'src/Entity/Foobar.php', 'tests/Unit/Service/', 'tests/Integration/'])
                 ->withExistingFiles(['/project/src/Service/Mailer.php', '/project/src/Entity/Foobar.php', '/project/tests/Unit/Service/MailerTest.php', '/project/tests/Integration/MailerTest.php'])
-                ->withExpected(new ClassifiedPositionalArguments(['src/Service/Mailer.php', 'src/Entity/Foobar.php'], ['tests/Unit/Service/', 'tests/Integration/'], [])),
+                ->withExpected(
+                    new ClassifiedPositionalArguments(
+                        ['src/Service/Mailer.php', 'src/Entity/Foobar.php'],
+                        ['tests/Unit/Service/', 'tests/Integration/'],
+                        [],
+                    ),
+                ),
         ];
 
         yield 'source selector and test path' => [
             $baseScenario
                 ->withPaths(['App\Service\Mailer::send::32', 'tests/Unit/MailerTest.php'])
                 ->withExistingFiles(['/project/tests/Unit/MailerTest.php'])
-                ->withExpected(new ClassifiedPositionalArguments(
-                    [],
-                    ['tests/Unit/MailerTest.php'],
-                    [new SourceSymbolSelector('App\Service\Mailer', 'send', 32)],
-                )),
+                ->withExpected(
+                    new ClassifiedPositionalArguments(
+                        [],
+                        ['tests/Unit/MailerTest.php'],
+                        [new SourceSymbolSelector('App\Service\Mailer', 'send', 32)],
+                    ),
+                ),
         ];
     }
 
