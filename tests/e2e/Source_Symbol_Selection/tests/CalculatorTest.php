@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SourceSymbolSelection\Test;
 
 use Differ;
+use Differ\ColorizedDiffer;
 use PHPUnit\Framework\TestCase;
 use SourceSymbolSelection\Differ\Differ as MatchingDiffer;
 use SourceSymbolSelection\Differ\Helper;
@@ -15,6 +16,10 @@ final class CalculatorTest extends TestCase
 {
     public function test_differ_declarations(): void
     {
+        $this->assertSame(
+            2,
+            (new ColorizedDiffer())->add(1),
+        );
         $this->assertSame(
             2,
             (new MatchingDiffer())->add(1),

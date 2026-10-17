@@ -153,12 +153,7 @@ final class RunCommand extends BaseCommand
             ->setDescription('Runs the mutation testing.')
         ;
 
-        PathsArgument::addArgument(
-            $this,
-            <<<'HELP'
-                Limit mutation testing to source paths, test paths, and/or class, method, or absolute source line selectors (`Differ`, `Differ::diff`, `Differ::diff::32`). Readable paths take precedence. An unresolved bare name intersects path and short class filters; use `Differ/` for paths only, `'Differ\'` for any class named Differ, or `'\Differ'` for the global class. Quote backslashes for your shell. Example: `infection run tests/DifferTest.php Differ::diff`.
-                HELP,
-        );
+        PathsArgument::addArgument($this);
 
         TestFrameworkOption::addOption($this)
             ->addOption(
