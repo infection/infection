@@ -290,7 +290,7 @@ final class InitialTestRunCommandTest extends TestCase
 
         $this->expectExceptionObject(
             new InvalidArgumentException(
-                'The initial-test:run command requires source or test paths when source symbol selectors are provided.',
+                'Source symbol selectors have no effect on the initial test run and cannot be used on their own with initial-test:run. They are accepted alongside source or test paths so the same arguments can be reused from the run command.',
             ),
         );
 

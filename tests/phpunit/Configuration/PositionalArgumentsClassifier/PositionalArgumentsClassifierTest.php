@@ -84,42 +84,6 @@ final class PositionalArgumentsClassifierTest extends TestCase
 
         yield 'no paths' => [$baseScenario];
 
-        yield 'lowercase bare file filter' => [
-            $baseScenario
-                ->withPaths(['mailer.php'])
-                ->withExpected(
-                    new ClassifiedPositionalArguments(
-                        ['mailer.php'],
-                        [],
-                        [],
-                    ),
-                ),
-        ];
-
-        yield 'digit-starting bare file filter' => [
-            $baseScenario
-                ->withPaths(['1Foo.php'])
-                ->withExpected(
-                    new ClassifiedPositionalArguments(
-                        ['1Foo.php'],
-                        [],
-                        [],
-                    ),
-                ),
-        ];
-
-        yield 'underscore-starting bare file filter' => [
-            $baseScenario
-                ->withPaths(['_mailer.php'])
-                ->withExpected(
-                    new ClassifiedPositionalArguments(
-                        ['_mailer.php'],
-                        [],
-                        [],
-                    ),
-                ),
-        ];
-
         yield 'single source file path' => [
             $baseScenario
                 ->withPaths(['src/SomeFile.php'])
@@ -290,7 +254,7 @@ final class PositionalArgumentsClassifierTest extends TestCase
                     )),
         ];
 
-        yield 'trailing backslash forces a short class selector' => [
+        yield 'trailing backslash selects a namespace prefix' => [
             $baseScenario
                 ->withPaths(['Differ\\'])
                 ->withExpected(new ClassifiedPositionalArguments(
@@ -298,7 +262,7 @@ final class PositionalArgumentsClassifierTest extends TestCase
                     [],
                     [
                         new SourceSymbolSelector(
-                            'Differ',
+                            'Differ\\',
                             null,
                             null,
                         ),
@@ -507,6 +471,24 @@ final class PositionalArgumentsClassifierTest extends TestCase
     public static function provideInvalidPaths(): iterable
     {
         $baseScenario = Scenario::empty();
+
+        yield 'lowercase bare file filter' => [
+            $baseScenario
+                ->withPaths(['mailer.php'])
+                ->withExpected(new InvalidArgumentException('Invalid path argument "mailer.php": multiple paths must be passed as separate arguments.')),
+        ];
+
+        yield 'digit-starting bare file filter' => [
+            $baseScenario
+                ->withPaths(['1Foo.php'])
+                ->withExpected(new InvalidArgumentException('Invalid path argument "1Foo.php": multiple paths must be passed as separate arguments.')),
+        ];
+
+        yield 'underscore-starting bare file filter' => [
+            $baseScenario
+                ->withPaths(['_mailer.php'])
+                ->withExpected(new InvalidArgumentException('Invalid path argument "_mailer.php": multiple paths must be passed as separate arguments.')),
+        ];
 
         yield 'selector with an ambiguous single-colon line' => [
             $baseScenario

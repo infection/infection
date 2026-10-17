@@ -13,5 +13,5 @@
     "mutators": {
         "Plus": true
     },
-    "tmpDir": "infection"
+    "tmpDir": "var"
 }

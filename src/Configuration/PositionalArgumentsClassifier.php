@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use function ctype_upper;
 use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
-use Infection\Configuration\SourceSymbol\InvalidSourceSymbolSelector;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelectorParser;
 use Infection\FileSystem\FileSystem;
 use function sprintf;
@@ -67,8 +67,6 @@ final readonly class PositionalArgumentsClassifier
 
     /**
      * @param list<non-empty-string> $paths
-     *
-     * @throws InvalidSourceSymbolSelector
      */
     public function classify(
         array $paths,
@@ -215,13 +213,13 @@ final readonly class PositionalArgumentsClassifier
             return true;
         }
 
-        return !str_contains($value, '/')
+        return ctype_upper($value[0])   // Class and file names start with PascalCase (A-Z only, not digits).
+            && !str_contains($value, '/')
             && !str_contains($value, '\\');
     }
 
     private function isValidPath(string $absolutePath): bool
     {
-        return $this->fileSystem->isReadableFile($absolutePath)
-            || $this->fileSystem->isReadableDirectory($absolutePath);
+        return $this->fileSystem->isReadableFile($absolutePath) || $this->fileSystem->isReadableDirectory($absolutePath);
     }
 }
