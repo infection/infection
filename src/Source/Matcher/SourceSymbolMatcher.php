@@ -40,10 +40,13 @@ use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
 use function ltrim;
 use PhpParser\Node;
 use function str_contains;
+use function str_ends_with;
 use function strcasecmp;
+use function strlen;
+use function strncasecmp;
 
 /**
- * Matches an enriched AST node against a class, optional method, and optional line.
+ * Matches an enriched AST node against source symbol selectors.
  *
  * @internal
  */
@@ -57,18 +60,25 @@ final readonly class SourceSymbolMatcher
     ) {
     }
 
+    /**
+     * The caller supplies the class and method context because $node alone does not
+     * identify the declarations it belongs to. For a class-like or method node,
+     * the corresponding context is $node itself.
+     */
     public function matches(
         Node $node,
         ?Node\Stmt\ClassLike $class,
         ?Node\Stmt\ClassMethod $method,
     ): bool {
         foreach ($this->selectors as $selector) {
-            if (self::matchesSelector(
+            $matches = self::matchesSelector(
                 $node,
                 $class,
                 $method,
                 $selector,
-            )) {
+            );
+
+            if ($matches) {
                 return true;
             }
         }
@@ -99,55 +109,91 @@ final readonly class SourceSymbolMatcher
 
         $className = FullyQualifiedClassNameManipulator::getFqcn($class);
 
-        if (
-            $className === null
-            || !self::classMatches(
-                $shortClassName,
-                $className,
-                $selector,
-            )
-        ) {
-            return false;
-        }
-
-        if ($selector->methodName !== null) {
-            if (
-                $method === null
-                || strcasecmp($method->name->toString(), $selector->methodName) !== 0
-            ) {
-                return false;
-            }
-        }
-
-        if ($selector->line === null) {
-            return true;
-        }
-
-        if ($node->getStartLine() > $selector->line) {
-            return false;
-        }
-
-        return $node->getEndLine() >= $selector->line;
+        return self::classMatches($shortClassName, $className, $selector)
+            && self::methodMatches($method, $selector)
+            && self::lineMatches($node, $selector);
     }
 
     private static function classMatches(
         Node\Identifier $shortClassName,
-        Node\Name $className,
+        ?Node\Name $className,
         SourceSymbolSelector $selector,
     ): bool {
-        if (str_contains($selector->className, '\\')) {
-            return strcasecmp(
-                $className->toString(),
-                ltrim(
-                    $selector->className,
-                    '\\',
-                ),
-            ) === 0;
+        if ($className === null) {
+            return false;
         }
 
+        if (!str_contains($selector->className, '\\')) {
+            return self::equalsIgnoringCase(
+                $shortClassName->toString(),
+                $selector->className,
+            );
+        }
+
+        $selectedClassName = ltrim($selector->className, '\\');
+
+        if (str_ends_with($selectedClassName, '\\')) {
+            return self::startsWithIgnoringCase(
+                $className->toString(),
+                $selectedClassName,
+            );
+        }
+
+        return self::equalsIgnoringCase(
+            $className->toString(),
+            $selectedClassName,
+        );
+    }
+
+    private static function methodMatches(
+        ?Node\Stmt\ClassMethod $method,
+        SourceSymbolSelector $selector,
+    ): bool {
+        if ($selector->methodName === null) {
+            return true;
+        }
+
+        if ($method === null) {
+            return false;
+        }
+
+        return self::equalsIgnoringCase(
+            $method->name->toString(),
+            $selector->methodName,
+        );
+    }
+
+    private static function lineMatches(
+        Node $node,
+        SourceSymbolSelector $selector,
+    ): bool {
+        if ($selector->line === null) {
+            return true;
+        }
+
+        return $node->getStartLine() > $selector->line
+            ? false
+            : $node->getEndLine() >= $selector->line;
+    }
+
+    private static function equalsIgnoringCase(
+        string $left,
+        string $right,
+    ): bool {
         return strcasecmp(
-            $shortClassName->toString(),
-            $selector->className,
+            $left,
+            $right,
+        ) === 0;
+    }
+
+    private static function startsWithIgnoringCase(
+        string $value,
+        string $prefix,
+    ): bool {
+        return strncasecmp(
+            $value,
+            $prefix,
+            strlen($prefix),
         ) === 0;
     }
 }

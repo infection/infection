@@ -42,7 +42,6 @@ use Infection\Command\Option\PathsArgument;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Configuration\Configuration;
 use Infection\Console\IO;
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
 use function Safe\getcwd;
@@ -77,10 +76,6 @@ final class ListSourcesCommand extends BaseCommand
         );
     }
 
-    /**
-     * @throws FileOrDirectoryNotFound
-     * @throws NoSourceFound
-     */
     protected function executeCommand(IO $io): bool
     {
         $diagnosticIo = self::createDiagnosticIo($io);
@@ -134,7 +129,7 @@ final class ListSourcesCommand extends BaseCommand
         Assert::isEmpty(
             $configuration->sourceFilter->symbolSelectors,
             sprintf(
-                'The %s command requires source or test paths when source symbol selectors are provided.',
+                'Source symbol selectors do not affect which source files are listed and cannot be used on their own with %s. They are accepted alongside source or test paths so the same arguments can be reused from the run command.',
                 self::NAME,
             ),
         );
