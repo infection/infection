@@ -40,7 +40,6 @@ use function sprintf;
 use function str_contains;
 use function str_ends_with;
 use function str_starts_with;
-use function substr;
 use Webmozart\Assert\Assert;
 
 /**
@@ -58,7 +57,7 @@ final class SourceSymbolSelectorParser
 
     private const string SELECTOR_PATTERN = <<<'REGEX'
         {^
-            (?<className>\\?%s)                       # Class name, optionally namespaced
+            (?<className>\\?%s\\?)             # Class name or namespace prefix
             (?:::(?<coordinate>%s|[1-9]\d*))?  # Optional method name or source line
             (?:::(?<line>[1-9]\d*))?           # Optional source line after a method name
         $}xD
@@ -66,8 +65,6 @@ final class SourceSymbolSelectorParser
 
     /**
      * Parses the first source-selector grammar without consulting the autoloader.
-     *
-     * @throws InvalidSourceSymbolSelector
      */
     public function parse(string $value): ?SourceSymbolSelector
     {
@@ -106,7 +103,6 @@ final class SourceSymbolSelectorParser
     }
 
     /**
-     * @throws InvalidSourceSymbolSelector
      * @return array{className: string, coordinate: string, line: string}|null
      */
     private static function matchSelector(string $value): ?array
@@ -118,12 +114,7 @@ final class SourceSymbolSelectorParser
         );
         $matches = [];
 
-        // A trailing backslash forces class selection without becoming part of the class name.
-        $selector = str_ends_with($value, '\\')
-            ? substr($value, 0, -1)
-            : $value;
-
-        if (preg_match($pattern, $selector, $matches) !== 1) {
+        if (preg_match($pattern, $value, $matches) !== 1) {
             if (self::looksLikeExplicitSymbolSelector($value)) {
                 throw InvalidSourceSymbolSelector::create($value);
             }

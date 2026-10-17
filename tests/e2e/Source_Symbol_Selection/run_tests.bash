@@ -21,6 +21,7 @@ run_selection() {
 run_selection 'Calculator::add' 1
 run_selection 'Differ' 1
 run_selection 'Differ/' 2
-run_selection 'Differ\' 3
+run_selection 'Differ\' 1
+run_selection 'SourceSymbolSelection\Differ\' 2
 run_selection '\Differ' 1
 run_selection 'src/Differ' 2
