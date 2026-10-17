@@ -179,7 +179,7 @@ final class ListSourcesCommandTest extends TestCase
     {
         $this->expectExceptionObject(
             new InvalidArgumentException(
-                'The config:list-sources command requires source or test paths when source symbol selectors are provided.',
+                'Source symbol selectors do not affect which source files are listed and cannot be used on their own with config:list-sources. They are accepted alongside source or test paths so the same arguments can be reused from the run command.',
             ),
         );
 
@@ -188,7 +188,7 @@ final class ListSourcesCommandTest extends TestCase
 
     public static function symbolSelectorsProvider(): iterable
     {
-        yield 'explicit short class selector' => [
+        yield 'namespace prefix selector' => [
             ['SomeClass\\'],
         ];
 

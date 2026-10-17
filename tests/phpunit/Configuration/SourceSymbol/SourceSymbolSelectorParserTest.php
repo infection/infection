@@ -196,30 +196,44 @@ final class SourceSymbolSelectorParserTest extends TestCase
             ),
         ];
 
-        yield 'trailing class marker' => [
+        yield 'namespace prefix' => [
             'Mailer\\',
             new SourceSymbolSelector(
-                'Mailer',
+                'Mailer\\',
                 null,
                 null,
             ),
         ];
 
-        yield 'global class with trailing marker' => [
+        yield 'explicitly qualified namespace prefix' => [
             '\Mailer\\',
             new SourceSymbolSelector(
-                '\Mailer',
+                '\Mailer\\',
                 null,
                 null,
             ),
         ];
 
-        yield 'invalid class with trailing marker' => [
+        yield 'namespace prefix with method and line' => [
+            'Mailer\::send::32',
+            new SourceSymbolSelector(
+                'Mailer\\',
+                'send',
+                32,
+            ),
+        ];
+
+        yield 'namespace separator after method' => [
+            'Mailer::send\\',
+            InvalidSourceSymbolSelector::create('Mailer::send\\'),
+        ];
+
+        yield 'invalid namespace prefix' => [
             '1Mailer\\',
             InvalidSourceSymbolSelector::create('1Mailer\\'),
         ];
 
-        yield 'repeated trailing class marker' => [
+        yield 'repeated trailing namespace separator' => [
             'Mailer\\\\',
             InvalidSourceSymbolSelector::create('Mailer\\\\'),
         ];
@@ -325,10 +339,10 @@ final class SourceSymbolSelectorParserTest extends TestCase
             InvalidSourceSymbolSelector::create('\\App\\\\Mailer'),
         ];
 
-        yield 'qualified class with trailing marker' => [
+        yield 'nested namespace prefix' => [
             '\\App\\Mailer\\',
             new SourceSymbolSelector(
-                '\\App\\Mailer',
+                '\\App\\Mailer\\',
                 null,
                 null,
             ),

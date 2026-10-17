@@ -47,9 +47,7 @@ use Infection\Configuration\Configuration;
 use Infection\Console\IO;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\Logger\Console\ConsoleLogger;
-use Infection\Source\Exception\NoSourceFound;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -80,10 +78,6 @@ final class InitialTestRunCommand extends BaseCommand
         DebugOption::addOption($this, default: true);
     }
 
-    /**
-     * @throws FileOrDirectoryNotFound
-     * @throws NoSourceFound
-     */
     protected function executeCommand(IO $io): bool
     {
         $logger = new ConsoleLogger($io);
@@ -144,7 +138,7 @@ final class InitialTestRunCommand extends BaseCommand
         Assert::isEmpty(
             $configuration->sourceFilter->symbolSelectors,
             sprintf(
-                'The %s command requires source or test paths when source symbol selectors are provided.',
+                'Source symbol selectors have no effect on the initial test run and cannot be used on their own with %s. They are accepted alongside source or test paths so the same arguments can be reused from the run command.',
                 self::NAME,
             ),
         );
