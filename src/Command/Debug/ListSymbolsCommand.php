@@ -35,18 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Command\Debug;
 
-use function array_values;
 use Infection\Command\BaseCommand;
 use Infection\Console\IO;
 use Infection\FileSystem\FileSystem;
+use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
-use Infection\PhpParser\Visitor\NameResolverFactory;
-use function ksort;
-use PhpParser\Node;
-use PhpParser\Node\Stmt\ClassLike;
-use PhpParser\NodeFinder;
-use PhpParser\NodeTraverser;
+use Infection\PhpParser\Visitor\CollectSourceSymbolsVisitor;
 use SplFileInfo;
 use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
@@ -71,21 +65,15 @@ final class ListSymbolsCommand extends BaseCommand
 
     protected function configure(): void
     {
-        $this->setDescription('Lists the symbols declared in a given file.');
+        $this->setDescription('Lists the symbols Infection recognizes for source selection in a given file.');
         $this->setHelp(
             <<<'HELP'
-                Lists named classes, interfaces, traits, enums, and their directly declared methods
+                Shows which symbols Infection recognizes in a file for use with the run command's
+                source selectors
+
+                Lists named classes, traits, enums, and their directly declared non-abstract methods
                 in source order. Each line contains a qualified name without a leading backslash,
-                such as App\Example or App\Example::method.
-
-                Anonymous classes, inherited methods, trait-imported methods, functions, properties,
-                and constants are omitted. A file with no matching declarations produces no output.
-
-                The file is parsed without executing it or autoloading its declarations. No project
-                configuration, test coverage, or mutation eligibility is required. A listed symbol
-                does not necessarily contain mutation candidates. Diagnostics are written to stderr.
-
-                Usage: infection debug:list-symbols path/to/File.php
+                such as "App\Example" or "App\Example::method".
                 HELP,
         );
         $this->addArgument(
@@ -103,12 +91,13 @@ final class ListSymbolsCommand extends BaseCommand
         $file = $this->getFile($io);
         [$nodes] = $this->getApplication()->getContainer()->getFileParser()->parse($file);
 
-        $nodes = (new NodeTraverser(
-            NameResolverFactory::create(),
-        ))->traverse($nodes);
+        $symbolsVisitor = new CollectSourceSymbolsVisitor();
+
+        $traverser = NodeTraverserFactory::createSourceSymbolTraverser($symbolsVisitor);
+        $traverser->traverse($nodes);
 
         $io->writeln(
-            self::getSymbols($nodes),
+            $symbolsVisitor->getSymbols(),
         );
 
         return true;
@@ -136,42 +125,5 @@ final class ListSymbolsCommand extends BaseCommand
         );
 
         return new SplFileInfo($canonicalPath);
-    }
-
-    /**
-     * @param Node[] $nodes
-     *
-     * @return list<string>
-     */
-    private static function getSymbols(array $nodes): array
-    {
-        $symbols = [];
-        $classes = (new NodeFinder())->findInstanceOf(
-            $nodes,
-            ClassLike::class,
-        );
-
-        foreach ($classes as $class) {
-            $name = FullyQualifiedClassNameManipulator::getFqcn($class);
-
-            if ($name === null) {
-                continue;
-            }
-
-            $symbols[$class->getStartTokenPos()] = $name->toString();
-
-            foreach ($class->getMethods() as $method) {
-                $symbols[$method->getStartTokenPos()] = sprintf(
-                    '%s::%s',
-                    $name->toString(),
-                    $method->name->toString(),
-                );
-            }
-        }
-
-        // Nested declarations may occur between two methods of their enclosing class.
-        ksort($symbols);
-
-        return array_values($symbols);
     }
 }
