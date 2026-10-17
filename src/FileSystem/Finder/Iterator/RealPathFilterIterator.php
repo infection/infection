@@ -39,6 +39,7 @@ use Infection\Framework\OperatingSystem;
 use function preg_quote;
 use Safe\Exceptions\PcreException;
 use function Safe\preg_match;
+use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 
@@ -79,20 +80,36 @@ final class RealPathFilterIterator extends MultiplePcreFilterIterator
      */
     protected function toRegex(string $str): string
     {
-        if ($this->isRegex($str)) {
-            try {
-                // Safe throws on invalid patterns but does not suppress PHP's compilation warning.
-                @preg_match($str, '');
+        return $this->isValidRegex($str)
+            ? $str
+            : sprintf(
+                '/%s/',
+                preg_quote(
+                    Path::normalize($str),
+                    '/',
+                ),
+            );
+    }
 
-                return $str;
-            } catch (PcreException) {
-                // Absolute directories ending in / can resemble regexes; match those paths literally.
-            }
+    private function isValidRegex(string $string): bool
+    {
+        // ::isRegex() only checks whether the string looks like a regex, so
+        // "/project/src/Differ/" passes because it starts and ends with "/".
+        // We therefore also evaluate the pattern to check its validity. This
+        //
+        // Note that it remains ambiguous for strings such as "/tmp/", which
+        // can be either a literal path or a valid regex.
+        if (!$this->isRegex($string)) {
+            return false;
         }
 
-        return '/' . preg_quote(
-            Path::normalize($str),
-            '/',
-        ) . '/';
+        try {
+            // Safe throws on invalid patterns but does not suppress PHP's compilation warning.
+            @preg_match($string, '');
+
+            return true;
+        } catch (PcreException) {
+            return false;
+        }
     }
 }
