@@ -204,7 +204,7 @@ final readonly class PositionalPathsClassifier
             return true;
         }
 
-        return ctype_upper($value[0])
+        return ctype_upper($value[0])   // Class and file names start with PascalCase (A-Z only, not digits).
             && !str_contains($value, '/')
             && !str_contains($value, '\\');
     }
