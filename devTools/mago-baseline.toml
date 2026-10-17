@@ -703,12 +703,6 @@ message = 'Potentially unhandled exception `UnexpectedValueException` in `Infect
 count = 1
 
 [[issues]]
-file = "src/Configuration/PositionalPathsClassifier.php"
-code = "redundant-logical-operation"
-message = "Redundant `&&` operation: left operand is evaluated and right operand is always truthy."
-count = 1
-
-[[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
 code = "invalid-type-cast"
 message = "Casting `mixed` to `array`."
