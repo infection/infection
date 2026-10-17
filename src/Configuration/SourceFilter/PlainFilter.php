@@ -38,9 +38,11 @@ namespace Infection\Configuration\SourceFilter;
 use function array_filter;
 use function array_map;
 use function array_unique;
+use function array_values;
 use function count;
 use function explode;
 use function implode;
+use function is_string;
 
 /**
  * @internal
@@ -56,9 +58,9 @@ final readonly class PlainFilter implements SourceFileFilter
     }
 
     /**
-     * @param string $value A comma separated list of paths to exclude.
+     * @param string|array<string> $value A comma-separated string or individual path values.
      */
-    public static function tryToCreate(string $value): ?self
+    public static function tryToCreate(string|array $value): ?self
     {
         $values = self::parseValues($value);
 
@@ -76,17 +78,40 @@ final readonly class PlainFilter implements SourceFileFilter
     }
 
     /**
+     * @param string|array<string> $value
+     *
      * @return non-empty-string[]
      */
-    private static function parseValues(string $value): array
+    private static function parseValues(string|array $value): array
     {
-        return array_unique(
-            array_filter(
-                array_map(
-                    trim(...),
-                    explode(',', $value),
+        $values = array_map(
+            trim(...),
+            is_string($value)
+                ? explode(
+                    ',',
+                    $value,
+                )
+                : $value,
+        );
+
+        // String filters historically discard "0", but it is a valid positional filename.
+        if (is_string($value)) {
+            return array_unique(
+                array_filter($values),
+            );
+        }
+
+        // Mago does not infer the non-empty strings retained by the predicate.
+        /** @var list<non-empty-string> $values */
+        $values = array_values(
+            array_unique(
+                array_filter(
+                    $values,
+                    static fn (string $path): bool => $path !== '',
                 ),
             ),
         );
+
+        return $values;
     }
 }

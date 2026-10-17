@@ -44,11 +44,11 @@ use PHPUnit\Framework\TestCase;
 final class PlainFilterTest extends TestCase
 {
     /**
-     * @param non-empty-string $value
+     * @param string|array<string> $value
      */
     #[DataProvider('valueProvider')]
-    public function test_it_can_parse_and_normalize_string_filter(
-        string $value,
+    public function test_it_can_parse_and_normalize_filter(
+        string|array $value,
         ?PlainFilter $expected,
     ): void {
         $actual = PlainFilter::tryToCreate($value);
@@ -56,7 +56,7 @@ final class PlainFilterTest extends TestCase
         $this->assertEquals(
             $expected,
             $actual,
-            'String filters should contain each normalized non-empty value only once.',
+            'Filters should contain each normalized non-empty value only once.',
         );
         $this->assertSame(
             $expected?->toString(),
@@ -67,6 +67,64 @@ final class PlainFilterTest extends TestCase
 
     public static function valueProvider(): iterable
     {
+        yield 'empty array' => [
+            [],
+            null,
+        ];
+
+        yield 'blank array values' => [
+            [
+                '',
+                ' ',
+                "\t\n",
+            ],
+            null,
+        ];
+
+        yield 'array values are normalized and deduplicated in first occurrence order' => [
+            [
+                ' src/Bar.php ',
+                '',
+                'src/Bar.php',
+                ' src/Foo.php',
+                'src/Foo.php ',
+                'src/Baz.php',
+            ],
+            new PlainFilter([
+                'src/Bar.php',
+                'src/Foo.php',
+                'src/Baz.php',
+            ]),
+        ];
+
+        yield 'commas in array values are preserved' => [
+            [
+                ' src/Foo,Bar.php ',
+                'src/Baz.php',
+                'src/Foo,Bar.php',
+            ],
+            new PlainFilter([
+                'src/Foo,Bar.php',
+                'src/Baz.php',
+            ]),
+        ];
+
+        yield 'zero filename in an array is preserved' => [
+            [
+                ' 0 ',
+                '0',
+                '',
+            ],
+            new PlainFilter([
+                '0',
+            ]),
+        ];
+
+        yield 'zero in a string is still discarded' => [
+            ' 0 ,0',
+            null,
+        ];
+
         yield 'nominal' => [
             'src/Foo.php, src/Bar.php',
             new PlainFilter([
