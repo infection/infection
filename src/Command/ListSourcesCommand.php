@@ -36,16 +36,17 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use function array_map;
+use Infection\Command\Git\LoggerFactory;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\PathsArgument;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Console\IO;
-use Infection\Logger\Console\ConsoleLogger;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
 use function Safe\getcwd;
 use function sort;
 use SplFileInfo;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Filesystem\Path;
 
 /**
@@ -74,11 +75,16 @@ final class ListSourcesCommand extends BaseCommand
 
     protected function executeCommand(IO $io): bool
     {
+        $diagnosticIo = self::createDiagnosticIo($io);
+
         $container = $this->getApplication()->getContainer()->withValues(
-            logger: new ConsoleLogger($io),
+            logger: LoggerFactory::create($io->getOutput()),
             output: $io->getOutput(),
             configFile: ConfigurationOption::get($io),
-            sourceFilter: SourceFilterOptions::get($io, PathsArgument::get($io)),
+            sourceFilter: SourceFilterOptions::get(
+                $diagnosticIo,
+                PathsArgument::get($io),
+            ),
         );
 
         $filePaths = self::collectPaths(
@@ -89,6 +95,21 @@ final class ListSourcesCommand extends BaseCommand
         $io->writeln($filePaths);
 
         return true;
+    }
+
+    // The --filter warning uses IO directly and bypasses the logger.
+    // Route it to stderr here until diagnostic logging is centralized.
+    private static function createDiagnosticIo(IO $io): IO
+    {
+        $output = $io->getOutput();
+        $errorOutput = $output instanceof ConsoleOutputInterface
+            ? $output->getErrorOutput()
+            : $output;
+
+        return new IO(
+            $io->getInput(),
+            $errorOutput,
+        );
     }
 
     /**
