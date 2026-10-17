@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command\ListSourcesCommand;
 
+use const DIRECTORY_SEPARATOR;
 use Infection\Command\ListSourcesCommand;
 use Infection\Console\Application;
 use Infection\Container\Container;
+use Infection\Framework\OperatingSystem;
 use Infection\Framework\Str;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -52,7 +54,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[CoversClass(ListSourcesCommand::class)]
 final class ListSourcesCommandTest extends TestCase
 {
-    private const string FIXTURES_DIR = __DIR__ . '/Fixtures';
+    private const string FIXTURES_DIR = __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures';
 
     private string $cwd;
 
@@ -68,7 +70,7 @@ final class ListSourcesCommandTest extends TestCase
     }
 
     /**
-     * @param list<non-empty-string> $paths
+     * @param list<string> $paths
      */
     #[DataProvider('sourcePathsProvider')]
     public function test_it_lists_all_source_files(
@@ -93,6 +95,7 @@ final class ListSourcesCommandTest extends TestCase
         $expectedStdout = <<<'STDOUT'
             File1.php
             File2.php
+            SubDir/File3.php
 
             STDOUT;
 
@@ -102,15 +105,28 @@ final class ListSourcesCommandTest extends TestCase
             '',
         ];
 
-        yield 'absolute directory without a trailing slash' => [
-            [self::FIXTURES_DIR],
-            $expectedStdout,
+        $directory = self::FIXTURES_DIR . DIRECTORY_SEPARATOR . 'SubDir';
+        $expectedFilteredStdout = "SubDir/File3.php\n";
+
+        yield 'absolute directory without a trailing separator' => [
+            [$directory],
+            $expectedFilteredStdout,
             '',
         ];
 
+        if (OperatingSystem::isWindows()) {
+            yield 'absolute directory with a trailing backslash' => [
+                [$directory . '\\'],
+                $expectedFilteredStdout,
+                '',
+            ];
+
+            return;
+        }
+
         yield 'absolute directory with a trailing slash' => [
-            [self::FIXTURES_DIR . '/'],
-            $expectedStdout,
+            [$directory . '/'],
+            $expectedFilteredStdout,
             '',
         ];
     }
