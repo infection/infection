@@ -38,6 +38,7 @@ namespace Infection\PhpParser;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\Logger\MutationGeneration\MutationGenerationDiagnosticLogger;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\CollectSourceSymbolsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
@@ -91,17 +92,12 @@ readonly class NodeTraverserFactory
         SplFileInfo $sourceFile,
         Trace $trace,
     ): NodeTraverserInterface {
-        $nodeIgnorers = [
-            new InterfaceIgnorer(),
-            new AbstractMethodIgnorer(),
-        ];
+        $symbolsVisitor = $this->sourceSymbolMatcher->hasSelectors()
+            ? new CollectSourceSymbolsVisitor()
+            : null;
 
         $visitors = [
-            new NextConnectingVisitor(),
-            new LabelNodesAsEligibleVisitor(),
-            new ExcludeIgnoredNodesVisitor(),
-            new SkipIgnoredNodesVisitor($nodeIgnorers),
-            NameResolverFactory::create(),
+            ...self::createSourceSymbolVisitors($symbolsVisitor),
             new ParentConnectingVisitor(),
             new ExcludeIgnoredMutatorsVisitor(
                 $this->diagnosticLogger,
@@ -116,9 +112,10 @@ readonly class NodeTraverserFactory
             ),
         ];
 
-        if ($this->sourceSymbolMatcher->hasSelectors()) {
+        if ($symbolsVisitor !== null) {
             $visitors[] = new ExcludeNonSelectedSourceNodesVisitor(
                 $this->sourceSymbolMatcher,
+                $symbolsVisitor,
             );
         }
 
@@ -134,11 +131,41 @@ readonly class NodeTraverserFactory
         return new NodeTraverser(...$visitors);
     }
 
+    public static function createSourceSymbolTraverser(CollectSourceSymbolsVisitor $symbolsVisitor): NodeTraverserInterface
+    {
+        return new NodeTraverser(
+            ...self::createSourceSymbolVisitors($symbolsVisitor),
+        );
+    }
+
     public function createMutationTraverser(NodeVisitor $mutationVisitor): NodeTraverserInterface
     {
         return new NodeTraverser(
             new NodeVisitor\CloningVisitor(),
             $mutationVisitor,
         );
+    }
+
+    /**
+     * @return list<NodeVisitor>
+     */
+    private static function createSourceSymbolVisitors(?CollectSourceSymbolsVisitor $symbolsVisitor): array
+    {
+        $visitors = [
+            new NextConnectingVisitor(),
+            new LabelNodesAsEligibleVisitor(),
+            new ExcludeIgnoredNodesVisitor(),
+            new SkipIgnoredNodesVisitor([
+                new InterfaceIgnorer(),
+                new AbstractMethodIgnorer(),
+            ]),
+            NameResolverFactory::create(),
+        ];
+
+        if ($symbolsVisitor !== null) {
+            $visitors[] = $symbolsVisitor;
+        }
+
+        return $visitors;
     }
 }

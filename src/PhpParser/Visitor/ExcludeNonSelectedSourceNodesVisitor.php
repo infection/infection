@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
-use function array_pop;
-use function array_reverse;
 use Infection\Source\Matcher\SourceSymbolMatcher;
 use Override;
 use PhpParser\Node;
@@ -47,78 +45,29 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class ExcludeNonSelectedSourceNodesVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @var list<Node\Stmt\ClassLike|Node\Stmt\ClassMethod>
-     */
-    private array $scopeStack = [];
-
     public function __construct(
         private readonly SourceSymbolMatcher $matcher,
+        private readonly CollectSourceSymbolsVisitor $symbols,
     ) {
-    }
-
-    #[Override]
-    public function beforeTraverse(array $nodes): null
-    {
-        $this->scopeStack = [];
-
-        return null;
     }
 
     #[Override]
     public function enterNode(Node $node): null
     {
-        if (
-            $node instanceof Node\Stmt\ClassLike
-            || $node instanceof Node\Stmt\ClassMethod
-        ) {
-            $this->scopeStack[] = $node;
+        if (!LabelNodesAsEligibleVisitor::isEligible($node)) {
+            return null;
         }
 
-        if (
-            LabelNodesAsEligibleVisitor::isEligible($node)
-            && !$this->matches($node)
-        ) {
+        [$class, $method] = $this->symbols->findSelectionContext();
+
+        if (!$this->matcher->matches(
+            $node,
+            $class,
+            $method,
+        )) {
             LabelNodesAsEligibleVisitor::markAsIneligible($node);
         }
 
         return null;
-    }
-
-    #[Override]
-    public function leaveNode(Node $node): null
-    {
-        if (
-            $node instanceof Node\Stmt\ClassLike
-            || $node instanceof Node\Stmt\ClassMethod
-        ) {
-            array_pop($this->scopeStack);
-        }
-
-        return null;
-    }
-
-    private function matches(Node $node): bool
-    {
-        $method = null;
-
-        foreach (array_reverse($this->scopeStack) as $scope) {
-            if ($scope instanceof Node\Stmt\ClassMethod) {
-                $method = $scope;
-
-                continue;
-            }
-
-            // An anonymous class and its methods belong to the enclosing named symbol selection.
-            if ($scope->name === null) {
-                $method = null;
-
-                continue;
-            }
-
-            return $this->matcher->matches($node, $scope, $method);
-        }
-
-        return false;
     }
 }
