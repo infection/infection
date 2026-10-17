@@ -43,8 +43,6 @@ use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\Source\Matcher\SourceSymbolMatcher;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
-use PhpParser\Node;
-use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -53,103 +51,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[CoversClass(SourceSymbolMatcher::class)]
 final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
 {
-    public function test_it_applies_method_selection_to_lexically_nested_function_like_nodes(): void
-    {
-        $nodes = $this->parse(<<<'PHP'
-            <?php
-
-            function outside(): int
-            {
-                return 0;
-            }
-
-            final class Example
-            {
-                public function selected(): void
-                {
-                    $closure = static function (): int {
-                        return 1;
-                    };
-                    $arrow = static fn (): int => 2;
-
-                    function nestedInSelected(): int
-                    {
-                        return 3;
-                    }
-                }
-
-                public function unselected(): void
-                {
-                    $closure = static function (): int {
-                        return 4;
-                    };
-                    $arrow = static fn (): int => 5;
-
-                    function nestedInUnselected(): int
-                    {
-                        return 6;
-                    }
-                }
-            }
-            PHP);
-
-        (new NodeTraverser(
-            new LabelNodesAsEligibleVisitor(),
-            NameResolverFactory::create(),
-            new ExcludeNonSelectedSourceNodesVisitor(
-                new SourceSymbolMatcher([
-                    new SourceSymbolSelector(
-                        'Example',
-                        'selected',
-                        null,
-                    ),
-                ]),
-            ),
-        ))->traverse($nodes);
-
-        $functionLikes = (new NodeFinder())->findInstanceOf(
-            $nodes,
-            Node\FunctionLike::class,
-        );
-
-        $this->assertFalse(
-            LabelNodesAsEligibleVisitor::isEligible($functionLikes[0]),
-            'top-level named function',
-        );
-        $this->assertTrue(
-            LabelNodesAsEligibleVisitor::isEligible($functionLikes[1]),
-            'selected method',
-        );
-        $this->assertTrue(
-            LabelNodesAsEligibleVisitor::isEligible($functionLikes[2]),
-            'closure in selected method',
-        );
-        $this->assertTrue(
-            LabelNodesAsEligibleVisitor::isEligible($functionLikes[3]),
-            'arrow function in selected method',
-        );
-        $this->assertTrue(
-            LabelNodesAsEligibleVisitor::isEligible($functionLikes[4]),
-            'named function in selected method',
-        );
-        $this->assertFalse(
-            LabelNodesAsEligibleVisitor::isEligible($functionLikes[5]),
-            'unselected method',
-        );
-        $this->assertFalse(
-            LabelNodesAsEligibleVisitor::isEligible($functionLikes[6]),
-            'closure in unselected method',
-        );
-        $this->assertFalse(
-            LabelNodesAsEligibleVisitor::isEligible($functionLikes[7]),
-            'arrow function in unselected method',
-        );
-        $this->assertFalse(
-            LabelNodesAsEligibleVisitor::isEligible($functionLikes[8]),
-            'named function in unselected method',
-        );
-    }
-
     /**
      * @param list<SourceSymbolSelector> $selectors
      * @param list<int> $expectedEligibleNodeIds
@@ -264,7 +165,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
             [21, 24, 25, 26, 27],
         ];
 
-        yield 'nodes outside the selected method' => [
+        yield 'nested function-like nodes follow the enclosing method selection' => [
             <<<'PHP'
                 <?php
                 namespace App;
@@ -273,11 +174,31 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                 {
                     public function send(): int
                     {
+                        $closure = static function (): int {
+                            return 1;
+                        };
+                        $arrow = static fn (): int => 2;
+
+                        function nestedInSelected(): int
+                        {
+                            return 3;
+                        }
+
                         return 1;
                     }
 
                     public function receive(): int
                     {
+                        $closure = static function (): int {
+                            return 4;
+                        };
+                        $arrow = static fn (): int => 5;
+
+                        function nestedInUnselected(): int
+                        {
+                            return 6;
+                        }
+
                         return 2;
                     }
                 }
@@ -289,7 +210,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                     null,
                 ),
             ],
-            [4, 5, 6, 7, 8],
+            [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26],
         ];
 
         yield 'a short class name selects every matching declaration' => [
@@ -471,12 +392,27 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
             <?php
             namespace {
                 class Mailer {}
+
+                function Mailer(): int
+                {
+                    return 1;
+                }
             }
             namespace App {
                 class Mailer {}
+
+                function Mailer(): int
+                {
+                    return 1;
+                }
             }
             namespace Other {
                 class Mailer {}
+
+                function Mailer(): int
+                {
+                    return 1;
+                }
             }
             PHP;
 
@@ -489,7 +425,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                     null,
                 ),
             ],
-            [1, 2, 5, 6, 9, 10],
+            [1, 2, 10, 11, 19, 20],
         ];
 
         yield 'explicit global name excludes namespaced classes' => [
@@ -513,7 +449,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                     null,
                 ),
             ],
-            [5, 6],
+            [10, 11],
         ];
 
         yield 'explicitly qualified class name' => [
@@ -525,7 +461,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                     null,
                 ),
             ],
-            [5, 6],
+            [10, 11],
         ];
 
         yield 'case insensitive explicit global name' => [
