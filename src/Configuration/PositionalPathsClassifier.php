@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Configuration;
 
 use function class_exists;
-use function ctype_upper;
 use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\FileSystem;
@@ -204,8 +203,7 @@ final readonly class PositionalPathsClassifier
             return true;
         }
 
-        return ctype_upper($value[0])
-            && !str_contains($value, '/')
+        return !str_contains($value, '/')
             && !str_contains($value, '\\');
     }
 
