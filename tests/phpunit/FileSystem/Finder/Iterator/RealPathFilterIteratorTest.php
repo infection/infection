@@ -37,6 +37,7 @@ namespace Infection\Tests\FileSystem\Finder\Iterator;
 
 use ArrayIterator;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
+use Infection\Framework\OperatingSystem;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Tests\Fixtures\Finder\MockRealPathFinder;
 use Infection\Tests\Fixtures\Finder\MockRelativePathFinder;
@@ -70,6 +71,26 @@ final class RealPathFilterIteratorTest extends TestCase
 
     public static function pathFilterProvider(): iterable
     {
+        if (OperatingSystem::isWindows()) {
+            yield 'Windows absolute directory without trailing backslash' => [
+                'C:\\project\\src\\Differ',
+                'C:/project/src/Differ/File.php',
+                true,
+            ];
+
+            yield 'Windows absolute directory with trailing backslash' => [
+                'C:\\project\\src\\Differ\\',
+                'C:/project/src/Differ/File.php',
+                true,
+            ];
+        }
+
+        yield 'absolute directory without trailing slash' => [
+            '/project/src/Differ',
+            '/project/src/Differ/File.php',
+            true,
+        ];
+
         yield 'absolute directory with trailing slash' => [
             '/project/src/Differ/',
             '/project/src/Differ/File.php',

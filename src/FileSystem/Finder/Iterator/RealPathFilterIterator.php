@@ -71,7 +71,7 @@ final class RealPathFilterIterator extends MultiplePcreFilterIterator
      * Default conversion:
      *     'lorem/ipsum/dolor' ==>  'lorem\/ipsum\/dolor/'
      *
-     * Use only / as directory separator (on Windows also).
+     * Literal paths use / separators to match the normalised file paths.
      *
      * @param string $str Pattern: regexp or dirname
      *
@@ -90,6 +90,9 @@ final class RealPathFilterIterator extends MultiplePcreFilterIterator
             }
         }
 
-        return '/' . preg_quote($str, '/') . '/';
+        return '/' . preg_quote(
+            Path::normalize($str),
+            '/',
+        ) . '/';
     }
 }
