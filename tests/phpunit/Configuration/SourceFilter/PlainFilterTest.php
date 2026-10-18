@@ -73,8 +73,8 @@ final class PlainFilterTest extends TestCase
             ],
             new PlainFilter([
                 'src/Bar.php',
-                'src/Foo.php',
-                'src/Baz.php',
+                2 => 'src/Foo.php',
+                4 => 'src/Baz.php',
             ]),
         ];
 
