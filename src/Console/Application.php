@@ -127,7 +127,7 @@ final class Application extends BaseApplication
     #[Override]
     protected function getDefaultCommands(): array
     {
-        $fileSystem = Container::create()->getFileSystem();
+        $fileSystem = $this->container->getFileSystem();
 
         return array_merge(
             parent::getDefaultCommands(),
