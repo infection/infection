@@ -44,7 +44,7 @@ use PHPUnit\Framework\TestCase;
 final class PlainFilterTest extends TestCase
 {
     /**
-     * @param string|array<string> $value
+     * @param string|array<non-empty-string> $value
      */
     #[DataProvider('valueProvider')]
     public function test_it_can_parse_and_normalize_filter(
@@ -53,7 +53,7 @@ final class PlainFilterTest extends TestCase
     ): void {
         $actual = PlainFilter::tryToCreate($value);
 
-        $this->assertEqualsCanonicalizing($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public static function valueProvider(): iterable
@@ -63,22 +63,12 @@ final class PlainFilterTest extends TestCase
             null,
         ];
 
-        yield 'blank array values' => [
+        yield 'array values are deduplicated in first occurrence order' => [
             [
-                '',
-                ' ',
-                "\t\n",
-            ],
-            null,
-        ];
-
-        yield 'array values are normalized and deduplicated in first occurrence order' => [
-            [
-                ' src/Bar.php ',
-                '',
                 'src/Bar.php',
-                ' src/Foo.php',
-                'src/Foo.php ',
+                'src/Bar.php',
+                'src/Foo.php',
+                'src/Foo.php',
                 'src/Baz.php',
             ],
             new PlainFilter([
@@ -88,25 +78,15 @@ final class PlainFilterTest extends TestCase
             ]),
         ];
 
-        yield 'commas in array values are preserved' => [
+        yield 'array values preserve whitespace, commas, and zero filenames' => [
             [
                 ' src/Foo,Bar.php ',
-                'src/Baz.php',
-                'src/Foo,Bar.php',
-            ],
-            new PlainFilter([
-                'src/Foo,Bar.php',
-                'src/Baz.php',
-            ]),
-        ];
-
-        yield 'zero filename in an array is preserved' => [
-            [
-                ' 0 ',
+                ' ',
                 '0',
-                '',
             ],
             new PlainFilter([
+                ' src/Foo,Bar.php ',
+                ' ',
                 '0',
             ]),
         ];
