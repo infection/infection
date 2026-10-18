@@ -542,22 +542,44 @@ final class PositionalArgumentsClassifierTest extends TestCase
     {
         $baseScenario = Scenario::empty();
 
+        yield 'invalid bare symbol falls back to path classification' => [
+            $baseScenario
+                ->withPaths(['1Differ'])
+                ->withExpected(
+                    new InvalidArgumentException(
+                        'Invalid positional argument "1Differ": expected a readable file or directory, a source path filter or a source symbol selector.',
+                    ),
+                ),
+        ];
+
         yield 'lowercase bare file filter' => [
             $baseScenario
                 ->withPaths(['mailer.php'])
-                ->withExpected(new InvalidArgumentException('Invalid path argument "mailer.php": multiple paths must be passed as separate arguments.')),
+                ->withExpected(
+                    new InvalidArgumentException(
+                        'Invalid positional argument "mailer.php": expected a readable file or directory, a source path filter or a source symbol selector.',
+                    ),
+                ),
         ];
 
         yield 'digit-starting bare file filter' => [
             $baseScenario
                 ->withPaths(['1Foo.php'])
-                ->withExpected(new InvalidArgumentException('Invalid path argument "1Foo.php": multiple paths must be passed as separate arguments.')),
+                ->withExpected(
+                    new InvalidArgumentException(
+                        'Invalid positional argument "1Foo.php": expected a readable file or directory, a source path filter or a source symbol selector.',
+                    ),
+                ),
         ];
 
         yield 'underscore-starting bare file filter' => [
             $baseScenario
                 ->withPaths(['_mailer.php'])
-                ->withExpected(new InvalidArgumentException('Invalid path argument "_mailer.php": multiple paths must be passed as separate arguments.')),
+                ->withExpected(
+                    new InvalidArgumentException(
+                        'Invalid positional argument "_mailer.php": expected a readable file or directory, a source path filter or a source symbol selector.',
+                    ),
+                ),
         ];
 
         yield 'selector with an ambiguous single-colon line' => [
@@ -575,7 +597,11 @@ final class PositionalArgumentsClassifierTest extends TestCase
         yield 'path-shaped argument that does not exist on disk' => [
             $baseScenario
                 ->withPaths(['scr/Foo.php'])
-                ->withExpected(new InvalidArgumentException('Invalid path argument "scr/Foo.php": multiple paths must be passed as separate arguments.')),
+                ->withExpected(
+                    new InvalidArgumentException(
+                        'Invalid positional argument "scr/Foo.php": expected a readable file or directory, a source path filter or a source symbol selector.',
+                    ),
+                ),
         ];
 
         yield 'non-existent absolute directory is not a project-relative source path' => [
@@ -584,9 +610,8 @@ final class PositionalArgumentsClassifierTest extends TestCase
                 ->withPaths(['/src/Differ'])
                 ->withExistingFiles(['/project/src/Differ/File.php'])
                 ->withExpected(
-                    // TODO: to improve the error message here.
                     new InvalidArgumentException(
-                        'Invalid path argument "/src/Differ": multiple paths must be passed as separate arguments.',
+                        'Invalid positional argument "/src/Differ": expected a readable file or directory, a source path filter or a source symbol selector.',
                     ),
                 ),
         ];
