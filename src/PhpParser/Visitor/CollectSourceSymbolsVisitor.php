@@ -43,7 +43,7 @@ use PhpParser\NodeVisitorAbstract;
 use function sprintf;
 
 /**
- * Tracks the lexical class and method used by selection.
+ * Collects source symbols and retains them until the next traversal.
  *
  * @internal
  */
@@ -138,33 +138,7 @@ final class CollectSourceSymbolsVisitor extends NodeVisitorAbstract
      */
     public function getSymbols(): array
     {
-        if ($this->symbols !== null) {
-            return $this->symbols;
-        }
-
-        $symbols = [];
-
-        foreach ($this->declarations as [$class, $method]) {
-            if ($class === null) {
-                continue;
-            }
-
-            $name = FullyQualifiedClassNameManipulator::getFqcn($class);
-
-            if ($name === null) {
-                continue;
-            }
-
-            $symbols[] = $method === null
-                ? $name->toString()
-                : sprintf(
-                    '%s::%s',
-                    $name->toString(),
-                    $method->name->toString(),
-                );
-        }
-
-        return $this->symbols = $symbols;
+        return $this->symbols ??= self::extractSymbolNames($this->declarations);
     }
 
     /**
@@ -192,5 +166,37 @@ final class CollectSourceSymbolsVisitor extends NodeVisitorAbstract
         }
 
         return [null, null];
+    }
+
+    /**
+     * @param list<array{Node\Stmt\ClassLike|null, Node\Stmt\ClassMethod|null}> $declarations
+     *
+     * @return list<string>
+     */
+    private static function extractSymbolNames(array $declarations): array
+    {
+        $symbols = [];
+
+        foreach ($declarations as [$class, $method]) {
+            if ($class === null) {
+                continue;
+            }
+
+            $name = FullyQualifiedClassNameManipulator::getFqcn($class);
+
+            if ($name === null) {
+                continue;
+            }
+
+            $symbols[] = $method === null
+                ? $name->toString()
+                : sprintf(
+                    '%s::%s',
+                    $name->toString(),
+                    $method->name->toString(),
+                );
+        }
+
+        return $symbols;
     }
 }

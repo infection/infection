@@ -42,6 +42,7 @@ use Infection\PhpParser\FileParser;
 use Infection\PhpParser\UnparsableFile;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Testing\SingletonContainer;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\NodeDumper;
@@ -50,10 +51,10 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Exception as PhpUnitFrameworkException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
+use SplFileInfo;
 use function sprintf;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -61,6 +62,8 @@ use function sprintf;
 #[CoversClass(FileParser::class)]
 final class FileParserTest extends TestCase
 {
+    use ExpectsThrowables;
+
     private FileSystem&MockObject $fileSystemMock;
 
     private FileParser $parser;
@@ -130,57 +133,52 @@ final class FileParserTest extends TestCase
         );
     }
 
-    public function test_it_throws_upon_failure(): void
+    #[DataProvider('invalidFileProvider')]
+    public function test_it_throws_upon_failure(
+        SplFileInfo|string $file,
+        string $expectedPath,
+    ): void {
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('readFile')
+            ->with($expectedPath)
+            ->willReturn('<?php use foo as self;')
+        ;
+
+        $exception = $this->expectToThrow(
+            fn () => $this->parser->parse($file),
+        );
+
+        $this->assertInstanceOf(UnparsableFile::class, $exception);
+        $this->assertSame(
+            sprintf(
+                'Could not parse the file "%s". Check if it is a valid PHP file',
+                $expectedPath,
+            ),
+            $exception->getMessage(),
+        );
+        $this->assertSame(0, $exception->getCode());
+        $this->assertInstanceOf(Error::class, $exception->getPrevious());
+    }
+
+    public static function invalidFileProvider(): iterable
     {
-        $contents = '<?php use foo as self;';
-
-        try {
-            $this->parser->parse(
-                $this->createFileInfo(
-                    '/unknown',
-                    $contents,
-                ),
-            );
-
-            $this->fail('Expected PHPParser to be unable to parse the above expression');
-        } catch (UnparsableFile $exception) {
-            $this->assertSame(
-                'Could not parse the file "/unknown". Check if it is a valid PHP file',
-                $exception->getMessage(),
-            );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(Error::class, $exception->getPrevious());
-        }
+        yield 'file info with a virtual real path' => [
+            new MockSplFileInfo(realPath: '/unknown'),
+            '/unknown',
+        ];
 
         $fileRealPath = realpath(__FILE__);
-        // Sanity check
-        $this->assertNotFalse($fileRealPath);
 
-        try {
-            $this->parser->parse(
-                $this->createFileInfo(
-                    $fileRealPath,
-                    $contents,
-                ),
-            );
+        yield 'file info with an existing real path' => [
+            MockSplFileInfo::create($fileRealPath),
+            $fileRealPath,
+        ];
 
-            $this->fail('Expected PHPParser to be unable to parse the above expression');
-        } catch (UnparsableFile $exception) {
-            // @phpstan-ignore instanceof.internalClass
-            if ($exception->getPrevious() instanceof PhpUnitFrameworkException) {
-                throw $exception->getPrevious();
-            }
-
-            $this->assertSame(
-                sprintf(
-                    'Could not parse the file "%s". Check if it is a valid PHP file',
-                    $fileRealPath,
-                ),
-                $exception->getMessage(),
-            );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(Error::class, $exception->getPrevious());
-        }
+        yield 'file path' => [
+            '/path/to/file.php',
+            '/path/to/file.php',
+        ];
     }
 
     public static function fileToParserProvider(): iterable
