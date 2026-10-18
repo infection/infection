@@ -49,20 +49,18 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 #[CoversClass(ListSymbolsCommand::class)]
 final class ListSymbolsCommandTest extends TestCase
 {
-    /**
-     * @param array<string, string> $arguments
-     */
     #[DataProvider('commandExecutionProvider')]
     public function test_it_lists_recognized_source_symbols(
         string $contents = '<?php',
+        ?string $filePath = __DIR__ . '/unused/../ListSymbolsCommandTest.php',
         string $expectedStdout = '',
         string $expectedStderr = '',
         int $expectedExitCode = Command::SUCCESS,
-        array $arguments = ['file' => '/path/to/unused/../file.php'],
     ): void {
+        // FileStore needs an existing path to resolve it, but reads the contents from memory.
         $fileSystem = new InMemoryFileSystem();
         $fileSystem->dumpFile(
-            '/path/to/file.php',
+            __FILE__,
             $contents,
         );
 
@@ -78,7 +76,9 @@ final class ListSymbolsCommandTest extends TestCase
         $tester->run(
             [
                 'command' => 'debug:list-symbols',
-                ...$arguments,
+                ...($filePath === null
+                    ? []
+                    : ['file' => $filePath]),
             ],
             ['capture_stderr_separately' => true],
         );
@@ -111,7 +111,7 @@ final class ListSymbolsCommandTest extends TestCase
                     private static function a() {}
                 }
                 PHP,
-            "Example\nExample::Z\nExample::b\nExample::a\n",
+            'expectedStdout' => "Example\nExample::Z\nExample::b\nExample::a\n",
         ];
 
         yield 'production traversal skips interfaces and abstract methods' => [
@@ -136,7 +136,7 @@ final class ListSymbolsCommandTest extends TestCase
                     public function label() {}
                 }
                 PHP,
-            <<<'STDOUT'
+            'expectedStdout' => <<<'STDOUT'
                 App\Behavior
                 App\Behavior::shared
                 App\ParentClass
@@ -160,7 +160,7 @@ final class ListSymbolsCommandTest extends TestCase
                 namespace A\B;
                 class Example {}
                 PHP,
-            "Z\\Example\nA\\B\\Example\n",
+            'expectedStdout' => "Z\\Example\nA\\B\\Example\n",
         ];
 
         yield 'bracketed namespaces including the global namespace' => [
@@ -173,7 +173,7 @@ final class ListSymbolsCommandTest extends TestCase
                     class Example {}
                 }
                 PHP,
-            "App\\Example\nExample\n",
+            'expectedStdout' => "App\\Example\nExample\n",
         ];
 
         yield 'nested and conditional declarations remain in source order' => [
@@ -190,7 +190,7 @@ final class ListSymbolsCommandTest extends TestCase
                 if (false) { class Conditional {} }
                 function declareClass() { class InFunction {} }
                 PHP,
-            <<<'STDOUT'
+            'expectedStdout' => <<<'STDOUT'
                 App\Outer
                 App\Outer::first
                 App\Inner
@@ -215,14 +215,13 @@ final class ListSymbolsCommandTest extends TestCase
                     public string $property;
                 }
                 PHP,
-            "Example\n",
+            'expectedStdout' => "Example\n",
         ];
 
-        yield 'empty result' => ['<?php', ''];
+        yield 'empty result' => [];
 
         yield 'only unsupported declarations' => [
             '<?php interface Contract { public function run(); }',
-            '',
         ];
 
         yield 'recognition does not require eligible mutation candidates' => [
@@ -234,7 +233,7 @@ final class ListSymbolsCommandTest extends TestCase
                 }
                 class EmptyClass {}
                 PHP,
-            "Ignored\nIgnored::ignored\nEmptyClass\n",
+            'expectedStdout' => "Ignored\nIgnored::ignored\nEmptyClass\n",
         ];
 
         yield 'the inspected file is never executed or autoloaded' => [
@@ -245,36 +244,36 @@ final class ListSymbolsCommandTest extends TestCase
                     use \Missing\Behavior;
                 }
                 PHP,
-            "Example\n",
+            'expectedStdout' => "Example\n",
         ];
 
         yield 'missing argument' => [
-            'arguments' => [],
+            'filePath' => null,
             'expectedStderr' => '%ANot enough arguments (missing: "file").%A',
             'expectedExitCode' => Command::FAILURE,
         ];
 
         yield 'blank path' => [
-            'arguments' => ['file' => ' '],
+            'filePath' => ' ',
             'expectedStderr' => '%AExpected the argument "file" to be a non-empty file path.%A',
             'expectedExitCode' => Command::FAILURE,
         ];
 
         yield 'non-existent path' => [
-            'arguments' => ['file' => '/path/to/missing.php'],
+            'filePath' => '/path/to/missing.php',
             'expectedStderr' => '%AExpected "/path/to/missing.php" to be a readable file path.%A',
             'expectedExitCode' => Command::FAILURE,
         ];
 
         yield 'directory path' => [
-            'arguments' => ['file' => '/path/to'],
-            'expectedStderr' => '%AExpected "/path/to" to be a readable file path.%A',
+            'filePath' => '/',
+            'expectedStderr' => '%AExpected "/" to be a readable file path.%A',
             'expectedExitCode' => Command::FAILURE,
         ];
 
         yield 'invalid PHP' => [
             'contents' => "<?php\nclass Valid {}\nclass Broken {",
-            'expectedStderr' => '%ACould not parse the file "/path/to/file.php". Check if it is a valid PHP file%A',
+            'expectedStderr' => '%ACheck if it is a valid PHP file%A',
             'expectedExitCode' => Command::FAILURE,
         ];
     }

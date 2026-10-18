@@ -135,7 +135,7 @@ final class FileParserTest extends TestCase
 
     #[DataProvider('invalidFileProvider')]
     public function test_it_throws_upon_failure(
-        SplFileInfo|string $file,
+        SplFileInfo $file,
         string $expectedPath,
     ): void {
         $this->fileSystemMock
@@ -173,11 +173,6 @@ final class FileParserTest extends TestCase
         yield 'file info with an existing real path' => [
             MockSplFileInfo::create($fileRealPath),
             $fileRealPath,
-        ];
-
-        yield 'file path' => [
-            '/path/to/file.php',
-            '/path/to/file.php',
         ];
     }
 
