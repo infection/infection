@@ -37,6 +37,9 @@ namespace Infection\FileSystem\Finder\Iterator;
 
 use Infection\Framework\OperatingSystem;
 use function preg_quote;
+use Safe\Exceptions\PcreException;
+use function Safe\preg_match;
+use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 
@@ -69,7 +72,7 @@ final class RealPathFilterIterator extends MultiplePcreFilterIterator
      * Default conversion:
      *     'lorem/ipsum/dolor' ==>  'lorem\/ipsum\/dolor/'
      *
-     * Use only / as directory separator (on Windows also).
+     * Literal paths use / separators to match the normalised file paths.
      *
      * @param string $str Pattern: regexp or dirname
      *
@@ -77,8 +80,36 @@ final class RealPathFilterIterator extends MultiplePcreFilterIterator
      */
     protected function toRegex(string $str): string
     {
-        return $this->isRegex($str)
+        return $this->isValidRegex($str)
             ? $str
-            : '/' . preg_quote($str, '/') . '/';
+            : sprintf(
+                '/%s/',
+                preg_quote(
+                    Path::normalize($str),
+                    '/',
+                ),
+            );
+    }
+
+    private function isValidRegex(string $string): bool
+    {
+        // ::isRegex() only checks whether the string looks like a regex, so
+        // "/project/src/Differ/" passes because it starts and ends with "/".
+        // We therefore also evaluate the pattern to check its validity.
+        //
+        // Note that it remains ambiguous for strings such as "/tmp/", which
+        // can be either a literal path or a valid regex.
+        if (!$this->isRegex($string)) {
+            return false;
+        }
+
+        try {
+            // Safe throws on invalid patterns but does not suppress PHP's compilation warning.
+            @preg_match($string, '');
+
+            return true;
+        } catch (PcreException) {
+            return false;
+        }
     }
 }
