@@ -41,7 +41,6 @@ use Infection\FileSystem\FileSystem;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\CollectSourceSymbolsVisitor;
-use SplFileInfo;
 use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Filesystem\Path;
@@ -88,8 +87,8 @@ final class ListSymbolsCommand extends BaseCommand
      */
     protected function executeCommand(IO $io): bool
     {
-        $file = $this->getFile($io);
-        [$nodes] = $this->getApplication()->getContainer()->getFileParser()->parse($file);
+        $filePath = $this->getFilePath($io);
+        [$nodes] = $this->getApplication()->getContainer()->getFileParser()->parse($filePath);
 
         $symbolsVisitor = new CollectSourceSymbolsVisitor();
 
@@ -103,7 +102,7 @@ final class ListSymbolsCommand extends BaseCommand
         return true;
     }
 
-    private function getFile(IO $io): SplFileInfo
+    private function getFilePath(IO $io): string
     {
         $path = trim(
             (string) $io->getInput()->getArgument(self::FILE_PATH_ARGUMENT),
@@ -124,6 +123,6 @@ final class ListSymbolsCommand extends BaseCommand
             ),
         );
 
-        return new SplFileInfo($canonicalPath);
+        return $canonicalPath;
     }
 }

@@ -127,9 +127,6 @@ parameters:
             message: '#^Call to method PHPUnit\\Framework\\Assert::assertNotFalse\(\) with SimpleXMLElement and ''Expected dumped…'' will always evaluate to true\.$#'
             path: ../tests/*
         -
-            message: '#^Call to method PHPUnit\\Framework\\Assert::assertNotFalse\(\) with string will always evaluate to true\.$#'
-            path: ../tests/*
-        -
             message: '#^Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with ''[a-zA-Z\\]+'' and [a-zA-Z\\]+ will always evaluate to (false|true)\.$#'
             path: ../tests/*
         -
