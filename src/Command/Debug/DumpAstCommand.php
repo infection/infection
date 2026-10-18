@@ -275,11 +275,9 @@ final class DumpAstCommand extends BaseCommand
     ): bool {
         $hasSymbolSelectors = $container->getConfiguration()->sourceFilter->symbolSelectors !== [];
 
-        if ($changedLinesRanges !== null) {
-            return true;
-        }
-
-        return $hasSymbolSelectors;
+        return $changedLinesRanges === null
+            ? $hasSymbolSelectors
+            : true;
     }
 
     /**

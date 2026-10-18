@@ -69,6 +69,12 @@ count = 1
 [[issues]]
 file = "src/Command/Debug/DumpAstCommand.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Command\Debug\DumpAstCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/Debug/DumpAstCommand.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Command\Debug\DumpAstCommand::executeCommand`.'
 count = 1
 
@@ -76,6 +82,12 @@ count = 1
 file = "src/Command/Debug/DumpAstCommand.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Command\Debug\DumpAstCommand::createAst`.'
+count = 1
+
+[[issues]]
+file = "src/Command/Debug/DumpAstCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\Debug\DumpAstCommand::executeCommand`.'
 count = 1
 
 [[issues]]
