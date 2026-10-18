@@ -42,7 +42,7 @@ use function array_values;
 use function count;
 use function explode;
 use function implode;
-use function is_string;
+use function is_array;
 
 /**
  * @internal
@@ -58,7 +58,7 @@ final readonly class PlainFilter implements SourceFileFilter
     }
 
     /**
-     * @param string|array<string> $value A comma-separated string or individual path values.
+     * @param string|array<non-empty-string> $value A comma-separated string or individual path values.
      */
     public static function tryToCreate(string|array $value): ?self
     {
@@ -78,40 +78,25 @@ final readonly class PlainFilter implements SourceFileFilter
     }
 
     /**
-     * @param string|array<string> $value
+     * @param string|array<non-empty-string> $value
      *
      * @return non-empty-string[]
      */
     private static function parseValues(string|array $value): array
     {
-        $values = array_map(
-            trim(...),
-            is_string($value)
-                ? explode(
-                    ',',
-                    $value,
-                )
-                : $value,
-        );
-
-        // String filters historically discard "0", but it is a valid positional filename.
-        if (is_string($value)) {
-            return array_unique(
-                array_filter($values),
+        if (is_array($value)) {
+            return array_values(
+                array_unique($value),
             );
         }
 
-        // Mago does not infer the non-empty strings retained by the predicate.
-        /** @var list<non-empty-string> $values */
-        $values = array_values(
-            array_unique(
-                array_filter(
-                    $values,
-                    static fn (string $path): bool => $path !== '',
+        return array_unique(
+            array_filter(
+                array_map(
+                    trim(...),
+                    explode(',', $value),
                 ),
             ),
         );
-
-        return $values;
     }
 }

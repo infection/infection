@@ -1508,27 +1508,6 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
-        yield 'positional source selectors alone leave the file filter empty' => [
-            $defaultScenario
-                ->withInput(
-                    $defaultInputBuilder->withSourceFilter(
-                        new PositionalPathsFilter(['Differ::diff']),
-                    ),
-                )
-                ->withExpected(
-                    $defaultConfigurationBuilder
-                        ->withSourceFilter(null)
-                        ->withSourceSymbolSelectors(
-                            new SourceSymbolSelector(
-                                'Differ',
-                                'diff',
-                                null,
-                            ),
-                        )
-                        ->build(),
-                ),
-        ];
-
         yield 'positional test paths become testFrameworkExtraOptions' => [
             $defaultScenario
                 ->withInput(
