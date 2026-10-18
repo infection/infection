@@ -95,7 +95,7 @@ final class RealPathFilterIterator extends MultiplePcreFilterIterator
     {
         // ::isRegex() only checks whether the string looks like a regex, so
         // "/project/src/Differ/" passes because it starts and ends with "/".
-        // We therefore also evaluate the pattern to check its validity. This
+        // We therefore also evaluate the pattern to check its validity.
         //
         // Note that it remains ambiguous for strings such as "/tmp/", which
         // can be either a literal path or a valid regex.
