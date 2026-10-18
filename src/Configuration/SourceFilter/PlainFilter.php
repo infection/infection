@@ -83,34 +83,33 @@ final readonly class PlainFilter implements SourceFileFilter
      */
     private static function parseValues(string|array $value): array
     {
-        if (is_array($value)) {
-            // Mago does not infer the non-empty strings retained by the predicate.
-            /** @var list<non-empty-string> $values */
-            $values = array_values(
-                array_unique(
-                    array_filter(
-                        array_map(
-                            trim(...),
-                            $value,
-                        ),
-                        // Unlike string filters, positional paths must preserve the filename "0".
-                        static fn (string $path): bool => $path !== '',
-                    ),
-                ),
-            );
-
-            return $values;
+        if (is_string($value)) {
+            $value = explode(',', $value);
         }
 
         return array_unique(
-            array_filter(
+            self::removeEmptyPaths(
                 array_map(
                     trim(...),
-                    explode(',', $value),
+                    $value,
                 ),
-            );
-        }
+            ),
+        );
+    }
 
-        return array_unique($value);
+    /**
+     * @param string[] $paths
+     *
+     * @return non-empty-string[]
+     */
+    private static function removeEmptyPaths(array $paths): array
+    {
+        // The filename "0" is valid and must not be discarded with empty strings.
+        // Mago does not infer the non-empty strings retained by the predicate.
+        // @mago-expect analysis:invalid-return-statement
+        return array_filter(
+            $paths,
+            static fn (string $path): bool => $path !== '',
+        );
     }
 }

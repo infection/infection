@@ -84,8 +84,8 @@ final class PlainFilterTest extends TestCase
             ],
             new PlainFilter([
                 'src/Bar.php',
-                'src/Foo.php',
-                'src/Baz.php',
+                3 => 'src/Foo.php',
+                6 => 'src/Baz.php',
             ]),
         ];
 
@@ -113,13 +113,22 @@ final class PlainFilterTest extends TestCase
             ],
             new PlainFilter([
                 'src/Foo,Bar.php',
+                2 => '0',
+            ]),
+        ];
+
+        yield 'zero filename in a string is preserved' => [
+            '0',
+            new PlainFilter([
                 '0',
             ]),
         ];
 
-        yield 'zero in a string is still discarded' => [
+        yield 'zero filenames in a string are trimmed and deduplicated' => [
             ' 0 ,0',
-            null,
+            new PlainFilter([
+                '0',
+            ]),
         ];
 
         yield 'nominal' => [
