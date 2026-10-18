@@ -44,6 +44,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\chdir;
 use function Safe\getcwd;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
 #[Group('integration')]
@@ -69,14 +70,18 @@ final class ListSourcesCommandTest extends TestCase
     {
         $tester = $this->runCommand([]);
 
-        $this->assertSame(
-            <<<'STDOUT'
-                File1.php
-                File2.php
+        $expectedStdout = <<<'STDOUT'
+            File1.php
+            File2.php
 
-                STDOUT,
-            Str::toUnixLineEndings($tester->getDisplay()),
-        );
+            STDOUT;
+        $expectedStderr = '';
+
+        $actualStdout = Str::toUnixLineEndings($tester->getDisplay());
+        $actualStderr = $tester->getErrorOutput(normalize: true);
+
+        $this->assertSame($expectedStdout, $actualStdout);
+        $this->assertSame($expectedStderr, $actualStderr);
         $tester->assertCommandIsSuccessful();
     }
 
@@ -84,11 +89,14 @@ final class ListSourcesCommandTest extends TestCase
     {
         $tester = $this->runCommand(['--filter' => 'File1']);
 
-        $actual = $tester->getDisplay();
+        $expectedStdout = "File1.php\n";
+        $expectedStderr = 'The "--filter" option is deprecated';
 
-        $this->assertStringContainsString('File1.php', $actual);
-        $this->assertStringNotContainsString('File2.php', $actual);
-        $this->assertStringContainsString('The "--filter" option is deprecated', $actual);
+        $actualStdout = Str::toUnixLineEndings($tester->getDisplay());
+        $actualStderr = $tester->getErrorOutput(normalize: true);
+
+        $this->assertSame($expectedStdout, $actualStdout);
+        $this->assertStringContainsString($expectedStderr, $actualStderr);
         $tester->assertCommandIsSuccessful();
     }
 
@@ -100,7 +108,14 @@ final class ListSourcesCommandTest extends TestCase
         $application = new Application(Container::create());
         $tester = new CommandTester($application->find('config:list-sources'));
 
-        $tester->execute($input);
+        $tester->execute(
+            $input,
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE,
+                'interactive' => false,
+                'capture_stderr_separately' => true,
+            ],
+        );
 
         return $tester;
     }
