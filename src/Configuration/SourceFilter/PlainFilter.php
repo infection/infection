@@ -38,10 +38,14 @@ namespace Infection\Configuration\SourceFilter;
 use function array_filter;
 use function array_map;
 use function array_unique;
+<<<<<<< HEAD
 use function array_values;
+=======
+use function count;
+>>>>>>> 92e204eeb (fix)
 use function explode;
 use function implode;
-use function is_array;
+use function is_string;
 
 /**
  * @internal
@@ -83,19 +87,15 @@ final readonly class PlainFilter implements SourceFileFilter
      */
     private static function parseValues(string|array $value): array
     {
-        if (is_array($value)) {
-            return array_values(
-                array_unique($value),
-            );
-        }
-
-        return array_unique(
-            array_filter(
+        if (is_string($value)) {
+            $value = array_filter(
                 array_map(
                     trim(...),
                     explode(',', $value),
                 ),
-            ),
-        );
+            );
+        }
+
+        return array_unique($value);
     }
 }
