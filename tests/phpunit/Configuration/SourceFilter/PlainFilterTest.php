@@ -44,7 +44,7 @@ use PHPUnit\Framework\TestCase;
 final class PlainFilterTest extends TestCase
 {
     /**
-     * @param string|array<non-empty-string> $value
+     * @param string|array<string> $value
      */
     #[DataProvider('valueProvider')]
     public function test_it_can_parse_and_normalize_filter(
@@ -63,6 +63,32 @@ final class PlainFilterTest extends TestCase
             null,
         ];
 
+        yield 'blank array values produce no filter' => [
+            [
+                '',
+                ' ',
+                "\t\n",
+            ],
+            null,
+        ];
+
+        yield 'array values are trimmed and deduplicated after removing blank entries' => [
+            [
+                ' src/Bar.php ',
+                '',
+                'src/Bar.php',
+                ' src/Foo.php',
+                ' ',
+                'src/Foo.php ',
+                'src/Baz.php',
+            ],
+            new PlainFilter([
+                'src/Bar.php',
+                'src/Foo.php',
+                'src/Baz.php',
+            ]),
+        ];
+
         yield 'array values are deduplicated in first occurrence order' => [
             [
                 'src/Bar.php',
@@ -78,15 +104,15 @@ final class PlainFilterTest extends TestCase
             ]),
         ];
 
-        yield 'array values preserve whitespace, commas, and zero filenames' => [
+        yield 'array normalization preserves commas and zero filenames' => [
             [
                 ' src/Foo,Bar.php ',
                 ' ',
+                ' 0 ',
                 '0',
             ],
             new PlainFilter([
-                ' src/Foo,Bar.php ',
-                ' ',
+                'src/Foo,Bar.php',
                 '0',
             ]),
         ];
