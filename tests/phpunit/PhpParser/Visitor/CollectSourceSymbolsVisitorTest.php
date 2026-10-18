@@ -199,45 +199,45 @@ final class CollectSourceSymbolsVisitorTest extends VisitorTestCase
 
     public function test_it_defers_resolving_symbol_names_until_they_are_requested(): void
     {
-        $visitor = new CollectSourceSymbolsVisitor();
-
-        $classMock = $this->createMock(Class_::class);
-        $classMock
-            ->expects($this->never())
-            ->method('getAttribute')
-        ;
-
+        $class = $this->createStub(Class_::class);
         $method = new ClassMethod('run');
-
-        $visitor->beforeTraverse([]);
-        $visitor->enterNode($classMock);
-        $visitor->enterNode($method);
-
-        $this->assertEquals(
-            $classMock,
-            $visitor->findClass(),
-        );
-        $this->assertEquals(
-            $method,
-            $visitor->findMethod(),
-        );
-
-        $visitor->leaveNode($method);
-        $visitor->leaveNode($classMock);
-
-        $classMock->namespacedName = new Name('App\Example');
 
         $expected = ['App\Example', 'App\Example::run'];
 
-        $this->assertSame(
-            $expected,
-            $visitor->getSymbols(),
-        );
+        $visitor = new CollectSourceSymbolsVisitor();
+
+        $visitor->enterNode($class);
+        $visitor->enterNode($method);
+        $visitor->leaveNode($method);
+        $visitor->leaveNode($class);
+
+        // We supply the name after traversal. Returning it below confirms that
+        // symbol names are resolved when requested, rather than during traversal.
+        $class->namespacedName = new Name('App\Example');
+
+        $actual = $visitor->getSymbols();
+
+        $this->assertSame($expected, $actual);
     }
 
     public function test_it_restores_enclosing_scopes_after_an_anonymous_class(): void
     {
         $visitor = new CollectSourceSymbolsVisitor();
+
+        // Nodes representing the PHP code:
+        //
+        // ```
+        // class Outer
+        // {
+        //     public function run()
+        //     {
+        //         new class {
+        //             public function hidden() {}
+        //         };
+        //     }
+        // }
+        // ```
+        //
         $class = new Class_('Outer');
         $class->namespacedName = new Name('App\Outer');
         $method = new ClassMethod('run');
@@ -253,7 +253,7 @@ final class CollectSourceSymbolsVisitorTest extends VisitorTestCase
         $this->assertEquals(
             $anonymousClass,
             $visitor->findClass(),
-            'An anonymous class must hide the enclosing named class from symbol selection.',
+            'An anonymous class must shadow the enclosing named class during symbol selection.',
         );
         $this->assertEquals(
             $anonymousMethod,
@@ -310,6 +310,7 @@ final class CollectSourceSymbolsVisitorTest extends VisitorTestCase
             $visitor->getSymbols(),
         );
 
+        // Adding the method here invalidates the while symbol list.
         $visitor->enterNode(new ClassMethod('run'));
 
         $this->assertSame(

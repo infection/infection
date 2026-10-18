@@ -43,7 +43,7 @@ use PhpParser\NodeVisitorAbstract;
 use function sprintf;
 
 /**
- * Tracks the lexical class and method used by selection.
+ * Collects source symbols and retains them until the next traversal.
  *
  * @internal
  */
@@ -120,12 +120,12 @@ final class CollectSourceSymbolsVisitor extends NodeVisitorAbstract
 
     public function findClass(): ?Node\Stmt\ClassLike
     {
-        return self::findCurrent($this->classStack);
+        return self::findLastNode($this->classStack);
     }
 
     public function findMethod(): ?Node\Stmt\ClassMethod
     {
-        return self::findCurrent($this->methodStack);
+        return self::findLastNode($this->methodStack);
     }
 
     /**
@@ -133,13 +133,19 @@ final class CollectSourceSymbolsVisitor extends NodeVisitorAbstract
      */
     public function getSymbols(): array
     {
-        if ($this->symbols !== null) {
-            return $this->symbols;
-        }
+        return $this->symbols ??= self::extractSymbolNames($this->declarations);
+    }
 
+    /**
+     * @param list<array{Node\Stmt\ClassLike|null, Node\Stmt\ClassMethod|null}> $declarations
+     *
+     * @return list<string>
+     */
+    private static function extractSymbolNames(array $declarations): array
+    {
         $symbols = [];
 
-        foreach ($this->declarations as [$class, $method]) {
+        foreach ($declarations as [$class, $method]) {
             if ($class === null) {
                 continue;
             }
@@ -159,7 +165,7 @@ final class CollectSourceSymbolsVisitor extends NodeVisitorAbstract
                 );
         }
 
-        return $this->symbols = $symbols;
+        return $symbols;
     }
 
     /**
@@ -169,7 +175,7 @@ final class CollectSourceSymbolsVisitor extends NodeVisitorAbstract
      *
      * @return T|null
      */
-    private static function findCurrent(array $nodes): ?Node
+    private static function findLastNode(array $nodes): ?Node
     {
         $key = array_key_last($nodes);
 

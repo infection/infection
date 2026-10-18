@@ -38,49 +38,69 @@ namespace Infection\Tests\Command\Debug\ListSymbolsCommand;
 use Infection\Command\Debug\ListSymbolsCommand;
 use Infection\Console\Application;
 use Infection\Container\Container;
-use Infection\Tests\FileSystem\FileSystemTestCase;
-use Infection\Tests\TestingUtility\FS;
+use Infection\FileSystem\FileSystem;
+use Infection\FileSystem\InMemoryFileSystem;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\ApplicationTester;
-use Symfony\Component\Console\Tester\CommandTester;
 
-#[Group('integration')]
 #[CoversClass(ListSymbolsCommand::class)]
-final class ListSymbolsCommandTest extends FileSystemTestCase
+final class ListSymbolsCommandTest extends TestCase
 {
-    #[DataProvider('declarationsProvider')]
+    /**
+     * @param array<string, string> $arguments
+     */
+    #[DataProvider('commandExecutionProvider')]
     public function test_it_lists_recognized_source_symbols(
-        string $contents,
-        string $expected,
+        string $contents = '<?php',
+        string $expectedStdout = '',
+        string $expectedStderr = '',
+        int $expectedExitCode = Command::SUCCESS,
+        array $arguments = ['file' => '/path/to/unused/../file.php'],
     ): void {
-        FS::dumpFile('symbols.php', $contents);
-
-        $application = new Application(
-            Container::create(),
-        );
-        $commandTester = new CommandTester(
-            $application->find('debug:list-symbols'),
+        $fileSystem = new InMemoryFileSystem();
+        $fileSystem->dumpFile(
+            '/path/to/file.php',
+            $contents,
         );
 
-        $commandTester->execute(
-            ['file' => './unused/../symbols.php'],
+        $container = Container::create()->cloneWithService(
+            FileSystem::class,
+            $fileSystem,
+        );
+
+        $application = new Application($container);
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+
+        $tester->run(
+            [
+                'command' => 'debug:list-symbols',
+                ...$arguments,
+            ],
             ['capture_stderr_separately' => true],
         );
 
-        $commandTester->assertCommandIsSuccessful();
+        $actualStdout = $tester->getDisplay(normalize: true);
+        $actualStderr = $tester->getErrorOutput(normalize: true);
+
         $this->assertSame(
-            $expected,
-            $commandTester->getDisplay(normalize: true),
+            $expectedStdout,
+            $actualStdout,
+        );
+        $this->assertStringMatchesFormat(
+            $expectedStderr,
+            $actualStderr,
         );
         $this->assertSame(
-            '',
-            $commandTester->getErrorOutput(normalize: true),
+            $expectedExitCode,
+            $tester->getStatusCode(),
         );
     }
 
-    public static function declarationsProvider(): iterable
+    public static function commandExecutionProvider(): iterable
     {
         yield 'global class and method visibility' => [
             <<<'PHP'
@@ -227,77 +247,35 @@ final class ListSymbolsCommandTest extends FileSystemTestCase
                 PHP,
             "Example\n",
         ];
-    }
 
-    /**
-     * @param array<string, string> $arguments
-     */
-    #[DataProvider('invalidInputProvider')]
-    public function test_it_reports_invalid_input_on_stderr(
-        array $arguments,
-        string $expectedDiagnostic,
-    ): void {
-        FS::dumpFile(
-            'invalid.php',
-            "<?php\nclass Valid {}\nclass Broken {",
-        );
-
-        $application = new Application(
-            Container::create(),
-        );
-        $application->setAutoExit(false);
-        $tester = new ApplicationTester($application);
-
-        $tester->run(
-            [
-                'command' => 'debug:list-symbols',
-                ...$arguments,
-            ],
-            ['capture_stderr_separately' => true],
-        );
-
-        $this->assertSame(
-            1,
-            $tester->getStatusCode(),
-            'Invalid input should fail the command.',
-        );
-        $this->assertSame(
-            '',
-            $tester->getDisplay(normalize: true),
-            'Invalid input should not produce partial symbol output on stdout.',
-        );
-        $this->assertStringContainsString(
-            $expectedDiagnostic,
-            $tester->getErrorOutput(normalize: true),
-            'The failure should be explained on stderr.',
-        );
-    }
-
-    public static function invalidInputProvider(): iterable
-    {
         yield 'missing argument' => [
-            [],
-            'Not enough arguments (missing: "file").',
+            'arguments' => [],
+            'expectedStderr' => '%ANot enough arguments (missing: "file").%A',
+            'expectedExitCode' => Command::FAILURE,
         ];
 
         yield 'blank path' => [
-            ['file' => ' '],
-            'Expected the argument "file" to be a non-empty file path.',
+            'arguments' => ['file' => ' '],
+            'expectedStderr' => '%AExpected the argument "file" to be a non-empty file path.%A',
+            'expectedExitCode' => Command::FAILURE,
         ];
 
         yield 'non-existent path' => [
-            ['file' => 'missing.php'],
-            'Expected "missing.php" to be a readable file path.',
+            'arguments' => ['file' => '/path/to/missing.php'],
+            'expectedStderr' => '%AExpected "/path/to/missing.php" to be a readable file path.%A',
+            'expectedExitCode' => Command::FAILURE,
         ];
 
         yield 'directory path' => [
-            ['file' => '.'],
-            'Expected "." to be a readable file path.',
+            'arguments' => ['file' => '/path/to'],
+            'expectedStderr' => '%AExpected "/path/to" to be a readable file path.%A',
+            'expectedExitCode' => Command::FAILURE,
         ];
 
         yield 'invalid PHP' => [
-            ['file' => 'invalid.php'],
-            'Check if it is a valid PHP file',
+            'contents' => "<?php\nclass Valid {}\nclass Broken {",
+            'expectedStderr' => '%ACould not parse the file "/path/to/file.php". Check if it is a valid PHP file%A',
+            'expectedExitCode' => Command::FAILURE,
         ];
     }
 }
