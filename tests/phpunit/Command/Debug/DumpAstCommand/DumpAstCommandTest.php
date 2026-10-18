@@ -686,10 +686,6 @@ final class DumpAstCommandTest extends FileSystemTestCase
                 ],
             ],
             $fullyEligibleScenario['expected'],
-            <<<'STDERR'
-                [warning] Source file filters are ignored by debug:dump-ast: only the file argument determines which file is dumped.
-
-                STDERR,
         ];
 
         yield 'with a source symbol selector and a test file' => [
