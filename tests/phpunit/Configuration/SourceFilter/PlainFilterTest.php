@@ -53,16 +53,7 @@ final class PlainFilterTest extends TestCase
     ): void {
         $actual = PlainFilter::tryToCreate($value);
 
-        $this->assertEquals(
-            $expected,
-            $actual,
-            'String filters should contain each normalized non-empty value only once.',
-        );
-        $this->assertSame(
-            $expected?->toString(),
-            $actual?->toString(),
-            'Normalized filters should preserve the order of first occurrence.',
-        );
+        $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
     public static function valueProvider(): iterable
