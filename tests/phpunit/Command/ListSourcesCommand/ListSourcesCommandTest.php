@@ -114,6 +114,12 @@ final class ListSourcesCommandTest extends TestCase
             '',
         ];
 
+        yield 'explicit path fragment' => [
+            ['Fixtures/SubDir/'],
+            $expectedFilteredStdout,
+            '',
+        ];
+
         if (OperatingSystem::isWindows()) {
             yield 'absolute directory with a trailing backslash' => [
                 [$directory . '\\'],

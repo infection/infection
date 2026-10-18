@@ -42,6 +42,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\FileSystem;
 use function sprintf;
 use function str_contains;
+use function str_ends_with;
 use function str_starts_with;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
@@ -164,17 +165,15 @@ final readonly class PositionalPathsClassifier
         $isValidPath = $this->isValidPath($absolutePath);
         $isInsideSourceDirectories = self::isInsideSourceDirectories($absolutePath, $absoluteSourceDirs);
 
-        if ($isValidPath && !$isInsideSourceDirectories) {
-            return self::KIND_TEST;
+        if ($isValidPath) {
+            return $isInsideSourceDirectories
+                ? self::KIND_SOURCE
+                : self::KIND_TEST;
         }
 
-        if ($isValidPath && $isInsideSourceDirectories) {
-            return self::KIND_SOURCE;
-        }
-
-        // like `SomeFile` or `SomeFile.php` - bare values behave as --filter values
+        // Unresolved directory fragments and bare names behave as --filter values.
         Assert::true(
-            self::looksLikeClassOrFileName($path),
+            self::looksLikePathFilter($path),
             sprintf(
                 'Invalid path argument "%s": multiple paths must be passed as separate arguments.',
                 $path,
@@ -199,9 +198,13 @@ final readonly class PositionalPathsClassifier
         return class_exists($value);
     }
 
-    private static function looksLikeClassOrFileName(string $value): bool
+    private static function looksLikePathFilter(string $value): bool
     {
-        return ctype_upper($value[0]) // class and file name starts with Pascal Case (A-Z only, not digits)
+        if (str_ends_with($value, '/')) {
+            return true;
+        }
+
+        return ctype_upper($value[0])   // Class and file names start with PascalCase (A-Z only, not digits).
             && !str_contains($value, '/')
             && !str_contains($value, '\\');
     }

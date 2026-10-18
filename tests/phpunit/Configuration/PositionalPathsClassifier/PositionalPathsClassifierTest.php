@@ -223,6 +223,17 @@ final class PositionalPathsClassifierTest extends TestCase
                 ->withExpected(new ClassifiedPaths(['Plus_.php'], [])),
         ];
 
+        yield 'trailing slash accepts a partial path filter' => [
+            $baseScenario
+                ->withPaths(['Differ/'])
+                ->withExpected(
+                    new ClassifiedPaths(
+                        ['Differ/'],
+                        [],
+                    ),
+                ),
+        ];
+
         yield 'source directory path with trailing slash' => [
             $baseScenario
                 ->withPaths(['src/Service/'])
