@@ -57,7 +57,7 @@ final readonly class PlainFilter implements SourceFileFilter
     }
 
     /**
-     * @param string|array<non-empty-string> $value A comma-separated string or individual path values.
+     * @param string|array<string> $value A comma-separated string or individual path values.
      */
     public static function tryToCreate(string|array $value): ?self
     {
@@ -77,14 +77,33 @@ final readonly class PlainFilter implements SourceFileFilter
     }
 
     /**
-     * @param string|array<non-empty-string> $value
+     * @param string|array<string> $value
      *
      * @return non-empty-string[]
      */
     private static function parseValues(string|array $value): array
     {
-        if (is_string($value)) {
-            $value = array_filter(
+        if (is_array($value)) {
+            // Mago does not infer the non-empty strings retained by the predicate.
+            /** @var list<non-empty-string> $values */
+            $values = array_values(
+                array_unique(
+                    array_filter(
+                        array_map(
+                            trim(...),
+                            $value,
+                        ),
+                        // Unlike string filters, positional paths must preserve the filename "0".
+                        static fn (string $path): bool => $path !== '',
+                    ),
+                ),
+            );
+
+            return $values;
+        }
+
+        return array_unique(
+            array_filter(
                 array_map(
                     trim(...),
                     explode(',', $value),
