@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\PhpParser;
 
 use Infection\FileSystem\FileStore;
-use function is_string;
 use PhpParser\Node\Stmt;
 use PhpParser\Parser;
 use PhpParser\Token;
@@ -59,7 +58,7 @@ final readonly class FileParser
      *
      * @return array{Stmt[], Token[]}
      */
-    public function parse(SplFileInfo|string $fileInfo): array
+    public function parse(SplFileInfo $fileInfo): array
     {
         try {
             return [
@@ -69,10 +68,6 @@ final readonly class FileParser
                 $this->parser->getTokens(),
             ];
         } catch (Throwable $throwable) {
-            if (is_string($fileInfo)) {
-                throw UnparsableFile::fromInvalidFile($fileInfo, $throwable);
-            }
-
             $filePath = $fileInfo->getRealPath() === false
                 ? $fileInfo->getPathname()
                 : $fileInfo->getRealPath();
