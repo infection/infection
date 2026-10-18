@@ -91,6 +91,20 @@ final class PositionalArgumentsClassifierTest extends TestCase
                 ->withExpected(new ClassifiedPositionalArguments(['src/SomeFile.php'], [], [])),
         ];
 
+        yield 'absolute source directories are canonicalized before classifying paths' => [
+            $baseScenario
+                ->withSourceDirectories(['/project/unused/../src/'])
+                ->withPaths(['src/SomeFile.php'])
+                ->withExistingFiles(['/project/src/SomeFile.php'])
+                ->withExpected(
+                    new ClassifiedPositionalArguments(
+                        ['src/SomeFile.php'],
+                        [],
+                        [],
+                    ),
+                ),
+        ];
+
         yield 'single test file path' => [
             $baseScenario
                 ->withPaths(['tests/SomeTest.php'])

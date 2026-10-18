@@ -40,6 +40,7 @@ use function array_values;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
+use Infection\FileSystem\Paths;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
@@ -62,7 +63,6 @@ use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
@@ -97,8 +97,15 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
+        $absoluteSourceDirectories = array_values(
+            Paths::makeAbsolute(
+                $sourceDirectories,
+                $sourceDirectoryBasePath,
+                canonicalize: true,
+            ),
+        );
         Assert::notEmpty(
-            $sourceDirectories,
+            $absoluteSourceDirectories,
             'The source directories cannot be empty. This indicates that an invalid configuration reached the test framework adapter factory.',
         );
 
@@ -113,12 +120,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $testFrameworkExecutable,
             $tmpDir,
             $jUnitFilePath,
-            new PCOVDirectoryProvider(
-                self::makeSourcePathsAbsolute(
-                    $sourceDirectoryBasePath,
-                    $sourceDirectories,
-                ),
-            ),
+            new PCOVDirectoryProvider($absoluteSourceDirectories),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
@@ -175,29 +177,5 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
     public static function getExecutableName(): string
     {
         return 'phpunit';
-    }
-
-    /**
-     * @param non-empty-array<string> $sourceDirectories
-     *
-     * @return non-empty-list<string>
-     */
-    private static function makeSourcePathsAbsolute(
-        string $sourceDirectoryBasePath,
-        array $sourceDirectories,
-    ): array {
-        $absolutePaths = array_values(
-            array_map(
-                static fn (string $sourceDirectory): string => Path::makeAbsolute(
-                    $sourceDirectory,
-                    $sourceDirectoryBasePath,
-                ),
-                $sourceDirectories,
-            ),
-        );
-
-        Assert::notEmpty($absolutePaths);
-
-        return $absolutePaths;
     }
 }

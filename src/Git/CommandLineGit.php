@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Git;
 
 use function array_filter;
-use function array_map;
 use function array_merge;
 use function implode;
 use Infection\Differ\ChangedLinesParser;
+use Infection\FileSystem\Paths;
 use Infection\Git\Throwable\GitDiffFailed;
 use Infection\Git\Throwable\NoGitProjectFound;
 use Infection\Source\Exception\NoSourceFound;
@@ -49,7 +49,6 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use function Safe\preg_split;
 use function sprintf;
-use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 use Webmozart\Assert\Assert;
 
@@ -87,7 +86,8 @@ final readonly class CommandLineGit implements Git
             $workingDirectory,
             nameOnly: true,
         );
-        $paths = self::makePathsAbsolute($lines, $projectDirectory);
+
+        $paths = Paths::makeAbsolute($lines, $projectDirectory);
 
         if ($paths === []) {
             throw NoSourceFound::noFilesForGitDiff($diffFilter, $base);
@@ -166,32 +166,6 @@ final readonly class CommandLineGit implements Git
         Assert::stringNotEmpty($directory);
 
         return $directory;
-    }
-
-    /**
-     * @param list<string> $paths
-     *
-     * @return list<non-empty-string>
-     */
-    private static function makePathsAbsolute(
-        array $paths,
-        string $projectDirectory,
-    ): array {
-        return array_map(
-            static fn (string $path): string => self::makePathAbsolute($projectDirectory, $path),
-            $paths,
-        );
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    private static function makePathAbsolute(string $projectDirectory, string $path): string
-    {
-        $absolutePath = Path::join($projectDirectory, $path);
-        Assert::stringNotEmpty($absolutePath);
-
-        return $absolutePath;
     }
 
     /**
