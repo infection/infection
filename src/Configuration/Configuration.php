@@ -64,6 +64,7 @@ readonly class Configuration
     ];
 
     /**
+     * @param Source $source Source directories are absolute paths resolved against the Infection configuration directory.
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      * @param positive-int $threadCount

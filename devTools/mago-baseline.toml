@@ -5101,12 +5101,6 @@ message = 'Argument type mismatch for argument #1 of `Infection\Tests\Source\Col
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Infection\Source\Collector\BasicSourceCollector::create`: expected `array<array-key, non-empty-string>`, but possibly received `list{string}`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/Source/MatcherLine/GitDiffSourceLineMatcherTest.php"
 code = "redundant-docblock-type"
 message = "Redundant docblock type for variable `$git`."
