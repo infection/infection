@@ -44,12 +44,10 @@ use Infection\FileSystem\InMemoryFileSystem;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PositionalArgumentsClassifier::class)]
 #[CoversClass(ClassifiedPositionalArguments::class)]
-#[Group('integration')]
 final class PositionalArgumentsClassifierTest extends TestCase
 {
     private InMemoryFileSystem $fileSystem;
@@ -69,7 +67,8 @@ final class PositionalArgumentsClassifierTest extends TestCase
 
         $actual = $this->classifier->classify(
             $scenario->paths,
-            $scenario->schema,
+            $scenario->sourceDirectories,
+            '/project',
         );
 
         $this->assertEquals(
@@ -80,7 +79,7 @@ final class PositionalArgumentsClassifierTest extends TestCase
 
     public static function provideClassifiablePaths(): iterable
     {
-        $baseScenario = Scenario::empty()->withSourceDirectories(['src']);
+        $baseScenario = Scenario::empty()->withSourceDirectories(['/project/src']);
 
         yield 'no paths' => [$baseScenario];
 
@@ -151,7 +150,7 @@ final class PositionalArgumentsClassifierTest extends TestCase
         yield 'path containing tests segment under configured source directory' => [
             $baseScenario
                 ->withPaths(['lib/gocardless/tests/Unit/FooTest.php'])
-                ->withSourceDirectories(['src', 'lib'])
+                ->withSourceDirectories(['/project/src', '/project/lib'])
                 ->withExistingFiles(['/project/lib/gocardless/tests/Unit/FooTest.php'])
                 ->withExpected(new ClassifiedPositionalArguments(['lib/gocardless/tests/Unit/FooTest.php'], [], [])),
         ];
@@ -194,7 +193,7 @@ final class PositionalArgumentsClassifierTest extends TestCase
         yield 'multiple configured source directories' => [
             $baseScenario
                 ->withPaths(['lib/B.php', 'tests/CTest.php'])
-                ->withSourceDirectories(['src', 'lib'])
+                ->withSourceDirectories(['/project/src', '/project/lib'])
                 ->withExistingFiles(['/project/lib/B.php', '/project/tests/CTest.php'])
                 ->withExpected(new ClassifiedPositionalArguments(['lib/B.php'], ['tests/CTest.php'], [])),
         ];
@@ -258,7 +257,7 @@ final class PositionalArgumentsClassifierTest extends TestCase
         yield 'trailing slash on an existing configured source directory selects sources' => [
             $baseScenario
                 ->withPaths(['Differ/'])
-                ->withSourceDirectories(['Differ'])
+                ->withSourceDirectories(['/project/Differ'])
                 ->withExistingFiles(['/project/Differ/Differ.php'])
                 ->withExpected(
                     new ClassifiedPositionalArguments(
@@ -304,7 +303,7 @@ final class PositionalArgumentsClassifierTest extends TestCase
         yield 'existing directory still takes precedence over a short class' => [
             $baseScenario
                 ->withPaths(['Differ'])
-                ->withSourceDirectories(['Differ'])
+                ->withSourceDirectories(['/project/Differ'])
                 ->withExistingFiles(['/project/Differ/File.php'])
                 ->withExpected(new ClassifiedPositionalArguments(
                     ['Differ'],
@@ -548,7 +547,8 @@ final class PositionalArgumentsClassifierTest extends TestCase
 
         $this->classifier->classify(
             $scenario->paths,
-            $scenario->schema,
+            $scenario->sourceDirectories,
+            '/project',
         );
     }
 
@@ -620,7 +620,7 @@ final class PositionalArgumentsClassifierTest extends TestCase
 
         yield 'non-existent absolute directory is not a project-relative source path' => [
             $baseScenario
-                ->withSourceDirectories(['src'])
+                ->withSourceDirectories(['/project/src'])
                 ->withPaths(['/src/Differ'])
                 ->withExistingFiles(['/project/src/Differ/File.php'])
                 ->withExpected(

@@ -67,7 +67,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             '/path/to/config-dir',
             '/path/to/junit.xml',
             '/path/to/project',
-            ['src'],
+            ['/path/to/project/src'],
             true,
             executeOnlyCoveringTestCases: false,
             filteredSourceFilesToMutate: [],

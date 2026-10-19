@@ -1494,6 +1494,54 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
+        yield 'source directories resolve against the Infection configuration directory' => [
+            $defaultScenario
+                ->withSchema(
+                    $defaultSchemaBuilder->withSource(
+                        new Source(
+                            ['src/', '../shared', '/external/link/..'],
+                            ['vendor/', 'Generated.php'],
+                        ),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceDirectories(
+                            '/path/to/src',
+                            '/path/shared',
+                            '/external/link/..',
+                        )
+                        ->withSourceFilesExcludes(
+                            'vendor/',
+                            'Generated.php',
+                        )
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional classification uses resolved source directories' => [
+            $defaultScenario
+                ->withSchema(
+                    $defaultSchemaBuilder->withSource(
+                        new Source(
+                            ['tests/'],
+                            [],
+                        ),
+                    ),
+                )
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalArgumentsFilter(['tests/FooTest.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceDirectories('/path/to/tests')
+                        ->withSourceFilter(new PlainFilter(['tests/FooTest.php']))
+                        ->build(),
+                ),
+        ];
+
         yield 'positional source paths become a PlainFilter (with deduplication)' => [
             $defaultScenario
                 ->withInput(
@@ -1732,7 +1780,7 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
                 expected: ConfigurationBuilder::withMinimalTestData()
                     ->withTimeout(10)
-                    ->withSourceDirectories('src/')
+                    ->withSourceDirectories('/path/to/src')
                     ->withSourceFilter(
                         new PlainFilter([
                             'src/Foo.php',

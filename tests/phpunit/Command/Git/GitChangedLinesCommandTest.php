@@ -106,7 +106,10 @@ final class GitChangedLinesCommandTest extends TestCase
             ->with(
                 $expectedFilter,
                 self::REFERENCE,
-                self::SOURCE_DIRECTORIES,
+                [
+                    self::FIXTURES_DIR . '/src',
+                    self::FIXTURES_DIR . '/lib',
+                ],
                 self::FIXTURES_DIR,
             )
             ->willReturn($changedLines)

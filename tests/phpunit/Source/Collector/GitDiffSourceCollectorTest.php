@@ -84,14 +84,14 @@ final class GitDiffSourceCollectorTest extends TestCase
         $git = $this->createMock(Git::class);
         $git->expects($this->once())
             ->method('getChangedFilePaths')
-            ->with('AM', 'main', ['src', 'lib'], '/project')
+            ->with('AM', 'main', ['/project/src', '/project/lib'], '/project')
             ->willReturn(['src/README.md'])
         ;
 
         $actual = GitDiffSourceCollector::create(
             $git,
             '/project/infection.json5',
-            ['src', 'lib'],
+            ['/project/src', '/project/lib'],
             ['Excluded.php'],
             $filter,
         );

@@ -71,8 +71,7 @@ final readonly class SourceCollectorFactory
                 $source->excludes,
                 $sourceFilter,
             ),
-            $sourceFilter === null || $sourceFilter instanceof PlainFilter => BasicSourceCollector::create(
-                $configurationPathname,
+            $sourceFilter === null || $sourceFilter instanceof PlainFilter => new BasicSourceCollector(
                 $source->directories,
                 $source->excludes,
                 $sourceFilter,

@@ -122,7 +122,7 @@ final class FactoryTest extends TestCase
     public function test_it_creates_phpunit_with_its_custom_executable(): void
     {
         $configuration = ConfigurationBuilder::withMinimalTestData()
-            ->withSourceDirectories('src')
+            ->withSourceDirectories('/path/to/project/src')
             ->withPhpUnit(new PhpUnit('config/phpunit', 'bin/phpunit'))
             ->build()
         ;
