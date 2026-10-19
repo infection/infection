@@ -65,7 +65,11 @@ final class SourceSymbolSelectorParser
         $matches = [];
 
         if (preg_match(self::SELECTOR_PATTERN, $value, $matches, PREG_UNMATCHED_AS_NULL) !== 1) {
-            return self::rejectExplicitSymbolSelector($value);
+            if (self::looksLikeExplicitSymbolSelector($value)) {
+                throw InvalidSourceSymbolSelector::create($value);
+            }
+
+            return null;
         }
 
         $className = $matches['className'] ?? null;
@@ -78,17 +82,11 @@ final class SourceSymbolSelectorParser
         );
     }
 
-    private static function rejectExplicitSymbolSelector(string $value): null
+    private static function looksLikeExplicitSymbolSelector(string $value): bool
     {
-        if (
-            str_starts_with($value, '\\')
+        return str_starts_with($value, '\\')
             || str_ends_with($value, '\\')
-            || str_contains($value, '::')
-        ) {
-            throw InvalidSourceSymbolSelector::create($value);
-        }
-
-        return null;
+            || str_contains($value, '::');
     }
 
     /**
