@@ -95,15 +95,18 @@ final class SourceSymbolSelectorParser
     /**
      * @return positive-int|null
      */
-    private static function parseLine(?string $line, string $value): ?int
-    {
+    private static function parseLine(
+        ?string $line,
+        string $value,
+    ): ?int {
         if ($line === null) {
             return null;
         }
 
         $parsedLine = (int) $line;
+        $lineOverflowsInteger = (string) $parsedLine !== $line;
 
-        if ((string) $parsedLine !== $line) {
+        if ($lineOverflowsInteger) {
             throw InvalidSourceSymbolSelector::lineOutOfRange($value);
         }
 
