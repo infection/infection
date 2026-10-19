@@ -97,7 +97,7 @@ final readonly class PositionalArgumentsClassifier
                 if ($selector !== null) {
                     $sourceSelectors[] = $selector;
 
-                    // Bare names retain their path-filter meaning as well as selecting a short class name.
+                    // Use bare names as both files/paths and short class names.
                     if (self::isBareClassName($path)) {
                         $sourcePaths[] = $path;
                     }
