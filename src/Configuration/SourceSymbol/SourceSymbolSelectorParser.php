@@ -81,7 +81,7 @@ final class SourceSymbolSelectorParser
         return new SourceSymbolSelector(
             $className,
             $matches['methodName'] ?? null,
-            self::parseLine($matches['line'] ?? null, $value),
+            self::tryParseLine($matches['line'] ?? null, $value),
         );
     }
 
@@ -95,7 +95,7 @@ final class SourceSymbolSelectorParser
     /**
      * @return positive-int|null
      */
-    private static function parseLine(
+    private static function tryParseLine(
         ?string $line,
         string $value,
     ): ?int {
