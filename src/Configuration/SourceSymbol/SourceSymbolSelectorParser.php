@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\SourceSymbol;
 
+use const PREG_UNMATCHED_AS_NULL;
 use function Safe\preg_match;
-use function sprintf;
 use function str_contains;
 use function str_ends_with;
 use function str_starts_with;
@@ -49,128 +49,60 @@ use Webmozart\Assert\Assert;
  */
 final class SourceSymbolSelectorParser
 {
-    // PHP identifier naming rules: https://www.php.net/manual/en/language.oop5.basic.php
-    private const string CLASS_NAME = '[A-Za-z_\x80-\xff][A-Za-z\d_\x80-\xff]*(?:\\\\[A-Za-z_\x80-\xff][A-Za-z\d_\x80-\xff]*)*';
-
-    // PHP function naming rules also apply to methods: https://www.php.net/manual/en/functions.user-defined.php
-    private const string METHOD_NAME = '[A-Za-z_\x80-\xff][A-Za-z\d_\x80-\xff]*';
-
-    private const string LINE_PATTERN = '/^[1-9]\d*$/D';
-
+    // PHP identifier naming rules apply to namespaces, classes, and methods:
+    // https://www.php.net/manual/en/language.variables.basics.php
     private const string SELECTOR_PATTERN = <<<'REGEX'
         {^
-            (?<className>\\?%s\\?)             # Class name or namespace prefix
-            (?:::(?<coordinate>%s|[1-9]\d*))?  # Optional method name or source line
-            (?:::(?<line>[1-9]\d*))?           # Optional source line after a method name
+            (?(DEFINE)(?<identifier>[A-Za-z_\x80-\xff][A-Za-z\d_\x80-\xff]*))
+            (?<className>\\?(?&identifier)(?:\\(?&identifier))*\\?)  # Class name or namespace prefix
+            (?:::(?<methodName>(?&identifier)))?                      # Optional method name
+            (?:::(?<line>[1-9]\d*))?                                  # Optional source line
         $}xD
         REGEX;
 
     public function parse(string $value): ?SourceSymbolSelector
     {
-        $matches = self::matchSelector($value);
+        $matches = [];
 
-        if ($matches === null) {
-            return null;
+        if (preg_match(self::SELECTOR_PATTERN, $value, $matches, PREG_UNMATCHED_AS_NULL) !== 1) {
+            return self::rejectExplicitSymbolSelector($value);
         }
 
-        [
-            'className' => $className,
-            'coordinate' => $coordinate,
-            'line' => $line,
-        ] = $matches;
-
-        if (
-            $coordinate !== ''
-            && preg_match(self::LINE_PATTERN, $coordinate) === 1
-        ) {
-            if ($line !== '') {
-                throw InvalidSourceSymbolSelector::create($value);
-            }
-
-            return new SourceSymbolSelector(
-                $className,
-                null,
-                self::parseLine($coordinate, $value),
-            );
-        }
+        $className = $matches['className'] ?? null;
+        Assert::string($className, 'A successful selector match must capture the class name.');
 
         return new SourceSymbolSelector(
             $className,
-            $coordinate === '' ? null : $coordinate,
-            self::tryParseLine($line, $value),
+            $matches['methodName'] ?? null,
+            self::parseLine($matches['line'] ?? null, $value),
         );
     }
 
-    /**
-     * @return array{className: string, coordinate: string, line: string}|null
-     */
-    private static function matchSelector(string $value): ?array
+    private static function rejectExplicitSymbolSelector(string $value): null
     {
-        $pattern = sprintf(
-            self::SELECTOR_PATTERN,
-            self::CLASS_NAME,
-            self::METHOD_NAME,
-        );
-        $matches = [];
-
-        if (preg_match($pattern, $value, $matches) !== 1) {
-            if (self::looksLikeExplicitSymbolSelector($value)) {
-                throw InvalidSourceSymbolSelector::create($value);
-            }
-
-            return null;
+        if (
+            str_starts_with($value, '\\')
+            || str_ends_with($value, '\\')
+            || str_contains($value, '::')
+        ) {
+            throw InvalidSourceSymbolSelector::create($value);
         }
 
-        Assert::isArray(
-            $matches,
-            'A successful selector match must provide captured groups.',
-        );
-        Assert::keyExists(
-            $matches,
-            'className',
-            'A successful selector match must capture the class name.',
-        );
-
-        return [
-            'className' => $matches['className'],
-            'coordinate' => $matches['coordinate'] ?? '',
-            'line' => $matches['line'] ?? '',
-        ];
-    }
-
-    private static function looksLikeExplicitSymbolSelector(string $value): bool
-    {
-        return str_starts_with($value, '\\')
-            || str_ends_with($value, '\\')
-            || str_contains($value, '::');
+        return null;
     }
 
     /**
      * @return positive-int|null
      */
-    private static function tryParseLine(
-        string $line,
-        string $value,
-    ): ?int {
-        return $line === ''
-            ? null
-            : self::parseLine(
-                $line,
-                $value,
-            );
-    }
+    private static function parseLine(?string $line, string $value): ?int
+    {
+        if ($line === null) {
+            return null;
+        }
 
-    /**
-     * @return positive-int
-     */
-    private static function parseLine(
-        string $line,
-        string $value,
-    ): int {
         $parsedLine = (int) $line;
-        $lineOverflowsInteger = (string) $parsedLine !== $line;
 
-        if ($lineOverflowsInteger) {
+        if ((string) $parsedLine !== $line) {
             throw InvalidSourceSymbolSelector::lineOutOfRange($value);
         }
 
