@@ -55,8 +55,8 @@ final class SourceSymbolSelectorParser
         {^
             (?(DEFINE)(?<identifier>[A-Za-z_\x80-\xff][A-Za-z\d_\x80-\xff]*))
             (?<className>\\?(?&identifier)(?:\\(?&identifier))*\\?)  # Class name or namespace prefix
-            (?:::(?<methodName>(?&identifier)))?                      # Optional method name
-            (?:::(?<line>[1-9]\d*))?                                  # Optional source line
+            (?: :: (?<methodName>(?&identifier)) )?                  # Optional method name
+            (?: :: (?<line>[1-9]\d*) )?                              # Optional source line
         $}xD
         REGEX;
 
