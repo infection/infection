@@ -35,12 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use function array_map;
 use function ctype_upper;
-use function dirname;
-use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelectorParser;
 use Infection\FileSystem\FileSystem;
-use Infection\FileSystem\Paths;
 use function sprintf;
 use function str_contains;
 use function str_ends_with;
@@ -68,21 +66,20 @@ final readonly class PositionalArgumentsClassifier
 
     /**
      * @param list<non-empty-string> $paths
+     * @param list<non-empty-string> $sourceDirectories Absolute paths from the runtime configuration.
      */
     public function classify(
         array $paths,
-        SchemaConfiguration $schema,
+        array $sourceDirectories,
+        string $configDir,
     ): ClassifiedPositionalArguments {
         if ($paths === []) {
             return new ClassifiedPositionalArguments([], [], []);
         }
 
-        $configDir = dirname($schema->pathname);
-
-        $absoluteSourceDirs = Paths::makeAbsolute(
-            $schema->source->directories,
-            $configDir,
-            canonicalize: true,
+        $absoluteSourceDirs = array_map(
+            Path::canonicalize(...),
+            $sourceDirectories,
         );
 
         $sourcePaths = [];
@@ -129,7 +126,7 @@ final readonly class PositionalArgumentsClassifier
     }
 
     /**
-     * @param list<non-empty-string> $absoluteSourceDirs
+     * @param list<string> $absoluteSourceDirs
      */
     private static function isInsideSourceDirectories(
         string $path,
@@ -151,7 +148,7 @@ final readonly class PositionalArgumentsClassifier
     }
 
     /**
-     * @param list<non-empty-string> $absoluteSourceDirs
+     * @param list<string> $absoluteSourceDirs
      *
      * @return self::KIND_SOURCE|self::KIND_TEST
      */

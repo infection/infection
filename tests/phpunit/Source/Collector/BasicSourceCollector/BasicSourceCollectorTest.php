@@ -77,8 +77,7 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
         array $excludedFilesOrDirectories,
         array|Exception $expected,
     ): void {
-        $collector = BasicSourceCollector::create(
-            configurationPathname: self::FIXTURES_ROOT . '/infection.json',
+        $collector = new BasicSourceCollector(
             sourceDirectories: $sourceDirectories,
             excludedFilesOrDirectories: $excludedFilesOrDirectories,
             filter: null,
@@ -119,21 +118,6 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
         yield 'multiple directories' => [
             [
                 self::FIXTURES_ROOT . '/case0',
-                self::FIXTURES_ROOT . '/case1',
-            ],
-            [],
-            [
-                'case0/a.php',
-                'case0/outside-symlink.php',
-                'case0/sub-dir/b.php',
-                'case1/a.php',
-                'case1/sub-dir/b.php',
-            ],
-        ];
-
-        yield 'source directories are relative to the configuration file' => [
-            [
-                'case0',
                 self::FIXTURES_ROOT . '/case1',
             ],
             [],
@@ -263,9 +247,8 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
             $this->filesystem->dumpFile($filePath, '');
         }
 
-        $collector = BasicSourceCollector::create(
-            configurationPathname: '/path/to/project',
-            sourceDirectories: [$this->tmp],
+        $collector = new BasicSourceCollector(
+            sourceDirectories: [$this->tmp . '/'],
             excludedFilesOrDirectories: [],
             filter: $filter,
         );

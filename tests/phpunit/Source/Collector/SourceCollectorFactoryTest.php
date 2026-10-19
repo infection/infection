@@ -73,7 +73,7 @@ final class SourceCollectorFactoryTest extends TestCase
 
         $actual = $factory->create(
             '/path/to/project',
-            new Source(['src', 'lib'], ['vendor', 'tests']),
+            new Source(['/path/to/src', '/path/to/lib'], ['vendor', 'tests']),
             $sourceFilter,
         );
 

@@ -69,8 +69,7 @@ final readonly class GitDiffSourceCollector implements SourceCollector
         GitDiffFilter $filter,
     ): self {
         return new self(
-            BasicSourceCollector::create(
-                $configurationPathname,
+            new BasicSourceCollector(
                 $sourceDirectories,
                 $excludedFilesOrDirectories,
                 self::convertToPlainFilter(

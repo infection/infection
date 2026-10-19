@@ -37,16 +37,11 @@ namespace Infection\Tests\Configuration\PositionalArgumentsClassifier;
 
 use Exception;
 use Infection\Configuration\ClassifiedPositionalArguments;
-use Infection\Configuration\Entry\Source;
-use Infection\Configuration\Schema\SchemaConfiguration;
-use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use InvalidArgumentException;
 use LogicException;
 
 final class Scenario
 {
-    public SchemaConfiguration $schema;
-
     /**
      * @param list<non-empty-string> $paths
      * @param list<non-empty-string> $sourceDirectories
@@ -55,12 +50,11 @@ final class Scenario
      */
     public function __construct(
         public array $paths,
-        array $sourceDirectories,
+        public array $sourceDirectories,
         public array $existingFiles,
         public array $existingDirectories,
         public ClassifiedPositionalArguments|Exception $expected,
     ) {
-        $this->schema = self::createSchema($sourceDirectories);
     }
 
     public static function empty(): self
@@ -95,7 +89,7 @@ final class Scenario
     public function withSourceDirectories(array $sourceDirectories): self
     {
         $clone = clone $this;
-        $clone->schema = self::createSchema($sourceDirectories);
+        $clone->sourceDirectories = $sourceDirectories;
 
         return $clone;
     }
@@ -150,17 +144,5 @@ final class Scenario
         }
 
         return $expected;
-    }
-
-    /**
-     * @param list<non-empty-string> $sourceDirectories
-     */
-    private static function createSchema(array $sourceDirectories): SchemaConfiguration
-    {
-        return SchemaConfigurationBuilder::withMinimalTestData()
-            ->withPathname('/project/infection.json5')
-            ->withSource(new Source($sourceDirectories, []))
-            ->build()
-        ;
     }
 }
