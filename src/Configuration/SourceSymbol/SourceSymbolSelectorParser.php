@@ -73,7 +73,10 @@ final class SourceSymbolSelectorParser
         }
 
         $className = $matches['className'] ?? null;
-        Assert::string($className, 'A successful selector match must capture the class name.');
+        Assert::string(
+            $className,
+            'A successful selector match must capture the class name.',
+        );
 
         return new SourceSymbolSelector(
             $className,
