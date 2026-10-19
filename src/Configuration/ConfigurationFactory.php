@@ -48,6 +48,7 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\Entry\Source;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
@@ -58,6 +59,7 @@ use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
+use Infection\FileSystem\Paths;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
 use Infection\Mutator\ConfigurableMutator;
@@ -173,15 +175,24 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
+        $source = new Source(
+            Paths::makeAbsolute(
+                $schema->source->directories,
+                $configDir,
+            ),
+            $schema->source->excludes,
+        );
+
         [$sourceFilter, $testFrameworkExtraArgs] = $this->refineFilterIfNecessary(
             $sourceFilter,
-            $schema,
+            $source,
+            $configDir,
             $testFrameworkExtraArgs,
         );
 
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
-            source: $schema->source,
+            source: $source,
             sourceFilter: $sourceFilter,
             logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath, $summaryJsonLogFilePath),
             logVerbosity: $logVerbosity,
@@ -431,12 +442,14 @@ class ConfigurationFactory
      */
     private function resolvePositionalArgumentsFilter(
         PositionalArgumentsFilter $sourceFilter,
-        SchemaConfiguration $schema,
+        Source $source,
+        string $configDir,
         ?string $testFrameworkExtraArgs,
     ): array {
         $classified = $this->positionalArgumentsClassifier->classify(
             $sourceFilter->arguments,
-            $schema,
+            $source->directories,
+            $configDir,
         );
 
         $resolvedFilter = PlainFilter::tryToCreate($classified->sourcePaths);
@@ -462,7 +475,8 @@ class ConfigurationFactory
      */
     private function refineFilterIfNecessary(
         PlainFilter|IncompleteGitDiffFilter|PositionalArgumentsFilter|null $sourceFilter,
-        SchemaConfiguration $schema,
+        Source $source,
+        string $configDir,
         ?string $testFrameworkExtraArgs,
     ): array {
         $sourceSymbolSelectors = [];
@@ -470,7 +484,8 @@ class ConfigurationFactory
         if ($sourceFilter instanceof PositionalArgumentsFilter) {
             [$sourceFilter, $testFrameworkExtraArgs, $sourceSymbolSelectors] = $this->resolvePositionalArgumentsFilter(
                 $sourceFilter,
-                $schema,
+                $source,
+                $configDir,
                 $testFrameworkExtraArgs,
             );
         }
