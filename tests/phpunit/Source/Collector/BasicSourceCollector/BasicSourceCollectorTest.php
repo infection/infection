@@ -66,67 +66,6 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
         $this->filesystem = new Filesystem();
     }
 
-    public function test_it_resolves_source_directories_relative_to_the_configuration_file(): void
-    {
-        $collector = BasicSourceCollector::create(
-            configurationPathname: self::FIXTURES_ROOT . '/infection.json',
-            sourceDirectories: [
-                'case0',
-                self::FIXTURES_ROOT . '/case1',
-            ],
-            excludedFilesOrDirectories: [],
-            filter: null,
-        );
-
-        self::assertIsEqualUnorderedLists(
-            [
-                'case0/a.php',
-                'case0/outside-symlink.php',
-                'case0/sub-dir/b.php',
-                'case1/a.php',
-                'case1/sub-dir/b.php',
-            ],
-            $collector->collect(),
-        );
-    }
-
-    public function test_it_preserves_parent_directory_resolution_after_an_absolute_symlink(): void
-    {
-        $projectDirectory = $this->tmp . '/project';
-        $externalDirectory = $this->tmp . '/external';
-
-        $this->filesystem->dumpFile(
-            $projectDirectory . '/Example.php',
-            '',
-        );
-        $this->filesystem->dumpFile(
-            $externalDirectory . '/Example.php',
-            '',
-        );
-        $this->filesystem->mkdir($externalDirectory . '/nested');
-        $this->filesystem->symlink(
-            $externalDirectory . '/nested',
-            $projectDirectory . '/link',
-        );
-
-        $collector = BasicSourceCollector::create(
-            configurationPathname: $projectDirectory . '/infection.json',
-            sourceDirectories: [$projectDirectory . '/link/..'],
-            excludedFilesOrDirectories: [],
-            filter: null,
-        );
-
-        $actual = array_map(
-            static fn (SplFileInfo $fileInfo) => $fileInfo->getRealPath(),
-            $collector->collect(),
-        );
-
-        $this->assertSame(
-            [$externalDirectory . '/Example.php'],
-            $actual,
-        );
-    }
-
     /**
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string[] $excludedFilesOrDirectories
@@ -138,10 +77,11 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
         array $excludedFilesOrDirectories,
         array|Exception $expected,
     ): void {
-        $collector = new BasicSourceCollector(
-            $sourceDirectories,
-            $excludedFilesOrDirectories,
-            null,
+        $collector = BasicSourceCollector::create(
+            configurationPathname: self::FIXTURES_ROOT . '/infection.json',
+            sourceDirectories: $sourceDirectories,
+            excludedFilesOrDirectories: $excludedFilesOrDirectories,
+            filter: null,
         );
 
         if ($expected instanceof Exception) {
@@ -188,6 +128,30 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
                 'case0/sub-dir/b.php',
                 'case1/a.php',
                 'case1/sub-dir/b.php',
+            ],
+        ];
+
+        yield 'source directories are relative to the configuration file' => [
+            [
+                'case0',
+                self::FIXTURES_ROOT . '/case1',
+            ],
+            [],
+            [
+                'case0/a.php',
+                'case0/outside-symlink.php',
+                'case0/sub-dir/b.php',
+                'case1/a.php',
+                'case1/sub-dir/b.php',
+            ],
+        ];
+
+        yield 'absolute source paths preserve parent directory resolution after a symlink' => [
+            [self::FIXTURES_ROOT . '/case0/directory-symlink/..'],
+            [],
+            [
+                'case0/directory-symlink/../a.php',
+                'case0/directory-symlink/../sub-dir/b.php',
             ],
         ];
 
@@ -426,7 +390,10 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
         foreach ($expectedList as $path) {
             $pathname = Path::normalize($root . '/' . $path);
 
-            $expected[$pathname] = Path::normalize($path);
+            $expected[$pathname] = Path::makeRelative(
+                $pathname,
+                $root,
+            );
         }
 
         return $expected;

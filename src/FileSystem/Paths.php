@@ -48,21 +48,22 @@ final class Paths
     use CannotBeInstantiated;
 
     /**
-     * Resolves a collection of paths against a base directory, preserving array keys.
+     * Resolves paths against a base directory, preserving array keys.
      *
-     * Unlike Symfony's Path::makeAbsolute(), the default mode preserves absolute
-     * paths verbatim. Source collection needs filesystem resolution: if
-     * /project/link points to /external/nested, /project/link/.. resolves to
-     * /external. Lexical canonicalization would instead select /project.
-     * Relative paths are joined and canonicalized by Path::join(). This mode also
-     * accepts relative bases, so callers need an absolute base for absolute results.
+     * By default, relative paths are joined to the base and simplified, while
+     * absolute paths are kept unchanged rather than simplified as in Symfony's
+     * Path::makeAbsolute().
+     * For example, if /project/link points to /external/nested, preserving
+     * /project/link/.. lets the filesystem follow the symbolic link before
+     * resolving ".." to /external, whereas Symfony returns /project.
      *
      * @template TKey of array-key
      *
      * @param array<TKey, string> $paths
-     * @param bool $canonicalize Set to true for lexical comparisons and PCOV configuration.
-     *                           Delegates to Symfony's Path::makeAbsolute(), which canonicalizes
-     *                           all paths and requires an absolute base directory.
+     * @param string $basePath Use an absolute base to ensure absolute results; required when $canonicalize is true.
+     * @param bool $canonicalize Set to true to use Symfony's Path::makeAbsolute(), which simplifies
+     *                           all paths by removing "." and resolving ".." segments without
+     *                           following symbolic links.
      *
      * @return ($paths is list<string> ? list<non-empty-string> : array<TKey, non-empty-string>)
      */
