@@ -41,7 +41,6 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
 use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
@@ -64,7 +63,6 @@ readonly class Configuration
     ];
 
     /**
-     * @param Source $source Source directories are absolute paths resolved against the Infection configuration directory.
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      * @param positive-int $threadCount
@@ -74,7 +72,7 @@ readonly class Configuration
      */
     public function __construct(
         public float $processTimeout,
-        public Source $source,
+        public ResolvedSource $source,
         public SourceFilter $sourceFilter,
         public Logs $logs,
         public string $logVerbosity,

@@ -48,7 +48,6 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
@@ -59,7 +58,6 @@ use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use Infection\FileSystem\Paths;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
 use Infection\Mutator\ConfigurableMutator;
@@ -175,12 +173,9 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
-        $source = new Source(
-            Paths::makeAbsolute(
-                $schema->source->directories,
-                $configDir,
-            ),
-            $schema->source->excludes,
+        $source = ResolvedSource::create(
+            $schema->source,
+            $configDir,
         );
 
         [$sourceFilter, $testFrameworkExtraArgs] = $this->refineFilterIfNecessary(
@@ -442,7 +437,7 @@ class ConfigurationFactory
      */
     private function resolvePositionalArgumentsFilter(
         PositionalArgumentsFilter $sourceFilter,
-        Source $source,
+        ResolvedSource $source,
         string $configDir,
         ?string $testFrameworkExtraArgs,
     ): array {
@@ -475,7 +470,7 @@ class ConfigurationFactory
      */
     private function refineFilterIfNecessary(
         PlainFilter|IncompleteGitDiffFilter|PositionalArgumentsFilter|null $sourceFilter,
-        Source $source,
+        ResolvedSource $source,
         string $configDir,
         ?string $testFrameworkExtraArgs,
     ): array {
