@@ -56,7 +56,7 @@ final class PathsArgument
     public static function addArgument(
         Command $command,
         string $description = <<<'HELP'
-            Limit mutation testing to source paths, test paths, and/or class, namespace prefix, method, or absolute source line selectors (`Differ`, `Differ::diff`, `Differ::diff::32`). Readable paths take precedence. An unresolved bare name intersects path and short class filters; use `Differ/` for paths only, `'Differ\'` for classes under the Differ namespace prefix, or `'\Differ'` for the global class. Quote backslashes for your shell. Example: `infection run tests/DifferTest.php Differ::diff`.
+            Reduce the selected source code or tests executed e.g. `App\Differ`, `Differ::diff`, `Differ::diff::32`). Existing paths take precedence. An unresolved bare name such as `Differ` intersects path and short class filters. Use `Differ/` for paths only, `'Differ\'` for classes under the Differ namespace prefix or `'\Differ'` for the global class.
             HELP,
     ): Command {
         return $command->addArgument(
