@@ -62,9 +62,36 @@ final class SourceSymbolSelectorParser
 
     public function parse(string $value): ?SourceSymbolSelector
     {
+        $matches = self::matchSelector($value);
+
+        if ($matches === null) {
+            return null;
+        }
+
+        [
+            $className,
+            $methodName,
+            $line,
+        ] = $matches;
+
+        return new SourceSymbolSelector(
+            $className,
+            $methodName,
+            self::tryParseLine(
+                $line,
+                $value,
+            ),
+        );
+    }
+
+    /**
+     * @return array{string, string|null, string|null}|null
+     */
+    private static function matchSelector(string $value): ?array
+    {
         $matches = [];
 
-        if (preg_match(self::SELECTOR_PATTERN, $value, $matches, PREG_UNMATCHED_AS_NULL) !== 1) {
+        if (preg_match(self::SELECTOR_PATTERN, $value, $matches, PREG_UNMATCHED_AS_NULL,) !== 1) {
             if (self::looksLikeExplicitSymbolSelector($value)) {
                 throw InvalidSourceSymbolSelector::create($value);
             }
@@ -78,11 +105,11 @@ final class SourceSymbolSelectorParser
             'A successful selector match must capture the class name.',
         );
 
-        return new SourceSymbolSelector(
+        return [
             $className,
             $matches['methodName'] ?? null,
-            self::tryParseLine($matches['line'] ?? null, $value),
-        );
+            $matches['line'] ?? null,
+        ];
     }
 
     private static function looksLikeExplicitSymbolSelector(string $value): bool
