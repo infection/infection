@@ -37,6 +37,8 @@ namespace Infection\Tests\Source\Collector\BasicSourceCollector;
 
 use function array_map;
 use Exception;
+use Infection\Configuration\Entry\Source;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Source\Collector\BasicSourceCollector;
 use Infection\Source\Exception\NoSourceFound;
@@ -67,8 +69,8 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
     }
 
     /**
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string[] $excludedFilesOrDirectories
+     * @param list<non-empty-string> $sourceDirectories
+     * @param list<non-empty-string> $excludedFilesOrDirectories
      * @param list<non-empty-string>|Exception $expected
      */
     #[DataProvider('sourceFilesProvider')]
@@ -78,8 +80,13 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
         array|Exception $expected,
     ): void {
         $collector = new BasicSourceCollector(
-            sourceDirectories: $sourceDirectories,
-            excludedFilesOrDirectories: $excludedFilesOrDirectories,
+            source: ResolvedSource::create(
+                new Source(
+                    $sourceDirectories,
+                    $excludedFilesOrDirectories,
+                ),
+                self::FIXTURES_ROOT,
+            ),
             filter: null,
         );
 
@@ -248,8 +255,13 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
         }
 
         $collector = new BasicSourceCollector(
-            sourceDirectories: [$this->tmp . '/'],
-            excludedFilesOrDirectories: [],
+            source: ResolvedSource::create(
+                new Source(
+                    [$this->tmp . '/'],
+                    [],
+                ),
+                $this->tmp,
+            ),
             filter: $filter,
         );
 

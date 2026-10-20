@@ -73,7 +73,6 @@ final class SourceCollectorFactoryTest extends TestCase
         }
 
         $actual = $factory->create(
-            '/path/to/project',
             ResolvedSource::create(
                 new Source(
                     ['/path/to/src', '/path/to/lib'],

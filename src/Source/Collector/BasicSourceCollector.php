@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Source\Collector;
 
 use function count;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Infection\Source\Exception\NoSourceFound;
@@ -50,13 +51,8 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 final readonly class BasicSourceCollector implements SourceCollector
 {
-    /**
-     * @param non-empty-string[] $sourceDirectories Absolute paths from the runtime configuration.
-     * @param non-empty-string[] $excludedFilesOrDirectories
-     */
     public function __construct(
-        private array $sourceDirectories,
-        private array $excludedFilesOrDirectories,
+        private ResolvedSource $source,
         private ?PlainFilter $filter,
     ) {
     }
@@ -77,7 +73,7 @@ final readonly class BasicSourceCollector implements SourceCollector
      */
     private function doCollect(): array
     {
-        if ($this->sourceDirectories === []) {
+        if ($this->source->directories === []) {
             return [];
         }
 
@@ -93,9 +89,9 @@ final readonly class BasicSourceCollector implements SourceCollector
     private function createFinder(): Finder
     {
         return Finder::create()
-            ->in($this->sourceDirectories)
-            ->exclude($this->excludedFilesOrDirectories)
-            ->notPath($this->excludedFilesOrDirectories)
+            ->in($this->source->directories)
+            ->exclude($this->source->excludes)
+            ->notPath($this->source->excludes)
             ->files()
             ->name('*.php')
         ;
@@ -119,8 +115,12 @@ final readonly class BasicSourceCollector implements SourceCollector
 
         // TODO: to check if we really need to re-apply the excluded files.
         //   could be necessary due to a Finder bug for example.
-        if (count($this->excludedFilesOrDirectories) !== 0) {
-            $iterator = new PathFilterIterator($iterator, [], $this->excludedFilesOrDirectories);
+        if (count($this->source->excludes) !== 0) {
+            $iterator = new PathFilterIterator(
+                $iterator,
+                [],
+                $this->source->excludes,
+            );
         }
 
         return $iterator;

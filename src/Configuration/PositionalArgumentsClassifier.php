@@ -66,12 +66,10 @@ final readonly class PositionalArgumentsClassifier
 
     /**
      * @param list<non-empty-string> $paths
-     * @param list<non-empty-string> $sourceDirectories Absolute paths from the runtime configuration.
      */
     public function classify(
         array $paths,
-        array $sourceDirectories,
-        string $configDir,
+        ResolvedSource $source,
     ): ClassifiedPositionalArguments {
         if ($paths === []) {
             return new ClassifiedPositionalArguments([], [], []);
@@ -79,7 +77,7 @@ final readonly class PositionalArgumentsClassifier
 
         $absoluteSourceDirs = array_map(
             Path::canonicalize(...),
-            $sourceDirectories,
+            $source->directories,
         );
 
         $sourcePaths = [];
@@ -89,7 +87,7 @@ final readonly class PositionalArgumentsClassifier
         foreach ($paths as $path) {
             $absolutePath = Path::isAbsolute($path)
                 ? $path
-                : Path::join($configDir, $path);
+                : Path::join($source->basePath, $path);
             $isExplicitPath = str_ends_with($path, '/');
 
             // Existing files and directories take precedence over symbol selectors, so Windows
@@ -109,7 +107,11 @@ final readonly class PositionalArgumentsClassifier
                 }
             }
 
-            $kind = $this->classifyPathKind($path, $absoluteSourceDirs, $configDir);
+            $kind = $this->classifyPathKind(
+                $path,
+                $absoluteSourceDirs,
+                $source->basePath,
+            );
 
             if ($kind === self::KIND_SOURCE) {
                 $sourcePaths[] = $path;

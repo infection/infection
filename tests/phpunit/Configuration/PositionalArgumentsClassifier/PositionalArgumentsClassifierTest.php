@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\PositionalArgumentsClassifier;
 
 use Infection\Configuration\ClassifiedPositionalArguments;
+use Infection\Configuration\Entry\Source;
 use Infection\Configuration\PositionalArgumentsClassifier;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\SourceSymbol\InvalidSourceSymbolSelector;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelectorParser;
@@ -67,8 +69,7 @@ final class PositionalArgumentsClassifierTest extends TestCase
 
         $actual = $this->classifier->classify(
             $scenario->paths,
-            $scenario->sourceDirectories,
-            '/project',
+            $scenario->source,
         );
 
         $this->assertEquals(
@@ -82,6 +83,31 @@ final class PositionalArgumentsClassifierTest extends TestCase
         $baseScenario = Scenario::empty()->withSourceDirectories(['/project/src']);
 
         yield 'no paths' => [$baseScenario];
+
+        yield 'relative source and test paths use the resolved source base path' => [
+            $baseScenario
+                ->withSource(
+                    ResolvedSource::create(
+                        new Source(
+                            ['src'],
+                            [],
+                        ),
+                        '/other-project',
+                    ),
+                )
+                ->withPaths(['src/SomeFile.php', 'tests/SomeTest.php'])
+                ->withExistingFiles([
+                    '/other-project/src/SomeFile.php',
+                    '/other-project/tests/SomeTest.php',
+                ])
+                ->withExpected(
+                    new ClassifiedPositionalArguments(
+                        ['src/SomeFile.php'],
+                        ['tests/SomeTest.php'],
+                        [],
+                    ),
+                ),
+        ];
 
         yield 'single source file path' => [
             $baseScenario
@@ -547,8 +573,7 @@ final class PositionalArgumentsClassifierTest extends TestCase
 
         $this->classifier->classify(
             $scenario->paths,
-            $scenario->sourceDirectories,
-            '/project',
+            $scenario->source,
         );
     }
 
