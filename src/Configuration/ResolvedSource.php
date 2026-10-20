@@ -42,19 +42,21 @@ use Webmozart\Assert\Assert;
 
 /**
  * Source directories resolved against the Infection configuration directory,
- * with unchanged exclusion rules.
+ * with unchanged exclusion rules and the base path used for resolution.
  *
  * @internal
  */
 final readonly class ResolvedSource
 {
     /**
-     * @param list<non-empty-string> $directories
+     * @param list<non-empty-string> $directories Absolute paths resolved against the Infection configuration directory.
      * @param list<non-empty-string> $excludes
+     * @param non-empty-string $basePath Absolute path to the Infection configuration directory.
      */
     private function __construct(
         public array $directories,
         public array $excludes,
+        public string $basePath,
     ) {
     }
 
@@ -63,7 +65,7 @@ final readonly class ResolvedSource
         string $basePath,
     ): self {
         Assert::true(
-            Path::isAbsolute($basePath),
+            $basePath !== '' && Path::isAbsolute($basePath),
             'The source base path must be absolute so resolved directories do not depend on the working directory.',
         );
 
@@ -73,6 +75,7 @@ final readonly class ResolvedSource
                 $basePath,
             ),
             $source->excludes,
+            $basePath,
         );
     }
 }

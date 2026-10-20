@@ -183,7 +183,6 @@ class ConfigurationFactory
         [$sourceFilter, $testFrameworkExtraArgs] = $this->refineFilterIfNecessary(
             $sourceFilter,
             $source,
-            $configDir,
             $testFrameworkExtraArgs,
         );
 
@@ -440,13 +439,11 @@ class ConfigurationFactory
     private function resolvePositionalArgumentsFilter(
         PositionalArgumentsFilter $sourceFilter,
         ResolvedSource $source,
-        string $configDir,
         ?string $testFrameworkExtraArgs,
     ): array {
         $classified = $this->positionalArgumentsClassifier->classify(
             $sourceFilter->arguments,
-            $source->directories,
-            $configDir,
+            $source,
         );
 
         $resolvedFilter = PlainFilter::tryToCreate($classified->sourcePaths);
@@ -473,7 +470,6 @@ class ConfigurationFactory
     private function refineFilterIfNecessary(
         PlainFilter|IncompleteGitDiffFilter|PositionalArgumentsFilter|null $sourceFilter,
         ResolvedSource $source,
-        string $configDir,
         ?string $testFrameworkExtraArgs,
     ): array {
         $sourceSymbolSelectors = [];
@@ -482,7 +478,6 @@ class ConfigurationFactory
             [$sourceFilter, $testFrameworkExtraArgs, $sourceSymbolSelectors] = $this->resolvePositionalArgumentsFilter(
                 $sourceFilter,
                 $source,
-                $configDir,
                 $testFrameworkExtraArgs,
             );
         }
