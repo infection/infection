@@ -37,6 +37,8 @@ namespace Infection\Tests\Configuration\PositionalArgumentsClassifier;
 
 use Exception;
 use Infection\Configuration\ClassifiedPositionalArguments;
+use Infection\Configuration\Entry\Source;
+use Infection\Configuration\ResolvedSource;
 use InvalidArgumentException;
 use LogicException;
 
@@ -44,13 +46,12 @@ final class Scenario
 {
     /**
      * @param list<non-empty-string> $paths
-     * @param list<non-empty-string> $sourceDirectories
      * @param list<non-empty-string> $existingFiles
      * @param list<non-empty-string> $existingDirectories
      */
     public function __construct(
         public array $paths,
-        public array $sourceDirectories,
+        public ResolvedSource $source,
         public array $existingFiles,
         public array $existingDirectories,
         public ClassifiedPositionalArguments|Exception $expected,
@@ -61,7 +62,10 @@ final class Scenario
     {
         return new self(
             paths: [],
-            sourceDirectories: [],
+            source: ResolvedSource::create(
+                new Source(),
+                '/project',
+            ),
             existingFiles: [],
             existingDirectories: [],
             expected: new ClassifiedPositionalArguments(
@@ -88,8 +92,21 @@ final class Scenario
      */
     public function withSourceDirectories(array $sourceDirectories): self
     {
+        return $this->withSource(
+            ResolvedSource::create(
+                new Source(
+                    $sourceDirectories,
+                    $this->source->excludes,
+                ),
+                $this->source->basePath,
+            ),
+        );
+    }
+
+    public function withSource(ResolvedSource $source): self
+    {
         $clone = clone $this;
-        $clone->sourceDirectories = $sourceDirectories;
+        $clone->source = $source;
 
         return $clone;
     }

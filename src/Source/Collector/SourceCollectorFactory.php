@@ -55,25 +55,18 @@ final readonly class SourceCollectorFactory
     ) {
     }
 
-    /**
-     * @param non-empty-string $configurationPathname
-     */
     public function create(
-        string $configurationPathname,
         ResolvedSource $source,
         ?SourceFileFilter $sourceFilter,
     ): SourceCollector {
         return match (true) {
             $sourceFilter instanceof GitDiffFilter => GitDiffSourceCollector::create(
                 $this->git,
-                $configurationPathname,
-                $source->directories,
-                $source->excludes,
+                $source,
                 $sourceFilter,
             ),
             $sourceFilter === null || $sourceFilter instanceof PlainFilter => new BasicSourceCollector(
-                $source->directories,
-                $source->excludes,
+                $source,
                 $sourceFilter,
             ),
             // @phpstan-ignore infection.invalidArgumentException (Keep the exhaustive match expression.)

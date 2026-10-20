@@ -1769,6 +1769,7 @@ final class ConfigurationFactoryTest extends TestCase
                     mutantId: 'h4sh',
                 ),
                 expected: ConfigurationBuilder::withMinimalTestData()
+                    ->withConfigPathname('/path/to/infection.json')
                     ->withTimeout(10)
                     ->withSourceDirectories('/path/to/src')
                     ->withSourceFilter(
@@ -1826,7 +1827,6 @@ final class ConfigurationFactoryTest extends TestCase
                     ->withProjectDirectory('/path/to/project')
                     ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
                     ->withMutantId('h4sh')
-                    ->withConfigPathname('/path/to/infection.json')
                     ->build(),
             ),
         ];
