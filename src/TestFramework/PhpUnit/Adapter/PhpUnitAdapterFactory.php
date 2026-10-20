@@ -97,14 +97,14 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
-        $sourceDirectories = array_values(
+        $absoluteSourceDirectories = array_values(
             Paths::makeAbsolute(
                 $sourceDirectories,
                 $sourceDirectoryBasePath,
             ),
         );
         Assert::notEmpty(
-            $sourceDirectories,
+            $absoluteSourceDirectories,
             'The source directories cannot be empty. This indicates that an invalid configuration reached the test framework adapter factory.',
         );
 
@@ -119,14 +119,14 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $testFrameworkExecutable,
             $tmpDir,
             $jUnitFilePath,
-            new PCOVDirectoryProvider($sourceDirectories),
+            new PCOVDirectoryProvider($absoluteSourceDirectories),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
                 $fileSystem,
-                $sourceDirectories,
+                $absoluteSourceDirectories,
                 array_map(
                     static function (SplFileInfo $fileInfo): string {
                         $realPath = $fileInfo->getRealPath();
