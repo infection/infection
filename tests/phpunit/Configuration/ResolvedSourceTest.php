@@ -45,32 +45,15 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ResolvedSource::class)]
 final class ResolvedSourceTest extends TestCase
 {
-    /**
-     * @param list<non-empty-string> $expectedDirectories
-     */
     #[DataProvider('sourceProvider')]
     public function test_it_resolves_directories_and_preserves_exclusions(
         Source $source,
         string $basePath,
-        array $expectedDirectories,
+        ResolvedSource $expected,
     ): void {
-        $resolvedSource = ResolvedSource::create(
-            $source,
-            $basePath,
-        );
+        $actual = ResolvedSource::create($source, $basePath);
 
-        $this->assertSame(
-            $expectedDirectories,
-            $resolvedSource->directories,
-        );
-        $this->assertSame(
-            $source->excludes,
-            $resolvedSource->excludes,
-        );
-        $this->assertSame(
-            $basePath,
-            $resolvedSource->basePath,
-        );
+        $this->assertEquals($expected, $actual);
     }
 
     public static function sourceProvider(): iterable
@@ -81,7 +64,11 @@ final class ResolvedSourceTest extends TestCase
                 ['vendor'],
             ),
             '/project',
-            [],
+            new ResolvedSource(
+                [],
+                ['vendor'],
+                '/project',
+            ),
         ];
 
         yield 'relative directories resolve against the configuration directory' => [
@@ -90,7 +77,11 @@ final class ResolvedSourceTest extends TestCase
                 ['vendor/', 'Generated.php', '/Generated/'],
             ),
             '/project/config',
-            ['/project/config/src', '/project/shared', '/project/config/app'],
+            new ResolvedSource(
+                ['/project/config/src', '/project/shared', '/project/config/app'],
+                ['vendor/', 'Generated.php', '/Generated/'],
+                '/project/config',
+            ),
         ];
 
         yield 'absolute directories preserve segments that may traverse symbolic links' => [
@@ -99,7 +90,11 @@ final class ResolvedSourceTest extends TestCase
                 ['Generated.php'],
             ),
             '/project',
-            ['/external/link/..', '/external/./src/'],
+            new ResolvedSource(
+                ['/external/link/..', '/external/./src/'],
+                ['Generated.php'],
+                '/project',
+            ),
         ];
 
         yield 'absolute and relative directories can be mixed' => [
@@ -108,25 +103,29 @@ final class ResolvedSourceTest extends TestCase
                 [],
             ),
             '/project',
-            ['/project/src', '/shared/lib'],
+            new ResolvedSource(
+                ['/project/src', '/shared/lib'],
+                [],
+                '/project',
+            ),
         ];
     }
 
     #[DataProvider('invalidBasePathProvider')]
     public function test_it_rejects_a_non_absolute_base_path(string $basePath): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'The source base path must be absolute so resolved directories do not depend on the working directory.',
+        $source = new Source(
+            ['src'],
+            [],
         );
 
-        ResolvedSource::create(
-            new Source(
-                ['src'],
-                [],
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The source base path must be absolute so resolved directories do not depend on the working directory.',
             ),
-            $basePath,
         );
+
+        ResolvedSource::create($source, $basePath);
     }
 
     public static function invalidBasePathProvider(): iterable
