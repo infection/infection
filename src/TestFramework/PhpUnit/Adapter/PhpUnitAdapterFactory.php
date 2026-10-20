@@ -97,15 +97,14 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
-        // Preserve absolute paths for PHPUnit; PCOV canonicalizes them when finding their common base path.
-        $absoluteSourceDirectories = array_values(
+        $sourceDirectories = array_values(
             Paths::makeAbsolute(
                 $sourceDirectories,
                 $sourceDirectoryBasePath,
             ),
         );
         Assert::notEmpty(
-            $absoluteSourceDirectories,
+            $sourceDirectories,
             'The source directories cannot be empty. This indicates that an invalid configuration reached the test framework adapter factory.',
         );
 
@@ -120,14 +119,14 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $testFrameworkExecutable,
             $tmpDir,
             $jUnitFilePath,
-            new PCOVDirectoryProvider($absoluteSourceDirectories),
+            new PCOVDirectoryProvider($sourceDirectories),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
                 $fileSystem,
-                $absoluteSourceDirectories,
+                $sourceDirectories,
                 array_map(
                     static function (SplFileInfo $fileInfo): string {
                         $realPath = $fileInfo->getRealPath();
