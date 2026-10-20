@@ -43,7 +43,6 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\SourceFilter\PlainFilter;
@@ -58,7 +57,6 @@ use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use PhpParser\Node;
-use Symfony\Component\Filesystem\Path;
 
 final class ConfigurationBuilder
 {
@@ -164,10 +162,7 @@ final class ConfigurationBuilder
     {
         return new self(
             timeout: 10.0,
-            source: ResolvedSource::create(
-                new Source(),
-                '/path/to/project',
-            ),
+            source: ResolvedSourceBuilder::withMinimalTestData()->build(),
             sourceFilter: new SourceFilter(null, []),
             logs: Logs::createEmpty(),
             logVerbosity: 'none',
@@ -212,13 +207,7 @@ final class ConfigurationBuilder
     {
         return new self(
             timeout: 5.0,
-            source: ResolvedSource::create(
-                new Source(
-                    ['src', 'lib'],
-                    ['vendor', 'tests'],
-                ),
-                '/path/to/project',
-            ),
+            source: ResolvedSourceBuilder::withCompleteTestData()->build(),
             sourceFilter: new SourceFilter(
                 new PlainFilter([
                     'src/Foo.php',
@@ -305,16 +294,11 @@ final class ConfigurationBuilder
      */
     public function withSourceDirectories(string ...$sourceDirectories): self
     {
-        $clone = clone $this;
-        $clone->source = ResolvedSource::create(
-            new Source(
-                array_values($sourceDirectories),
-                $this->source->excludes,
-            ),
-            Path::getDirectory($this->configPathname),
+        return $this->withSource(
+            ResolvedSourceBuilder::from($this->source)
+                ->withDirectories(...$sourceDirectories)
+                ->build(),
         );
-
-        return $clone;
     }
 
     /**
@@ -322,16 +306,11 @@ final class ConfigurationBuilder
      */
     public function withSourceFilesExcludes(string ...$sourceFilesExcludes): self
     {
-        $clone = clone $this;
-        $clone->source = ResolvedSource::create(
-            new Source(
-                $this->source->directories,
-                array_values($sourceFilesExcludes),
-            ),
-            Path::getDirectory($this->configPathname),
+        return $this->withSource(
+            ResolvedSourceBuilder::from($this->source)
+                ->withExcludes(...$sourceFilesExcludes)
+                ->build(),
         );
-
-        return $clone;
     }
 
     public function withSourceFilter(?SourceFileFilter $sourceFilter): self

@@ -78,6 +78,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
+use Infection\Tests\Configuration\ResolvedSourceBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
@@ -1781,14 +1782,19 @@ final class ConfigurationFactoryTest extends TestCase
                 expected: ConfigurationBuilder::withMinimalTestData()
                     ->withConfigPathname('/path/to/infection.json')
                     ->withTimeout(10)
-                    ->withSourceDirectories('/path/to/src')
+                    ->withSource(
+                        ResolvedSourceBuilder::withMinimalTestData()
+                            ->withDirectories('/path/to/src')
+                            ->withExcludes('vendor/')
+                            ->withBasePath('/path/to')
+                            ->build(),
+                    )
                     ->withSourceFilter(
                         new PlainFilter([
                             'src/Foo.php',
                             'src/Bar.php',
                         ]),
                     )
-                    ->withSourceFilesExcludes('vendor/')
                     ->withLogs(
                         LogsBuilder::withMinimalTestData()
                             ->withTextLogFilePath('/text.log')

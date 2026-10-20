@@ -52,7 +52,7 @@ use Symfony\Component\Filesystem\Filesystem;
 interface TestFrameworkFactory
 {
     /**
-     * @param string[] $sourceDirectories Absolute paths from the runtime configuration.
+     * @param string[] $sourceDirectories Absolute paths.
      * @param SplFileInfo[] $filteredSourceFilesToMutate
      */
     public static function create(

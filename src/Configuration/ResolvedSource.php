@@ -53,7 +53,7 @@ final readonly class ResolvedSource
      * @param list<non-empty-string> $excludes
      * @param non-empty-string $basePath Absolute path to the Infection configuration directory.
      */
-    private function __construct(
+    public function __construct(
         public array $directories,
         public array $excludes,
         public string $basePath,
