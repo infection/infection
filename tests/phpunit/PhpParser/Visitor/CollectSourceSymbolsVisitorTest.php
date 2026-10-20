@@ -267,6 +267,12 @@ final class CollectSourceSymbolsVisitorTest extends VisitorTestCase
         );
 
         $visitor->leaveNode($anonymousMethod);
+
+        $this->assertEquals(
+            $method,
+            $visitor->findMethod(),
+        );
+
         $visitor->leaveNode($anonymousClass);
 
         $this->assertEquals(
