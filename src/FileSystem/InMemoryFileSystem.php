@@ -60,11 +60,6 @@ final class InMemoryFileSystem extends FileSystem
     private array $files = [];
 
     /**
-     * @var array<string, string>
-     */
-    private array $canonicalFileNames = [];
-
-    /**
      * @var array<string, true>
      */
     private array $directories = [];
@@ -81,8 +76,7 @@ final class InMemoryFileSystem extends FileSystem
         Assert::stringNotEmpty($content);
         $this->assertDirectoryDoesNotExist($filename);
 
-        $this->files[$filename] = $content;
-        $this->canonicalFileNames[$filename] = Path::canonicalize($filename);
+        $this->files[Path::canonicalize($filename)] = $content;
     }
 
     public function isReadable(string $filename): bool
@@ -93,7 +87,10 @@ final class InMemoryFileSystem extends FileSystem
     #[Override]
     public function isReadableFile(string $filename): bool
     {
-        return array_key_exists($filename, $this->files);
+        return array_key_exists(
+            Path::canonicalize($filename),
+            $this->files,
+        );
     }
 
     #[Override]
@@ -111,7 +108,7 @@ final class InMemoryFileSystem extends FileSystem
             return true;
         }
 
-        foreach ($this->canonicalFileNames as $file) {
+        foreach (array_keys($this->files) as $file) {
             if (self::isParentDirectory($canonicalDirectory, $file)) {
                 return true;
             }
@@ -247,7 +244,9 @@ final class InMemoryFileSystem extends FileSystem
     #[Override]
     public function readFile(string $filename): string
     {
-        if (!array_key_exists($filename, $this->files)) {
+        $canonicalFilename = Path::canonicalize($filename);
+
+        if (!array_key_exists($canonicalFilename, $this->files)) {
             throw new IOException(
                 sprintf(
                     'Failed to read file "%s": File is a directory.',
@@ -256,7 +255,7 @@ final class InMemoryFileSystem extends FileSystem
             );
         }
 
-        return $this->files[$filename];
+        return $this->files[$canonicalFilename];
     }
 
     private function assertDirectoryDoesNotExist(string $filename): void
@@ -273,17 +272,17 @@ final class InMemoryFileSystem extends FileSystem
         }
     }
 
-    private function assertFileDoesNotExist(string $canonicalDirName): void
+    private function assertFileDoesNotExist(string $directory): void
     {
-        foreach (array_keys($this->files) as $filename) {
-            if ($filename === $canonicalDirName) {
-                throw new DomainException(
-                    sprintf(
-                        'Cannot create directory "%s": a file exists at the same path.',
-                        $canonicalDirName,
-                    ),
-                );
-            }
+        $canonicalDirectory = Path::canonicalize($directory);
+
+        if (array_key_exists($canonicalDirectory, $this->files)) {
+            throw new DomainException(
+                sprintf(
+                    'Cannot create directory "%s": a file exists at the same path.',
+                    $directory,
+                ),
+            );
         }
     }
 
