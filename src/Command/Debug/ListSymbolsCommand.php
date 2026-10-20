@@ -65,15 +65,22 @@ final class ListSymbolsCommand extends BaseCommand
 
     protected function configure(): void
     {
-        $this->setDescription('Lists the symbols Infection recognizes for source selection in a given file.');
+        $this->setDescription('Lists the symbols Infection tracks in a PHP file.');
         $this->setHelp(
             <<<'HELP'
-                Shows which symbols Infection recognizes in a file for use with the run command's
-                source selectors
+                Lists the symbols Infection tracks for source selection, one per line in declaration
+                order. The output is a subset of the symbols declared in the PHP file.
 
-                Lists named classes, traits, enums, and their directly declared non-abstract methods
-                in source order. Each line contains a qualified name without a leading backslash,
-                such as "App\Example" or "App\Example::method".
+                Names include the namespace and have no leading backslash, for example:
+
+                    App\Example
+                    App\Example::method
+
+                Pass a listed name to Infection to select the code to mutate, for example:
+
+                    infection 'App\Example::method'
+
+                The file is parsed without executing it or autoloading its declarations.
                 HELP,
         );
         $this->addArgument(
