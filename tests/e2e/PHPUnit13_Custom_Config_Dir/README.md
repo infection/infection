@@ -1,10 +1,10 @@
 # PHPUnit 13 with a custom configuration directory
 
-The PHPUnit configuration lives in `build/phpunit.xml`. Its bootstrap, test suite,
-and source coverage paths are relative to `build/`, while Infection's source
-paths are relative to `infection.json` in the project root.
+This scenario was first added as `PHPUnit_Custom_Config_Dir`, later renamed
+`PHPUnit9_Custom_Config_Dir`. This version runs the same scenario with PHPUnit 13.
+
+The PHPUnit configuration lives in `build/phpunit.xml`. All paths in the PHPUnit
+and Infection configurations are relative.
 
 This checks that Infection resolves each path against the configuration that
 contains it and preserves PHPUnit's configured source coverage.
-
-Requires PHP 8.4.1 or newer. Temporary artefacts are written under `var/`.
