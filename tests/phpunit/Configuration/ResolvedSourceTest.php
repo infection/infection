@@ -67,6 +67,10 @@ final class ResolvedSourceTest extends TestCase
             $source->excludes,
             $resolvedSource->excludes,
         );
+        $this->assertSame(
+            $basePath,
+            $resolvedSource->basePath,
+        );
     }
 
     public static function sourceProvider(): iterable
@@ -108,7 +112,8 @@ final class ResolvedSourceTest extends TestCase
         ];
     }
 
-    public function test_it_rejects_a_relative_base_path(): void
+    #[DataProvider('invalidBasePathProvider')]
+    public function test_it_rejects_a_non_absolute_base_path(string $basePath): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -120,7 +125,14 @@ final class ResolvedSourceTest extends TestCase
                 ['src'],
                 [],
             ),
-            'project',
+            $basePath,
         );
+    }
+
+    public static function invalidBasePathProvider(): iterable
+    {
+        yield 'relative path' => ['project'];
+
+        yield 'empty path' => [''];
     }
 }
