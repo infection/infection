@@ -51,7 +51,7 @@ count = 1
 [[issues]]
 file = "src/Command/ConfigureCommand.php"
 code = "mixed-property-access"
-message = "Attempting to access a property on a non-object type (`nonnull`)."
+message = "Attempting to access property `$customPath` on a non-object type (`nonnull`)."
 count = 1
 
 [[issues]]
@@ -1466,6 +1466,12 @@ count = 1
 
 [[issues]]
 file = "src/Event/EventDispatcher/SyncEventDispatcher.php"
+code = "mixed-array-index"
+message = "Invalid index type `mixed` used in array assignment on `array<array-key, array<array-key, (callable(...mixed): mixed)>>`."
+count = 1
+
+[[issues]]
+file = "src/Event/EventDispatcher/SyncEventDispatcher.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 2
@@ -1545,7 +1551,7 @@ count = 1
 [[issues]]
 file = "src/FileSystem/Finder/Iterator/RealPathFilterIterator.php"
 code = "mixed-method-access"
-message = "Attempting to access a method on a non-object type (`mixed`)."
+message = "Attempting to call method `getRealPath()` on a non-object type (`mixed`)."
 count = 1
 
 [[issues]]
@@ -2363,6 +2369,12 @@ file = "src/Mutator/Removal/SharedCaseRemoval.php"
 code = "invalid-operand"
 message = "Invalid type for left operand."
 count = 2
+
+[[issues]]
+file = "src/Mutator/Removal/SharedCaseRemoval.php"
+code = "mixed-array-index"
+message = 'Invalid index type `mixed` used in array assignment on `array<array-key, PhpParser\Node\Stmt\Case_>`.'
+count = 1
 
 [[issues]]
 file = "src/Mutator/ReturnValue/FloatNegation.php"
@@ -3435,8 +3447,14 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php"
 code = "invalid-method-access"
-message = "Attempting to access a method on a non-object type (`false`)."
-count = 2
+message = "Attempting to call method `appendChild()` on a non-object type (`false`)."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php"
+code = "invalid-method-access"
+message = "Attempting to call method `setAttribute()` on a non-object type (`false`)."
+count = 1
 
 [[issues]]
 file = "src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php"
@@ -3471,7 +3489,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php"
 code = "invalid-method-access"
-message = "Attempting to access a method on a non-object type (`false`)."
+message = "Attempting to call method `appendChild()` on a non-object type (`false`)."
 count = 2
 
 [[issues]]
@@ -4293,8 +4311,26 @@ count = 3
 [[issues]]
 file = "tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php"
 code = "mixed-method-access"
-message = "Attempting to access a method on a non-object type (`mixed`)."
-count = 4
+message = "Attempting to call method `current()` on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php"
+code = "mixed-method-access"
+message = "Attempting to call method `getFilename()` on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php"
+code = "mixed-method-access"
+message = "Attempting to call method `getIterator()` on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php"
+code = "mixed-method-access"
+message = "Attempting to call method `rewind()` on a non-object type (`mixed`)."
+count = 1
 
 [[issues]]
 file = "tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php"
@@ -4521,7 +4557,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutator/MutatorCategoryTest.php"
 code = "invalid-method-access"
-message = "Attempting to access a method on a non-object type (`false`)."
+message = "Attempting to call method `isPublic()` on a non-object type (`false`)."
 count = 2
 
 [[issues]]
@@ -4679,6 +4715,12 @@ file = "tests/phpunit/Mutator/MutatorResolverTest.php"
 code = "possibly-invalid-argument"
 message = '''Possible argument type mismatch for argument #1 of `Infection\Mutator\MutatorResolver::resolve`: expected `array<string, bool|stdClass>`, but possibly received `array{'global-ignoreSourceCodeByRegex': list{string('A::B')}, ...<string, array{'ignoreSourceCodeByRegex': list{string('B::C')}}|bool>}`.'''
 count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutator/MutatorRobustnessTest.php"
+code = "named-argument-not-allowed"
+message = 'Named arguments are not allowed for `PHPUnit\Framework\Exception::__construct`.'
+count = 2
 
 [[issues]]
 file = "tests/phpunit/Mutator/MutatorRobustnessTest.php"
@@ -4845,7 +4887,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
 code = "mixed-property-access"
-message = "Attempting to access a property on a non-object type (`mixed`)."
+message = "Attempting to access property `$commandLine` on a non-object type (`mixed`)."
 count = 1
 
 [[issues]]
@@ -4941,7 +4983,7 @@ count = 3
 [[issues]]
 file = "tests/phpunit/Report/DebugEventsDataProducerTest.php"
 code = "mixed-property-access"
-message = "Attempting to access a property on a non-object type (`mixed`)."
+message = "Attempting to access property `$data` on a non-object type (`mixed`)."
 count = 1
 
 [[issues]]
@@ -5127,7 +5169,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Path/PathReplacerTest.php"
 code = "invalid-property-access"
-message = "Attempting to access a property on a non-object type (`false`)."
+message = "Attempting to access property `$nodeValue` on a non-object type (`false`)."
 count = 1
 
 [[issues]]
@@ -5259,7 +5301,7 @@ count = 2
 [[issues]]
 file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
 code = "mixed-method-access"
-message = "Attempting to access a method on a non-object type (`mixed`)."
+message = "Attempting to call method `getNamedItem()` on a non-object type (`mixed`)."
 count = 2
 
 [[issues]]
