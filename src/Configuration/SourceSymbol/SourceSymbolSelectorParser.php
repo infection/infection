@@ -91,7 +91,7 @@ final class SourceSymbolSelectorParser
     {
         $matches = [];
 
-        if (preg_match(self::SELECTOR_PATTERN, $value, $matches, PREG_UNMATCHED_AS_NULL,) !== 1) {
+        if (preg_match(self::SELECTOR_PATTERN, $value, $matches, PREG_UNMATCHED_AS_NULL) !== 1) {
             if (self::looksLikeExplicitSymbolSelector($value)) {
                 throw InvalidSourceSymbolSelector::create($value);
             }
