@@ -48,6 +48,7 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\PositionalArgumentsClassifier;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
@@ -291,7 +292,10 @@ final class ConfigurationFactoryTest extends TestCase
 
         $defaultConfiguration = new Configuration(
             processTimeout: 10,
-            source: new Source(),
+            source: ResolvedSource::create(
+                new Source(),
+                '/path/to',
+            ),
             sourceFilter: new SourceFilter(new GitDiffFilter('AM', 'reference(master)'), []),
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
@@ -1499,18 +1503,14 @@ final class ConfigurationFactoryTest extends TestCase
                 ->withSchema(
                     $defaultSchemaBuilder->withSource(
                         new Source(
-                            ['src/', '../shared', '/external/link/..'],
+                            ['src/'],
                             ['vendor/', 'Generated.php'],
                         ),
                     ),
                 )
                 ->withExpected(
                     $defaultConfigurationBuilder
-                        ->withSourceDirectories(
-                            '/path/to/src',
-                            '/path/shared',
-                            '/external/link/..',
-                        )
+                        ->withSourceDirectories('/path/to/src')
                         ->withSourceFilesExcludes(
                             'vendor/',
                             'Generated.php',

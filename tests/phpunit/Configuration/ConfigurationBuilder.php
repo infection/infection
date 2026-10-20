@@ -45,6 +45,7 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFileFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
@@ -57,6 +58,7 @@ use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use PhpParser\Node;
+use Symfony\Component\Filesystem\Path;
 
 final class ConfigurationBuilder
 {
@@ -70,7 +72,7 @@ final class ConfigurationBuilder
      */
     private function __construct(
         private float $timeout,
-        private Source $source,
+        private ResolvedSource $source,
         private SourceFilter $sourceFilter,
         private Logs $logs,
         private string $logVerbosity,
@@ -162,7 +164,10 @@ final class ConfigurationBuilder
     {
         return new self(
             timeout: 10.0,
-            source: new Source(),
+            source: ResolvedSource::create(
+                new Source(),
+                '/path/to/project',
+            ),
             sourceFilter: new SourceFilter(null, []),
             logs: Logs::createEmpty(),
             logVerbosity: 'none',
@@ -207,9 +212,12 @@ final class ConfigurationBuilder
     {
         return new self(
             timeout: 5.0,
-            source: new Source(
-                ['src', 'lib'],
-                ['vendor', 'tests'],
+            source: ResolvedSource::create(
+                new Source(
+                    ['src', 'lib'],
+                    ['vendor', 'tests'],
+                ),
+                '/path/to/project',
             ),
             sourceFilter: new SourceFilter(
                 new PlainFilter([
@@ -284,7 +292,7 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withSource(Source $source): self
+    public function withSource(ResolvedSource $source): self
     {
         $clone = clone $this;
         $clone->source = $source;
@@ -298,9 +306,12 @@ final class ConfigurationBuilder
     public function withSourceDirectories(string ...$sourceDirectories): self
     {
         $clone = clone $this;
-        $clone->source = new Source(
-            array_values($sourceDirectories),
-            $this->source->excludes,
+        $clone->source = ResolvedSource::create(
+            new Source(
+                array_values($sourceDirectories),
+                $this->source->excludes,
+            ),
+            Path::getDirectory($this->configPathname),
         );
 
         return $clone;
@@ -312,9 +323,12 @@ final class ConfigurationBuilder
     public function withSourceFilesExcludes(string ...$sourceFilesExcludes): self
     {
         $clone = clone $this;
-        $clone->source = new Source(
-            $this->source->directories,
-            array_values($sourceFilesExcludes),
+        $clone->source = ResolvedSource::create(
+            new Source(
+                $this->source->directories,
+                array_values($sourceFilesExcludes),
+            ),
+            Path::getDirectory($this->configPathname),
         );
 
         return $clone;
