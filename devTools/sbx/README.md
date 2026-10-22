@@ -6,6 +6,10 @@ It extends [`docker/sandbox-templates:codex-docker`][docker-sandbox-templates-co
 
 It uses [container-structure-test][container-structure-test] for testing the image.
 
+The base image provides the GitHub CLI (`gh`). The `devTools/sbx/kits/gh-stack` kit
+installs the latest [`github/gh-stack`](https://github.com/github/gh-stack) release
+for the `agent` user during sandbox creation with `gh extension install`.
+
 ## Telemetry
 
 Codex telemetry is optional. The OpenTelemetry settings live in
@@ -26,12 +30,21 @@ sbx policy allow network localhost:4318
 
 ## Usage
 
+Authenticate `gh` on the host, then configure the sandbox's GitHub credential:
+
+```shell
+sbx secret set github --command 'gh auth token'
+```
+
+The host-side proxy injects the token into GitHub API requests. Approve the
+kit's use of the GitHub credential when prompted on first creation.
+
 ```shell
 make sbx-create
 ```
 
-This will create the Docker Sandbox image with the template and OTEL kit for the current
-branch and will make it available with:
+This will create the Docker Sandbox image with the template, OTEL kit, and
+gh-stack kit for the current branch and will make it available with:
 
 ```shell
 sbx run codex-infection
@@ -59,6 +72,7 @@ To run a sandbox manually with the loaded template from the repository root:
 sbx run codex \
   --template=infection-sbx-php-8.4:latest \
   --kit=./devTools/sbx/kits/codex-otel \
+  --kit=./devTools/sbx/kits/gh-stack \
   --kit="git+https://github.com/docker/sbx-kits-contrib#ref=1f2f62200d68b8e1f653730ab29134a1a06755db&dir=git-ssh-sign" \
   --kit=./devTools/sbx/kits/project-local
 ```

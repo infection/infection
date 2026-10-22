@@ -1,0 +1,31 @@
+schemaVersion: "2"
+kind: mixin
+name: infection-gh-stack
+displayName: Infection gh-stack
+description: Install the latest GitHub CLI extension for stacked pull requests.
+
+permissions:
+  network:
+    allow:
+      - api.github.com
+      - github.com
+      - release-assets.githubusercontent.com
+
+credentials:
+  - service: github
+    required: true
+    apiKey:
+      name: GH_TOKEN
+      proxyManaged: true
+      inject:
+        - domain: api.github.com
+          scheme: bearer
+
+setup:
+  install:
+    - command: |
+        set -eu
+        gh extension install github/gh-stack
+        gh stack --version
+      user: "1000"
+      description: Install and verify gh-stack for the agent user.
