@@ -48,7 +48,6 @@ use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
-use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -56,6 +55,7 @@ use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
+use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
@@ -88,7 +88,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         private readonly PCOVDirectoryProvider $pcovDirectoryProvider,
         private readonly InitialConfigBuilder $initialConfigBuilder,
         private readonly MutationConfigBuilder $mutationConfigBuilder,
-        private readonly CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
+        private readonly ArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
         private readonly ShellCommandRunner $shellCommandRunner,
         private readonly VersionParser $versionParser,
         private readonly CommandLineBuilder $commandLineBuilder,
