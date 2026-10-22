@@ -200,92 +200,92 @@ final class GitHubActionsLogTextFileReporterTest extends TestCase
             false,
             false,
             false,
-            <<<'TXT'
+            <<<TXT
                 Note: Pass `--log-verbosity=all` to log information about killed and errored mutants.
                 Note: Pass `--debug` to log test-framework output.
 
                 ::group::Escaped mutants
                 1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
-                --- Original
-                +++ New
+                \e[31m--- Original\e[0m
+                \e[32m+++ New\e[0m
                 @@ @@
 
-                - echo 'original';
-                + echo 'escaped#1';
+                \e[31m- echo 'original';\e[0m
+                \e[32m+ echo 'escaped#1';\e[0m
 
 
                 2) foo/bar:10    [M] For_ [ID] a1b2c3
 
-                --- Original
-                +++ New
+                \e[31m--- Original\e[0m
+                \e[32m+++ New\e[0m
                 @@ @@
 
-                - echo 'original';
-                + echo 'escaped#0';
+                \e[31m- echo 'original';\e[0m
+                \e[32m+ echo 'escaped#0';\e[0m
                 ::endgroup::
 
                 ::group::Timed Out mutants
                 1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
-                --- Original
-                +++ New
+                \e[31m--- Original\e[0m
+                \e[32m+++ New\e[0m
                 @@ @@
 
-                - echo 'original';
-                + echo 'timedOut#1';
+                \e[31m- echo 'original';\e[0m
+                \e[32m+ echo 'timedOut#1';\e[0m
 
 
                 2) foo/bar:10    [M] For_ [ID] a1b2c3
 
-                --- Original
-                +++ New
+                \e[31m--- Original\e[0m
+                \e[32m+++ New\e[0m
                 @@ @@
 
-                - echo 'original';
-                + echo 'timedOut#0';
+                \e[31m- echo 'original';\e[0m
+                \e[32m+ echo 'timedOut#0';\e[0m
                 ::endgroup::
 
                 ::group::Skipped mutants
                 1) foo/bar:10    [M] For_ [ID] a1b2c3
 
-                --- Original
-                +++ New
+                \e[31m--- Original\e[0m
+                \e[32m+++ New\e[0m
                 @@ @@
 
-                - echo 'original';
-                + echo 'skipped#0';
+                \e[31m- echo 'original';\e[0m
+                \e[32m+ echo 'skipped#0';\e[0m
 
 
                 2) foo/bar:10    [M] PregQuote [ID] a1b2c3
 
-                --- Original
-                +++ New
+                \e[31m--- Original\e[0m
+                \e[32m+++ New\e[0m
                 @@ @@
 
-                - echo 'original';
-                + echo 'skipped#1';
+                \e[31m- echo 'original';\e[0m
+                \e[32m+ echo 'skipped#1';\e[0m
                 ::endgroup::
 
                 ::group::Not Covered mutants
                 1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
-                --- Original
-                +++ New
+                \e[31m--- Original\e[0m
+                \e[32m+++ New\e[0m
                 @@ @@
 
-                - echo 'original';
-                + echo 'notCovered#1';
+                \e[31m- echo 'original';\e[0m
+                \e[32m+ echo 'notCovered#1';\e[0m
 
 
                 2) foo/bar:10    [M] For_ [ID] a1b2c3
 
-                --- Original
-                +++ New
+                \e[31m--- Original\e[0m
+                \e[32m+++ New\e[0m
                 @@ @@
 
-                - echo 'original';
-                + echo 'notCovered#0';
+                \e[31m- echo 'original';\e[0m
+                \e[32m+ echo 'notCovered#0';\e[0m
                 ::endgroup::
 
 
