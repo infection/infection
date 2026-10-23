@@ -41,14 +41,13 @@ use function count;
 use function implode;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use SplFileInfo;
 use function sprintf;
 
 /**
  * @internal
  */
-final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
+final readonly class ArgumentsAndOptionsBuilder
 {
     /**
      * @param SplFileInfo[] $filteredSourceFilesToMutate
