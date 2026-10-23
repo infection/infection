@@ -193,7 +193,7 @@ final readonly class PositionalArgumentsClassifier
         Assert::true(
             self::looksLikePathFilter($path),
             sprintf(
-                'Invalid path argument "%s": multiple paths must be passed as separate arguments.',
+                'Invalid positional argument "%s": expected a readable file or directory, a source path filter or a source symbol selector.',
                 $path,
             ),
         );
