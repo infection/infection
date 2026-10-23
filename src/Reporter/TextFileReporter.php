@@ -59,4 +59,9 @@ final readonly class TextFileReporter extends BaseTextFileReporter
             ],
         );
     }
+
+    protected function formatDiff(string $diff): string
+    {
+        return $diff;
+    }
 }
