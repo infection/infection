@@ -40,14 +40,17 @@ use Infection\Command\Git\LoggerFactory;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\PathsArgument;
 use Infection\Command\Option\SourceFilterOptions;
+use Infection\Configuration\Configuration;
 use Infection\Console\IO;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
 use function Safe\getcwd;
 use function sort;
 use SplFileInfo;
+use function sprintf;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -87,6 +90,8 @@ final class ListSourcesCommand extends BaseCommand
             ),
         );
 
+        self::assertNoSymbolSelectors($container->getConfiguration());
+
         $filePaths = self::collectPaths(
             getcwd(),
             $container->getSourceCollector(),
@@ -109,6 +114,24 @@ final class ListSourcesCommand extends BaseCommand
         return new IO(
             $io->getInput(),
             $errorOutput,
+        );
+    }
+
+    private static function assertNoSymbolSelectors(Configuration $configuration): void
+    {
+        if (
+            $configuration->sourceFilter->filtersFiles()
+            || $configuration->testFrameworkExtraOptions !== ''
+        ) {
+            return;
+        }
+
+        Assert::isEmpty(
+            $configuration->sourceFilter->symbolSelectors,
+            sprintf(
+                'Source symbol selectors do not affect which source files are listed and cannot be used on their own with %s. They are accepted alongside source or test paths so the same arguments can be reused from the run command.',
+                self::NAME,
+            ),
         );
     }
 

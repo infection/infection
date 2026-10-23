@@ -46,14 +46,18 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
-use Infection\Configuration\PositionalPathsClassifier;
+use Infection\Configuration\PositionalArgumentsClassifier;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\Configuration\SourceFilter\PositionalPathsFilter;
+use Infection\Configuration\SourceFilter\PositionalArgumentsFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelectorParser;
 use Infection\Console\LogVerbosity;
+use Infection\Differ\Differ;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
@@ -288,7 +292,7 @@ final class ConfigurationFactoryTest extends TestCase
         $defaultConfiguration = new Configuration(
             processTimeout: 10,
             source: new Source(),
-            sourceFilter: new GitDiffFilter('AM', 'reference(master)'),
+            sourceFilter: new SourceFilter(new GitDiffFilter('AM', 'reference(master)'), []),
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
             tmpDir: Path::normalize(sys_get_temp_dir() . '/infection'),
@@ -1494,7 +1498,7 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario
                 ->withInput(
                     $defaultInputBuilder->withSourceFilter(
-                        new PositionalPathsFilter(['Foo.php', 'Bar.php', 'Foo.php']),
+                        new PositionalArgumentsFilter(['Foo.php', 'Bar.php', 'Foo.php']),
                     ),
                 )
                 ->withExpected(
@@ -1508,7 +1512,7 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario
                 ->withInput(
                     $defaultInputBuilder->withSourceFilter(
-                        new PositionalPathsFilter(['tests/FooTest.php', 'tests/BarTest.php']),
+                        new PositionalArgumentsFilter(['tests/FooTest.php', 'tests/BarTest.php']),
                     ),
                 )
                 ->withExpected(
@@ -1523,7 +1527,7 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario
                 ->withInput(
                     $defaultInputBuilder->withSourceFilter(
-                        new PositionalPathsFilter(['Foo.php', 'tests/FooTest.php']),
+                        new PositionalArgumentsFilter(['Foo.php', 'tests/FooTest.php']),
                     ),
                 )
                 ->withExpected(
@@ -1534,11 +1538,36 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
+        yield 'positional source selectors preserve ambiguous path filters and test paths' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalArgumentsFilter([
+                            'tests/FooTest.php',
+                            'Differ::diff',
+                            'UnifiedDiffOutputBuilder',
+                            'Infection\\Differ\\Differ::diffToArray',
+                        ]),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceFilter(new PlainFilter(['UnifiedDiffOutputBuilder']))
+                        ->withSourceSymbolSelectors(
+                            new SourceSymbolSelector('Differ', 'diff', null),
+                            new SourceSymbolSelector('UnifiedDiffOutputBuilder', null, null),
+                            new SourceSymbolSelector(Differ::class, 'diffToArray', null),
+                        )
+                        ->withTestFrameworkExtraOptions('tests/FooTest.php')
+                        ->build(),
+                ),
+        ];
+
         yield 'positional test paths with existing testFrameworkExtraArgs throws' => [
             $defaultScenario
                 ->withInput(
                     $defaultInputBuilder
-                        ->withSourceFilter(new PositionalPathsFilter(['tests/FooTest.php']))
+                        ->withSourceFilter(new PositionalArgumentsFilter(['tests/FooTest.php']))
                         ->withTestFrameworkExtraArgs('--stop-on-failure'),
                 )
                 ->withExpected(
@@ -1812,7 +1841,7 @@ final class ConfigurationFactoryTest extends TestCase
             ),
             $projectDirectoryProviderStub,
             $cpuCoresCountProvider,
-            new PositionalPathsClassifier($fileSystem),
+            new PositionalArgumentsClassifier($fileSystem, new SourceSymbolSelectorParser()),
             new FileSystem(),
         );
     }

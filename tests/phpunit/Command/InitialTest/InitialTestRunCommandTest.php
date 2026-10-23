@@ -49,6 +49,7 @@ use Infection\Git\Git;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -215,6 +216,27 @@ final class InitialTestRunCommandTest extends TestCase
             ]),
         ];
 
+        yield 'ambiguous short name also supplies a source filter' => [
+            ['paths' => ['SomeClass']],
+            new PlainFilter(['SomeClass']),
+        ];
+
+        yield 'method selector with a source path' => [
+            ['paths' => [
+                'Foo.php',
+                'SomeClass::method',
+            ]],
+            new PlainFilter(['Foo.php']),
+        ];
+
+        yield 'method selector with a test path' => [
+            ['paths' => [
+                '../InitialTestRunCommandTest.php',
+                'SomeClass::method',
+            ]],
+            null,
+        ];
+
         yield 'Git filtering resolves the default base' => [
             ['--git-diff-filter' => 'AM'],
             new GitDiffFilter(
@@ -244,6 +266,45 @@ final class InitialTestRunCommandTest extends TestCase
                 Git::DEFAULT_GIT_DIFF_FILTER,
                 '<refinedGitReference>',
             ),
+        ];
+    }
+
+    /**
+     * @param list<string> $paths
+     */
+    #[DataProvider('symbolSelectorsProvider')]
+    public function test_it_rejects_source_symbol_selectors_before_running_tests(array $paths): void
+    {
+        $testFramework = $this->createMock(TestFramework::class);
+        $testFramework
+            ->expects($this->never())
+            ->method('executeInitialRun')
+        ;
+
+        $container = Container::create()->cloneWithService(
+            TestFramework::class,
+            $testFramework,
+        );
+        $application = new Application($container);
+        $tester = new CommandTester($application->find('initial-test:run'));
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Source symbol selectors have no effect on the initial test run and cannot be used on their own with initial-test:run. They are accepted alongside source or test paths so the same arguments can be reused from the run command.',
+            ),
+        );
+
+        $tester->execute(['paths' => $paths]);
+    }
+
+    public static function symbolSelectorsProvider(): iterable
+    {
+        yield 'explicit class selector' => [
+            ['\SomeClass'],
+        ];
+
+        yield 'method selector alone' => [
+            ['SomeClass::method'],
         ];
     }
 
@@ -285,7 +346,7 @@ final class InitialTestRunCommandTest extends TestCase
             function (Container $container) use ($testFrameworkMock, $expectedSourceFilter): TestFramework {
                 $this->assertEquals(
                     $expectedSourceFilter,
-                    $container->getConfiguration()->sourceFilter,
+                    $container->getConfiguration()->sourceFilter->fileFilter,
                     'The initial test run should use the requested source filter.',
                 );
 
