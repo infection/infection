@@ -44,20 +44,58 @@ use PHPUnit\Framework\TestCase;
 final class PlainFilterTest extends TestCase
 {
     /**
-     * @param non-empty-string $value
+     * @param string|array<non-empty-string> $value
      */
     #[DataProvider('valueProvider')]
-    public function test_it_can_parse_and_normalize_string_filter(
-        string $value,
+    public function test_it_can_parse_and_normalize_filter(
+        string|array $value,
         ?PlainFilter $expected,
     ): void {
         $actual = PlainFilter::tryToCreate($value);
 
-        $this->assertEqualsCanonicalizing($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public static function valueProvider(): iterable
     {
+        yield 'empty array' => [
+            [],
+            null,
+        ];
+
+        yield 'array values are deduplicated in first occurrence order' => [
+            [
+                'src/Bar.php',
+                'src/Bar.php',
+                'src/Foo.php',
+                'src/Foo.php',
+                'src/Baz.php',
+            ],
+            new PlainFilter([
+                'src/Bar.php',
+                2 => 'src/Foo.php',
+                4 => 'src/Baz.php',
+            ]),
+        ];
+
+        yield 'array values preserve whitespace, commas, and zero filenames' => [
+            [
+                ' src/Foo,Bar.php ',
+                ' ',
+                '0',
+            ],
+            new PlainFilter([
+                ' src/Foo,Bar.php ',
+                ' ',
+                '0',
+            ]),
+        ];
+
+        yield 'zero in a string is still discarded' => [
+            ' 0 ,0',
+            null,
+        ];
+
         yield 'nominal' => [
             'src/Foo.php, src/Bar.php',
             new PlainFilter([
