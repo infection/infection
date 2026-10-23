@@ -42,6 +42,7 @@ use function count;
 use function explode;
 use function implode;
 use Infection\Differ\ChangedLinesRange;
+use Infection\FileSystem\Paths;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use const PHP_EOL;
@@ -97,7 +98,8 @@ final readonly class CommandLineGit implements Git
             $workingDirectory,
             nameOnly: true,
         );
-        $paths = self::makePathsAbsolute($lines, $projectDirectory);
+
+        $paths = Paths::makeAbsolute($lines, $projectDirectory);
 
         if (count($paths) === 0) {
             throw NoSourceFound::noFilesForGitDiff($diffFilter, $base);
@@ -204,32 +206,6 @@ final readonly class CommandLineGit implements Git
         }
 
         return $result;
-    }
-
-    /**
-     * @param list<string> $paths
-     *
-     * @return list<non-empty-string>
-     */
-    private static function makePathsAbsolute(
-        array $paths,
-        string $projectDirectory,
-    ): array {
-        return array_map(
-            static fn (string $path): string => self::makePathAbsolute($projectDirectory, $path),
-            $paths,
-        );
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    private static function makePathAbsolute(string $projectDirectory, string $path): string
-    {
-        $absolutePath = Path::join($projectDirectory, $path);
-        Assert::stringNotEmpty($absolutePath);
-
-        return $absolutePath;
     }
 
     /**

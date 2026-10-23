@@ -40,6 +40,7 @@ use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelectorParser;
 use Infection\FileSystem\FileSystem;
+use Infection\FileSystem\Paths;
 use function sprintf;
 use function str_contains;
 use function str_ends_with;
@@ -77,7 +78,12 @@ final readonly class PositionalArgumentsClassifier
         }
 
         $configDir = dirname($schema->pathname);
-        $absoluteSourceDirs = self::resolveAbsoluteSourceDirectories($schema, $configDir);
+
+        $absoluteSourceDirs = Paths::makeAbsolute(
+            $schema->source->directories,
+            $configDir,
+            canonicalize: true,
+        );
 
         $sourcePaths = [];
         $testPaths = [];
@@ -120,28 +126,6 @@ final readonly class PositionalArgumentsClassifier
             $testPaths,
             $sourceSelectors,
         );
-    }
-
-    /**
-     * @return list<non-empty-string>
-     */
-    private static function resolveAbsoluteSourceDirectories(
-        SchemaConfiguration $schema,
-        string $configDir,
-    ): array {
-        $absolute = [];
-
-        foreach ($schema->source->directories as $directory) {
-            $canonical = Path::isAbsolute($directory)
-                ? Path::canonicalize($directory)
-                : Path::join($configDir, $directory);
-
-            if ($canonical !== '') {
-                $absolute[] = $canonical;
-            }
-        }
-
-        return $absolute;
     }
 
     /**
