@@ -1,21 +1,59 @@
 # Testing PhpParser Visitors
 
-This document explains how to use the testing utilities provided in this directory to test PhpParser visitors.
-
+This guide explains how to test PhpParser visitors using the utilities in this directory.
 
 ## Overview
 
-The `VisitorTestCase` base class and accompanying utilities provide a comprehensive framework for testing PhpParser node
-visitors. These utilities help you:
+The `VisitorTestCase` base class and its supporting utilities let you:
 
 - Parse PHP code into an Abstract Syntax Tree (AST).
 - Apply visitors to the AST.
 - Dump the AST in a readable, testable format.
-- Track which nodes were visited by your visitor.
-- Filter attributes to focus on what matters in your tests.
+- Track which nodes were visited.
+- Filter attributes to show only those relevant to your test.
 
+## Covering Visitor Behaviour and Integration
 
-## Getting Started
+Use individual visitor tests to cover the visitor's behaviour in detail, including edge cases. When
+changing node skipping, enrichment or visitor behaviour, normally add or extend a case in
+[`EnrichmentTraverseIntegrationTest`](EnrichmentTraverse/EnrichmentTraverseIntegrationTest.php) too.
+Cover at least the most relevant or critical scenarios there, and keep exhaustive coverage in the
+individual visitor tests.
+
+The integration test runs the production enrichment visitor stack followed by the mutation
+traversal, then checks the AST as the mutation visitor sees it. It verifies that visitors work
+together in the registered order and use shared attributes correctly. Individual visitor tests can
+pass even when these interactions produce an incorrect AST.
+
+## Generating and Comparing AST Dumps
+
+Use `debug:dump-ast` to generate an AST dump in the same format as
+`EnrichmentTraverseIntegrationTest`. It runs the same production enrichment and mutation traversers
+and assigns node IDs. From the repository root, run:
+
+```bash
+./bin/infection debug:dump-ast path/to/fixture.php \
+    --show-attributes \
+    --no-ansi
+```
+
+`--show-attributes` includes enrichment attributes and node references in the output.
+
+For scenarios involving changed lines, use the same inclusive line ranges as the integration test:
+
+```bash
+./bin/infection debug:dump-ast path/to/fixture.php \
+    --show-attributes \
+    --no-ansi \
+    --changed-lines-ranges='10:12,24:30'
+```
+
+This includes line numbers in the dump, as in integration cases with changed line ranges. Use
+`--configuration=path/to/infection.json5` to select a configuration. The command uses an empty
+coverage trace and includes uncovered code; bear this in mind when comparing scenarios that depend
+on coverage.
+
+## Setting Up an Individual Visitor Test
 
 ### Extending VisitorTestCase
 
@@ -26,7 +64,10 @@ Create your test class by extending `VisitorTestCase`:
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;use PHPUnit\Framework\Attributes\CoversClass;use PHPUnit\Framework\Attributes\DataProvider;use YourNamespace\YourVisitor;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use YourNamespace\YourVisitor;
 
 #[CoversClass(YourVisitor::class)]
 final class YourVisitorTest extends VisitorTestCase
@@ -41,18 +82,16 @@ final class YourVisitorTest extends VisitorTestCase
 }
 ```
 
-
 ### Available Properties
 
 The base class provides two protected properties:
 
 - **`$this->parser`**: A PHP parser for converting code strings into AST nodes.
-- **`$this->dumper`**: A NodeDumper for converting AST nodes into readable strings.
-
+- **`$this->dumper`**: A `NodeDumper` for converting AST nodes into readable strings.
 
 ## Core Testing Pattern
 
-The typical pattern for testing a visitor follows these steps:
+To test a visitor, follow these steps:
 
 ### 1. Parse the Code
 
@@ -60,10 +99,9 @@ The typical pattern for testing a visitor follows these steps:
 $nodes = $this->parse($code);
 ```
 
-
 ### 2. Add IDs to Nodes (Recommended)
 
-Add sequential IDs to all nodes. This helps:
+Assign sequential IDs to all nodes to:
 
 - Identify nodes uniquely and deterministically in test output.
 - Handle circular references in node attributes.
@@ -73,13 +111,13 @@ Add sequential IDs to all nodes. This helps:
 $this->addIdsToNodes($nodes);
 ```
 
-
 ### 3. Apply Your Visitor
 
-Use a `NodeTraverser` to apply your visitor (and any dependencies) to the nodes:
+Use a `NodeTraverser` to apply your visitor and any dependencies to the nodes:
 
 ```php
-use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;use PhpParser\NodeTraverser;
+use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
+use PhpParser\NodeTraverser;
 
 (new NodeTraverser(
     new ParentConnectingVisitor(),              // If your visitor needs parent references
@@ -89,10 +127,9 @@ use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;use PhpParser
 ))->traverse($nodes);
 ```
 
-
 ### 4. Filter Attributes (Optional)
 
-If your test only cares about specific node attributes, filter them:
+To focus on specific node attributes, keep only those attributes:
 
 ```php
 $this->keepOnlyDesiredAttributes(
@@ -102,12 +139,11 @@ $this->keepOnlyDesiredAttributes(
 );
 ```
 
-Note: The `visited` attribute is automatically preserved when using `keepOnlyDesiredAttributes()`.
-
+`keepOnlyDesiredAttributes()` always preserves the `visited` attribute.
 
 ### 5. Dump and Assert
 
-Dump the AST and assert against the expected output:
+Dump the AST and compare it with the expected output:
 
 ```php
 $actual = $this->dumper->dump($nodes);
@@ -115,10 +151,9 @@ $actual = $this->dumper->dump($nodes);
 $this->assertSame($expected, $actual);
 ```
 
-
 ## Complete Example
 
-Here's a full example from `ReflectionVisitorTest`:
+This example from `ReflectionVisitorTest` brings the steps together:
 
 ```php
 public function test_it_annotates_nodes(
@@ -129,10 +164,9 @@ public function test_it_annotates_nodes(
     // 1. Parse the code
     $nodes = $this->parse($code);
 
-    // 2. Add IDs for easier debugging; This is totally optional.
-    //    If there are attributes with circular dependencies, the IDs
-    //    allow handling them out the box. Otherwise, those attributes
-    //    will have to be explicitly removed.
+    // 2. Optionally add IDs for easier debugging. IDs let the dumper handle
+    //    circular references in attributes. Without IDs, those attributes
+    //    must be removed explicitly.
     $this->addIdsToNodes($nodes);
 
     // 3. Apply visitors
@@ -186,14 +220,14 @@ array(
 )
 ```
 
-Key features:
+The dump shows:
 
 - **Node types**: e.g., `Stmt_Namespace`, `Name`, `Identifier`
 - **Properties**: e.g., `name`, `stmts`
 - **Attributes**: e.g., `nodeId`, `parent`, `customAttribute`
 - **References**: Nodes referenced in attributes show as `nodeId(N)` to avoid circular references
-- **Skipped nodes**: Unvisited nodes show as `<skipped>` (when using `MarkTraversedNodesAsVisitedVisitor`)
-
+- **Skipped nodes**: Unvisited nodes show as `<skipped>` (when using
+  `MarkTraversedNodesAsVisitedVisitor`)
 
 ## Testing Utilities Reference
 
@@ -203,9 +237,9 @@ The dumper is configured by default to:
 
 - Dump only visited nodes (nodes without the `visited` attribute show as `<skipped>`).
 - Exclude comments and position information.
-- Dump "other" attributes (omit the native PhpParser ones like `startLine`, `endLine`, etc.).
+- Dump "other" attributes, omitting native PhpParser attributes such as `startLine` and `endLine`.
 
-You can customize dumping with additional parameters:
+You can customise the dump with additional parameters:
 
 ```php
 $output = $this->dumper->dump(
@@ -216,4 +250,4 @@ $output = $this->dumper->dump(
 );
 ```
 
-Or by overriding `VisitorTestCase::createDumper()` to configure the dumper directly.
+You can also override `VisitorTestCase::createDumper()` to configure the dumper directly.
