@@ -66,6 +66,12 @@ commandTests:
         expectedOutput: ["(?m)^GNU Wget "]
         exitCode: 0
 
+    -   name: "GitHub CLI is executable"
+        command: "gh"
+        args: ["--version"]
+        expectedOutput: ['(?m)^gh version \d+\.\d+\.\d+']
+        exitCode: 0
+
     -   name: "Container runs as agent user"
         command: "whoami"
         expectedOutput: ["(?m)^agent$"]
