@@ -38,6 +38,7 @@ namespace Infection\Tests\PhpParser\Visitor\ExcludeNonSelectedSourceNodesVisitor
 use function array_filter;
 use function array_keys;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
+use Infection\PhpParser\Visitor\CollectSourceSymbolsVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonSelectedSourceNodesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NameResolverFactory;
@@ -62,12 +63,15 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         array $expectedEligibleNodeIds,
     ): void {
         $nodes = $this->parse($code);
+        $symbols = new CollectSourceSymbolsVisitor();
 
         (new NodeTraverser(
             new LabelNodesAsEligibleVisitor(),
             NameResolverFactory::create(),
+            $symbols,
             new ExcludeNonSelectedSourceNodesVisitor(
                 new SourceSymbolMatcher($selectors),
+                $symbols,
             ),
         ))->traverse($nodes);
 
