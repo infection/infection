@@ -88,6 +88,7 @@ final readonly class GitHubActionsLogTextFileReporter extends BaseTextFileReport
     #[Override]
     protected function formatDiff(string $diff): string
     {
+        $a = 1 + 2;
         return implode(
             "\n",
             array_map(
