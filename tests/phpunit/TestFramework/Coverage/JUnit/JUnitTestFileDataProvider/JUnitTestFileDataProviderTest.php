@@ -164,6 +164,31 @@ final class JUnitTestFileDataProviderTest extends TestCase
             CodeceptionCestProvider::infoProvider(),
         );
 
+        yield 'test case present in multiple test suites' => [
+            <<<'XML'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <testsuites>
+                  <testsuite name="All" tests="2">
+                    <testsuite name="Unit" tests="1">
+                      <testsuite name="Acme\ServiceTest" file="/path/to/ServiceTest.php" tests="1" time="0.1">
+                        <testcase name="test_it_works" class="Acme\ServiceTest" file="/path/to/ServiceTest.php" time="0.1"/>
+                      </testsuite>
+                    </testsuite>
+                    <testsuite name="Everything" tests="1">
+                      <testsuite name="Acme\ServiceTest" file="/path/to/ServiceTest.php" tests="1" time="0.2">
+                        <testcase name="test_it_works" class="Acme\ServiceTest" file="/path/to/ServiceTest.php" time="0.2"/>
+                      </testsuite>
+                    </testsuite>
+                  </testsuite>
+                </testsuites>
+                XML,
+            'Acme\ServiceTest',
+            new TestFileTimeData(
+                '/path/to/ServiceTest.php',
+                0.1,
+            ),
+        ];
+
         yield 'invalid XML' => [
             '',
             'Acme\Service',
