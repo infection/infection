@@ -1449,12 +1449,6 @@ count = 1
 [[issues]]
 file = "src/Environment/StrykerApiKeyResolver.php"
 code = "redundant-type-comparison"
-message = "Redundant condition: variable `$environment[$name]` (type `string`) is already known to be `string`."
-count = 1
-
-[[issues]]
-file = "src/Environment/StrykerApiKeyResolver.php"
-code = "redundant-type-comparison"
 message = "Redundant type assertion: `$environment[$name]` is already `string`."
 count = 1
 
