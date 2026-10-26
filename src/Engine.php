@@ -45,13 +45,12 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
 use Infection\PhpParser\UnparsableFile;
-use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
-use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\PreloadedSourceChecker;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\Coverage\JUnit\TestNotFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
@@ -80,7 +79,6 @@ final readonly class Engine
 
     /**
      * @throws InitialTestsFailed
-     * @throws InitialStaticAnalysisRunFailed
      * @throws RequirementChecksFailed
      * @throws MinMsiCheckFailed
      * @throws MaxTimeoutCountReached
