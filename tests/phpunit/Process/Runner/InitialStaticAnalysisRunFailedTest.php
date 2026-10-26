@@ -66,10 +66,7 @@ final class InitialStaticAnalysisRunFailedTest extends TestCase
 
         $exception = InitialStaticAnalysisRunFailed::fromCompletedProcessAndAdapter($process, 'PHPStan');
 
-        $this->assertInstanceOf(
-            InitialTestsFailedContract::class,
-            $exception,
-        );
+        $this->assertInstanceOf(InitialTestsFailedContract::class, $exception);
         $this->assertSame($error, $exception->getMessage());
     }
 }

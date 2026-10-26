@@ -71,10 +71,7 @@ final class InitialTestsFailedTest extends TestCase
 
         $exception = InitialTestsFailed::fromProcessAndAdapter($process, $testFrameworkAdapter);
 
-        $this->assertInstanceOf(
-            InitialTestsFailedContract::class,
-            $exception,
-        );
+        $this->assertInstanceOf(InitialTestsFailedContract::class, $exception);
         $this->assertSame($error, $exception->getMessage());
     }
 }
