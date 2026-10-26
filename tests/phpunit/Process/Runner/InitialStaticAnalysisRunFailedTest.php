@@ -35,38 +35,73 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use function implode;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(InitialStaticAnalysisRunFailed::class)]
 final class InitialStaticAnalysisRunFailedTest extends TestCase
 {
-    public function test_log_initial_tests_do_not_pass(): void
-    {
+    #[DataProvider('processOutputProvider')]
+    public function test_it_creates_a_failure_from_a_process(
+        string $stdout,
+        string $stderr,
+        string $expectedOutput,
+    ): void {
         $process = new CompletedProcess(
             ['phpstan', 'analyse'],
-            0,
-            'output string',
-            'error string',
+            3,
+            $stdout,
+            $stderr,
         );
 
-        $error = implode("\n", [
-            'Project static analysis must be in a passing state before running Infection.',
-            'PHPStan reported an exit code of 0.',
-            'Refer to the PHPStan\'s output below:',
-            'STDOUT:',
+        $exception = InitialStaticAnalysisRunFailed::fromCompletedProcessAndAdapter(
+            $process,
+            'PHPStan',
+        );
+
+        $this->assertInstanceOf(
+            InitialTestsFailedContract::class,
+            $exception,
+        );
+        $this->assertSame(
+            <<<'MESSAGE'
+                Project static analysis must be in a passing state before running Infection.
+                PHPStan reported an exit code of 3.
+                Refer to the PHPStan's output below:
+                MESSAGE
+            . $expectedOutput,
+            $exception->getMessage(),
+        );
+    }
+
+    public static function processOutputProvider(): iterable
+    {
+        yield 'both output streams' => [
             'output string',
-            'STDERR:',
             'error string',
-        ]);
+            "\nSTDOUT:\noutput string\nSTDERR:\nerror string",
+        ];
 
-        $exception = InitialStaticAnalysisRunFailed::fromCompletedProcessAndAdapter($process, 'PHPStan');
+        yield 'standard output only' => [
+            'output string',
+            '',
+            "\nSTDOUT:\noutput string",
+        ];
 
-        $this->assertInstanceOf(InitialTestsFailedContract::class, $exception);
-        $this->assertSame($error, $exception->getMessage());
+        yield 'standard error only' => [
+            '',
+            'error string',
+            "\nSTDERR:\nerror string",
+        ];
+
+        yield 'no output' => [
+            '',
+            '',
+            '',
+        ];
     }
 }
