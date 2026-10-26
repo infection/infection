@@ -40,7 +40,6 @@ use function array_values;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
-use Infection\FileSystem\Paths;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
@@ -97,14 +96,8 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
-        $absoluteSourceDirectories = array_values(
-            Paths::makeAbsolute(
-                $sourceDirectories,
-                $sourceDirectoryBasePath,
-            ),
-        );
         Assert::notEmpty(
-            $absoluteSourceDirectories,
+            $sourceDirectories,
             'The source directories cannot be empty. This indicates that an invalid configuration reached the test framework adapter factory.',
         );
 
@@ -119,14 +112,16 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $testFrameworkExecutable,
             $tmpDir,
             $jUnitFilePath,
-            new PCOVDirectoryProvider($absoluteSourceDirectories),
+            new PCOVDirectoryProvider(
+                array_values($sourceDirectories),
+            ),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
                 $fileSystem,
-                $absoluteSourceDirectories,
+                $sourceDirectories,
                 array_map(
                     static function (SplFileInfo $fileInfo): string {
                         $realPath = $fileInfo->getRealPath();

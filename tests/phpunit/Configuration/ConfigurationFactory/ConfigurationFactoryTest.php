@@ -48,6 +48,7 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\PositionalArgumentsClassifier;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
@@ -77,6 +78,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
+use Infection\Tests\Configuration\ResolvedSourceBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
@@ -291,7 +293,10 @@ final class ConfigurationFactoryTest extends TestCase
 
         $defaultConfiguration = new Configuration(
             processTimeout: 10,
-            source: new Source(),
+            source: ResolvedSource::create(
+                new Source(),
+                '/path/to',
+            ),
             sourceFilter: new SourceFilter(new GitDiffFilter('AM', 'reference(master)'), []),
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
@@ -1494,6 +1499,50 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
+        yield 'source directories resolve against the Infection configuration directory' => [
+            $defaultScenario
+                ->withSchema(
+                    $defaultSchemaBuilder->withSource(
+                        new Source(
+                            ['src/'],
+                            ['vendor/', 'Generated.php'],
+                        ),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceDirectories('/path/to/src')
+                        ->withSourceFilesExcludes(
+                            'vendor/',
+                            'Generated.php',
+                        )
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional classification uses resolved source directories' => [
+            $defaultScenario
+                ->withSchema(
+                    $defaultSchemaBuilder->withSource(
+                        new Source(
+                            ['tests/'],
+                            [],
+                        ),
+                    ),
+                )
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalArgumentsFilter(['tests/FooTest.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceDirectories('/path/to/tests')
+                        ->withSourceFilter(new PlainFilter(['tests/FooTest.php']))
+                        ->build(),
+                ),
+        ];
+
         yield 'positional source paths become a PlainFilter (with deduplication)' => [
             $defaultScenario
                 ->withInput(
@@ -1731,15 +1780,21 @@ final class ConfigurationFactoryTest extends TestCase
                     mutantId: 'h4sh',
                 ),
                 expected: ConfigurationBuilder::withMinimalTestData()
+                    ->withConfigPathname('/path/to/infection.json')
                     ->withTimeout(10)
-                    ->withSourceDirectories('src/')
+                    ->withSource(
+                        ResolvedSourceBuilder::withMinimalTestData()
+                            ->withDirectories('/path/to/src')
+                            ->withExcludes('vendor/')
+                            ->withBasePath('/path/to')
+                            ->build(),
+                    )
                     ->withSourceFilter(
                         new PlainFilter([
                             'src/Foo.php',
                             'src/Bar.php',
                         ]),
                     )
-                    ->withSourceFilesExcludes('vendor/')
                     ->withLogs(
                         LogsBuilder::withMinimalTestData()
                             ->withTextLogFilePath('/text.log')
@@ -1788,7 +1843,6 @@ final class ConfigurationFactoryTest extends TestCase
                     ->withProjectDirectory('/path/to/project')
                     ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
                     ->withMutantId('h4sh')
-                    ->withConfigPathname('/path/to/infection.json')
                     ->build(),
             ),
         ];

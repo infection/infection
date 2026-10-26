@@ -37,6 +37,7 @@ namespace Infection\Tests\Source\Collector;
 
 use Exception;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\SourceFilter\FakeSourceFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
@@ -72,8 +73,13 @@ final class SourceCollectorFactoryTest extends TestCase
         }
 
         $actual = $factory->create(
-            '/path/to/project',
-            new Source(['src', 'lib'], ['vendor', 'tests']),
+            ResolvedSource::create(
+                new Source(
+                    ['/path/to/src', '/path/to/lib'],
+                    ['vendor', 'tests'],
+                ),
+                '/path/to',
+            ),
             $sourceFilter,
         );
 

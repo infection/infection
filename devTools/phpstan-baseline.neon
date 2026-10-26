@@ -964,12 +964,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\FileSystem\Paths
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Process\Factory\MutantProcessContainerFactory
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -1717,12 +1711,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Reporter/StrykerReporterFactoryTest.php
-
-		-
-			rawMessage: 'Parameter $sourceDirectories of static method Infection\Source\Collector\BasicSourceCollector::create() expects array<non-empty-string>, array{string} given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
 
 		-
 			rawMessage: 'Unable to resolve the template type TMapKey in call to method Pipeline\Standard<(int|string),Symfony\Component\Finder\SplFileInfo>::map()'

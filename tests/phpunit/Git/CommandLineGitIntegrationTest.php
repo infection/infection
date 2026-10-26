@@ -154,7 +154,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         $actual = $this->git->getChangedFilePaths(
             'M',
             'HEAD',
-            ['src', '../shared'],
+            [$projectDirectory . '/src', $this->tmp . '/shared'],
             $projectDirectory,
         );
 

@@ -1149,25 +1149,25 @@ count = 1
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:646:32}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:645:32}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:650:53}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:649:53}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:672:37}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:671:37}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:770:13}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:769:13}`.'
 count = 1
 
 [[issues]]
@@ -1359,25 +1359,25 @@ count = 1
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:646:32}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:645:32}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:650:53}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:649:53}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:672:37}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:671:37}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:770:13}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:769:13}`.'
 count = 1
 
 [[issues]]
@@ -5092,12 +5092,6 @@ count = 3
 file = "tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php"
 code = "less-specific-argument"
 message = 'Argument type mismatch for argument #1 of `Infection\Tests\Source\Collector\BasicSourceCollector\BasicSourceCollectorTest::normalizePaths`: expected `array<string, SplFileInfo>`, but provided type `array<array-key, SplFileInfo>` is less specific.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Infection\Source\Collector\BasicSourceCollector::create`: expected `array<array-key, non-empty-string>`, but possibly received `list{string}`.'
 count = 1
 
 [[issues]]
