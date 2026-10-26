@@ -24,6 +24,7 @@
     },
     "mutators": {
         "global-ignore": [
+            "Infection\\Command\\Debug\\DumpAstCommand::configure",
             "Infection\\Command\\Debug\\ListSymbolsCommand::configure"
         ],
         "global-ignoreSourceCodeByRegex": [
