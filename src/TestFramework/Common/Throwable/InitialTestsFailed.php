@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Common\Throwable;
 
 use function implode;
+use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use RuntimeException;
 use function sprintf;
@@ -58,6 +59,36 @@ final class InitialTestsFailed extends RuntimeException implements InitialTestsF
             'The initial test process must have terminated before its failure is reported.',
         );
 
+        return self::fromOutput(
+            $exitCode,
+            $process->getOutput(),
+            $process->getErrorOutput(),
+            $testFramework,
+            $recommendations,
+        );
+    }
+
+    public static function fromCompletedProcess(
+        CompletedProcess $process,
+        string $testFramework,
+        string $recommendations,
+    ): self {
+        return self::fromOutput(
+            $process->exitCode,
+            $process->stdout,
+            $process->stderr,
+            $testFramework,
+            $recommendations,
+        );
+    }
+
+    private static function fromOutput(
+        int $exitCode,
+        string $stdOut,
+        string $stdError,
+        string $testFramework,
+        string $recommendations,
+    ): self {
         $lines = [
             'Project tests must be in a passing state before running Infection.',
             $recommendations,
@@ -72,14 +103,10 @@ final class InitialTestsFailed extends RuntimeException implements InitialTestsF
             ),
         ];
 
-        $stdOut = $process->getOutput();
-
         if ($stdOut !== '') {
             $lines[] = 'STDOUT:';
             $lines[] = $stdOut;
         }
-
-        $stdError = $process->getErrorOutput();
 
         if ($stdError !== '') {
             $lines[] = 'STDERR:';
