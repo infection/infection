@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Common\Throwable;
 
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
+use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -85,6 +86,41 @@ final class InitialTestsFailedTest extends TestCase
                 Recommendations
                 PHPUnit reported an exit code of 3.
                 Refer to the PHPUnit's output below:
+                MESSAGE
+            . $expectedOutput,
+            $exception->getMessage(),
+        );
+    }
+
+    #[DataProvider('processOutputProvider')]
+    public function test_it_creates_a_failure_from_a_completed_process(
+        string $stdout,
+        string $stderr,
+        string $expectedOutput,
+    ): void {
+        $process = new CompletedProcess(
+            ['phpstan', 'analyse'],
+            3,
+            $stdout,
+            $stderr,
+        );
+
+        $exception = InitialTestsFailed::fromCompletedProcess(
+            $process,
+            'PHPStan',
+            'Recommendations',
+        );
+
+        $this->assertInstanceOf(
+            InitialTestsFailedContract::class,
+            $exception,
+        );
+        $this->assertSame(
+            <<<'MESSAGE'
+                Project tests must be in a passing state before running Infection.
+                Recommendations
+                PHPStan reported an exit code of 3.
+                Refer to the PHPStan's output below:
                 MESSAGE
             . $expectedOutput,
             $exception->getMessage(),

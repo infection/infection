@@ -39,9 +39,9 @@ use Closure;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
-use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
@@ -146,7 +146,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             )
         ;
 
-        $this->expectException(InitialStaticAnalysisRunFailed::class);
+        $this->expectException(InitialTestsFailed::class);
         $this->expectExceptionMessageMatches('/phpstan reported an exit code of 3\\./');
 
         $this->runner->run();
