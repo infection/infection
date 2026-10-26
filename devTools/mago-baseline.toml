@@ -2960,12 +2960,6 @@ count = 2
 
 [[issues]]
 file = "src/Source/Collector/BasicSourceCollector.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Source\Collector\BasicSourceCollector::makePathsAbsolute`: expected `array<array-key, non-empty-string>`, but found `array<array-key, string>|list<string>`.'
-count = 1
-
-[[issues]]
-file = "src/Source/Collector/BasicSourceCollector.php"
 code = "less-specific-nested-return-statement"
 message = '''Returned type `Infection\FileSystem\Finder\Iterator\RealPathFilterIterator<mixed, mixed>|Iterator<mixed, Symfony\Component\Finder\SplFileInfo>|Symfony\Component\Finder\Iterator\PathFilterIterator` is less specific than the declared return type `Iterator<mixed, Symfony\Component\Finder\SplFileInfo>` for function `Infection\Source\Collector\BasicSourceCollector::filter` due to nested 'mixed'.'''
 count = 1

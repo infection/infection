@@ -35,15 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use function array_map;
 use function count;
 use function dirname;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
+use Infection\FileSystem\Paths;
 use Infection\Source\Exception\NoSourceFound;
 use Iterator;
 use function Pipeline\take;
-use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Iterator\PathFilterIterator;
 use Symfony\Component\Finder\SplFileInfo;
@@ -93,7 +92,7 @@ final readonly class BasicSourceCollector implements SourceCollector
             // collector will collect the files relative to the current working
             // directory instead of relative to the location of the configuration
             // file.
-            self::makePathsAbsolute($configurationDirname, $sourceDirectories),
+            Paths::makeAbsolute($sourceDirectories, $configurationDirname),
             $excludedFilesOrDirectories,
             $filter,
         );
@@ -115,29 +114,6 @@ final readonly class BasicSourceCollector implements SourceCollector
         );
 
         return take($iterator)->toList();
-    }
-
-    /**
-     * @param non-empty-string $configurationDirname
-     * @param non-empty-string[] $sourceDirectories
-     *
-     * @return non-empty-string[]
-     */
-    private static function makePathsAbsolute(
-        string $configurationDirname,
-        array $sourceDirectories,
-    ): array {
-        $mapToAbsolutePath = static fn (string $path) => Path::isAbsolute($path)
-            ? $path
-            : Path::join(
-                $configurationDirname,
-                $path,
-            );
-
-        return array_map(
-            $mapToAbsolutePath(...),
-            $sourceDirectories,
-        );
     }
 
     private function createFinder(): Finder
