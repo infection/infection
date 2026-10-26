@@ -36,9 +36,17 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Removal;
 
 use Infection\Mutator\Removal\MethodCallRemoval;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\Testing\BaseMutatorTestCase;
+use Infection\Testing\FileSystem\MockSplFileInfo;
+use Infection\Testing\SingletonContainer;
+use PhpParser\Node\Stmt\Expression;
+use PhpParser\NodeFinder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use function Pipeline\take;
+use Psr\Log\NullLogger;
+use Symfony\Component\Console\Output\NullOutput;
 
 #[CoversClass(MethodCallRemoval::class)]
 final class MethodCallRemovalTest extends BaseMutatorTestCase
@@ -160,21 +168,294 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
             ),
         ];
 
-        yield 'It does not remove a method call assigning a variable in its arguments' => [
+        yield 'It preserves an assignment in an argument when removing a method call' => [
             self::wrapCodeInMethod(
                 <<<'PHP'
                     $this->checkAccess($prospect = $this->find($id));
-                    $this->checkCart($cart = $this->find($id));
-                    $this->checkOther(foo($other = 1));
+                    return $prospect;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $prospect = $this->find($id);
+                    return $prospect;
                     PHP,
             ),
         ];
 
-        yield 'It does not remove a method call compound or reference assigning a variable in its arguments' => [
+        yield 'It preserves the enclosing expression of a nested assignment' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->checkOther(foo($other = 1));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    foo($other = 1);
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves compound assignments' => [
             self::wrapCodeInMethod(
                 <<<'PHP'
                     $this->foo($a += 1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a += 1;
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves reference assignments in static calls' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
                     self::bar($b = &$c);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $b = &$c;
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves multiple assignments in one mutant in evaluation order' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->check($a = first(), $b = second($a), $a += $b);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = first();
+                    $b = second($a);
+                    $a += $b;
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves chained assignments as one expression' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->check($a = $b = load());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b = load();
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves destructuring assignments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->check([$a, $b] = load());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [$a, $b] = load();
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves statement comments once when retaining multiple expressions' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    // Resolve both values before continuing.
+                    $this->check($a = first(), $b = second($a));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    // Resolve both values before continuing.
+                    $a = first();
+                    $b = second($a);
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves conditional execution of an assignment' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->check($ready && ($value = load()));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $ready && ($value = load());
+                    PHP,
+            ),
+        ];
+
+        yield 'It retains other argument evaluations around an assignment' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->check(before(), $value = load(), after());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    before();
+                    $value = load();
+                    after();
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves named argument evaluation order' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->check(second: $b = first(), first: $a = second($b));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $b = first();
+                    $a = second($b);
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves receiver evaluation before argument assignments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->createService()->check($value = load());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->createService();
+                    $value = load();
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves an assignment in the receiver without arguments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ($service = createService())->check();
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $service = createService();
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves receiver and argument assignments together' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ($service = createService())->check($value = load());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $service = createService();
+                    $value = load();
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves property receiver evaluation before arguments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $services->active->check($value = load());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $services->active;
+                    $value = load();
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves dynamic receiver variable evaluation' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ${$name = getServiceName()}->check($value = load());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ${$name = getServiceName()};
+                    $value = load();
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves dynamic method name evaluation before arguments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $service->{$name = getMethodName()}($value = load());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $name = getMethodName();
+                    $value = load();
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves a dynamic static class expression' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ($class = getClassName())::check($value = load());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class = getClassName();
+                    $value = load();
+                    PHP,
+            ),
+        ];
+
+        yield 'It retains arguments when the static class is a simple variable' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class::check($value = load());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $value = load();
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves a static property receiver' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    Services::$active->check($value = load());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    Services::$active;
+                    $value = load();
+                    PHP,
+            ),
+        ];
+
+        yield 'It evaluates the receiver and dynamic method name before the arguments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    createService()->{getMethodName()}($value = load());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    createService();
+                    getMethodName();
+                    $value = load();
                     PHP,
             ),
         ];
@@ -204,6 +485,167 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
             ),
         ];
 
+        yield 'It preserves an immediately invoked closure assigning a captured reference' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->consume((function () use (&$value) {
+                        return $value = 42;
+                    })());
+
+                    return $value;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (function () use (&$value) {
+                        return $value = 42;
+                    })();
+
+                    return $value;
+                    PHP,
+            ),
+        ];
+
+        yield 'It preserves an immediately invoked arrow function assigning a property' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->consume((fn () => $state->value = 42)());
+
+                    return $state->value;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (fn () => $state->value = 42)();
+
+                    return $state->value;
+                    PHP,
+            ),
+        ];
+
+        yield 'It leaves a nullsafe expression within a retained argument intact' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->check($service?->load($value = load()));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $service?->load($value = load());
+                    PHP,
+            ),
+        ];
+
+        yield 'It skips assignments in the arguments of a nullsafe call' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $service?->check($value = load());
+                    PHP,
+            ),
+        ];
+
+        yield 'It skips assignments after a nullsafe method receiver' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $service?->prepare()->check($value = load());
+                    PHP,
+            ),
+        ];
+
+        yield 'It skips assignments after a nullsafe property receiver' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $service?->active->check($value = load());
+                    PHP,
+            ),
+        ];
+
+        yield 'It skips assignments after a nullsafe chain with a regular property access' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $service?->active->handler->check($value = load());
+                    PHP,
+            ),
+        ];
+
+        yield 'It skips assignments in a static call following a nullsafe access' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $service?->active::check($value = load());
+                    PHP,
+            ),
+        ];
+
+        yield 'It skips assignments after a static property in a nullsafe chain' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $service?->active::$handler->check($value = load());
+                    PHP,
+            ),
+        ];
+
+        yield 'It skips assignments after a nullsafe receiver with array access' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $services?->active[0]->check($value = load());
+                    PHP,
+            ),
+        ];
+
+        yield 'It skips assignments with unpacked arguments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->check(...($items = generateItems()), last: $last = readState());
+                    PHP,
+            ),
+        ];
+
+        yield 'It skips assignments when creating a first-class callable' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ($service = createService())->check(...);
+                    PHP,
+            ),
+        ];
+
+        yield 'It removes a method call with an immediately invoked closure without assignments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->consume((fn () => 42)());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    PHP,
+            ),
+        ];
+
+        yield 'It removes a method call creating a first-class callable from a closure' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->consume((function () use (&$value) {
+                        return $value = 42;
+                    })(...));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    PHP,
+            ),
+        ];
+
+        yield 'It removes a method call with an invoked arrow function returning an uninvoked closure' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->consume((fn () => fn () => $state->value = 42)());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    PHP,
+            ),
+        ];
+
         yield 'It does not remove a function call' => [
             self::wrapCodeInMethod(
                 <<<'PHP'
@@ -212,5 +654,49 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
                     PHP,
             ),
         ];
+    }
+
+    public function test_it_does_not_change_the_input_statement_when_preserving_assignments(): void
+    {
+        $container = SingletonContainer::getContainer()->withValues(
+            logger: new NullLogger(),
+            output: new NullOutput(),
+            withUncovered: true,
+        );
+
+        $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
+
+        $nodes = $container->getParser()->parse(
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->check($a = first(), $b = second($a));
+                    PHP,
+            ),
+        );
+        $this->assertNotNull($nodes);
+
+        $container->getNodeTraverserFactory()
+            ->createEnrichmentTraverser(
+                $sourceFile,
+                new EmptyTrace($sourceFile),
+            )
+            ->traverse($nodes)
+        ;
+
+        $statement = (new NodeFinder())->findFirstInstanceOf(
+            $nodes,
+            Expression::class,
+        );
+
+        $this->assertNotNull($statement);
+
+        $originalExpression = $statement->expr;
+
+        $mutations = take($this->mutator->mutate($statement))->toList();
+
+        $newExpression = $statement->expr;
+
+        $this->assertCount(1, $mutations);
+        $this->assertSame($originalExpression, $newExpression);
     }
 }
