@@ -57,7 +57,7 @@ final readonly class PlainFilter implements SourceFileFilter
     }
 
     /**
-     * @param string|array<non-empty-string> $value A comma-separated string or individual path values.
+     * @param string|array<string> $value A comma-separated string or individual path values.
      */
     public static function tryToCreate(string|array $value): ?self
     {
@@ -77,21 +77,39 @@ final readonly class PlainFilter implements SourceFileFilter
     }
 
     /**
-     * @param string|array<non-empty-string> $value
+     * @param string|array<string> $value
      *
      * @return non-empty-string[]
      */
     private static function parseValues(string|array $value): array
     {
         if (is_string($value)) {
-            $value = array_filter(
-                array_map(
-                    trim(...),
-                    explode(',', $value),
-                ),
-            );
+            $value = explode(',', $value);
         }
 
-        return array_unique($value);
+        return array_unique(
+            self::removeEmptyPaths(
+                array_map(
+                    trim(...),
+                    $value,
+                ),
+            ),
+        );
+    }
+
+    /**
+     * @param string[] $paths
+     *
+     * @return non-empty-string[]
+     */
+    private static function removeEmptyPaths(array $paths): array
+    {
+        // The filename "0" is valid and must not be discarded with empty strings.
+        // Mago does not infer the non-empty strings retained by the predicate.
+        // @mago-expect analysis:invalid-return-statement
+        return array_filter(
+            $paths,
+            static fn (string $path): bool => $path !== '',
+        );
     }
 }
