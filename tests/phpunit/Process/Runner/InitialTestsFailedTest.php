@@ -38,6 +38,7 @@ namespace Infection\Tests\Process\Runner;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\Runner\InitialTestsFailed;
+use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -70,6 +71,10 @@ final class InitialTestsFailedTest extends TestCase
 
         $exception = InitialTestsFailed::fromProcessAndAdapter($process, $testFrameworkAdapter);
 
+        $this->assertInstanceOf(
+            InitialTestsFailedContract::class,
+            $exception,
+        );
         $this->assertSame($error, $exception->getMessage());
     }
 }

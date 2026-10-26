@@ -38,6 +38,7 @@ namespace Infection\Tests\Process\Runner;
 use function implode;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\TestFramework\Contracts\CompletedProcess;
+use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -65,6 +66,10 @@ final class InitialStaticAnalysisRunFailedTest extends TestCase
 
         $exception = InitialStaticAnalysisRunFailed::fromCompletedProcessAndAdapter($process, 'PHPStan');
 
+        $this->assertInstanceOf(
+            InitialTestsFailedContract::class,
+            $exception,
+        );
         $this->assertSame($error, $exception->getMessage());
     }
 }

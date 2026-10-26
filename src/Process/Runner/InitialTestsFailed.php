@@ -38,6 +38,7 @@ namespace Infection\Process\Runner;
 use Exception;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use function sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
@@ -45,7 +46,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class InitialTestsFailed extends Exception
+final class InitialTestsFailed extends Exception implements InitialTestsFailedContract
 {
     public static function fromProcessAndAdapter(
         Process $initialTestSuiteProcess,
