@@ -44,6 +44,7 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Source\Exception\NoSourceFound;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed as CommonInitialTestsFailed;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
@@ -191,6 +192,10 @@ final class RunCommandTest extends TestCase
 
         yield 'initial tests failed' => [
             'failure' => new InitialTestsFailed('Project tests must be in a passing state before running Infection.'),
+        ];
+
+        yield 'native initial tests failed' => [
+            'failure' => new CommonInitialTestsFailed('Native initial tests failed.'),
         ];
 
         yield 'initial static analysis failed' => [

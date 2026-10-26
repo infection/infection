@@ -55,7 +55,10 @@ final class InitialTestsFailed extends Exception implements InitialTestsFailedCo
         $testFrameworkKey = $testFrameworkAdapter->getName();
 
         $exitCode = $initialTestSuiteProcess->getExitCode();
-        Assert::notNull($exitCode);
+        Assert::notNull(
+            $exitCode,
+            'The initial test process must have terminated before its failure is reported.',
+        );
 
         $lines = [
             'Project tests must be in a passing state before running Infection.',

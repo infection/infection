@@ -43,9 +43,9 @@ use Infection\Configuration\Configuration;
 use Infection\FileSystem\FileSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
@@ -221,6 +221,11 @@ final class PhpUnitAdapterTest extends TestCase
             ->willReturn(1)
         ;
 
+        $process
+            ->method('getCommandLine')
+            ->willReturn('vendor/bin/phpunit --configuration failing.xml')
+        ;
+
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $adapter = $this->createAdapter(
             '<phpunit/>',
@@ -243,6 +248,11 @@ final class PhpUnitAdapterTest extends TestCase
         ;
 
         $this->expectException(InitialTestsFailed::class);
+        $this->expectExceptionMessage(
+            $adapter->getInitialTestsFailRecommendations(
+                'vendor/bin/phpunit --configuration failing.xml',
+            ),
+        );
 
         $adapter->executeInitialRun();
     }
