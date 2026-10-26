@@ -179,14 +179,18 @@ class ParallelProcessRunner implements ProcessRunner
             $mutantProcess = $mutantProcessContainer->getCurrent();
             $process = $mutantProcess->getProcess();
 
-            try {
-                $process->checkTimeout();
-            } catch (ProcessTimedOutException) {
-                $mutantProcess->markAsTimedOut();
-            }
-
+            // isRunning() first: checkTimeout() only knows the status of the last poll, so a process that ended while
+            // the runner was busy elsewhere (e.g. generating the mutations of a large file) was marked as timed out
             if ($process->isRunning()) {
-                continue;
+                try {
+                    $process->checkTimeout();
+                } catch (ProcessTimedOutException) {
+                    $mutantProcess->markAsTimedOut();
+                }
+
+                if ($process->isRunning()) {
+                    continue;
+                }
             }
 
             $mutantProcess->markAsFinished();
