@@ -41,7 +41,6 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeAttributes;
 use Infection\PhpParser\Visitor\AssignmentVisitor;
-use function is_string;
 use PhpParser\Node;
 use function Pipeline\take;
 use Webmozart\Assert\Assert;
@@ -143,12 +142,9 @@ final class MethodCallRemoval implements Mutator
         // Keep whole expressions: extracting nested assignments could change conditional
         // execution, and other operands can affect the values assigned later in the call.
         $statements = take(self::getEvaluatedExpressions($call))
-            ->cast(
-                static fn (Node\Expr $expression): Node\Stmt\Expression => new Node\Stmt\Expression(
-                    $expression,
-                    NodeAttributes::getAllExceptOriginalNode($expression),
-                ),
-            )
+            // Standalone reads and literals are rejected as unused by static analysers.
+            ->filter(AssignmentVisitor::containsSideEffect(...))
+            ->cast(self::wrapInStatement(...))
             ->toList()
         ;
 
@@ -165,9 +161,15 @@ final class MethodCallRemoval implements Mutator
         return $statements;
     }
 
+    private static function wrapInStatement(Node\Expr $expression): Node\Stmt\Expression
+    {
+        return new Node\Stmt\Expression(
+            $expression,
+            NodeAttributes::getAllExceptOriginalNode($expression),
+        );
+    }
+
     /**
-     * @psalm-mutation-free
-     *
      * @return iterable<Node\Expr>
      */
     private static function getEvaluatedExpressions(Node\Expr\MethodCall|Node\Expr\StaticCall $call): iterable
@@ -176,30 +178,7 @@ final class MethodCallRemoval implements Mutator
             ? $call->class
             : $call->var;
 
-        // Omit plain receiver variable reads; retain receiver expressions that may
-        // have side effects. For example:
-        //
-        // ```php
-        // $service->check($value = load());
-        // ```
-        //
-        // becomes `$value = load();`, without a standalone `$service;` statement.
-        // When the receiver is the result of a function call:
-        //
-        // ```php
-        // createService()->check($value = load());
-        // ```
-        //
-        // retain that call before the assignment to preserve its side effects:
-        //
-        // ```php
-        // createService();
-        // $value = load();
-        // ```
-        if (
-            $receiver instanceof Node\Expr
-            && !($receiver instanceof Node\Expr\Variable && is_string($receiver->name))
-        ) {
+        if ($receiver instanceof Node\Expr) {
             yield $receiver;
         }
 

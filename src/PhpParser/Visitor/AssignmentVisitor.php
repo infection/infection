@@ -40,7 +40,7 @@ use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 /**
- * Marks AST nodes that contain assignments. Assignments inside function bodies
+ * Marks AST nodes that contain assignments or other side effects. Function bodies
  * do not mark surrounding code, except when a closure or arrow function is
  * invoked immediately.
  *
@@ -50,27 +50,32 @@ final class AssignmentVisitor extends NodeVisitorAbstract
 {
     private const string CONTAINS_ASSIGNMENT = 'containsAssignment';
 
+    private const string CONTAINS_SIDE_EFFECT = 'containsSideEffect';
+
     #[Override]
     public function leaveNode(Node $node): ?Node
     {
-        if (!self::containsAssignment($node)) {
-            return null;
-        }
-
         $parent = ParentConnector::findParent($node);
 
         if (self::isFunctionWithoutImmediateInvocation($node, $parent)) {
             return null;
         }
 
-        $parent?->setAttribute(self::CONTAINS_ASSIGNMENT, true);
+        if (self::containsAssignment($node)) {
+            $parent?->setAttribute(self::CONTAINS_ASSIGNMENT, true);
+        }
+
+        if (self::containsSideEffect($node)) {
+            $parent?->setAttribute(self::CONTAINS_SIDE_EFFECT, true);
+        }
 
         return null;
     }
 
     public static function containsAssignment(Node $node): bool
     {
-        if ($node instanceof Node\Expr\Assign
+        if (
+            $node instanceof Node\Expr\Assign
             || $node instanceof Node\Expr\AssignOp
             || $node instanceof Node\Expr\AssignRef
         ) {
@@ -78,6 +83,35 @@ final class AssignmentVisitor extends NodeVisitorAbstract
         }
 
         return $node->getAttribute(self::CONTAINS_ASSIGNMENT) === true;
+    }
+
+    public static function containsSideEffect(Node $node): bool
+    {
+        // Creating a function does not execute its body.
+        if ($node instanceof Node\FunctionLike) {
+            return false;
+        }
+
+        if (
+            self::containsAssignment($node)
+            || ($node instanceof Node\Expr\CallLike && !$node->isFirstClassCallable())
+            || $node instanceof Node\Expr\PreInc
+            || $node instanceof Node\Expr\PreDec
+            || $node instanceof Node\Expr\PostInc
+            || $node instanceof Node\Expr\PostDec
+            || $node instanceof Node\Expr\Yield_
+            || $node instanceof Node\Expr\YieldFrom
+            || $node instanceof Node\Expr\Print_
+            || $node instanceof Node\Expr\Include_
+            || $node instanceof Node\Expr\Exit_
+            || $node instanceof Node\Expr\Throw_
+            || $node instanceof Node\Expr\Eval_
+            || $node instanceof Node\Expr\ShellExec
+        ) {
+            return true;
+        }
+
+        return $node->getAttribute(self::CONTAINS_SIDE_EFFECT) === true;
     }
 
     /**

@@ -362,7 +362,7 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
             ),
         ];
 
-        yield 'It preserves property receiver evaluation before arguments' => [
+        yield 'It omits a property receiver without side effects' => [
             self::wrapCodeInMethod(
                 <<<'PHP'
                     $services->active->check($value = load());
@@ -370,8 +370,94 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
             ),
             self::wrapCodeInMethod(
                 <<<'PHP'
-                    $services->active;
                     $value = load();
+                    PHP,
+            ),
+        ];
+
+        yield 'It omits literal and read-only arguments and receivers' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->cache->set('key', $value = compute(), $other, true, null, 42, [$other], $items[0], Services::$active);
+                    return $value;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $value = compute();
+                    return $value;
+                    PHP,
+            ),
+        ];
+
+        yield 'It omits a read-only dynamic method name' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $service->{$method}('key', $value = load());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $value = load();
+                    PHP,
+            ),
+        ];
+
+        yield 'It omits deferred functions and first-class callables around assignments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->check(fn () => $state->value = load(), $value = load(), function () { update(); }, load(...));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $value = load();
+                    PHP,
+            ),
+        ];
+
+        yield 'It retains calls nested in argument expressions in evaluation order' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->check([before()], $value = load(), $ready && after(), new Service());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [before()];
+                    $value = load();
+                    $ready && after();
+                    new Service();
+                    PHP,
+            ),
+        ];
+
+        yield 'It retains calls nested in fetches' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    createService()->active->check($items[nextIndex()], $value = load());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    createService()->active;
+                    $items[nextIndex()];
+                    $value = load();
+                    PHP,
+            ),
+        ];
+
+        yield 'It retains increments and decrements around assignments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->check(++$count, $value = $count, $count--);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ++$count;
+                    $value = $count;
+                    $count--;
                     PHP,
             ),
         ];
@@ -431,7 +517,7 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
             ),
         ];
 
-        yield 'It preserves a static property receiver' => [
+        yield 'It omits a static property receiver without side effects' => [
             self::wrapCodeInMethod(
                 <<<'PHP'
                     Services::$active->check($value = load());
@@ -439,7 +525,6 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
             ),
             self::wrapCodeInMethod(
                 <<<'PHP'
-                    Services::$active;
                     $value = load();
                     PHP,
             ),

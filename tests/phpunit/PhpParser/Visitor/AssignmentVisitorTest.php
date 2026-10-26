@@ -47,8 +47,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[CoversClass(AssignmentVisitor::class)]
 final class AssignmentVisitorTest extends VisitorTestCase
 {
-    #[DataProvider('assignmentProvider')]
-    public function test_it_identifies_nodes_containing_assignments(
+    #[DataProvider('nodeProvider')]
+    public function test_it_identifies_assignments_and_other_side_effects(
         string $code,
         string $expected,
     ): void {
@@ -66,6 +66,7 @@ final class AssignmentVisitorTest extends VisitorTestCase
             $nodes,
             AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE,
             'containsAssignment',
+            'containsSideEffect',
         );
 
         $actual = $this->dumper->dump($nodes);
@@ -73,7 +74,7 @@ final class AssignmentVisitorTest extends VisitorTestCase
         $this->assertSame($expected, $actual);
     }
 
-    public static function assignmentProvider(): iterable
+    public static function nodeProvider(): iterable
     {
         yield 'nested assignment does not affect sibling statements' => [
             <<<'PHP'
@@ -105,20 +106,25 @@ final class AssignmentVisitorTest extends VisitorTestCase
                                                     nodeId: 7
                                                 )
                                                 containsAssignment: true
+                                                containsSideEffect: true
                                                 nodeId: 6
                                             )
                                         )
                                         containsAssignment: true
+                                        containsSideEffect: true
                                         nodeId: 4
                                     )
                                     containsAssignment: true
+                                    containsSideEffect: true
                                     nodeId: 3
                                 )
                             )
                             containsAssignment: true
+                            containsSideEffect: true
                             nodeId: 1
                         )
                         containsAssignment: true
+                        containsSideEffect: true
                         nodeId: 0
                     )
                     1: Stmt_Expression(
@@ -128,6 +134,7 @@ final class AssignmentVisitorTest extends VisitorTestCase
                             )
                             nodeId: 11
                         )
+                        containsSideEffect: true
                         nodeId: 10
                     )
                 )
@@ -157,13 +164,16 @@ final class AssignmentVisitorTest extends VisitorTestCase
                                         nodeId: 4
                                     )
                                     containsAssignment: true
+                                    containsSideEffect: true
                                     nodeId: 3
                                 )
                             )
                             containsAssignment: true
+                            containsSideEffect: true
                             nodeId: 1
                         )
                         containsAssignment: true
+                        containsSideEffect: true
                         nodeId: 0
                     )
                 )
@@ -193,13 +203,16 @@ final class AssignmentVisitorTest extends VisitorTestCase
                                         nodeId: 4
                                     )
                                     containsAssignment: true
+                                    containsSideEffect: true
                                     nodeId: 3
                                 )
                             )
                             containsAssignment: true
+                            containsSideEffect: true
                             nodeId: 1
                         )
                         containsAssignment: true
+                        containsSideEffect: true
                         nodeId: 0
                     )
                 )
@@ -242,13 +255,16 @@ final class AssignmentVisitorTest extends VisitorTestCase
                                                                 nodeId: 9
                                                             )
                                                             containsAssignment: true
+                                                            containsSideEffect: true
                                                             nodeId: 8
                                                         )
                                                     )
                                                     containsAssignment: true
+                                                    containsSideEffect: true
                                                     nodeId: 6
                                                 )
                                                 containsAssignment: true
+                                                containsSideEffect: true
                                                 nodeId: 5
                                             )
                                             1: Stmt_Expression(
@@ -258,10 +274,12 @@ final class AssignmentVisitorTest extends VisitorTestCase
                                                     )
                                                     nodeId: 13
                                                 )
+                                                containsSideEffect: true
                                                 nodeId: 12
                                             )
                                         )
                                         containsAssignment: true
+                                        containsSideEffect: true
                                         nodeId: 4
                                     )
                                     nodeId: 3
@@ -269,6 +287,7 @@ final class AssignmentVisitorTest extends VisitorTestCase
                             )
                             nodeId: 1
                         )
+                        containsSideEffect: true
                         nodeId: 0
                     )
                     1: Stmt_Expression(
@@ -278,6 +297,7 @@ final class AssignmentVisitorTest extends VisitorTestCase
                             )
                             nodeId: 16
                         )
+                        containsSideEffect: true
                         nodeId: 15
                     )
                 )
@@ -308,6 +328,7 @@ final class AssignmentVisitorTest extends VisitorTestCase
                                             nodeId: 5
                                         )
                                         containsAssignment: true
+                                        containsSideEffect: true
                                         nodeId: 4
                                     )
                                     nodeId: 3
@@ -315,6 +336,7 @@ final class AssignmentVisitorTest extends VisitorTestCase
                             )
                             nodeId: 1
                         )
+                        containsSideEffect: true
                         nodeId: 0
                     )
                 )
@@ -358,23 +380,28 @@ final class AssignmentVisitorTest extends VisitorTestCase
                                                         nodeId: 9
                                                     )
                                                     containsAssignment: true
+                                                    containsSideEffect: true
                                                     nodeId: 8
                                                 )
                                             )
                                             containsAssignment: true
+                                            containsSideEffect: true
                                             nodeId: 5
                                         )
                                         containsAssignment: true
                                         nodeId: 4
                                     )
                                     containsAssignment: true
+                                    containsSideEffect: true
                                     nodeId: 3
                                 )
                             )
                             containsAssignment: true
+                            containsSideEffect: true
                             nodeId: 1
                         )
                         containsAssignment: true
+                        containsSideEffect: true
                         nodeId: 0
                     )
                 )
@@ -412,19 +439,23 @@ final class AssignmentVisitorTest extends VisitorTestCase
                                                 nodeId: 6
                                             )
                                             containsAssignment: true
+                                            containsSideEffect: true
                                             nodeId: 5
                                         )
                                         containsAssignment: true
                                         nodeId: 4
                                     )
                                     containsAssignment: true
+                                    containsSideEffect: true
                                     nodeId: 3
                                 )
                             )
                             containsAssignment: true
+                            containsSideEffect: true
                             nodeId: 1
                         )
                         containsAssignment: true
+                        containsSideEffect: true
                         nodeId: 0
                     )
                 )
@@ -468,10 +499,12 @@ final class AssignmentVisitorTest extends VisitorTestCase
                                                         nodeId: 9
                                                     )
                                                     containsAssignment: true
+                                                    containsSideEffect: true
                                                     nodeId: 8
                                                 )
                                             )
                                             containsAssignment: true
+                                            containsSideEffect: true
                                             nodeId: 5
                                         )
                                         args: array(
@@ -486,6 +519,7 @@ final class AssignmentVisitorTest extends VisitorTestCase
                             )
                             nodeId: 1
                         )
+                        containsSideEffect: true
                         nodeId: 0
                     )
                 )
@@ -524,17 +558,21 @@ final class AssignmentVisitorTest extends VisitorTestCase
                                                     nodeId: 7
                                                 )
                                                 containsAssignment: true
+                                                containsSideEffect: true
                                                 nodeId: 6
                                             )
                                             nodeId: 5
                                         )
                                         nodeId: 4
                                     )
+                                    containsSideEffect: true
                                     nodeId: 3
                                 )
                             )
+                            containsSideEffect: true
                             nodeId: 1
                         )
+                        containsSideEffect: true
                         nodeId: 0
                     )
                 )
@@ -584,17 +622,21 @@ final class AssignmentVisitorTest extends VisitorTestCase
                                                                             nodeId: 12
                                                                         )
                                                                         containsAssignment: true
+                                                                        containsSideEffect: true
                                                                         nodeId: 11
                                                                     )
                                                                 )
                                                                 containsAssignment: true
+                                                                containsSideEffect: true
                                                                 nodeId: 9
                                                             )
                                                             containsAssignment: true
+                                                            containsSideEffect: true
                                                             nodeId: 8
                                                         )
                                                     )
                                                     containsAssignment: true
+                                                    containsSideEffect: true
                                                     nodeId: 6
                                                 )
                                             )
@@ -602,12 +644,325 @@ final class AssignmentVisitorTest extends VisitorTestCase
                                         )
                                         nodeId: 4
                                     )
+                                    containsSideEffect: true
                                     nodeId: 3
                                 )
+                            )
+                            containsSideEffect: true
+                            nodeId: 1
+                        )
+                        containsSideEffect: true
+                        nodeId: 0
+                    )
+                )
+                AST,
+        ];
+
+        yield 'expressions without side effects' => [
+            <<<'PHP'
+                $service->active;
+                load(...);
+                [fn () => update()];
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Expression(
+                        expr: Expr_PropertyFetch(
+                            var: Expr_Variable(
+                                nodeId: 2
+                            )
+                            name: Identifier(
+                                nodeId: 3
                             )
                             nodeId: 1
                         )
                         nodeId: 0
+                    )
+                    1: Stmt_Expression(
+                        expr: Expr_FuncCall(
+                            name: Name(
+                                nodeId: 6
+                            )
+                            args: array(
+                                0: VariadicPlaceholder(
+                                    nodeId: 7
+                                )
+                            )
+                            nodeId: 5
+                        )
+                        nodeId: 4
+                    )
+                    2: Stmt_Expression(
+                        expr: Expr_Array(
+                            items: array(
+                                0: ArrayItem(
+                                    value: Expr_ArrowFunction(
+                                        expr: Expr_FuncCall(
+                                            name: Name(
+                                                nodeId: 13
+                                            )
+                                            nodeId: 12
+                                        )
+                                        containsSideEffect: true
+                                        nodeId: 11
+                                    )
+                                    nodeId: 10
+                                )
+                            )
+                            nodeId: 9
+                        )
+                        nodeId: 8
+                    )
+                )
+                AST,
+        ];
+
+        yield 'calls and construction' => [
+            <<<'PHP'
+                [load()];
+                new Service();
+                ($service = load())->check(...);
+                (function () {
+                    update();
+                })();
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Expression(
+                        expr: Expr_Array(
+                            items: array(
+                                0: ArrayItem(
+                                    value: Expr_FuncCall(
+                                        name: Name(
+                                            nodeId: 4
+                                        )
+                                        nodeId: 3
+                                    )
+                                    containsSideEffect: true
+                                    nodeId: 2
+                                )
+                            )
+                            containsSideEffect: true
+                            nodeId: 1
+                        )
+                        containsSideEffect: true
+                        nodeId: 0
+                    )
+                    1: Stmt_Expression(
+                        expr: Expr_New(
+                            class: Name(
+                                nodeId: 7
+                            )
+                            nodeId: 6
+                        )
+                        containsSideEffect: true
+                        nodeId: 5
+                    )
+                    2: Stmt_Expression(
+                        expr: Expr_MethodCall(
+                            var: Expr_Assign(
+                                var: Expr_Variable(
+                                    nodeId: 11
+                                )
+                                expr: Expr_FuncCall(
+                                    name: Name(
+                                        nodeId: 13
+                                    )
+                                    nodeId: 12
+                                )
+                                containsSideEffect: true
+                                nodeId: 10
+                            )
+                            name: Identifier(
+                                nodeId: 14
+                            )
+                            args: array(
+                                0: VariadicPlaceholder(
+                                    nodeId: 15
+                                )
+                            )
+                            containsAssignment: true
+                            containsSideEffect: true
+                            nodeId: 9
+                        )
+                        containsAssignment: true
+                        containsSideEffect: true
+                        nodeId: 8
+                    )
+                    3: Stmt_Expression(
+                        expr: Expr_FuncCall(
+                            name: Expr_Closure(
+                                stmts: array(
+                                    0: Stmt_Expression(
+                                        expr: Expr_FuncCall(
+                                            name: Name(
+                                                nodeId: 21
+                                            )
+                                            nodeId: 20
+                                        )
+                                        containsSideEffect: true
+                                        nodeId: 19
+                                    )
+                                )
+                                containsSideEffect: true
+                                nodeId: 18
+                            )
+                            nodeId: 17
+                        )
+                        containsSideEffect: true
+                        nodeId: 16
+                    )
+                )
+                AST,
+        ];
+
+        yield 'increments and decrements' => [
+            <<<'PHP'
+                ++$value;
+                $value++;
+                --$value;
+                $value--;
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Expression(
+                        expr: Expr_PreInc(
+                            var: Expr_Variable(
+                                nodeId: 2
+                            )
+                            nodeId: 1
+                        )
+                        containsSideEffect: true
+                        nodeId: 0
+                    )
+                    1: Stmt_Expression(
+                        expr: Expr_PostInc(
+                            var: Expr_Variable(
+                                nodeId: 5
+                            )
+                            nodeId: 4
+                        )
+                        containsSideEffect: true
+                        nodeId: 3
+                    )
+                    2: Stmt_Expression(
+                        expr: Expr_PreDec(
+                            var: Expr_Variable(
+                                nodeId: 8
+                            )
+                            nodeId: 7
+                        )
+                        containsSideEffect: true
+                        nodeId: 6
+                    )
+                    3: Stmt_Expression(
+                        expr: Expr_PostDec(
+                            var: Expr_Variable(
+                                nodeId: 11
+                            )
+                            nodeId: 10
+                        )
+                        containsSideEffect: true
+                        nodeId: 9
+                    )
+                )
+                AST,
+        ];
+
+        yield 'other side effects' => [
+            <<<'PHP'
+                yield $value;
+                yield from $values;
+                print $value;
+                include $file;
+                exit(1);
+                throw $error;
+                eval($code);
+                `command`;
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Expression(
+                        expr: Expr_Yield(
+                            value: Expr_Variable(
+                                nodeId: 2
+                            )
+                            nodeId: 1
+                        )
+                        containsSideEffect: true
+                        nodeId: 0
+                    )
+                    1: Stmt_Expression(
+                        expr: Expr_YieldFrom(
+                            expr: Expr_Variable(
+                                nodeId: 5
+                            )
+                            nodeId: 4
+                        )
+                        containsSideEffect: true
+                        nodeId: 3
+                    )
+                    2: Stmt_Expression(
+                        expr: Expr_Print(
+                            expr: Expr_Variable(
+                                nodeId: 8
+                            )
+                            nodeId: 7
+                        )
+                        containsSideEffect: true
+                        nodeId: 6
+                    )
+                    3: Stmt_Expression(
+                        expr: Expr_Include(
+                            expr: Expr_Variable(
+                                nodeId: 11
+                            )
+                            nodeId: 10
+                        )
+                        containsSideEffect: true
+                        nodeId: 9
+                    )
+                    4: Stmt_Expression(
+                        expr: Expr_Exit(
+                            expr: Scalar_Int(
+                                nodeId: 14
+                            )
+                            nodeId: 13
+                        )
+                        containsSideEffect: true
+                        nodeId: 12
+                    )
+                    5: Stmt_Expression(
+                        expr: Expr_Throw(
+                            expr: Expr_Variable(
+                                nodeId: 17
+                            )
+                            nodeId: 16
+                        )
+                        containsSideEffect: true
+                        nodeId: 15
+                    )
+                    6: Stmt_Expression(
+                        expr: Expr_Eval(
+                            expr: Expr_Variable(
+                                nodeId: 20
+                            )
+                            nodeId: 19
+                        )
+                        containsSideEffect: true
+                        nodeId: 18
+                    )
+                    7: Stmt_Expression(
+                        expr: Expr_ShellExec(
+                            parts: array(
+                                0: InterpolatedStringPart(
+                                    nodeId: 23
+                                )
+                            )
+                            nodeId: 22
+                        )
+                        containsSideEffect: true
+                        nodeId: 21
                     )
                 )
                 AST,
