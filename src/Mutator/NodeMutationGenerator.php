@@ -51,11 +51,13 @@ use Webmozart\Assert\Assert;
  */
 class NodeMutationGenerator
 {
-    /** @var Mutator<Node>[] */
+    /**
+     * @var array<string, Mutator<Node>>
+     */
     private readonly array $mutators;
 
     /**
-     * @param Mutator<Node>[] $mutators
+     * @param array<string, Mutator<Node>> $mutators Mutators keyed by their names.
      * @param Node[] $fileNodes
      * @param Token[] $originalFileTokens
      */
