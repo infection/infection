@@ -52,25 +52,18 @@ use Webmozart\Assert\Assert;
 class NodeMutationGenerator
 {
     /**
-     * @var array<string, Mutator<Node>>
-     */
-    private readonly array $mutators;
-
-    /**
-     * @param array<string, Mutator<Node>> $mutators Mutators keyed by their names.
+     * @param array<string, Mutator<Node>> $mutatorsByName Mutators keyed by their names.
      * @param Node[] $fileNodes
      * @param Token[] $originalFileTokens
      */
     public function __construct(
-        array $mutators,
+        private readonly array $mutatorsByName,
         private readonly string $filePath,
         private readonly array $fileNodes,
         private readonly array $originalFileTokens,
         private readonly string $originalFileContent,
     ) {
-        Assert::allIsInstanceOf($mutators, Mutator::class);
-
-        $this->mutators = $mutators;
+        Assert::allIsInstanceOf($mutatorsByName, Mutator::class);
     }
 
     /**
@@ -84,7 +77,7 @@ class NodeMutationGenerator
             return;
         }
 
-        foreach ($this->mutators as $mutator) {
+        foreach ($this->mutatorsByName as $mutator) {
             yield from $this->generateForMutator($node, $mutator);
         }
     }

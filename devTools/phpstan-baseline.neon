@@ -1359,7 +1359,7 @@ parameters:
 			path: ../tests/phpunit/MockedContainer.php
 
 		-
-			rawMessage: 'Parameter #3 $mutators of method Infection\Mutation\FileMutationGenerator::generate() expects array<string, Infection\Mutator\Mutator<PhpParser\Node>>, array{Plus: Infection\Mutator\Arithmetic\Plus} given.'
+			rawMessage: 'Parameter #3 $mutatorsByName of method Infection\Mutation\FileMutationGenerator::generate() expects array<string, Infection\Mutator\Mutator<PhpParser\Node>>, array{Plus: Infection\Mutator\Arithmetic\Plus} given.'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php

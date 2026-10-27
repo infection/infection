@@ -69,7 +69,7 @@ class FileMutationGenerator
     }
 
     /**
-     * @param array<string, Mutator<Node>> $mutators
+     * @param array<string, Mutator<Node>> $mutatorsByName Mutators keyed by their names.
      *
      * @throws NoSourceFound
      * @throws UnparsableFile
@@ -79,9 +79,9 @@ class FileMutationGenerator
     public function generate(
         SplFileInfo $sourceFile,
         bool $onlyCovered,
-        array $mutators,
+        array $mutatorsByName,
     ): iterable {
-        Assert::allIsInstanceOf($mutators, Mutator::class);
+        Assert::allIsInstanceOf($mutatorsByName, Mutator::class);
 
         $trace = $this->trace($sourceFile);
 
@@ -95,7 +95,7 @@ class FileMutationGenerator
         );
 
         yield from $this->generateMutations(
-            $mutators,
+            $mutatorsByName,
             $sourceFile,
             $initialStatements,
             $originalFileTokens,
@@ -103,21 +103,21 @@ class FileMutationGenerator
     }
 
     /**
-     * @param array<string, Mutator<Node>> $mutators
+     * @param array<string, Mutator<Node>> $mutatorsByName
      * @param Stmt[] $initialStatements
      * @param Token[] $originalFileTokens
      *
      * @return iterable<Mutation>
      */
     private function generateMutations(
-        array $mutators,
+        array $mutatorsByName,
         SplFileInfo $sourceFile,
         mixed $initialStatements,
         mixed $originalFileTokens,
     ): iterable {
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
-                mutators: $mutators,
+                mutatorsByName: $mutatorsByName,
                 filePath: $sourceFile->getRealPath(),
                 fileNodes: $initialStatements,
                 originalFileTokens: $originalFileTokens,
