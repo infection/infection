@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Container;
 
 use function array_filter;
+use function array_keys;
 use Closure;
 use DIContainer\Container as DIContainer;
 use function dirname;
@@ -463,6 +464,8 @@ final class Container extends DIContainer
                 $container->getSourceLineMatcher(),
                 $container->getLineRangeCalculator(),
                 $container->getConfiguration()->mutateOnlyCoveredCode(),
+                $container->getLogger(),
+                array_keys($container->getConfiguration()->mutators),
             ),
             FileReporterFactory::class => static function (self $container): FileReporterFactory {
                 $config = $container->getConfiguration();

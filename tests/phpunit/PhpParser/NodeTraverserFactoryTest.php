@@ -38,6 +38,7 @@ namespace Infection\Tests\PhpParser;
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
@@ -50,6 +51,7 @@ use Infection\Source\MatcherLine\NullSourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\Testing\FileSystem\MockSplFileInfo;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
@@ -60,6 +62,9 @@ use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
+use Psr\Log\Test\TestLogger;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -67,6 +72,41 @@ use ReflectionProperty;
 final class NodeTraverserFactoryTest extends TestCase
 {
     private static ?ReflectionProperty $visitorsReflection = null;
+
+    public function test_it_supplies_the_logger_file_and_known_mutators_to_ignore_annotations(): void
+    {
+        $logger = new TestLogger();
+        $sourceFile = MockSplFileInfo::create('/source.php');
+        $factory = new NodeTraverserFactory(
+            sourceLineMatcher: new NullSourceLineMatcher(),
+            lineRangeCalculator: new LineRangeCalculator(),
+            onlyCovered: false,
+            logger: $logger,
+            knownMutatorNames: ['CustomAlias'],
+        );
+        $nodes = SingletonContainer::getContainer()->getParser()->parse(<<<'PHP'
+            <?php
+            // @infection-ignore FalseValue, CustomAlias, UnknownMutator
+            return false;
+            PHP);
+        $this->assertNotNull($nodes);
+
+        $factory->createEnrichmentTraverser(
+            $sourceFile,
+            new EmptyTrace($sourceFile),
+        )->traverse($nodes);
+
+        $this->assertSame(
+            [
+                [
+                    'level' => LogLevel::WARNING,
+                    'message' => 'Unknown mutator "UnknownMutator" in @infection-ignore at /source.php:3.',
+                    'context' => [],
+                ],
+            ],
+            $logger->records,
+        );
+    }
 
     /**
      * @param list<class-string<NodeVisitor>> $expected
@@ -97,6 +137,7 @@ final class NodeTraverserFactoryTest extends TestCase
             SkipIgnoredNodesVisitor::class,
             NameResolver::class,
             ParentConnectingVisitor::class,
+            ExcludeIgnoredMutatorsVisitor::class,
             ReflectionVisitor::class,
             ExcludeNonMutableCodeVisitor::class,
             ExcludeUnchangedLinesVisitor::class,
@@ -173,6 +214,8 @@ final class NodeTraverserFactoryTest extends TestCase
             sourceLineMatcher: new NullSourceLineMatcher(),
             lineRangeCalculator: new LineRangeCalculator(),
             onlyCovered: $onlyCovered,
+            logger: new NullLogger(),
+            knownMutatorNames: [],
         );
     }
 }

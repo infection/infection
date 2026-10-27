@@ -227,6 +227,10 @@ The core mutation testing cycle: generate, filter, instantiate, evaluate. Encomp
 
 The traversal of the [AST][ast] to yield [mutations][mutation] for each [eligible node][eligible-node].
 
+Infection can exclude specific mutations of an eligible node through
+`@infection-ignore` annotations. These exclusions apply during generation, after
+node eligibility has been determined.
+
 
 ### Mutator
 
