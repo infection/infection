@@ -80,7 +80,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
         ;
 
         $generator = new NodeMutationGenerator(
-            mutators: ['FalseValue' => $mutator],
+            mutatorsByName: ['FalseValue' => $mutator],
             filePath: '/source.php',
             fileNodes: [$node],
             originalFileTokens: [],
@@ -126,7 +126,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
 
         $collector = new MutationCollectorVisitor(
             new NodeMutationGenerator(
-                mutators: $container->getConfiguration()->mutators,
+                mutatorsByName: $container->getConfiguration()->mutators,
                 filePath: '/source.php',
                 fileNodes: $nodes,
                 originalFileTokens: $this->parser->getTokens(),
