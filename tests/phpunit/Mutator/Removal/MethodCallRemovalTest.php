@@ -92,6 +92,58 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
             ),
         ];
 
+        // TODO: Incorrect: array_pop($replyTo) must be retained because it modifies $replyTo.
+        yield 'It removes a method call with an array_pop argument without assignments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->formatAddress(array_pop($replyTo));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    PHP,
+            ),
+        ];
+
+        // TODO: Incorrect: $i++ must be retained because it modifies $i.
+        yield 'It removes a method call with a post-increment argument without assignments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->printIssueListElement($i++, $title, $body);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    PHP,
+            ),
+        ];
+
+        // TODO: Incorrect: ++$operationPriority must be retained because it modifies $operationPriority.
+        yield 'It removes a method call with a pre-increment argument without assignments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $operation->withPriority(++$operationPriority);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    PHP,
+            ),
+        ];
+
+        // TODO: Incorrect: $errorsCallback() must be retained because invoking it can have side effects.
+        yield 'It removes a method call with an invoked callback argument without assignments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $transformer->absolutizeErrors($errorsCallback());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    PHP,
+            ),
+        ];
+
         yield 'It remove a static method call without parameters' => [
             self::wrapCodeInMethod(
                 <<<'PHP'
@@ -705,6 +757,7 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
             ),
         ];
 
+        // TODO: Incorrect: creating the closure initializes $value through use (&$value), even without invoking its body.
         yield 'It removes a method call creating a first-class callable from a closure' => [
             self::wrapCodeInMethod(
                 <<<'PHP'
@@ -727,6 +780,14 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
             ),
             self::wrapCodeInMethod(
                 <<<'PHP'
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not remove a constructor call or its method call arguments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    new PendingChain($jobs->shift(), $jobs->toArray());
                     PHP,
             ),
         ];
