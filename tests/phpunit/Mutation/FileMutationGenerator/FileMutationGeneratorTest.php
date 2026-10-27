@@ -102,8 +102,8 @@ final class FileMutationGeneratorTest extends TestCase
         $fileInfoMock = new MockSplFileInfo(realPath: '/path/to/file');
 
         $mutators = [
-            new FakeMutator(),
-            new FakeMutator(),
+            'First' => new FakeMutator(),
+            'Second' => new FakeMutator(),
         ];
 
         $initialStatements = [
@@ -210,8 +210,8 @@ final class FileMutationGeneratorTest extends TestCase
         $fileInfoMock = new MockSplFileInfo(realPath: '/path/to/file');
 
         $mutators = [
-            new FakeMutator(),
-            new FakeMutator(),
+            'First' => new FakeMutator(),
+            'Second' => new FakeMutator(),
         ];
 
         $initialStatements = [

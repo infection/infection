@@ -233,12 +233,14 @@ abstract class BaseMutatorTestCase extends TestCase
 
         $this->assertNotNull($nodes);
 
+        $mutator = $this->createMutator($settings);
+
         // Note that in theory we could just use the FileMutationGenerator. However,
         // we may add more visitors/traverses in the near future, which would become
         // impossible with FileMutationGenerator, hence we leave it as is for now.
         $mutationsCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
-                mutators: [$this->createMutator($settings)],
+                mutators: [$mutator->getName() => $mutator],
                 filePath: '/path/to/test-file.php',
                 fileNodes: $nodes,
                 originalFileTokens: $originalFileTokens,

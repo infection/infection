@@ -69,7 +69,7 @@ class FileMutationGenerator
     }
 
     /**
-     * @param Mutator<Node>[] $mutators
+     * @param array<string, Mutator<Node>> $mutators
      *
      * @throws NoSourceFound
      * @throws UnparsableFile
@@ -103,7 +103,7 @@ class FileMutationGenerator
     }
 
     /**
-     * @param Mutator<Node>[] $mutators
+     * @param array<string, Mutator<Node>> $mutators
      * @param Stmt[] $initialStatements
      * @param Token[] $originalFileTokens
      *

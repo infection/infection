@@ -58,11 +58,11 @@ use Webmozart\Assert\Assert;
  */
 class MutationGenerator
 {
-    /** @var Mutator<Node>[] */
+    /** @var array<string, Mutator<Node>> */
     private readonly array $mutators;
 
     /**
-     * @param Mutator<Node>[] $mutators
+     * @param array<string, Mutator<Node>> $mutators
      */
     public function __construct(
         private readonly SourceCollector $sourceCollector,
