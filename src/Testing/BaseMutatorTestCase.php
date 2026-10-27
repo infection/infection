@@ -154,14 +154,14 @@ abstract class BaseMutatorTestCase extends TestCase
         /** @var class-string<ConfigurableMutator<Node>> $mutatorClassName */
         $mutatorClassName = $this->getTestedMutatorClassName();
 
-        $mutators = SingletonContainer::getContainer()
+        $mutatorsByName = SingletonContainer::getContainer()
             ->getMutatorFactory()
             ->create([
                 $mutatorClassName => ['settings' => $settings],
             ], false)
         ;
 
-        $mutator = array_shift($mutators);
+        $mutator = array_shift($mutatorsByName);
         Assert::isInstanceOf($mutator, Mutator::class);
 
         return $mutator;
@@ -240,7 +240,7 @@ abstract class BaseMutatorTestCase extends TestCase
         // impossible with FileMutationGenerator, hence we leave it as is for now.
         $mutationsCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
-                mutators: [$mutator->getName() => $mutator],
+                mutatorsByName: [$mutator->getName() => $mutator],
                 filePath: '/path/to/test-file.php',
                 fileNodes: $nodes,
                 originalFileTokens: $originalFileTokens,

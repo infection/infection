@@ -101,7 +101,7 @@ final class FileMutationGeneratorTest extends TestCase
     {
         $fileInfoMock = new MockSplFileInfo(realPath: '/path/to/file');
 
-        $mutators = [
+        $mutatorsByName = [
             'First' => new FakeMutator(),
             'Second' => new FakeMutator(),
         ];
@@ -186,7 +186,7 @@ final class FileMutationGeneratorTest extends TestCase
         $mutations = $this->mutationGenerator->generate(
             $fileInfoMock,
             false,
-            $mutators,
+            $mutatorsByName,
         );
 
         // We cannot really check more than that here as controlling the mutations yielded
@@ -209,7 +209,7 @@ final class FileMutationGeneratorTest extends TestCase
     ): void {
         $fileInfoMock = new MockSplFileInfo(realPath: '/path/to/file');
 
-        $mutators = [
+        $mutatorsByName = [
             'First' => new FakeMutator(),
             'Second' => new FakeMutator(),
         ];
@@ -279,7 +279,7 @@ final class FileMutationGeneratorTest extends TestCase
         $mutations = $this->mutationGenerator->generate(
             $fileInfoMock,
             $scenario->onlyCovered,
-            $mutators,
+            $mutatorsByName,
         );
 
         // See the test description: we do not check the result itself only the mocks
