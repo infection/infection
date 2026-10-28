@@ -118,6 +118,8 @@ final class ExcludeIgnoredMutatorsVisitor extends NodeVisitorAbstract
     private function findIgnoredMutators(Node $node): array
     {
         if ($node->getComments() === []) {
+            // False positive: this mutation affects performance without changing behaviour.
+            // @infection-ignore ReturnRemoval
             return [];
         }
 

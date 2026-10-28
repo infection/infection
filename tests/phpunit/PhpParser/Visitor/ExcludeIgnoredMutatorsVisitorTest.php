@@ -39,6 +39,7 @@ use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
+use PhpParser\Node\Stmt\Nop;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -938,5 +939,25 @@ final class ExcludeIgnoredMutatorsVisitorTest extends VisitorTestCase
                 ],
             ],
         ];
+    }
+
+    public function test_it_reads_ignored_mutators_from_a_node(): void
+    {
+        $node = new Nop();
+
+        $this->assertSame(
+            [],
+            ExcludeIgnoredMutatorsVisitor::getIgnoredMutators($node),
+        );
+
+        $node->setAttribute(
+            ExcludeIgnoredMutatorsVisitor::IGNORED_MUTATORS,
+            ['FalseValue', 'CustomAlias'],
+        );
+
+        $this->assertSame(
+            ['FalseValue', 'CustomAlias'],
+            ExcludeIgnoredMutatorsVisitor::getIgnoredMutators($node),
+        );
     }
 }
