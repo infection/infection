@@ -35,13 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
+use function array_flip;
 use function array_key_exists;
 use function array_unique;
 use function array_values;
-use function count;
 use function explode;
 use Generator;
-use function in_array;
 use Infection\Mutator\ProfileList;
 use Override;
 use PhpParser\Comment;
@@ -67,13 +66,19 @@ final class ExcludeIgnoredMutatorsVisitor extends NodeVisitorAbstract
     private const string IGNORE_ANNOTATION_PATTERN = '/@infection-ignore(?=[ \t\r\n]|\*\/|$)[ \t]*([^\r\n]*?)(?=\*\/|[\r\n]|$)/';
 
     /**
+     * @var array<string, mixed>
+     */
+    private readonly array $knownMutatorNamesByKey;
+
+    /**
      * @param list<string> $knownMutatorNames
      */
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly string $filePath,
-        private readonly array $knownMutatorNames,
+        array $knownMutatorNames,
     ) {
+        $this->knownMutatorNamesByKey = array_flip($knownMutatorNames);
     }
 
     #[Override]
@@ -92,7 +97,7 @@ final class ExcludeIgnoredMutatorsVisitor extends NodeVisitorAbstract
             ]),
         );
 
-        if (count($ignoredMutators) > 0) {
+        if ($ignoredMutators !== []) {
             $node->setAttribute(self::IGNORED_MUTATORS, $ignoredMutators);
         }
 
@@ -202,6 +207,6 @@ final class ExcludeIgnoredMutatorsVisitor extends NodeVisitorAbstract
     private function isKnownMutator(string $mutatorName): bool
     {
         return array_key_exists($mutatorName, ProfileList::ALL_MUTATORS)
-            || in_array($mutatorName, $this->knownMutatorNames, true);
+            || array_key_exists($mutatorName, $this->knownMutatorNamesByKey);
     }
 }
