@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Composer\XdebugHandler\XdebugHandler;
-use function count;
 use function extension_loaded;
 use function implode;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
@@ -130,7 +129,7 @@ class CoverageChecker
             }
         }
 
-        if (count($errors) === 0) {
+        if ($errors === []) {
             return;
         }
 

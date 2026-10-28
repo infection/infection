@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Source\Collector;
 
 use function array_map;
-use function count;
 use function dirname;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
@@ -68,7 +67,7 @@ final readonly class BasicSourceCollector implements SourceCollector
     {
         $files = $this->doCollect();
 
-        if (count($files) === 0) {
+        if ($files === []) {
             throw NoSourceFound::noSourceFileFound($this->filter);
         }
 
@@ -169,7 +168,7 @@ final readonly class BasicSourceCollector implements SourceCollector
 
         // TODO: to check if we really need to re-apply the excluded files.
         //   could be necessary due to a Finder bug for example.
-        if (count($this->excludedFilesOrDirectories) !== 0) {
+        if ($this->excludedFilesOrDirectories !== []) {
             $iterator = new PathFilterIterator($iterator, [], $this->excludedFilesOrDirectories);
         }
 

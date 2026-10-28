@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
-use function count;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ReflectionProvider;
@@ -74,7 +73,7 @@ final class IoCodeDetector
             $this->reflectionProvider,
         );
 
-        if (count($coveredSymbols) === 0) {
+        if ($coveredSymbols === []) {
             return false;
         }
 
@@ -94,7 +93,7 @@ final class IoCodeDetector
             $this->reflectionProvider,
         );
 
-        return count($coveredSymbols) > 0;
+        return $coveredSymbols !== [];
     }
 
     /**

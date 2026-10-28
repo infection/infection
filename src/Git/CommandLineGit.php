@@ -88,7 +88,7 @@ final readonly class CommandLineGit implements Git
         );
         $paths = self::makePathsAbsolute($lines, $projectDirectory);
 
-        if (count($paths) === 0) {
+        if ($paths === []) {
             throw NoSourceFound::noFilesForGitDiff($diffFilter, $base);
         }
 
@@ -110,7 +110,7 @@ final readonly class CommandLineGit implements Git
         );
         $changedLines = ChangedLinesParser::parse($lines, $projectDirectory);
 
-        if (count($changedLines) === 0) {
+        if ($changedLines === []) {
             throw NoSourceFound::noChangedLinesForGitDiff(
                 $diffFilter,
                 $base,
