@@ -71,23 +71,6 @@ final class SchemaConfigurationFactoryTest extends TestCase
 {
     private const string SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/schema.json';
 
-    private const array PROFILES = [
-        '@arithmetic',
-        '@boolean',
-        '@cast',
-        '@conditional_boundary',
-        '@conditional_negotiation',
-        '@function_signature',
-        '@number',
-        '@operator',
-        '@regex',
-        '@removal',
-        '@return_value',
-        '@sort',
-        '@loop',
-        '@default',
-    ];
-
     #[DataProvider('provideRawConfig')]
     public function test_it_can_create_a_config(
         string $json,
@@ -2198,7 +2181,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             ];
         }
 
-        foreach (self::PROFILES as $profile) {
+        foreach (array_keys(ProfileList::ALL_PROFILES) as $profile) {
             yield '[mutators][profile] ' . $profile . ' false' => (static fn (): array => [
                 <<<JSON
                     {
