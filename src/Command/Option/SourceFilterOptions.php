@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Command\Option;
 
 use Infection\CannotBeInstantiated;
+use Infection\Configuration\SourceFilter\DiffFileFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalPathsFilter;
@@ -63,6 +64,8 @@ final class SourceFilterOptions
     private const string GIT_DIFF_LINES_NAME = 'git-diff-lines';
 
     private const string GIT_DIFF_BASE_NAME = 'git-diff-base';
+
+    private const string DIFF_FILE_NAME = 'diff-file';
 
     /**
      * @template T of Command
@@ -104,20 +107,35 @@ final class SourceFilterOptions
                 sprintf('Base for <comment>"--%1$s"</comment> option. Can be the git branch short name, full name or a commit hash. Must be used only together with <comment>"--%1$s"</comment>.', self::GIT_DIFF_FILTER_NAME),
                 Container::DEFAULT_GIT_DIFF_BASE,
             )
+            ->addOption(
+                self::DIFF_FILE_NAME,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Mutates only the lines added or modified by the given unified diff file. The diff must have no context lines, e.g. the output of <comment>"git diff --unified=0"</comment>. The file path and the paths in the diff are relative to the configuration file directory.',
+            )
         ;
     }
 
     /**
      * @param list<non-empty-string> $positionalPaths
      */
-    public static function get(IO $io, array $positionalPaths = []): PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null
+    public static function get(IO $io, array $positionalPaths = []): PlainFilter|IncompleteGitDiffFilter|DiffFileFilter|PositionalPathsFilter|null
     {
         $input = $io->getInput();
 
         $filter = self::getPlainFilter($io);
+        $diffFileFilter = self::getDiffFileFilter($input);
+
+        // Checked before getGitFilter(), whose own check would otherwise tell a "--diff-file" user to add "--git-diff-lines" or "--git-diff-filter".
+        self::assertDiffFileIsUsedAlone($diffFileFilter, $filter, $input, $positionalPaths);
+
         $gitFilter = self::getGitFilter($input);
 
         self::assertOnlyOneTypeOfFiltering($filter, $gitFilter, $positionalPaths);
+
+        if ($diffFileFilter !== null) {
+            return $diffFileFilter;
+        }
 
         if ($positionalPaths !== []) {
             return new PositionalPathsFilter($positionalPaths);
@@ -157,6 +175,28 @@ final class SourceFilterOptions
         return $gitDiffFilter !== null
             ? new IncompleteGitDiffFilter($gitDiffFilter, $gitDiffBase)
             : null;
+    }
+
+    private static function getDiffFileFilter(InputInterface $input): ?DiffFileFilter
+    {
+        /** @var string|null $value */
+        $value = $input->getOption(self::DIFF_FILE_NAME);
+
+        if ($value === null) {
+            return null;
+        }
+
+        $trimmedValue = trim($value);
+
+        Assert::stringNotEmpty(
+            $trimmedValue,
+            sprintf(
+                'Expected a non-blank value for the option "--%s".',
+                self::DIFF_FILE_NAME,
+            ),
+        );
+
+        return new DiffFileFilter($trimmedValue);
     }
 
     /**
@@ -273,6 +313,34 @@ final class SourceFilterOptions
                 'Cannot pass positional paths together with "--%s" / "--%s". Use either form, not both.',
                 self::GIT_DIFF_FILTER_NAME,
                 self::GIT_DIFF_LINES_NAME,
+            ),
+        );
+    }
+
+    /**
+     * @param list<non-empty-string> $positionalPaths
+     */
+    private static function assertDiffFileIsUsedAlone(
+        ?DiffFileFilter $diffFileFilter,
+        ?PlainFilter $plainFilter,
+        InputInterface $input,
+        array $positionalPaths,
+    ): void {
+        Assert::false(
+            $diffFileFilter !== null && (
+                $plainFilter !== null
+                || $positionalPaths !== []
+                || $input->getOption(self::GIT_DIFF_FILTER_NAME) !== null
+                || $input->getOption(self::GIT_DIFF_LINES_NAME) === true
+                || $input->getOption(self::GIT_DIFF_BASE_NAME) !== null
+            ),
+            sprintf(
+                'The option "--%s" cannot be used together with source paths or the options "--%s", "--%s", "--%s" and "--%s".',
+                self::DIFF_FILE_NAME,
+                self::PLAIN_FILTER_NAME,
+                self::GIT_DIFF_FILTER_NAME,
+                self::GIT_DIFF_LINES_NAME,
+                self::GIT_DIFF_BASE_NAME,
             ),
         );
     }

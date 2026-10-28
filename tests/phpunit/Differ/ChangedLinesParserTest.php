@@ -37,6 +37,7 @@ namespace Infection\Tests\Differ;
 
 use Infection\Differ\ChangedLinesParser;
 use Infection\Differ\ChangedLinesRange;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -54,6 +55,31 @@ final class ChangedLinesParserTest extends TestCase
         $actual = ChangedLinesParser::parse($lines, '/path/to/project');
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function test_it_fails_on_a_hunk_before_any_diff_line(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The following hunk line comes before any diff line: "@@ -1 +1 @@"');
+
+        ChangedLinesParser::parse(['@@ -1 +1 @@'], '/path/to/project');
+    }
+
+    public function test_it_fails_on_a_context_line(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected a diff without context lines, e.g. the output of "git diff --unified=0", but found the following context line: "     return 1;"');
+
+        ChangedLinesParser::parse(
+            [
+                'diff --git a/src/Foo.php b/src/Foo.php',
+                '@@ -10,2 +10,2 @@ final class Foo',
+                '     return 1;',
+                '-    return 2;',
+                '+    return 3;',
+            ],
+            '/path/to/project',
+        );
     }
 
     public static function diffProvider(): iterable

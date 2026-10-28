@@ -1,0 +1,8 @@
+diff --git a/src/Removed.php b/src/Removed.php
+deleted file mode 100644
+index 4444444..0000000
+--- a/src/Removed.php
++++ /dev/null
+@@ -1,2 +0,0 @@
+-<?php
+-
