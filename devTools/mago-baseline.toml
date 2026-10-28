@@ -2641,6 +2641,24 @@ message = 'Could not infer a precise return type for function `Infection\PhpPars
 count = 1
 
 [[issues]]
+file = "src/PhpParser/Visitor/ExcludeIgnoredMutatorsVisitor.php"
+code = "invalid-argument"
+message = 'Invalid argument type for argument #1 of `Pipeline\Standard::map`: expected `(callable(): Generator<int, Generator<int, string, mixed, mixed>|string, mixed, mixed>|string)|(callable(Generator<int, string, mixed, mixed>|string): Generator<int, Generator<int, string, mixed, mixed>|string, mixed, mixed>|string)|null`, but found `(closure(string): Generator<int, string, mixed, mixed>)`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ExcludeIgnoredMutatorsVisitor.php"
+code = "invalid-return-statement"
+message = 'Invalid return type for function `Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor::findIgnoredMutators`: expected `list<string>`, but found `list<Generator<int, string, mixed, mixed>|string>`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ExcludeIgnoredMutatorsVisitor.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor::getIgnoredMutators`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
 file = "src/PhpParser/Visitor/ExcludeNonMutableCodeVisitor.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor::isInsideFunction`. Saw type `mixed`.'

@@ -93,6 +93,8 @@ class NodeMutationGenerator
         $ignoredMutators = ExcludeIgnoredMutatorsVisitor::getIgnoredMutators($node);
 
         if ($ignoredMutators === []) {
+            // False positive: this mutation affects performance without changing behaviour.
+            // @infection-ignore ReturnRemoval
             return $this->mutatorsByName;
         }
 
