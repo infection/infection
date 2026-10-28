@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-use Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector;
+use Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector\VarTagOnParameterToParamTagRector;
 use Rector\Config\RectorConfig;
 
 return RectorConfig::configure()
