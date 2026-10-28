@@ -66,22 +66,40 @@ final class ChangedLinesParser
      * @param string[] $lines
      * @param string $baseDirectory Directory the paths of the diff are relative to.
      *
-     * @return array<string, list<ChangedLinesRange>> The changed lines ranges by absolute file path.
+     * @return array<non-empty-string, list<ChangedLinesRange>> The changed lines ranges by absolute file path.
      */
     public static function parse(array $lines, string $baseDirectory): array
     {
-        $filePath = '';
+        $filePath = null;
         $result = [];
 
         foreach ($lines as $line) {
             if (str_starts_with($line, 'diff ')) {
-                $filePath = self::parseFilePathFromLine($line);
+                $filePath = Path::join($baseDirectory, self::parseFilePathFromLine($line));
+                Assert::stringNotEmpty($filePath);
             } elseif (str_starts_with($line, '@@ ')) {
+                Assert::notNull(
+                    $filePath,
+                    sprintf(
+                        'The following hunk line comes before any diff line: "%s"',
+                        $line,
+                    ),
+                );
+
                 $changedLinesRange = self::parseChangedLinesRangeFromLine($line);
 
                 if ($changedLinesRange !== null) {
-                    $result[Path::join($baseDirectory, $filePath)][] = $changedLinesRange;
+                    $result[$filePath][] = $changedLinesRange;
                 }
+            } else {
+                // Only the hunk headers are read, which gives the changed lines only when the diff has no context lines.
+                Assert::false(
+                    str_starts_with($line, ' '),
+                    sprintf(
+                        'Expected a diff without context lines, e.g. the output of "git diff --unified=0", but found the following context line: "%s"',
+                        $line,
+                    ),
+                );
             }
         }
 

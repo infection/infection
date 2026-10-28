@@ -49,6 +49,8 @@ use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\PositionalArgumentsClassifier;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\SourceFilter\ChangedLinesFilter;
+use Infection\Configuration\SourceFilter\DiffFileFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
@@ -57,8 +59,10 @@ use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelectorParser;
 use Infection\Console\LogVerbosity;
+use Infection\Differ\ChangedLinesRange;
 use Infection\Differ\Differ;
 use Infection\FileSystem\FileSystem;
+use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
@@ -71,6 +75,7 @@ use Infection\Mutator\MutatorParser;
 use Infection\Mutator\NoopMutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -1525,6 +1530,44 @@ final class ConfigurationFactoryTest extends TestCase
                 ->forSourceFilter(
                     sourceFilter: new IncompleteGitDiffFilter('AD', null),
                     expectedSourceFilter: new GitDiffFilter('AD', 'reference(test/default)'),
+                ),
+        ];
+
+        yield 'with a diff file' => [
+            $defaultScenario
+                ->forSourceFilter(
+                    sourceFilter: new DiffFileFilter(
+                        __DIR__ . '/../../Fixtures/Files/diff-file/changes.diff',
+                    ),
+                    expectedSourceFilter: new ChangedLinesFilter([
+                        '/path/to/src/Foo.php' => [ChangedLinesRange::forRange(10, 3)],
+                    ]),
+                ),
+        ];
+
+        yield 'with a diff file that does not exist' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(new DiffFileFilter('unknown.diff')),
+                )
+                ->withExpected(
+                    FileOrDirectoryNotFound::fromFileName('unknown.diff', ['/path/to']),
+                ),
+        ];
+
+        yield 'with a diff file without added or modified lines' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new DiffFileFilter(
+                            __DIR__ . '/../../Fixtures/Files/diff-file/removed-lines-only.diff',
+                        ),
+                    ),
+                )
+                ->withExpected(
+                    NoSourceFound::noChangedLinesForDiffFile(
+                        __DIR__ . '/../../Fixtures/Files/diff-file/removed-lines-only.diff',
+                    ),
                 ),
         ];
 

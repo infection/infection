@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^9.6.20"
+    },
+    "autoload": {
+        "psr-4": {
+            "DiffFile\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "DiffFile\\Test\\": "tests/"
+        }
+    }
+}

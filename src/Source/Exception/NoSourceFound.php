@@ -116,6 +116,17 @@ final class NoSourceFound extends RuntimeException
         );
     }
 
+    public static function noChangedLinesForDiffFile(string $pathname): self
+    {
+        return new self(
+            isSourceFiltered: true,
+            message: sprintf(
+                'Could not find any added or modified lines in the diff file "%s".',
+                $pathname,
+            ),
+        );
+    }
+
     public static function noSourceFileFound(?PlainFilter $filter): self
     {
         return new self(

@@ -43,6 +43,7 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\SourceFilter\DiffFileFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalArgumentsFilter;
@@ -803,7 +804,7 @@ final class ConfigurationFactoryScenario
     }
 
     public function forSourceFilter(
-        PlainFilter|IncompleteGitDiffFilter|PositionalArgumentsFilter|null $sourceFilter,
+        PlainFilter|IncompleteGitDiffFilter|DiffFileFilter|PositionalArgumentsFilter|null $sourceFilter,
         ?SourceFileFilter $expectedSourceFilter,
     ): self {
         $previousExpected = $this->expected;

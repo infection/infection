@@ -35,12 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Source\Collector;
 
+use function array_map;
+use function array_values;
 use Exception;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\SourceFilter\ChangedLinesFilter;
 use Infection\Configuration\SourceFilter\FakeSourceFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFileFilter;
+use Infection\Differ\ChangedLinesRange;
 use Infection\Git\Git;
 use Infection\Source\Collector\BasicSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
@@ -50,6 +54,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use SplFileInfo;
 use function sprintf;
 
 #[CoversClass(SourceCollectorFactory::class)]
@@ -80,6 +85,30 @@ final class SourceCollectorFactoryTest extends TestCase
         if (!($exceptionOrExpectedCollectorClassName instanceof Exception)) {
             $this->assertSame($actual::class, $exceptionOrExpectedCollectorClassName);
         }
+    }
+
+    public function test_it_collects_only_the_files_with_changed_lines(): void
+    {
+        $fixturesDirectory = __DIR__ . '/BasicSourceCollector/Fixtures/case1';
+
+        $factory = new SourceCollectorFactory(
+            $this->createStub(Git::class),
+        );
+
+        $collector = $factory->create(
+            $fixturesDirectory . '/infection.json5',
+            new Source(['.'], []),
+            new ChangedLinesFilter([
+                $fixturesDirectory . '/sub-dir/b.php' => [ChangedLinesRange::forLine(3)],
+            ]),
+        );
+
+        $actual = array_map(
+            static fn (SplFileInfo $fileInfo): string => $fileInfo->getFilename(),
+            array_values($collector->collect()),
+        );
+
+        $this->assertSame(['b.php'], $actual);
     }
 
     public static function sourceFilterProvider(): iterable

@@ -50,15 +50,19 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\SourceFilter\ChangedLinesFilter;
+use Infection\Configuration\SourceFilter\DiffFileFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalArgumentsFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
+use Infection\Differ\ChangedLinesParser;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Framework\Str;
 use Infection\Git\Git;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
@@ -136,7 +140,7 @@ class ConfigurationFactory
         ?string $testFrameworkExtraOptions,
         ?string $testFrameworkExtraArgs,
         ?string $staticAnalysisToolOptions,
-        PlainFilter|IncompleteGitDiffFilter|PositionalArgumentsFilter|null $sourceFilter,
+        PlainFilter|IncompleteGitDiffFilter|DiffFileFilter|PositionalArgumentsFilter|null $sourceFilter,
         int|string|null $threadCount,
         string|int|null $dotsPerRow,
         bool $dryRun,
@@ -460,10 +464,13 @@ class ConfigurationFactory
     }
 
     /**
+     * @throws FileOrDirectoryNotFound
+     * @throws NoSourceFound
+     *
      * @return array{0: SourceFilter, 1: string|null}
      */
     private function refineFilterIfNecessary(
-        PlainFilter|IncompleteGitDiffFilter|PositionalArgumentsFilter|null $sourceFilter,
+        PlainFilter|IncompleteGitDiffFilter|DiffFileFilter|PositionalArgumentsFilter|null $sourceFilter,
         SchemaConfiguration $schema,
         ?string $testFrameworkExtraArgs,
     ): array {
@@ -484,10 +491,40 @@ class ConfigurationFactory
             );
         }
 
+        if ($sourceFilter instanceof DiffFileFilter) {
+            $sourceFilter = $this->refineDiffFileFilter($sourceFilter, dirname($schema->pathname));
+        }
+
         return [
             new SourceFilter($sourceFilter, $sourceSymbolSelectors),
             $testFrameworkExtraArgs,
         ];
+    }
+
+    /**
+     * @throws FileOrDirectoryNotFound
+     * @throws NoSourceFound
+     */
+    private function refineDiffFileFilter(DiffFileFilter $diffFileFilter, string $configDir): ChangedLinesFilter
+    {
+        $pathname = Path::makeAbsolute($diffFileFilter->pathname, $configDir);
+
+        if (!$this->fileSystem->isReadableFile($pathname)) {
+            throw FileOrDirectoryNotFound::fromFileName($diffFileFilter->pathname, [$configDir]);
+        }
+
+        $diff = $this->fileSystem->readFile($pathname);
+
+        $changedLinesRangesByFilePath = ChangedLinesParser::parse(
+            explode("\n", Str::toUnixLineEndings($diff)),
+            $configDir,
+        );
+
+        if ($changedLinesRangesByFilePath === []) {
+            throw NoSourceFound::noChangedLinesForDiffFile($diffFileFilter->pathname);
+        }
+
+        return new ChangedLinesFilter($changedLinesRangesByFilePath);
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath, ?string $summaryJsonLogFilePath, ?string $jsonLogFilePath): Logs
