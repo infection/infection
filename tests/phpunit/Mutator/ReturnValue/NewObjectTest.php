@@ -171,8 +171,30 @@ final class NewObjectTest extends BaseMutatorTestCase
                 CODE,
         ];
 
-        yield 'It does not mutate the return of an anonymous class' => [
-            MutatorFixturesProvider::getFixtureFileContent(self::class, 'no-not-mutates-anonymous-class.php'),
+        yield 'It mutates the return of an anonymous class' => [
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'no-mutates-anonymous-class.php'),
+            <<<'PHP'
+                <?php
+
+                namespace NewObject_MutatesAnonymousClass;
+
+                class Test
+                {
+                    public function test()
+                    {
+                        new class
+                        {
+                            private $foo;
+                            public function getFoo()
+                            {
+                                return $this->foo;
+                            }
+                        };
+                        return null;
+                    }
+                }
+
+                PHP,
         ];
     }
 }
