@@ -50,14 +50,17 @@ use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
 use Infection\Container\Container;
 use Infection\Framework\InfectionVersion;
+use Infection\Git\Throwable\GitDiffFailed;
 use OutOfBoundsException;
 use Override;
 use function sprintf;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 use function trim;
 
 /**
@@ -157,6 +160,24 @@ final class Application extends BaseApplication
         }
 
         OutputFormatterStyleConfigurator::configure($output);
+    }
+
+    #[Override]
+    protected function doRenderThrowable(Throwable $e, OutputInterface $output): void
+    {
+        if ($e instanceof GitDiffFailed && !$output->isVerbose()) {
+            $output->writeln(
+                sprintf(
+                    '<error>%s</error>',
+                    OutputFormatter::escape($e->getMessage()),
+                ),
+                OutputInterface::VERBOSITY_QUIET,
+            );
+
+            return;
+        }
+
+        parent::doRenderThrowable($e, $output);
     }
 
     private function isUnknownCommand(InputInterface $input): bool

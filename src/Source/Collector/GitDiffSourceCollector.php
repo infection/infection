@@ -39,6 +39,7 @@ use function dirname;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Git\Git;
+use Infection\Git\Throwable\GitDiffFailed;
 use Infection\Source\Exception\NoSourceFound;
 use Webmozart\Assert\Assert;
 
@@ -57,6 +58,8 @@ final readonly class GitDiffSourceCollector implements SourceCollector
      * @param non-empty-string $configurationPathname
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string[] $excludedFilesOrDirectories
+     *
+     * @throws GitDiffFailed
      */
     public static function create(
         Git $git,
@@ -97,6 +100,7 @@ final readonly class GitDiffSourceCollector implements SourceCollector
     /**
      * @param non-empty-string[] $sourceDirectories
      *
+     * @throws GitDiffFailed
      * @throws NoSourceFound
      */
     private static function convertToPlainFilter(

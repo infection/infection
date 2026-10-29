@@ -93,6 +93,7 @@ use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
+use Infection\Git\Throwable\GitDiffFailed;
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLoggerFactory;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
@@ -629,6 +630,9 @@ final class Container extends DIContainer
                     : new NullSourceLineMatcher();
             },
             SourceCollector::class => static fn (self $container): SourceCollector => new LazySourceCollector(
+                /**
+                 * @throws GitDiffFailed
+                 */
                 static function () use ($container): SourceCollector {
                     $configuration = $container->getConfiguration();
 
