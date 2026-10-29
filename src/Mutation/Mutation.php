@@ -61,6 +61,8 @@ class Mutation
 
     private ?float $nominalTimeToTest = null;
 
+    private ?float $shortestTimeToTest = null;
+
     private ?string $hash = null;
 
     /**
@@ -179,6 +181,14 @@ class Mutation
     {
         // TestLocator returns non-unique tests, and JUnitTestCaseSorter works around that; we have to do that too.
         return $this->nominalTimeToTest ??= (new TestTotalTimeCalculator($this->tests))->getTotalTestTime();
+    }
+
+    /**
+     * Time needed to run the fastest known test for a mutation
+     */
+    public function getShortestTestExecutionTime(): float
+    {
+        return $this->shortestTimeToTest ??= (new TestTotalTimeCalculator($this->tests))->getShortestTestTime();
     }
 
     public function getHash(): string

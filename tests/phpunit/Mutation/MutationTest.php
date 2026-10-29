@@ -70,6 +70,7 @@ final class MutationTest extends TestCase
         int $mutationByMutatorIndex,
         array $tests,
         float $timeToTest,
+        float $shortestTimeToTest,
         array $originalFileTokens,
         string $originalFileContent,
         array $expectedAttributes,
@@ -101,6 +102,7 @@ final class MutationTest extends TestCase
         $this->assertSame($mutatedNode, $mutation->getMutatedNode());
         $this->assertSame($tests, $mutation->getAllTests());
         $this->assertSame($timeToTest, $mutation->getNominalTestExecutionTime());
+        $this->assertSame($shortestTimeToTest, $mutation->getShortestTestExecutionTime());
         $this->assertSame($originalFileTokens, $mutation->getOriginalFileTokens());
         $this->assertSame($originalFileContent, $mutation->getOriginalFileContent());
         $this->assertSame($expectedCoveredByTests, $mutation->isCoveredByTest());
@@ -131,6 +133,7 @@ final class MutationTest extends TestCase
             'originalFileTokens' => [],
             'originalFileContent' => '',
             'timeToTest' => 0.0,
+            'shortestTimeToTest' => 0.0,
             'expectedAttributes' => $nominalAttributes,
             'expectedOriginalStartingLine' => $originalStartingLine,
             'expectedCoveredByTests' => false,
@@ -159,6 +162,7 @@ final class MutationTest extends TestCase
             'originalFileTokens' => [],
             'originalFileContent' => '',
             'timeToTest' => 0.01,
+            'shortestTimeToTest' => 0.01,
             'expectedAttributes' => $nominalAttributes,
             'expectedOriginalStartingLine' => $originalStartingLine,
             'expectedCoveredByTests' => true,
@@ -187,6 +191,7 @@ final class MutationTest extends TestCase
             'originalFileTokens' => [],
             'originalFileContent' => '',
             'timeToTest' => 0.01,
+            'shortestTimeToTest' => 0.01,
             'expectedAttributes' => $nominalAttributes,
             'expectedOriginalStartingLine' => $originalStartingLine,
             'expectedCoveredByTests' => true,
@@ -220,6 +225,7 @@ final class MutationTest extends TestCase
             'originalFileTokens' => [],
             'originalFileContent' => '',
             'timeToTest' => 1.1,
+            'shortestTimeToTest' => 1.1,
             'expectedAttributes' => $nominalAttributes,
             'expectedOriginalStartingLine' => $originalStartingLine,
             'expectedCoveredByTests' => true,
@@ -242,6 +248,7 @@ final class MutationTest extends TestCase
             'originalFileTokens' => [],
             'originalFileContent' => '',
             'timeToTest' => 0.0,
+            'shortestTimeToTest' => 0.0,
             'expectedAttributes' => $nominalAttributes,
             'expectedOriginalStartingLine' => $originalStartingLine,
             'expectedCoveredByTests' => false,
@@ -278,6 +285,7 @@ final class MutationTest extends TestCase
             'originalFileTokens' => [],
             'originalFileContent' => '',
             'timeToTest' => 0.03,
+            'shortestTimeToTest' => 0.01,
             'expectedAttributes' => $nominalAttributes,
             'expectedOriginalStartingLine' => $originalStartingLine,
             'expectedCoveredByTests' => true,

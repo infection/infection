@@ -48,8 +48,10 @@ use Infection\Testing\MutatorName;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -222,6 +224,100 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
             $originalFilePath,
             $originalStartingLine,
         );
+    }
+
+    /**
+     * @param list<float> $testTimes
+     */
+    #[DataProvider('timedOutProcessProvider')]
+    public function test_it_distinguishes_expected_timeouts_from_unexpected_ones(
+        ?float $processTimeout,
+        array $testTimes,
+        DetectionStatus $expected,
+    ): void {
+        $processMock = $this->createMock(Process::class);
+        $processMock
+            ->method('isTerminated')
+            ->willReturn(true)
+        ;
+        $processMock
+            ->method('getOutput')
+            ->willReturn('')
+        ;
+        $processMock
+            ->method('getTimeout')
+            ->willReturn($processTimeout)
+        ;
+
+        $tests = [];
+
+        foreach ($testTimes as $index => $testTime) {
+            $tests[] = new TestLocation(
+                sprintf('Foo%dTest::test_it_can_instantiate', $index),
+                sprintf('/path/to/acme/Foo%dTest.php', $index),
+                $testTime,
+            );
+        }
+
+        $mutantProcess = new MutantProcess(
+            $processMock,
+            MutantBuilder::withMinimalTestData()
+                ->withMutation(new Mutation(
+                    'path/to/Foo.php',
+                    [],
+                    For_::class,
+                    MutatorName::getName(For_::class),
+                    [
+                        'startLine' => 10,
+                        'endLine' => 15,
+                        'startTokenPos' => 0,
+                        'endTokenPos' => 8,
+                        'startFilePos' => 2,
+                        'endFilePos' => 4,
+                    ],
+                    'Unknown',
+                    MutatedNode::wrap(new Nop()),
+                    0,
+                    $tests,
+                    [],
+                    '',
+                ))
+                ->build(),
+            $this->resultFactory,
+        );
+        $mutantProcess->markAsTimedOut();
+
+        $this->assertSame(
+            $expected,
+            $this->resultFactory->createFromProcess($mutantProcess)->getDetectionStatus(),
+        );
+    }
+
+    public static function timedOutProcessProvider(): iterable
+    {
+        yield 'no process timeout' => [
+            null,
+            [6.0, 6.0],
+            DetectionStatus::TIMED_OUT,
+        ];
+
+        yield 'tests are expected to fit in the timeout' => [
+            10.0,
+            [4.0, 5.0],
+            DetectionStatus::TIMED_OUT,
+        ];
+
+        yield 'tests are expected to take exactly the timeout' => [
+            10.0,
+            [4.0, 6.0],
+            DetectionStatus::SKIPPED,
+        ];
+
+        yield 'tests are expected to exceed the timeout' => [
+            10.0,
+            [6.0, 6.0],
+            DetectionStatus::SKIPPED,
+        ];
     }
 
     public function test_it_can_create_a_result_from_an_errored_mutant_process(): void
