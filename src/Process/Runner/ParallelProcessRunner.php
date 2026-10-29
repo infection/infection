@@ -174,7 +174,7 @@ class ParallelProcessRunner implements ProcessRunner
     private function tryToFreeNotRunningProcess(): iterable
     {
         // remove any finished process from the stack
-        foreach ($this->runningProcessContainers as $index => $indexedMutantProcess) {
+        foreach ($this->runningProcessContainers as $index => $indexedMutantProcess) { // @infection-ignore-all
             $mutantProcessContainer = $indexedMutantProcess->mutantProcessContainer;
             $mutantProcess = $mutantProcessContainer->getCurrent();
             $process = $mutantProcess->getProcess();

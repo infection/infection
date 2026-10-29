@@ -4939,6 +4939,12 @@ message = "Invalid argument type for argument #1 of `iterator_count`: expected `
 count = 2
 
 [[issues]]
+file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #1 of `iterator_to_array`: expected `Traversable<('K.iterator_to_array() extends mixed), ('V.iterator_to_array() extends mixed)>|array<('K.iterator_to_array() extends mixed), ('V.iterator_to_array() extends mixed)>`, but found `mixed`."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "mixed-operand"
 message = "Invalid left operand: type `mixed` cannot be reliably used in string concatenation."

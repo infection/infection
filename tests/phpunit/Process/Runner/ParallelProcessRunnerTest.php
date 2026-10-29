@@ -51,6 +51,7 @@ use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use function iterator_count;
+use function iterator_to_array;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -381,6 +382,43 @@ final class ParallelProcessRunnerTest extends TestCase
         iterator_count($method->invokeArgs($runner, []));
     }
 
+    public function test_it_frees_finished_processes_after_a_running_one(): void
+    {
+        $runner = new ParallelProcessRunner(2, 0, new TimeSpy());
+
+        $reflection = new ReflectionClass($runner);
+
+        $runningProcessMock = $this->createMock(Process::class);
+        $runningProcessMock->expects($this->once())
+            ->method('isRunning')
+            ->willReturn(true)
+        ;
+
+        $finishedProcessMock = $this->createMock(Process::class);
+        $finishedProcessMock->expects($this->once())
+            ->method('isRunning')
+            ->willReturn(false)
+        ;
+
+        $runningContainer = new IndexedMutantProcessContainer(1, $this->createDummyMutantProcessContainer($runningProcessMock));
+        $finishedMutantProcessContainer = $this->createDummyMutantProcessContainer($finishedProcessMock);
+
+        $runningProcessContainers = $reflection->getProperty('runningProcessContainers');
+        $runningProcessContainers->setValue($runner, [
+            0 => $runningContainer,
+            1 => new IndexedMutantProcessContainer(2, $finishedMutantProcessContainer),
+        ]);
+
+        $availableThreadIndexes = $reflection->getProperty('availableThreadIndexes');
+        $availableThreadIndexes->setValue($runner, []);
+
+        $method = $reflection->getMethod('tryToFreeNotRunningProcess');
+
+        $this->assertSame([$finishedMutantProcessContainer], iterator_to_array($method->invokeArgs($runner, []), false));
+        $this->assertSame([2], $availableThreadIndexes->getValue($runner));
+        $this->assertSame([0 => $runningContainer], $runningProcessContainers->getValue($runner));
+    }
+
     public function test_mark_as_finished_method_call_removal_mutation(): void
     {
         // This test kills the MethodCallRemoval mutation
@@ -590,6 +628,11 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturn(false)
         ;
 
+        return $this->createDummyMutantProcessContainer($processMock);
+    }
+
+    private function createDummyMutantProcessContainer(Process $processMock): MutantProcessContainer
+    {
         return new MutantProcessContainer(
             new DummyMutantProcess(
                 $processMock,
