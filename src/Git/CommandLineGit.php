@@ -40,6 +40,7 @@ use function array_map;
 use function array_merge;
 use function implode;
 use Infection\Differ\ChangedLinesParser;
+use Infection\Git\Throwable\GitDiffFailed;
 use Infection\Git\Throwable\NoGitProjectFound;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
@@ -196,6 +197,8 @@ final readonly class CommandLineGit implements Git
     /**
      * @param string[] $sourceDirectories
      *
+     * @throws GitDiffFailed
+     *
      * @return array{string, list<string>}
      */
     private function diff(
@@ -206,14 +209,6 @@ final readonly class CommandLineGit implements Git
         bool $nameOnly = false,
         bool $noContext = false,
     ): array {
-        $projectDirectory = $this->shellCommandRunner->mustRun([
-            'git',
-            '-C',
-            $workingDirectory,
-            'rev-parse',
-            '--show-toplevel',
-        ]);
-
         $command = [
             'git',
             '-C',
@@ -229,12 +224,28 @@ final readonly class CommandLineGit implements Git
             '--',
         ];
 
-        $diff = $this->shellCommandRunner->mustRun(
-            array_merge(
-                array_filter($command),
-                $sourceDirectories,
-            ),
-        );
+        try {
+            $projectDirectory = $this->shellCommandRunner->mustRun([
+                'git',
+                '-C',
+                $workingDirectory,
+                'rev-parse',
+                '--show-toplevel',
+            ]);
+
+            $diff = $this->shellCommandRunner->mustRun(
+                array_merge(
+                    array_filter($command),
+                    $sourceDirectories,
+                ),
+            );
+        } catch (ProcessException $exception) {
+            throw GitDiffFailed::create(
+                $base,
+                $workingDirectory,
+                $exception,
+            );
+        }
 
         if ($diff === '') {
             return [$projectDirectory, []];

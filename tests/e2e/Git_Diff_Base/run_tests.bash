@@ -29,12 +29,35 @@ php "$INFECTION" --git-diff-base=HEAD --git-diff-lines
 
 diff --unified=3 --ignore-all-space expected-output.txt var/infection.log
 
-if output=$(php "$INFECTION" --git-diff-base=missing-base --git-diff-lines 2>&1); then
-    printf 'Expected a missing Git base to fail.\n%s\n' "$output" >&2
-    exit 1
-fi
+assert_git_diff_failure() {
+    local base=$1
+    local show_process_details=$2
+    local output
 
-printf '%s\n' "$output"
+    shift 2
 
-[[ "$output" == *"fatal: bad revision 'missing-base'"* ]]
-[[ "$output" == *'Exit Code:'* ]]
+    if output=$(php "$INFECTION" --git-diff-base="$base" --git-diff-lines "$@" 2>&1); then
+        printf 'Expected a missing Git base to fail.\n%s\n' "$output" >&2
+        exit 1
+    fi
+
+    printf '%s\n' "$output"
+
+    [[ "$output" == *"Could not compute the Git diff against \"$base\""* ]]
+
+    if [ "$show_process_details" = true ]; then
+        [[ "$output" == *"fatal: bad revision '$base'"* ]]
+        [[ "$output" == *'Exit Code:'* ]]
+
+        return
+    fi
+
+    [[ "$output" == *'Fetch the base reference if it is missing.'* ]]
+    [[ "$output" != *'Exit Code:'* ]]
+}
+
+assert_git_diff_failure missing-base false
+assert_git_diff_failure missing-base false --quiet
+assert_git_diff_failure missing-base true --verbose
+assert_git_diff_failure missing-base true -vvv
+assert_git_diff_failure 'feature/<info>example</info>' false

@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Git;
 
 use function implode;
-use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
+use Infection\Git\Throwable\GitDiffFailed;
 use Infection\Git\Throwable\NoGitProjectFound;
 use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\Tests\FileSystem\FileSystemTestCase;
@@ -47,6 +47,7 @@ use Infection\Tests\TestingUtility\GitRepositorySetup;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\chdir;
+use function sprintf;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Webmozart\Assert\Assert;
 
@@ -156,8 +157,13 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             'The temporary fixture directory must be initialized before running Git.',
         );
 
-        $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage('not a git repository');
+        $this->expectException(GitDiffFailed::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'Could not compute the Git diff against "HEAD" in "%s".',
+                $workingDirectory,
+            ),
+        );
 
         $this->git->getChangedFilePaths(
             'AM',
@@ -167,24 +173,15 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         );
     }
 
-    public function test_it_fails_at_getting_the_relative_paths_of_the_changed_files_if_getting_the_merge_base_failed_unexpectedly(): void
+    public function test_it_reports_a_git_diff_failure_when_the_base_is_invalid_for_changed_files(): void
     {
         $badCommitReference = self::BAD_COMMIT_REFERENCE;
 
-        $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage('Exit Code:');
-        $this->expectExceptionMessage('Working directory:');
+        $this->expectException(GitDiffFailed::class);
         $this->expectExceptionMessage(
-            Str::toSystemLineEndings(
-                <<<EOF
-                    Output:
-                    ================
-
-
-                    Error Output:
-                    ================
-                    fatal: bad revision '{$badCommitReference}'
-                    EOF,
+            sprintf(
+                'Could not compute the Git diff against "%s"',
+                $badCommitReference,
             ),
         );
 
@@ -227,24 +224,15 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         $this->assertArrayNotHasKey($this->cwd . '/tests/phpunit/Git/CommandLineGitTest.php', $actual);
     }
 
-    public function test_it_fails_at_getting_the_modified_lines_if_getting_the_merge_base_failed_unexpectedly(): void
+    public function test_it_reports_a_git_diff_failure_when_the_base_is_invalid_for_changed_lines(): void
     {
         $badCommitReference = self::BAD_COMMIT_REFERENCE;
 
-        $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage('Exit Code:');
-        $this->expectExceptionMessage('Working directory:');
+        $this->expectException(GitDiffFailed::class);
         $this->expectExceptionMessage(
-            Str::toSystemLineEndings(
-                <<<EOF
-                    Output:
-                    ================
-
-
-                    Error Output:
-                    ================
-                    fatal: bad revision '{$badCommitReference}'
-                    EOF,
+            sprintf(
+                'Could not compute the Git diff against "%s"',
+                $badCommitReference,
             ),
         );
 
