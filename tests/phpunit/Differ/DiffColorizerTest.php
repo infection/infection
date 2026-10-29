@@ -216,6 +216,15 @@ final class DiffColorizerTest extends TestCase
                 CODE,
         ];
 
+        yield 'backslash right before an inline diff tag' => [
+            <<<'CODE'
+
+                -        preg_match('/a\\\\|b/i', $x);
+                +        preg_match('/a\\\|b/', $x);
+                CODE,
+            "<code>\n\n<diff-del>-        preg_match('/a\0\0\0<diff-del-inline>\0|b/i</diff-del-inline>', \$x);</diff-del>\n<diff-add>+        preg_match('/a\0\0\0<diff-add-inline>|b/</diff-add-inline>', \$x);</diff-add></code>",
+        ];
+
         yield 'multibyte characters full-deletion' => [
             <<<'CODE'
                      function ($a) {
