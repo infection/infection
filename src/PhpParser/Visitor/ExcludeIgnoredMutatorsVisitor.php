@@ -117,13 +117,15 @@ final class ExcludeIgnoredMutatorsVisitor extends NodeVisitorAbstract
      */
     private function findIgnoredMutators(Node $node): array
     {
-        if ($node->getComments() === []) {
+        $comments = $node->getComments();
+
+        if ($comments === []) {
             // False positive: this mutation affects performance without changing behaviour.
             // @infection-ignore ReturnRemoval
             return [];
         }
 
-        return take($node->getComments())
+        return take($comments)
             ->map(self::findAnnotationsInComment(...))
             ->map(fn (string $names) => $this->parseMutatorNames($node, $names))
             ->toList()
