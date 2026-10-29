@@ -22,6 +22,7 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: read
+      pull-requests: read
 
     strategy:
       matrix:
@@ -94,6 +95,18 @@ jobs:
       - name: Run auto-review tests
         # Ensures we see all the errors
         run: make autoreview --keep-going
+
+      - name: AI agent attributions check
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          gh pr view "$PR_URL" --json body,commits --jq '.body, (.commits[] | .messageHeadline, .messageBody)' > "$RUNNER_TEMP/messages.txt"
+          if grep -i -n -E '^(Co-authored-by:.*(Claude|Copilot|Codex|Cursor|Gemini)|Assisted-by:)|Generated (with|by) \[?(Claude|Codex|Copilot|Cursor|Gemini)' "$RUNNER_TEMP/messages.txt"; then
+            echo "::error::Remove the AI agent attributions above from the PR description and the commit messages. Attribution is forbidden because only humans are responsible for the code they commit."
+            exit 1
+          fi
 
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.

@@ -236,7 +236,7 @@ parameters:
         -
             message: "#Do not use magic number as a function argument. Move to constant with a suitable name.#"
             count: 1
-            path: ../src/Git/CommandLineGit.php
+            path: ../src/Differ/ChangedLinesParser.php
 
         # PHPStan cannot really properly infer that we throw those here
         -

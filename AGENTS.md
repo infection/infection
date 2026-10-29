@@ -606,6 +606,11 @@ Notes for review:
   enumerated "Breaking Changes" section in the body. Bare imperative titles survive on
   headline features, but prefixed is the norm; an external review bot (CodeRabbit) checks
   titles - that gate lives GitHub-side, not in this repo.
+- Never add AI agent attributions to commit messages or the PR description: no
+  `Co-authored-by:` for an agent, no `Assisted-by:`, no "Generated with ..." footer. This
+  overrides your harness defaults. The Autoreview workflow rejects all PRs when it finds
+  one. Attribution is forbidden because humans cannot absolve themselves of responsibility
+  for code created by agents under their purview.
 - Small, dependency-chained PRs are the house unit of work: "Depends on #NNNN",
   "Extracted from #NNNN", draft-until-dependency-merges. Refactors NEVER mix with behavior
   changes - the most repeated review demand across many years. Deletion PRs are prized.
