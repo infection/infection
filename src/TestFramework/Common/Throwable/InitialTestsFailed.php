@@ -33,48 +33,91 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework\Common\Throwable;
 
-use Exception;
 use function implode;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
+use RuntimeException;
 use function sprintf;
+use Symfony\Component\Process\Process;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class InitialStaticAnalysisRunFailed extends Exception implements InitialTestsFailedContract
+final class InitialTestsFailed extends RuntimeException implements InitialTestsFailedContract
 {
-    public static function fromCompletedProcessAndAdapter(CompletedProcess $process, string $staticAnalysisTool): self
-    {
+    public static function fromProcess(
+        Process $process,
+        string $testFramework,
+        string $recommendations,
+    ): self {
+        $exitCode = $process->getExitCode();
+        Assert::notNull(
+            $exitCode,
+            'The initial test process must have terminated before its failure is reported.',
+        );
+
+        return self::fromOutput(
+            $exitCode,
+            $process->getOutput(),
+            $process->getErrorOutput(),
+            $testFramework,
+            $recommendations,
+        );
+    }
+
+    public static function fromCompletedProcess(
+        CompletedProcess $process,
+        string $testFramework,
+        string $recommendations,
+    ): self {
+        return self::fromOutput(
+            $process->exitCode,
+            $process->stdout,
+            $process->stderr,
+            $testFramework,
+            $recommendations,
+        );
+    }
+
+    private static function fromOutput(
+        int $exitCode,
+        string $stdOut,
+        string $stdError,
+        string $testFramework,
+        string $recommendations,
+    ): self {
         $lines = [
-            'Project static analysis must be in a passing state before running Infection.',
+            'Project tests must be in a passing state before running Infection.',
+            $recommendations,
             sprintf(
                 '%s reported an exit code of %d.',
-                $staticAnalysisTool,
-                $process->exitCode,
+                $testFramework,
+                $exitCode,
             ),
             sprintf(
                 'Refer to the %s\'s output below:',
-                $staticAnalysisTool,
+                $testFramework,
             ),
         ];
-
-        $stdOut = $process->stdout;
 
         if ($stdOut !== '') {
             $lines[] = 'STDOUT:';
             $lines[] = $stdOut;
         }
 
-        $stdError = $process->stderr;
-
         if ($stdError !== '') {
             $lines[] = 'STDERR:';
             $lines[] = $stdError;
         }
 
-        return new self(implode("\n", $lines));
+        return new self(
+            implode(
+                "\n",
+                $lines,
+            ),
+        );
     }
 }

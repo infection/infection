@@ -40,6 +40,7 @@ use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStati
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 
 /**
@@ -61,7 +62,7 @@ readonly class InitialStaticAnalysisRunner
     }
 
     /**
-     * @throws InitialStaticAnalysisRunFailed
+     * @throws InitialTestsFailed
      */
     public function run(): void
     {
@@ -76,9 +77,10 @@ readonly class InitialStaticAnalysisRunner
         $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($process->stdout));
 
         if (!$process->isSuccessful()) {
-            throw InitialStaticAnalysisRunFailed::fromCompletedProcessAndAdapter(
+            throw InitialTestsFailed::fromCompletedProcess(
                 $process,
                 $this->staticAnalysisToolAdapter->getName(),
+                '',
             );
         }
     }

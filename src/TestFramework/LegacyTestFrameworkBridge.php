@@ -43,8 +43,8 @@ use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -99,9 +99,12 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         );
 
         if (!$initialTestSuiteProcess->isSuccessful()) {
-            throw InitialTestsFailed::fromProcessAndAdapter(
+            throw InitialTestsFailed::fromProcess(
                 $initialTestSuiteProcess,
-                $this->adapter,
+                $this->getName(),
+                $this->adapter->getInitialTestsFailRecommendations(
+                    $initialTestSuiteProcess->getCommandLine(),
+                ),
             );
         }
 

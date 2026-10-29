@@ -37,9 +37,9 @@ namespace Infection\Tests\TestFramework;
 
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
-use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\LegacyStaticAnalysisBridge;
 use Infection\Tests\Mutant\MutantBuilder;
@@ -82,7 +82,11 @@ final class LegacyStaticAnalysisBridgeTest extends TestCase
             ->withExitCode(3)
             ->build()
         ;
-        $failure = InitialStaticAnalysisRunFailed::fromCompletedProcessAndAdapter($process, 'PHPStan');
+        $failure = InitialTestsFailed::fromCompletedProcess(
+            $process,
+            'PHPStan',
+            '',
+        );
         $this->runner
             ->expects($this->once())
             ->method('run')
