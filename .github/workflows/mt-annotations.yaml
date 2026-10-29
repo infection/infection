@@ -63,7 +63,6 @@ jobs:
 
             - name: Run Infection for changed lines only
               env:
-                  # GITHUB_BASE_REF identifies the final stack base for native stacks.
                   PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
               run: |
                   git fetch --no-tags origin "$PR_BASE_SHA"
