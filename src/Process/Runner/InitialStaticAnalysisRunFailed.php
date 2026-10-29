@@ -38,12 +38,13 @@ namespace Infection\Process\Runner;
 use Exception;
 use function implode;
 use Infection\TestFramework\Contracts\CompletedProcess;
+use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use function sprintf;
 
 /**
  * @internal
  */
-final class InitialStaticAnalysisRunFailed extends Exception
+final class InitialStaticAnalysisRunFailed extends Exception implements InitialTestsFailedContract
 {
     public static function fromCompletedProcessAndAdapter(CompletedProcess $process, string $staticAnalysisTool): self
     {
