@@ -101,6 +101,333 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
 
     public static function nodeProvider(): iterable
     {
+        yield 'specific mutator exclusions survive enrichment and cloning without changing eligibility' => [
+            file_get_contents(self::FIXTURES_DIR . '/IgnoredMutators.php'),
+            null,
+            <<<'AST'
+                array(
+                    0: Stmt_Declare(
+                        declares: array(
+                            0: DeclareItem(
+                                key: Identifier(
+                                    eligible: false
+                                    nodeId: 2
+                                    origNode: nodeId(2)
+                                    parent: nodeId(1)
+                                )
+                                value: Scalar_Int(
+                                    eligible: false
+                                    kind: KIND_DEC (10)
+                                    nodeId: 3
+                                    origNode: nodeId(3)
+                                    parent: nodeId(1)
+                                    rawValue: 1
+                                )
+                                eligible: false
+                                nodeId: 1
+                                origNode: nodeId(1)
+                                parent: nodeId(0)
+                            )
+                        )
+                        eligible: false
+                        next: nodeId(4)
+                        nodeId: 0
+                        origNode: nodeId(0)
+                    )
+                    1: Stmt_Namespace(
+                        name: Name(
+                            eligible: false
+                            nodeId: 5
+                            origNode: nodeId(5)
+                            parent: nodeId(4)
+                        )
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier(
+                                    eligible: false
+                                    nodeId: 7
+                                    origNode: nodeId(7)
+                                    parent: nodeId(6)
+                                )
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            eligible: true
+                                            functionName: first
+                                            functionScope: nodeId(8)
+                                            ignoredMutators: array(
+                                                0: ArrayItemRemoval
+                                            )
+                                            isInsideFunction: true
+                                            isStrictTypes: true
+                                            nodeId: 9
+                                            origNode: nodeId(9)
+                                            parent: nodeId(8)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
+                                        )
+                                        returnType: Identifier(
+                                            eligible: true
+                                            functionName: first
+                                            functionScope: nodeId(8)
+                                            ignoredMutators: array(
+                                                0: ArrayItemRemoval
+                                            )
+                                            isInsideFunction: true
+                                            isStrictTypes: true
+                                            nodeId: 10
+                                            origNode: nodeId(10)
+                                            parent: nodeId(8)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Return(
+                                                expr: Expr_Array(
+                                                    items: array(
+                                                        0: ArrayItem(
+                                                            value: Expr_ConstFetch(
+                                                                name: Name(
+                                                                    eligible: true
+                                                                    functionName: first
+                                                                    functionScope: nodeId(8)
+                                                                    ignoredMutators: array(
+                                                                        0: ArrayItemRemoval
+                                                                        1: FalseValue
+                                                                        2: TrueValue
+                                                                    )
+                                                                    isInsideFunction: true
+                                                                    isStrictTypes: true
+                                                                    namespacedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\false)
+                                                                    nodeId: 15
+                                                                    origNode: nodeId(15)
+                                                                    parent: nodeId(14)
+                                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                    tests: Closure
+                                                                )
+                                                                eligible: true
+                                                                functionName: first
+                                                                functionScope: nodeId(8)
+                                                                ignoredMutators: array(
+                                                                    0: ArrayItemRemoval
+                                                                    1: FalseValue
+                                                                    2: TrueValue
+                                                                )
+                                                                isInsideFunction: true
+                                                                isStrictTypes: true
+                                                                nodeId: 14
+                                                                origNode: nodeId(14)
+                                                                parent: nodeId(13)
+                                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                tests: Closure
+                                                            )
+                                                            eligible: true
+                                                            functionName: first
+                                                            functionScope: nodeId(8)
+                                                            ignoredMutators: array(
+                                                                0: ArrayItemRemoval
+                                                                1: FalseValue
+                                                                2: TrueValue
+                                                            )
+                                                            isInsideFunction: true
+                                                            isStrictTypes: true
+                                                            nodeId: 13
+                                                            origNode: nodeId(13)
+                                                            parent: nodeId(12)
+                                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                                            tests: Closure
+                                                        )
+                                                        1: ArrayItem(
+                                                            value: Expr_ConstFetch(
+                                                                name: Name(
+                                                                    eligible: true
+                                                                    functionName: first
+                                                                    functionScope: nodeId(8)
+                                                                    ignoredMutators: array(
+                                                                        0: ArrayItemRemoval
+                                                                        1: FalseValue
+                                                                        2: TrueValue
+                                                                    )
+                                                                    isInsideFunction: true
+                                                                    isStrictTypes: true
+                                                                    namespacedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\true)
+                                                                    nodeId: 18
+                                                                    origNode: nodeId(18)
+                                                                    parent: nodeId(17)
+                                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                    tests: Closure
+                                                                )
+                                                                eligible: true
+                                                                functionName: first
+                                                                functionScope: nodeId(8)
+                                                                ignoredMutators: array(
+                                                                    0: ArrayItemRemoval
+                                                                    1: FalseValue
+                                                                    2: TrueValue
+                                                                )
+                                                                isInsideFunction: true
+                                                                isStrictTypes: true
+                                                                nodeId: 17
+                                                                origNode: nodeId(17)
+                                                                parent: nodeId(16)
+                                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                tests: Closure
+                                                            )
+                                                            eligible: true
+                                                            functionName: first
+                                                            functionScope: nodeId(8)
+                                                            ignoredMutators: array(
+                                                                0: ArrayItemRemoval
+                                                                1: FalseValue
+                                                                2: TrueValue
+                                                            )
+                                                            isInsideFunction: true
+                                                            isStrictTypes: true
+                                                            nodeId: 16
+                                                            origNode: nodeId(16)
+                                                            parent: nodeId(12)
+                                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                                            tests: Closure
+                                                        )
+                                                    )
+                                                    eligible: true
+                                                    functionName: first
+                                                    functionScope: nodeId(8)
+                                                    ignoredMutators: array(
+                                                        0: ArrayItemRemoval
+                                                        1: FalseValue
+                                                        2: TrueValue
+                                                    )
+                                                    isInsideFunction: true
+                                                    isStrictTypes: true
+                                                    kind: KIND_SHORT (2)
+                                                    nodeId: 12
+                                                    origNode: nodeId(12)
+                                                    parent: nodeId(11)
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    tests: Closure
+                                                )
+                                                eligible: true
+                                                functionName: first
+                                                functionScope: nodeId(8)
+                                                ignoredMutators: array(
+                                                    0: ArrayItemRemoval
+                                                    1: FalseValue
+                                                    2: TrueValue
+                                                )
+                                                isInsideFunction: true
+                                                isStrictTypes: true
+                                                nodeId: 11
+                                                origNode: nodeId(11)
+                                                parent: nodeId(8)
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                tests: Closure
+                                            )
+                                        )
+                                        eligible: true
+                                        functionName: first
+                                        ignoredMutators: array(
+                                            0: ArrayItemRemoval
+                                        )
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: true
+                                        nodeId: 8
+                                        origNode: nodeId(8)
+                                        parent: nodeId(6)
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                        tests: Closure
+                                    )
+                                    1: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            eligible: true
+                                            functionName: second
+                                            functionScope: nodeId(19)
+                                            isInsideFunction: true
+                                            isStrictTypes: true
+                                            nodeId: 20
+                                            origNode: nodeId(20)
+                                            parent: nodeId(19)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
+                                        )
+                                        returnType: Identifier(
+                                            eligible: true
+                                            functionName: second
+                                            functionScope: nodeId(19)
+                                            isInsideFunction: true
+                                            isStrictTypes: true
+                                            nodeId: 21
+                                            origNode: nodeId(21)
+                                            parent: nodeId(19)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Return(
+                                                expr: Expr_ConstFetch(
+                                                    name: Name(
+                                                        eligible: true
+                                                        functionName: second
+                                                        functionScope: nodeId(19)
+                                                        isInsideFunction: true
+                                                        isStrictTypes: true
+                                                        namespacedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\false)
+                                                        nodeId: 24
+                                                        origNode: nodeId(24)
+                                                        parent: nodeId(23)
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        tests: Closure
+                                                    )
+                                                    eligible: true
+                                                    functionName: second
+                                                    functionScope: nodeId(19)
+                                                    isInsideFunction: true
+                                                    isStrictTypes: true
+                                                    nodeId: 23
+                                                    origNode: nodeId(23)
+                                                    parent: nodeId(22)
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    tests: Closure
+                                                )
+                                                eligible: true
+                                                functionName: second
+                                                functionScope: nodeId(19)
+                                                isInsideFunction: true
+                                                isStrictTypes: true
+                                                nodeId: 22
+                                                origNode: nodeId(22)
+                                                parent: nodeId(19)
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                tests: Closure
+                                            )
+                                        )
+                                        eligible: true
+                                        functionName: second
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: true
+                                        nodeId: 19
+                                        origNode: nodeId(19)
+                                        parent: nodeId(6)
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                        tests: Closure
+                                    )
+                                )
+                                eligible: false
+                                nodeId: 6
+                                origNode: nodeId(6)
+                                parent: nodeId(4)
+                            )
+                        )
+                        eligible: false
+                        kind: 1
+                        next: nodeId(6)
+                        nodeId: 4
+                        origNode: nodeId(4)
+                    )
+                )
+                AST,
+        ];
+
         yield 'random example' => [
             file_get_contents(self::FIXTURES_DIR . '/TwoAdditions.php'),
             null,

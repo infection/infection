@@ -39,6 +39,7 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
+use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\MatcherLine\NullSourceLineMatcher;
@@ -203,6 +204,430 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             ],
         ];
 
+        yield 'multiple mutators in a docblock' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    /** @infection-ignore ArrayItemRemoval, FalseValue */
+                    public function values(): array {
+                        return [false, true];
+                    }
+                }
+                PHP,
+            [
+                [
+                    'mutator' => 'TrueValue',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        class Example {
+                            /** @infection-ignore ArrayItemRemoval, FalseValue */
+                            public function values(): array {
+                                return [false, false];
+                            }
+                        }
+                        PHP,
+                ],
+            ],
+        ];
+
+        yield 'nested annotations are additive and stop at their scope' => [
+            <<<'PHP'
+                <?php
+
+                /** @infection-ignore ArrayItemRemoval */
+                class Example {
+                    /** @infection-ignore FalseValue */
+                    public function first(): array {
+                        return [false, true];
+                    }
+
+                    public function second(): array {
+                        return [false, true];
+                    }
+                }
+
+                class Outside {
+                    public function values(): array {
+                        return [false, true];
+                    }
+                }
+                PHP,
+            [
+                [
+                    'mutator' => 'TrueValue',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        /** @infection-ignore ArrayItemRemoval */
+                        class Example {
+                            /** @infection-ignore FalseValue */
+                            public function first(): array {
+                                return [false, false];
+                            }
+
+                            public function second(): array {
+                                return [false, true];
+                            }
+                        }
+
+                        class Outside {
+                            public function values(): array {
+                                return [false, true];
+                            }
+                        }
+                        PHP,
+                ],
+                [
+                    'mutator' => 'FalseValue',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        /** @infection-ignore ArrayItemRemoval */
+                        class Example {
+                            /** @infection-ignore FalseValue */
+                            public function first(): array {
+                                return [false, true];
+                            }
+
+                            public function second(): array {
+                                return [true, true];
+                            }
+                        }
+
+                        class Outside {
+                            public function values(): array {
+                                return [false, true];
+                            }
+                        }
+                        PHP,
+                ],
+                [
+                    'mutator' => 'TrueValue',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        /** @infection-ignore ArrayItemRemoval */
+                        class Example {
+                            /** @infection-ignore FalseValue */
+                            public function first(): array {
+                                return [false, true];
+                            }
+
+                            public function second(): array {
+                                return [false, false];
+                            }
+                        }
+
+                        class Outside {
+                            public function values(): array {
+                                return [false, true];
+                            }
+                        }
+                        PHP,
+                ],
+                [
+                    'mutator' => 'FalseValue',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        /** @infection-ignore ArrayItemRemoval */
+                        class Example {
+                            /** @infection-ignore FalseValue */
+                            public function first(): array {
+                                return [false, true];
+                            }
+
+                            public function second(): array {
+                                return [false, true];
+                            }
+                        }
+
+                        class Outside {
+                            public function values(): array {
+                                return [true, true];
+                            }
+                        }
+                        PHP,
+                ],
+                [
+                    'mutator' => 'TrueValue',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        /** @infection-ignore ArrayItemRemoval */
+                        class Example {
+                            /** @infection-ignore FalseValue */
+                            public function first(): array {
+                                return [false, true];
+                            }
+
+                            public function second(): array {
+                                return [false, true];
+                            }
+                        }
+
+                        class Outside {
+                            public function values(): array {
+                                return [false, false];
+                            }
+                        }
+                        PHP,
+                ],
+                [
+                    'mutator' => 'ArrayItemRemoval',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        /** @infection-ignore ArrayItemRemoval */
+                        class Example {
+                            /** @infection-ignore FalseValue */
+                            public function first(): array {
+                                return [false, true];
+                            }
+
+                            public function second(): array {
+                                return [false, true];
+                            }
+                        }
+
+                        class Outside {
+                            public function values(): array {
+                                return [true];
+                            }
+                        }
+                        PHP,
+                ],
+            ],
+        ];
+
+        yield 'ignore all still takes precedence' => [
+            <<<'PHP'
+                <?php
+
+                /** @infection-ignore ArrayItemRemoval */
+                class Example {
+                    public function ignored(): array {
+                        // @infection-ignore-all
+                        return [false, true];
+                    }
+
+                    public function outside(): bool {
+                        return false;
+                    }
+                }
+                PHP,
+            [
+                [
+                    'mutator' => 'FalseValue',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        /** @infection-ignore ArrayItemRemoval */
+                        class Example {
+                            public function ignored(): array {
+                                // @infection-ignore-all
+                                return [false, true];
+                            }
+
+                            public function outside(): bool {
+                                return true;
+                            }
+                        }
+                        PHP,
+                ],
+            ],
+        ];
+
+        yield 'annotation on an array item excludes its descendants only' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    public function values(): array {
+                        return [
+                            // @infection-ignore FalseValue
+                            false,
+                            false,
+                        ];
+                    }
+                }
+                PHP,
+            [
+                [
+                    'mutator' => 'FalseValue',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        class Example {
+                            public function values(): array {
+                                return [
+                                    // @infection-ignore FalseValue
+                                    false,
+                                    true,
+                                ];
+                            }
+                        }
+                        PHP,
+                ],
+                [
+                    'mutator' => 'ArrayItemRemoval',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        class Example {
+                            public function values(): array {
+                                return [
+                                    false,
+                                ];
+                            }
+                        }
+                        PHP,
+                ],
+            ],
+        ];
+
+        yield 'names are exact, case sensitive, and unknown names have no effect' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    public function values(): array {
+                        // @infection-ignore False, falsevalue, UnknownMutator
+                        return [false, true];
+                    }
+                }
+                PHP,
+            [
+                [
+                    'mutator' => 'FalseValue',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        class Example {
+                            public function values(): array {
+                                // @infection-ignore False, falsevalue, UnknownMutator
+                                return [true, true];
+                            }
+                        }
+                        PHP,
+                ],
+                [
+                    'mutator' => 'TrueValue',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        class Example {
+                            public function values(): array {
+                                // @infection-ignore False, falsevalue, UnknownMutator
+                                return [false, false];
+                            }
+                        }
+                        PHP,
+                ],
+                [
+                    'mutator' => 'ArrayItemRemoval',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        class Example {
+                            public function values(): array {
+                                // @infection-ignore False, falsevalue, UnknownMutator
+                                return [true];
+                            }
+                        }
+                        PHP,
+                ],
+            ],
+        ];
+
+        yield 'an array item annotation does not exclude mutations of the parent array' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    public function values(): array {
+                        return [
+                            // @infection-ignore ArrayItemRemoval
+                            false,
+                        ];
+                    }
+                }
+                PHP,
+            [
+                [
+                    'mutator' => 'FalseValue',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        class Example {
+                            public function values(): array {
+                                return [
+                                    // @infection-ignore ArrayItemRemoval
+                                    true,
+                                ];
+                            }
+                        }
+                        PHP,
+                ],
+                [
+                    'mutator' => 'ArrayItemRemoval',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        class Example {
+                            public function values(): array {
+                                return [];
+                            }
+                        }
+                        PHP,
+                ],
+            ],
+        ];
+
+        yield 'all selected mutators can be excluded' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    /** @infection-ignore ArrayItemRemoval, FalseValue, TrueValue */
+                    public function values(): array {
+                        return [false, true];
+                    }
+                }
+                PHP,
+            [],
+        ];
+
+        yield 'commas do not require surrounding spaces' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    /** @infection-ignore ArrayItemRemoval,FalseValue,TrueValue */
+                    public function values(): array {
+                        return [false, true];
+                    }
+                }
+                PHP,
+            [],
+        ];
+
+        yield 'extra spaces around names are allowed' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    /** @infection-ignore   ArrayItemRemoval   ,   FalseValue  ,   TrueValue */
+                    public function values(): array {
+                        return [false, true];
+                    }
+                }
+                PHP,
+            [],
+        ];
+
         yield 'code outside a class remains ineligible' => [
             <<<'PHP'
                 <?php
@@ -260,6 +685,51 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
                 ],
             ],
         ];
+    }
+
+    #[DataProvider('ignoredMutatorNameProvider')]
+    public function test_it_does_not_consult_ignored_mutators(string $mutatorName): void
+    {
+        $node = new Nop();
+        LabelNodesAsEligibleVisitor::markAsEligible($node);
+        $node->setAttribute(
+            ExcludeIgnoredMutatorsVisitor::IGNORED_MUTATORS,
+            [$mutatorName],
+        );
+
+        $mutator = $this->createMock(Mutator::class);
+        $mutator
+            ->expects($this->never())
+            ->method('getName')
+        ;
+        $mutator
+            ->expects($this->never())
+            ->method('canMutate')
+        ;
+        $mutator
+            ->expects($this->never())
+            ->method('mutate')
+        ;
+
+        $generator = new NodeMutationGenerator(
+            mutatorsByName: [$mutatorName => $mutator],
+            filePath: '/source.php',
+            fileNodes: [$node],
+            originalFileTokens: [],
+            originalFileContent: '',
+        );
+
+        $this->assertSame(
+            [],
+            iterator_to_array($generator->generate($node)),
+        );
+    }
+
+    public static function ignoredMutatorNameProvider(): iterable
+    {
+        yield 'built-in mutator' => ['FalseValue'];
+
+        yield 'custom mutator' => ['Acme\\CustomMutator'];
     }
 
     private function createTraceStub(): Trace

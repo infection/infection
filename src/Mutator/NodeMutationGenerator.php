@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use function array_diff_key;
+use function array_flip;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\Source\Exception\NoSourceFound;
 use PhpParser\Node;
@@ -77,9 +80,28 @@ class NodeMutationGenerator
             return;
         }
 
-        foreach ($this->mutatorsByName as $mutator) {
+        foreach ($this->getNonIgnoredMutators($node) as $mutator) {
             yield from $this->generateForMutator($node, $mutator);
         }
+    }
+
+    /**
+     * @return array<string, Mutator<Node>>
+     */
+    private function getNonIgnoredMutators(Node $node): array
+    {
+        $ignoredMutators = ExcludeIgnoredMutatorsVisitor::getIgnoredMutators($node);
+
+        if ($ignoredMutators === []) {
+            // False positive: this mutation affects performance without changing behaviour.
+            // @infection-ignore ReturnRemoval
+            return $this->mutatorsByName;
+        }
+
+        return array_diff_key(
+            $this->mutatorsByName,
+            array_flip($ignoredMutators),
+        );
     }
 
     /**
