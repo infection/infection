@@ -1351,6 +1351,42 @@ message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceF
 count = 1
 
 [[issues]]
+file = "src/Differ/ChangedLinesParser.php"
+code = "invalid-return-statement"
+message = 'Invalid return type for function `Infection\Differ\ChangedLinesParser::parseFilePathFromLine`: expected `string`, but found `null|string`.'
+count = 1
+
+[[issues]]
+file = "src/Differ/ChangedLinesParser.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #3 of `Safe\preg_match`: expected `array<array-key, string>|null`, but found `mixed`.'
+count = 2
+
+[[issues]]
+file = "src/Differ/ChangedLinesParser.php"
+code = "nullable-return-statement"
+message = 'Function `Infection\Differ\ChangedLinesParser::parseFilePathFromLine` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`).'
+count = 1
+
+[[issues]]
+file = "src/Differ/ChangedLinesParser.php"
+code = "possibly-null-argument"
+message = "Argument #2 of function `explode` is possibly `null`, but parameter type `string` does not accept it."
+count = 1
+
+[[issues]]
+file = "src/Differ/ChangedLinesParser.php"
+code = "possibly-null-array-access"
+message = "Cannot perform array access on possibly `null` value."
+count = 2
+
+[[issues]]
+file = "src/Differ/ChangedLinesParser.php"
+code = "reference-to-undefined-variable"
+message = "Reference created from a previously undefined variable `$matches`."
+count = 2
+
+[[issues]]
 file = "src/Differ/DiffColorizer.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #1 of `array_filter`: expected `array<('K.array_filter() extends array-key), ('V.array_filter() extends mixed)>`, but found `mixed`."
@@ -1748,45 +1784,9 @@ count = 1
 
 [[issues]]
 file = "src/Git/CommandLineGit.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Git\CommandLineGit::parseFilePathFromLine`: expected `string`, but found `null|string`.'
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
 code = "less-specific-nested-return-statement"
 message = '''Returned type `list{string, list<mixed>}` is less specific than the declared return type `array{0: string, 1: list<string>}` for function `Infection\Git\CommandLineGit::diff` due to nested 'mixed'.'''
 count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #3 of `Safe\preg_match`: expected `array<array-key, string>|null`, but found `mixed`.'
-count = 2
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "nullable-return-statement"
-message = 'Function `Infection\Git\CommandLineGit::parseFilePathFromLine` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`).'
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "possibly-null-argument"
-message = "Argument #2 of function `explode` is possibly `null`, but parameter type `string` does not accept it."
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "possibly-null-array-access"
-message = "Cannot perform array access on possibly `null` value."
-count = 2
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "reference-to-undefined-variable"
-message = "Reference created from a previously undefined variable `$matches`."
-count = 2
 
 [[issues]]
 file = "src/Git/CommandLineGit.php"
