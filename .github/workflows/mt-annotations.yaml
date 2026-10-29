@@ -31,6 +31,7 @@ jobs:
               with:
                   # Compare the PR's own changes without the synthetic stack merge.
                   ref: ${{ github.event.pull_request.head.sha }}
+                  fetch-depth: 0
                   persist-credentials: false
             - name: Setup PHP
               uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
@@ -62,10 +63,9 @@ jobs:
 
             - name: Run Infection for changed lines only
               env:
-                  PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
                   PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
               run: |
-                  git fetch --no-tags --unshallow origin "$PR_HEAD_SHA" "$PR_BASE_SHA"
+                  git fetch --no-tags origin "$PR_BASE_SHA"
                   php bin/infection \
                     --git-diff-lines \
                     --git-diff-base="$PR_BASE_SHA" \
