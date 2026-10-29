@@ -70,6 +70,16 @@ final class NewObjectTest extends BaseMutatorTestCase
             ),
         ];
 
+        yield 'It does not mutate the return of a dynamic class instantiation' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $className = 'SimpleClass';
+
+                    return new $className();
+                    PHP,
+            ),
+        ];
+
         yield 'It does not mutate with not nullable return typehint' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'no-not-mutates-with-not-nullable-typehint.php'),
         ];
