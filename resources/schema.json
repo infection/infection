@@ -252,6 +252,7 @@
                 "@equal": { "$ref": "#/definitions/default-mutator-config" },
                 "@function_signature": { "$ref": "#/definitions/default-mutator-config" },
                 "@identical": { "$ref": "#/definitions/default-mutator-config" },
+                "@nullify": { "$ref": "#/definitions/default-mutator-config" },
                 "@number": { "$ref": "#/definitions/default-mutator-config" },
                 "@operator": { "$ref": "#/definitions/default-mutator-config" },
                 "@regex": { "$ref": "#/definitions/default-mutator-config" },
