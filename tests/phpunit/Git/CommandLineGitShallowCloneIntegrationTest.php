@@ -97,30 +97,26 @@ final class CommandLineGitShallowCloneIntegrationTest extends FileSystemTestCase
             ],
         );
 
+        $expectedChangedLines = [
+            $this->tmp.'/clone/src/Order.php' => [ChangedLinesRange::forLine(1)],
+            $this->tmp.'/clone/src/Tax.php' => [ChangedLinesRange::forLine(1)],
+        ];
+
         $base = $this->git->getBaseReference($this->base);
 
-        $this->assertSame(
-            $this->base,
-            $base,
-        );
+        $this->assertSame($this->base, $base);
         $this->assertTrue(
             $this->logger->hasInfoThatContains('Could not find a common ancestor commit'),
         );
 
-        $actual = $this->git->getChangedLinesRangesByFilePaths(
+        $actualChangedLines = $this->git->getChangedLinesRangesByFilePaths(
             'AM',
             $base,
             ['src'],
             $this->tmp . '/clone',
         );
 
-        $this->assertEquals(
-            [
-                $this->tmp . '/clone/src/Order.php' => [ChangedLinesRange::forLine(1)],
-                $this->tmp . '/clone/src/Tax.php' => [ChangedLinesRange::forLine(1)],
-            ],
-            $actual,
-        );
+        $this->assertEquals($expectedChangedLines, $actualChangedLines);
     }
 
     public function test_it_selects_only_the_pull_request_changes_after_fetching_both_histories(): void
@@ -138,30 +134,23 @@ final class CommandLineGitShallowCloneIntegrationTest extends FileSystemTestCase
             ],
         );
 
+        $expectedChangedLines = [
+            $this->tmp.'/clone/src/Order.php' => [ChangedLinesRange::forLine(1)],
+        ];
+
         $base = $this->git->getBaseReference($this->base);
 
-        $this->assertSame(
-            $this->mergeBase,
-            $base,
-        );
-        $this->assertSame(
-            [],
-            $this->logger->records,
-        );
+        $this->assertSame($this->mergeBase, $base);
+        $this->assertSame([], $this->logger->records);
 
-        $actual = $this->git->getChangedLinesRangesByFilePaths(
+        $actualChangedLines = $this->git->getChangedLinesRangesByFilePaths(
             'AM',
             $base,
             ['src'],
             $this->tmp . '/clone',
         );
 
-        $this->assertEquals(
-            [
-                $this->tmp . '/clone/src/Order.php' => [ChangedLinesRange::forLine(1)],
-            ],
-            $actual,
-        );
+        $this->assertEquals($expectedChangedLines, $actualChangedLines);
     }
 
     /**
