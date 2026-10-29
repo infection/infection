@@ -77,7 +77,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
 
     public static function setUpBeforeClass(): void
     {
-        if (!self::checkIfCommitReferenceExists()) {
+        if (!self::checkIfCommitReferenceExists(self::COMMIT_REFERENCE)) {
             self::markTestSkipped('Commit reference not found. It may require more history.');
         }
     }
@@ -264,6 +264,10 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
     {
         $originalBase = $this->git->getDefaultBase();
 
+        if (!self::checkIfCommitReferenceExists($originalBase)) {
+            $this->markTestSkipped('Default Git base not found. It may need to be fetched.');
+        }
+
         $refinedBase = $this->git->getBaseReference($originalBase);
 
         $this->assertNotSame($originalBase, $refinedBase);
@@ -295,21 +299,21 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
 
     private function skipIfCommitReferenceIsNotAvailable(): void
     {
-        self::$commitReferenceExists ??= self::checkIfCommitReferenceExists();
+        self::$commitReferenceExists ??= self::checkIfCommitReferenceExists(self::COMMIT_REFERENCE);
 
         if (!self::$commitReferenceExists) {
             $this->markTestSkipped('Commit reference not found. It may require more history.');
         }
     }
 
-    private static function checkIfCommitReferenceExists(): bool
+    private static function checkIfCommitReferenceExists(string $reference): bool
     {
         try {
             (new SymfonyProcessShellCommandRunner())->mustRun([
                 'git',
                 'cat-file',
                 '-e',
-                self::COMMIT_REFERENCE,
+                $reference,
             ]);
 
             return true;
