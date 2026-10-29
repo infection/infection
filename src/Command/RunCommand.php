@@ -130,6 +130,8 @@ final class RunCommand extends BaseCommand
 
     private const string OPTION_LOGGER_TEXT = 'logger-text';
 
+    private const string OPTION_LOGGER_JSON = 'logger-json';
+
     private const string OPTION_USE_NOOP_MUTATORS = 'noop';
 
     private const string OPTION_EXECUTE_ONLY_COVERING_TEST_CASES = 'only-covering-test-cases';
@@ -284,6 +286,12 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Path to text report file.',
+            )
+            ->addOption(
+                self::OPTION_LOGGER_JSON,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Path to JSON report file, with all mutants, source and mutated code, and test framework output.',
             )
             ->addOption(
                 self::OPTION_LOGGER_SUMMARY_JSON,
@@ -490,6 +498,7 @@ final class RunCommand extends BaseCommand
             htmlLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_HTML, Container::DEFAULT_HTML_LOGGER_PATH),
             textLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_TEXT, Container::DEFAULT_TEXT_LOGGER_PATH),
             summaryJsonLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_SUMMARY_JSON, Container::DEFAULT_SUMMARY_JSON_LOGGER_PATH),
+            jsonLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_JSON, Container::DEFAULT_JSON_LOGGER_PATH),
             useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             mapSourceClassToTestStrategy: MapSourceClassToTestOption::get($io),

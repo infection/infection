@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Command;
 
 use Infection\Command\RunCommand;
+use Infection\Configuration\Entry\Logs;
 use Infection\Console\Application;
 use Infection\Container\Container;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
@@ -47,7 +48,9 @@ use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Throwable;
 
@@ -208,6 +211,33 @@ final class RunCommandTest extends TestCase
 
         $this->assertSame($expectedStatusCode, $tester->getStatusCode());
         $this->assertStringContainsString($failure->getMessage(), $tester->getDisplay(normalize: true));
+    }
+
+    #[Group('integration')]
+    public function test_it_passes_the_json_logger_option_to_the_configuration(): void
+    {
+        $logs = null;
+
+        // Stop on the first service requested in startUp(), once the container has been bound
+        // to the CLI values.
+        $container = Container::create()->cloneWithService(
+            RootsFileOrDirectoryLocator::class,
+            static function (Container $container) use (&$logs): never {
+                $logs = $container->getConfiguration()->logs;
+
+                throw new RuntimeException('Stopped after reading the configuration.');
+            },
+        );
+
+        $tester = new CommandTester((new Application($container))->find('run'));
+
+        try {
+            $tester->execute(['--logger-json' => '/from-cli.json']);
+        } catch (RuntimeException) {
+        }
+
+        $this->assertInstanceOf(Logs::class, $logs);
+        $this->assertSame('/from-cli.json', $logs->getJsonLogFilePath());
     }
 
     private function createCommandTesterFailingOnStartUp(Throwable $failure): CommandTester

@@ -203,6 +203,7 @@ final class ConfigurationFactoryTest extends TestCase
                 htmlLogFilePath: null,
                 textLogFilePath: null,
                 summaryJsonLogFilePath: null,
+                jsonLogFilePath: null,
                 useNoopMutators: false,
                 executeOnlyCoveringTestCases: false,
                 mapSourceClassToTestStrategy: null,
@@ -277,6 +278,7 @@ final class ConfigurationFactoryTest extends TestCase
             htmlLogFilePath: null,
             textLogFilePath: null,
             summaryJsonLogFilePath: null,
+            jsonLogFilePath: null,
             useNoopMutators: false,
             executeOnlyCoveringTestCases: true,
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
@@ -479,6 +481,38 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                 ),
+        ];
+
+        yield 'override JSON file log path from CLI option with existing path from config file' => [
+            $defaultScenario->forValueForJsonLogFilePath(
+                '/from-config.json',
+                '/from-cli.json',
+                '/from-cli.json',
+            ),
+        ];
+
+        yield 'set JSON file log path from CLI option when config file has no setting' => [
+            $defaultScenario->forValueForJsonLogFilePath(
+                null,
+                '/from-cli.json',
+                '/from-cli.json',
+            ),
+        ];
+
+        yield 'relative JSON file log path' => [
+            $defaultScenario->forValueForJsonLogFilePath(
+                'relative/path/to/from-config.json',
+                null,
+                '/path/to/relative/path/to/from-config.json',
+            ),
+        ];
+
+        yield 'null JSON file log path in config and CLI' => [
+            $defaultScenario->forValueForJsonLogFilePath(
+                null,
+                null,
+                null,
+            ),
         ];
 
         yield 'null timeout' => [
@@ -1665,6 +1699,7 @@ final class ConfigurationFactoryTest extends TestCase
                     htmlLogFilePath: null,
                     textLogFilePath: null,
                     summaryJsonLogFilePath: null,
+                    jsonLogFilePath: null,
                     useNoopMutators: false,
                     executeOnlyCoveringTestCases: false,
                     mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,

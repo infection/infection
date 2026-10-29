@@ -76,6 +76,7 @@ final class ConfigurationFactoryInputBuilder
         private ?string $htmlLogFilePath,
         private ?string $textLogFilePath,
         private ?string $summaryJsonLogFilePath,
+        private ?string $jsonLogFilePath,
         private bool $useNoopMutators,
         private bool $executeOnlyCoveringTestCases,
         private ?string $mapSourceClassToTestStrategy,
@@ -315,6 +316,14 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
+    public function withJsonLogFilePath(?string $jsonLogFilePath): self
+    {
+        $clone = clone $this;
+        $clone->jsonLogFilePath = $jsonLogFilePath;
+
+        return $clone;
+    }
+
     public function withUseNoopMutators(bool $useNoopMutators): self
     {
         $clone = clone $this;
@@ -397,12 +406,13 @@ final class ConfigurationFactoryInputBuilder
      *     26: string|null,
      *     27: string|null,
      *     28: string|null,
-     *     29: bool,
+     *     29: string|null,
      *     30: bool,
-     *     31: string|null,
-     *     32: non-empty-string|null,
-     *     33: string|null,
+     *     31: bool,
+     *     32: string|null,
+     *     33: non-empty-string|null,
      *     34: string|null,
+     *     35: string|null,
      * }
      */
     public function build(SchemaConfiguration $schema): array
@@ -437,6 +447,7 @@ final class ConfigurationFactoryInputBuilder
             $this->htmlLogFilePath,
             $this->textLogFilePath,
             $this->summaryJsonLogFilePath,
+            $this->jsonLogFilePath,
             $this->useNoopMutators,
             $this->executeOnlyCoveringTestCases,
             $this->mapSourceClassToTestStrategy,
