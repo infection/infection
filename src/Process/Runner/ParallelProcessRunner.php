@@ -147,6 +147,10 @@ class ParallelProcessRunner implements ProcessRunner
             // prematurely when the queue empties (we check for isEmpty() below), even
             // if the generator has more processes.
             $this->queue->enqueueFrom($generator);
+
+            if ($this->shouldStop) {
+                break;
+            }
         } while (!$this->queue->isEmpty() || $this->runningProcessContainers !== []);
     }
 
