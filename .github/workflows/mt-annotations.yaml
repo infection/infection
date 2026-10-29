@@ -68,7 +68,6 @@ jobs:
                   git fetch --no-tags --unshallow origin "$PR_HEAD_SHA" "$PR_BASE_SHA"
                   php bin/infection \
                     --git-diff-lines \
-                    --git-diff-base="$PR_BASE_SHA" \
                     --ignore-msi-with-no-mutations \
                     --max-timeouts=0 \
                     --min-msi=100 \
