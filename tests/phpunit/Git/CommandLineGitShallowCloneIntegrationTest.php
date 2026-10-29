@@ -98,8 +98,8 @@ final class CommandLineGitShallowCloneIntegrationTest extends FileSystemTestCase
         );
 
         $expectedChangedLines = [
-            $this->tmp.'/clone/src/Order.php' => [ChangedLinesRange::forLine(1)],
-            $this->tmp.'/clone/src/Tax.php' => [ChangedLinesRange::forLine(1)],
+            $this->tmp . '/clone/src/Order.php' => [ChangedLinesRange::forLine(1)],
+            $this->tmp . '/clone/src/Tax.php' => [ChangedLinesRange::forLine(1)],
         ];
 
         $base = $this->git->getBaseReference($this->base);
@@ -135,7 +135,7 @@ final class CommandLineGitShallowCloneIntegrationTest extends FileSystemTestCase
         );
 
         $expectedChangedLines = [
-            $this->tmp.'/clone/src/Order.php' => [ChangedLinesRange::forLine(1)],
+            $this->tmp . '/clone/src/Order.php' => [ChangedLinesRange::forLine(1)],
         ];
 
         $base = $this->git->getBaseReference($this->base);
