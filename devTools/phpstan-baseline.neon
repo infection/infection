@@ -301,10 +301,10 @@ parameters:
 			path: ../src/Git/CommandLineGit.php
 
 		-
-			rawMessage: Infection\Git\NoGitProjectFound should not exist
+			rawMessage: Infection\Git\Throwable\NoGitProjectFound should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
-			path: ../src/Git/NoGitProjectFound.php
+			path: ../src/Git/Throwable/NoGitProjectFound.php
 
 		-
 			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.

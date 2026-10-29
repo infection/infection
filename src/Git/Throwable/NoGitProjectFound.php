@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Git;
+namespace Infection\Git\Throwable;
 
 use RuntimeException;
 use Throwable;
