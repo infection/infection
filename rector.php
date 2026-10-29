@@ -41,6 +41,7 @@ use Rector\CodeQuality\Rector\ClassConstFetch\VariableConstFetchToClassConstFetc
 use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
+use Rector\CodeQuality\Rector\If_\ExplicitNullableObjectInstanceRector;
 use Rector\CodeQuality\Rector\If_\SimplifyIfReturnBoolRector;
 use Rector\CodeQuality\Rector\Include_\AbsolutizeRequireAndIncludePathRector;
 use Rector\Config\RectorConfig;
@@ -53,6 +54,7 @@ use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector;
 use Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector;
 use Rector\EarlyReturn\Rector\StmtsAwareInterface\ReturnEarlyIfVariableRector;
+use Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector;
 use Rector\Php73\Rector\String_\SensitiveHereNowDocRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
@@ -143,11 +145,13 @@ $config = RectorConfig::configure()
         AddReturnTypeDeclarationBasedOnParentClassMethodRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/Console/FakeOutputSymfony5.php',
         ],
+        ExplicitNullableObjectInstanceRector::class,
         AssertCompareOnCountableWithMethodToAssertCountRector::class,
         AssertEmptyNullableObjectToAssertInstanceofRector::class,
         AssertEqualsOrAssertSameFloatParameterToSpecificMethodsTypeRector::class,
         ClosureReturnTypeRector::class,
         DataProviderArrayItemsNewLinedRector::class,
+        FlipNegatedTernaryInstanceofRector::class,
         FlipTypeControlToUseExclusiveTypeRector::class,
         LocallyCalledStaticMethodToNonStaticRector::class,
         MergeWithCallableAndWillReturnRector::class => [
