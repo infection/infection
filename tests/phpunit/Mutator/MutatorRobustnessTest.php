@@ -157,7 +157,7 @@ final class MutatorRobustnessTest extends TestCase
         $mutations = $this->fileMutationGenerator->generate(
             sourceFile: $fileInfo,
             onlyCovered: false,
-            mutators: [$mutator],
+            mutatorsByName: [$mutator->getName() => $mutator],
         );
 
         take($mutations)->toList();
