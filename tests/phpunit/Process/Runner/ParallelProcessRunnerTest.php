@@ -344,7 +344,6 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('checkTimeout')
             ->willThrowException(new ProcessTimedOutException($processMock, 1))
         ;
-        // Still running when polled, stopped by checkTimeout(), freed on the next poll
         $processMock->expects($this->once())
             ->method('isRunning')
             ->willReturn(true)
@@ -396,7 +395,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // Create a finished process
         $processMock = $this->createMock(Process::class);
         $processMock->expects($this->never())
-            ->method('checkTimeout')
+            ->method('checkTimeout') // Finished processes are never checked for timeouts
         ;
         $processMock->expects($this->once())
             ->method('isRunning')
