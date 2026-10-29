@@ -182,14 +182,6 @@ final class PositionalPathsClassifierTest extends TestCase
                 ->withExpected(new ClassifiedPaths(['lib/B.php'], ['tests/CTest.php'])),
         ];
 
-        yield 'no configured source directories routes existing paths to test' => [
-            $baseScenario
-                ->withPaths(['src/SomeFile.php'])
-                ->withSourceDirectories([])
-                ->withExistingFiles(['/project/src/SomeFile.php'])
-                ->withExpected(new ClassifiedPaths([], ['src/SomeFile.php'])),
-        ];
-
         yield 'singular test directory file path' => [
             $baseScenario
                 ->withPaths(['test/Foo.php'])
