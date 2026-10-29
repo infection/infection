@@ -601,29 +601,6 @@ final class ParallelProcessRunnerTest extends TestCase
         );
     }
 
-    private function createPolledMutantProcessContainer(bool $isRunning): MutantProcessContainer
-    {
-        $processMock = $this->createMock(Process::class);
-        $processMock->expects($this->once())
-            ->method('isRunning')
-            ->willReturn($isRunning)
-        ;
-
-        $mutantProcessMock = $this->createMock(MutantProcess::class);
-        $mutantProcessMock->method('getProcess')->willReturn($processMock);
-        $mutantProcessMock->expects($this->never())
-            ->method('markAsTimedOut')
-        ;
-        $mutantProcessMock->expects($isRunning ? $this->never() : $this->once())
-            ->method('markAsFinished')
-        ;
-
-        $mutantProcessContainerMock = $this->createMock(MutantProcessContainer::class);
-        $mutantProcessContainerMock->method('getCurrent')->willReturn($mutantProcessMock);
-
-        return $mutantProcessContainerMock;
-    }
-
     private function createMutantProcessContainerWithNextMutantProcess(int $threadCount): MutantProcessContainer
     {
         $phpUnitProcessMock = $this->createMock(Process::class);
