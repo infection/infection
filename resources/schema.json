@@ -261,6 +261,7 @@
                 "@loop": { "$ref": "#/definitions/default-mutator-config" },
                 "@cast": { "$ref": "#/definitions/default-mutator-config" },
                 "@unwrap": { "$ref": "#/definitions/default-mutator-config" },
+                "@nullify": { "$ref": "#/definitions/default-mutator-config" },
                 "@extensions": { "$ref": "#/definitions/default-mutator-config" },
 
                 "@default": { "$ref": "#/definitions/default-mutator-config" },

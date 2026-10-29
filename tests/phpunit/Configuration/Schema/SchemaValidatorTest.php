@@ -39,12 +39,15 @@ use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Framework\Str;
+use Infection\Mutator\ProfileList;
+use function array_keys;
 use function json_last_error_msg;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\json_decode;
+use function Safe\json_encode;
 use Webmozart\Assert\Assert;
 
 #[CoversClass(SchemaValidator::class)]
@@ -138,6 +141,19 @@ final class SchemaValidatorTest extends TestCase
             ),
             null,
         ];
+
+        foreach (array_keys(ProfileList::ALL_PROFILES) as $profile) {
+            yield 'valid profile ' . $profile => [
+                self::createConfigWithContents(
+                    $pathname,
+                    json_encode([
+                        'source' => ['directories' => ['src']],
+                        'mutators' => [$profile => true],
+                    ]),
+                ),
+                null,
+            ];
+        }
 
         yield 'valid schema' => [
             self::createConfigWithContents(
