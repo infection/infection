@@ -51,6 +51,7 @@ use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use function iterator_count;
+use function iterator_to_array;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -345,7 +346,7 @@ final class ParallelProcessRunnerTest extends TestCase
         ;
         $processMock->expects($this->once())
             ->method('isRunning')
-            ->willReturn(false)
+            ->willReturn(true)
         ;
 
         $mutantProcessMock = $this->createMock(MutantProcess::class);
@@ -355,6 +356,9 @@ final class ParallelProcessRunnerTest extends TestCase
         ;
         $mutantProcessMock->expects($this->once())
             ->method('markAsTimedOut') // This call must happen
+        ;
+        $mutantProcessMock->expects($this->never())
+            ->method('markAsFinished')
         ;
 
         $mutantProcessContainerMock = $this->createMock(MutantProcessContainer::class);
@@ -378,6 +382,43 @@ final class ParallelProcessRunnerTest extends TestCase
         iterator_count($method->invokeArgs($runner, []));
     }
 
+    public function test_it_frees_finished_processes_after_a_running_one(): void
+    {
+        $runner = new ParallelProcessRunner(2, 0, new TimeSpy());
+
+        $reflection = new ReflectionClass($runner);
+
+        $runningProcessMock = $this->createMock(Process::class);
+        $runningProcessMock->expects($this->once())
+            ->method('isRunning')
+            ->willReturn(true)
+        ;
+
+        $finishedProcessMock = $this->createMock(Process::class);
+        $finishedProcessMock->expects($this->once())
+            ->method('isRunning')
+            ->willReturn(false)
+        ;
+
+        $runningContainer = new IndexedMutantProcessContainer(1, $this->createDummyMutantProcessContainer($runningProcessMock));
+        $finishedMutantProcessContainer = $this->createDummyMutantProcessContainer($finishedProcessMock);
+
+        $runningProcessContainers = $reflection->getProperty('runningProcessContainers');
+        $runningProcessContainers->setValue($runner, [
+            0 => $runningContainer,
+            1 => new IndexedMutantProcessContainer(2, $finishedMutantProcessContainer),
+        ]);
+
+        $availableThreadIndexes = $reflection->getProperty('availableThreadIndexes');
+        $availableThreadIndexes->setValue($runner, []);
+
+        $method = $reflection->getMethod('tryToFreeNotRunningProcess');
+
+        $this->assertSame([$finishedMutantProcessContainer], iterator_to_array($method->invokeArgs($runner, []), false));
+        $this->assertSame([2], $availableThreadIndexes->getValue($runner));
+        $this->assertSame([0 => $runningContainer], $runningProcessContainers->getValue($runner));
+    }
+
     public function test_mark_as_finished_method_call_removal_mutation(): void
     {
         // This test kills the MethodCallRemoval mutation
@@ -390,8 +431,8 @@ final class ParallelProcessRunnerTest extends TestCase
 
         // Create a finished process
         $processMock = $this->createMock(Process::class);
-        $processMock->expects($this->once())
-            ->method('checkTimeout') // No exception
+        $processMock->expects($this->never())
+            ->method('checkTimeout') // Finished processes are never checked for timeouts
         ;
         $processMock->expects($this->once())
             ->method('isRunning')
@@ -578,7 +619,7 @@ final class ParallelProcessRunnerTest extends TestCase
             ])
         ;
         $processMock
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('checkTimeout')
         ;
         $processMock
@@ -587,6 +628,11 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturn(false)
         ;
 
+        return $this->createDummyMutantProcessContainer($processMock);
+    }
+
+    private function createDummyMutantProcessContainer(Process $processMock): MutantProcessContainer
+    {
         return new MutantProcessContainer(
             new DummyMutantProcess(
                 $processMock,
@@ -610,7 +656,7 @@ final class ParallelProcessRunnerTest extends TestCase
             ])
         ;
         $phpUnitProcessMock
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('checkTimeout')
         ;
         $phpUnitProcessMock
@@ -629,7 +675,7 @@ final class ParallelProcessRunnerTest extends TestCase
             ])
         ;
         $nextProcessMock
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('checkTimeout')
         ;
         $nextProcessMock
@@ -691,10 +737,11 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('checkTimeout')
             ->willThrowException(new ProcessTimedOutException($processMock, 1))
         ;
+        // The process is still running when polled, so it will be stopped by checkTimeout()
         $processMock
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('isRunning')
-            ->willReturn(false)
+            ->willReturnOnConsecutiveCalls(true, false)
         ;
 
         return new MutantProcessContainer(

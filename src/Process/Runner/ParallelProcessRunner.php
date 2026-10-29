@@ -174,18 +174,24 @@ class ParallelProcessRunner implements ProcessRunner
     private function tryToFreeNotRunningProcess(): iterable
     {
         // remove any finished process from the stack
+        // @infection-ignore-all
         foreach ($this->runningProcessContainers as $index => $indexedMutantProcess) {
             $mutantProcessContainer = $indexedMutantProcess->mutantProcessContainer;
             $mutantProcess = $mutantProcessContainer->getCurrent();
             $process = $mutantProcess->getProcess();
 
+            $isRunning = $process->isRunning();
+
             try {
-                $process->checkTimeout();
+                // Only check if the process has timed out if it was running in the first place.
+                if ($isRunning) {
+                    $process->checkTimeout();
+                }
             } catch (ProcessTimedOutException) {
                 $mutantProcess->markAsTimedOut();
             }
 
-            if ($process->isRunning()) {
+            if ($isRunning) {
                 continue;
             }
 
