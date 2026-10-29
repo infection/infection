@@ -148,6 +148,25 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         $this->assertSame($expected, $actual);
     }
 
+    public function test_it_fails_to_get_changed_files_outside_a_git_repository(): void
+    {
+        $workingDirectory = $this->tmp;
+        Assert::stringNotEmpty(
+            $workingDirectory,
+            'The temporary fixture directory must be initialized before running Git.',
+        );
+
+        $this->expectException(ProcessFailedException::class);
+        $this->expectExceptionMessage('not a git repository');
+
+        $this->git->getChangedFilePaths(
+            'AM',
+            'HEAD',
+            ['src'],
+            $workingDirectory,
+        );
+    }
+
     public function test_it_fails_at_getting_the_relative_paths_of_the_changed_files_if_getting_the_merge_base_failed_unexpectedly(): void
     {
         $badCommitReference = self::BAD_COMMIT_REFERENCE;
