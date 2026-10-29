@@ -29,6 +29,8 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
+                  # Compare the PR's own changes without the synthetic stack merge.
+                  ref: ${{ github.event.pull_request.head.sha }}
                   fetch-depth: 0
                   persist-credentials: false
             - name: Setup PHP
@@ -60,11 +62,13 @@ jobs:
                   composer install --no-interaction --prefer-dist --no-progress
 
             - name: Run Infection for changed lines only
+              env:
+                  PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
               run: |
-                  git fetch origin $GITHUB_BASE_REF
+                  git fetch --no-tags origin "$PR_BASE_SHA"
                   php bin/infection \
                     --git-diff-lines \
-                    --git-diff-base=origin/$GITHUB_BASE_REF \
+                    --git-diff-base="$PR_BASE_SHA" \
                     --ignore-msi-with-no-mutations \
                     --max-timeouts=0 \
                     --min-msi=100 \
