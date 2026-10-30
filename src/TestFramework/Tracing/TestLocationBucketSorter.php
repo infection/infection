@@ -76,8 +76,10 @@ final readonly class TestLocationBucketSorter
             // @codeCoverageIgnoreStart
             // This is a very hot path. Factoring here another method just to test this math may not be as good idea.
 
+            $time = $location->getExecutionTime() ?? 0.0;
+
             // Quick drop off lower bits, reducing precision to 8th of a second
-            $msTime = (int) (($location->getExecutionTime() ?? 0) * 1024) >> 7; // * 1024 / 128
+            $msTime = (int) ($time * 1024) >> 7; // * 1024 / 128
 
             // For anything above 4 seconds reduce precision to 4 seconds
             if ($msTime > 32) {
@@ -85,7 +87,18 @@ final readonly class TestLocationBucketSorter
             }
             // @codeCoverageIgnoreEnd
 
-            $buckets[$msTime][] = $location;
+            // Buckets are not sorted, but the fastest test must run first: a mutant is
+            // run only when its fastest test fits in the timeout. Each bucket keeps its
+            // fastest test at the front, so the first bucket starts with the fastest test overall.
+            // A faster test takes the front, and the one it replaces moves to the end.
+            $bucketFastest = $buckets[$msTime][0] ?? null;
+
+            if ($bucketFastest !== null && $time < ($bucketFastest->getExecutionTime() ?? 0.0)) {
+                $buckets[$msTime][] = $bucketFastest;
+                $buckets[$msTime][0] = $location;
+            } else {
+                $buckets[$msTime][] = $location;
+            }
         }
 
         ksort($buckets);
