@@ -113,14 +113,18 @@ final readonly class CiAwareGit implements Git
      */
     private function findCiBase(): ?string
     {
+        // https://docs.gitlab.com/ci/variables/predefined_variables/#predefined-variables
         if (getenv('GITLAB_CI') === 'true') {
             // This is the merge base of the MR diff. Unlike the target branch
             // SHA, it is also available in detached merge request pipelines.
+            // https://docs.gitlab.com/ci/variables/predefined_variables/#predefined-variables-for-merge-request-pipelines
             return self::findNonEmptyString(
                 getenv('CI_MERGE_REQUEST_DIFF_BASE_SHA'),
             );
         }
 
+        // GITHUB_ACTIONS and GITHUB_EVENT_PATH:
+        // https://docs.github.com/en/actions/reference/workflows-and-actions/variables#default-environment-variables
         if (getenv('GITHUB_ACTIONS') !== 'true') {
             return null;
         }
@@ -157,6 +161,8 @@ final readonly class CiAwareGit implements Git
     {
         // GITHUB_BASE_REF can name the final base of a native stack. The event
         // payload records the immediate target of this pull request instead.
+        // https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/optimizing-ci-for-stacked-pull-requests
+        // https://docs.github.com/en/webhooks/webhook-events-and-payloads#pull_request
         return self::findNonEmptyString($event->pull_request->base->sha ?? null);
     }
 
