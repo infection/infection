@@ -157,11 +157,12 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             'The temporary fixture directory must be initialized before running Git.',
         );
 
-        $this->expectException(GitDiffFailed::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'Could not compute the Git diff against "HEAD" in "%s".',
-                $workingDirectory,
+        $this->expectExceptionObject(
+            new GitDiffFailed(
+                sprintf(
+                    'Could not compute the Git diff against "HEAD" in "%s".',
+                    $workingDirectory,
+                ),
             ),
         );
 
@@ -177,11 +178,12 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
     {
         $badCommitReference = self::BAD_COMMIT_REFERENCE;
 
-        $this->expectException(GitDiffFailed::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'Could not compute the Git diff against "%s"',
-                $badCommitReference,
+        $this->expectExceptionObject(
+            new GitDiffFailed(
+                sprintf(
+                    'Could not compute the Git diff against "%s"',
+                    $badCommitReference,
+                ),
             ),
         );
 
@@ -228,11 +230,12 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
     {
         $badCommitReference = self::BAD_COMMIT_REFERENCE;
 
-        $this->expectException(GitDiffFailed::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'Could not compute the Git diff against "%s"',
-                $badCommitReference,
+        $this->expectExceptionObject(
+            new GitDiffFailed(
+                sprintf(
+                    'Could not compute the Git diff against "%s"',
+                    $badCommitReference,
+                ),
             ),
         );
 
