@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser;
 
 use function array_map;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
+use Infection\PhpParser\Visitor\ExcludeNonSelectedSourceNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
 use Infection\PhpParser\Visitor\ExcludeUntestedNodesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
@@ -70,15 +72,20 @@ final class NodeTraverserFactoryTest extends TestCase
 
     /**
      * @param list<class-string<NodeVisitor>> $expected
+     * @param list<SourceSymbolSelector> $sourceSymbolSelectors
      */
     #[DataProvider('visitorProvider')]
     public function test_it_can_create_a_traverser_for_enriching_the_ast(
         bool $onlyCovered,
         array $expected,
+        array $sourceSymbolSelectors = [],
     ): void {
         $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
 
-        $factory = self::createTraverserFactory($onlyCovered);
+        $factory = self::createTraverserFactory(
+            $onlyCovered,
+            $sourceSymbolSelectors,
+        );
 
         $traverser = $factory->createEnrichmentTraverser(
             $sourceFile,
@@ -100,19 +107,38 @@ final class NodeTraverserFactoryTest extends TestCase
             ReflectionVisitor::class,
             ExcludeNonMutableCodeVisitor::class,
             ExcludeUnchangedLinesVisitor::class,
-            AddTestsVisitor::class,
         ];
 
         yield 'without only covered' => [
             false,
-            $baseVisitors,
+            [
+                ...$baseVisitors,
+                AddTestsVisitor::class,
+            ],
         ];
 
         yield 'with only covered' => [
             true,
             [
                 ...$baseVisitors,
+                AddTestsVisitor::class,
                 ExcludeUntestedNodesVisitor::class,
+            ],
+        ];
+
+        yield 'with source selection' => [
+            false,
+            [
+                ...$baseVisitors,
+                ExcludeNonSelectedSourceNodesVisitor::class,
+                AddTestsVisitor::class,
+            ],
+            [
+                new SourceSymbolSelector(
+                    'Vendor\\Package\\ClassName',
+                    'method',
+                    42,
+                ),
             ],
         ];
     }
@@ -167,12 +193,18 @@ final class NodeTraverserFactoryTest extends TestCase
         return self::$visitorsReflection ??= (new ReflectionClass(NodeTraverser::class))->getProperty('visitors');
     }
 
-    private static function createTraverserFactory(bool $onlyCovered): NodeTraverserFactory
-    {
+    /**
+     * @param list<SourceSymbolSelector> $sourceSymbolSelectors
+     */
+    private static function createTraverserFactory(
+        bool $onlyCovered,
+        array $sourceSymbolSelectors = [],
+    ): NodeTraverserFactory {
         return new NodeTraverserFactory(
             sourceLineMatcher: new NullSourceLineMatcher(),
             lineRangeCalculator: new LineRangeCalculator(),
             onlyCovered: $onlyCovered,
+            sourceSymbolSelectors: $sourceSymbolSelectors,
         );
     }
 }
