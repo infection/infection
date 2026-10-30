@@ -59,17 +59,6 @@ final class DiffColorizerTest extends TestCase
         $this->assertFormatterAcceptsOutput($actual);
     }
 
-    private function assertFormatterAcceptsOutput(string $colorizedDiff): void
-    {
-        $output = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, true);
-        OutputFormatterStyleConfigurator::configure($output);
-
-        // throws on an incorrectly nested style tag
-        $output->getFormatter()->format($colorizedDiff);
-
-        $this->addToAssertionCount(1);
-    }
-
     public static function provideDiffs(): iterable
     {
         yield 'full-deletion' => [
@@ -280,5 +269,17 @@ final class DiffColorizerTest extends TestCase
                      }</code>
                 CODE,
         ];
+    }
+
+    private function assertFormatterAcceptsOutput(string $colorizedDiff): void
+    {
+        $output = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, true);
+        OutputFormatterStyleConfigurator::configure($output);
+
+        // throws on an incorrectly nested style tag
+        $output->getFormatter()->format($colorizedDiff);
+
+        // @phpstan-ignore method.internal
+        $this->addToAssertionCount(1);
     }
 }
