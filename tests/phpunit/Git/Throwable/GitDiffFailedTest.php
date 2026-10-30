@@ -57,9 +57,11 @@ final class GitDiffFailedTest extends TestCase
             <<<'MESSAGE'
                 Could not compute the Git diff against "origin/main" in "/project".
 
-                Check that this directory is a Git repository with a HEAD commit.
-                Make sure "origin/main" is available locally. Fetch the base reference if it is missing.
-                Run Infection with -vvv to see the Git error.
+                This can happen when the directory is not a Git repository,
+                has no commits yet, or "origin/main" is not available locally.
+
+                Fetching the base reference from the remote may resolve the issue
+                if it is missing locally.
                 MESSAGE,
             $exception->getMessage(),
         );

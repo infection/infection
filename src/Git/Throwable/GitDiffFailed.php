@@ -54,9 +54,11 @@ final class GitDiffFailed extends RuntimeException
                 <<<'MESSAGE'
                     Could not compute the Git diff against "%1$s" in "%2$s".
 
-                    Check that this directory is a Git repository with a HEAD commit.
-                    Make sure "%1$s" is available locally. Fetch the base reference if it is missing.
-                    Run Infection with -vvv to see the Git error.
+                    This can happen when the directory is not a Git repository,
+                    has no commits yet, or "%1$s" is not available locally.
+
+                    Fetching the base reference from the remote may resolve the issue
+                    if it is missing locally.
                     MESSAGE,
                 $base,
                 $workingDirectory,
