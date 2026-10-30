@@ -49,10 +49,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 /**
  * @internal
  *
- * Uses the current request's comparison base from GitHub or GitLab CI metadata
- * when available and delegates other Git operations. Comparing only the request's
- * own changes also requires checking out its head and making the base and any
- * required history available.
+ * Selects a default Git comparison base suited to the current CI context.
  */
 final readonly class CiAwareGit implements Git
 {

@@ -82,6 +82,7 @@ final class CiAwareGitTest extends TestCase
 
         $this->fileSystem = new InMemoryFileSystem();
         $this->logger = new TestLogger();
+
         $this->git = new CiAwareGit(
             $this->decoratedGit,
             $this->fileSystem,
