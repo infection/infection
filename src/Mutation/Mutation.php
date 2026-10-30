@@ -61,8 +61,6 @@ class Mutation
 
     private ?float $nominalTimeToTest = null;
 
-    private ?float $shortestTimeToTest = null;
-
     private ?string $hash = null;
 
     /**
@@ -188,7 +186,7 @@ class Mutation
      */
     public function getShortestTestExecutionTime(): float
     {
-        return $this->shortestTimeToTest ??= (new TestTotalTimeCalculator($this->tests))->getShortestTestTime();
+        return (new TestTotalTimeCalculator($this->tests))->getShortestTestTime();
     }
 
     public function getHash(): string
