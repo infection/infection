@@ -71,6 +71,23 @@ final class PlainFilterTest extends TestCase
             null,
         ];
 
+        yield 'repeated values' => [
+            'src/Foo.php,src/Bar.php,src/Foo.php,src/Bar.php',
+            new PlainFilter([
+                'src/Foo.php',
+                'src/Bar.php',
+            ]),
+        ];
+
+        yield 'whitespace-equivalent values with empty entries preserve first occurrence order' => [
+            ' src/Bar.php, ,src/Bar.php , src/Foo.php,, src/Foo.php ,src/Baz.php, src/Bar.php ',
+            new PlainFilter([
+                'src/Bar.php',
+                3 => 'src/Foo.php',
+                6 => 'src/Baz.php',
+            ]),
+        ];
+
         yield 'spaces & untrimmed string' => [
             '  src/Foo.php,, , src/Bar.php , src/File withSpace.php ',
             new PlainFilter([
