@@ -8,6 +8,7 @@ class SourceClass
     {
         preg_match('/(?:.*controller\\\|.*controllers\\\)([\w\\\]+)controller$/iU', '', $m);
         preg_match('/(?:.*controller\\\\|.*controllers\\\\)([\w\\\\]+)controller$/iU', '', $m);
+        preg_match('/a\\\\|b\\\w/iU', '', $m);
 
         return 'hello';
     }
