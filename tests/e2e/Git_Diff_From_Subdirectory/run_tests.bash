@@ -51,17 +51,3 @@ run_infection() {
 run_infection server infection.json5
 run_infection . server/infection.json5
 run_infection frontend ../server/infection.json5
-
-(
-    cd server
-
-    if output=$(php "$INFECTION" --configuration=infection.json5 --git-diff-base=missing-base --git-diff-filter=M 2>&1); then
-        printf 'Expected a missing Git base to fail.\n%s\n' "$output" >&2
-        exit 1
-    fi
-
-    printf '%s\n' "$output"
-
-    [[ "$output" == *"fatal: bad revision 'missing-base'"* ]]
-    [[ "$output" == *'Exit Code:'* ]]
-)

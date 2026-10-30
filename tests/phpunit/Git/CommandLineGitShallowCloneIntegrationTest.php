@@ -176,13 +176,7 @@ final class CommandLineGitShallowCloneIntegrationTest extends FileSystemTestCase
 
         $this->mergeBase = self::commitGitChanges($repository, 'Common ancestor');
 
-        self::runGit(
-            $repository,
-            [
-                'branch',
-                'feature',
-            ],
-        );
+        self::runGit($repository, ['branch', 'feature']);
 
         FS::dumpFile($repository . '/src/Tax.php', '<?php return 1.21;');
 

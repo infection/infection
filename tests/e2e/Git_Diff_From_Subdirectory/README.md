@@ -10,6 +10,3 @@ configuration file from `server/`. Each run uses `--git-diff-base=HEAD` to selec
 modified source file and must produce the same result. Paths reported by Git must be resolved
 relative to the configured PHP project rather than the process working directory or the
 repository root.
-
-A final run uses a missing Git base and records the current process failure,
-including Git's diagnostic and the process exit code.

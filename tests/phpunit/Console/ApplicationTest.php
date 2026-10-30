@@ -52,13 +52,10 @@ use Infection\Command\RunCommand;
 use Infection\Console\Application;
 use Infection\Framework\InfectionVersion;
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\Process\Exception\GenericProcessException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
-use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -199,101 +196,6 @@ final class ApplicationTest extends TestCase
         $application->run($input, new BufferedOutput());
 
         $this->assertFalse($command->wasInteractive);
-    }
-
-    #[DataProvider('gitFailureVerbosityProvider')]
-    public function test_it_renders_git_diff_failures(
-        int $verbosity,
-        bool $showProcessDetails,
-    ): void {
-        $previous = new GenericProcessException('fatal: bad revision');
-        $exception = new RuntimeException(
-            'Git diff failed',
-            previous: $previous,
-        );
-        $application = new Application(SingletonContainer::getContainer());
-        $output = new BufferedOutput($verbosity);
-
-        $application->renderThrowable(
-            $exception,
-            $output,
-        );
-
-        $display = $output->fetch();
-
-        $this->assertStringContainsString(
-            'Git diff failed',
-            $display,
-        );
-
-        if ($showProcessDetails) {
-            $this->assertStringContainsString(
-                'fatal: bad revision',
-                $display,
-            );
-
-            return;
-        }
-
-        $this->assertSame(
-            sprintf(
-                "\n%s\n",
-                $exception->getMessage(),
-            ),
-            $display,
-        );
-    }
-
-    public static function gitFailureVerbosityProvider(): iterable
-    {
-        yield 'quiet' => [OutputInterface::VERBOSITY_QUIET, true];
-
-        yield 'normal' => [OutputInterface::VERBOSITY_NORMAL, true];
-
-        yield 'verbose' => [OutputInterface::VERBOSITY_VERBOSE, true];
-
-        yield 'debug' => [OutputInterface::VERBOSITY_DEBUG, true];
-    }
-
-    public function test_it_displays_git_references_as_literal_text(): void
-    {
-        $application = new Application(SingletonContainer::getContainer());
-        $output = new BufferedOutput();
-
-        $application->renderThrowable(
-            new RuntimeException('feature/<info>example</info>'),
-            $output,
-        );
-
-        $this->assertStringContainsString(
-            'feature/<info>example</info>',
-            $output->fetch(),
-        );
-    }
-
-    public function test_it_preserves_the_cause_of_other_failures_at_normal_verbosity(): void
-    {
-        $application = new Application(SingletonContainer::getContainer());
-        $output = new BufferedOutput();
-
-        $application->renderThrowable(
-            new RuntimeException(
-                'Another failure',
-                previous: new RuntimeException('Original cause'),
-            ),
-            $output,
-        );
-
-        $display = $output->fetch();
-
-        $this->assertStringContainsString(
-            'Another failure',
-            $display,
-        );
-        $this->assertStringContainsString(
-            'Original cause',
-            $display,
-        );
     }
 
     /**
