@@ -73,6 +73,7 @@ jobs:
                     --max-timeouts=0 \
                     --min-msi=100 \
                     --min-covered-msi=100 \
+                    --with-timeouts \
                     --logger-text=php://stdout
 
     # This is a meta job to avoid to have to constantly change the protection rules
