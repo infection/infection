@@ -45,6 +45,7 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Testing\MutatorName;
+use Infection\Tests\Mutation\MutationBuilder;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -262,26 +263,11 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
         $mutantProcess = new MutantProcess(
             $processMock,
             MutantBuilder::withMinimalTestData()
-                ->withMutation(new Mutation(
-                    'path/to/Foo.php',
-                    [],
-                    For_::class,
-                    MutatorName::getName(For_::class),
-                    [
-                        'startLine' => 10,
-                        'endLine' => 15,
-                        'startTokenPos' => 0,
-                        'endTokenPos' => 8,
-                        'startFilePos' => 2,
-                        'endFilePos' => 4,
-                    ],
-                    'Unknown',
-                    MutatedNode::wrap(new Nop()),
-                    0,
-                    $tests,
-                    [],
-                    '',
-                ))
+                ->withMutation(
+                    MutationBuilder::withMinimalTestData()
+                        ->withTests($tests)
+                        ->build(),
+                )
                 ->build(),
             $this->resultFactory,
         );
