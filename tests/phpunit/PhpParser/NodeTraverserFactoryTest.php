@@ -38,6 +38,7 @@ namespace Infection\Tests\PhpParser;
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\AssignmentVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
@@ -97,6 +98,7 @@ final class NodeTraverserFactoryTest extends TestCase
             SkipIgnoredNodesVisitor::class,
             NameResolver::class,
             ParentConnectingVisitor::class,
+            AssignmentVisitor::class,
             ReflectionVisitor::class,
             ExcludeNonMutableCodeVisitor::class,
             ExcludeUnchangedLinesVisitor::class,

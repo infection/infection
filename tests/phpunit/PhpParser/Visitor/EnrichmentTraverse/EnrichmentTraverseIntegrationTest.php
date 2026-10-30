@@ -1054,6 +1054,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                                 reflectionClass: Infection\Reflection\CoreClassReflection
                                                                 tests: Closure
                                                             )
+                                                            containsSideEffect: true
                                                             eligible: true
                                                             functionName: concreteMethod
                                                             functionScope: nodeId(14)
@@ -1066,6 +1067,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                             tests: Closure
                                                         )
                                                     )
+                                                    containsSideEffect: true
                                                     eligible: true
                                                     functionName: concreteMethod
                                                     functionScope: nodeId(14)
@@ -1078,6 +1080,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     tests: Closure
                                                 )
+                                                containsSideEffect: true
                                                 eligible: true
                                                 functionName: concreteMethod
                                                 functionScope: nodeId(14)
@@ -1091,6 +1094,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 tests: Closure
                                             )
                                         )
+                                        containsSideEffect: true
                                         eligible: true
                                         functionName: concreteMethod
                                         isOnFunctionSignature: true
@@ -1504,6 +1508,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                                 reflectionClass: Infection\Reflection\CoreClassReflection
                                                                 startLine: 49
                                                             )
+                                                            containsSideEffect: true
                                                             eligible: false
                                                             endLine: 49
                                                             functionName: concreteMethod
@@ -1517,6 +1522,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                             startLine: 49
                                                         )
                                                     )
+                                                    containsSideEffect: true
                                                     eligible: false
                                                     endLine: 50
                                                     functionName: concreteMethod
@@ -1530,6 +1536,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     startLine: 48
                                                 )
+                                                containsSideEffect: true
                                                 eligible: true
                                                 endLine: 50
                                                 functionName: concreteMethod
@@ -1545,6 +1552,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 tests: Closure
                                             )
                                         )
+                                        containsSideEffect: true
                                         eligible: true
                                         endLine: 51
                                         functionName: concreteMethod
@@ -2167,6 +2175,210 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         next: nodeId(6)
                         nodeId: 4
                         origNode: nodeId(4)
+                    )
+                )
+                AST,
+        ];
+
+        yield 'method call with an assignment' => [
+            <<<'PHP'
+                <?php
+
+                class Example
+                {
+                    public function run()
+                    {
+                        $this->check($value = load());
+
+                        return $value;
+                    }
+                }
+                PHP,
+            null,
+            <<<'AST'
+                array(
+                    0: Stmt_Class(
+                        name: Identifier(
+                            eligible: false
+                            nodeId: 1
+                            origNode: nodeId(1)
+                            parent: nodeId(0)
+                        )
+                        stmts: array(
+                            0: Stmt_ClassMethod(
+                                name: Identifier(
+                                    eligible: true
+                                    functionName: run
+                                    functionScope: nodeId(2)
+                                    isInsideFunction: true
+                                    isStrictTypes: false
+                                    nodeId: 3
+                                    origNode: nodeId(3)
+                                    parent: nodeId(2)
+                                    reflectionClass: Infection\Reflection\NullReflection
+                                    tests: Closure
+                                )
+                                stmts: array(
+                                    0: Stmt_Expression(
+                                        expr: Expr_MethodCall(
+                                            var: Expr_Variable(
+                                                eligible: true
+                                                functionName: run
+                                                functionScope: nodeId(2)
+                                                isInsideFunction: true
+                                                isStrictTypes: false
+                                                nodeId: 6
+                                                origNode: nodeId(6)
+                                                parent: nodeId(5)
+                                                reflectionClass: Infection\Reflection\NullReflection
+                                                tests: Closure
+                                            )
+                                            name: Identifier(
+                                                eligible: true
+                                                functionName: run
+                                                functionScope: nodeId(2)
+                                                isInsideFunction: true
+                                                isStrictTypes: false
+                                                nodeId: 7
+                                                origNode: nodeId(7)
+                                                parent: nodeId(5)
+                                                reflectionClass: Infection\Reflection\NullReflection
+                                                tests: Closure
+                                            )
+                                            args: array(
+                                                0: Arg(
+                                                    value: Expr_Assign(
+                                                        var: Expr_Variable(
+                                                            eligible: true
+                                                            functionName: run
+                                                            functionScope: nodeId(2)
+                                                            isInsideFunction: true
+                                                            isStrictTypes: false
+                                                            nodeId: 10
+                                                            origNode: nodeId(10)
+                                                            parent: nodeId(9)
+                                                            reflectionClass: Infection\Reflection\NullReflection
+                                                            tests: Closure
+                                                        )
+                                                        expr: Expr_FuncCall(
+                                                            name: Name(
+                                                                eligible: true
+                                                                functionName: run
+                                                                functionScope: nodeId(2)
+                                                                isInsideFunction: true
+                                                                isStrictTypes: false
+                                                                nodeId: 12
+                                                                origNode: nodeId(12)
+                                                                parent: nodeId(11)
+                                                                reflectionClass: Infection\Reflection\NullReflection
+                                                                resolvedName: FullyQualified(load)
+                                                                tests: Closure
+                                                            )
+                                                            eligible: true
+                                                            functionName: run
+                                                            functionScope: nodeId(2)
+                                                            isInsideFunction: true
+                                                            isStrictTypes: false
+                                                            nodeId: 11
+                                                            origNode: nodeId(11)
+                                                            parent: nodeId(9)
+                                                            reflectionClass: Infection\Reflection\NullReflection
+                                                            tests: Closure
+                                                        )
+                                                        containsSideEffect: true
+                                                        eligible: true
+                                                        functionName: run
+                                                        functionScope: nodeId(2)
+                                                        isInsideFunction: true
+                                                        isStrictTypes: false
+                                                        nodeId: 9
+                                                        origNode: nodeId(9)
+                                                        parent: nodeId(8)
+                                                        reflectionClass: Infection\Reflection\NullReflection
+                                                        tests: Closure
+                                                    )
+                                                    containsAssignment: true
+                                                    containsSideEffect: true
+                                                    eligible: true
+                                                    functionName: run
+                                                    functionScope: nodeId(2)
+                                                    isInsideFunction: true
+                                                    isStrictTypes: false
+                                                    nodeId: 8
+                                                    origNode: nodeId(8)
+                                                    parent: nodeId(5)
+                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                    tests: Closure
+                                                )
+                                            )
+                                            containsAssignment: true
+                                            containsSideEffect: true
+                                            eligible: true
+                                            functionName: run
+                                            functionScope: nodeId(2)
+                                            isInsideFunction: true
+                                            isStrictTypes: false
+                                            nodeId: 5
+                                            origNode: nodeId(5)
+                                            parent: nodeId(4)
+                                            reflectionClass: Infection\Reflection\NullReflection
+                                            tests: Closure
+                                        )
+                                        containsAssignment: true
+                                        containsSideEffect: true
+                                        eligible: true
+                                        functionName: run
+                                        functionScope: nodeId(2)
+                                        isInsideFunction: true
+                                        isStrictTypes: false
+                                        next: nodeId(13)
+                                        nodeId: 4
+                                        origNode: nodeId(4)
+                                        parent: nodeId(2)
+                                        reflectionClass: Infection\Reflection\NullReflection
+                                        tests: Closure
+                                    )
+                                    1: Stmt_Return(
+                                        expr: Expr_Variable(
+                                            eligible: true
+                                            functionName: run
+                                            functionScope: nodeId(2)
+                                            isInsideFunction: true
+                                            isStrictTypes: false
+                                            nodeId: 14
+                                            origNode: nodeId(14)
+                                            parent: nodeId(13)
+                                            reflectionClass: Infection\Reflection\NullReflection
+                                            tests: Closure
+                                        )
+                                        eligible: true
+                                        functionName: run
+                                        functionScope: nodeId(2)
+                                        isInsideFunction: true
+                                        isStrictTypes: false
+                                        nodeId: 13
+                                        origNode: nodeId(13)
+                                        parent: nodeId(2)
+                                        reflectionClass: Infection\Reflection\NullReflection
+                                        tests: Closure
+                                    )
+                                )
+                                containsAssignment: true
+                                containsSideEffect: true
+                                eligible: true
+                                functionName: run
+                                isOnFunctionSignature: true
+                                isStrictTypes: false
+                                nodeId: 2
+                                origNode: nodeId(2)
+                                parent: nodeId(0)
+                                reflectionClass: Infection\Reflection\NullReflection
+                                tests: Closure
+                            )
+                        )
+                        eligible: false
+                        nodeId: 0
+                        origNode: nodeId(0)
                     )
                 )
                 AST,

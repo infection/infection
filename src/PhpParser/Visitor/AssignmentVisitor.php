@@ -1,0 +1,148 @@
+<?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
+
+namespace Infection\PhpParser\Visitor;
+
+use Override;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+
+/**
+ * Marks AST nodes that contain assignments or other side effects. Function bodies
+ * do not mark surrounding code, except when a closure or arrow function is
+ * invoked immediately.
+ *
+ * @internal
+ */
+final class AssignmentVisitor extends NodeVisitorAbstract
+{
+    private const string CONTAINS_ASSIGNMENT = 'containsAssignment';
+
+    private const string CONTAINS_SIDE_EFFECT = 'containsSideEffect';
+
+    #[Override]
+    public function leaveNode(Node $node): ?Node
+    {
+        $parent = ParentConnector::findParent($node);
+
+        if (self::isFunctionWithoutImmediateInvocation($node, $parent)) {
+            return null;
+        }
+
+        if (self::containsAssignment($node)) {
+            $parent?->setAttribute(self::CONTAINS_ASSIGNMENT, true);
+        }
+
+        if (self::containsSideEffect($node)) {
+            $parent?->setAttribute(self::CONTAINS_SIDE_EFFECT, true);
+        }
+
+        return null;
+    }
+
+    public static function containsAssignment(Node $node): bool
+    {
+        if (
+            $node instanceof Node\Expr\Assign
+            || $node instanceof Node\Expr\AssignOp
+            || $node instanceof Node\Expr\AssignRef
+        ) {
+            return true;
+        }
+
+        return $node->getAttribute(self::CONTAINS_ASSIGNMENT) === true;
+    }
+
+    public static function containsSideEffect(Node $node): bool
+    {
+        // Creating a function does not execute its body.
+        if ($node instanceof Node\FunctionLike) {
+            return false;
+        }
+
+        if (
+            self::containsAssignment($node)
+            || ($node instanceof Node\Expr\CallLike && !$node->isFirstClassCallable())
+            || $node instanceof Node\Expr\PreInc
+            || $node instanceof Node\Expr\PreDec
+            || $node instanceof Node\Expr\PostInc
+            || $node instanceof Node\Expr\PostDec
+            || $node instanceof Node\Expr\Yield_
+            || $node instanceof Node\Expr\YieldFrom
+            || $node instanceof Node\Expr\Print_
+            || $node instanceof Node\Expr\Include_
+            || $node instanceof Node\Expr\Exit_
+            || $node instanceof Node\Expr\Throw_
+            || $node instanceof Node\Expr\Eval_
+            || $node instanceof Node\Expr\ShellExec
+        ) {
+            return true;
+        }
+
+        return $node->getAttribute(self::CONTAINS_SIDE_EFFECT) === true;
+    }
+
+    /**
+     * Checks whether the node defines a function that is not called immediately.
+     * Passing a closure or arrow function as an argument does not itself execute
+     * its body, so its assignments do not mark the enclosing call:
+     *
+     * ```php
+     * consume(fn () => $state->value = 42);
+     * ```
+     *
+     * Calling the function immediately executes its body, so its assignments do
+     * mark the enclosing call:
+     *
+     * ```php
+     * consume((fn () => $state->value = 42)());
+     * ```
+     *
+     * The first-class callable syntax (...) creates a callable without invoking
+     * it, so this also keeps the assignment separate from the enclosing call:
+     *
+     * ```php
+     * consume((fn () => $state->value = 42)(...));
+     * ```
+     */
+    private static function isFunctionWithoutImmediateInvocation(Node $node, ?Node $parent): bool
+    {
+        return $node instanceof Node\FunctionLike
+            && (
+                !$parent instanceof Node\Expr\FuncCall
+                || $parent->isFirstClassCallable()
+            );
+    }
+}
