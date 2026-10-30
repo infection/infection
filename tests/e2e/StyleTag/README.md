@@ -1,6 +1,7 @@
 # StyleTag e2e test
 
 * https://github.com/infection/infection/issues/2977
+* https://github.com/infection/infection/issues/3730
 
 ## Summary
 When `PregMatchRemoveFlags` mutates a regex containing backslashes (e.g. `\|`, `\)`, `\w`),
