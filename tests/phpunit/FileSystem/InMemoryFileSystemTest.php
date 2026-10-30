@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
+use const DIRECTORY_SEPARATOR;
 use DomainException;
 use Infection\FileSystem\InMemoryFileSystem;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -63,15 +65,49 @@ final class InMemoryFileSystemTest extends TestCase
         $this->assertFalse($this->fileSystem->isReadableDirectory('/path/to/directory'));
     }
 
-    public function test_it_can_dump_and_read_a_file(): void
-    {
-        $filename = '/path/to/file.php';
+    #[DataProvider('filePathsProvider')]
+    public function test_it_can_dump_and_read_a_file(
+        string $filename,
+        string $readPath,
+    ): void {
         $content = '<?php echo "Hello";';
 
         $this->fileSystem->dumpFile($filename, $content);
 
-        $this->assertTrue($this->fileSystem->isReadableFile($filename));
-        $this->assertSame($content, $this->fileSystem->readFile($filename));
+        $this->assertTrue($this->fileSystem->isReadableFile($readPath));
+        $this->assertSame($content, $this->fileSystem->readFile($readPath));
+    }
+
+    public static function filePathsProvider(): iterable
+    {
+        yield 'same POSIX path' => [
+            '/path/to/file.php',
+            '/path/to/file.php',
+        ];
+
+        yield 'POSIX path with dot segments' => [
+            '/path/to/unused/../file.php',
+            '/path/./to/file.php',
+        ];
+
+        if (DIRECTORY_SEPARATOR !== '\\') {
+            return;
+        }
+
+        yield 'Windows backslashes to forward slashes' => [
+            'C:\\path\\to\\file.php',
+            'C:/path/to/file.php',
+        ];
+
+        yield 'Windows forward slashes to backslashes' => [
+            'C:/path/to/file.php',
+            'C:\\path\\to\\file.php',
+        ];
+
+        yield 'Windows path with mixed separators and dot segments' => [
+            'C:\\path/to\\unused/../file.php',
+            'C:/path/./to/file.php',
+        ];
     }
 
     public function test_it_can_create_a_directory(): void
@@ -97,7 +133,7 @@ final class InMemoryFileSystemTest extends TestCase
 
     public function test_it_cannot_dump_a_file_where_a_directory_exists(): void
     {
-        $this->fileSystem->mkdir('/path/to/directory');
+        $this->fileSystem->mkdir('/path/to/unused/../directory');
 
         $this->expectException(DomainException::class);
         $this->expectExceptionMessage('Cannot dump file "/path/to/directory": a directory exists at the same path.');
@@ -107,12 +143,12 @@ final class InMemoryFileSystemTest extends TestCase
 
     public function test_it_cannot_create_a_directory_where_a_file_exists(): void
     {
-        $this->fileSystem->dumpFile('/path/to/file.php', 'content');
+        $this->fileSystem->dumpFile('/path/to/unused/../file.php', 'content');
 
         $this->expectException(DomainException::class);
-        $this->expectExceptionMessage('Cannot create directory "/path/to/file.php": a file exists at the same path.');
+        $this->expectExceptionMessage('Cannot create directory "/path/to/./file.php": a file exists at the same path.');
 
-        $this->fileSystem->mkdir('/path/to/file.php');
+        $this->fileSystem->mkdir('/path/to/./file.php');
     }
 
     public function test_it_can_create_multiple_directories(): void
@@ -136,10 +172,10 @@ final class InMemoryFileSystemTest extends TestCase
 
     public function test_it_overwrites_existing_files_on_dump(): void
     {
-        $filename = '/path/to/file.php';
+        $filename = '/path/to/unused/../file.php';
 
         $this->fileSystem->dumpFile($filename, 'first');
-        $this->fileSystem->dumpFile($filename, 'second');
+        $this->fileSystem->dumpFile('/path/to/file.php', 'second');
 
         $this->assertSame('second', $this->fileSystem->readFile($filename));
     }

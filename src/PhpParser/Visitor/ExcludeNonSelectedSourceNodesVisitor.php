@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
-use function array_key_last;
-use function array_pop;
 use Infection\Source\Matcher\SourceSymbolMatcher;
 use Override;
 use PhpParser\Node;
@@ -47,92 +45,26 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class ExcludeNonSelectedSourceNodesVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @var list<Node\Stmt\ClassLike>
-     */
-    private array $classStack = [];
-
-    /**
-     * @var list<Node\Stmt\ClassMethod>
-     */
-    private array $methodStack = [];
-
     public function __construct(
         private readonly SourceSymbolMatcher $matcher,
+        private readonly CollectSourceSymbolsVisitor $symbols,
     ) {
-    }
-
-    #[Override]
-    public function beforeTraverse(array $nodes): null
-    {
-        $this->classStack = [];
-        $this->methodStack = [];
-
-        return null;
     }
 
     #[Override]
     public function enterNode(Node $node): null
     {
-        if ($node instanceof Node\Stmt\ClassLike) {
-            $this->classStack[] = $node;
-        }
-
-        if ($node instanceof Node\Stmt\ClassMethod) {
-            $this->methodStack[] = $node;
-        }
-
         if (
             LabelNodesAsEligibleVisitor::isEligible($node)
-            && !$this->matches($node)
+            && !$this->matcher->matches(
+                $node,
+                $this->symbols->findClass(),
+                $this->symbols->findMethod(),
+            )
         ) {
             LabelNodesAsEligibleVisitor::markAsIneligible($node);
         }
 
         return null;
-    }
-
-    #[Override]
-    public function leaveNode(Node $node): null
-    {
-        if ($node instanceof Node\Stmt\ClassMethod) {
-            array_pop($this->methodStack);
-        }
-
-        if ($node instanceof Node\Stmt\ClassLike) {
-            array_pop($this->classStack);
-        }
-
-        return null;
-    }
-
-    /**
-     * @template T of Node
-     *
-     * @param list<T> $nodes
-     *
-     * @return T|null
-     */
-    private static function findLastNode(array $nodes): ?Node
-    {
-        $key = array_key_last($nodes);
-
-        if ($key === null) {
-            return null;
-        }
-
-        return $nodes[$key];
-    }
-
-    private function matches(Node $node): bool
-    {
-        $class = self::findLastNode($this->classStack);
-        $method = self::findLastNode($this->methodStack);
-
-        return $this->matcher->matches(
-            $node,
-            $class,
-            $method,
-        );
     }
 }

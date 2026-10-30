@@ -38,6 +38,7 @@ namespace Infection\Console;
 use function array_merge;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\Debug\DumpAstCommand;
+use Infection\Command\Debug\ListSymbolsCommand;
 use Infection\Command\Debug\MockTeamCityCommand;
 use Infection\Command\DescribeCommand;
 use Infection\Command\Git\GitBaseReferenceCommand;
@@ -126,7 +127,7 @@ final class Application extends BaseApplication
     #[Override]
     protected function getDefaultCommands(): array
     {
-        $fileSystem = Container::create()->getFileSystem();
+        $fileSystem = $this->container->getFileSystem();
 
         return array_merge(
             parent::getDefaultCommands(),
@@ -134,6 +135,7 @@ final class Application extends BaseApplication
                 new ConfigureCommand($fileSystem),
                 new MockTeamCityCommand($fileSystem),
                 new DumpAstCommand($fileSystem),
+                new ListSymbolsCommand($fileSystem),
                 new GitBaseReferenceCommand(),
                 new GitChangedFilesCommand(),
                 new GitChangedLinesCommand(),
