@@ -739,7 +739,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
 
         yield 'non-existent positional path' => [
             'file' => __DIR__ . '/EchoGreeter.php',
-            'expectedMessage' => 'Invalid path argument "./Missing.php": multiple paths must be passed as separate arguments.',
+            'expectedMessage' => 'Invalid positional argument "./Missing.php": expected a readable file or directory, a source path filter or a source symbol selector.',
             'options' => [
                 '--configuration' => __DIR__ . '/infection.json5',
                 'paths' => [
