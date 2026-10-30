@@ -18,7 +18,8 @@ git init --quiet
 git config user.email infection@infection.github.io
 git config user.name Infection
 git add src
-git commit --quiet --no-gpg-sign --message baseline
+# Keep the fixture commit independent of the user's Git hooks.
+git -c core.hooksPath=/dev/null commit --quiet --no-gpg-sign --message baseline
 
 cp src/SourceClass.php src/SourceClass.php.original
 sed --in-place=.bak 's/return true;/return true; \/\/ Changed/' src/SourceClass.php
