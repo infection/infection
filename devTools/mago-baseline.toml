@@ -4894,7 +4894,7 @@ count = 1
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "less-specific-nested-argument-type"
 message = 'Argument type mismatch for argument #2 of `Infection\Tests\Process\Runner\MutationTestingRunnerTest::assertAreSameEvents`: expected `array<array-key, Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted|Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished|Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted>`, but provided type `array<array-key, mixed>` is less specific.'
-count = 7
+count = 8
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"

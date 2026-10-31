@@ -165,8 +165,8 @@ class MutationTestingRunner
 
     private function takingTooLong(Mutant $mutant): bool
     {
-        // TODO refactor this comparison into a dedicated comparer to make it possible to swap strategies
-        if ($mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout) {
+        // any test running within the timeout may still kill the mutant, so we skip only when all of them are too slow.
+        if ($mutant->getMutation()->getShortestTestExecutionTime() < $this->timeout) {
             return true;
         }
 

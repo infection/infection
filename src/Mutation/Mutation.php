@@ -181,6 +181,14 @@ class Mutation
         return $this->nominalTimeToTest ??= (new TestTotalTimeCalculator($this->tests))->getTotalTestTime();
     }
 
+    /**
+     * Time needed to run the fastest known test for a mutation
+     */
+    public function getShortestTestExecutionTime(): float
+    {
+        return (new TestTotalTimeCalculator($this->tests))->getShortestTestTime();
+    }
+
     public function getHash(): string
     {
         return $this->hash ??= $this->createHash();
