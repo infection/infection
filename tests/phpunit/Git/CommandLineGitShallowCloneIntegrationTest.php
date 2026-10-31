@@ -43,6 +43,7 @@ use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\GitRepositorySetup;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use Psr\Log\Test\TestLogger;
 use function Safe\chdir;
 
@@ -50,9 +51,13 @@ use function Safe\chdir;
  * Kept separate from CommandLineGitIntegrationTest because these scenarios need
  * more setup: a repository with diverging branches and a shallow clone whose
  * history each test fetches differently.
+ *
+ * Windows is excluded because Symfony 6.4 cannot reliably remove Git's read-only
+ * object files when cleaning up these repositories.
  */
 #[Group('integration')]
 #[CoversClass(CommandLineGit::class)]
+#[RequiresOperatingSystem('Linux|Darwin')]
 final class CommandLineGitShallowCloneIntegrationTest extends FileSystemTestCase
 {
     use GitRepositorySetup;

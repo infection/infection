@@ -39,13 +39,19 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use function Safe\chmod;
 use function Safe\file_get_contents;
 use function Safe\putenv;
 
+/**
+ * Windows is excluded because Symfony 6.4 cannot reliably remove Git's read-only
+ * object files when cleaning up these repositories.
+ */
 #[Group('integration')]
 #[CoversTrait(GitRepositorySetup::class)]
+#[RequiresOperatingSystem('Linux|Darwin')]
 #[WithEnvironmentVariable('GIT_AUTHOR_NAME', 'Another author')]
 #[WithEnvironmentVariable('GIT_AUTHOR_EMAIL', 'author@example.com')]
 #[WithEnvironmentVariable('GIT_COMMITTER_NAME', 'Another committer')]
