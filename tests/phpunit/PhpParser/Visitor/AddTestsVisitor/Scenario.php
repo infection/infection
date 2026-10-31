@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\AddTestsVisitor;
 
-use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 
 final class Scenario
@@ -53,7 +52,7 @@ final class Scenario
         public int $expectedTraceCallCount,
         public array $expectedTests,
     ) {
-        $this->expectedHasTests = count($this->expectedTests) > 0;
+        $this->expectedHasTests = $this->expectedTests !== [];
     }
 
     public function withIsEligible(?bool $isEligible): self
@@ -98,7 +97,7 @@ final class Scenario
     {
         $clone = clone $this;
         $clone->expectedTests = $expectedTests;
-        $clone->expectedHasTests = count($expectedTests) > 0;
+        $clone->expectedHasTests = $expectedTests !== [];
 
         return $clone;
     }

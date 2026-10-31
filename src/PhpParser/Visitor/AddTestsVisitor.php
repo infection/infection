@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\PhpParser\Visitor;
 
 use Closure;
-use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
@@ -85,7 +84,7 @@ final class AddTestsVisitor extends NodeVisitorAbstract
 
     public static function hasTests(Node $node): bool
     {
-        return count(self::getTests($node)) > 0;
+        return self::getTests($node) !== [];
     }
 
     /**

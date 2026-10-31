@@ -37,7 +37,6 @@ namespace Infection\Configuration\SourceFilter;
 
 use function array_filter;
 use function array_map;
-use function count;
 use function explode;
 use function implode;
 
@@ -61,7 +60,7 @@ final readonly class PlainFilter implements SourceFileFilter
     {
         $values = self::parseValues($value);
 
-        return count($values) === 0
+        return $values === []
             ? null
             : new self($values);
     }

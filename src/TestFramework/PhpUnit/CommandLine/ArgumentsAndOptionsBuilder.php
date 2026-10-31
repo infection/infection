@@ -37,7 +37,6 @@ namespace Infection\TestFramework\PhpUnit\CommandLine;
 
 use function array_map;
 use function array_merge;
-use function count;
 use function implode;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
@@ -93,7 +92,7 @@ final readonly class ArgumentsAndOptionsBuilder
     {
         $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
 
-        if ($this->executeOnlyCoveringTestCases && count($tests) > 0) {
+        if ($this->executeOnlyCoveringTestCases && $tests !== []) {
             $filter = $this->createFilterString(
                 $tests,
                 $testFrameworkVersion,
@@ -148,7 +147,7 @@ final readonly class ArgumentsAndOptionsBuilder
             useWindowsFilterLimit: $this->useWindowsFilterLimit,
         );
 
-        return count($filters) === 0
+        return $filters === []
             ? null
             : sprintf(
                 '/%s/',

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -96,6 +95,6 @@ final class Finally_ implements Mutator
         $parentNode = ParentConnector::getParent($node);
         Assert::isInstanceOf($parentNode, Node\Stmt\TryCatch::class);
 
-        return count($parentNode->catches) > 0;
+        return $parentNode->catches !== [];
     }
 }

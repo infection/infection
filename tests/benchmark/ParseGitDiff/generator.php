@@ -172,7 +172,7 @@ final readonly class Configuration
         }
 
         // Validate file extensions is non-empty array
-        if (count($fileExtensions) === 0) {
+        if ($fileExtensions === []) {
             throw new InvalidArgumentException('fileExtensions must be a non-empty array');
         }
 
@@ -299,7 +299,7 @@ final readonly class Generator
             $fileSizes[] = $size;
         }
 
-        if (count($fileSizes) === 0) {
+        if ($fileSizes === []) {
             throw new InvalidArgumentException('fileSizes must be a non-empty array!');
         }
 

@@ -62,7 +62,6 @@ use function array_map;
 use function array_search;
 use function array_values;
 use BackedEnum;
-use function count;
 use function get_debug_type;
 use function implode;
 use OutOfBoundsException;
@@ -138,7 +137,7 @@ final class EnumBucket
 
     public function isEmpty(): bool
     {
-        return count($this->values) === 0;
+        return $this->values === [];
     }
 
     public function assertIsEmpty(): void
