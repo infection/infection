@@ -38,7 +38,6 @@ namespace Infection\Git;
 use function array_filter;
 use function array_map;
 use function array_merge;
-use function count;
 use function implode;
 use Infection\Differ\ChangedLinesParser;
 use Infection\Source\Exception\NoSourceFound;
