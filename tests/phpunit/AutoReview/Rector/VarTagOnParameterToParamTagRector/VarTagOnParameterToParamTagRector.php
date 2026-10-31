@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\Rector;
+namespace Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector;
 
 use Override;
 use PhpParser\Node;

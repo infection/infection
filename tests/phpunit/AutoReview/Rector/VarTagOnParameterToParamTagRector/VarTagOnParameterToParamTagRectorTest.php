@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\Rector;
+namespace Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector;
 
 use Iterator;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -53,7 +53,7 @@ final class VarTagOnParameterToParamTagRectorTest extends AbstractRectorTestCase
 
     public static function provideFixtures(): Iterator
     {
-        return self::yieldFilesFromDirectory(__DIR__ . '/Fixture');
+        return self::yieldFilesFromDirectory(__DIR__ . '/Fixtures');
     }
 
     public function provideConfigFilePath(): string

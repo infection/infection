@@ -34,7 +34,7 @@
 declare(strict_types=1);
 
 use Infection\Tests\AutoReview\Rector\CountArrayToEmptyArrayComparisonRector\CountArrayToEmptyArrayComparisonRector;
-use Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector;
+use Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector\VarTagOnParameterToParamTagRector;
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\CodeQuality\Rector\BooleanNot\NegatedAndsToPositiveOrsRector;
 use Rector\CodeQuality\Rector\BooleanNot\SimplifyDeMorganBinaryRector;
