@@ -160,6 +160,50 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
             ),
         ];
 
+        yield 'It does not remove a method call assigning a variable in its arguments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->checkAccess($prospect = $this->find($id));
+                    $this->checkCart($cart = $this->find($id));
+                    $this->checkOther(foo($other = 1));
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not remove a method call compound or reference assigning a variable in its arguments' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->foo($a += 1);
+                    self::bar($b = &$c);
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not remove a method call assigning a variable in its caller' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ($a = new Foo())?->bar();
+                    PHP,
+            ),
+        ];
+
+        yield 'It removes a method call with an assignment scoped to a closure argument' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->foo(function () {
+                        $a = 1;
+                    }, fn () => $b = 2);
+                    $a = 3;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+
+                    $a = 3;
+                    PHP,
+            ),
+        ];
+
         yield 'It does not remove a function call' => [
             self::wrapCodeInMethod(
                 <<<'PHP'
