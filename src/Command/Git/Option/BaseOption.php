@@ -64,7 +64,7 @@ final class BaseOption
             self::NAME,
             null,
             InputOption::VALUE_REQUIRED,
-            'Git base, can be a commit hash, a short name or full name. Will lookup for the default base branch if none provided.',
+            'Git base, can be a commit hash, a short name or full name. Uses CI metadata or the repository default branch if none provided.',
         );
     }
 
