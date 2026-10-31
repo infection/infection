@@ -90,17 +90,20 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
      */
     private static function testCaseMapGenerator(string $testId): iterable
     {
+        // The exact-match queries are parenthesised so that `[1]` picks the first match of the whole
+        // document rather than the first match of each parent: a test may be listed in several test suites.
+
         // A default format for <testsuite>
-        yield '//testsuite[@name="%s"][1]' => $testId;
+        yield '(//testsuite[@name="%s"])[1]' => $testId;
 
         // A format where the class name is inside `class` attribute of `testcase` tag
-        yield '//testcase[@class="%s"][1]' => $testId;
+        yield '(//testcase[@class="%s"])[1]' => $testId;
 
         // A format where the class name is inside `file` attribute of `testcase` tag
         yield '//testcase[contains(@file, "%s")][1]' => preg_replace('/^(.*):+.*$/', '$1.feature', $testId);
 
         // A format where the class name parsed from feature and is inside `class` attribute of `testcase` tag
-        yield '//testcase[@class="%s"][1]' => preg_replace('/^(.*):+.*$/', '$1', $testId);
+        yield '(//testcase[@class="%s"])[1]' => preg_replace('/^(.*):+.*$/', '$1', $testId);
     }
 
     private function getXPath(): SafeDOMXPath
