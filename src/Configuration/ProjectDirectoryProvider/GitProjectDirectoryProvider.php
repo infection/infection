@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Configuration\ProjectDirectoryProvider;
 
 use Infection\Git\Git;
-use Infection\Git\NoGitProjectFound;
+use Infection\Git\Throwable\NoGitProjectFound;
 use Psr\Log\LoggerInterface;
 
 /**

@@ -39,7 +39,7 @@ use function implode;
 use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
-use Infection\Git\NoGitProjectFound;
+use Infection\Git\Throwable\NoGitProjectFound;
 use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\TestingUtility\FS;
