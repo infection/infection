@@ -140,6 +140,35 @@ final class RunCommandTest extends TestCase
         ]);
     }
 
+    /**
+     * @param array<string, mixed> $input
+     */
+    #[DataProvider('diffFileCombinationProvider')]
+    public function test_it_fails_when_the_diff_file_is_combined_with_another_source_filter(array $input): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The option "--diff-file" cannot be used together with source paths or the options "--filter", "--git-diff-filter", "--git-diff-lines" and "--git-diff-base".');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute(['--diff-file' => 'changes.diff', ...$input]);
+    }
+
+    public static function diffFileCombinationProvider(): iterable
+    {
+        yield 'source paths' => [['paths' => ['src/Engine.php']]];
+
+        yield '--filter' => [['--filter' => 'src/Engine.php']];
+
+        yield '--git-diff-filter' => [['--git-diff-filter' => 'AM']];
+
+        yield '--git-diff-lines' => [['--git-diff-lines' => true]];
+
+        yield '--git-diff-base' => [['--git-diff-base' => 'master']];
+    }
+
     public function test_it_fails_when_a_positional_path_does_not_exist_on_disk(): void
     {
         $this->expectException(InvalidArgumentException::class);
