@@ -33,6 +33,7 @@
 
 declare(strict_types=1);
 
+use Infection\Tests\AutoReview\Rector\CountArrayToEmptyArrayComparisonRector\CountArrayToEmptyArrayComparisonRector;
 use Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector;
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\CodeQuality\Rector\BooleanNot\NegatedAndsToPositiveOrsRector;
@@ -118,6 +119,7 @@ $config = RectorConfig::configure()
         AddReturnDocblockForJsonArrayRector::class,
         AddParamArrayDocblockFromDimFetchAccessRector::class,
         ClassMethodArrayDocblockParamFromLocalCallsRector::class,
+        CountArrayToEmptyArrayComparisonRector::class,
         DocblockGetterReturnArrayFromPropertyDocblockVarRector::class,
         DocblockVarArrayFromGetterReturnRector::class,
         DocblockVarArrayFromPropertyDefaultsRector::class,
@@ -147,6 +149,10 @@ $config = RectorConfig::configure()
         AssertEmptyNullableObjectToAssertInstanceofRector::class,
         AssertEqualsOrAssertSameFloatParameterToSpecificMethodsTypeRector::class,
         ClosureReturnTypeRector::class,
+        CountArrayToEmptyArrayComparisonRector::class => [
+            // Keep cosmetic differences from the vendored sebastian/diff implementation to a minimum.
+            __DIR__ . '/src/Differ/UnifiedDiffOutputBuilder.php',
+        ],
         DataProviderArrayItemsNewLinedRector::class,
         FlipTypeControlToUseExclusiveTypeRector::class,
         LocallyCalledStaticMethodToNonStaticRector::class,
