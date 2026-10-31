@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Git;
 
 use Infection\Differ\ChangedLinesRange;
+use Infection\Git\Throwable\GitDiffFailed;
 use Infection\Git\Throwable\NoGitProjectFound;
 use Infection\Source\Exception\NoSourceFound;
 
@@ -86,6 +87,7 @@ interface Git
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string $workingDirectory Directory from which to interpret source paths.
      *
+     * @throws GitDiffFailed
      * @throws NoSourceFound
      *
      * @return non-empty-list<non-empty-string>
@@ -115,6 +117,7 @@ interface Git
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string $workingDirectory Directory from which to interpret source paths.
      *
+     * @throws GitDiffFailed
      * @throws NoSourceFound
      *
      * @return non-empty-array<string, list<ChangedLinesRange>>

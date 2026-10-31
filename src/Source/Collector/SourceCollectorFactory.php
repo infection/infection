@@ -41,6 +41,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFileFilter;
 use Infection\Git\Git;
+use Infection\Git\Throwable\GitDiffFailed;
 use InvalidArgumentException;
 use function sprintf;
 use const true;
@@ -57,6 +58,8 @@ final readonly class SourceCollectorFactory
 
     /**
      * @param non-empty-string $configurationPathname
+     *
+     * @throws GitDiffFailed
      */
     public function create(
         string $configurationPathname,
