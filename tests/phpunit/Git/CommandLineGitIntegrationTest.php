@@ -43,6 +43,7 @@ use Infection\Git\NoGitProjectFound;
 use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\TestingUtility\FS;
+use Infection\Tests\TestingUtility\GitRepositorySetup;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\chdir;
@@ -57,6 +58,8 @@ use Webmozart\Assert\Assert;
 #[CoversClass(CommandLineGit::class)]
 final class CommandLineGitIntegrationTest extends FileSystemTestCase
 {
+    use GitRepositorySetup;
+
     // https://github.com/infection/infection/commit/40d08afda22d5fe6d0d87ffb95fd609dcb01992a
     // At minimum we will have the following files in the entire output:
     // - src/Git/CommandLineGit.php
@@ -124,24 +127,8 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         FS::dumpFile($projectDirectory . '/src/SourceClass.php', 'before');
         FS::dumpFile($this->tmp . '/shared/SharedClass.php', 'before');
 
-        $executor = new SymfonyProcessShellCommandRunner();
-        $executor->mustRun(['git', '-C', $this->tmp, 'init', '--quiet']);
-        $executor->mustRun(['git', '-C', $this->tmp, 'add', '.']);
-        $executor->mustRun([
-            'git',
-            '-C',
-            $this->tmp,
-            '-c',
-            'user.name=Infection',
-            '-c',
-            'user.email=infection@infection.github.io',
-            '-c',
-            'commit.gpgsign=false',
-            'commit',
-            '--quiet',
-            '-m',
-            'baseline',
-        ]);
+        self::initializeGitRepository($this->tmp);
+        self::commitGitChanges($this->tmp, 'baseline');
 
         FS::dumpFile($projectDirectory . '/src/SourceClass.php', 'after');
         FS::dumpFile($this->tmp . '/shared/SharedClass.php', 'after');
@@ -159,6 +146,25 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         );
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_fails_to_get_changed_files_outside_a_git_repository(): void
+    {
+        $workingDirectory = $this->tmp;
+        Assert::stringNotEmpty(
+            $workingDirectory,
+            'The temporary fixture directory must be initialized before running Git.',
+        );
+
+        $this->expectException(ProcessFailedException::class);
+        $this->expectExceptionMessage('not a git repository');
+
+        $this->git->getChangedFilePaths(
+            'AM',
+            'HEAD',
+            ['src'],
+            $workingDirectory,
+        );
     }
 
     public function test_it_fails_at_getting_the_relative_paths_of_the_changed_files_if_getting_the_merge_base_failed_unexpectedly(): void
@@ -309,12 +315,14 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
     private static function checkIfCommitReferenceExists(string $reference): bool
     {
         try {
-            (new SymfonyProcessShellCommandRunner())->mustRun([
-                'git',
-                'cat-file',
-                '-e',
-                $reference,
-            ]);
+            self::runGit(
+                '.',
+                [
+                    'cat-file',
+                    '-e',
+                    $reference,
+                ],
+            );
 
             return true;
         } catch (ProcessFailedException) {
