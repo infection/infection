@@ -112,50 +112,79 @@ final class TestLocationBucketSorterTest extends TestCase
         $this->assertSame([$testLocation1, $testLocation2], $sortedTestLocations);
     }
 
+    /**
+     * @param list<float|null> $times
+     * @param list<float|null> $expectedTimes
+     */
+    #[DataProvider('fastestFirstProvider')]
+    public function test_it_puts_the_fastest_test_location_first(
+        array $times,
+        array $expectedTimes,
+    ): void {
+        $testLocations = array_map(
+            static fn (?float $time): TestLocation => new TestLocation('', '', $time),
+            $times,
+        );
+
+        $sortedTestLocations = iterator_to_array(
+            TestLocationBucketSorter::bucketSort($testLocations),
+            false,
+        );
+
+        $this->assertSame(
+            $expectedTimes,
+            array_map(
+                static fn (TestLocation $location): ?float => $location->getExecutionTime(),
+                $sortedTestLocations,
+            ),
+        );
+    }
+
     public static function fastestFirstProvider(): iterable
     {
-        yield 'no tests' => [[], []];
-
-        yield 'fastest test moves to the front of an eighth of a second bucket' => [
-            ['a' => 0.1, 'b' => 0.05, 'c' => 0.01],
-            ['c', 'a', 'b'],
+        yield 'within a 4 seconds bucket' => [
+            [11.0, 8.1],
+            [8.1, 11.0],
         ];
 
-        yield 'fastest test moves to the front of a 4 seconds bucket' => [
-            ['a' => 11.0, 'b' => 8.1],
-            ['b', 'a'],
+        yield 'within an eighth of a second bucket' => [
+            [0.1, 0.01],
+            [0.01, 0.1],
         ];
 
-        yield 'first of the fastest tests with the same time stays first' => [
-            ['a' => 0.01, 'b' => 0.01],
-            ['a', 'b'],
+        // Only the fastest test is moved to the front, the rest of the bucket stays unsorted
+        yield 'fastest test added last' => [
+            [0.1, 0.05, 0.01],
+            [0.01, 0.1, 0.05],
         ];
 
-        yield 'only the first bucket is reordered' => [
-            ['a' => 0.01, 'b' => 11.0, 'c' => 8.1],
-            ['a', 'b', 'c'],
+        yield 'fastest test added first' => [
+            [0.01, 0.1, 0.05],
+            [0.01, 0.1, 0.05],
+        ];
+
+        yield 'test without execution time added last' => [
+            [0.05, null],
+            [null, 0.05],
+        ];
+
+        yield 'test without execution time added first' => [
+            [null, 0.05],
+            [null, 0.05],
         ];
     }
 
-    /**
-     * @param array<string, float> $timesByMethod
-     * @param list<string> $expectedMethods
-     */
-    #[DataProvider('fastestFirstProvider')]
-    public function test_it_puts_the_fastest_test_first(array $timesByMethod, array $expectedMethods): void
+    public function test_it_keeps_the_order_of_test_locations_with_the_same_time(): void
     {
-        $testLocations = [];
+        $testLocation1 = new TestLocation('first', '', 0.05);
+        $testLocation2 = new TestLocation('second', '', 0.05);
 
-        foreach ($timesByMethod as $method => $time) {
-            $testLocations[] = new TestLocation($method, '', $time);
-        }
-
-        $sortedMethods = array_map(
-            static fn (TestLocation $testLocation): string => $testLocation->getMethod(),
-            iterator_to_array(TestLocationBucketSorter::bucketSort($testLocations), false),
+        $sortedTestLocations = iterator_to_array(
+            TestLocationBucketSorter::bucketSort([$testLocation1, $testLocation2]),
+            false,
         );
 
-        $this->assertSame($expectedMethods, $sortedMethods);
+        $this->assertSame([$testLocation1, $testLocation2], $sortedTestLocations);
     }
 
     /**
