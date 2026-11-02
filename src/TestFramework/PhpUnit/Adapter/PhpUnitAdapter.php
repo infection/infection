@@ -135,6 +135,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
             throw InitialTestsFailed::fromProcess(
                 $initialTestSuiteProcess,
                 $this->getName(),
+                'tests',
                 $this->getInitialTestsFailRecommendations(
                     $initialTestSuiteProcess->getCommandLine(),
                 ),

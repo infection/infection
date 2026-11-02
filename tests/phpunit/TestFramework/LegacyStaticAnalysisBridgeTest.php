@@ -85,6 +85,7 @@ final class LegacyStaticAnalysisBridgeTest extends TestCase
         $failure = InitialTestsFailed::fromCompletedProcess(
             $process,
             'PHPStan',
+            'static analysis',
             '',
         );
         $this->runner

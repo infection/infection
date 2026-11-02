@@ -102,6 +102,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
             throw InitialTestsFailed::fromProcess(
                 $initialTestSuiteProcess,
                 $this->getName(),
+                'tests',
                 $this->adapter->getInitialTestsFailRecommendations(
                     $initialTestSuiteProcess->getCommandLine(),
                 ),

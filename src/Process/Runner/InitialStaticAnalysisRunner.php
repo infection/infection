@@ -80,6 +80,7 @@ readonly class InitialStaticAnalysisRunner
             throw InitialTestsFailed::fromCompletedProcess(
                 $process,
                 $this->staticAnalysisToolAdapter->getName(),
+                'static analysis',
                 '',
             );
         }

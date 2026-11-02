@@ -51,6 +51,7 @@ final class InitialTestsFailed extends RuntimeException implements InitialTestsF
     public static function fromProcess(
         Process $process,
         string $testFramework,
+        string $testFrameworkType,
         string $recommendations,
     ): self {
         $exitCode = $process->getExitCode();
@@ -64,6 +65,7 @@ final class InitialTestsFailed extends RuntimeException implements InitialTestsF
             $process->getOutput(),
             $process->getErrorOutput(),
             $testFramework,
+            $testFrameworkType,
             $recommendations,
         );
     }
@@ -71,6 +73,7 @@ final class InitialTestsFailed extends RuntimeException implements InitialTestsF
     public static function fromCompletedProcess(
         CompletedProcess $process,
         string $testFramework,
+        string $testFrameworkType,
         string $recommendations,
     ): self {
         return self::fromOutput(
@@ -78,6 +81,7 @@ final class InitialTestsFailed extends RuntimeException implements InitialTestsF
             $process->stdout,
             $process->stderr,
             $testFramework,
+            $testFrameworkType,
             $recommendations,
         );
     }
@@ -87,10 +91,14 @@ final class InitialTestsFailed extends RuntimeException implements InitialTestsF
         string $stdOut,
         string $stdError,
         string $testFramework,
+        string $testFrameworkType,
         string $recommendations,
     ): self {
         $lines = [
-            'Project tests must be in a passing state before running Infection.',
+            sprintf(
+                'Project %s must be in a passing state before running Infection.',
+                $testFrameworkType,
+            ),
             $recommendations,
             sprintf(
                 '%s reported an exit code of %d.',

@@ -52,6 +52,8 @@ final class InitialTestsFailedTest extends TestCase
         string $stdout,
         string $stderr,
         string $expectedOutput,
+        string $testFrameworkType,
+        string $expectedOpening,
     ): void {
         $process = $this->createMock(Process::class);
         $process
@@ -73,6 +75,7 @@ final class InitialTestsFailedTest extends TestCase
         $exception = InitialTestsFailed::fromProcess(
             $process,
             'PHPUnit',
+            $testFrameworkType,
             'Recommendations',
         );
 
@@ -81,8 +84,8 @@ final class InitialTestsFailedTest extends TestCase
             $exception,
         );
         $this->assertSame(
-            <<<'MESSAGE'
-                Project tests must be in a passing state before running Infection.
+            $expectedOpening . "\n"
+            . <<<'MESSAGE'
                 Recommendations
                 PHPUnit reported an exit code of 3.
                 Refer to the PHPUnit's output below:
@@ -97,6 +100,8 @@ final class InitialTestsFailedTest extends TestCase
         string $stdout,
         string $stderr,
         string $expectedOutput,
+        string $testFrameworkType,
+        string $expectedOpening,
     ): void {
         $process = new CompletedProcess(
             ['phpstan', 'analyse'],
@@ -108,6 +113,7 @@ final class InitialTestsFailedTest extends TestCase
         $exception = InitialTestsFailed::fromCompletedProcess(
             $process,
             'PHPStan',
+            $testFrameworkType,
             'Recommendations',
         );
 
@@ -116,8 +122,8 @@ final class InitialTestsFailedTest extends TestCase
             $exception,
         );
         $this->assertSame(
-            <<<'MESSAGE'
-                Project tests must be in a passing state before running Infection.
+            $expectedOpening . "\n"
+            . <<<'MESSAGE'
                 Recommendations
                 PHPStan reported an exit code of 3.
                 Refer to the PHPStan's output below:
@@ -141,6 +147,7 @@ final class InitialTestsFailedTest extends TestCase
         InitialTestsFailed::fromProcess(
             $process,
             'PHPUnit',
+            'tests',
             '',
         );
     }
@@ -151,24 +158,48 @@ final class InitialTestsFailedTest extends TestCase
             'output string',
             'error string',
             "\nSTDOUT:\noutput string\nSTDERR:\nerror string",
+            'tests',
+            'Project tests must be in a passing state before running Infection.',
         ];
 
         yield 'standard output only' => [
             'output string',
             '',
             "\nSTDOUT:\noutput string",
+            'tests',
+            'Project tests must be in a passing state before running Infection.',
         ];
 
         yield 'standard error only' => [
             '',
             'error string',
             "\nSTDERR:\nerror string",
+            'tests',
+            'Project tests must be in a passing state before running Infection.',
         ];
 
         yield 'no output' => [
             '',
             '',
             '',
+            'tests',
+            'Project tests must be in a passing state before running Infection.',
+        ];
+
+        yield 'static analysis failure' => [
+            'output string',
+            'error string',
+            "\nSTDOUT:\noutput string\nSTDERR:\nerror string",
+            'static analysis',
+            'Project static analysis must be in a passing state before running Infection.',
+        ];
+
+        yield 'custom framework category' => [
+            '',
+            '',
+            '',
+            'lint checks',
+            'Project lint checks must be in a passing state before running Infection.',
         ];
     }
 }

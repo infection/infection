@@ -147,7 +147,14 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
         ;
 
         $this->expectException(InitialTestsFailed::class);
-        $this->expectExceptionMessageMatches('/phpstan reported an exit code of 3\\./');
+        $this->expectExceptionMessage(
+            <<<'MESSAGE'
+                Project static analysis must be in a passing state before running Infection.
+
+                phpstan reported an exit code of 3.
+                Refer to the phpstan's output below:
+                MESSAGE,
+        );
 
         $this->runner->run();
     }
