@@ -68,10 +68,6 @@ final readonly class TestRunOrderResolver
      */
     public function resolve(array $tests): iterable
     {
-        if ($tests === []) {
-            return [];
-        }
-
         $uniqueTestLocations = $this->uniqueByTestFile($tests);
 
         $numberOfTestLocation = count($uniqueTestLocations);
@@ -137,9 +133,9 @@ final readonly class TestRunOrderResolver
     }
 
     /**
-     * @param non-empty-array<TestLocation> $testLocations
+     * @param TestLocation[] $testLocations
      *
-     * @return non-empty-array<TestLocation>
+     * @return TestLocation[]
      */
     private function uniqueByTestFile(array $testLocations): array
     {
