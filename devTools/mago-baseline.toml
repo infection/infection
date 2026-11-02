@@ -3554,12 +3554,6 @@ count = 1
 
 [[issues]]
 file = "src/TestFramework/Tracing/TestLocationBucketSorter.php"
-code = "possible-method-access-on-null"
-message = "Attempting to call a method on `null`."
-count = 2
-
-[[issues]]
-file = "src/TestFramework/Tracing/TestLocationBucketSorter.php"
 code = "possibly-null-operand"
 message = "Left operand in `<` comparison might be `null` (type `float|null`)."
 count = 1
@@ -3568,12 +3562,6 @@ count = 1
 file = "src/TestFramework/Tracing/TestLocationBucketSorter.php"
 code = "possibly-null-operand"
 message = "Right operand in `<` comparison might be `null` (type `float|null`)."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/Tracing/TestLocationBucketSorter.php"
-code = "yield-from-invalid-value-type"
-message = 'Invalid value type from `yield from`: current generator expects to yield `Infection\AbstractTestFramework\Coverage\TestLocation`, but the inner iterable yields `Infection\AbstractTestFramework\Coverage\TestLocation|null`.'
 count = 1
 
 [[issues]]
@@ -5242,6 +5230,12 @@ count = 1
 file = "tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php"
 code = "missing-parameter-type"
 message = "Parameter `$uniqueTestLocations` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `Infection\TestFramework\Tracing\TestLocationBucketSorter::bucketSort`: expected `non-empty-array<array-key, Infection\AbstractTestFramework\Coverage\TestLocation>`, but possibly received `list<Infection\AbstractTestFramework\Coverage\TestLocation>`.'
 count = 1
 
 [[issues]]
