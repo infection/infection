@@ -3868,7 +3868,7 @@ count = 1
 file = "tests/benchmark/ParseGitDiff/generator.php"
 code = "impossible-condition"
 message = "This condition (type `false`) will always evaluate to false."
-count = 11
+count = 9
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/generator.php"
@@ -3880,7 +3880,7 @@ count = 8
 file = "tests/benchmark/ParseGitDiff/generator.php"
 code = "redundant-comparison"
 message = "Redundant `===` comparison: left-hand side is never identical to right-hand side."
-count = 3
+count = 1
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/profile.php"

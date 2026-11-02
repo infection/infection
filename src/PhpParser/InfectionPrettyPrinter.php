@@ -36,14 +36,40 @@ declare(strict_types=1);
 namespace Infection\PhpParser;
 
 use Override;
+use PhpParser\Node\Scalar\String_;
 use PhpParser\PrettyPrinter\Standard;
 use function Safe\preg_replace;
+use function str_starts_with;
+use function strtr;
+use function substr;
 
 /**
  * @internal
  */
 final class InfectionPrettyPrinter extends Standard
 {
+    /**
+     * A mutated string keeps the attributes of the original one, including its raw value.
+     * When the original source used PHP-Parser's own escaping (canonical '\\\\|'), print the
+     * mutated string the same way, so the diff only shows what the mutator changed.
+     */
+    #[Override]
+    protected function pScalar_String(String_ $node): string
+    {
+        /** @var string $rawValue */
+        $rawValue = $node->getAttribute('rawValue', '');
+
+        if ($node->getAttribute('kind') === String_::KIND_SINGLE_QUOTED && str_starts_with($rawValue, '\'')) {
+            $originalValue = strtr(substr($rawValue, 1, -1), ['\\\\' => '\\', '\\\'' => '\'']);
+
+            if (parent::pSingleQuotedString($originalValue) === $rawValue) {
+                return parent::pSingleQuotedString($node->value);
+            }
+        }
+
+        return parent::pScalar_String($node);
+    }
+
     /**
      * Prints a single-quoted string using minimal escaping.
      *

@@ -33,29 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\Rector;
+namespace Infection\Tests\AutoReview\Rector\CountArrayToEmptyArrayComparisonRector;
 
 use Iterator;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
-#[CoversClass(VarTagOnParameterToParamTagRector::class)]
+#[CoversClass(CountArrayToEmptyArrayComparisonRector::class)]
 #[Group('integration')]
-final class VarTagOnParameterToParamTagRectorTest extends AbstractRectorTestCase
+final class CountArrayToEmptyArrayComparisonRectorTest extends AbstractRectorTestCase
 {
     #[DataProvider('provideFixtures')]
-    public function test_it_moves_var_tags_to_the_method(string $fixture): void
+    public function test_it_compares_arrays_directly_when_checking_emptiness(string $fixture): void
     {
         $this->doTestFile($fixture);
     }
 
     public static function provideFixtures(): Iterator
     {
-        return self::yieldFilesFromDirectory(__DIR__ . '/Fixture');
+        return self::yieldFilesFromDirectory(__DIR__ . '/Fixtures');
     }
 
+    #[Override]
     public function provideConfigFilePath(): string
     {
         return __DIR__ . '/config/configured_rule.php';

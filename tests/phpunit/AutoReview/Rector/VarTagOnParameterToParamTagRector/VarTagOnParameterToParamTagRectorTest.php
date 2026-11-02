@@ -33,9 +33,31 @@
 
 declare(strict_types=1);
 
-use Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector;
-use Rector\Config\RectorConfig;
+namespace Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector;
 
-return RectorConfig::configure()
-    ->withRules([VarTagOnParameterToParamTagRector::class])
-;
+use Iterator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Rector\Testing\PHPUnit\AbstractRectorTestCase;
+
+#[CoversClass(VarTagOnParameterToParamTagRector::class)]
+#[Group('integration')]
+final class VarTagOnParameterToParamTagRectorTest extends AbstractRectorTestCase
+{
+    #[DataProvider('provideFixtures')]
+    public function test_it_moves_var_tags_to_the_method(string $fixture): void
+    {
+        $this->doTestFile($fixture);
+    }
+
+    public static function provideFixtures(): Iterator
+    {
+        return self::yieldFilesFromDirectory(__DIR__ . '/Fixtures');
+    }
+
+    public function provideConfigFilePath(): string
+    {
+        return __DIR__ . '/config/configured_rule.php';
+    }
+}

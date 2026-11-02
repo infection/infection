@@ -828,7 +828,7 @@ final class MutationTestingRunnerTest extends TestCase
      */
     private function formatExpectedEvents(array $events): string
     {
-        if (count($events) === 0) {
+        if ($events === []) {
             return ' Ø (no events)';
         }
 

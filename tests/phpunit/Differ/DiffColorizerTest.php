@@ -35,10 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Differ;
 
+use Infection\Console\OutputFormatterStyleConfigurator;
 use Infection\Differ\DiffColorizer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 #[CoversClass(DiffColorizer::class)]
 final class DiffColorizerTest extends TestCase
@@ -53,6 +56,7 @@ final class DiffColorizerTest extends TestCase
         $actual = (new DiffColorizer())->colorize($originalDiff);
 
         $this->assertSame($expected, $actual);
+        $this->assertFormatterAcceptsOutput($actual);
     }
 
     public static function provideDiffs(): iterable
@@ -216,6 +220,24 @@ final class DiffColorizerTest extends TestCase
                 CODE,
         ];
 
+        yield 'backslash right before an inline diff tag' => [
+            <<<'CODE'
+
+                -        preg_match('/a\\\\|b/i', $x);
+                +        preg_match('/a\\\|b/', $x);
+                CODE,
+            "<code>\n\n<diff-del>-        preg_match('/a\0\0\0<diff-del-inline>\0|b/i</diff-del-inline>', \$x);</diff-del>\n<diff-add>+        preg_match('/a\0\0\0<diff-add-inline>|b/</diff-add-inline>', \$x);</diff-add></code>",
+        ];
+
+        yield 'backslashes in both encodings right before an inline diff tag' => [
+            <<<'CODE'
+
+                -        preg_match('/a\\\\|b\\\w/iU', '', $m);
+                +        preg_match('/a\\\|b\\\w/iU', '', $m);
+                CODE,
+            "<code>\n\n<diff-del>-        preg_match('/a\0\0\0<diff-del-inline>\0</diff-del-inline>|b\0\0\0w/iU', '', \$m);</diff-del>\n<diff-add>+        preg_match('/a\0\0\0|b\0\0\0w/iU', '', \$m);</diff-add></code>",
+        ];
+
         yield 'multibyte characters full-deletion' => [
             <<<'CODE'
                      function ($a) {
@@ -247,5 +269,17 @@ final class DiffColorizerTest extends TestCase
                      }</code>
                 CODE,
         ];
+    }
+
+    private function assertFormatterAcceptsOutput(string $colorizedDiff): void
+    {
+        $output = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, true);
+        OutputFormatterStyleConfigurator::configure($output);
+
+        // throws on an incorrectly nested style tag
+        $output->getFormatter()->format($colorizedDiff);
+
+        // @phpstan-ignore method.internal
+        $this->addToAssertionCount(1);
     }
 }
