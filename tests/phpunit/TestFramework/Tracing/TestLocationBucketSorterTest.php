@@ -121,6 +121,7 @@ final class TestLocationBucketSorterTest extends TestCase
         array $times,
         array $expectedTimes,
     ): void {
+        /** @var non-empty-array<TestLocation> $testLocations */
         $testLocations = array_map(
             static fn (?float $time): TestLocation => new TestLocation('', '', $time),
             $times,
@@ -193,6 +194,7 @@ final class TestLocationBucketSorterTest extends TestCase
     #[DataProvider('locationsArrayProvider')]
     public function test_it_sorts_correctly(ArrayIterator $uniqueTestLocations): void
     {
+        /** @var non-empty-array<TestLocation> $uniqueTestLocations */
         $uniqueTestLocations = $uniqueTestLocations->getArrayCopy();
 
         $sortedTestLocations = iterator_to_array(
@@ -236,6 +238,7 @@ final class TestLocationBucketSorterTest extends TestCase
 
         $uniqueTestLocations = $uniqueTestLocations->getArrayCopy();
 
+        /** @var non-empty-array<TestLocation> $uniqueTestLocations */
         if (self::areConstraintsOrderValid($uniqueTestLocations)) {
             // Ignore silently as to not pollute to the log.
             $this->expectNotToPerformAssertions();
