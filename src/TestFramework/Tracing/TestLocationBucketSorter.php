@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
-use function array_pop;
 use function array_shift;
 use function array_unshift;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
