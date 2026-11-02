@@ -52,6 +52,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 use function usort;
 
 /**
@@ -127,18 +128,12 @@ final class TestLocationBucketSorterTest extends TestCase
             $times,
         );
 
-        $sortedTestLocations = iterator_to_array(
-            TestLocationBucketSorter::bucketSort($testLocations),
-            false,
-        );
+        $actualTimes = take(TestLocationBucketSorter::bucketSort($testLocations))
+            ->cast(static fn (TestLocation $location): ?float => $location->getExecutionTime())
+            ->toList()
+        ;
 
-        $this->assertSame(
-            $expectedTimes,
-            array_map(
-                static fn (TestLocation $location): ?float => $location->getExecutionTime(),
-                $sortedTestLocations,
-            ),
-        );
+        $this->assertSame($expectedTimes, $actualTimes);
     }
 
     public static function fastestFirstProvider(): iterable
