@@ -5222,6 +5222,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `Infection\TestFramework\Tracing\TestLocationBucketSorter::bucketSort`: expected `non-empty-array<array-key, Infection\AbstractTestFramework\Coverage\TestLocation>`, but possibly received `list<Infection\AbstractTestFramework\Coverage\TestLocation>`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php"
 code = "possibly-null-operand"
 message = "Left operand in `>` comparison might be `null` (type `float|null`)."
 count = 1
