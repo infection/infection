@@ -66,7 +66,7 @@ final readonly class TestLocationBucketSorter
     /**
      * Sorts tests to run the fastest first. Exposed for benchmarking purposes.
      *
-     * @param TestLocation[] $uniqueTestLocations
+     * @param non-empty-array<TestLocation> $uniqueTestLocations
      *
      * @return iterable<TestLocation>
      */
