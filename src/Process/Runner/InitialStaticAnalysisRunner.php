@@ -60,6 +60,9 @@ readonly class InitialStaticAnalysisRunner
     ) {
     }
 
+    /**
+     * @throws InitialStaticAnalysisRunFailed
+     */
     public function run(): void
     {
         $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());

@@ -399,12 +399,6 @@ count = 1
 [[issues]]
 file = "src/Command/RunCommand.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Process\Runner\InitialStaticAnalysisRunFailed` in `Infection\Command\RunCommand::executeCommand`.'
-count = 1
-
-[[issues]]
-file = "src/Command/RunCommand.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\RunCommand::executeCommand`.'
 count = 1
 
@@ -1450,12 +1444,6 @@ count = 3
 file = "src/Differ/UnifiedDiffOutputBuilder.php"
 code = "redundant-comparison"
 message = "Redundant `===` comparison: left-hand side is never identical to right-hand side."
-count = 1
-
-[[issues]]
-file = "src/Engine.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Contracts\Throwable\InitialTestsFailed` in `Infection\Engine::execute`.'
 count = 1
 
 [[issues]]
@@ -2751,12 +2739,6 @@ count = 1
 [[issues]]
 file = "src/Process/Runner/InitialStaticAnalysisRunner.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Process\Runner\InitialStaticAnalysisRunFailed` in `Infection\Process\Runner\InitialStaticAnalysisRunner::run`.'
-count = 1
-
-[[issues]]
-file = "src/Process/Runner/InitialStaticAnalysisRunner.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Process\Runner\InitialStaticAnalysisRunner::run`.'
 count = 1
 
@@ -3247,12 +3229,6 @@ message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceF
 count = 1
 
 [[issues]]
-file = "src/TestFramework/LegacyTestFrameworkBridge.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Process\Runner\InitialTestsFailed` in `Infection\TestFramework\LegacyTestFrameworkBridge::executeInitialRun`.'
-count = 1
-
-[[issues]]
 file = "src/TestFramework/PHPStan/Adapter/PHPStanAdapter.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter::assertMinimumVersionSatisfied`.'
@@ -3328,12 +3304,6 @@ count = 1
 file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter::getMutantCommandLine`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Process\Runner\InitialTestsFailed` in `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter::executeInitialRun`.'
 count = 1
 
 [[issues]]
