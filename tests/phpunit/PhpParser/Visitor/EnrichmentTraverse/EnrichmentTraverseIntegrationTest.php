@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Configuration\Configuration;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\Container\Container;
 use Infection\Differ\ChangedLinesRange;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
@@ -45,6 +47,7 @@ use Infection\Source\MatcherLine\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Testing\SingletonContainer;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -62,15 +65,20 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
 
     /**
      * @param list<ChangedLinesRange>|null $changedLinesRange
+     * @param list<SourceSymbolSelector> $sourceSymbolSelectors
      */
     #[DataProvider('nodeProvider')]
     public function test_it_creates_a_rich_ast(
         string $code,
         ?array $changedLinesRange,
+        array $sourceSymbolSelectors,
         string $expected,
     ): void {
         $traverserFactory = $this
-            ->createContainer($changedLinesRange)
+            ->createContainer(
+                $changedLinesRange,
+                $sourceSymbolSelectors,
+            )
             ->getNodeTraverserFactory()
         ;
 
@@ -104,6 +112,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         yield 'random example' => [
             file_get_contents(self::FIXTURES_DIR . '/TwoAdditions.php'),
             null,
+            [],
             <<<'AST'
                 array(
                     0: Stmt_Declare(
@@ -345,9 +354,254 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                 AST,
         ];
 
+        yield 'source selection keeps only the selected covered method eligible' => [
+            file_get_contents(self::FIXTURES_DIR . '/TwoAdditions.php'),
+            null,
+            [
+                new SourceSymbolSelector(
+                    __NAMESPACE__ . '\Fixtures\TwoAdditions',
+                    'first',
+                    null,
+                ),
+            ],
+            <<<'AST'
+                array(
+                    0: Stmt_Declare(
+                        declares: array(
+                            0: DeclareItem(
+                                key: Identifier(
+                                    eligible: false
+                                    nodeId: 2
+                                    origNode: nodeId(2)
+                                    parent: nodeId(1)
+                                )
+                                value: Scalar_Int(
+                                    eligible: false
+                                    kind: KIND_DEC (10)
+                                    nodeId: 3
+                                    origNode: nodeId(3)
+                                    parent: nodeId(1)
+                                    rawValue: 1
+                                )
+                                eligible: false
+                                nodeId: 1
+                                origNode: nodeId(1)
+                                parent: nodeId(0)
+                            )
+                        )
+                        eligible: false
+                        next: nodeId(4)
+                        nodeId: 0
+                        origNode: nodeId(0)
+                    )
+                    1: Stmt_Namespace(
+                        name: Name(
+                            eligible: false
+                            nodeId: 5
+                            origNode: nodeId(5)
+                            parent: nodeId(4)
+                        )
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier(
+                                    eligible: false
+                                    nodeId: 7
+                                    origNode: nodeId(7)
+                                    parent: nodeId(6)
+                                )
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            eligible: true
+                                            functionName: first
+                                            functionScope: nodeId(8)
+                                            isInsideFunction: true
+                                            isStrictTypes: true
+                                            nodeId: 9
+                                            origNode: nodeId(9)
+                                            parent: nodeId(8)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
+                                        )
+                                        returnType: Identifier(
+                                            eligible: true
+                                            functionName: first
+                                            functionScope: nodeId(8)
+                                            isInsideFunction: true
+                                            isStrictTypes: true
+                                            nodeId: 10
+                                            origNode: nodeId(10)
+                                            parent: nodeId(8)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Return(
+                                                expr: Expr_BinaryOp_Plus(
+                                                    left: Scalar_Int(
+                                                        eligible: true
+                                                        functionName: first
+                                                        functionScope: nodeId(8)
+                                                        isInsideFunction: true
+                                                        isStrictTypes: true
+                                                        kind: KIND_DEC (10)
+                                                        nodeId: 13
+                                                        origNode: nodeId(13)
+                                                        parent: nodeId(12)
+                                                        rawValue: 1
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        tests: Closure
+                                                    )
+                                                    right: Scalar_Int(
+                                                        eligible: true
+                                                        functionName: first
+                                                        functionScope: nodeId(8)
+                                                        isInsideFunction: true
+                                                        isStrictTypes: true
+                                                        kind: KIND_DEC (10)
+                                                        nodeId: 14
+                                                        origNode: nodeId(14)
+                                                        parent: nodeId(12)
+                                                        rawValue: 2
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        tests: Closure
+                                                    )
+                                                    eligible: true
+                                                    functionName: first
+                                                    functionScope: nodeId(8)
+                                                    isInsideFunction: true
+                                                    isStrictTypes: true
+                                                    nodeId: 12
+                                                    origNode: nodeId(12)
+                                                    parent: nodeId(11)
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    tests: Closure
+                                                )
+                                                eligible: true
+                                                functionName: first
+                                                functionScope: nodeId(8)
+                                                isInsideFunction: true
+                                                isStrictTypes: true
+                                                nodeId: 11
+                                                origNode: nodeId(11)
+                                                parent: nodeId(8)
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                tests: Closure
+                                            )
+                                        )
+                                        eligible: true
+                                        functionName: first
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: true
+                                        nodeId: 8
+                                        origNode: nodeId(8)
+                                        parent: nodeId(6)
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                        tests: Closure
+                                    )
+                                    1: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            eligible: false
+                                            functionName: second
+                                            functionScope: nodeId(15)
+                                            isInsideFunction: true
+                                            isStrictTypes: true
+                                            nodeId: 16
+                                            origNode: nodeId(16)
+                                            parent: nodeId(15)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                        )
+                                        returnType: Identifier(
+                                            eligible: false
+                                            functionName: second
+                                            functionScope: nodeId(15)
+                                            isInsideFunction: true
+                                            isStrictTypes: true
+                                            nodeId: 17
+                                            origNode: nodeId(17)
+                                            parent: nodeId(15)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Return(
+                                                expr: Expr_BinaryOp_Minus(
+                                                    left: Scalar_Int(
+                                                        eligible: false
+                                                        functionName: second
+                                                        functionScope: nodeId(15)
+                                                        isInsideFunction: true
+                                                        isStrictTypes: true
+                                                        kind: KIND_DEC (10)
+                                                        nodeId: 20
+                                                        origNode: nodeId(20)
+                                                        parent: nodeId(19)
+                                                        rawValue: 1
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    )
+                                                    right: Scalar_Int(
+                                                        eligible: false
+                                                        functionName: second
+                                                        functionScope: nodeId(15)
+                                                        isInsideFunction: true
+                                                        isStrictTypes: true
+                                                        kind: KIND_DEC (10)
+                                                        nodeId: 21
+                                                        origNode: nodeId(21)
+                                                        parent: nodeId(19)
+                                                        rawValue: 2
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    )
+                                                    eligible: false
+                                                    functionName: second
+                                                    functionScope: nodeId(15)
+                                                    isInsideFunction: true
+                                                    isStrictTypes: true
+                                                    nodeId: 19
+                                                    origNode: nodeId(19)
+                                                    parent: nodeId(18)
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                )
+                                                eligible: false
+                                                functionName: second
+                                                functionScope: nodeId(15)
+                                                isInsideFunction: true
+                                                isStrictTypes: true
+                                                nodeId: 18
+                                                origNode: nodeId(18)
+                                                parent: nodeId(15)
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                            )
+                                        )
+                                        eligible: false
+                                        functionName: second
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: true
+                                        nodeId: 15
+                                        origNode: nodeId(15)
+                                        parent: nodeId(6)
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                    )
+                                )
+                                eligible: false
+                                nodeId: 6
+                                origNode: nodeId(6)
+                                parent: nodeId(4)
+                            )
+                        )
+                        eligible: false
+                        kind: 1
+                        next: nodeId(6)
+                        nodeId: 4
+                        origNode: nodeId(4)
+                    )
+                )
+                AST,
+        ];
+
         yield 'function declaration' => [
             file_get_contents(self::FIXTURES_DIR . '/Function_.php'),
             null,
+            [],
             <<<'AST'
                 array(
                     0: Stmt_Declare(
@@ -482,6 +736,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         yield 'trait declaration' => [
             file_get_contents(self::FIXTURES_DIR . '/TraitExample.php'),
             null,
+            [],
             <<<'AST'
                 array(
                     0: Stmt_Declare(
@@ -680,6 +935,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         yield 'interface declaration' => [
             file_get_contents(self::FIXTURES_DIR . '/InterfaceExample.php'),
             null,
+            [],
             <<<'AST'
                 array(
                     0: Stmt_Declare(
@@ -789,6 +1045,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         yield 'concrete class' => [
             file_get_contents(self::FIXTURES_DIR . '/ConcreteClass.php'),
             null,
+            [],
             <<<'AST'
                 array(
                     0: Stmt_Declare(
@@ -1198,6 +1455,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         yield 'concrete class with one line of a method changed' => [
             file_get_contents(self::FIXTURES_DIR . '/ConcreteClass.php'),
             [ChangedLinesRange::forLine(46)],
+            [],
             <<<'AST'
                 array(
                     0: Stmt_Declare(
@@ -1664,6 +1922,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         yield 'class with an abstract method' => [
             file_get_contents(self::FIXTURES_DIR . '/AbstractMethod.php'),
             null,
+            [],
             <<<'AST'
                 array(
                     0: Stmt_Declare(
@@ -1879,6 +2138,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         yield 'with incorrect usage infection-ignore-all' => [
             file_get_contents(self::FIXTURES_DIR . '/ProblematicIgnoreAll.php'),
             null,
+            [],
             <<<'AST'
                 array(
                     0: Stmt_Declare(
@@ -2175,18 +2435,33 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
 
     /**
      * @param list<ChangedLinesRange>|null $changedLinesRange
+     * @param list<SourceSymbolSelector> $sourceSymbolSelectors
      */
     private function createContainer(
         ?array $changedLinesRange,
+        array $sourceSymbolSelectors,
     ): Container {
         $sourceLineMatcher = $changedLinesRange === null
             ? new NullSourceLineMatcher()
             : new SimpleSourceLineMatcher($changedLinesRange);
 
-        return SingletonContainer::getContainer()
+        $container = SingletonContainer::getContainer();
+
+        $configuration = ConfigurationBuilder::from(
+            $container->getConfiguration(),
+        )
+            ->withSourceSymbolSelectors(...$sourceSymbolSelectors)
+            ->build()
+        ;
+
+        return $container
             ->cloneWithService(
                 SourceLineMatcher::class,
                 $sourceLineMatcher,
+            )
+            ->cloneWithService(
+                Configuration::class,
+                $configuration,
             )
         ;
     }

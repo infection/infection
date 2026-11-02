@@ -1538,7 +1538,7 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
-        yield 'positional source selectors preserve ambiguous path filters and test paths' => [
+        yield 'positional source selectors and function names preserve path filters and test paths' => [
             $defaultScenario
                 ->withInput(
                     $defaultInputBuilder->withSourceFilter(
@@ -1547,16 +1547,45 @@ final class ConfigurationFactoryTest extends TestCase
                             'Differ::diff',
                             'UnifiedDiffOutputBuilder',
                             'Infection\\Differ\\Differ::diffToArray',
+                            'calculateInvoiceTotal',
+                            'App\Billing\calculateInvoiceTotal',
+                            '\calculateInvoiceTotal',
+                            '\App\Billing\calculateInvoiceTotal',
                         ]),
                     ),
                 )
                 ->withExpected(
                     $defaultConfigurationBuilder
-                        ->withSourceFilter(new PlainFilter(['UnifiedDiffOutputBuilder']))
+                        ->withSourceFilter(
+                            new PlainFilter([
+                                'UnifiedDiffOutputBuilder',
+                                'calculateInvoiceTotal',
+                            ]),
+                        )
                         ->withSourceSymbolSelectors(
                             new SourceSymbolSelector('Differ', 'diff', null),
                             new SourceSymbolSelector('UnifiedDiffOutputBuilder', null, null),
                             new SourceSymbolSelector(Differ::class, 'diffToArray', null),
+                            new SourceSymbolSelector(
+                                'calculateInvoiceTotal',
+                                null,
+                                null,
+                            ),
+                            new SourceSymbolSelector(
+                                'App\Billing\calculateInvoiceTotal',
+                                null,
+                                null,
+                            ),
+                            new SourceSymbolSelector(
+                                '\calculateInvoiceTotal',
+                                null,
+                                null,
+                            ),
+                            new SourceSymbolSelector(
+                                '\App\Billing\calculateInvoiceTotal',
+                                null,
+                                null,
+                            ),
                         )
                         ->withTestFrameworkExtraOptions('tests/FooTest.php')
                         ->build(),
