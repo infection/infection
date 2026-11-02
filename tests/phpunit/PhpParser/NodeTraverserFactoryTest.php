@@ -39,6 +39,7 @@ use function array_map;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\CollectSourceSymbolsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonSelectedSourceNodesVisitor;
@@ -53,6 +54,8 @@ use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Interface_;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
@@ -129,7 +132,16 @@ final class NodeTraverserFactoryTest extends TestCase
         yield 'with source selection' => [
             false,
             [
-                ...$baseVisitors,
+                NextConnectingVisitor::class,
+                LabelNodesAsEligibleVisitor::class,
+                ExcludeIgnoredNodesVisitor::class,
+                SkipIgnoredNodesVisitor::class,
+                NameResolver::class,
+                CollectSourceSymbolsVisitor::class,
+                ParentConnectingVisitor::class,
+                ReflectionVisitor::class,
+                ExcludeNonMutableCodeVisitor::class,
+                ExcludeUnchangedLinesVisitor::class,
                 ExcludeNonSelectedSourceNodesVisitor::class,
                 AddTestsVisitor::class,
             ],
@@ -141,6 +153,37 @@ final class NodeTraverserFactoryTest extends TestCase
                 ),
             ],
         ];
+    }
+
+    public function test_it_can_create_a_traverser_for_collecting_source_symbols(): void
+    {
+        $symbolsVisitor = new CollectSourceSymbolsVisitor();
+
+        $traverser = NodeTraverserFactory::createSourceSymbolTraverser(
+            $symbolsVisitor,
+        );
+
+        $nodes = [
+            new Interface_('Contract'),
+            new Class_('Example'),
+        ];
+        $expectedSymbols = ['Example'];
+
+        $this->assertTraverserVisitorsAre(
+            $traverser,
+            [
+                NextConnectingVisitor::class,
+                LabelNodesAsEligibleVisitor::class,
+                ExcludeIgnoredNodesVisitor::class,
+                SkipIgnoredNodesVisitor::class,
+                NameResolver::class,
+                CollectSourceSymbolsVisitor::class,
+            ],
+        );
+
+        $traverser->traverse($nodes);
+
+        $this->assertSame($expectedSymbols, $symbolsVisitor->getSymbols());
     }
 
     public function test_it_can_create_a_traverser_for_generating_mutations(): void

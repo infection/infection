@@ -39,6 +39,7 @@ use function array_map;
 use function array_values;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\Debug\DumpAstCommand;
+use Infection\Command\Debug\ListSymbolsCommand;
 use Infection\Command\Debug\MockTeamCityCommand;
 use Infection\Command\DescribeCommand;
 use Infection\Command\Git\GitBaseReferenceCommand;
@@ -91,6 +92,8 @@ final class ApplicationTest extends TestCase
         yield 'initial test run' => [InitialTestRunCommand::class];
 
         yield 'list sources' => [ListSourcesCommand::class];
+
+        yield 'list symbols' => [ListSymbolsCommand::class];
 
         yield 'make custom mutator' => [MakeCustomMutatorCommand::class];
 
