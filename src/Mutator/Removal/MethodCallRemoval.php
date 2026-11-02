@@ -39,7 +39,11 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
+use Infection\PhpParser\Visitor\AssignmentVisitor;
 use PhpParser\Node;
+use function Pipeline\take;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -53,11 +57,13 @@ final class MethodCallRemoval implements Mutator
     public static function getDefinition(): Definition
     {
         return new Definition(
-            'Removes the method call.',
+            'Removes the method call while preserving assignments in its receiver and arguments.',
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-                - $this->fooBar();
+                - $this->checkAccess($user = $this->findUser($id));
+                + $user = $this->findUser($id);
+                  return $user;
                 DIFF,
         );
     }
@@ -65,21 +71,159 @@ final class MethodCallRemoval implements Mutator
     /**
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Stmt\Nop>
+     * @return iterable<Node\Stmt\Nop|list<Node\Stmt\Expression>>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Stmt\Nop();
+        if (!AssignmentVisitor::containsAssignment($node->expr)) {
+            yield new Node\Stmt\Nop();
+
+            return;
+        }
+
+        yield self::removeCallPreservingAssignments($node);
     }
 
     public function canMutate(Node $node): bool
     {
-        if (!$node instanceof Node\Stmt\Expression) {
+        if (!$node instanceof Node\Stmt\Expression
+            || !self::isMethodCall($node->expr)
+        ) {
             return false;
         }
 
-        return $node->expr instanceof Node\Expr\MethodCall
-            || $node->expr instanceof Node\Expr\NullsafeMethodCall
-            || $node->expr instanceof Node\Expr\StaticCall;
+        if (!AssignmentVisitor::containsAssignment($node->expr)) {
+            return true;
+        }
+
+        // Splitting a nullsafe chain would evaluate arguments even when its receiver is null.
+        if (self::isInNullsafeChain($node->expr)) {
+            return false;
+        }
+
+        foreach ($node->expr->args as $argument) {
+            // Unpacking consumes iterators; callable placeholders do not evaluate arguments.
+            if (!$argument instanceof Node\Arg || $argument->unpack) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @phpstan-assert-if-true Node\Expr\MethodCall|Node\Expr\NullsafeMethodCall|Node\Expr\StaticCall $expression
+     */
+    private static function isMethodCall(Node\Expr $expression): bool
+    {
+        return $expression instanceof Node\Expr\MethodCall
+            || $expression instanceof Node\Expr\NullsafeMethodCall
+            || $expression instanceof Node\Expr\StaticCall;
+    }
+
+    /**
+     * @psalm-mutation-free
+     *
+     * @return non-empty-list<Node\Stmt\Expression>
+     */
+    private static function removeCallPreservingAssignments(Node\Stmt\Expression $node): array
+    {
+        $call = $node->expr;
+
+        Assert::isInstanceOfAny(
+            $call,
+            [
+                Node\Expr\MethodCall::class,
+                Node\Expr\StaticCall::class,
+            ],
+            'Assignment-preserving removal supports only MethodCall and StaticCall nodes; got %s. Check MethodCallRemoval::canMutate().',
+        );
+
+        // Keep whole expressions: extracting nested assignments could change conditional
+        // execution, and other operands can affect the values assigned later in the call.
+        $statements = take(self::getEvaluatedExpressions($call))
+            // Standalone reads and literals are rejected as unused by static analysers.
+            ->filter(AssignmentVisitor::containsSideEffect(...))
+            ->cast(self::wrapInStatement(...))
+            ->toList()
+        ;
+
+        Assert::notEmpty(
+            $statements,
+            'A method call containing an assignment must retain at least one expression.',
+        );
+
+        // Keep the original statement's printing anchor and comments on the first expression.
+        $firstStatement = clone $node;
+        $firstStatement->expr = $statements[0]->expr;
+        $statements[0] = $firstStatement;
+
+        return $statements;
+    }
+
+    private static function wrapInStatement(Node\Expr $expression): Node\Stmt\Expression
+    {
+        return new Node\Stmt\Expression(
+            $expression,
+            NodeAttributes::getAllExceptOriginalNode($expression),
+        );
+    }
+
+    /**
+     * @return iterable<Node\Expr>
+     */
+    private static function getEvaluatedExpressions(Node\Expr\MethodCall|Node\Expr\StaticCall $call): iterable
+    {
+        $receiver = $call instanceof Node\Expr\StaticCall
+            ? $call->class
+            : $call->var;
+
+        if ($receiver instanceof Node\Expr) {
+            yield $receiver;
+        }
+
+        if ($call->name instanceof Node\Expr) {
+            yield $call->name;
+        }
+
+        foreach ($call->getArgs() as $argument) {
+            yield $argument->value;
+        }
+    }
+
+    /**
+     * Checks whether the call itself or an earlier operation in its receiver chain
+     * uses PHP's nullsafe operator (`?->`). For example:
+     *
+     * ```php
+     * $service?->prepare()->check($value = load());
+     * ```
+     *
+     * A null $service skips check() and its arguments. Splitting that call into
+     * separate expressions would execute the assignment unconditionally.
+     *
+     * Only receiver links are followed. Nullsafe expressions inside arguments remain
+     * intact when those complete argument expressions are retained.
+     */
+    private static function isInNullsafeChain(Node $node): bool
+    {
+        while ($node instanceof Node\Expr) {
+            if ($node instanceof Node\Expr\NullsafeMethodCall
+                || $node instanceof Node\Expr\NullsafePropertyFetch
+            ) {
+                return true;
+            }
+
+            $node = match (true) {
+                $node instanceof Node\Expr\MethodCall,
+                $node instanceof Node\Expr\PropertyFetch,
+                $node instanceof Node\Expr\ArrayDimFetch => $node->var,
+                $node instanceof Node\Expr\StaticCall,
+                $node instanceof Node\Expr\StaticPropertyFetch => $node->class,
+                default => null,
+            };
+        }
+
+        return false;
     }
 }

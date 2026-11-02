@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\PhpParser;
 
 use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\AssignmentVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
@@ -88,6 +89,7 @@ readonly class NodeTraverserFactory
             new SkipIgnoredNodesVisitor($nodeIgnorers),
             NameResolverFactory::create(),
             new ParentConnectingVisitor(),
+            new AssignmentVisitor(),
             new ReflectionVisitor(),
             new ExcludeNonMutableCodeVisitor(),
             new ExcludeUnchangedLinesVisitor(
