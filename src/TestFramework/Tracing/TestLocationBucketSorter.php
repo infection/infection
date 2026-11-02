@@ -77,7 +77,7 @@ final readonly class TestLocationBucketSorter
         $fastest = array_shift($uniqueTestLocations);
 
         foreach ($uniqueTestLocations as $location) {
-            if ($location->getExecutionTime() < $fastest->getExecutionTime()) {
+            if (($location->getExecutionTime() ?? 0.0) < ($fastest->getExecutionTime() ?? 0.0)) {
                 [$fastest, $location] = [$location, $fastest];
             }
 

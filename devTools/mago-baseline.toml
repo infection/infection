@@ -3553,18 +3553,6 @@ message = 'Potential static method call on interface `Infection\TestFramework\Co
 count = 1
 
 [[issues]]
-file = "src/TestFramework/Tracing/TestLocationBucketSorter.php"
-code = "possibly-null-operand"
-message = "Left operand in `<` comparison might be `null` (type `float|null`)."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/Tracing/TestLocationBucketSorter.php"
-code = "possibly-null-operand"
-message = "Right operand in `<` comparison might be `null` (type `float|null`)."
-count = 1
-
-[[issues]]
 file = "src/TestFramework/Tracing/TestRunOrderResolver.php"
 code = "invalid-yield-value-type"
 message = "Invalid value type yielded; expected `string`, but found `null|string`."
