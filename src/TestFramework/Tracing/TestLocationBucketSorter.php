@@ -98,9 +98,7 @@ final readonly class TestLocationBucketSorter
 
         ksort($buckets);
 
-        if ($fastest !== null) {
-            array_unshift($buckets[0], $fastest);
-        }
+        array_unshift($buckets[0], $fastest);
 
         foreach ($buckets as $bucket) {
             yield from $bucket;
