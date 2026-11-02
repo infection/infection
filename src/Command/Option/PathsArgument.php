@@ -53,12 +53,16 @@ final class PathsArgument
 
     public const string NAME = 'paths';
 
-    public static function addArgument(Command $command): Command
-    {
+    public static function addArgument(
+        Command $command,
+        string $description = <<<'HELP'
+            Reduce the selected source code or tests executed e.g. `App\Differ`, `Differ::diff`, `Differ::diff::32`). Existing paths take precedence. An unresolved bare name such as `Differ` intersects path and short class filters. Use `Differ/` for paths only, `'Differ\'` for classes under the Differ namespace prefix or `'\Differ'` for the global class.
+            HELP,
+    ): Command {
         return $command->addArgument(
             self::NAME,
             InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
-            'Limit mutation testing to the given source and/or test paths. Path kind is inferred from the configured source directories and test-like paths. Pass as many paths as needed: `infection run src/A.php src/B.php tests/ATest.php`.',
+            $description,
         );
     }
 

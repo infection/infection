@@ -33,21 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
+namespace Infection\Configuration\SourceSymbol;
 
 /**
- * Wraps raw positional CLI path arguments before they are classified into source
- * and test paths. ConfigurationFactory resolves this into a PlainFilter (source
- * paths) and forwards test paths to testFrameworkExtraArgs.
+ * Identifies a class or namespace prefix, optionally narrowed to a method and/or source line, to select code for mutation.
  *
  * @internal
  */
-final readonly class PositionalPathsFilter implements SourceFileFilter
+final readonly class SourceSymbolSelector
 {
     /**
-     * @param list<non-empty-string> $paths
+     * @param string $className A leading namespace separator selects a fully qualified class name; a trailing separator selects a namespace prefix.
+     * @param positive-int|null $line Line number counted from the beginning of the source file, starting at 1.
+     *                                For example, Invoice::calculateTotal::42 selects line 42 of the file
+     *                                containing Invoice::calculateTotal, not the 42nd line of the method.
      */
-    public function __construct(public array $paths)
-    {
+    public function __construct(
+        public string $className,
+        public ?string $methodName,
+        public ?int $line,
+    ) {
     }
 }
