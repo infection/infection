@@ -39,11 +39,18 @@ use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
+use PhpParser\Node;
+use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
+use PhpParser\Node\Stmt\Return_;
+use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use function Pipeline\take;
 use Psr\Log\LogLevel;
 use Psr\Log\Test\TestLogger;
 use function str_replace;
@@ -879,7 +886,7 @@ final class ExcludeIgnoredMutatorsVisitorTest extends VisitorTestCase
             <<<'PHP'
                 <?php
 
-                // @infection-ignore FalseValue, CustomAlias, UnknownMutator, falsevalue, UnknownMutator, *
+                // @infection-ignore FalseValue, CustomAlias, UnknownMutator, falsevalue, UnknownMutator, *, False
                 return false;
                 PHP,
             <<<'AST'
@@ -894,6 +901,7 @@ final class ExcludeIgnoredMutatorsVisitorTest extends VisitorTestCase
                                     2: UnknownMutator
                                     3: falsevalue
                                     4: *
+                                    5: False
                                 )
                                 nodeId: 2
                                 parent: nodeId(1)
@@ -905,6 +913,7 @@ final class ExcludeIgnoredMutatorsVisitorTest extends VisitorTestCase
                                 2: UnknownMutator
                                 3: falsevalue
                                 4: *
+                                5: False
                             )
                             nodeId: 1
                             parent: nodeId(0)
@@ -916,6 +925,7 @@ final class ExcludeIgnoredMutatorsVisitorTest extends VisitorTestCase
                             2: UnknownMutator
                             3: falsevalue
                             4: *
+                            5: False
                         )
                         nodeId: 0
                     )
@@ -937,6 +947,285 @@ final class ExcludeIgnoredMutatorsVisitorTest extends VisitorTestCase
                     'message' => 'Unknown mutator "*" in @infection-ignore at /source.php:4.',
                     'context' => [],
                 ],
+                [
+                    'level' => LogLevel::WARNING,
+                    'message' => 'Unknown mutator "False" in @infection-ignore at /source.php:4.',
+                    'context' => [],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param class-string<Node> $nodeClass
+     * @param list<list<string>> $expectedIgnoredMutators
+     */
+    #[DataProvider('nodeExclusionProvider')]
+    public function test_it_attaches_mutator_exclusions_to_the_expected_nodes(
+        string $code,
+        string $nodeClass,
+        array $expectedIgnoredMutators,
+    ): void {
+        $nodes = $this->parse($code);
+
+        (new NodeTraverser(
+            new ParentConnectingVisitor(),
+            new ExcludeIgnoredMutatorsVisitor(
+                new TestLogger(),
+                '/source.php',
+                [],
+            ),
+        ))->traverse($nodes);
+
+        $selectedNodes = (new NodeFinder())->findInstanceOf(
+            $nodes,
+            $nodeClass,
+        );
+
+        $actual = take($selectedNodes)
+            ->cast(ExcludeIgnoredMutatorsVisitor::getIgnoredMutators(...))
+            ->toList()
+        ;
+
+        $this->assertSame($expectedIgnoredMutators, $actual);
+    }
+
+    public static function nodeExclusionProvider(): iterable
+    {
+        yield 'a trailing annotation excludes only the middle statement' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    public function values(): void {
+                        $a = true;
+                        $b = true; // @infection-ignore TrueValue
+                        $c = true;
+                    }
+                }
+                PHP,
+            Expression::class,
+            [
+                [],
+                ['TrueValue'],
+                [],
+            ],
+        ];
+
+        yield 'a trailing annotation excludes its own statement instead of the following statement' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    public function values(): void {
+                        $a = true; // @infection-ignore TrueValue
+                        $b = true;
+                    }
+                }
+                PHP,
+            Expression::class,
+            [
+                ['TrueValue'],
+                [],
+            ],
+        ];
+
+        yield 'a trailing annotation excludes the final statement in a method' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    public function values(): void {
+                        $a = true; // @infection-ignore TrueValue
+                    }
+                }
+                PHP,
+            Expression::class,
+            [
+                ['TrueValue'],
+            ],
+        ];
+
+        yield 'multiple mutators in a method docblock reach all descendant values' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    /** @infection-ignore ArrayItemRemoval, FalseValue */
+                    public function values(): array {
+                        return [false, true];
+                    }
+                }
+                PHP,
+            ConstFetch::class,
+            [
+                ['ArrayItemRemoval', 'FalseValue'],
+                ['ArrayItemRemoval', 'FalseValue'],
+            ],
+        ];
+
+        yield 'nested class and method annotations add exclusions without leaking to siblings' => [
+            <<<'PHP'
+                <?php
+
+                /** @infection-ignore ArrayItemRemoval */
+                class Example {
+                    /** @infection-ignore FalseValue */
+                    public function first(): array {
+                        return [false, true];
+                    }
+
+                    public function second(): array {
+                        return [false, true];
+                    }
+                }
+
+                class Outside {
+                    public function values(): array {
+                        return [false, true];
+                    }
+                }
+                PHP,
+            Return_::class,
+            [
+                ['ArrayItemRemoval', 'FalseValue'],
+                ['ArrayItemRemoval'],
+                [],
+            ],
+        ];
+
+        yield 'ignore-all does not alter inherited mutator names' => [
+            <<<'PHP'
+                <?php
+
+                /** @infection-ignore ArrayItemRemoval */
+                class Example {
+                    public function ignored(): array {
+                        // @infection-ignore-all
+                        return [false, true];
+                    }
+
+                    public function outside(): bool {
+                        return false;
+                    }
+                }
+                PHP,
+            Return_::class,
+            [
+                ['ArrayItemRemoval'],
+                ['ArrayItemRemoval'],
+            ],
+        ];
+
+        $ignoredArrayItem = <<<'PHP'
+            <?php
+
+            class Example {
+                public function values(): array {
+                    return [
+                        // @infection-ignore FalseValue
+                        false,
+                        false,
+                    ];
+                }
+            }
+            PHP;
+
+        yield 'an array item annotation reaches its descendants without leaking to its sibling' => [
+            $ignoredArrayItem,
+            ConstFetch::class,
+            [
+                ['FalseValue'],
+                [],
+            ],
+        ];
+
+        yield 'an array item annotation does not reach its parent array' => [
+            $ignoredArrayItem,
+            Array_::class,
+            [
+                [],
+            ],
+        ];
+
+        $arrayItemWithIgnoredArrayMutator = <<<'PHP'
+            <?php
+
+            class Example {
+                public function values(): array {
+                    return [
+                        // @infection-ignore ArrayItemRemoval
+                        false,
+                    ];
+                }
+            }
+            PHP;
+
+        yield 'an array mutator name on an item still reaches its descendants' => [
+            $arrayItemWithIgnoredArrayMutator,
+            ConstFetch::class,
+            [
+                ['ArrayItemRemoval'],
+            ],
+        ];
+
+        yield 'an array mutator name on an item does not reach the parent array' => [
+            $arrayItemWithIgnoredArrayMutator,
+            Array_::class,
+            [
+                [],
+            ],
+        ];
+
+        yield 'all listed mutator names reach every descendant value' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    /** @infection-ignore ArrayItemRemoval, FalseValue, TrueValue */
+                    public function values(): array {
+                        return [false, true];
+                    }
+                }
+                PHP,
+            ConstFetch::class,
+            [
+                ['ArrayItemRemoval', 'FalseValue', 'TrueValue'],
+                ['ArrayItemRemoval', 'FalseValue', 'TrueValue'],
+            ],
+        ];
+
+        yield 'commas do not require surrounding spaces' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    /** @infection-ignore ArrayItemRemoval,FalseValue,TrueValue */
+                    public function values(): array {
+                        return [false, true];
+                    }
+                }
+                PHP,
+            Return_::class,
+            [
+                ['ArrayItemRemoval', 'FalseValue', 'TrueValue'],
+            ],
+        ];
+
+        yield 'extra spaces around names are allowed' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    /** @infection-ignore   ArrayItemRemoval   ,   FalseValue  ,   TrueValue */
+                    public function values(): array {
+                        return [false, true];
+                    }
+                }
+                PHP,
+            Return_::class,
+            [
+                ['ArrayItemRemoval', 'FalseValue', 'TrueValue'],
             ],
         ];
     }
