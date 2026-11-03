@@ -59,9 +59,12 @@ interface Git
     public const DEFAULT_GIT_DIFF_FILTER = 'AM';
 
     /**
-     * Retrieves the default base branch name for the repository.
+     * Retrieves the default base for Git comparisons, as determined by the implementation.
+     *
+     * Implementations may use CI metadata to select the base.
      *
      * Examples of output:
+     * - a commit SHA (recorded by GitHub or GitLab for the current request if supported)
      * - 'refs/remotes/origin/main'
      * - 'origin/main'
      * - 'origin/master'

@@ -91,6 +91,7 @@ use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
+use Infection\Git\CiAwareGit;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
@@ -610,8 +611,12 @@ final class Container extends DIContainer
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
             ShellCommandRunner::class => SymfonyProcessShellCommandRunner::class,
-            Git::class => static fn (self $container): Git => new CommandLineGit(
-                $container->getShellCommandRunner(),
+            Git::class => static fn (self $container): Git => new CiAwareGit(
+                new CommandLineGit(
+                    $container->getShellCommandRunner(),
+                    $container->getLogger(),
+                ),
+                $container->getFileSystem(),
                 $container->getLogger(),
             ),
             SourceLineMatcher::class => static function (self $container): SourceLineMatcher {
