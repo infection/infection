@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Git;
 
 use Infection\Differ\ChangedLinesRange;
+use Infection\Git\Throwable\NoGitProjectFound;
 use Infection\Source\Exception\NoSourceFound;
 
 /**
