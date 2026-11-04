@@ -203,6 +203,52 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             ],
         ];
 
+        yield 'ignore-all on a method excludes all descendant mutations' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    /** @infection-ignore-all */
+                    public function values(): array {
+                        return [false, true];
+                    }
+                }
+                PHP,
+            [],
+        ];
+
+        yield 'ignore-all on a statement does not exclude following statements' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    public function value(): bool {
+                        /** @infection-ignore-all */
+                        $values = [false, true];
+
+                        return false;
+                    }
+                }
+                PHP,
+            [
+                [
+                    'mutator' => 'FalseValue',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        class Example {
+                            public function value(): bool {
+                                /** @infection-ignore-all */
+                                $values = [false, true];
+
+                                return true;
+                            }
+                        }
+                        PHP,
+                ],
+            ],
+        ];
+
         yield 'code outside a class remains ineligible' => [
             <<<'PHP'
                 <?php
