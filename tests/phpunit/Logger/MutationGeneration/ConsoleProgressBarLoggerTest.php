@@ -35,35 +35,39 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\MutationGeneration;
 
+use Infection\Console\IO;
+use Infection\Logger\Console\ConsoleLogger;
 use Infection\Logger\MutationGeneration\ConsoleProgressBarLogger;
-use Infection\Logger\MutationGeneration\MutationGenerationLogger;
+use Infection\Logger\MutationGeneration\PsrMutationGenerationDiagnosticLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[CoversClass(ConsoleProgressBarLogger::class)]
 final class ConsoleProgressBarLoggerTest extends TestCase
 {
-    private OutputInterface&MockObject $outputMock;
-
-    private MutationGenerationLogger $logger;
-
-    protected function setUp(): void
-    {
-        $this->outputMock = $this->createMock(OutputInterface::class);
-
-        $this->logger = new ConsoleProgressBarLogger($this->outputMock);
-    }
-
     public function test_it_logs_the_start(): void
     {
-        $this->outputMock
+        $outputMock = $this->createMock(OutputInterface::class);
+
+        $logger = new ConsoleProgressBarLogger(
+            $outputMock,
+            new PsrMutationGenerationDiagnosticLogger(
+                new NullLogger(),
+                true,
+            ),
+        );
+
+        $outputMock
             ->expects($this->once())
             ->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET)
         ;
-        $this->outputMock
+        $outputMock
             ->expects($this->once())
             ->method('writeln')
             ->with([
@@ -73,6 +77,52 @@ final class ConsoleProgressBarLoggerTest extends TestCase
             ])
         ;
 
-        $this->logger->start(10);
+        $logger->start(10);
+    }
+
+    #[DataProvider('provideDiagnostics')]
+    public function test_it_flushes_diagnostics_after_finishing_the_progress_bar(bool $withDiagnostics): void
+    {
+        $output = new BufferedOutput();
+        $diagnosticLogger = new PsrMutationGenerationDiagnosticLogger(
+            new ConsoleLogger(
+                new IO(
+                    new StringInput(''),
+                    $output,
+                ),
+            ),
+            true,
+        );
+
+        $logger = new ConsoleProgressBarLogger(
+            $output,
+            $diagnosticLogger,
+        );
+
+        $logger->start(1);
+        $output->fetch();
+
+        if ($withDiagnostics) {
+            $diagnosticLogger->warning('Unknown mutator "UnknownMutator".');
+            $diagnosticLogger->warning('No mutator names.');
+        }
+
+        $this->assertSame('', $output->fetch());
+
+        $logger->advance();
+        $logger->finish();
+
+        $expected = $withDiagnostics
+            ? "\nProcessing source code files: 1/1\n[warning] Unknown mutator \"UnknownMutator\".\n[warning] No mutator names.\n"
+            : "\nProcessing source code files: 1/1";
+
+        $this->assertSame($expected, $output->fetch());
+    }
+
+    public static function provideDiagnostics(): iterable
+    {
+        yield 'buffered diagnostics appear below the finished progress bar' => [true];
+
+        yield 'an empty buffer adds no newline' => [false];
     }
 }

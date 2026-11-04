@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser;
 
 use function array_map;
+use Infection\Logger\MutationGeneration\PsrMutationGenerationDiagnosticLogger;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
@@ -81,7 +82,10 @@ final class NodeTraverserFactoryTest extends TestCase
             sourceLineMatcher: new NullSourceLineMatcher(),
             lineRangeCalculator: new LineRangeCalculator(),
             onlyCovered: false,
-            logger: $logger,
+            diagnosticLogger: new PsrMutationGenerationDiagnosticLogger(
+                $logger,
+                false,
+            ),
             knownMutatorNames: ['CustomAlias'],
         );
         $nodes = SingletonContainer::getContainer()->getParser()->parse(<<<'PHP'
@@ -214,7 +218,10 @@ final class NodeTraverserFactoryTest extends TestCase
             sourceLineMatcher: new NullSourceLineMatcher(),
             lineRangeCalculator: new LineRangeCalculator(),
             onlyCovered: $onlyCovered,
-            logger: new NullLogger(),
+            diagnosticLogger: new PsrMutationGenerationDiagnosticLogger(
+                new NullLogger(),
+                false,
+            ),
             knownMutatorNames: [],
         );
     }

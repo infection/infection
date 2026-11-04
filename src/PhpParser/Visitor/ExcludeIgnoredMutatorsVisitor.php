@@ -41,13 +41,13 @@ use function array_unique;
 use function array_values;
 use function explode;
 use Generator;
+use Infection\Logger\MutationGeneration\MutationGenerationDiagnosticLogger;
 use Infection\Mutator\ProfileList;
 use Override;
 use PhpParser\Comment;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use function Pipeline\take;
-use Psr\Log\LoggerInterface;
 use function Safe\preg_match_all;
 use function sprintf;
 use function trim;
@@ -74,7 +74,7 @@ final class ExcludeIgnoredMutatorsVisitor extends NodeVisitorAbstract
      * @param list<string> $knownMutatorNames
      */
     public function __construct(
-        private readonly LoggerInterface $logger,
+        private readonly MutationGenerationDiagnosticLogger $logger,
         private readonly string $filePath,
         array $knownMutatorNames,
     ) {
