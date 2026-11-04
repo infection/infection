@@ -139,6 +139,42 @@ final class DumpAstCommandTest extends FileSystemTestCase
             $greeterAst,
         ];
 
+        $returnAst = <<<'AST'
+            array(
+                0: Stmt_Declare(
+                    declares: array(
+                        0: DeclareItem(
+                            key: Identifier
+                            value: Scalar_Int
+                        )
+                    )
+                )
+                1: Stmt_Return(
+                    expr: Expr_ConstFetch(
+                        name: Name
+                    )
+                )
+            )
+            AST;
+
+        yield 'unknown mutator alongside a known mutator' => [
+            'command' => [
+                'file' => __DIR__ . '/UnknownMutator.php',
+                '--configuration' => __DIR__ . '/infection.json5',
+            ],
+            'expected' => $returnAst,
+            'expectedLogs' => "[warning] Unknown mutator \"UnknownMutator\" in @infection-ignore at %s/UnknownMutator.php:37.\n",
+        ];
+
+        yield 'missing mutator names' => [
+            'command' => [
+                'file' => __DIR__ . '/MissingMutatorNames.php',
+                '--configuration' => __DIR__ . '/infection.json5',
+            ],
+            'expected' => $returnAst,
+            'expectedLogs' => "[warning] No mutator names in @infection-ignore at %s/MissingMutatorNames.php:37.\n",
+        ];
+
         yield [
             [
                 'file' => __DIR__ . '/EchoGreeter.php',

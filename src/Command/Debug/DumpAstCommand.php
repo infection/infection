@@ -306,6 +306,7 @@ final class DumpAstCommand extends BaseCommand
                 output: $io->getOutput(),
                 configFile: $configFile,
                 withUncovered: true,
+                noProgress: true,
                 sourceFilter: SourceFilterOptions::get(
                     self::createDiagnosticIo($io),
                 ),
