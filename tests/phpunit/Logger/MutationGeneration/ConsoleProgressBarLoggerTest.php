@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger\MutationGeneration;
 
 use Infection\Console\IO;
+use Infection\Framework\Str;
 use Infection\Logger\Console\ConsoleLogger;
 use Infection\Logger\MutationGeneration\ConsoleProgressBarLogger;
 use Infection\Logger\MutationGeneration\PsrMutationGenerationDiagnosticLogger;
@@ -116,7 +117,10 @@ final class ConsoleProgressBarLoggerTest extends TestCase
             ? "\nProcessing source code files: 1/1\n[warning] Unknown mutator \"UnknownMutator\".\n[warning] No mutator names.\n"
             : "\nProcessing source code files: 1/1";
 
-        $this->assertSame($expected, $output->fetch());
+        $this->assertSame(
+            Str::toSystemLineEndings($expected),
+            $output->fetch(),
+        );
     }
 
     public static function provideDiagnostics(): iterable
