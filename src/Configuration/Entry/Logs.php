@@ -45,7 +45,7 @@ class Logs
         private ?string $textLogFilePath,
         private ?string $htmlLogFilePath,
         private readonly ?string $summaryLogFilePath,
-        private readonly ?string $jsonLogFilePath,
+        private ?string $jsonLogFilePath,
         private ?string $gitlabLogFilePath,
         private readonly ?string $debugLogFilePath,
         private readonly ?string $perMutatorFilePath,
@@ -106,6 +106,11 @@ class Logs
     public function getJsonLogFilePath(): ?string
     {
         return $this->jsonLogFilePath;
+    }
+
+    public function setJsonLogFilePath(string $jsonLogFilePath): void
+    {
+        $this->jsonLogFilePath = $jsonLogFilePath;
     }
 
     public function getGitlabLogFilePath(): ?string

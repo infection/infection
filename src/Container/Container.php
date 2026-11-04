@@ -227,6 +227,8 @@ final class Container extends DIContainer
 
     public const null DEFAULT_SUMMARY_JSON_LOGGER_PATH = null;
 
+    public const null DEFAULT_JSON_LOGGER_PATH = null;
+
     public const bool DEFAULT_USE_NOOP_MUTATORS = false;
 
     public const bool DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES = false;
@@ -724,6 +726,7 @@ final class Container extends DIContainer
         ?string $htmlLogFilePath = self::DEFAULT_HTML_LOGGER_PATH,
         ?string $textLogFilePath = self::DEFAULT_TEXT_LOGGER_PATH,
         ?string $summaryJsonLogFilePath = self::DEFAULT_SUMMARY_JSON_LOGGER_PATH,
+        ?string $jsonLogFilePath = self::DEFAULT_JSON_LOGGER_PATH,
         bool $useNoopMutators = self::DEFAULT_USE_NOOP_MUTATORS,
         bool $executeOnlyCoveringTestCases = self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
         ?string $mapSourceClassToTestStrategy = self::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
@@ -808,6 +811,7 @@ final class Container extends DIContainer
                 htmlLogFilePath: $htmlLogFilePath,
                 textLogFilePath: $textLogFilePath,
                 summaryJsonLogFilePath: $summaryJsonLogFilePath,
+                jsonLogFilePath: $jsonLogFilePath,
                 useNoopMutators: $useNoopMutators,
                 executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
                 mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
