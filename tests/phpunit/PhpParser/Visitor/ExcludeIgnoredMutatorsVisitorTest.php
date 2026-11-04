@@ -992,7 +992,7 @@ final class ExcludeIgnoredMutatorsVisitorTest extends VisitorTestCase
 
     public static function nodeExclusionProvider(): iterable
     {
-        yield 'a trailing annotation excludes only the middle statement' => [
+        yield 'a trailing annotation on the middle statement excludes the following statement' => [
             <<<'PHP'
                 <?php
 
@@ -1007,12 +1007,12 @@ final class ExcludeIgnoredMutatorsVisitorTest extends VisitorTestCase
             Expression::class,
             [
                 [],
-                ['TrueValue'],
                 [],
+                ['TrueValue'],
             ],
         ];
 
-        yield 'a trailing annotation excludes its own statement instead of the following statement' => [
+        yield 'a trailing annotation excludes the following statement instead of its own statement' => [
             <<<'PHP'
                 <?php
 
@@ -1025,12 +1025,12 @@ final class ExcludeIgnoredMutatorsVisitorTest extends VisitorTestCase
                 PHP,
             Expression::class,
             [
-                ['TrueValue'],
                 [],
+                ['TrueValue'],
             ],
         ];
 
-        yield 'a trailing annotation excludes the final statement in a method' => [
+        yield 'a trailing annotation on the final statement does not exclude that statement' => [
             <<<'PHP'
                 <?php
 
@@ -1042,7 +1042,7 @@ final class ExcludeIgnoredMutatorsVisitorTest extends VisitorTestCase
                 PHP,
             Expression::class,
             [
-                ['TrueValue'],
+                [],
             ],
         ];
 
