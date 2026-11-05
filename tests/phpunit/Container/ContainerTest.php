@@ -47,7 +47,7 @@ use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Reflection\ContainerReflection;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -56,7 +56,7 @@ use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Webmozart\Assert\InvalidArgumentException as AssertException;
 
-#[CoversNothing]
+#[CoversClass(Container::class)]
 #[Group('integration')]
 final class ContainerTest extends TestCase
 {
