@@ -38,10 +38,10 @@ namespace Infection\Configuration\SourceFilter;
 /**
  * @internal
  *
- * The path of the unified diff file given with the "--diff-file" option. ConfigurationFactory reads
+ * The path of the unified diff file given with the "--git-diff-file" option. ConfigurationFactory reads
  * the file into a ChangedLinesFilter.
  */
-final readonly class DiffFileFilter
+final readonly class GitDiffFileFilter
 {
     /**
      * @param non-empty-string $pathname

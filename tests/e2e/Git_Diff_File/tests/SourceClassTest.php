@@ -1,8 +1,8 @@
 <?php
 
-namespace DiffFile\Test;
+namespace Git_Diff_File\Tests;
 
-use DiffFile\SourceClass;
+use Git_Diff_File\SourceClass;
 use PHPUnit\Framework\TestCase;
 
 class SourceClassTest extends TestCase

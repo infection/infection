@@ -51,7 +51,7 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\ChangedLinesFilter;
-use Infection\Configuration\SourceFilter\DiffFileFilter;
+use Infection\Configuration\SourceFilter\GitDiffFileFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
@@ -140,7 +140,7 @@ class ConfigurationFactory
         ?string $testFrameworkExtraOptions,
         ?string $testFrameworkExtraArgs,
         ?string $staticAnalysisToolOptions,
-        PlainFilter|IncompleteGitDiffFilter|DiffFileFilter|PositionalArgumentsFilter|null $sourceFilter,
+        PlainFilter|IncompleteGitDiffFilter|GitDiffFileFilter|PositionalArgumentsFilter|null $sourceFilter,
         int|string|null $threadCount,
         string|int|null $dotsPerRow,
         bool $dryRun,
@@ -470,7 +470,7 @@ class ConfigurationFactory
      * @return array{0: SourceFilter, 1: string|null}
      */
     private function refineFilterIfNecessary(
-        PlainFilter|IncompleteGitDiffFilter|DiffFileFilter|PositionalArgumentsFilter|null $sourceFilter,
+        PlainFilter|IncompleteGitDiffFilter|GitDiffFileFilter|PositionalArgumentsFilter|null $sourceFilter,
         SchemaConfiguration $schema,
         ?string $testFrameworkExtraArgs,
     ): array {
@@ -491,8 +491,8 @@ class ConfigurationFactory
             );
         }
 
-        if ($sourceFilter instanceof DiffFileFilter) {
-            $sourceFilter = $this->refineDiffFileFilter($sourceFilter, dirname($schema->pathname));
+        if ($sourceFilter instanceof GitDiffFileFilter) {
+            $sourceFilter = $this->resolveGitDiffFileFilter($sourceFilter, dirname($schema->pathname));
         }
 
         return [
@@ -505,12 +505,12 @@ class ConfigurationFactory
      * @throws FileOrDirectoryNotFound
      * @throws NoSourceFound
      */
-    private function refineDiffFileFilter(DiffFileFilter $diffFileFilter, string $configDir): ChangedLinesFilter
+    private function resolveGitDiffFileFilter(GitDiffFileFilter $gitDiffFileFilter, string $configDir): ChangedLinesFilter
     {
-        $pathname = Path::makeAbsolute($diffFileFilter->pathname, $configDir);
+        $pathname = Path::makeAbsolute($gitDiffFileFilter->pathname, $configDir);
 
         if (!$this->fileSystem->isReadableFile($pathname)) {
-            throw FileOrDirectoryNotFound::fromFileName($diffFileFilter->pathname, [$configDir]);
+            throw FileOrDirectoryNotFound::fromFileName($gitDiffFileFilter->pathname, [$configDir]);
         }
 
         $diff = $this->fileSystem->readFile($pathname);
@@ -521,7 +521,7 @@ class ConfigurationFactory
         );
 
         if ($changedLinesRangesByFilePath === []) {
-            throw NoSourceFound::noChangedLinesForDiffFile($diffFileFilter->pathname);
+            throw NoSourceFound::noChangedLinesForGitDiffFile($gitDiffFileFilter->pathname);
         }
 
         return new ChangedLinesFilter($changedLinesRangesByFilePath);
