@@ -58,12 +58,12 @@ use function sprintf;
 final class SourceCollectorFactoryTest extends TestCase
 {
     /**
-     * @param Exception|class-string<SourceCollector> $exceptionOrExpectedCollectorClassName
+     * @param Exception|SourceCollector|class-string<SourceCollector> $exceptionOrExpectedCollectorClassName
      */
     #[DataProvider('sourceFilterProvider')]
     public function test_it_can_create_a_collector(
         ?SourceFileFilter $sourceFilter,
-        Exception|string $exceptionOrExpectedCollectorClassName,
+        Exception|SourceCollector|string $exceptionOrExpectedCollectorClassName,
     ): void {
         $factory = new SourceCollectorFactory(
             $this->createStub(Git::class),
@@ -79,7 +79,9 @@ final class SourceCollectorFactoryTest extends TestCase
             $sourceFilter,
         );
 
-        if (!($exceptionOrExpectedCollectorClassName instanceof Exception)) {
+        if ($exceptionOrExpectedCollectorClassName instanceof SourceCollector) {
+            $this->assertEquals($exceptionOrExpectedCollectorClassName, $actual);
+        } elseif (!($exceptionOrExpectedCollectorClassName instanceof Exception)) {
             $this->assertSame($actual::class, $exceptionOrExpectedCollectorClassName);
         }
     }
@@ -100,7 +102,12 @@ final class SourceCollectorFactoryTest extends TestCase
             new ChangedLinesFilter([
                 '/path/to/project/src/Service.php' => [ChangedLinesRange::forLine(3)],
             ]),
-            BasicSourceCollector::class,
+            BasicSourceCollector::create(
+                '/path/to/project',
+                ['src', 'lib'],
+                ['vendor', 'tests'],
+                new PlainFilter(['/path/to/project/src/Service.php']),
+            ),
         ];
 
         yield 'git diff filter' => [
