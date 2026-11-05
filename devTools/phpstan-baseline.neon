@@ -448,12 +448,6 @@ parameters:
 			path: ../src/Mutator/MutatorResolver.php
 
 		-
-			rawMessage: Infection\Mutator\NodeMutationGenerator should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Mutator/NodeMutationGenerator.php
-
-		-
 			rawMessage: '''
 				Access to constant on deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
 				This mutator is a semantic addition
@@ -1347,7 +1341,7 @@ parameters:
 			path: ../tests/phpunit/MockedContainer.php
 
 		-
-			rawMessage: 'Parameter #3 $mutators of method Infection\Mutation\FileMutationGenerator::generate() expects array<Infection\Mutator\Mutator<PhpParser\Node>>, array{Infection\Mutator\Arithmetic\Plus} given.'
+			rawMessage: 'Parameter #3 $mutatorsByName of method Infection\Mutation\FileMutationGenerator::generate() expects array<string, Infection\Mutator\Mutator<PhpParser\Node>>, array{Plus: Infection\Mutator\Arithmetic\Plus} given.'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php

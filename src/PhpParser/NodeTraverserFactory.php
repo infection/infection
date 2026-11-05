@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
+use Infection\Logger\MutationGeneration\MutationGenerationDiagnosticLogger;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
@@ -62,10 +64,15 @@ use SplFileInfo;
  */
 readonly class NodeTraverserFactory
 {
+    /**
+     * @param list<string> $knownMutatorNames
+     */
     public function __construct(
         private SourceLineMatcher $sourceLineMatcher,
         private LineRangeCalculator $lineRangeCalculator,
         private bool $onlyCovered,
+        private MutationGenerationDiagnosticLogger $diagnosticLogger,
+        private array $knownMutatorNames,
     ) {
     }
 
@@ -88,6 +95,11 @@ readonly class NodeTraverserFactory
             new SkipIgnoredNodesVisitor($nodeIgnorers),
             NameResolverFactory::create(),
             new ParentConnectingVisitor(),
+            new ExcludeIgnoredMutatorsVisitor(
+                $this->diagnosticLogger,
+                $sourceFile->getPathname(),
+                $this->knownMutatorNames,
+            ),
             new ReflectionVisitor(),
             new ExcludeNonMutableCodeVisitor(),
             new ExcludeUnchangedLinesVisitor(

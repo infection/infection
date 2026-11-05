@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Container;
 
 use function array_filter;
+use function array_keys;
 use Closure;
 use DIContainer\Container as DIContainer;
 use function dirname;
@@ -101,8 +102,10 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
+use Infection\Logger\MutationGeneration\MutationGenerationDiagnosticLogger;
 use Infection\Logger\MutationGeneration\MutationGenerationLogger;
 use Infection\Logger\MutationGeneration\MutationGenerationLoggerFactory;
+use Infection\Logger\MutationGeneration\PsrMutationGenerationDiagnosticLogger;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
@@ -440,9 +443,14 @@ final class Container extends DIContainer
             },
             InitialStaticAnalysisExecutionLogger::class => static fn (self $container): InitialStaticAnalysisExecutionLogger => $container->get(InitialStaticAnalysisExecutionLoggerFactory::class)->create(),
             MutationGenerationLogger::class => static fn (self $container): MutationGenerationLogger => $container->get(MutationGenerationLoggerFactory::class)->create(),
+            MutationGenerationDiagnosticLogger::class => static fn (self $container): MutationGenerationDiagnosticLogger => new PsrMutationGenerationDiagnosticLogger(
+                $container->getLogger(),
+                !$container->getConfiguration()->noProgress,
+            ),
             MutationGenerationLoggerFactory::class => static fn (self $container): MutationGenerationLoggerFactory => new MutationGenerationLoggerFactory(
                 $container->getConfiguration()->noProgress,
                 $container->getOutput(),
+                $container->getMutationGenerationDiagnosticLogger(),
             ),
             MutationTestingResultsCollectorSubscriber::class => static fn (self $container): MutationTestingResultsCollectorSubscriber => new MutationTestingResultsCollectorSubscriber(
                 ...array_filter([
@@ -463,6 +471,8 @@ final class Container extends DIContainer
                 $container->getSourceLineMatcher(),
                 $container->getLineRangeCalculator(),
                 $container->getConfiguration()->mutateOnlyCoveredCode(),
+                $container->getMutationGenerationDiagnosticLogger(),
+                array_keys($container->getConfiguration()->mutators),
             ),
             FileReporterFactory::class => static function (self $container): FileReporterFactory {
                 $config = $container->getConfiguration();
@@ -1033,6 +1043,11 @@ final class Container extends DIContainer
     public function getLogger(): LoggerInterface
     {
         return $this->get(LoggerInterface::class);
+    }
+
+    public function getMutationGenerationDiagnosticLogger(): MutationGenerationDiagnosticLogger
+    {
+        return $this->get(MutationGenerationDiagnosticLogger::class);
     }
 
     public function getOutput(): OutputInterface
