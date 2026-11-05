@@ -1538,18 +1538,6 @@ count = 1
 
 [[issues]]
 file = "src/FileSystem/FileSystem.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #1 of `Symfony\Component\Filesystem\Exception\IOException::__construct`: expected `string`, but found `nonnull`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/FileSystem.php"
-code = "mixed-assignment"
-message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 1
-
-[[issues]]
-file = "src/FileSystem/FileSystem.php"
 code = "possibly-invalid-argument"
 message = 'Possible argument type mismatch for argument #2 of `Symfony\Component\Filesystem\Exception\IOException::__construct`: expected `int`, but possibly received `int|string`.'
 count = 1

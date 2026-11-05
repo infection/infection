@@ -89,10 +89,12 @@ class FileSystem extends SymfonyFilesystem
             return parent::readFile($filename);
         }
 
+        $error = '';
+
         // To delete once we drop support for Symfony 6.4.
         // Copied from Symfony\Finder\SplFileInfo::getContents() with the exception adjusted
         // @phpstan-ignore argument.type
-        set_error_handler(static function ($type, $msg) use (&$error): void { $error = $msg; });
+        set_error_handler(static function (int $type, string $msg) use (&$error): void { $error = $msg; });
 
         try {
             // @phpstan-ignore theCodingMachineSafe.function
@@ -102,7 +104,8 @@ class FileSystem extends SymfonyFilesystem
         }
 
         if ($content === false) {
-            throw new IOException($error ?? '');
+            // Same message as Symfony 7.4+: since PHP 8.6, the PHP warning no longer names the file.
+            throw new IOException(sprintf('Failed to read file "%s": %s', $filename, $error), 0, null, $filename);
         }
 
         return $content;
