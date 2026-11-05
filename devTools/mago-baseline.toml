@@ -153,6 +153,12 @@ count = 1
 [[issues]]
 file = "src/Command/Git/GitChangedFilesCommand.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Git\Throwable\GitDiffFailed` in `Infection\Command\Git\GitChangedFilesCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/Git/GitChangedFilesCommand.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\Git\GitChangedFilesCommand::executeCommand`.'
 count = 1
 
@@ -166,6 +172,12 @@ count = 1
 file = "src/Command/Git/GitChangedLinesCommand.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Command\Git\GitChangedLinesCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/Git/GitChangedLinesCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Git\Throwable\GitDiffFailed` in `Infection\Command\Git\GitChangedLinesCommand::executeCommand`.'
 count = 1
 
 [[issues]]
@@ -1143,6 +1155,12 @@ count = 1
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Git\Throwable\GitDiffFailed` in `{closure:src/Container/Container.php:632:17}`.'
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Container\Container::getProcessRunner`.'
 count = 1
 
@@ -1786,30 +1804,6 @@ count = 1
 file = "src/Git/CommandLineGit.php"
 code = "less-specific-nested-return-statement"
 message = '''Returned type `list{string, list<mixed>}` is less specific than the declared return type `array{0: string, 1: list<string>}` for function `Infection\Git\CommandLineGit::diff` due to nested 'mixed'.'''
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Git\CommandLineGit::diff`.'
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Git\CommandLineGit::diff`.'
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Git\CommandLineGit::diff`.'
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Git\CommandLineGit::diff`.'
 count = 1
 
 [[issues]]

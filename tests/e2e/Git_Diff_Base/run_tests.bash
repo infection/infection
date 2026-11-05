@@ -36,5 +36,5 @@ fi
 
 printf '%s\n' "$output"
 
-[[ "$output" == *"fatal: bad revision 'missing-base'"* ]]
-[[ "$output" == *'Exit Code:'* ]]
+[[ "$output" == *'Could not compute the Git diff against "missing-base"'* ]]
+[[ "$output" == *'Fetching the base reference'* ]]
