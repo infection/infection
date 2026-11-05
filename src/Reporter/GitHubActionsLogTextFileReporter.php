@@ -35,14 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Reporter;
 
+use function array_map;
+use function explode;
+use function implode;
 use Infection\Mutant\MutantExecutionResult;
 use Override;
 use const PHP_EOL;
 use function sprintf;
+use function str_starts_with;
 use function trim;
 
 /**
  * Uses the GitHub Actions line grouping feature to make the output more digestable and collapsable.
+ *
+ * Diff lines are colored with ANSI escape sequences, which the GitHub Actions log viewer renders.
  *
  * @see https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#grouping-log-lines
  *
@@ -50,6 +56,12 @@ use function trim;
  */
 final readonly class GitHubActionsLogTextFileReporter extends BaseTextFileReporter
 {
+    private const string REMOVED_LINE_COLOR = "\033[31m";
+
+    private const string ADDED_LINE_COLOR = "\033[32m";
+
+    private const string RESET_COLOR = "\033[0m";
+
     protected function getHeadlineLines(string $headlinePrefix): string
     {
         return '';
@@ -71,5 +83,28 @@ final readonly class GitHubActionsLogTextFileReporter extends BaseTextFileReport
         }
 
         return sprintf('::group::%s mutants' . PHP_EOL . '%s' . PHP_EOL . '::endgroup::' . PHP_EOL, $headlinePrefix, $results);
+    }
+
+    #[Override]
+    protected function formatDiff(string $diff): string
+    {
+        $a = 1 + 2;
+        return implode(
+            "\n",
+            array_map(
+                static function (string $line): string {
+                    if (str_starts_with($line, '-')) {
+                        return self::REMOVED_LINE_COLOR . $line . self::RESET_COLOR;
+                    }
+
+                    if (str_starts_with($line, '+')) {
+                        return self::ADDED_LINE_COLOR . $line . self::RESET_COLOR;
+                    }
+
+                    return $line;
+                },
+                explode("\n", $diff),
+            ),
+        );
     }
 }

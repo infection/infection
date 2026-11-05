@@ -166,7 +166,7 @@ abstract readonly class BaseTextFileReporter implements LineMutationTestingResul
 
             $lines[] = self::getMutatorLine($index, $executionResult);
             $lines[] = '';
-            $lines[] = Str::cleanForDisplay($executionResult->getMutantDiff());
+            $lines[] = $this->formatDiff(Str::cleanForDisplay($executionResult->getMutantDiff()));
 
             if ($this->debugMode) {
                 $lines[] = '';
@@ -188,6 +188,8 @@ abstract readonly class BaseTextFileReporter implements LineMutationTestingResul
     }
 
     abstract protected function getHeadlineLines(string $headlinePrefix): string;
+
+    abstract protected function formatDiff(string $diff): string;
 
     private static function getMutatorLine(int $index, MutantExecutionResult $mutantProcess): string
     {
