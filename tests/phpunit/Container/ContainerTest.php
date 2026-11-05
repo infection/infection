@@ -41,6 +41,7 @@ use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
 use Infection\Event\EventDispatcher\EventCollectingEventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Logger\MutationGeneration\MutationGenerationLogger;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -51,7 +52,10 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
+use Psr\Log\Test\TestLogger;
 use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Webmozart\Assert\InvalidArgumentException as AssertException;
@@ -184,6 +188,68 @@ final class ContainerTest extends TestCase
             EventCollectingEventDispatcher::class,
             $container->getEventDispatcher(),
         );
+    }
+
+    #[DataProvider('provideMutationGenerationProgressModes')]
+    public function test_it_shares_mutation_generation_diagnostics_without_changing_the_default_logger(bool $noProgress): void
+    {
+        $logger = new TestLogger();
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withNoProgress($noProgress)
+            ->build()
+        ;
+        $container = Container::create()
+            ->cloneWithService(
+                Configuration::class,
+                $configuration,
+            )
+            ->cloneWithService(
+                LoggerInterface::class,
+                $logger,
+            )
+        ;
+
+        $this->assertSame(
+            $logger,
+            $container->getLogger(),
+        );
+
+        // Resolving this service failed when diagnostics were a second PSR logger candidate.
+        $container->getConsoleOutput();
+        $container->getNodeTraverserFactory();
+
+        $progressLogger = $container->get(MutationGenerationLogger::class);
+        $progressLogger->start(1);
+
+        $container->getMutationGenerationDiagnosticLogger()->warning('Unknown mutator.');
+
+        $expected = [
+            [
+                'level' => LogLevel::WARNING,
+                'message' => 'Unknown mutator.',
+                'context' => [],
+            ],
+        ];
+
+        $this->assertSame(
+            $noProgress ? $expected : [],
+            $logger->records,
+        );
+
+        $progressLogger->advance();
+        $progressLogger->finish();
+
+        $this->assertSame(
+            $expected,
+            $logger->records,
+        );
+    }
+
+    public static function provideMutationGenerationProgressModes(): iterable
+    {
+        yield 'progress enabled' => [false];
+
+        yield 'progress disabled' => [true];
     }
 
     public static function provideServicesWithReflection(): iterable

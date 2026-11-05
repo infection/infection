@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
+use Infection\Logger\MutationGeneration\PsrMutationGenerationDiagnosticLogger;
 use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
@@ -76,7 +77,10 @@ final class ExcludeIgnoredMutatorsVisitorTest extends VisitorTestCase
             new LabelNodesAsEligibleVisitor(),
             new ParentConnectingVisitor(),
             new ExcludeIgnoredMutatorsVisitor(
-                $logger,
+                new PsrMutationGenerationDiagnosticLogger(
+                    $logger,
+                    false,
+                ),
                 '/source.php',
                 ['CustomAlias'],
             ),
@@ -971,7 +975,10 @@ final class ExcludeIgnoredMutatorsVisitorTest extends VisitorTestCase
         (new NodeTraverser(
             new ParentConnectingVisitor(),
             new ExcludeIgnoredMutatorsVisitor(
-                new TestLogger(),
+                new PsrMutationGenerationDiagnosticLogger(
+                    new TestLogger(),
+                    false,
+                ),
                 '/source.php',
                 [],
             ),
