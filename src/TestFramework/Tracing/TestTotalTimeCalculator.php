@@ -38,6 +38,7 @@ namespace Infection\TestFramework\Tracing;
 use function array_key_exists;
 use function array_sum;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use function min;
 use function strpos;
 use function substr;
 
@@ -59,6 +60,17 @@ final readonly class TestTotalTimeCalculator
         return array_sum(
             $this->uniqueTestLocations(),
         );
+    }
+
+    public function getShortestTestTime(): float
+    {
+        $timings = $this->uniqueTestLocations();
+
+        if ($timings === []) {
+            return 0.0;
+        }
+
+        return (float) min($timings);
     }
 
     /**

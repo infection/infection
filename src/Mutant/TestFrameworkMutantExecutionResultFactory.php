@@ -100,7 +100,9 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
         }
 
         if ($mutantProcess->isTimedOut()) {
-            return DetectionStatus::TIMED_OUT;
+            return self::isTimeoutExpected($mutantProcess)
+                ? DetectionStatus::SKIPPED
+                : DetectionStatus::TIMED_OUT;
         }
 
         $process = $mutantProcess->getProcess();
@@ -121,5 +123,18 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
         }
 
         return DetectionStatus::KILLED_BY_TESTS;
+    }
+
+    /**
+     * The mutant is run as long as one of its tests fits in the timeout. If none of the
+     * tests killed it and running all of them was known to exceed the timeout, the timeout
+     * is not a sign of an infinite loop, and the mutant would be wrongly counted as detected.
+     */
+    private static function isTimeoutExpected(MutantProcess $mutantProcess): bool
+    {
+        $timeout = $mutantProcess->getProcess()->getTimeout();
+
+        return $timeout !== null
+            && $mutantProcess->getMutant()->getMutation()->getNominalTestExecutionTime() >= $timeout;
     }
 }

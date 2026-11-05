@@ -163,7 +163,7 @@ abstract class AbstractIdenticalComparison implements Mutator
             return $constType !== null && $constType === $narrowed;
         }
 
-        if ($expr instanceof Expr\Array_ && count($expr->items) === 0) {
+        if ($expr instanceof Expr\Array_ && $expr->items === []) {
             return $narrowed === 'array';
         }
 

@@ -119,7 +119,7 @@ final class NewObject extends AbstractValueToNullReturnValue
             return false;
         }
 
-        if (!$node->expr->class instanceof Node\Name) {
+        if (!$node->expr->class instanceof Node\Name && !$node->expr->class instanceof Node\Stmt\Class_) {
             return false;
         }
 

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
+use function array_shift;
+use function array_unshift;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\CannotBeInstantiated;
 use function ksort;
@@ -64,7 +66,7 @@ final readonly class TestLocationBucketSorter
     /**
      * Sorts tests to run the fastest first. Exposed for benchmarking purposes.
      *
-     * @param TestLocation[] $uniqueTestLocations
+     * @param non-empty-array<TestLocation> $uniqueTestLocations
      *
      * @return iterable<TestLocation>
      */
@@ -72,12 +74,18 @@ final readonly class TestLocationBucketSorter
     {
         $buckets = self::INIT_BUCKETS;
 
+        $fastest = array_shift($uniqueTestLocations);
+
         foreach ($uniqueTestLocations as $location) {
+            if (($location->getExecutionTime() ?? 0.0) < ($fastest->getExecutionTime() ?? 0.0)) {
+                [$fastest, $location] = [$location, $fastest];
+            }
+
             // @codeCoverageIgnoreStart
             // This is a very hot path. Factoring here another method just to test this math may not be as good idea.
 
             // Quick drop off lower bits, reducing precision to 8th of a second
-            $msTime = (int) (($location->getExecutionTime() ?? 0) * 1024) >> 7; // * 1024 / 128
+            $msTime = (int) (($location->getExecutionTime() ?? 0.0) * 1024) >> 7; // * 1024 / 128
 
             // For anything above 4 seconds reduce precision to 4 seconds
             if ($msTime > 32) {
@@ -89,6 +97,8 @@ final readonly class TestLocationBucketSorter
         }
 
         ksort($buckets);
+
+        array_unshift($buckets[0], $fastest);
 
         foreach ($buckets as $bucket) {
             yield from $bucket;

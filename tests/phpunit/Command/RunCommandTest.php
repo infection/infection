@@ -41,13 +41,15 @@ use Infection\Container\Container;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
-use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Source\Exception\NoSourceFound;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
+use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Throwable;
 
@@ -217,6 +219,11 @@ final class RunCommandTest extends TestCase
 
         yield 'initial tests failed' => [
             'failure' => new InitialTestsFailed('Project tests must be in a passing state before running Infection.'),
+        ];
+
+        yield 'custom framework initial run failed' => [
+            'failure' => new class('Custom initial run failed.') extends RuntimeException implements InitialTestsFailedContract {
+            },
         ];
 
         yield 'minimum MSI not reached' => [

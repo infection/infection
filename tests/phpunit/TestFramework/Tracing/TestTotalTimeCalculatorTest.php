@@ -113,4 +113,61 @@ final class TestTotalTimeCalculatorTest extends TestCase
 
         $this->assertSame(0.9 + 0.2, $total);
     }
+
+    public function test_it_returns_zero_as_shortest_time_without_tests(): void
+    {
+        $calculator = new TestTotalTimeCalculator([]);
+
+        $this->assertSame(0.0, $calculator->getShortestTestTime());
+    }
+
+    public function test_it_returns_shortest_time_for_unique_test_cases(): void
+    {
+        $coverageTestCases = [
+            new TestLocation(
+                'FooTest::testMethod1',
+                '/path/to/test-file-1',
+                0.9,
+            ),
+            new TestLocation(
+                'BarTest::testMethod2_1',
+                '/path/to/test-file-2',
+                0.2,
+            ),
+            new TestLocation(
+                'BarTest::testMethod2_2',
+                '/path/to/test-file-2',
+                0.2,
+            ),
+            new TestLocation(
+                'BazTest::testMethod3',
+                '/path/to/test-file-3',
+                0.5,
+            ),
+        ];
+
+        $calculator = new TestTotalTimeCalculator($coverageTestCases);
+
+        $this->assertSame(0.2, $calculator->getShortestTestTime());
+    }
+
+    public function test_it_treats_tests_without_execution_time_as_the_shortest(): void
+    {
+        $coverageTestCases = [
+            new TestLocation(
+                'FooTest::testMethod1',
+                '/path/to/test-file-1',
+                10.0,
+            ),
+            new TestLocation(
+                'BarTest::testMethod2',
+                '/path/to/test-file-2',
+                null,
+            ),
+        ];
+
+        $calculator = new TestTotalTimeCalculator($coverageTestCases);
+
+        $this->assertSame(0.0, $calculator->getShortestTestTime());
+    }
 }

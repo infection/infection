@@ -33,31 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\Rector;
+namespace Infection\Logger\MutationGeneration;
 
-use Iterator;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use Rector\Testing\PHPUnit\AbstractRectorTestCase;
-
-#[CoversClass(VarTagOnParameterToParamTagRector::class)]
-#[Group('integration')]
-final class VarTagOnParameterToParamTagRectorTest extends AbstractRectorTestCase
+/**
+ * Reports issues encountered during mutation generation.
+ *
+ * @internal
+ */
+interface MutationGenerationDiagnosticLogger
 {
-    #[DataProvider('provideFixtures')]
-    public function test_it_moves_var_tags_to_the_method(string $fixture): void
-    {
-        $this->doTestFile($fixture);
-    }
+    public function warning(string $message): void;
 
-    public static function provideFixtures(): Iterator
-    {
-        return self::yieldFilesFromDirectory(__DIR__ . '/Fixture');
-    }
+    public function hasPendingMessages(): bool;
 
-    public function provideConfigFilePath(): string
-    {
-        return __DIR__ . '/config/configured_rule.php';
-    }
+    public function flush(): void;
 }

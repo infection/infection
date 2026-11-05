@@ -33,43 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Runner;
+namespace Infection\Tests\AutoReview\Rector\CountArrayToEmptyArrayComparisonRector;
 
-use function implode;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Process\Runner\InitialTestsFailed;
+use Iterator;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
-#[CoversClass(InitialTestsFailed::class)]
-final class InitialTestsFailedTest extends TestCase
+#[CoversClass(CountArrayToEmptyArrayComparisonRector::class)]
+#[Group('integration')]
+final class CountArrayToEmptyArrayComparisonRectorTest extends AbstractRectorTestCase
 {
-    public function test_log_initial_tests_do_not_pass(): void
+    #[DataProvider('provideFixtures')]
+    public function test_it_compares_arrays_directly_when_checking_emptiness(string $fixture): void
     {
-        $process = $this->createMock(Process::class);
-        $process->expects($this->once())->method('getExitCode')->willReturn(0);
-        $process->expects($this->once())->method('getOutput')->willReturn('output string');
-        $process->expects($this->once())->method('getErrorOutput')->willReturn('error string');
-        $process->expects($this->once())->method('getCommandLine')->willReturn('vendor/bin/phpunit --order=random');
+        $this->doTestFile($fixture);
+    }
 
-        $testFrameworkAdapter = $this->createMock(TestFrameworkAdapter::class);
-        $testFrameworkAdapter->expects($this->once())->method('getName')->willReturn('phpunit');
-        $testFrameworkAdapter->expects($this->once())->method('getInitialTestsFailRecommendations')->willReturn('-');
+    public static function provideFixtures(): Iterator
+    {
+        return self::yieldFilesFromDirectory(__DIR__ . '/Fixtures');
+    }
 
-        $error = implode("\n", [
-            'Project tests must be in a passing state before running Infection.',
-            '-',
-            'phpunit reported an exit code of 0.',
-            'Refer to the phpunit\'s output below:',
-            'STDOUT:',
-            'output string',
-            'STDERR:',
-            'error string',
-        ]);
-
-        $exception = InitialTestsFailed::fromProcessAndAdapter($process, $testFrameworkAdapter);
-
-        $this->assertSame($error, $exception->getMessage());
+    #[Override]
+    public function provideConfigFilePath(): string
+    {
+        return __DIR__ . '/config/configured_rule.php';
     }
 }

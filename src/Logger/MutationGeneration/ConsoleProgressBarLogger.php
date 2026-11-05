@@ -47,6 +47,7 @@ final readonly class ConsoleProgressBarLogger implements MutationGenerationLogge
 
     public function __construct(
         private OutputInterface $output,
+        private MutationGenerationDiagnosticLogger $diagnosticLogger,
     ) {
         $this->progressBar = new ProgressBar($this->output);
         $this->progressBar->setFormat('Processing source code files: %current%/%max%');
@@ -71,5 +72,12 @@ final readonly class ConsoleProgressBarLogger implements MutationGenerationLogge
     public function finish(): void
     {
         $this->progressBar->finish();
+
+        if ($this->diagnosticLogger->hasPendingMessages()) {
+            // The progress bar leaves the cursor on its last line so we need a line break.
+            $this->output->writeln('');
+
+            $this->diagnosticLogger->flush();
+        }
     }
 }

@@ -33,9 +33,52 @@
 
 declare(strict_types=1);
 
-use Infection\Tests\AutoReview\Rector\VarTagOnParameterToParamTagRector;
-use Rector\Config\RectorConfig;
+namespace Infection\Logger\MutationGeneration;
 
-return RectorConfig::configure()
-    ->withRules([VarTagOnParameterToParamTagRector::class])
-;
+use Infection\Logger\BufferedLogger;
+use Override;
+use Psr\Log\LoggerInterface;
+
+/**
+ * Sends diagnostics to a PSR logger, optionally buffering them until flushed.
+ *
+ * @internal
+ */
+final readonly class PsrMutationGenerationDiagnosticLogger implements MutationGenerationDiagnosticLogger
+{
+    private LoggerInterface $logger;
+
+    private ?BufferedLogger $bufferedLogger;
+
+    public function __construct(
+        LoggerInterface $logger,
+        bool $bufferMessages,
+    ) {
+        $this->bufferedLogger = $bufferMessages
+            ? new BufferedLogger($logger)
+            : null;
+        $this->logger = $this->bufferedLogger ?? $logger;
+    }
+
+    #[Override]
+    public function warning(string $message): void
+    {
+        $this->logger->warning($message);
+    }
+
+    #[Override]
+    public function hasPendingMessages(): bool
+    {
+        if ($this->bufferedLogger === null) {
+            return false;
+        }
+
+        return !$this->bufferedLogger->isEmpty();
+    }
+
+    #[Override]
+    public function flush(): void
+    {
+        $this->bufferedLogger?->flush();
+    }
+}

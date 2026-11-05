@@ -1,6 +1,6 @@
 <?php
 
-namespace NewObject_NotMutatesAnonymousClass;
+namespace NewObject_MutatesAnonymousClass;
 
 class Test
 {

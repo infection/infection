@@ -40,7 +40,6 @@ use function array_map;
 use function array_shift;
 use function array_unshift;
 use function array_values;
-use function count;
 use Fidry\Makefile\Rule;
 use Fidry\Makefile\Test\BaseMakefileTestCase;
 use function implode;
@@ -374,7 +373,7 @@ final class MakefileTest extends BaseMakefileTestCase
         array $array,
         array $items,
     ): void {
-        if (count($items) === 0) {
+        if ($items === []) {
             // @phpstan-ignore method.internal
             $this->addToAssertionCount(1);
 
@@ -396,7 +395,7 @@ final class MakefileTest extends BaseMakefileTestCase
         array $array,
         array $items,
     ): void {
-        if (count($items) === 0) {
+        if ($items === []) {
             $this->expectNotToPerformAssertions();
 
             return;

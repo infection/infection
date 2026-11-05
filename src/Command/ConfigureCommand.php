@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Composer\InstalledVersions;
-use function count;
 use const GLOB_ONLYDIR;
 use function implode;
 use Infection\Config\ConsoleHelper;
@@ -139,7 +138,7 @@ final class ConfigureCommand extends BaseCommand
         $sourceDirsProvider = new SourceDirsProvider($consoleHelper, $questionHelper, $sourceDirGuesser);
         $sourceDirs = $sourceDirsProvider->get($io, $dirsInCurrentDir);
 
-        if (count($sourceDirs) === 0) {
+        if ($sourceDirs === []) {
             $io->writeln('A source directory was not provided. Unable to generate "infection.json.dist".');
 
             $this->abort();

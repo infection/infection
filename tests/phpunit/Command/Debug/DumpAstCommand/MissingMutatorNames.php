@@ -33,57 +33,5 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
-
-use Exception;
-use function implode;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use function sprintf;
-use Symfony\Component\Process\Process;
-use Webmozart\Assert\Assert;
-
-/**
- * @internal
- */
-final class InitialTestsFailed extends Exception
-{
-    public static function fromProcessAndAdapter(
-        Process $initialTestSuiteProcess,
-        TestFrameworkAdapter $testFrameworkAdapter,
-    ): self {
-        $testFrameworkKey = $testFrameworkAdapter->getName();
-
-        $exitCode = $initialTestSuiteProcess->getExitCode();
-        Assert::notNull($exitCode);
-
-        $lines = [
-            'Project tests must be in a passing state before running Infection.',
-            $testFrameworkAdapter->getInitialTestsFailRecommendations($initialTestSuiteProcess->getCommandLine()),
-            sprintf(
-                '%s reported an exit code of %d.',
-                $testFrameworkKey,
-                $exitCode,
-            ),
-            sprintf(
-                'Refer to the %s\'s output below:',
-                $testFrameworkKey,
-            ),
-        ];
-
-        $stdOut = $initialTestSuiteProcess->getOutput();
-
-        if ($stdOut !== '') {
-            $lines[] = 'STDOUT:';
-            $lines[] = $stdOut;
-        }
-
-        $stdError = $initialTestSuiteProcess->getErrorOutput();
-
-        if ($stdError !== '') {
-            $lines[] = 'STDERR:';
-            $lines[] = $stdError;
-        }
-
-        return new self(implode("\n", $lines));
-    }
-}
+// @infection-ignore
+return false;

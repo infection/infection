@@ -1,0 +1,18 @@
+{
+    "timeout": 2,
+    "threads": 1,
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "mutators": {
+        "Plus": true,
+        "GreaterThan": true,
+        "Minus": true
+    },
+    "logs": {
+        "summary": "infection.log"
+    },
+    "tmpDir": "."
+}

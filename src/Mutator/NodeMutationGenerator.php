@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use function array_diff_key;
+use function array_flip;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\Source\Exception\NoSourceFound;
 use PhpParser\Node;
@@ -51,24 +54,19 @@ use Webmozart\Assert\Assert;
  */
 class NodeMutationGenerator
 {
-    /** @var Mutator<Node>[] */
-    private readonly array $mutators;
-
     /**
-     * @param Mutator<Node>[] $mutators
+     * @param array<string, Mutator<Node>> $mutatorsByName Mutators keyed by their names.
      * @param Node[] $fileNodes
      * @param Token[] $originalFileTokens
      */
     public function __construct(
-        array $mutators,
+        private readonly array $mutatorsByName,
         private readonly string $filePath,
         private readonly array $fileNodes,
         private readonly array $originalFileTokens,
         private readonly string $originalFileContent,
     ) {
-        Assert::allIsInstanceOf($mutators, Mutator::class);
-
-        $this->mutators = $mutators;
+        Assert::allIsInstanceOf($mutatorsByName, Mutator::class);
     }
 
     /**
@@ -82,9 +80,28 @@ class NodeMutationGenerator
             return;
         }
 
-        foreach ($this->mutators as $mutator) {
+        foreach ($this->getNonIgnoredMutators($node) as $mutator) {
             yield from $this->generateForMutator($node, $mutator);
         }
+    }
+
+    /**
+     * @return array<string, Mutator<Node>>
+     */
+    private function getNonIgnoredMutators(Node $node): array
+    {
+        $ignoredMutators = ExcludeIgnoredMutatorsVisitor::getIgnoredMutators($node);
+
+        if ($ignoredMutators === []) {
+            // False positive: this mutation affects performance without changing behaviour.
+            // @infection-ignore ReturnRemoval
+            return $this->mutatorsByName;
+        }
+
+        return array_diff_key(
+            $this->mutatorsByName,
+            array_flip($ignoredMutators),
+        );
     }
 
     /**
