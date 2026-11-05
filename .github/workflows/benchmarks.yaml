@@ -83,9 +83,9 @@ jobs:
     if: always()
     steps:
       - name: Successful run
-        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'skipped') }}
         run: exit 0
 
       - name: Failing run
-        if: ${{ contains(needs.*.result, 'failure') }}
+        if: ${{ always() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')) }}
         run: exit 1
