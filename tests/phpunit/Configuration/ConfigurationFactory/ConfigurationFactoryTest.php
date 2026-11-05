@@ -58,7 +58,6 @@ use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\LogVerbosity;
 use Infection\Differ\ChangedLinesRange;
 use Infection\FileSystem\FileSystem;
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
@@ -88,6 +87,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use function str_contains;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 
@@ -1513,7 +1513,8 @@ final class ConfigurationFactoryTest extends TestCase
                     $defaultInputBuilder->withSourceFilter(new GitDiffFileFilter('unknown.diff')),
                 )
                 ->withExpected(
-                    FileOrDirectoryNotFound::fromFileName('unknown.diff', ['/path/to']),
+                    // The message differs between Symfony versions, but both contain the path.
+                    new IOException('/path/to/unknown.diff'),
                 ),
         ];
 
