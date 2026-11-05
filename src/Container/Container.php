@@ -53,7 +53,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\SourceFilter\ChangedLinesFilter;
-use Infection\Configuration\SourceFilter\DiffFileFilter;
+use Infection\Configuration\SourceFilter\GitDiffFileFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
@@ -631,19 +631,17 @@ final class Container extends DIContainer
                 $configuration = $container->getConfiguration();
                 $sourceFilter = $configuration->sourceFilter;
 
-                if ($sourceFilter instanceof ChangedLinesFilter) {
-                    return new ChangedLinesSourceLineMatcher($sourceFilter->changedLinesRangesByFilePath);
-                }
-
-                return $sourceFilter instanceof GitDiffFilter
-                    ? new GitDiffSourceLineMatcher(
+                return match (true) {
+                    $sourceFilter instanceof GitDiffFilter => new GitDiffSourceLineMatcher(
                         $container->getGit(),
                         $sourceFilter->base,
                         $sourceFilter->value,
                         $configuration->source->directories,
                         dirname($configuration->configurationPathname),
-                    )
-                    : new NullSourceLineMatcher();
+                    ),
+                    $sourceFilter instanceof ChangedLinesFilter => new ChangedLinesSourceLineMatcher($sourceFilter->changedLinesRangesByFilePath),
+                    default => new NullSourceLineMatcher(),
+                };
             },
             SourceCollector::class => static fn (self $container): SourceCollector => new LazySourceCollector(
                 static function () use ($container): SourceCollector {
@@ -732,7 +730,7 @@ final class Container extends DIContainer
         ?string $testFrameworkExtraOptions = null,
         ?string $testFrameworkExtraArgs = null,
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
-        PlainFilter|IncompleteGitDiffFilter|DiffFileFilter|PositionalPathsFilter|null $sourceFilter = null,
+        PlainFilter|IncompleteGitDiffFilter|GitDiffFileFilter|PositionalPathsFilter|null $sourceFilter = null,
         int|string|null $threadCount = self::DEFAULT_THREAD_COUNT,
         string|int|null $dotsPerRow = self::DEFAULT_DOTS_PER_ROW,
         bool $dryRun = self::DEFAULT_DRY_RUN,

@@ -50,7 +50,7 @@ use Infection\Configuration\PositionalPathsClassifier;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\ChangedLinesFilter;
-use Infection\Configuration\SourceFilter\DiffFileFilter;
+use Infection\Configuration\SourceFilter\GitDiffFileFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
@@ -1495,11 +1495,11 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
-        yield 'with a diff file' => [
+        yield 'with a git diff file' => [
             $defaultScenario
                 ->forSourceFilter(
-                    sourceFilter: new DiffFileFilter(
-                        __DIR__ . '/../../Fixtures/Files/diff-file/changes.diff',
+                    sourceFilter: new GitDiffFileFilter(
+                        __DIR__ . '/../../Fixtures/Files/git-diff-file/changes.diff',
                     ),
                     expectedSourceFilter: new ChangedLinesFilter([
                         '/path/to/src/Foo.php' => [ChangedLinesRange::forRange(10, 3)],
@@ -1507,28 +1507,28 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
-        yield 'with a diff file that does not exist' => [
+        yield 'with a git diff file that does not exist' => [
             $defaultScenario
                 ->withInput(
-                    $defaultInputBuilder->withSourceFilter(new DiffFileFilter('unknown.diff')),
+                    $defaultInputBuilder->withSourceFilter(new GitDiffFileFilter('unknown.diff')),
                 )
                 ->withExpected(
                     FileOrDirectoryNotFound::fromFileName('unknown.diff', ['/path/to']),
                 ),
         ];
 
-        yield 'with a diff file without added or modified lines' => [
+        yield 'with a git diff file without added or modified lines' => [
             $defaultScenario
                 ->withInput(
                     $defaultInputBuilder->withSourceFilter(
-                        new DiffFileFilter(
-                            __DIR__ . '/../../Fixtures/Files/diff-file/removed-lines-only.diff',
+                        new GitDiffFileFilter(
+                            __DIR__ . '/../../Fixtures/Files/git-diff-file/removed-lines-only.diff',
                         ),
                     ),
                 )
                 ->withExpected(
-                    NoSourceFound::noChangedLinesForDiffFile(
-                        __DIR__ . '/../../Fixtures/Files/diff-file/removed-lines-only.diff',
+                    NoSourceFound::noChangedLinesForGitDiffFile(
+                        __DIR__ . '/../../Fixtures/Files/git-diff-file/removed-lines-only.diff',
                     ),
                 ),
         ];

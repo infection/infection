@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
 use Infection\Configuration\Schema\SchemaConfiguration;
-use Infection\Configuration\SourceFilter\DiffFileFilter;
+use Infection\Configuration\SourceFilter\GitDiffFileFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalPathsFilter;
@@ -68,7 +68,7 @@ final class ConfigurationFactoryInputBuilder
         private ?string $testFrameworkExtraOptions,
         private ?string $testFrameworkExtraArgs,
         private ?string $staticAnalysisToolOptions,
-        private PlainFilter|IncompleteGitDiffFilter|DiffFileFilter|PositionalPathsFilter|null $sourceFilter,
+        private PlainFilter|IncompleteGitDiffFilter|GitDiffFileFilter|PositionalPathsFilter|null $sourceFilter,
         private int|string|null $threadCount,
         private string|int|null $dotsPerRow,
         private bool $dryRun,
@@ -238,7 +238,7 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
-    public function withSourceFilter(PlainFilter|IncompleteGitDiffFilter|DiffFileFilter|PositionalPathsFilter|null $sourceFilter): self
+    public function withSourceFilter(PlainFilter|IncompleteGitDiffFilter|GitDiffFileFilter|PositionalPathsFilter|null $sourceFilter): self
     {
         $clone = clone $this;
         $clone->sourceFilter = $sourceFilter;
@@ -389,7 +389,7 @@ final class ConfigurationFactoryInputBuilder
      *     17: string|null,
      *     18: string|null,
      *     19: string|null,
-     *     20: PlainFilter|IncompleteGitDiffFilter|DiffFileFilter|PositionalPathsFilter|null,
+     *     20: PlainFilter|IncompleteGitDiffFilter|GitDiffFileFilter|PositionalPathsFilter|null,
      *     21: positive-int|'auto'|'max'|null,
      *     22: positive-int|'max'|null,
      *     23: bool,

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Source\MatcherLine;
 
 use Infection\Differ\ChangedLinesRange;
+use Infection\Framework\OperatingSystem;
 use Symfony\Component\Filesystem\Path;
 
 /**
@@ -53,7 +54,9 @@ final readonly class ChangedLinesSourceLineMatcher implements SourceLineMatcher
 
     public function touches(string $fileRealPath, int $startLine, int $endLine): bool
     {
-        $fileRealPath = Path::normalize($fileRealPath);
+        if (OperatingSystem::isWindows()) {
+            $fileRealPath = Path::normalize($fileRealPath);
+        }
 
         foreach ($this->changedLinesRangesByFilePath[$fileRealPath] ?? [] as $changedLinesRange) {
             if ($changedLinesRange->touches($startLine, $endLine)) {

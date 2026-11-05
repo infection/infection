@@ -1,6 +1,6 @@
 <?php
 
-namespace DiffFile;
+namespace Git_Diff_File;
 
 class SourceClass
 {

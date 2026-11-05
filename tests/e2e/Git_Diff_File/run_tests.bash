@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-readonly INFECTION="../../../${1} --diff-file=changes.diff"
+readonly INFECTION="../../../${1} --git-diff-file=changes.diff"
 
 set -eo pipefail
 
@@ -11,4 +11,4 @@ else
     php $INFECTION
 fi
 
-diff --ignore-all-space expected-output.txt infection.log
+diff --ignore-all-space expected-output.txt var/infection.log
