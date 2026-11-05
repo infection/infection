@@ -67,7 +67,7 @@ final class MutationGeneratorTest extends TestCase
             ],
         );
 
-        $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
+        $mutatorsByName = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
         $eventDispatcherMock = $this->createStub(EventDispatcher::class);
         $onlyCovered = true;
 
@@ -81,8 +81,8 @@ final class MutationGeneratorTest extends TestCase
             ->method('generate')
             ->with(
                 ...WithConsecutive::create(
-                    [$fileInfoA, $onlyCovered, $mutators],
-                    [$fileInfoB, $onlyCovered, $mutators],
+                    [$fileInfoA, $onlyCovered, $mutatorsByName],
+                    [$fileInfoB, $onlyCovered, $mutatorsByName],
                 ),
             )
             ->willReturnOnConsecutiveCalls(
@@ -100,7 +100,7 @@ final class MutationGeneratorTest extends TestCase
 
         $mutationGenerator = new MutationGenerator(
             $sourceCollector,
-            $mutators,
+            $mutatorsByName,
             $eventDispatcherMock,
             $fileMutationGenerator,
         );
