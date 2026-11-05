@@ -1,0 +1,10 @@
+diff --git a/src/Foo.php b/src/Foo.php
+index 1111111..2222222 100644
+--- a/src/Foo.php
++++ b/src/Foo.php
+@@ -10,2 +10,3 @@ final class Foo
+-        return 1;
+-        return 2;
++        return 10;
++        return 20;
++        return 30;
