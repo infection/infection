@@ -79,6 +79,7 @@ use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PhpParser\Node;
 use function sprintf;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
@@ -464,7 +465,7 @@ class ConfigurationFactory
     }
 
     /**
-     * @throws FileOrDirectoryNotFound
+     * @throws IOException
      * @throws NoSourceFound
      *
      * @return array{0: SourceFilter, 1: string|null}
@@ -502,16 +503,12 @@ class ConfigurationFactory
     }
 
     /**
-     * @throws FileOrDirectoryNotFound
+     * @throws IOException
      * @throws NoSourceFound
      */
     private function resolveGitDiffFileFilter(GitDiffFileFilter $gitDiffFileFilter, string $configDir): ChangedLinesFilter
     {
         $pathname = Path::makeAbsolute($gitDiffFileFilter->pathname, $configDir);
-
-        if (!$this->fileSystem->isReadableFile($pathname)) {
-            throw FileOrDirectoryNotFound::fromFileName($gitDiffFileFilter->pathname, [$configDir]);
-        }
 
         $diff = $this->fileSystem->readFile($pathname);
 
