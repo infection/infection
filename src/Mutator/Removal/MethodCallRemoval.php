@@ -39,7 +39,11 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Override;
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
@@ -78,8 +82,45 @@ final class MethodCallRemoval implements Mutator
             return false;
         }
 
-        return $node->expr instanceof Node\Expr\MethodCall
-            || $node->expr instanceof Node\Expr\NullsafeMethodCall
-            || $node->expr instanceof Node\Expr\StaticCall;
+        if (!$node->expr instanceof Node\Expr\MethodCall
+            && !$node->expr instanceof Node\Expr\NullsafeMethodCall
+            && !$node->expr instanceof Node\Expr\StaticCall
+        ) {
+            return false;
+        }
+
+        // Removing the call would also remove the assignment, leaving the variable undefined further down
+        return !self::containsAssignment($node->expr);
+    }
+
+    private static function containsAssignment(Node $node): bool
+    {
+        $visitor = new class extends NodeVisitorAbstract {
+            public bool $found = false;
+
+            #[Override]
+            public function enterNode(Node $node): ?int
+            {
+                // Closures and arrow functions have their own variable scope
+                if ($node instanceof Node\FunctionLike) {
+                    return NodeVisitor::DONT_TRAVERSE_CHILDREN;
+                }
+
+                if (!$node instanceof Node\Expr\Assign
+                    && !$node instanceof Node\Expr\AssignOp
+                    && !$node instanceof Node\Expr\AssignRef
+                ) {
+                    return null;
+                }
+
+                $this->found = true;
+
+                return NodeVisitor::STOP_TRAVERSAL;
+            }
+        };
+
+        (new NodeTraverser($visitor))->traverse([$node]);
+
+        return $visitor->found;
     }
 }
