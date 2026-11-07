@@ -36,6 +36,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
+use function array_unshift;
 use function array_values;
 use function implode;
 use Infection\Configuration\Configuration;
@@ -160,7 +161,7 @@ final class ConfigurationBuilder
     {
         return new self(
             timeout: 10.0,
-            source: new Source(),
+            source: new Source(['src'], []),
             sourceFilter: null,
             logs: Logs::createEmpty(),
             logVerbosity: 'none',
@@ -288,10 +289,15 @@ final class ConfigurationBuilder
     }
 
     /**
+     * @param non-empty-string $sourceDirectory
      * @param non-empty-string ...$sourceDirectories
      */
-    public function withSourceDirectories(string ...$sourceDirectories): self
-    {
+    public function withSourceDirectories(
+        string $sourceDirectory,
+        string ...$sourceDirectories,
+    ): self {
+        array_unshift($sourceDirectories, $sourceDirectory);
+
         $clone = clone $this;
         $clone->source = new Source(
             array_values($sourceDirectories),

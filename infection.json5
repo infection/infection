@@ -4,7 +4,7 @@
     "threads": "max",
     "source": {
         "directories": [
-            "src"
+            ""
         ],
         excludes: [
             "FileSystem/DummyFileSystem.php",
