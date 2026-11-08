@@ -153,7 +153,18 @@ final class RunCommand extends BaseCommand
             ->setDescription('Runs the mutation testing.')
         ;
 
-        PathsArgument::addArgument($this);
+        PathsArgument::addArgument(
+            $this,
+            description: <<<'HELP'
+                Source and test paths, e.g. `src/A.php src/B.php tests/ATest.php`.
+                Existing paths inside the configured source directories select source files; other existing paths select tests.
+
+                Source code can also be selected by class or method, e.g. 'App\Differ', 'Differ::diff' or 'Differ::diff::32'. Line numbers are counted from the start of the source file.
+                Existing paths take precedence over symbol selectors.
+                An unresolved bare name such as `Differ` selects classes named Differ in files whose paths contain Differ.
+                `Differ/` selects paths only, 'Differ\' selects classes under that namespace prefix and '\Differ' selects the global class. Quotes preserve backslashes in shell arguments.
+                HELP,
+        );
 
         TestFrameworkOption::addOption($this)
             ->addOption(

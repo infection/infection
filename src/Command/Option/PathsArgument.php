@@ -56,7 +56,8 @@ final class PathsArgument
     public static function addArgument(
         Command $command,
         string $description = <<<'HELP'
-            Reduce the selected source code or tests executed e.g. `App\Differ`, `Differ::diff`, `Differ::diff::32`. Existing paths take precedence. An unresolved bare name such as `Differ` intersects path and short class filters. Use `Differ/` for paths only, `'Differ\'` for classes under the Differ namespace prefix or `'\Differ'` for the global class.
+            Source and test paths, e.g. `src/A.php src/B.php tests/ATest.php`.
+            Existing paths inside the configured source directories select source files; other existing paths select tests.
             HELP,
     ): Command {
         return $command->addArgument(
