@@ -107,6 +107,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
     #[DataProvider('ignoreAllMutationProvider')]
     #[DataProvider('ignoredMutatorsMutationProvider')]
     #[DataProvider('sourceSymbolSelectionMutationProvider')]
+    #[DataProvider('anonymousClassSelectionMutationProvider')]
     #[DataProvider('statementLineSelectionMutationProvider')]
     #[DataProvider('methodLineSelectionMutationProvider')]
     public function test_it_generates_mutations(
@@ -632,6 +633,106 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
                 new SourceSymbolSelector(
                     className: 'Missing',
                     methodName: null,
+                    line: null,
+                ),
+            ],
+        ];
+    }
+
+    public static function anonymousClassSelectionMutationProvider(): iterable
+    {
+        $code = <<<'PHP'
+            <?php
+            class Differ
+            {
+                public function diff(): object
+                {
+                    return new class {
+                        public function value(): bool
+                        {
+                            return false;
+                        }
+                    };
+                }
+
+                public function other(): bool
+                {
+                    return false;
+                }
+            }
+            PHP;
+
+        $anonymousClassMutation = [
+            'mutator' => 'FalseValue',
+            'code' => <<<'PHP'
+                <?php
+                class Differ
+                {
+                    public function diff(): object
+                    {
+                        return new class {
+                            public function value(): bool
+                            {
+                                return true;
+                            }
+                        };
+                    }
+
+                    public function other(): bool
+                    {
+                        return false;
+                    }
+                }
+                PHP,
+        ];
+
+        yield 'method selection includes mutations inside its anonymous classes' => [
+            $code,
+            [$anonymousClassMutation],
+            ['FalseValue'],
+            [
+                new SourceSymbolSelector(
+                    className: 'Differ',
+                    methodName: 'diff',
+                    line: null,
+                ),
+            ],
+        ];
+
+        yield 'method and line selection includes a mutation inside an anonymous class' => [
+            $code,
+            [$anonymousClassMutation],
+            ['FalseValue'],
+            [
+                new SourceSymbolSelector(
+                    className: 'Differ',
+                    methodName: 'diff',
+                    line: 9,
+                ),
+            ],
+        ];
+
+        yield 'method and line selection excludes anonymous class mutations on another line' => [
+            $code,
+            [],
+            ['FalseValue'],
+            [
+                new SourceSymbolSelector(
+                    className: 'Differ',
+                    methodName: 'diff',
+                    line: 15,
+                ),
+            ],
+        ];
+
+        yield 'anonymous class methods are not methods of the enclosing named class' => [
+            $code,
+            [],
+            ['FalseValue'],
+            [
+                new SourceSymbolSelector(
+                    className: 'Differ',
+                    methodName: 'value',
                     line: null,
                 ),
             ],
