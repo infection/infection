@@ -217,7 +217,13 @@ final class PositionalArgumentsClassifierTest extends TestCase
         yield 'short class selector' => [
             $baseScenario
                 ->withPaths(['Plus_'])
-                ->withExpected(new ClassifiedPositionalArguments(['Plus_'], [], [new SourceSymbolSelector('Plus_', null, null)])),
+                ->withExpected(
+                    new ClassifiedPositionalArguments(
+                        ['Plus_'],
+                        [],
+                        [new SourceSymbolSelector('Plus_')],
+                    ),
+                ),
         ];
 
         yield 'trailing slash forces a partial path filter' => [
@@ -261,11 +267,7 @@ final class PositionalArgumentsClassifierTest extends TestCase
                     [],
                     [],
                     [
-                        new SourceSymbolSelector(
-                            'Differ\\',
-                            null,
-                            null,
-                        ),
+                        new SourceSymbolSelector('Differ\\'),
                     ],
                 ),
                 ),
@@ -277,13 +279,7 @@ final class PositionalArgumentsClassifierTest extends TestCase
                 ->withExpected(new ClassifiedPositionalArguments(
                     [],
                     [],
-                    [
-                        new SourceSymbolSelector(
-                            '\Differ',
-                            null,
-                            null,
-                        ),
-                    ],
+                    [new SourceSymbolSelector('\Differ')],
                 )),
         ];
 
@@ -413,7 +409,7 @@ final class PositionalArgumentsClassifierTest extends TestCase
                 ->withExpected(
                     new ClassifiedPositionalArguments(
                         ['Mailer'], ['tests/Unit/Service/'],
-                        [new SourceSymbolSelector('Mailer', null, null)],
+                        [new SourceSymbolSelector('Mailer')],
                     ),
                 ),
         ];
@@ -427,8 +423,8 @@ final class PositionalArgumentsClassifierTest extends TestCase
                         ['Mailer', 'Plus_'],
                         ['tests/Unit/Service/'],
                         [
-                            new SourceSymbolSelector('Mailer', null, null),
-                            new SourceSymbolSelector('Plus_', null, null),
+                            new SourceSymbolSelector('Mailer'),
+                            new SourceSymbolSelector('Plus_'),
                         ],
                     ),
                 ),
@@ -448,7 +444,7 @@ final class PositionalArgumentsClassifierTest extends TestCase
                 ->withExpected(
                     new ClassifiedPositionalArguments(
                         ['Mailer'], ['tests/Unit/Service/'],
-                        [new SourceSymbolSelector('Mailer', null, null)],
+                        [new SourceSymbolSelector('Mailer')],
                     ),
                 ),
         ];
@@ -459,8 +455,8 @@ final class PositionalArgumentsClassifierTest extends TestCase
                 ->withExistingFiles(['/project/tests/Unit/Service/MailerTest.php'])
                 ->withExpected(
                     new ClassifiedPositionalArguments(['Mailer', 'Plus_'], ['tests/Unit/Service/'], [
-                        new SourceSymbolSelector('Mailer', null, null),
-                        new SourceSymbolSelector('Plus_', null, null),
+                        new SourceSymbolSelector('Mailer'),
+                        new SourceSymbolSelector('Plus_'),
                     ]),
                 ),
         ];
