@@ -8,8 +8,6 @@
 
 ## Checklist
 
-<!-- Keep every item. Tick what you did; leave the rest unticked. Do not delete items. -->
-
 - [ ] Tests added/updated
 - [ ] Documentation updated (provide link to PR: https://github.com/infection/infection.github.io/pull/XXX)
 - [ ] CHANGELOG.md updated (if deprecations/breaking changes)

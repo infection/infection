@@ -628,8 +628,7 @@ Notes for review:
 - Use `.github/PULL_REQUEST_TEMPLATE.md` as the PR body, even when you create the PR with
   `gh pr create --body` or another tool that skips the template. Keep every checklist item.
   Tick the items you did and leave the others unticked; do not delete them. Reviewers use the
-  unticked items to see what is missing (#3683 lost its docs item this way). Remove only the
-  sections that the template marks "Remove if not applicable/relevant".
+  unticked items to see what is missing.
 - User-facing changes need a doc PR to github.com/infection/infection.github.io (linked in
   the checklist); internal work does not.
 - Review culture to anticipate: "explain WHY" (maks-rafalko) - undocumented non-obvious
