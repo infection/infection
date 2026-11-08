@@ -56,6 +56,8 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
      * @param list<int> $expectedEligibleNodeIds
      */
     #[DataProvider('scenarioProvider')]
+    #[DataProvider('statementLineSelectionProvider')]
+    #[DataProvider('methodLineSelectionProvider')]
     public function test_it_excludes_non_selected_source_nodes(
         string $code,
         array $selectors,
@@ -108,23 +110,23 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'qualified method selection excludes a method with the same name in another namespace' => [
             $mailerClassesInDifferentNamespaces,
             [
-                new SourceSymbolSelector(
-                    'App\\Mailer',
-                    'send',
-                    null,
-                ),
+                new SourceSymbolSelector('App\\Mailer', 'send'),
             ],
             [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+        ];
+
+        yield 'an unmatched class excludes every node' => [
+            $mailerClassesInDifferentNamespaces,
+            [
+                new SourceSymbolSelector('Missing'),
+            ],
+            [],
         ];
 
         yield 'class and absolute line' => [
             $mailerClassesInDifferentNamespaces,
             [
-                new SourceSymbolSelector(
-                    'App\\Mailer',
-                    null,
-                    6,
-                ),
+                new SourceSymbolSelector('App\\Mailer', line: 6),
             ],
             [2, 4, 7, 8, 10, 11],
         ];
@@ -132,11 +134,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'method and absolute line' => [
             $mailerClassesInDifferentNamespaces,
             [
-                new SourceSymbolSelector(
-                    'App\\Mailer',
-                    'send',
-                    7,
-                ),
+                new SourceSymbolSelector('App\\Mailer', 'send', 7),
             ],
             [4, 7, 8, 10, 12],
         ];
@@ -144,11 +142,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'line beyond the selected method' => [
             $mailerClassesInDifferentNamespaces,
             [
-                new SourceSymbolSelector(
-                    'App\\Mailer',
-                    'send',
-                    15,
-                ),
+                new SourceSymbolSelector('App\\Mailer', 'send', 15),
             ],
             [],
         ];
@@ -156,41 +150,52 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'other qualified method on its absolute line' => [
             $mailerClassesInDifferentNamespaces,
             [
-                new SourceSymbolSelector(
-                    'Other\\Mailer',
-                    'send',
-                    15,
-                ),
+                new SourceSymbolSelector('Other\\Mailer', 'send', 15),
             ],
             [21, 24, 25, 26, 27],
         ];
 
-        yield 'nodes outside the selected method' => [
-            <<<'PHP'
-                <?php
-                namespace App;
+        $mailerWithTwoMethods = <<<'PHP'
+            <?php
+            namespace App;
 
-                final class Mailer
+            final class Mailer
+            {
+                public function send(): int
                 {
-                    public function send(): int
-                    {
-                        return 1;
-                    }
-
-                    public function receive(): int
-                    {
-                        return 2;
-                    }
+                    return 1;
                 }
-                PHP,
+
+                public function receive(): int
+                {
+                    return 2;
+                }
+            }
+            PHP;
+
+        yield 'nodes outside the selected method' => [
+            $mailerWithTwoMethods,
             [
-                new SourceSymbolSelector(
-                    'Mailer',
-                    'send',
-                    null,
-                ),
+                new SourceSymbolSelector('Mailer', 'send'),
             ],
             [4, 5, 6, 7, 8],
+        ];
+
+        yield 'class selection includes every method in the class' => [
+            $mailerWithTwoMethods,
+            [
+                new SourceSymbolSelector('Mailer'),
+            ],
+            [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+        ];
+
+        yield 'a method selector and a class selector in another namespace form a union' => [
+            $mailerClassesInDifferentNamespaces,
+            [
+                new SourceSymbolSelector('App\\Mailer', 'send'),
+                new SourceSymbolSelector('Other\\Mailer'),
+            ],
+            [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 26, 27],
         ];
 
         yield 'a short class name selects every matching declaration' => [
@@ -218,11 +223,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                 }
                 PHP,
             [
-                new SourceSymbolSelector(
-                    'Differ',
-                    'diff',
-                    null,
-                ),
+                new SourceSymbolSelector('Differ', 'diff'),
             ],
             [4, 5, 6, 7, 8, 13, 14, 15, 16, 17],
         ];
@@ -251,16 +252,8 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                 }
                 PHP,
             [
-                new SourceSymbolSelector(
-                    'Differ',
-                    'diff',
-                    null,
-                ),
-                new SourceSymbolSelector(
-                    'App\\Differ',
-                    'diffToArray',
-                    null,
-                ),
+                new SourceSymbolSelector('Differ', 'diff'),
+                new SourceSymbolSelector('App\\Differ', 'diffToArray'),
             ],
             [4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
         ];
@@ -288,11 +281,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'an anonymous class inherits the enclosing symbol context' => [
             $methodContainingAnonymousClass,
             [
-                new SourceSymbolSelector(
-                    'Differ',
-                    'diff',
-                    null,
-                ),
+                new SourceSymbolSelector('Differ', 'diff'),
             ],
             [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
         ];
@@ -300,11 +289,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'class selection includes anonymous classes in its methods' => [
             $methodContainingAnonymousClass,
             [
-                new SourceSymbolSelector(
-                    'Differ',
-                    null,
-                    null,
-                ),
+                new SourceSymbolSelector('Differ'),
             ],
             [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
         ];
@@ -312,23 +297,23 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'method and line selection reaches inside an anonymous class' => [
             $methodContainingAnonymousClass,
             [
-                new SourceSymbolSelector(
-                    'Differ',
-                    'diff',
-                    11,
-                ),
+                new SourceSymbolSelector('Differ', 'diff', 11),
             ],
             [4, 7, 8, 10, 11, 12, 15, 16],
+        ];
+
+        yield 'line after an anonymous class excludes its nodes while keeping the enclosing method' => [
+            $methodContainingAnonymousClass,
+            [
+                new SourceSymbolSelector('Differ', 'diff', 15),
+            ],
+            [4, 17, 18],
         ];
 
         yield 'an anonymous class method cannot be selected as a method of its enclosing class' => [
             $methodContainingAnonymousClass,
             [
-                new SourceSymbolSelector(
-                    'Differ',
-                    'nested',
-                    null,
-                ),
+                new SourceSymbolSelector('Differ', 'nested'),
             ],
             [],
         ];
@@ -355,11 +340,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                 }
                 PHP,
             [
-                new SourceSymbolSelector(
-                    'Differ',
-                    'diff',
-                    null,
-                ),
+                new SourceSymbolSelector('Differ', 'diff'),
             ],
             [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
         ];
@@ -389,11 +370,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                 }
                 PHP,
             [
-                new SourceSymbolSelector(
-                    'Differ',
-                    'diff',
-                    null,
-                ),
+                new SourceSymbolSelector('Differ', 'diff'),
             ],
             [2, 3, 4, 5, 6, 7, 8, 15, 16],
         ];
@@ -409,11 +386,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                 };
                 PHP,
             [
-                new SourceSymbolSelector(
-                    'Differ',
-                    'diff',
-                    null,
-                ),
+                new SourceSymbolSelector('Differ', 'diff'),
             ],
             [],
         ];
@@ -446,11 +419,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'namespace prefix selects only its namespace and nested namespaces' => [
             $classesWithOverlappingNamespacePrefixes,
             [
-                new SourceSymbolSelector(
-                    'Differ\\',
-                    null,
-                    null,
-                ),
+                new SourceSymbolSelector('Differ\\'),
             ],
             [5, 6, 9, 10],
         ];
@@ -458,11 +427,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'explicitly qualified namespace prefix' => [
             $classesWithOverlappingNamespacePrefixes,
             [
-                new SourceSymbolSelector(
-                    '\\Differ\\',
-                    null,
-                    null,
-                ),
+                new SourceSymbolSelector('\\Differ\\'),
             ],
             [5, 6, 9, 10],
         ];
@@ -470,11 +435,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'nested namespace prefix' => [
             $classesWithOverlappingNamespacePrefixes,
             [
-                new SourceSymbolSelector(
-                    'App\\Differ\\',
-                    null,
-                    null,
-                ),
+                new SourceSymbolSelector('App\\Differ\\'),
             ],
             [25, 26],
         ];
@@ -482,11 +443,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'case insensitive namespace prefix' => [
             $classesWithOverlappingNamespacePrefixes,
             [
-                new SourceSymbolSelector(
-                    'dIfFeR\\',
-                    null,
-                    null,
-                ),
+                new SourceSymbolSelector('dIfFeR\\'),
             ],
             [5, 6, 9, 10],
         ];
@@ -507,11 +464,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'short name selects global and namespaced classes' => [
             $globalAndNamespacedMailers,
             [
-                new SourceSymbolSelector(
-                    'Mailer',
-                    null,
-                    null,
-                ),
+                new SourceSymbolSelector('Mailer'),
             ],
             [1, 2, 5, 6, 9, 10],
         ];
@@ -519,11 +472,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'explicit global name excludes namespaced classes' => [
             $globalAndNamespacedMailers,
             [
-                new SourceSymbolSelector(
-                    '\\Mailer',
-                    null,
-                    null,
-                ),
+                new SourceSymbolSelector('\\Mailer'),
             ],
             [1, 2],
         ];
@@ -531,11 +480,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'qualified name excludes other namespaces and the global class' => [
             $globalAndNamespacedMailers,
             [
-                new SourceSymbolSelector(
-                    'App\\Mailer',
-                    null,
-                    null,
-                ),
+                new SourceSymbolSelector('App\\Mailer'),
             ],
             [5, 6],
         ];
@@ -543,11 +488,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'explicitly qualified class name' => [
             $globalAndNamespacedMailers,
             [
-                new SourceSymbolSelector(
-                    '\\App\\Mailer',
-                    null,
-                    null,
-                ),
+                new SourceSymbolSelector('\\App\\Mailer'),
             ],
             [5, 6],
         ];
@@ -555,11 +496,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'case insensitive explicit global name' => [
             $globalAndNamespacedMailers,
             [
-                new SourceSymbolSelector(
-                    '\\mAiLeR',
-                    null,
-                    null,
-                ),
+                new SourceSymbolSelector('\\mAiLeR'),
             ],
             [1, 2],
         ];
@@ -567,11 +504,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'method declaration line precedes its statements' => [
             $mailerClassesInDifferentNamespaces,
             [
-                new SourceSymbolSelector(
-                    'App\\Mailer',
-                    'send',
-                    4,
-                ),
+                new SourceSymbolSelector('App\\Mailer', 'send', 4),
             ],
             [4, 5, 6],
         ];
@@ -579,11 +512,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'first line of a multiline statement' => [
             $mailerClassesInDifferentNamespaces,
             [
-                new SourceSymbolSelector(
-                    'App\\Mailer',
-                    'send',
-                    5,
-                ),
+                new SourceSymbolSelector('App\\Mailer', 'send', 5),
             ],
             [4, 7, 8, 9],
         ];
@@ -591,11 +520,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'line inside a multiline statement' => [
             $mailerClassesInDifferentNamespaces,
             [
-                new SourceSymbolSelector(
-                    'App\\Mailer',
-                    'send',
-                    6,
-                ),
+                new SourceSymbolSelector('App\\Mailer', 'send', 6),
             ],
             [4, 7, 8, 10, 11],
         ];
@@ -603,11 +528,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'line after a multiline statement' => [
             $mailerClassesInDifferentNamespaces,
             [
-                new SourceSymbolSelector(
-                    'App\\Mailer',
-                    'send',
-                    8,
-                ),
+                new SourceSymbolSelector('App\\Mailer', 'send', 8),
             ],
             [4, 13, 14, 15, 16],
         ];
@@ -615,11 +536,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'last line of the method excludes its statements' => [
             $mailerClassesInDifferentNamespaces,
             [
-                new SourceSymbolSelector(
-                    'App\\Mailer',
-                    'send',
-                    9,
-                ),
+                new SourceSymbolSelector('App\\Mailer', 'send', 9),
             ],
             [4],
         ];
@@ -627,11 +544,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'another method does not match the line alone' => [
             $mailerClassesInDifferentNamespaces,
             [
-                new SourceSymbolSelector(
-                    'App\\Mailer',
-                    'receive',
-                    6,
-                ),
+                new SourceSymbolSelector('App\\Mailer', 'receive', 6),
             ],
             [],
         ];
@@ -639,11 +552,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'another qualified class does not match the method and line alone' => [
             $mailerClassesInDifferentNamespaces,
             [
-                new SourceSymbolSelector(
-                    'Other\\Mailer',
-                    'send',
-                    6,
-                ),
+                new SourceSymbolSelector('Other\\Mailer', 'send', 6),
             ],
             [],
         ];
@@ -651,13 +560,137 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
         yield 'case insensitive method name' => [
             $mailerClassesInDifferentNamespaces,
             [
-                new SourceSymbolSelector(
-                    'App\\Mailer',
-                    'SeNd',
-                    null,
-                ),
+                new SourceSymbolSelector('App\\Mailer', 'SeNd'),
             ],
             [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+        ];
+    }
+
+    public static function statementLineSelectionProvider(): iterable
+    {
+        $code = <<<'PHP'
+            <?php
+
+            class Example {
+                public function values(): array {
+                    $fallback = false;
+                    return array_filter(
+                        [
+                            false,
+                            true,
+                        ],
+                    );
+                }
+            }
+            PHP;
+
+        // Node 2 is the method, 5-9 are the assignment, 10 is the return,
+        // 11 is the call, 12 is its name, and 13-20 are its array argument.
+        yield 'assignment line excludes the following multiline call and its arguments' => [
+            $code,
+            [
+                new SourceSymbolSelector('Example', 'values', 5),
+            ],
+            [2, 5, 6, 7, 8, 9],
+        ];
+
+        yield 'call opening line keeps the call but excludes its arguments on later lines' => [
+            $code,
+            [
+                new SourceSymbolSelector('Example', 'values', 6),
+            ],
+            [2, 10, 11, 12],
+        ];
+
+        yield 'array item line keeps the item and enclosing call but excludes the other item' => [
+            $code,
+            [
+                new SourceSymbolSelector('Example', 'values', 8),
+            ],
+            [2, 10, 11, 13, 14, 15, 16, 17],
+        ];
+
+        yield 'call closing line keeps the call but excludes its arguments on earlier lines' => [
+            $code,
+            [
+                new SourceSymbolSelector('Example', 'values', 11),
+            ],
+            [2, 10, 11],
+        ];
+    }
+
+    public static function methodLineSelectionProvider(): iterable
+    {
+        $code = <<<'PHP'
+            <?php
+
+            class Example {
+                public function value(
+                    bool $fallback = false,
+                ): bool {
+                    $value = false;
+
+                    return $value || true;
+                }
+            }
+            PHP;
+
+        // Node 2 is the method, 3 its name, 4-8 its parameter and default,
+        // 9 its return type, 10-14 the assignment, and 15-19 the return statement.
+        yield 'whole method selection includes its signature and body' => [
+            $code,
+            [
+                new SourceSymbolSelector('Example', 'value'),
+            ],
+            [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+        ];
+
+        yield 'method opening line excludes parameter and body nodes on later lines' => [
+            $code,
+            [
+                new SourceSymbolSelector('Example', 'value', 4),
+            ],
+            [2, 3],
+        ];
+
+        yield 'parameter line keeps its default and the enclosing method' => [
+            $code,
+            [
+                new SourceSymbolSelector('Example', 'value', 5),
+            ],
+            [2, 4, 5, 6, 7, 8],
+        ];
+
+        yield 'body assignment line keeps the method declaration but excludes its other statements' => [
+            $code,
+            [
+                new SourceSymbolSelector('Example', 'value', 7),
+            ],
+            [2, 10, 11, 12, 13, 14],
+        ];
+
+        yield 'body return line keeps the method declaration but excludes the earlier assignment' => [
+            $code,
+            [
+                new SourceSymbolSelector('Example', 'value', 9),
+            ],
+            [2, 15, 16, 17, 18, 19],
+        ];
+
+        yield 'method closing brace line keeps only the method declaration' => [
+            $code,
+            [
+                new SourceSymbolSelector('Example', 'value', 10),
+            ],
+            [2],
+        ];
+
+        yield 'line after the method excludes its declaration and body' => [
+            $code,
+            [
+                new SourceSymbolSelector('Example', 'value', 11),
+            ],
+            [],
         ];
     }
 }

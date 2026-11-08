@@ -1554,9 +1554,9 @@ final class ConfigurationFactoryTest extends TestCase
                     $defaultConfigurationBuilder
                         ->withSourceFilter(new PlainFilter(['UnifiedDiffOutputBuilder']))
                         ->withSourceSymbolSelectors(
-                            new SourceSymbolSelector('Differ', 'diff', null),
-                            new SourceSymbolSelector('UnifiedDiffOutputBuilder', null, null),
-                            new SourceSymbolSelector(Differ::class, 'diffToArray', null),
+                            new SourceSymbolSelector('Differ', 'diff'),
+                            new SourceSymbolSelector('UnifiedDiffOutputBuilder'),
+                            new SourceSymbolSelector(Differ::class, 'diffToArray'),
                         )
                         ->withTestFrameworkExtraOptions('tests/FooTest.php')
                         ->build(),

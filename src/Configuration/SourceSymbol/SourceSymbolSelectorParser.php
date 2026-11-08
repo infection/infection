@@ -74,14 +74,7 @@ final class SourceSymbolSelectorParser
             $line,
         ] = $matches;
 
-        return new SourceSymbolSelector(
-            $className,
-            $methodName,
-            self::tryParseLine(
-                $line,
-                $value,
-            ),
-        );
+        return new SourceSymbolSelector($className, $methodName, self::tryParseLine($line, $value));
     }
 
     /**
