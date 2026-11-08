@@ -71,110 +71,62 @@ final class SourceSymbolSelectorParserTest extends TestCase
     {
         yield 'ordinary FQCN' => [
             'App\Service\Mailer',
-            new SourceSymbolSelector(
-                'App\Service\Mailer',
-                null,
-                null,
-            ),
+            new SourceSymbolSelector('App\Service\Mailer'),
         ];
 
         yield 'leading namespace separator' => [
             '\App\Service\Mailer',
-            new SourceSymbolSelector(
-                '\App\Service\Mailer',
-                null,
-                null,
-            ),
+            new SourceSymbolSelector('\App\Service\Mailer'),
         ];
 
         yield 'explicit global namespace' => [
             '\Mailer',
-            new SourceSymbolSelector(
-                '\Mailer',
-                null,
-                null,
-            ),
+            new SourceSymbolSelector('\Mailer'),
         ];
 
         yield 'explicit global namespace and line' => [
             '\Mailer::32',
-            new SourceSymbolSelector(
-                '\Mailer',
-                null,
-                32,
-            ),
+            new SourceSymbolSelector('\Mailer', null, 32),
         ];
 
         yield 'explicit global namespace and method line' => [
             '\Mailer::send::32',
-            new SourceSymbolSelector(
-                '\Mailer',
-                'send',
-                32,
-            ),
+            new SourceSymbolSelector('\Mailer', 'send', 32),
         ];
 
         yield 'method' => [
             'App\Service\Mailer::__invoke',
-            new SourceSymbolSelector(
-                'App\Service\Mailer',
-                '__invoke',
-                null,
-            ),
+            new SourceSymbolSelector('App\Service\Mailer', '__invoke'),
         ];
 
         yield 'short class and method' => [
             'Mailer::send',
-            new SourceSymbolSelector(
-                'Mailer',
-                'send',
-                null,
-            ),
+            new SourceSymbolSelector('Mailer', 'send'),
         ];
 
         yield 'short class and absolute line' => [
             'Mailer::32',
-            new SourceSymbolSelector(
-                'Mailer',
-                null,
-                32,
-            ),
+            new SourceSymbolSelector('Mailer', null, 32),
         ];
 
         yield 'absolute line' => [
             'App\Service\Mailer::32',
-            new SourceSymbolSelector(
-                'App\Service\Mailer',
-                null,
-                32,
-            ),
+            new SourceSymbolSelector('App\Service\Mailer', null, 32),
         ];
 
         yield 'method and absolute line' => [
             'App\Service\Mailer::send::32',
-            new SourceSymbolSelector(
-                'App\Service\Mailer',
-                'send',
-                32,
-            ),
+            new SourceSymbolSelector('App\Service\Mailer', 'send', 32),
         ];
 
         yield 'maximum absolute line' => [
             'Mailer::' . PHP_INT_MAX,
-            new SourceSymbolSelector(
-                'Mailer',
-                null,
-                PHP_INT_MAX,
-            ),
+            new SourceSymbolSelector('Mailer', null, PHP_INT_MAX),
         ];
 
         yield 'method and maximum absolute line' => [
             'Mailer::send::' . PHP_INT_MAX,
-            new SourceSymbolSelector(
-                'Mailer',
-                'send',
-                PHP_INT_MAX,
-            ),
+            new SourceSymbolSelector('Mailer', 'send', PHP_INT_MAX),
         ];
 
         yield 'overflowing absolute line' => [
@@ -189,38 +141,22 @@ final class SourceSymbolSelectorParserTest extends TestCase
 
         yield 'bare short class' => [
             'Mailer',
-            new SourceSymbolSelector(
-                'Mailer',
-                null,
-                null,
-            ),
+            new SourceSymbolSelector('Mailer'),
         ];
 
         yield 'namespace prefix' => [
             'Mailer\\',
-            new SourceSymbolSelector(
-                'Mailer\\',
-                null,
-                null,
-            ),
+            new SourceSymbolSelector('Mailer\\'),
         ];
 
         yield 'explicitly qualified namespace prefix' => [
             '\Mailer\\',
-            new SourceSymbolSelector(
-                '\Mailer\\',
-                null,
-                null,
-            ),
+            new SourceSymbolSelector('\Mailer\\'),
         ];
 
         yield 'namespace prefix with method and line' => [
             'Mailer\::send::32',
-            new SourceSymbolSelector(
-                'Mailer\\',
-                'send',
-                32,
-            ),
+            new SourceSymbolSelector('Mailer\\', 'send', 32),
         ];
 
         yield 'namespace separator after method' => [
@@ -260,38 +196,22 @@ final class SourceSymbolSelectorParserTest extends TestCase
 
         yield 'underscores and trailing digits in identifiers' => [
             '_App2\_Mailer3::_send4',
-            new SourceSymbolSelector(
-                '_App2\_Mailer3',
-                '_send4',
-                null,
-            ),
+            new SourceSymbolSelector('_App2\_Mailer3', '_send4'),
         ];
 
         yield 'non-ASCII identifiers' => [
             'École\Élève::étudier',
-            new SourceSymbolSelector(
-                'École\Élève',
-                'étudier',
-                null,
-            ),
+            new SourceSymbolSelector('École\Élève', 'étudier'),
         ];
 
         yield 'minimum absolute line' => [
             'Mailer::1',
-            new SourceSymbolSelector(
-                'Mailer',
-                null,
-                1,
-            ),
+            new SourceSymbolSelector('Mailer', null, 1),
         ];
 
         yield 'method and minimum absolute line' => [
             'Mailer::send::1',
-            new SourceSymbolSelector(
-                'Mailer',
-                'send',
-                1,
-            ),
+            new SourceSymbolSelector('Mailer', 'send', 1),
         ];
 
         yield 'empty input' => [
@@ -341,11 +261,7 @@ final class SourceSymbolSelectorParserTest extends TestCase
 
         yield 'nested namespace prefix' => [
             '\\App\\Mailer\\',
-            new SourceSymbolSelector(
-                '\\App\\Mailer\\',
-                null,
-                null,
-            ),
+            new SourceSymbolSelector('\\App\\Mailer\\'),
         ];
 
         yield 'namespace separator without a class' => [

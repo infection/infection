@@ -573,11 +573,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$firstMethodMutation, $secondMethodMutation],
             ['FalseValue'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: null,
-                    line: null,
-                ),
+                new SourceSymbolSelector('Example'),
             ],
         ];
 
@@ -586,11 +582,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$secondMethodMutation],
             ['FalseValue'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: 'second',
-                    line: null,
-                ),
+                new SourceSymbolSelector('Example', 'second'),
             ],
         ];
 
@@ -599,11 +591,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$secondMethodMutation],
             ['FalseValue'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: null,
-                    line: 9,
-                ),
+                new SourceSymbolSelector('Example', line: 9),
             ],
         ];
 
@@ -612,16 +600,8 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$firstMethodMutation, $otherClassMutation],
             ['FalseValue'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: 'first',
-                    line: null,
-                ),
-                new SourceSymbolSelector(
-                    className: 'Other',
-                    methodName: null,
-                    line: null,
-                ),
+                new SourceSymbolSelector('Example', 'first'),
+                new SourceSymbolSelector('Other'),
             ],
         ];
 
@@ -630,11 +610,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [],
             ['FalseValue'],
             [
-                new SourceSymbolSelector(
-                    className: 'Missing',
-                    methodName: null,
-                    line: null,
-                ),
+                new SourceSymbolSelector('Missing'),
             ],
         ];
     }
@@ -691,11 +667,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$anonymousClassMutation],
             ['FalseValue'],
             [
-                new SourceSymbolSelector(
-                    className: 'Differ',
-                    methodName: 'diff',
-                    line: null,
-                ),
+                new SourceSymbolSelector('Differ', 'diff'),
             ],
         ];
 
@@ -704,11 +676,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$anonymousClassMutation],
             ['FalseValue'],
             [
-                new SourceSymbolSelector(
-                    className: 'Differ',
-                    methodName: 'diff',
-                    line: 9,
-                ),
+                new SourceSymbolSelector('Differ', 'diff', 9),
             ],
         ];
 
@@ -717,11 +685,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [],
             ['FalseValue'],
             [
-                new SourceSymbolSelector(
-                    className: 'Differ',
-                    methodName: 'diff',
-                    line: 15,
-                ),
+                new SourceSymbolSelector('Differ', 'diff', 15),
             ],
         ];
 
@@ -730,11 +694,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [],
             ['FalseValue'],
             [
-                new SourceSymbolSelector(
-                    className: 'Differ',
-                    methodName: 'value',
-                    line: null,
-                ),
+                new SourceSymbolSelector('Differ', 'value'),
             ],
         ];
     }
@@ -818,11 +778,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$assignmentMutation],
             ['FalseValue', 'TrueValue', 'UnwrapArrayFilter'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: 'values',
-                    line: 5,
-                ),
+                new SourceSymbolSelector('Example', 'values', 5),
             ],
         ];
 
@@ -831,11 +787,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$unwrapMutation],
             ['FalseValue', 'TrueValue', 'UnwrapArrayFilter'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: 'values',
-                    line: 6,
-                ),
+                new SourceSymbolSelector('Example', 'values', 6),
             ],
         ];
 
@@ -844,11 +796,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$arrayItemMutation, $unwrapMutation],
             ['FalseValue', 'TrueValue', 'UnwrapArrayFilter'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: 'values',
-                    line: 8,
-                ),
+                new SourceSymbolSelector('Example', 'values', 8),
             ],
         ];
 
@@ -857,11 +805,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$unwrapMutation],
             ['FalseValue', 'TrueValue', 'UnwrapArrayFilter'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: 'values',
-                    line: 11,
-                ),
+                new SourceSymbolSelector('Example', 'values', 11),
             ],
         ];
     }
@@ -955,11 +899,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$parameterMutation, $assignmentMutation, $returnMutation, $visibilityMutation],
             ['FalseValue', 'TrueValue', 'PublicVisibility'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: 'value',
-                    line: null,
-                ),
+                new SourceSymbolSelector('Example', 'value'),
             ],
         ];
 
@@ -968,11 +908,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$visibilityMutation],
             ['FalseValue', 'TrueValue', 'PublicVisibility'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: 'value',
-                    line: 4,
-                ),
+                new SourceSymbolSelector('Example', 'value', 4),
             ],
         ];
 
@@ -981,11 +917,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$parameterMutation, $visibilityMutation],
             ['FalseValue', 'TrueValue', 'PublicVisibility'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: 'value',
-                    line: 5,
-                ),
+                new SourceSymbolSelector('Example', 'value', 5),
             ],
         ];
 
@@ -997,11 +929,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$assignmentMutation, $visibilityMutation],
             ['FalseValue', 'TrueValue', 'PublicVisibility'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: 'value',
-                    line: 7,
-                ),
+                new SourceSymbolSelector('Example', 'value', 7),
             ],
         ];
 
@@ -1010,11 +938,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$returnMutation, $visibilityMutation],
             ['FalseValue', 'TrueValue', 'PublicVisibility'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: 'value',
-                    line: 9,
-                ),
+                new SourceSymbolSelector('Example', 'value', 9),
             ],
         ];
 
@@ -1023,11 +947,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [$visibilityMutation],
             ['FalseValue', 'TrueValue', 'PublicVisibility'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: 'value',
-                    line: 10,
-                ),
+                new SourceSymbolSelector('Example', 'value', 10),
             ],
         ];
 
@@ -1036,11 +956,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [],
             ['FalseValue', 'TrueValue', 'PublicVisibility'],
             [
-                new SourceSymbolSelector(
-                    className: 'Example',
-                    methodName: 'value',
-                    line: 11,
-                ),
+                new SourceSymbolSelector('Example', 'value', 11),
             ],
         ];
     }

@@ -689,7 +689,6 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                 new SourceSymbolSelector(
                     __NAMESPACE__ . '\Fixtures\TwoAdditions',
                     'first',
-                    null,
                 ),
             ],
             <<<'AST'

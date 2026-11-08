@@ -50,8 +50,8 @@ final readonly class SourceSymbolSelector
      */
     public function __construct(
         public string $className,
-        public ?string $methodName,
-        public ?int $line,
+        public ?string $methodName = null,
+        public ?int $line = null,
     ) {
     }
 }

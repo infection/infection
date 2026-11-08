@@ -180,11 +180,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 AddTestsVisitor::class,
             ],
             [
-                new SourceSymbolSelector(
-                    'Vendor\\Package\\ClassName',
-                    'method',
-                    42,
-                ),
+                new SourceSymbolSelector('Vendor\\Package\\ClassName', 'method', 42),
             ],
         ];
     }
