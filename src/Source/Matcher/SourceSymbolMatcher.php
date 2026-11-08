@@ -71,12 +71,7 @@ final readonly class SourceSymbolMatcher
         ?Node\Stmt\ClassMethod $method,
     ): bool {
         foreach ($this->selectors as $selector) {
-            $matches = self::matchesSelector(
-                $node,
-                $class,
-                $method,
-                $selector,
-            );
+            $matches = self::matchesSelector($node, $class, $method, $selector);
 
             if ($matches) {
                 return true;
@@ -133,16 +128,10 @@ final readonly class SourceSymbolMatcher
         $selectedClassName = ltrim($selector->className, '\\');
 
         if (str_ends_with($selectedClassName, '\\')) {
-            return self::startsWithIgnoringCase(
-                $className->toString(),
-                $selectedClassName,
-            );
+            return self::startsWithIgnoringCase($className->toString(), $selectedClassName);
         }
 
-        return self::equalsIgnoringCase(
-            $className->toString(),
-            $selectedClassName,
-        );
+        return self::equalsIgnoringCase($className->toString(), $selectedClassName);
     }
 
     private static function methodMatches(
@@ -180,20 +169,13 @@ final readonly class SourceSymbolMatcher
         string $left,
         string $right,
     ): bool {
-        return strcasecmp(
-            $left,
-            $right,
-        ) === 0;
+        return strcasecmp($left, $right) === 0;
     }
 
     private static function startsWithIgnoringCase(
         string $value,
         string $prefix,
     ): bool {
-        return strncasecmp(
-            $value,
-            $prefix,
-            strlen($prefix),
-        ) === 0;
+        return strncasecmp($value, $prefix, strlen($prefix)) === 0;
     }
 }
