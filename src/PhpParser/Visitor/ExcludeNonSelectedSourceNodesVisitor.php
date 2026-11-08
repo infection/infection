@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
-use function array_key_last;
 use function array_pop;
+use function array_reverse;
 use Infection\Source\Matcher\SourceSymbolMatcher;
 use Override;
 use PhpParser\Node;
@@ -48,14 +48,9 @@ use PhpParser\NodeVisitorAbstract;
 final class ExcludeNonSelectedSourceNodesVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var list<Node\Stmt\ClassLike>
+     * @var list<Node\Stmt\ClassLike|Node\Stmt\ClassMethod>
      */
-    private array $classStack = [];
-
-    /**
-     * @var list<Node\Stmt\ClassMethod>
-     */
-    private array $methodStack = [];
+    private array $scopeStack = [];
 
     public function __construct(
         private readonly SourceSymbolMatcher $matcher,
@@ -65,8 +60,7 @@ final class ExcludeNonSelectedSourceNodesVisitor extends NodeVisitorAbstract
     #[Override]
     public function beforeTraverse(array $nodes): null
     {
-        $this->classStack = [];
-        $this->methodStack = [];
+        $this->scopeStack = [];
 
         return null;
     }
@@ -74,12 +68,11 @@ final class ExcludeNonSelectedSourceNodesVisitor extends NodeVisitorAbstract
     #[Override]
     public function enterNode(Node $node): null
     {
-        if ($node instanceof Node\Stmt\ClassLike) {
-            $this->classStack[] = $node;
-        }
-
-        if ($node instanceof Node\Stmt\ClassMethod) {
-            $this->methodStack[] = $node;
+        if (
+            $node instanceof Node\Stmt\ClassLike
+            || $node instanceof Node\Stmt\ClassMethod
+        ) {
+            $this->scopeStack[] = $node;
         }
 
         if (
@@ -95,44 +88,37 @@ final class ExcludeNonSelectedSourceNodesVisitor extends NodeVisitorAbstract
     #[Override]
     public function leaveNode(Node $node): null
     {
-        if ($node instanceof Node\Stmt\ClassMethod) {
-            array_pop($this->methodStack);
-        }
-
-        if ($node instanceof Node\Stmt\ClassLike) {
-            array_pop($this->classStack);
+        if (
+            $node instanceof Node\Stmt\ClassLike
+            || $node instanceof Node\Stmt\ClassMethod
+        ) {
+            array_pop($this->scopeStack);
         }
 
         return null;
     }
 
-    /**
-     * @template T of Node
-     *
-     * @param list<T> $nodes
-     *
-     * @return T|null
-     */
-    private static function findLastNode(array $nodes): ?Node
-    {
-        $key = array_key_last($nodes);
-
-        if ($key === null) {
-            return null;
-        }
-
-        return $nodes[$key];
-    }
-
     private function matches(Node $node): bool
     {
-        $class = self::findLastNode($this->classStack);
-        $method = self::findLastNode($this->methodStack);
+        $method = null;
 
-        return $this->matcher->matches(
-            $node,
-            $class,
-            $method,
-        );
+        foreach (array_reverse($this->scopeStack) as $scope) {
+            if ($scope instanceof Node\Stmt\ClassMethod) {
+                $method = $scope;
+
+                continue;
+            }
+
+            // An anonymous class and its methods belong to the enclosing named symbol selection.
+            if ($scope->name === null) {
+                $method = null;
+
+                continue;
+            }
+
+            return $this->matcher->matches($node, $scope, $method);
+        }
+
+        return false;
     }
 }
