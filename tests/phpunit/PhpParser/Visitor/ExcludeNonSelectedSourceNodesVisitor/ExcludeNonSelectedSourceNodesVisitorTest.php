@@ -105,7 +105,7 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
             }
             PHP;
 
-        yield 'qualified method excludes its namesake' => [
+        yield 'qualified method selection excludes a method with the same name in another namespace' => [
             $mailerClassesInDifferentNamespaces,
             [
                 new SourceSymbolSelector(
