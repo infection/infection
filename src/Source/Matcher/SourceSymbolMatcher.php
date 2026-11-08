@@ -62,8 +62,9 @@ final readonly class SourceSymbolMatcher
 
     /**
      * The caller supplies the class and method context because $node alone does not
-     * identify the declarations it belongs to. For a class-like or method node,
-     * the corresponding context is $node itself.
+     * identify the declarations it belongs to. For a named class-like declaration
+     * or one of its methods, the corresponding context is $node itself. Anonymous
+     * classes and their methods use the enclosing named class and method context.
      */
     public function matches(
         Node $node,

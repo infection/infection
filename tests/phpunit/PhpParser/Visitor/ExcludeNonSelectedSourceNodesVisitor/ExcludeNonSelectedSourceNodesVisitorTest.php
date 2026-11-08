@@ -265,23 +265,92 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
             [4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
         ];
 
-        yield 'an anonymous class does not inherit the enclosing symbol context' => [
+        $methodContainingAnonymousClass = <<<'PHP'
+            <?php
+            namespace App;
+
+            final class Differ
+            {
+                public function diff(): int
+                {
+                    $value = new class {
+                        public function nested(): int
+                        {
+                            return 1;
+                        }
+                    };
+
+                    return 2;
+                }
+            }
+            PHP;
+
+        yield 'an anonymous class inherits the enclosing symbol context' => [
+            $methodContainingAnonymousClass,
+            [
+                new SourceSymbolSelector(
+                    'Differ',
+                    'diff',
+                    null,
+                ),
+            ],
+            [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+        ];
+
+        yield 'class selection includes anonymous classes in its methods' => [
+            $methodContainingAnonymousClass,
+            [
+                new SourceSymbolSelector(
+                    'Differ',
+                    null,
+                    null,
+                ),
+            ],
+            [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+        ];
+
+        yield 'method and line selection reaches inside an anonymous class' => [
+            $methodContainingAnonymousClass,
+            [
+                new SourceSymbolSelector(
+                    'Differ',
+                    'diff',
+                    11,
+                ),
+            ],
+            [4, 7, 8, 10, 11, 12, 15, 16],
+        ];
+
+        yield 'an anonymous class method cannot be selected as a method of its enclosing class' => [
+            $methodContainingAnonymousClass,
+            [
+                new SourceSymbolSelector(
+                    'Differ',
+                    'nested',
+                    null,
+                ),
+            ],
+            [],
+        ];
+
+        yield 'nested anonymous classes inherit the enclosing named method' => [
             <<<'PHP'
                 <?php
-                namespace App;
-
-                final class Differ
+                class Differ
                 {
-                    public function diff(): int
+                    public function diff()
                     {
-                        $value = new class {
-                            public function nested(): int
+                        return new class {
+                            public function nested()
                             {
-                                return 1;
+                                return new class {
+                                    public function value()
+                                    {
+                                        return 1;
+                                    }
+                                };
                             }
                         };
-
-                        return 2;
                     }
                 }
                 PHP,
@@ -292,7 +361,61 @@ final class ExcludeNonSelectedSourceNodesVisitorTest extends VisitorTestCase
                     null,
                 ),
             ],
-            [4, 5, 6, 7, 8, 9, 10, 17, 18],
+            [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        ];
+
+        yield 'a named class inside an anonymous class has its own symbol context' => [
+            <<<'PHP'
+                <?php
+                class Differ
+                {
+                    public function diff()
+                    {
+                        return new class {
+                            public function nested()
+                            {
+                                class Other
+                                {
+                                    public function value()
+                                    {
+                                        return 1;
+                                    }
+                                }
+
+                                return 2;
+                            }
+                        };
+                    }
+                }
+                PHP,
+            [
+                new SourceSymbolSelector(
+                    'Differ',
+                    'diff',
+                    null,
+                ),
+            ],
+            [2, 3, 4, 5, 6, 7, 8, 15, 16],
+        ];
+
+        yield 'an anonymous class without an enclosing named class does not match a method selector' => [
+            <<<'PHP'
+                <?php
+                $value = new class {
+                    public function diff()
+                    {
+                        return 1;
+                    }
+                };
+                PHP,
+            [
+                new SourceSymbolSelector(
+                    'Differ',
+                    'diff',
+                    null,
+                ),
+            ],
+            [],
         ];
 
         $classesWithOverlappingNamespacePrefixes = <<<'PHP'
