@@ -589,7 +589,8 @@ Notes for review:
 
 - Test methods read as sentences: `test_it_...` - the descriptive naming is on you (casing
   and `$this->` assertion style auto-fix); `webmozarts/strict-phpunit` is active.
-- `#[CoversClass(X::class)]` on every test. PHPat enforces the IO boundary BOTH ways: a test
+- Declare explicit coverage metadata (see `adr/0007-declare-phpunit-coverage-metadata.md`);
+  use `#[CoversClass(X::class)]` for class subjects. PHPat enforces the IO boundary BOTH ways: a test
   doing IO must be `#[Group('integration')]`, a test doing no IO must NOT be. Tests are
   final/abstract/trait (PHPat), deterministic (no hard-coded `/unlikely-to-exist` paths -
   use `sys_get_temp_dir()` + `uniqid()`), and fast.
@@ -605,6 +606,12 @@ Notes for review:
   extend `VisitorTestCase`, `addIdsToNodes()`, traverse with your visitor +
   `MarkTraversedNodesAsVisitedVisitor`, dump with the configured `NodeDumper`, `assertSame`
   the dump. Console commands use `CommandTester`.
+- For mutation-generation scenarios spanning services, use
+  `tests/phpunit/Mutation/MutationGenerationIntegrationTest.php`: PHP snippets, enabled
+  mutators, changed-line ranges, and source-symbol selectors produce expected mutation diffs.
+  Use `EnrichmentTraverseIntegrationTest` to inspect the enriched AST instead. Both use
+  `#[CoversNothing]` to avoid adding broad scenarios to coverage-based mutant test selection;
+  keep each service's essential behaviour covered by focused tests.
 - Do not write one-off probe scripts; write the unit test you would have wanted anyway.
 
 ## Pull requests and review culture
