@@ -35,11 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Mutation\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\PhpParser\MutatedNode;
+use Infection\Mutator\Removal\ArrayItemRemoval;
+use Infection\Mutator\Removal\ArrayItemRemovalConfig;
 use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
@@ -48,6 +49,7 @@ use Infection\Source\MatcherLine\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Testing\SingletonContainer;
+use Infection\Tests\Mutation\MutationBuilder;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use function iterator_to_array;
 use PhpParser\Node\Stmt\Nop;
@@ -96,7 +98,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
     }
 
     /**
-     * @param list<array{mutator: string, code: string}> $expectedMutations
+     * @param list<array{mutator: string, index: int, code: string}> $expectedMutations
      */
     #[DataProvider('mutationProvider')]
     public function test_it_generates_mutations(
@@ -126,9 +128,16 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             ->traverse($nodes)
         ;
 
+        $mutatorsByName = [
+            ...$container->getConfiguration()->mutators,
+            'ArrayItemRemoval' => new ArrayItemRemoval(
+                new ArrayItemRemovalConfig(['remove' => 'all']),
+            ),
+        ];
+
         $collector = new MutationCollectorVisitor(
             new NodeMutationGenerator(
-                mutatorsByName: $container->getConfiguration()->mutators,
+                mutatorsByName: $mutatorsByName,
                 filePath: '/source.php',
                 fileNodes: $nodes,
                 originalFileTokens: $this->parser->getTokens(),
@@ -142,15 +151,21 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
         ;
 
         $codeFactory = $container->getMutantCodeFactory();
-        $actualMutations = take($collector->getMutations())
-            ->cast(static fn (Mutation $mutation): array => [
-                'mutator' => $mutation->getMutatorName(),
-                'code' => $codeFactory->createCode($mutation),
-            ])
-            ->toList()
-        ;
+        $mutations = take($collector->getMutations())->toList();
 
-        $this->assertSame($expectedMutations, $actualMutations);
+        $this->assertCount(count($expectedMutations), $mutations);
+
+        foreach ($mutations as $index => $mutation) {
+            $expected = $expectedMutations[$index];
+            $expectedMutation = MutationBuilder::from($mutation)
+                ->withMutationByMutatorIndex($expected['index'])
+                ->build()
+            ;
+
+            $this->assertEquals($expectedMutation, $mutation);
+            $this->assertSame($expected['mutator'], $mutation->getMutatorName());
+            $this->assertSame($expected['code'], $codeFactory->createCode($mutation));
+        }
     }
 
     public static function mutationProvider(): iterable
@@ -168,6 +183,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [
                 [
                     'mutator' => 'FalseValue',
+                    'index' => 0,
                     'code' => <<<'PHP'
                         <?php
 
@@ -180,6 +196,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
                 ],
                 [
                     'mutator' => 'TrueValue',
+                    'index' => 0,
                     'code' => <<<'PHP'
                         <?php
 
@@ -192,12 +209,26 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
                 ],
                 [
                     'mutator' => 'ArrayItemRemoval',
+                    'index' => 0,
                     'code' => <<<'PHP'
                         <?php
 
                         class Example {
                             public function values(): array {
                                 return [true];
+                            }
+                        }
+                        PHP,
+                ],
+                [
+                    'mutator' => 'ArrayItemRemoval',
+                    'index' => 1,
+                    'code' => <<<'PHP'
+                        <?php
+
+                        class Example {
+                            public function values(): array {
+                                return [false];
                             }
                         }
                         PHP,
@@ -219,6 +250,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
             [
                 [
                     'mutator' => 'TrueValue',
+                    'index' => 0,
                     'code' => <<<'PHP'
                         <?php
 
@@ -238,127 +270,9 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
                 <?php
 
                 $values = [false, true];
-
-                class Example {
-                    public function values(): array {
-                        return [false, true];
-                    }
-                }
                 PHP,
-            [
-                [
-                    'mutator' => 'FalseValue',
-                    'code' => <<<'PHP'
-                        <?php
-
-                        $values = [false, true];
-
-                        class Example {
-                            public function values(): array {
-                                return [true, true];
-                            }
-                        }
-                        PHP,
-                ],
-                [
-                    'mutator' => 'TrueValue',
-                    'code' => <<<'PHP'
-                        <?php
-
-                        $values = [false, true];
-
-                        class Example {
-                            public function values(): array {
-                                return [false, false];
-                            }
-                        }
-                        PHP,
-                ],
-                [
-                    'mutator' => 'ArrayItemRemoval',
-                    'code' => <<<'PHP'
-                        <?php
-
-                        $values = [false, true];
-
-                        class Example {
-                            public function values(): array {
-                                return [true];
-                            }
-                        }
-                        PHP,
-                ],
-            ],
+            [],
         ];
-    }
-
-    public function test_it_starts_mutation_indices_at_zero_and_increments_them(): void
-    {
-        $attributes = [
-            'startLine' => 1,
-            'endLine' => 1,
-            'startTokenPos' => 0,
-            'endTokenPos' => 0,
-            'startFilePos' => 0,
-            'endFilePos' => 0,
-        ];
-        $node = new Nop($attributes);
-        LabelNodesAsEligibleVisitor::markAsEligible($node);
-        $replacement = new Nop();
-
-        $mutator = $this->createStub(Mutator::class);
-        $mutator
-            ->method('getName')
-            ->willReturn('FalseValue')
-        ;
-        $mutator
-            ->method('canMutate')
-            ->willReturn(true)
-        ;
-        $mutator
-            ->method('mutate')
-            ->willReturn([$replacement, $replacement])
-        ;
-
-        $generator = new NodeMutationGenerator(
-            mutatorsByName: ['FalseValue' => $mutator],
-            filePath: '/source.php',
-            fileNodes: [$node],
-            originalFileTokens: [],
-            originalFileContent: '',
-        );
-
-        $this->assertEquals(
-            [
-                new Mutation(
-                    originalFilePath: '/source.php',
-                    originalFileAst: [$node],
-                    mutatorClass: $mutator::class,
-                    mutatorName: 'FalseValue',
-                    attributes: $attributes,
-                    mutatedNodeClass: Nop::class,
-                    mutatedNode: MutatedNode::wrap($replacement),
-                    mutationByMutatorIndex: 0,
-                    tests: [],
-                    originalFileTokens: [],
-                    originalFileContent: '',
-                ),
-                new Mutation(
-                    originalFilePath: '/source.php',
-                    originalFileAst: [$node],
-                    mutatorClass: $mutator::class,
-                    mutatorName: 'FalseValue',
-                    attributes: $attributes,
-                    mutatedNodeClass: Nop::class,
-                    mutatedNode: MutatedNode::wrap($replacement),
-                    mutationByMutatorIndex: 1,
-                    tests: [],
-                    originalFileTokens: [],
-                    originalFileContent: '',
-                ),
-            ],
-            iterator_to_array($generator->generate($node), false),
-        );
     }
 
     #[DataProvider('ignoredMutatorNameProvider')]
