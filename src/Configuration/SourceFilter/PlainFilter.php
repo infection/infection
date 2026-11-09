@@ -38,11 +38,6 @@ namespace Infection\Configuration\SourceFilter;
 use function array_filter;
 use function array_map;
 use function array_unique;
-<<<<<<< HEAD
-use function array_values;
-=======
-use function count;
->>>>>>> 92e204eeb (fix)
 use function explode;
 use function implode;
 use function is_string;
