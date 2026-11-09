@@ -66,6 +66,8 @@ final class ListSymbolsCommand extends BaseCommand
     protected function configure(): void
     {
         $this->setDescription('Lists the symbols Infection tracks in a PHP file.');
+
+        // @infection-ignore MethodCallRemoval
         $this->setHelp(
             <<<'HELP'
                 Lists the symbols Infection tracks for source selection, one per line in declaration
