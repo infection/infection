@@ -23,6 +23,19 @@ Execute `make` to see the available commands. Most commands have a `-docker` var
 To test `PhpParser` visitors check out [its dedicated documentation][visitor-documentation].
 
 
+### Mutation-generation integration tests
+
+Use [MutationGenerationIntegrationTest][mutation-generation-test] for regression scenarios
+that combine mutation-generation behaviour across services. Each scenario supplies a PHP
+snippet, enabled mutators, changed-line ranges, and source-symbol selectors, then asserts
+the generated mutations as compact diffs.
+
+Use [EnrichmentTraverseIntegrationTest][enrichment-traverse-test] when you need to inspect
+the enriched AST. Both tests use `#[CoversNothing]` so their broader scenarios do not add
+to the coverage used to select tests for mutant evaluation. These tests are expensive and
+do not replace focused tests of each service's essential behaviour.
+
+
 ### End-to-end tests
 
 Infection contains a few end-to-end tests that can be executed. Some of those are self-contained, in which
@@ -106,5 +119,7 @@ Read the [Benchmark documentation].
 
 [Benchmark documentation]: ../doc/benchmarking.md
 [docker]: https://www.docker.com/get-docker
+[enrichment-traverse-test]: ../tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/EnrichmentTraverseIntegrationTest.php
+[mutation-generation-test]: ../tests/phpunit/Mutation/MutationGenerationIntegrationTest.php
 [readme]: /README.md
 [visitor-documentation]: ../tests/phpunit/PhpParser/Visitor/README.md
