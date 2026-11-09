@@ -1521,6 +1521,12 @@ parameters:
 			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
 
 		-
+			rawMessage: 'Parameter $mutatorsByName of class Infection\Mutator\NodeMutationGenerator constructor expects array<string, Infection\Mutator\Mutator<PhpParser\Node>>, non-empty-array<string, Infection\Mutator\Mutator<PhpParser\Node>|Infection\Mutator\Removal\ArrayItemRemoval> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/NodeMutationGeneratorTest.php
+
+		-
 			rawMessage: 'Method Infection\Tests\Mutator\ProfileListProvider::getProfiles() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
