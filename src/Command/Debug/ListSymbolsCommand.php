@@ -63,11 +63,11 @@ final class ListSymbolsCommand extends BaseCommand
         parent::__construct(self::NAME);
     }
 
+    // @infection-ignore-all
     protected function configure(): void
     {
         $this->setDescription('Lists the symbols Infection tracks in a PHP file.');
 
-        // @infection-ignore MethodCallRemoval
         $this->setHelp(
             <<<'HELP'
                 Lists the symbols Infection tracks for source selection, one per line in declaration
