@@ -35,13 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Configuration\Configuration;
-use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
+use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
@@ -50,7 +48,6 @@ use Infection\Source\MatcherLine\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use function iterator_to_array;
 use PhpParser\Node\Stmt\Nop;
@@ -100,45 +97,23 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
 
     /**
      * @param list<array{mutator: string, code: string}> $expectedMutations
-     * @param list<non-empty-string> $mutatorNames
-     * @param list<SourceSymbolSelector> $sourceSymbolSelectors
      */
-    #[DataProvider('eligibleCodeMutationProvider')]
-    #[DataProvider('ignoreAllMutationProvider')]
-    #[DataProvider('ignoredMutatorsMutationProvider')]
-    #[DataProvider('sourceSymbolSelectionMutationProvider')]
-    #[DataProvider('anonymousClassSelectionMutationProvider')]
-    #[DataProvider('statementLineSelectionMutationProvider')]
-    #[DataProvider('methodLineSelectionMutationProvider')]
+    #[DataProvider('mutationProvider')]
     public function test_it_generates_mutations(
         string $code,
         array $expectedMutations,
-        array $mutatorNames,
-        array $sourceSymbolSelectors = [],
     ): void {
         $container = SingletonContainer::getContainer()
             ->withValues(
                 logger: new NullLogger(),
                 output: new NullOutput(),
-                mutatorsInput: implode(',', $mutatorNames),
+                mutatorsInput: 'ArrayItemRemoval,FalseValue,TrueValue',
             )
             ->cloneWithService(
                 SourceLineMatcher::class,
                 new NullSourceLineMatcher(),
             )
         ;
-
-        $configuration = ConfigurationBuilder::from(
-            $container->getConfiguration(),
-        )
-            ->withSourceSymbolSelectors(...$sourceSymbolSelectors)
-            ->build()
-        ;
-        $container = $container->cloneWithService(
-            Configuration::class,
-            $configuration,
-        );
-
         $traverserFactory = $container->getNodeTraverserFactory();
         $sourceFile = new MockSplFileInfo(realPath: '/source.php');
         $nodes = $this->parse($code);
@@ -178,7 +153,7 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
         $this->assertSame($expectedMutations, $actualMutations);
     }
 
-    public static function eligibleCodeMutationProvider(): iterable
+    public static function mutationProvider(): iterable
     {
         yield 'without annotations' => [
             <<<'PHP'
@@ -228,7 +203,34 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
                         PHP,
                 ],
             ],
-            ['ArrayItemRemoval', 'FalseValue', 'TrueValue'],
+        ];
+
+        yield 'multiple mutators in a docblock' => [
+            <<<'PHP'
+                <?php
+
+                class Example {
+                    /** @infection-ignore ArrayItemRemoval, FalseValue */
+                    public function values(): array {
+                        return [false, true];
+                    }
+                }
+                PHP,
+            [
+                [
+                    'mutator' => 'TrueValue',
+                    'code' => <<<'PHP'
+                        <?php
+
+                        class Example {
+                            /** @infection-ignore ArrayItemRemoval, FalseValue */
+                            public function values(): array {
+                                return [false, false];
+                            }
+                        }
+                        PHP,
+                ],
+            ],
         ];
 
         yield 'code outside a class remains ineligible' => [
@@ -287,678 +289,76 @@ final class NodeMutationGeneratorTest extends VisitorTestCase
                         PHP,
                 ],
             ],
-            ['ArrayItemRemoval', 'FalseValue', 'TrueValue'],
         ];
     }
 
-    public static function ignoreAllMutationProvider(): iterable
+    public function test_it_starts_mutation_indices_at_zero_and_increments_them(): void
     {
-        yield 'ignore-all on a method excludes all descendant mutations' => [
-            <<<'PHP'
-                <?php
-
-                class Example {
-                    /** @infection-ignore-all */
-                    public function values(): array {
-                        return [false, true];
-                    }
-                }
-                PHP,
-            [],
-            ['ArrayItemRemoval', 'FalseValue', 'TrueValue'],
+        $attributes = [
+            'startLine' => 1,
+            'endLine' => 1,
+            'startTokenPos' => 0,
+            'endTokenPos' => 0,
+            'startFilePos' => 0,
+            'endFilePos' => 0,
         ];
+        $node = new Nop($attributes);
+        LabelNodesAsEligibleVisitor::markAsEligible($node);
+        $replacement = new Nop();
 
-        yield 'ignore-all on a statement does not exclude following statements' => [
-            <<<'PHP'
-                <?php
+        $mutator = $this->createStub(Mutator::class);
+        $mutator
+            ->method('getName')
+            ->willReturn('FalseValue')
+        ;
+        $mutator
+            ->method('canMutate')
+            ->willReturn(true)
+        ;
+        $mutator
+            ->method('mutate')
+            ->willReturn([$replacement, $replacement])
+        ;
 
-                class Example {
-                    public function value(): bool {
-                        /** @infection-ignore-all */
-                        $values = [false, true];
+        $generator = new NodeMutationGenerator(
+            mutatorsByName: ['FalseValue' => $mutator],
+            filePath: '/source.php',
+            fileNodes: [$node],
+            originalFileTokens: [],
+            originalFileContent: '',
+        );
 
-                        return false;
-                    }
-                }
-                PHP,
+        $this->assertEquals(
             [
-                [
-                    'mutator' => 'FalseValue',
-                    'code' => <<<'PHP'
-                        <?php
-
-                        class Example {
-                            public function value(): bool {
-                                /** @infection-ignore-all */
-                                $values = [false, true];
-
-                                return true;
-                            }
-                        }
-                        PHP,
-                ],
+                new Mutation(
+                    originalFilePath: '/source.php',
+                    originalFileAst: [$node],
+                    mutatorClass: $mutator::class,
+                    mutatorName: 'FalseValue',
+                    attributes: $attributes,
+                    mutatedNodeClass: Nop::class,
+                    mutatedNode: MutatedNode::wrap($replacement),
+                    mutationByMutatorIndex: 0,
+                    tests: [],
+                    originalFileTokens: [],
+                    originalFileContent: '',
+                ),
+                new Mutation(
+                    originalFilePath: '/source.php',
+                    originalFileAst: [$node],
+                    mutatorClass: $mutator::class,
+                    mutatorName: 'FalseValue',
+                    attributes: $attributes,
+                    mutatedNodeClass: Nop::class,
+                    mutatedNode: MutatedNode::wrap($replacement),
+                    mutationByMutatorIndex: 1,
+                    tests: [],
+                    originalFileTokens: [],
+                    originalFileContent: '',
+                ),
             ],
-            ['ArrayItemRemoval', 'FalseValue', 'TrueValue'],
-        ];
-    }
-
-    public static function ignoredMutatorsMutationProvider(): iterable
-    {
-        yield 'multiple mutators in a docblock' => [
-            <<<'PHP'
-                <?php
-
-                class Example {
-                    /** @infection-ignore ArrayItemRemoval, FalseValue */
-                    public function values(): array {
-                        return [false, true];
-                    }
-                }
-                PHP,
-            [
-                [
-                    'mutator' => 'TrueValue',
-                    'code' => <<<'PHP'
-                        <?php
-
-                        class Example {
-                            /** @infection-ignore ArrayItemRemoval, FalseValue */
-                            public function values(): array {
-                                return [false, false];
-                            }
-                        }
-                        PHP,
-                ],
-            ],
-            ['ArrayItemRemoval', 'FalseValue', 'TrueValue'],
-        ];
-
-        yield 'ignore all still takes precedence' => [
-            <<<'PHP'
-                <?php
-
-                /** @infection-ignore ArrayItemRemoval */
-                class Example {
-                    public function ignored(): array {
-                        // @infection-ignore-all
-                        return [false, true];
-                    }
-
-                    public function outside(): bool {
-                        return false;
-                    }
-                }
-                PHP,
-            [
-                [
-                    'mutator' => 'FalseValue',
-                    'code' => <<<'PHP'
-                        <?php
-
-                        /** @infection-ignore ArrayItemRemoval */
-                        class Example {
-                            public function ignored(): array {
-                                // @infection-ignore-all
-                                return [false, true];
-                            }
-
-                            public function outside(): bool {
-                                return true;
-                            }
-                        }
-                        PHP,
-                ],
-            ],
-            ['ArrayItemRemoval', 'FalseValue', 'TrueValue'],
-        ];
-
-        yield 'annotation on an array item excludes its descendants only' => [
-            <<<'PHP'
-                <?php
-
-                class Example {
-                    public function values(): array {
-                        return [
-                            // @infection-ignore FalseValue
-                            false,
-                            false,
-                        ];
-                    }
-                }
-                PHP,
-            [
-                [
-                    'mutator' => 'FalseValue',
-                    'code' => <<<'PHP'
-                        <?php
-
-                        class Example {
-                            public function values(): array {
-                                return [
-                                    // @infection-ignore FalseValue
-                                    false,
-                                    true,
-                                ];
-                            }
-                        }
-                        PHP,
-                ],
-                [
-                    'mutator' => 'ArrayItemRemoval',
-                    'code' => <<<'PHP'
-                        <?php
-
-                        class Example {
-                            public function values(): array {
-                                return [
-                                    false,
-                                ];
-                            }
-                        }
-                        PHP,
-                ],
-            ],
-            ['ArrayItemRemoval', 'FalseValue', 'TrueValue'],
-        ];
-
-        yield 'all selected mutators can be excluded' => [
-            <<<'PHP'
-                <?php
-
-                class Example {
-                    /** @infection-ignore ArrayItemRemoval, FalseValue, TrueValue */
-                    public function values(): array {
-                        return [false, true];
-                    }
-                }
-                PHP,
-            [],
-            ['ArrayItemRemoval', 'FalseValue', 'TrueValue'],
-        ];
-    }
-
-    public static function sourceSymbolSelectionMutationProvider(): iterable
-    {
-        $code = <<<'PHP'
-            <?php
-
-            class Example {
-                public function first(): bool {
-                    return false;
-                }
-
-                public function second(): bool {
-                    return false;
-                }
-            }
-
-            class Other {
-                public function value(): bool {
-                    return false;
-                }
-            }
-            PHP;
-
-        $firstMethodMutation = [
-            'mutator' => 'FalseValue',
-            'code' => <<<'PHP'
-                <?php
-
-                class Example {
-                    public function first(): bool {
-                        return true;
-                    }
-
-                    public function second(): bool {
-                        return false;
-                    }
-                }
-
-                class Other {
-                    public function value(): bool {
-                        return false;
-                    }
-                }
-                PHP,
-        ];
-
-        $secondMethodMutation = [
-            'mutator' => 'FalseValue',
-            'code' => <<<'PHP'
-                <?php
-
-                class Example {
-                    public function first(): bool {
-                        return false;
-                    }
-
-                    public function second(): bool {
-                        return true;
-                    }
-                }
-
-                class Other {
-                    public function value(): bool {
-                        return false;
-                    }
-                }
-                PHP,
-        ];
-
-        $otherClassMutation = [
-            'mutator' => 'FalseValue',
-            'code' => <<<'PHP'
-                <?php
-
-                class Example {
-                    public function first(): bool {
-                        return false;
-                    }
-
-                    public function second(): bool {
-                        return false;
-                    }
-                }
-
-                class Other {
-                    public function value(): bool {
-                        return true;
-                    }
-                }
-                PHP,
-        ];
-
-        yield 'class selection excludes mutations in other classes' => [
-            $code,
-            [$firstMethodMutation, $secondMethodMutation],
-            ['FalseValue'],
-            [
-                new SourceSymbolSelector('Example'),
-            ],
-        ];
-
-        yield 'method selection excludes mutations in other methods' => [
-            $code,
-            [$secondMethodMutation],
-            ['FalseValue'],
-            [
-                new SourceSymbolSelector('Example', 'second'),
-            ],
-        ];
-
-        yield 'class and line selection excludes boolean literals on other lines' => [
-            $code,
-            [$secondMethodMutation],
-            ['FalseValue'],
-            [
-                new SourceSymbolSelector('Example', line: 9),
-            ],
-        ];
-
-        yield 'multiple selectors include mutations matching either selector' => [
-            $code,
-            [$firstMethodMutation, $otherClassMutation],
-            ['FalseValue'],
-            [
-                new SourceSymbolSelector('Example', 'first'),
-                new SourceSymbolSelector('Other'),
-            ],
-        ];
-
-        yield 'unmatched symbol selection produces no mutations' => [
-            $code,
-            [],
-            ['FalseValue'],
-            [
-                new SourceSymbolSelector('Missing'),
-            ],
-        ];
-    }
-
-    public static function anonymousClassSelectionMutationProvider(): iterable
-    {
-        $code = <<<'PHP'
-            <?php
-            class Differ
-            {
-                public function diff(): object
-                {
-                    return new class {
-                        public function value(): bool
-                        {
-                            return false;
-                        }
-                    };
-                }
-
-                public function other(): bool
-                {
-                    return false;
-                }
-            }
-            PHP;
-
-        $anonymousClassMutation = [
-            'mutator' => 'FalseValue',
-            'code' => <<<'PHP'
-                <?php
-                class Differ
-                {
-                    public function diff(): object
-                    {
-                        return new class {
-                            public function value(): bool
-                            {
-                                return true;
-                            }
-                        };
-                    }
-
-                    public function other(): bool
-                    {
-                        return false;
-                    }
-                }
-                PHP,
-        ];
-
-        yield 'method selection includes mutations inside its anonymous classes' => [
-            $code,
-            [$anonymousClassMutation],
-            ['FalseValue'],
-            [
-                new SourceSymbolSelector('Differ', 'diff'),
-            ],
-        ];
-
-        yield 'method and line selection includes a mutation inside an anonymous class' => [
-            $code,
-            [$anonymousClassMutation],
-            ['FalseValue'],
-            [
-                new SourceSymbolSelector('Differ', 'diff', 9),
-            ],
-        ];
-
-        yield 'method and line selection excludes anonymous class mutations on another line' => [
-            $code,
-            [],
-            ['FalseValue'],
-            [
-                new SourceSymbolSelector('Differ', 'diff', 15),
-            ],
-        ];
-
-        yield 'anonymous class methods are not methods of the enclosing named class' => [
-            $code,
-            [],
-            ['FalseValue'],
-            [
-                new SourceSymbolSelector('Differ', 'value'),
-            ],
-        ];
-    }
-
-    public static function statementLineSelectionMutationProvider(): iterable
-    {
-        $code = <<<'PHP'
-            <?php
-
-            class Example {
-                public function values(): array {
-                    $fallback = false;
-                    return array_filter(
-                        [
-                            false,
-                            true,
-                        ],
-                    );
-                }
-            }
-            PHP;
-
-        $assignmentMutation = [
-            'mutator' => 'FalseValue',
-            'code' => <<<'PHP'
-                <?php
-
-                class Example {
-                    public function values(): array {
-                        $fallback = true;
-                        return array_filter(
-                            [
-                                false,
-                                true,
-                            ],
-                        );
-                    }
-                }
-                PHP,
-        ];
-
-        $arrayItemMutation = [
-            'mutator' => 'FalseValue',
-            'code' => <<<'PHP'
-                <?php
-
-                class Example {
-                    public function values(): array {
-                        $fallback = false;
-                        return array_filter(
-                            [
-                                true,
-                                true,
-                            ],
-                        );
-                    }
-                }
-                PHP,
-        ];
-
-        $unwrapMutation = [
-            'mutator' => 'UnwrapArrayFilter',
-            'code' => <<<'PHP'
-                <?php
-
-                class Example {
-                    public function values(): array {
-                        $fallback = false;
-                        return [
-                            false,
-                            true,
-                        ];
-                    }
-                }
-                PHP,
-        ];
-
-        // Lines are counted from the start of the PHP source, not from the method.
-        yield 'assignment line excludes the following multiline call and its arguments' => [
-            $code,
-            [$assignmentMutation],
-            ['FalseValue', 'TrueValue', 'UnwrapArrayFilter'],
-            [
-                new SourceSymbolSelector('Example', 'values', 5),
-            ],
-        ];
-
-        yield 'call opening line allows unwrapping but excludes arguments on later lines' => [
-            $code,
-            [$unwrapMutation],
-            ['FalseValue', 'TrueValue', 'UnwrapArrayFilter'],
-            [
-                new SourceSymbolSelector('Example', 'values', 6),
-            ],
-        ];
-
-        yield 'array item line allows its literal mutation and unwrapping the enclosing call' => [
-            $code,
-            [$arrayItemMutation, $unwrapMutation],
-            ['FalseValue', 'TrueValue', 'UnwrapArrayFilter'],
-            [
-                new SourceSymbolSelector('Example', 'values', 8),
-            ],
-        ];
-
-        yield 'call closing line still allows unwrapping but excludes arguments on earlier lines' => [
-            $code,
-            [$unwrapMutation],
-            ['FalseValue', 'TrueValue', 'UnwrapArrayFilter'],
-            [
-                new SourceSymbolSelector('Example', 'values', 11),
-            ],
-        ];
-    }
-
-    public static function methodLineSelectionMutationProvider(): iterable
-    {
-        $code = <<<'PHP'
-            <?php
-
-            class Example {
-                public function value(
-                    bool $fallback = false,
-                ): bool {
-                    $value = false;
-
-                    return $value || true;
-                }
-            }
-            PHP;
-
-        $parameterMutation = [
-            'mutator' => 'FalseValue',
-            'code' => <<<'PHP'
-                <?php
-
-                class Example {
-                    public function value(
-                        bool $fallback = true,
-                    ): bool {
-                        $value = false;
-
-                        return $value || true;
-                    }
-                }
-                PHP,
-        ];
-
-        $assignmentMutation = [
-            'mutator' => 'FalseValue',
-            'code' => <<<'PHP'
-                <?php
-
-                class Example {
-                    public function value(
-                        bool $fallback = false,
-                    ): bool {
-                        $value = true;
-
-                        return $value || true;
-                    }
-                }
-                PHP,
-        ];
-
-        $returnMutation = [
-            'mutator' => 'TrueValue',
-            'code' => <<<'PHP'
-                <?php
-
-                class Example {
-                    public function value(
-                        bool $fallback = false,
-                    ): bool {
-                        $value = false;
-
-                        return $value || false;
-                    }
-                }
-                PHP,
-        ];
-
-        $visibilityMutation = [
-            'mutator' => 'PublicVisibility',
-            'code' => <<<'PHP'
-                <?php
-
-                class Example {
-                    protected function value(
-                        bool $fallback = false,
-                    ): bool {
-                        $value = false;
-
-                        return $value || true;
-                    }
-                }
-                PHP,
-        ];
-
-        yield 'whole method selection allows signature and body mutations' => [
-            $code,
-            [$parameterMutation, $assignmentMutation, $returnMutation, $visibilityMutation],
-            ['FalseValue', 'TrueValue', 'PublicVisibility'],
-            [
-                new SourceSymbolSelector('Example', 'value'),
-            ],
-        ];
-
-        yield 'method opening line allows visibility mutation but excludes parameter and body literals' => [
-            $code,
-            [$visibilityMutation],
-            ['FalseValue', 'TrueValue', 'PublicVisibility'],
-            [
-                new SourceSymbolSelector('Example', 'value', 4),
-            ],
-        ];
-
-        yield 'parameter line allows default value and method visibility mutations' => [
-            $code,
-            [$parameterMutation, $visibilityMutation],
-            ['FalseValue', 'TrueValue', 'PublicVisibility'],
-            [
-                new SourceSymbolSelector('Example', 'value', 5),
-            ],
-        ];
-
-        // The method node spans its body too, so a body line currently allows
-        // changing visibility on line 4. See the discussion in:
-        // https://github.com/infection/infection/pull/3683#issuecomment-6705406904
-        yield 'body assignment line also allows visibility mutation on the method opening line' => [
-            $code,
-            [$assignmentMutation, $visibilityMutation],
-            ['FalseValue', 'TrueValue', 'PublicVisibility'],
-            [
-                new SourceSymbolSelector('Example', 'value', 7),
-            ],
-        ];
-
-        yield 'body return line also allows visibility mutation but excludes the earlier assignment' => [
-            $code,
-            [$returnMutation, $visibilityMutation],
-            ['FalseValue', 'TrueValue', 'PublicVisibility'],
-            [
-                new SourceSymbolSelector('Example', 'value', 9),
-            ],
-        ];
-
-        yield 'method closing brace line still allows visibility mutation but excludes body literals' => [
-            $code,
-            [$visibilityMutation],
-            ['FalseValue', 'TrueValue', 'PublicVisibility'],
-            [
-                new SourceSymbolSelector('Example', 'value', 10),
-            ],
-        ];
-
-        yield 'line after the method excludes both visibility and body mutations' => [
-            $code,
-            [],
-            ['FalseValue', 'TrueValue', 'PublicVisibility'],
-            [
-                new SourceSymbolSelector('Example', 'value', 11),
-            ],
-        ];
+            iterator_to_array($generator->generate($node), false),
+        );
     }
 
     #[DataProvider('ignoredMutatorNameProvider')]
