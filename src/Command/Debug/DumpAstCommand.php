@@ -89,6 +89,7 @@ final class DumpAstCommand extends BaseCommand
         parent::__construct(self::NAME);
     }
 
+    // @infection-ignore MethodCallRemoval
     protected function configure(): void
     {
         $this->setDescription('Dumps the AST of a given file.');
