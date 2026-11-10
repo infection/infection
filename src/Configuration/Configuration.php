@@ -75,6 +75,7 @@ readonly class Configuration
         public float $processTimeout,
         public ResolvedSource $source,
         public SourceFilter $sourceFilter,
+        public ClassifiedPositionalArguments $classifiedPositionalArguments,
         public Logs $logs,
         public string $logVerbosity,
         public string $tmpDir,

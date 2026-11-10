@@ -55,7 +55,6 @@ use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalArgumentsFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
-use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
@@ -180,7 +179,7 @@ class ConfigurationFactory
             $configDir,
         );
 
-        [$sourceFilter, $testFrameworkExtraArgs] = $this->refineFilterIfNecessary(
+        [$sourceFilter, $testFrameworkExtraArgs, $classifiedPositionalArguments] = $this->refineFilterIfNecessary(
             $sourceFilter,
             $source,
             $testFrameworkExtraArgs,
@@ -190,6 +189,7 @@ class ConfigurationFactory
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
             source: $source,
             sourceFilter: $sourceFilter,
+            classifiedPositionalArguments: $classifiedPositionalArguments,
             logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath, $summaryJsonLogFilePath, $jsonLogFilePath),
             logVerbosity: $logVerbosity,
             tmpDir: $namespacedTmpDir,
@@ -434,7 +434,7 @@ class ConfigurationFactory
     }
 
     /**
-     * @return array{0: PlainFilter|null, 1: string|null, 2: list<SourceSymbolSelector>}
+     * @return array{0: PlainFilter|null, 1: string|null, 2: ClassifiedPositionalArguments}
      */
     private function resolvePositionalArgumentsFilter(
         PositionalArgumentsFilter $sourceFilter,
@@ -460,22 +460,22 @@ class ConfigurationFactory
         return [
             $resolvedFilter,
             $testFrameworkExtraArgs,
-            $classified->sourceSelectors,
+            $classified,
         ];
     }
 
     /**
-     * @return array{0: SourceFilter, 1: string|null}
+     * @return array{0: SourceFilter, 1: string|null, 2: ClassifiedPositionalArguments}
      */
     private function refineFilterIfNecessary(
         PlainFilter|IncompleteGitDiffFilter|PositionalArgumentsFilter|null $sourceFilter,
         ResolvedSource $source,
         ?string $testFrameworkExtraArgs,
     ): array {
-        $sourceSymbolSelectors = [];
+        $classified = new ClassifiedPositionalArguments([], [], []);
 
         if ($sourceFilter instanceof PositionalArgumentsFilter) {
-            [$sourceFilter, $testFrameworkExtraArgs, $sourceSymbolSelectors] = $this->resolvePositionalArgumentsFilter(
+            [$sourceFilter, $testFrameworkExtraArgs, $classified] = $this->resolvePositionalArgumentsFilter(
                 $sourceFilter,
                 $source,
                 $testFrameworkExtraArgs,
@@ -490,8 +490,9 @@ class ConfigurationFactory
         }
 
         return [
-            new SourceFilter($sourceFilter, $sourceSymbolSelectors),
+            new SourceFilter($sourceFilter, $classified->sourceSelectors),
             $testFrameworkExtraArgs,
+            $classified,
         ];
     }
 
