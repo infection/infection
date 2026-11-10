@@ -42,7 +42,7 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\Http\StrykerCurlClient;
 use Infection\Reporter\Http\StrykerDashboardClient;
-use OndraM\CiDetector\CiDetector;
+use OndraM\CiDetector\CiDetectorInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -54,7 +54,7 @@ class StrykerReporterFactory
     public function __construct(
         private readonly MetricsCalculator $metricsCalculator,
         private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
-        private readonly CiDetector $ciDetector,
+        private readonly CiDetectorInterface $ciDetector,
         private readonly LoggerInterface $logger,
     ) {
     }

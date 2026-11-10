@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Environment;
 
-use OndraM\CiDetector\CiDetector;
+use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use function trim;
 
@@ -45,7 +45,7 @@ use function trim;
 final readonly class BuildContextResolver
 {
     public function __construct(
-        private CiDetector $ciDetector,
+        private CiDetectorInterface $ciDetector,
     ) {
     }
 

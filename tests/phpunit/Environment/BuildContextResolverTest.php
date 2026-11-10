@@ -38,7 +38,7 @@ namespace Infection\Tests\Environment;
 use Infection\Environment\BuildContextResolver;
 use Infection\Environment\CouldNotResolveBuildContext;
 use OndraM\CiDetector\Ci\CiInterface;
-use OndraM\CiDetector\CiDetector;
+use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use OndraM\CiDetector\TrinaryLogic;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -50,7 +50,7 @@ final class BuildContextResolverTest extends TestCase
 {
     public function test_resolve_throws_when_ci_could_not_be_detected(): void
     {
-        $ciDetector = $this->createStub(CiDetector::class);
+        $ciDetector = $this->createStub(CiDetectorInterface::class);
 
         $ciDetector
             ->method('detect')
@@ -74,7 +74,7 @@ final class BuildContextResolverTest extends TestCase
             ->willReturn(TrinaryLogic::createFromBoolean(true))
         ;
 
-        $ciDetector = $this->createStub(CiDetector::class);
+        $ciDetector = $this->createStub(CiDetectorInterface::class);
 
         $ciDetector
             ->method('detect')
@@ -98,7 +98,7 @@ final class BuildContextResolverTest extends TestCase
             ->willReturn(TrinaryLogic::createMaybe())
         ;
 
-        $ciDetector = $this->createStub(CiDetector::class);
+        $ciDetector = $this->createStub(CiDetectorInterface::class);
 
         $ciDetector
             ->method('detect')
@@ -135,7 +135,7 @@ final class BuildContextResolverTest extends TestCase
             ->willReturn($gitBranch)
         ;
 
-        $ciDetector = $this->createStub(CiDetector::class);
+        $ciDetector = $this->createStub(CiDetectorInterface::class);
 
         $ciDetector
             ->method('detect')
@@ -172,7 +172,7 @@ final class BuildContextResolverTest extends TestCase
             ->willReturn($gitBranch)
         ;
 
-        $ciDetector = $this->createStub(CiDetector::class);
+        $ciDetector = $this->createStub(CiDetectorInterface::class);
 
         $ciDetector
             ->method('detect')
@@ -216,7 +216,7 @@ final class BuildContextResolverTest extends TestCase
             ->willReturn($gitBranch)
         ;
 
-        $ciDetector = $this->createStub(CiDetector::class);
+        $ciDetector = $this->createStub(CiDetectorInterface::class);
 
         $ciDetector
             ->method('detect')

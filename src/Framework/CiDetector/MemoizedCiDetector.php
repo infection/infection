@@ -35,30 +35,48 @@ declare(strict_types=1);
 
 namespace Infection\Framework\CiDetector;
 
+use Later\Interfaces\Deferred;
+use function Later\later;
 use OndraM\CiDetector\Ci\CiInterface;
-use OndraM\CiDetector\CiDetector;
+use OndraM\CiDetector\CiDetectorInterface;
+use OndraM\CiDetector\Exception\CiNotDetectedException;
 use Override;
 
 /**
  * @internal
- *
- * TODO: for now we are forced to extend CiDetector which is not ideal since we need to mind all
- *  the API of the parent. See https://github.com/OndraM/ci-detector/issues/64
  */
-final class MemoizedCiDetector extends CiDetector
+final readonly class MemoizedCiDetector implements CiDetectorInterface
 {
     /**
-     * @var CiInterface|false|null
+     * @var Deferred<CiInterface>
      */
-    private $ci = false;
+    private Deferred $ci;
+
+    public function __construct(CiDetectorInterface $decoratedDetector)
+    {
+        $this->ci = later(
+            /**
+             * @throws CiNotDetectedException
+             */
+            static fn () => yield $decoratedDetector->detect(),
+        );
+    }
 
     #[Override]
-    protected function detectCurrentCiServer(): ?CiInterface
+    public function isCiDetected(): bool
     {
-        if ($this->ci === false) {
-            $this->ci = parent::detectCurrentCiServer();
+        try {
+            $this->detect();
+        } catch (CiNotDetectedException) {
+            return false;
         }
 
-        return $this->ci;
+        return true;
+    }
+
+    #[Override]
+    public function detect(): CiInterface
+    {
+        return $this->ci->get();
     }
 }
