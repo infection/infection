@@ -53,6 +53,7 @@ use function Safe\chdir;
 use function Safe\getcwd;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(GitChangedLinesCommand::class)]
@@ -107,8 +108,8 @@ final class GitChangedLinesCommandTest extends TestCase
                 $expectedFilter,
                 self::REFERENCE,
                 [
-                    self::FIXTURES_DIR . '/src',
-                    self::FIXTURES_DIR . '/lib',
+                    Path::canonicalize(self::FIXTURES_DIR . '/src'),
+                    Path::canonicalize(self::FIXTURES_DIR . '/lib'),
                 ],
                 self::FIXTURES_DIR,
             )
