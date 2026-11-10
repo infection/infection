@@ -48,6 +48,7 @@ final readonly class AnalysisResult
         public bool $belongsToIntegrationGroup,
         public bool $declaresPublicNonReadonlyProperty,
         public array $environmentVariables,
+        public bool $callsContainerCreate,
     ) {
     }
 }

@@ -45,6 +45,7 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
+use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\Parser;
 use PHPStan\Reflection\ClassReflection;
@@ -91,6 +92,7 @@ final class Analyser
                 belongsToIntegrationGroup: PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
                 declaresPublicNonReadonlyProperty: PublicPropertyAnalysis::hasDeclaredPublicNonReadonlyProperty($classReflection),
                 environmentVariables: [],
+                callsContainerCreate: false,
             );
         }
 
@@ -139,12 +141,14 @@ final class Analyser
             : null;
         $ioCodeDetectorVisitor = IoCodeDetectorVisitor::create();
         $environmentVariableUsageVisitor = new EnvironmentVariableUsageVisitor();
+        $containerCreateUsageVisitor = new ContainerCreateUsageVisitor($classReflection->getName());
 
         $this
             ->createTraverser(
                 $meaningfulImplementationVisitor,
                 $ioCodeDetectorVisitor,
                 $environmentVariableUsageVisitor,
+                $containerCreateUsageVisitor,
             )
             ->traverse($nodes)
         ;
@@ -157,12 +161,14 @@ final class Analyser
             belongsToIntegrationGroup: PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
             declaresPublicNonReadonlyProperty: PublicPropertyAnalysis::hasDeclaredPublicNonReadonlyProperty($classReflection),
             environmentVariables: $environmentVariableUsageVisitor->getEnvironmentVariables(),
+            callsContainerCreate: $containerCreateUsageVisitor->callsContainerCreate(),
         );
     }
 
     private function createTraverser(?NodeVisitor ...$visitors): NodeTraverserInterface
     {
         return new NodeTraverser(
+            new NameResolver(null, ['replaceNodes' => false]),
             new ParentConnectingVisitor(),
             ...array_filter($visitors),
         );
