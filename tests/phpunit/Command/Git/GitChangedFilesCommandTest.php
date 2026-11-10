@@ -107,8 +107,8 @@ final class GitChangedFilesCommandTest extends TestCase
                 $expectedFilter,
                 self::REFERENCE,
                 [
-                    self::FIXTURES_DIR . '/src',
-                    self::FIXTURES_DIR . '/lib',
+                    Path::canonicalize(self::FIXTURES_DIR . '/src'),
+                    Path::canonicalize(self::FIXTURES_DIR . '/lib'),
                 ],
                 self::FIXTURES_DIR,
             )
@@ -289,8 +289,8 @@ final class GitChangedFilesCommandTest extends TestCase
                 Git::DEFAULT_GIT_DIFF_FILTER,
                 self::REFERENCE,
                 [
-                    self::FIXTURES_DIR . '/src',
-                    self::FIXTURES_DIR . '/lib',
+                    Path::canonicalize(self::FIXTURES_DIR . '/src'),
+                    Path::canonicalize(self::FIXTURES_DIR . '/lib'),
                 ],
                 self::FIXTURES_DIR,
             )
