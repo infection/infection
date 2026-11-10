@@ -36,7 +36,13 @@ declare(strict_types=1);
 namespace Infection\Testing;
 
 use Infection\CannotBeInstantiated;
+use Infection\Configuration\ProjectDirectoryProvider\ChainProjectDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\CurrentWorkingDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\GitProjectDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Container\Container;
+use Infection\Framework\CiDetector\CiDetectorFactory;
+use Infection\Framework\CiDetector\NullCiDetectorFactory;
 use Infection\Mutant\MutantCodePrinter;
 use Infection\PhpParser\InfectionPrettyPrinter;
 use PhpParser\NodeDumper;
@@ -44,7 +50,8 @@ use PhpParser\NodeDumper;
 /**
  * Singleton for the container and a few services (used for tests). The goal is to avoid
  * instantiating multiple times stateless services across the tests to reduce the memory footprint
- * and remove some redundant code.
+ * and remove some redundant code. CI detection and CI workspace providers are disabled so
+ * inherited CI variables do not change progress, annotation logging, or project-directory defaults.
  *
  * @internal
  */
@@ -60,7 +67,7 @@ final class SingletonContainer
 
     public static function getContainer(): Container
     {
-        return self::$container ??= Container::create();
+        return self::$container ??= self::createContainer();
     }
 
     public static function getNodeDumper(): NodeDumper
@@ -71,5 +78,25 @@ final class SingletonContainer
     public static function getPrinter(): MutantCodePrinter
     {
         return self::$printer ??= new MutantCodePrinter(new InfectionPrettyPrinter());
+    }
+
+    private static function createContainer(): Container
+    {
+        return Container::create()
+            ->cloneWithService(
+                CiDetectorFactory::class,
+                new NullCiDetectorFactory(),
+            )
+            ->cloneWithService(
+                ProjectDirectoryProvider::class,
+                static fn (Container $container): ProjectDirectoryProvider => new ChainProjectDirectoryProvider(
+                    new GitProjectDirectoryProvider(
+                        $container->getGit(),
+                        $container->getLogger(),
+                    ),
+                    new CurrentWorkingDirectoryProvider(),
+                ),
+            )
+        ;
     }
 }

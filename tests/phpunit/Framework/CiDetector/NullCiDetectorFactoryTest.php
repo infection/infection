@@ -35,35 +35,30 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Framework\CiDetector;
 
-use Infection\Framework\CiDetector\CiDetectorFactory;
-use Infection\Framework\CiDetector\MemoizedCiDetector;
 use Infection\Framework\CiDetector\NullCiDetector;
-use OndraM\CiDetector\CiDetectorInterface;
+use Infection\Framework\CiDetector\NullCiDetectorFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(CiDetectorFactory::class)]
-final class CiDetectorFactoryTest extends TestCase
+#[CoversClass(NullCiDetectorFactory::class)]
+final class NullCiDetectorFactoryTest extends TestCase
 {
-    /**
-     * @param class-string<CiDetectorInterface> $expectedClass
-     */
     #[DataProvider('provideCiDetectionModes')]
-    public function test_it_creates_the_detector_for_the_ci_detection_mode(bool $disableCiDetection, string $expectedClass): void
+    public function test_it_disables_ci_detection(bool $disableCiDetection): void
     {
-        $factory = new CiDetectorFactory();
+        $factory = new NullCiDetectorFactory();
 
         $this->assertInstanceOf(
-            $expectedClass,
+            NullCiDetector::class,
             $factory->create(disableCiDetection: $disableCiDetection),
         );
     }
 
     public static function provideCiDetectionModes(): iterable
     {
-        yield 'CI detection enabled' => [false, MemoizedCiDetector::class];
+        yield 'CI detection requested' => [false];
 
-        yield 'CI detection disabled' => [true, NullCiDetector::class];
+        yield 'CI detection disabled' => [true];
     }
 }

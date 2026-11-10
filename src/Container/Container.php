@@ -91,6 +91,7 @@ use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
 use Infection\Framework\CiDetector\CiDetectorFactory;
+use Infection\Framework\CiDetector\DefaultCiDetectorFactory;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
@@ -274,7 +275,7 @@ final class Container extends DIContainer
     public static function create(): self
     {
         $container = new self([
-            CiDetectorFactory::class => static fn (): CiDetectorFactory => new CiDetectorFactory(),
+            CiDetectorFactory::class => static fn (): CiDetectorFactory => new DefaultCiDetectorFactory(),
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
             Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
                 $container->getTraceProvider(),

@@ -41,11 +41,13 @@ use Infection\Container\Container;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 
 #[CoversClass(RunCommandHelper::class)]
+#[WithEnvironmentVariable('INFECTION_E2E_TESTS_ENV')]
 final class RunCommandHelperTest extends TestCase
 {
     private InputInterface&MockObject $inputMock;

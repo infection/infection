@@ -35,18 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Framework\CiDetector;
 
-use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 
 /**
  * @internal
  */
-final class CiDetectorFactory
+interface CiDetectorFactory
 {
-    public function create(bool $disableCiDetection): CiDetectorInterface
-    {
-        return $disableCiDetection
-            ? new NullCiDetector()
-            : new MemoizedCiDetector(new CiDetector());
-    }
+    public function create(bool $disableCiDetection): CiDetectorInterface;
 }
