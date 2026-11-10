@@ -285,10 +285,13 @@ final class InitialTestRunCommandTest extends TestCase
 
     /**
      * @param list<string> $paths
+     * @param array<string, string> $extraArguments
      */
     #[DataProvider('symbolSelectorsProvider')]
-    public function test_it_rejects_source_symbol_selectors_before_running_tests(array $paths): void
-    {
+    public function test_it_rejects_source_symbol_selectors_before_running_tests(
+        array $paths,
+        array $extraArguments = [],
+    ): void {
         $testFramework = $this->createMock(TestFramework::class);
         $testFramework
             ->expects($this->never())
@@ -308,13 +311,21 @@ final class InitialTestRunCommandTest extends TestCase
             ),
         );
 
-        $tester->execute(['paths' => $paths]);
+        $tester->execute([
+            'paths' => $paths,
+            ...$extraArguments,
+        ]);
     }
 
     public static function symbolSelectorsProvider(): iterable
     {
         yield 'explicit class selector' => [
             ['\SomeClass'],
+        ];
+
+        yield 'method selector with explicit test-framework arguments' => [
+            ['SomeClass::method'],
+            ['--test-framework-extra-args' => '--filter=testSomething'],
         ];
 
         yield 'method selector alone' => [
