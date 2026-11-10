@@ -43,7 +43,7 @@ use Infection\Metrics\ResultsCollector;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\Http\StrykerDashboardClient;
 use Infection\Reporter\StrykerReporter;
-use Infection\Tests\CI\ConfigurableEnv;
+use Infection\Tests\Framework\CiDetector\ConfigurableEnv;
 use Infection\Tests\Logger\DummyLogger;
 use OndraM\CiDetector\CiDetector;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
