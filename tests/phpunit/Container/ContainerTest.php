@@ -112,7 +112,7 @@ final class ContainerTest extends TestCase
     {
         $this->expectNotToPerformAssertions();
 
-        $container = SingletonContainer::getContainer();
+        $container = Container::create();
 
         $container->getSubscriberRegisterer();
         $container->getTestFrameworkFinder();

@@ -37,7 +37,7 @@ namespace Infection\Tests\Command\Debug\DumpAstCommand;
 
 use Infection\Command\Debug\DumpAstCommand;
 use Infection\Console\Application;
-use Infection\Container\Container;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -755,7 +755,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
 
     private function createCommandTester(): CommandTester
     {
-        $container = Container::create();
+        $container = SingletonContainer::getContainer();
 
         $application = new Application($container);
 

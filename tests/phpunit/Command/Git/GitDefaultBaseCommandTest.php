@@ -37,8 +37,8 @@ namespace Infection\Tests\Command\Git;
 
 use Infection\Command\Git\GitDefaultBaseCommand;
 use Infection\Console\Application;
-use Infection\Container\Container;
 use Infection\Git\Git;
+use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -77,8 +77,7 @@ final class GitDefaultBaseCommandTest extends TestCase
 
     private function createCommandTester(): CommandTester
     {
-        $container = Container::create();
-        $container->set(Git::class, fn () => $this->git);
+        $container = SingletonContainer::getContainer()->cloneWithService(Git::class, $this->git);
 
         $application = new Application($container);
 
