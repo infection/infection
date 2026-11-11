@@ -1,6 +1,11 @@
 schemaVersion: 2.0.0
 
 commandTests:
+    -   name: "Base image uses Debian 13 for the PHP mixin baseline"
+        command: "bash"
+        args: ["-c", ". /etc/os-release && test \"$ID\" = debian && test \"$VERSION_ID\" = 13"]
+        exitCode: 0
+
     -   name: "php 8.4 is installed"
         command: "php"
         args: ["--version"]
@@ -55,27 +60,14 @@ commandTests:
             - "/usr/bin/phpize"
         exitCode: 0
 
-    -   name: "container-structure-test is executable"
-        command: "container-structure-test"
-        args: ["version"]
-        exitCode: 0
-
     -   name: "wget is executable"
         command: "wget"
         args: ["--version"]
         expectedOutput: ["(?m)^GNU Wget "]
         exitCode: 0
 
-    -   name: "GitHub CLI is executable"
-        command: "gh"
-        args: ["--version"]
-        expectedOutput: ['(?m)^gh version \d+\.\d+\.\d+']
+    -   name: "PHP is executable by an unprivileged user"
+        command: "runuser"
+        args: ["-u", "nobody", "--", "php", "--version"]
+        expectedOutput: ['^PHP 8\.4\.\d+ \(cli\) ']
         exitCode: 0
-
-    -   name: "Container runs as agent user"
-        command: "whoami"
-        expectedOutput: ["(?m)^agent$"]
-
-globalEnvVars:
-    -   key: "SHELL"
-        value: "/bin/bash"

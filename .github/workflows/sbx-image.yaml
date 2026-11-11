@@ -89,8 +89,8 @@ jobs:
       - name: Ensures container-structure-test works
         run: container-structure-test version
 
-      - name: Build and test the Docker sandbox image
-        run: ./devTools/sbx/build-image.sh
+      - name: Build and test the sandbox kits
+        run: ./devTools/sbx/test-kits.sh
 
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.

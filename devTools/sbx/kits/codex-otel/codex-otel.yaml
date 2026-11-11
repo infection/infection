@@ -1,0 +1,15 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: Infection Codex OTEL
+description: Merge Infection OpenTelemetry settings into the generated Codex user config.
+
+capabilities:
+    -   type: com.docker.sandbox/lifecycle@1
+        config:
+            startup:
+                -   command: ["/usr/local/bin/infection-merge-codex-otel"]
+                    env: [CODEX_CONFIG_FILE, CODEX_OTEL_CONFIG_FILE]
+                    user: "1000"
+                    background: false
+                    description: Merge Infection OTEL settings into Codex config.

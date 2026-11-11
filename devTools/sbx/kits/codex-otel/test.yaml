@@ -1,0 +1,15 @@
+schemaVersion: 2.0.0
+
+fileExistenceTests:
+    -   name: "Telemetry merge helper is executable"
+        path: "/usr/local/bin/infection-merge-codex-otel"
+        shouldExist: true
+        permissions: "-rwxr-xr-x"
+
+    -   name: "Telemetry settings are bundled at the helper's default path"
+        path: "/usr/share/infection-sbx/codex-otel.toml"
+        shouldExist: true
+
+    -   name: "Telemetry overlay does not replace home directory ownership"
+        path: "/home"
+        shouldExist: false

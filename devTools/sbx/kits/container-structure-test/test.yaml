@@ -1,0 +1,8 @@
+schemaVersion: 2.0.0
+
+commandTests:
+    -   name: "container-structure-test is executable"
+        command: "/usr/local/bin/container-structure-test"
+        args: ["version"]
+        expectedOutput: ['1\.22\.1']
+        exitCode: 0

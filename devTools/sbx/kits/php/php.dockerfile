@@ -1,8 +1,8 @@
-FROM docker/sandbox-templates:codex-docker
+# Debian 13 is the compatibility baseline for workloads using this mixin.
+# The kit frontend excludes unchanged base files from the overlay.
+FROM debian:trixie-slim
 
-# The base image runs as the non-root `agent` user by default.
-# Switch to root for all system-level package installations.
-USER root
+SHELL ["/bin/bash", "-c"]
 
 ARG PHP_VERSION=8.4
 
@@ -13,10 +13,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
-        lsb-release \
         gnupg \
     && curl -fsSL https://packages.sury.org/php/apt.gpg | gpg --dearmor > /usr/share/keyrings/php-sury.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/php-sury.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/sury-php.list \
+    && . /etc/os-release \
+    && echo "deb [signed-by=/usr/share/keyrings/php-sury.gpg] https://packages.sury.org/php/ ${VERSION_CODENAME} main" > /etc/apt/sources.list.d/sury-php.list \
     && DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         # CLI SAPI
@@ -38,10 +38,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         php${PHP_VERSION}-dev \
         pkg-config \
         re2c \
-        # CA bundle used by curl for HTTPS downloads
-        ca-certificates \
-        # Downloads files during image build and sandbox usage
-        curl \
+        # Downloads files during sandbox usage
         wget \
     && echo 'xdebug.mode=coverage' > /etc/php/${PHP_VERSION}/cli/conf.d/xdebug.ini \
     && echo 'memory_limit=-1' > /etc/php/${PHP_VERSION}/cli/conf.d/memory-limit.ini \
@@ -55,25 +52,3 @@ RUN set -o errexit -o nounset -o pipefail \
     && curl -fL --output /tmp/pie.phar https://github.com/php/pie/releases/latest/download/pie.phar \
     && mv /tmp/pie.phar /usr/local/bin/pie \
     && chmod +x /usr/local/bin/pie
-
-ARG CONTAINER_STRUCTURE_TEST_VERSION=1.22.1
-ARG TARGET_ARCH
-
-# container-structure-test
-RUN set -o errexit -o nounset -o pipefail \
-    && target_arch="${TARGET_ARCH:-$(dpkg --print-architecture)}" \
-    && case "${target_arch}" in \
-        x86_64) target_arch=amd64 ;; \
-        aarch64) target_arch=arm64 ;; \
-    esac \
-    && curl --location --fail --show-error --silent \
-        --output /usr/local/bin/container-structure-test \
-        "https://github.com/GoogleContainerTools/container-structure-test/releases/download/v${CONTAINER_STRUCTURE_TEST_VERSION}/container-structure-test-linux-${target_arch}" \
-    && chmod +x /usr/local/bin/container-structure-test
-
-# Allow telemetry
-ENV NO_PROXY="${NO_PROXY:+${NO_PROXY},}host.docker.internal,169.254.1.1,localhost,127.0.0.1,::1,gateway.docker.internal"
-ENV no_proxy="$NO_PROXY"
-
-# Restore the default non-root user that the sandbox agent runs as.
-USER agent
