@@ -151,6 +151,12 @@ parameters:
             count: 1
             path: ../tests/phpunit/Process/Runner/DryProcessRunnerTest.php
 
+        # SourceSymbolMatcher requires an enriched AST and is covered by ExcludeNonSelectedSourceNodesVisitorTest.
+        -
+            identifier: phpat.testConcreteSourceClassesHaveTests
+            count: 1
+            path: ../src/Source/Matcher/SourceSymbolMatcher.php
+
         # Permanent PHPat exceptions: these PHPUnit support classes are intentionally not tested directly.
         -
             identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
