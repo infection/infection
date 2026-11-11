@@ -4519,6 +4519,12 @@ message = 'Argument type mismatch for argument #6 of `Infection\Tests\Mutation\M
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Mutation/MutationGenerationIntegrationTest.php"
+code = "invalid-return-statement"
+message = '''Invalid return type for function `Infection\Tests\Mutation\MutationGenerationIntegrationTest::createMutationDiffs`: expected `list<array{'diff': string, 'mutator': string}>`, but found `list<array{'diff': array<array-key, mixed>|array<array-key, string>|string, 'mutator': string}>`.'''
+count = 1
+
+[[issues]]
 file = "tests/phpunit/Mutation/MutationTest.php"
 code = "invalid-argument"
 message = 'Invalid argument type for argument #2 of `PhpParser\Node\Stmt\Namespace_::__construct`: expected `array<array-key, PhpParser\Node\Stmt>|null`, but found `list{PhpParser\Node\Scalar\Int_}`.'
