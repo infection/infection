@@ -109,12 +109,6 @@ parameters:
 			path: ../src/Configuration/Schema/SchemaConfigurationFactory.php
 
 		-
-			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
-			identifier: arrayFilter.strict
-			count: 1
-			path: ../src/Configuration/SourceFilter/PlainFilter.php
-
-		-
 			rawMessage: Fetching deprecated class constant DEBUG_INTEGER of class Infection\Console\LogVerbosity.
 			identifier: classConstant.deprecated
 			count: 1
