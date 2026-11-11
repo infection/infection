@@ -3,73 +3,58 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-KIT_DIR="${SCRIPT_DIR}/kits/php"
-DOCKERFILE="${KIT_DIR}/php.dockerfile"
-KIT_SPEC="${KIT_DIR}/php.yaml"
-TEST_CONFIG="${KIT_DIR}/test.yaml"
-PHP_VERSION="${PHP_VERSION:-8.4}"
-IMAGE_NAME="${IMAGE_NAME:-infection-sbx-php-${PHP_VERSION}}"
-IMAGE_TAG="${IMAGE_TAG:-latest}"
-IMAGE_REF="${IMAGE_REF:-${IMAGE_NAME}:${IMAGE_TAG}}"
-TEST_IMAGE_REF="${TEST_IMAGE_REF:-${IMAGE_NAME}-test:${IMAGE_TAG}}"
-IMAGE_PLATFORM="${IMAGE_PLATFORM:-}"
-IMAGE_CACHE_FROM="${IMAGE_CACHE_FROM:-}"
-IMAGE_CACHE_TO="${IMAGE_CACHE_TO:-}"
 
-if ! command -v container-structure-test >/dev/null 2>&1; then
-    cat >&2 <<'EOF'
-container-structure-test is required to test the sandbox kits, but it was not found in PATH.
-
-https://github.com/GoogleContainerTools/container-structure-test
-EOF
+if ! command -v sbx >/dev/null 2>&1; then
+    printf 'sbx 0.51 or later is required to test the sandbox kits.\n' >&2
     exit 1
 fi
 
-DOCKER_BUILD_OPTIONS=(--load)
-TEST_OPTIONS=()
+kit_options=()
+test_scripts=()
 
-if [[ -n "${IMAGE_PLATFORM}" ]]; then
-    DOCKER_BUILD_OPTIONS+=(--platform="${IMAGE_PLATFORM}")
-    TEST_OPTIONS+=(--platform="${IMAGE_PLATFORM}")
+for kit_dir in "${SCRIPT_DIR}"/kits/*; do
+    kit_name="${kit_dir##*/}"
+    # Personal hooks are outside the shared kit contract.
+    if [[ "$kit_name" == project-local || ! -f "${kit_dir}/${kit_name}.yaml" ]]; then
+        continue
+    fi
+    if [[ ! -f "${kit_dir}/test.sh" ]]; then
+        printf 'Missing kit checks: %s/test.sh\n' "$kit_dir" >&2
+        exit 1
+    fi
+    kit_options+=("--kit=${kit_dir}")
+    test_scripts+=("${kit_dir}/test.sh")
+done
+
+if [[ "${#test_scripts[@]}" == 0 ]]; then
+    printf 'No shared kit checks found.\n' >&2
+    exit 1
 fi
 
-if [[ -n "${IMAGE_CACHE_FROM}" ]]; then
-    DOCKER_BUILD_OPTIONS+=(--cache-from="${IMAGE_CACHE_FROM}")
-fi
+# mktemp reserves a unique name; never reuse or remove a user's sandbox.
+name_reservation="$(mktemp -d "${TMPDIR:-/tmp}/infection-kit-test.XXXXXXXX")"
+sandbox_name="${name_reservation##*/}"
 
-if [[ -n "${IMAGE_CACHE_TO}" ]]; then
-    DOCKER_BUILD_OPTIONS+=(--cache-to="${IMAGE_CACHE_TO}")
-fi
+cleanup() {
+    result=$?
+    trap - EXIT
+    if ! sbx --no-input rm --force "$sandbox_name"; then
+        printf 'Could not remove test sandbox %s.\n' "$sandbox_name" >&2
+        if [[ "$result" == 0 ]]; then
+            result=1
+        fi
+    fi
+    rmdir "$name_reservation"
+    exit "$result"
+}
 
-if [[ "${FORCE_REBUILD:-}" == "1" ]]; then
-    DOCKER_BUILD_OPTIONS+=(--no-cache)
-fi
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
-# Build the full filesystem for executable contract tests. A published mixin
-# contains only an overlay and cannot run these commands on its own.
-set -x
-docker buildx build "${DOCKER_BUILD_OPTIONS[@]}" \
-    --build-arg="PHP_VERSION=${PHP_VERSION}" \
-    --file="${DOCKERFILE}" \
-    --tag="${TEST_IMAGE_REF}" \
-    "${KIT_DIR}"
-container-structure-test test "${TEST_OPTIONS[@]}" --image="${TEST_IMAGE_REF}" --config="${TEST_CONFIG}"
-
-# The kit frontend emits the overlay and its v3 descriptor, not a workload.
-docker buildx build "${DOCKER_BUILD_OPTIONS[@]}" \
-    --build-arg="php_version=${PHP_VERSION}" \
-    --file="${KIT_SPEC}" \
-    --tag="${IMAGE_REF}" \
-    "${KIT_DIR}"
-
-# File and standalone CLI checks need no workload filesystem.
-for tool in container-structure-test sbx gh-stack codex-otel; do
-    tool_kit_dir="${SCRIPT_DIR}/kits/${tool}"
-    tool_image_ref="infection-sbx-${tool}:latest"
-    docker buildx build "${DOCKER_BUILD_OPTIONS[@]}" \
-        --file="${tool_kit_dir}/${tool}.yaml" \
-        --tag="${tool_image_ref}" \
-        "${tool_kit_dir}"
-    container-structure-test test "${TEST_OPTIONS[@]}" \
-        --image="${tool_image_ref}" --config="${tool_kit_dir}/test.yaml"
+# No workspace or shared host skills: exercise only the composed shared kits.
+sbx --no-input create shell --name "$sandbox_name" --skills=off "${kit_options[@]}"
+for test_script in "${test_scripts[@]}"; do
+    printf 'Testing %s\n' "$(basename "$(dirname "$test_script")")"
+    sbx --no-input exec -i --user 1000 "$sandbox_name" bash -se < "$test_script"
 done

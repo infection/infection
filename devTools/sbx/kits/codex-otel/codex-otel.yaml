@@ -5,6 +5,12 @@ displayName: Infection Codex OTEL
 description: Merge Infection OpenTelemetry settings into the generated Codex user config.
 
 capabilities:
+    -   type: com.docker.sandbox/network-policy@1
+        config:
+            runtime:
+                allow:
+                    - localhost:4318
+
     -   type: com.docker.sandbox/lifecycle@1
         config:
             startup:

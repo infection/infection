@@ -75,7 +75,7 @@ compile-docker: $(DOCKER_FILE_IMAGE)
 # Local v3 kit builds use the OCI exporter, which needs docker-container
 # when Docker's containerd image store is disabled. Keep this builder local
 # to the sbx targets instead of changing the user's selected builder.
-sbx-create sbx-kit-validate: export BUILDX_BUILDER=$(SBX_BUILDER)
+sbx-create sbx-kit-validate sbx-kit-test: export BUILDX_BUILDER=$(SBX_BUILDER)
 
 .PHONY: sbx-builder
 sbx-builder:
@@ -83,10 +83,11 @@ sbx-builder:
 
 .PHONY: sbx-create
 sbx-create:	## Creates the Codex sandbox with the PHP tooling mixin
-sbx-create: sbx-project-local-kit sbx-kit-validate
-	#sbx rm codex-infection || true
+sbx-create: sbx-builder sbx-project-local-kit
+	sbx rm codex-infection || true
 	sbx run codex \
-		--name=codex-infection-test \
+		--name=codex-infection \
+		--skills=off \
 		$(foreach kit,$(SBX_KITS),--kit="$(kit)") \
 		--kit="git+https://github.com/docker/sbx-kits-contrib#ref=f17734585e96110334a7e9ea609d08d7b8f1c99d&dir=git-ssh-sign" .
 
@@ -103,18 +104,9 @@ sbx-kit-validate: sbx-builder sbx-project-local-kit
 	done
 
 .PHONY: sbx-kit-test
-sbx-kit-test:	## Builds and tests the shared sbx kit images
-sbx-kit-test:
+sbx-kit-test:	## Tests the shared kits in a disposable shell sandbox
+sbx-kit-test: sbx-builder
 	./devTools/sbx/test-kits.sh
-
-.PHONY: _sbx-kit-test
-_sbx-kit-test:
-	FORCE_REBUILD=1 ./devTools/sbx/test-kits.sh
-
-.PHONY: sbx-php-test
-sbx-php-test:	## Checks the existing PHP test image
-sbx-php-test:
-	container-structure-test test --image=infection-sbx-php-8.4-test:latest --config=./devTools/sbx/kits/php/test.yaml
 
 .PHONY: check_trailing_whitespaces
 check_trailing_whitespaces:

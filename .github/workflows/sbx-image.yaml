@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   sbx-image:
-    name: Build and Test Docker Sandbox Image (${{ matrix.platform }})
+    name: Build Docker Sandbox Kits (${{ matrix.platform }})
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -34,11 +34,9 @@ jobs:
             cache-scope: sbx-image-linux-arm64
 
     env:
-      CONTAINER_STRUCTURE_TEST_VERSION: 1.22.1
       DOCKER_BUILDKIT: 1
       IMAGE_PLATFORM: ${{ matrix.platform }}
-      IMAGE_CACHE_FROM: ${{ github.event_name != 'release' && format('type=gha,scope={0}', matrix.cache-scope) || '' }}
-      IMAGE_CACHE_TO: ${{ github.event_name != 'release' && format('type=gha,mode=max,ignore-error=true,scope={0}', matrix.cache-scope) || '' }}
+      KIT_CACHE_SCOPE: ${{ matrix.cache-scope }}
 
     steps:
       - name: Checkout code
@@ -56,41 +54,27 @@ jobs:
       - name: Expose GitHub runtime for Buildx cache
         uses: crazy-max/ghaction-github-runtime@04d248b84655b509d8c44dc1d6f990c879747487 # v4.0.0
 
-      - name: Restore container-structure-test
-        id: container-structure-test-cache
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: .tools/container-structure-test
-          key: container-structure-test-${{ runner.os }}-${{ runner.arch }}-${{ env.CONTAINER_STRUCTURE_TEST_VERSION }}
-
-      - name: Install container-structure-test
-        if: steps.container-structure-test-cache.outputs.cache-hit != 'true'
+      # Runtime checks use make sbx-kit-test on a host with a working sbx daemon.
+      - name: Build and validate the kit artifacts
         run: |
-          mkdir -p .tools
-          curl --location --fail --show-error --silent \
-            --output .tools/container-structure-test \
-            "https://github.com/GoogleContainerTools/container-structure-test/releases/download/v${CONTAINER_STRUCTURE_TEST_VERSION}/container-structure-test-linux-amd64"
-          chmod +x .tools/container-structure-test
-
-      - name: Cache container-structure-test
-        if: github.event_name == 'push' && steps.container-structure-test-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: .tools/container-structure-test
-          key: container-structure-test-${{ runner.os }}-${{ runner.arch }}-${{ env.CONTAINER_STRUCTURE_TEST_VERSION }}
-
-      - name: Register container-structure-test
-        run: echo "${GITHUB_WORKSPACE}/.tools" >> "${GITHUB_PATH}"
-
-        # This needs to be done even on cache hit as the permissions are not preserved.
-      - name: Ensures container-structure-test is executable
-        run: chmod +x .tools/container-structure-test
-
-      - name: Ensures container-structure-test works
-        run: container-structure-test version
-
-      - name: Build and test the sandbox kits
-        run: ./devTools/sbx/test-kits.sh
+          set -euo pipefail
+          for kit_dir in devTools/sbx/kits/*; do
+            kit_name="${kit_dir##*/}"
+            kit_spec="${kit_dir}/${kit_name}.yaml"
+            if [[ "$kit_name" == project-local || ! -f "$kit_spec" ]]; then
+              continue
+            fi
+            test -f "${kit_dir}/test.sh"
+            bash -n "${kit_dir}/test.sh"
+            build_options=(--platform="$IMAGE_PLATFORM")
+            if [[ "$GITHUB_EVENT_NAME" != release ]]; then
+              build_options+=(
+                --cache-from="type=gha,scope=${KIT_CACHE_SCOPE}-${kit_name}"
+                --cache-to="type=gha,mode=max,ignore-error=true,scope=${KIT_CACHE_SCOPE}-${kit_name}"
+              )
+            fi
+            docker buildx build "${build_options[@]}" --file="$kit_spec" "$kit_dir"
+          done
 
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.

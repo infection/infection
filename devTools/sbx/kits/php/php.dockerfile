@@ -1,8 +1,10 @@
-# Debian 13 is the compatibility baseline for workloads using this mixin.
-# The kit frontend excludes unchanged base files from the overlay.
-FROM debian:trixie-slim
+# Match Docker's neutral workload base so inherited dependencies are available
+# when the kit frontend excludes unchanged files from the overlay.
+FROM docker.io/sbx/shell:latest
 
 SHELL ["/bin/bash", "-c"]
+
+USER root
 
 ARG PHP_VERSION=8.4
 
@@ -21,6 +23,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         # CLI SAPI
         php${PHP_VERSION}-cli \
+        # Debian's PHP uses the system timezone database.
+        tzdata \
         # Extensions used by infection to not have to rely on polyfills
         php${PHP_VERSION}-curl \
         php${PHP_VERSION}-mbstring \
@@ -52,3 +56,5 @@ RUN set -o errexit -o nounset -o pipefail \
     && curl -fL --output /tmp/pie.phar https://github.com/php/pie/releases/latest/download/pie.phar \
     && mv /tmp/pie.phar /usr/local/bin/pie \
     && chmod +x /usr/local/bin/pie
+
+USER agent
