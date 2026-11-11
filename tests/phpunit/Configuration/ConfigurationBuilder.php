@@ -38,6 +38,7 @@ namespace Infection\Tests\Configuration;
 
 use function array_values;
 use function implode;
+use Infection\Configuration\ClassifiedPositionalArguments;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
@@ -72,6 +73,7 @@ final class ConfigurationBuilder
         private float $timeout,
         private ResolvedSource $source,
         private SourceFilter $sourceFilter,
+        private ClassifiedPositionalArguments $classifiedPositionalArguments,
         private Logs $logs,
         private string $logVerbosity,
         private string $tmpDir,
@@ -117,6 +119,7 @@ final class ConfigurationBuilder
             timeout: $configuration->processTimeout,
             source: $configuration->source,
             sourceFilter: $configuration->sourceFilter,
+            classifiedPositionalArguments: $configuration->classifiedPositionalArguments,
             logs: $configuration->logs,
             logVerbosity: $configuration->logVerbosity,
             tmpDir: $configuration->tmpDir,
@@ -164,6 +167,7 @@ final class ConfigurationBuilder
             timeout: 10.0,
             source: ResolvedSourceBuilder::withMinimalTestData()->build(),
             sourceFilter: new SourceFilter(null, []),
+            classifiedPositionalArguments: new ClassifiedPositionalArguments([], [], []),
             logs: Logs::createEmpty(),
             logVerbosity: 'none',
             tmpDir: '/tmp/infection',
@@ -215,6 +219,7 @@ final class ConfigurationBuilder
                 ]),
                 [],
             ),
+            classifiedPositionalArguments: new ClassifiedPositionalArguments([], [], []),
             logs: new Logs(
                 textLogFilePath: 'text.log',
                 htmlLogFilePath: 'report.html',
@@ -311,6 +316,14 @@ final class ConfigurationBuilder
                 ->withExcludes(...$sourceFilesExcludes)
                 ->build(),
         );
+    }
+
+    public function withClassifiedPositionalArguments(ClassifiedPositionalArguments $classifiedPositionalArguments): self
+    {
+        $clone = clone $this;
+        $clone->classifiedPositionalArguments = $classifiedPositionalArguments;
+
+        return $clone;
     }
 
     public function withSourceFilter(?SourceFileFilter $sourceFilter): self
@@ -644,6 +657,7 @@ final class ConfigurationBuilder
             processTimeout: $this->timeout,
             source: $this->source,
             sourceFilter: $this->sourceFilter,
+            classifiedPositionalArguments: $this->classifiedPositionalArguments,
             logs: $this->logs,
             logVerbosity: $this->logVerbosity,
             tmpDir: $this->tmpDir,

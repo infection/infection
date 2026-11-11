@@ -130,7 +130,7 @@ final class InitialTestRunCommand extends BaseCommand
     {
         if (
             $configuration->sourceFilter->filtersFiles()
-            || $configuration->testFrameworkExtraOptions !== ''
+            || $configuration->classifiedPositionalArguments->testPaths !== []
         ) {
             return;
         }

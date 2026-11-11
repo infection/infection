@@ -38,6 +38,7 @@ namespace Infection\Tests\Configuration\ConfigurationFactory;
 use Exception;
 use Fidry\CpuCoreCounter\CpuCoreCounter;
 use Fidry\CpuCoreCounter\Finder\DummyCpuCoreFinder;
+use Infection\Configuration\ClassifiedPositionalArguments;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
@@ -298,6 +299,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to',
             ),
             sourceFilter: new SourceFilter(new GitDiffFilter('AM', 'reference(master)'), []),
+            classifiedPositionalArguments: new ClassifiedPositionalArguments([], [], []),
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
             tmpDir: Path::normalize(sys_get_temp_dir() . '/infection'),
@@ -1539,6 +1541,9 @@ final class ConfigurationFactoryTest extends TestCase
                     $defaultConfigurationBuilder
                         ->withSourceDirectories('/path/to/tests')
                         ->withSourceFilter(new PlainFilter(['tests/FooTest.php']))
+                        ->withClassifiedPositionalArguments(
+                            new ClassifiedPositionalArguments(['tests/FooTest.php'], [], []),
+                        )
                         ->build(),
                 ),
         ];
@@ -1553,6 +1558,13 @@ final class ConfigurationFactoryTest extends TestCase
                 ->withExpected(
                     $defaultConfigurationBuilder
                         ->withSourceFilter(new PlainFilter(['Foo.php', 'Bar.php']))
+                        ->withClassifiedPositionalArguments(
+                            new ClassifiedPositionalArguments(
+                                ['Foo.php', 'Bar.php', 'Foo.php'],
+                                [],
+                                [],
+                            ),
+                        )
                         ->build(),
                 ),
         ];
@@ -1568,6 +1580,13 @@ final class ConfigurationFactoryTest extends TestCase
                     $defaultConfigurationBuilder
                         ->withSourceFilter(null)
                         ->withTestFrameworkExtraOptions('tests/FooTest.php tests/BarTest.php')
+                        ->withClassifiedPositionalArguments(
+                            new ClassifiedPositionalArguments(
+                                [],
+                                ['tests/FooTest.php', 'tests/BarTest.php'],
+                                [],
+                            ),
+                        )
                         ->build(),
                 ),
         ];
@@ -1583,8 +1602,21 @@ final class ConfigurationFactoryTest extends TestCase
                     $defaultConfigurationBuilder
                         ->withSourceFilter(new PlainFilter(['Foo.php']))
                         ->withTestFrameworkExtraOptions('tests/FooTest.php')
+                        ->withClassifiedPositionalArguments(
+                            new ClassifiedPositionalArguments(['Foo.php'], ['tests/FooTest.php'], []),
+                        )
                         ->build(),
                 ),
+        ];
+
+        $sourceSelectors = [
+            new SourceSymbolSelector('Differ', 'diff'),
+            new SourceSymbolSelector('UnifiedDiffOutputBuilder'),
+            new SourceSymbolSelector(Differ::class, 'diffToArray'),
+            new SourceSymbolSelector('calculateInvoiceTotal'),
+            new SourceSymbolSelector('App\Billing\calculateInvoiceTotal'),
+            new SourceSymbolSelector('\calculateInvoiceTotal'),
+            new SourceSymbolSelector('\App\Billing\calculateInvoiceTotal'),
         ];
 
         yield 'positional source selectors and function names preserve path filters and test paths' => [
@@ -1611,22 +1643,15 @@ final class ConfigurationFactoryTest extends TestCase
                                 'calculateInvoiceTotal',
                             ]),
                         )
-                        ->withSourceSymbolSelectors(
-                            new SourceSymbolSelector(
-                                'Differ',
-                                'diff',
-                            ),
-                            new SourceSymbolSelector('UnifiedDiffOutputBuilder'),
-                            new SourceSymbolSelector(
-                                Differ::class,
-                                'diffToArray',
-                            ),
-                            new SourceSymbolSelector('calculateInvoiceTotal'),
-                            new SourceSymbolSelector('App\Billing\calculateInvoiceTotal'),
-                            new SourceSymbolSelector('\calculateInvoiceTotal'),
-                            new SourceSymbolSelector('\App\Billing\calculateInvoiceTotal'),
-                        )
+                        ->withSourceSymbolSelectors(...$sourceSelectors)
                         ->withTestFrameworkExtraOptions('tests/FooTest.php')
+                        ->withClassifiedPositionalArguments(
+                            new ClassifiedPositionalArguments(
+                                sourcePaths: ['UnifiedDiffOutputBuilder', 'calculateInvoiceTotal'],
+                                testPaths: ['tests/FooTest.php'],
+                                sourceSelectors: $sourceSelectors,
+                            ),
+                        )
                         ->build(),
                 ),
         ];

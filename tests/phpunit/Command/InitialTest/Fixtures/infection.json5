@@ -1,5 +1,6 @@
 {
     "$schema": "../../../../../resources/schema.json",
+    "testFrameworkOptions": "--stop-on-failure",
     "source": {
         "directories": ["src", "lib"]
     },
