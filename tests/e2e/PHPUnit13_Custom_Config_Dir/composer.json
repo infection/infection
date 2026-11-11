@@ -1,0 +1,17 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "~13.3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PHPUnit13CustomConfigDir\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PHPUnit13CustomConfigDir\\Test\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

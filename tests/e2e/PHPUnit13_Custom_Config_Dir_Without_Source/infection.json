@@ -1,0 +1,19 @@
+{
+    "timeout": 25,
+    "threads": 1,
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "logs": {
+        "summary": "var/infection.log"
+    },
+    "phpUnit": {
+        "configDir": "build"
+    },
+    "mutators": {
+        "PublicVisibility": true
+    },
+    "tmpDir": "var/infection-tmp"
+}
