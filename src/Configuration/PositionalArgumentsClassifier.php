@@ -35,12 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use function array_map;
 use function ctype_upper;
-use function dirname;
-use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelectorParser;
 use Infection\FileSystem\FileSystem;
-use Infection\FileSystem\Paths;
 use function sprintf;
 use function str_contains;
 use function str_ends_with;
@@ -71,18 +69,15 @@ final readonly class PositionalArgumentsClassifier
      */
     public function classify(
         array $paths,
-        SchemaConfiguration $schema,
+        ResolvedSource $source,
     ): ClassifiedPositionalArguments {
         if ($paths === []) {
             return new ClassifiedPositionalArguments([], [], []);
         }
 
-        $configDir = dirname($schema->pathname);
-
-        $absoluteSourceDirs = Paths::makeAbsolute(
-            $schema->source->directories,
-            $configDir,
-            canonicalize: true,
+        $absoluteSourceDirs = array_map(
+            Path::canonicalize(...),
+            $source->directories,
         );
 
         $sourcePaths = [];
@@ -92,7 +87,7 @@ final readonly class PositionalArgumentsClassifier
         foreach ($paths as $path) {
             $absolutePath = Path::isAbsolute($path)
                 ? $path
-                : Path::join($configDir, $path);
+                : Path::join($source->basePath, $path);
             $isExplicitPath = str_ends_with($path, '/');
 
             // Existing files and directories take precedence over symbol selectors, so Windows
@@ -112,7 +107,11 @@ final readonly class PositionalArgumentsClassifier
                 }
             }
 
-            $kind = $this->classifyPathKind($path, $absoluteSourceDirs, $configDir);
+            $kind = $this->classifyPathKind(
+                $path,
+                $absoluteSourceDirs,
+                $source->basePath,
+            );
 
             if ($kind === self::KIND_SOURCE) {
                 $sourcePaths[] = $path;
@@ -129,7 +128,7 @@ final readonly class PositionalArgumentsClassifier
     }
 
     /**
-     * @param list<non-empty-string> $absoluteSourceDirs
+     * @param list<string> $absoluteSourceDirs
      */
     private static function isInsideSourceDirectories(
         string $path,
@@ -151,7 +150,7 @@ final readonly class PositionalArgumentsClassifier
     }
 
     /**
-     * @param list<non-empty-string> $absoluteSourceDirs
+     * @param list<string> $absoluteSourceDirs
      *
      * @return self::KIND_SOURCE|self::KIND_TEST
      */

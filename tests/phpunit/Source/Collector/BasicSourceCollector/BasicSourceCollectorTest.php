@@ -37,6 +37,8 @@ namespace Infection\Tests\Source\Collector\BasicSourceCollector;
 
 use function array_map;
 use Exception;
+use Infection\Configuration\Entry\Source;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Source\Collector\BasicSourceCollector;
 use Infection\Source\Exception\NoSourceFound;
@@ -67,8 +69,8 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
     }
 
     /**
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string[] $excludedFilesOrDirectories
+     * @param list<non-empty-string> $sourceDirectories
+     * @param list<non-empty-string> $excludedFilesOrDirectories
      * @param list<non-empty-string>|Exception $expected
      */
     #[DataProvider('sourceFilesProvider')]
@@ -77,10 +79,14 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
         array $excludedFilesOrDirectories,
         array|Exception $expected,
     ): void {
-        $collector = BasicSourceCollector::create(
-            configurationPathname: self::FIXTURES_ROOT . '/infection.json',
-            sourceDirectories: $sourceDirectories,
-            excludedFilesOrDirectories: $excludedFilesOrDirectories,
+        $collector = new BasicSourceCollector(
+            source: ResolvedSource::create(
+                new Source(
+                    $sourceDirectories,
+                    $excludedFilesOrDirectories,
+                ),
+                self::FIXTURES_ROOT,
+            ),
             filter: null,
         );
 
@@ -119,21 +125,6 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
         yield 'multiple directories' => [
             [
                 self::FIXTURES_ROOT . '/case0',
-                self::FIXTURES_ROOT . '/case1',
-            ],
-            [],
-            [
-                'case0/a.php',
-                'case0/outside-symlink.php',
-                'case0/sub-dir/b.php',
-                'case1/a.php',
-                'case1/sub-dir/b.php',
-            ],
-        ];
-
-        yield 'source directories are relative to the configuration file' => [
-            [
-                'case0',
                 self::FIXTURES_ROOT . '/case1',
             ],
             [],
@@ -263,10 +254,14 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
             $this->filesystem->dumpFile($filePath, '');
         }
 
-        $collector = BasicSourceCollector::create(
-            configurationPathname: '/path/to/project',
-            sourceDirectories: [$this->tmp],
-            excludedFilesOrDirectories: [],
+        $collector = new BasicSourceCollector(
+            source: ResolvedSource::create(
+                new Source(
+                    [$this->tmp . '/'],
+                    [],
+                ),
+                $this->tmp,
+            ),
             filter: $filter,
         );
 

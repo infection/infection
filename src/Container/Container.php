@@ -645,7 +645,6 @@ final class Container extends DIContainer
 
                     return new MemoizedSourceCollector(
                         $container->get(SourceCollectorFactory::class)->create(
-                            $configuration->configurationPathname,
                             $configuration->source,
                             $configuration->sourceFilter->fileFilter,
                         ),

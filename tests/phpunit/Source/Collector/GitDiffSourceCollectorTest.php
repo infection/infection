@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Source\Collector;
 
+use Infection\Configuration\Entry\Source;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Git\Git;
@@ -45,11 +47,9 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(GitDiffSourceCollector::class)]
-#[Group('integration')]
 final class GitDiffSourceCollectorTest extends TestCase
 {
     use ExpectsThrowables;
@@ -80,26 +80,35 @@ final class GitDiffSourceCollectorTest extends TestCase
     public function test_it_creates_a_collector_with_the_git_diff_filter(): void
     {
         $filter = new GitDiffFilter('AM', 'main');
+        $source = ResolvedSource::create(
+            new Source(
+                ['/project/src', '/project/lib'],
+                ['Excluded.php'],
+            ),
+            '/project',
+        );
 
         $git = $this->createMock(Git::class);
         $git->expects($this->once())
             ->method('getChangedFilePaths')
-            ->with('AM', 'main', ['src', 'lib'], '/project')
+            ->with(
+                'AM',
+                'main',
+                ['/project/src', '/project/lib'],
+                '/project',
+            )
             ->willReturn(['src/README.md'])
         ;
 
         $actual = GitDiffSourceCollector::create(
             $git,
-            '/project/infection.json5',
-            ['src', 'lib'],
-            ['Excluded.php'],
+            $source,
             $filter,
         );
 
         $expected = new GitDiffSourceCollector(
             new BasicSourceCollector(
-                ['/project/src', '/project/lib'],
-                ['Excluded.php'],
+                $source,
                 new PlainFilter(['src/README.md']),
             ),
             $filter,

@@ -173,15 +173,20 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
+        $source = ResolvedSource::create(
+            $schema->source,
+            $configDir,
+        );
+
         [$sourceFilter, $testFrameworkExtraArgs] = $this->refineFilterIfNecessary(
             $sourceFilter,
-            $schema,
+            $source,
             $testFrameworkExtraArgs,
         );
 
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
-            source: $schema->source,
+            source: $source,
             sourceFilter: $sourceFilter,
             logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath, $summaryJsonLogFilePath),
             logVerbosity: $logVerbosity,
@@ -431,12 +436,12 @@ class ConfigurationFactory
      */
     private function resolvePositionalArgumentsFilter(
         PositionalArgumentsFilter $sourceFilter,
-        SchemaConfiguration $schema,
+        ResolvedSource $source,
         ?string $testFrameworkExtraArgs,
     ): array {
         $classified = $this->positionalArgumentsClassifier->classify(
             $sourceFilter->arguments,
-            $schema,
+            $source,
         );
 
         $resolvedFilter = PlainFilter::tryToCreate($classified->sourcePaths);
@@ -462,7 +467,7 @@ class ConfigurationFactory
      */
     private function refineFilterIfNecessary(
         PlainFilter|IncompleteGitDiffFilter|PositionalArgumentsFilter|null $sourceFilter,
-        SchemaConfiguration $schema,
+        ResolvedSource $source,
         ?string $testFrameworkExtraArgs,
     ): array {
         $sourceSymbolSelectors = [];
@@ -470,7 +475,7 @@ class ConfigurationFactory
         if ($sourceFilter instanceof PositionalArgumentsFilter) {
             [$sourceFilter, $testFrameworkExtraArgs, $sourceSymbolSelectors] = $this->resolvePositionalArgumentsFilter(
                 $sourceFilter,
-                $schema,
+                $source,
                 $testFrameworkExtraArgs,
             );
         }

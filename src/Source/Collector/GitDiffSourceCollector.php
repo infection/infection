@@ -35,12 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use function dirname;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Git\Git;
 use Infection\Source\Exception\NoSourceFound;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -53,28 +52,18 @@ final readonly class GitDiffSourceCollector implements SourceCollector
     ) {
     }
 
-    /**
-     * @param non-empty-string $configurationPathname
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string[] $excludedFilesOrDirectories
-     */
     public static function create(
         Git $git,
-        string $configurationPathname,
-        array $sourceDirectories,
-        array $excludedFilesOrDirectories,
+        ResolvedSource $source,
         GitDiffFilter $filter,
     ): self {
         return new self(
-            BasicSourceCollector::create(
-                $configurationPathname,
-                $sourceDirectories,
-                $excludedFilesOrDirectories,
+            new BasicSourceCollector(
+                $source,
                 self::convertToPlainFilter(
                     $git,
                     $filter,
-                    $sourceDirectories,
-                    $configurationPathname,
+                    $source,
                 ),
             ),
             $filter,
@@ -95,25 +84,19 @@ final readonly class GitDiffSourceCollector implements SourceCollector
     }
 
     /**
-     * @param non-empty-string[] $sourceDirectories
-     *
      * @throws NoSourceFound
      */
     private static function convertToPlainFilter(
         Git $git,
         GitDiffFilter $sourceFilter,
-        array $sourceDirectories,
-        string $configurationPathname,
+        ResolvedSource $source,
     ): PlainFilter {
-        $workingDirectory = dirname($configurationPathname);
-        Assert::stringNotEmpty($workingDirectory);
-
         return new PlainFilter(
             $git->getChangedFilePaths(
                 $sourceFilter->value,
                 $sourceFilter->base,
-                $sourceDirectories,
-                $workingDirectory,
+                $source->directories,
+                $source->basePath,
             ),
         );
     }

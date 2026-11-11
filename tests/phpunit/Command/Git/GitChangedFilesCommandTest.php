@@ -106,7 +106,10 @@ final class GitChangedFilesCommandTest extends TestCase
             ->with(
                 $expectedFilter,
                 self::REFERENCE,
-                ['src', 'lib'],
+                [
+                    Path::canonicalize(self::FIXTURES_DIR . '/src'),
+                    Path::canonicalize(self::FIXTURES_DIR . '/lib'),
+                ],
                 self::FIXTURES_DIR,
             )
             ->willReturn($files)
@@ -285,7 +288,10 @@ final class GitChangedFilesCommandTest extends TestCase
             ->with(
                 Git::DEFAULT_GIT_DIFF_FILTER,
                 self::REFERENCE,
-                self::SOURCE_DIRECTORIES,
+                [
+                    Path::canonicalize(self::FIXTURES_DIR . '/src'),
+                    Path::canonicalize(self::FIXTURES_DIR . '/lib'),
+                ],
                 self::FIXTURES_DIR,
             )
             ->willReturn([self::FIXTURES_DIR . '/src/File1.php'])
