@@ -1,94 +1,97 @@
-# PHP sbx image
+# Docker Sandbox
 
-This directory contains a dedicated Docker image for [docker sandbox] with PHP.
-
-It extends [`docker/sandbox-templates:codex-docker`][docker-sandbox-templates-codex] and adds the PHP runtime/tooling needed by this repository. It is intentionally separate from `devTools/Dockerfile` as the usage is different.
-
-It uses [container-structure-test][container-structure-test] for testing the image.
-
-The base image provides the GitHub CLI (`gh`). The `devTools/sbx/kits/gh-stack` kit
-installs the latest [`github/gh-stack`](https://github.com/github/gh-stack) release
-for the `agent` user during sandbox creation with `gh extension install`.
-
-## Telemetry
-
-Codex telemetry is optional. The OpenTelemetry settings live in
-`devTools/sbx/codex-otel.toml` and are merged into the Codex user-level config
-by the `devTools/sbx/kits/codex-otel` kit when the sandbox starts.
-
-The provided template assumes the OTLP HTTP collector is reachable from
-the sandbox at `http://host.docker.internal:4318`. If it runs elsewhere,
-update `devTools/sbx/codex-otel.toml`.
-
-Note that depending on the port used or your network policies, the connection
-to the host may be denied. For example, with the value above, you will need to
-execute:
-
-```shell
-sbx policy allow network localhost:4318
-```
+This directory contains Infection's [Docker Sandbox] setup. It requires sbx 0.51
+or later and Docker Buildx. Run the Make commands from the repository root.
 
 ## Usage
 
-Authenticate `gh` on the host, then configure the sandbox's GitHub credential:
+Configure the GitHub credential used by gh-stack, then create the sandbox:
 
 ```shell
 sbx secret set github --command 'gh auth token'
-```
-
-The host-side proxy injects the token into GitHub API requests. Approve the
-kit's use of the GitHub credential when prompted on first creation.
-
-```shell
 make sbx-create
 ```
 
-This will create the Docker Sandbox image with the template, OTEL kit, and
-gh-stack kit for the current branch and will make it available with:
+`make sbx-create` runs Codex with the repository mounted as its workspace.
+sbx builds the kits during creation. The Makefile prepares a Buildx builder
+automatically. After changing kits, run validation and tests manually.
+
+To use another workload or sandbox name, edit `sbx run codex` and
+`--name=codex-infection-test` in the [Makefile]'s `sbx-create` recipe before
+running it. Use a workload compatible with the PHP kit's Debian-based
+`sbx/shell:latest` base, and omit Codex-specific kits when using another agent.
+
+Reopen the default sandbox with:
 
 ```shell
-sbx run codex-infection
+sbx run --name codex-infection-test
 ```
 
-Be aware that this command will drop the existing `codex-infection` sandbox.
+Reopening an existing sandbox does not apply kit changes. To apply them, remove
+the sandbox, then recreate it with `make sbx-create`.
 
-The command also creates `devTools/sbx/kits/project-local/spec.yaml` from
-`devTools/sbx/project-local-kit.yaml` when the local file is missing. The
-generated file is ignored by Git and is always included as a kit.
+## Kits
 
-If you wish to only build the image:
+Local kits are stored under `kits/`. Each has a matching `<kit>/<kit>.yaml`
+descriptor and is automatically included in creation and validation.
+
+| Kit | Contents |
+| --- | --- |
+| [php](kits/php) | PHP, coverage drivers, Composer, PIE, and extension build tools. |
+| [gh-stack](kits/gh-stack) | The GitHub CLI extension and its upstream skill. |
+| [sbx](kits/sbx) | The sbx CLI and Docker's official skills. |
+| [container-structure-test](kits/container-structure-test) | The container-structure-test CLI. |
+| [codex-otel](kits/codex-otel) | Codex telemetry settings and their configuration merge helper. |
+
+The creation command also includes the pinned upstream `git-ssh-sign` kit and
+the personal `project-local` kit.
+
+## Telemetry
+
+The `codex-otel` kit merges [the telemetry settings](kits/codex-otel/codex-otel.toml)
+into Codex's user configuration when the sandbox starts. Edit that file to change the
+settings, then recreate the sandbox to apply them.
+
+The default OTLP HTTP collector endpoint is `http://host.docker.internal:4318`.
+The kit declares runtime network access to `localhost:4318`. If you change the
+collector address, also update the kit's network policy.
+
+Local kits are included automatically when you switch workloads. With Claude,
+`codex-otel` still creates Codex configuration and requests collector network
+access, but Claude ignores that configuration. Exclude the kit when using
+another agent.
+
+## Testing
 
 ```shell
-make sbx-image-build
-
-# Force the build, no caching
-make _sbx-image-build
+make sbx-kit-validate  # Validate local kit descriptors.
+make sbx-kit-test      # Run checks in a disposable shell sandbox.
 ```
 
-To run a sandbox manually with the loaded template from the repository root:
+Each shared kit defines its checks in `test.sh`. The test harness discovers
+the kits, creates a shell sandbox, runs their checks as the agent user through
+`sbx exec`, and removes the sandbox on success or failure. New shared kits must
+include a test script.
 
-```shell
-# In case the following gets outdated, you can check `make sbx-create`.
-sbx run codex \
-  --template=infection-sbx-php-8.4:latest \
-  --kit=./devTools/sbx/kits/codex-otel \
-  --kit=./devTools/sbx/kits/gh-stack \
-  --kit="git+https://github.com/docker/sbx-kits-contrib#ref=1f2f62200d68b8e1f653730ab29134a1a06755db&dir=git-ssh-sign" \
-  --kit=./devTools/sbx/kits/project-local
-```
+Tests exclude project-local customisations, the remote signing kit, and
+host-shared skills. The telemetry checks cover configuration merging; verifying
+Codex startup and telemetry delivery requires a Codex sandbox. Credential
+approvals must be granted in advance because the harness runs with `--no-input`.
 
-The `--kit` flag only applies when the sandbox is created. For an existing
-sandbox, recreate it. The Codex OTEL kit uses startup hooks and generated files
-that `sbx kit add` cannot apply to an existing sandbox.
+CI validates the shared kits with Docker Buildx and the kit frontend on the
+runner’s native architecture. This builds each kit without exporting an image
+or requiring an sbx login. Run the sandbox integration tests separately with
+`make sbx-kit-test` on a host with a working sbx daemon.
 
-To add user-specific sandbox customisation, edit:
+## Personal customisation
 
-```text
-devTools/sbx/kits/project-local/spec.yaml
-```
+`make sbx-create` creates `kits/project-local/project-local.yaml` from
+[the template](templates/project-local.yaml) if it is missing. This file is
+ignored by Git and always included in your sandbox.
 
-You can use the `--clone` or `--name` option to further adjust your setup.
+Use this file for personal settings, tools, and install hooks. Existing contents
+are preserved. Downloads from additional hosts in install hooks may require
+install-phase network rules in the kit.
 
-[docker sandbox]: https://www.docker.com/products/docker-sandboxes/
-[docker-sandbox-templates-codex]: https://hub.docker.com/layers/docker/sandbox-templates/codex-docker/images
-[container-structure-test]: https://github.com/GoogleContainerTools/container-structure-test
+[Docker Sandbox]: https://docs.docker.com/ai/sandboxes/
+[Makefile]: ../../Makefile

@@ -1,0 +1,5 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: Infection Project (local)
+description: Uncommitted, developer-local sandbox customisation. Add v3 capabilities or a build recipe to customise your own sandbox; this file is gitignored.

@@ -260,10 +260,9 @@ final class MakefileTest extends BaseMakefileTestCase
 
             [33mcompile:[0m	 	 Bundles Infection into a PHAR
             [33mcompile-docker:[0m	 	 Bundles Infection into a PHAR using docker
-            [33msbx-create:[0m	 Drops the existing PHP sbx image and create it anew
+            [33msbx-create:[0m	 Creates the Codex sandbox with the PHP tooling mixin
             [33msbx-kit-validate:[0m	 Validates the sbx kit specs
-            [33msbx-image-build:[0m	 Builds the PHP sbx image
-            [33msbx-image-test:[0m	 Verifies the PHP sbx image contains the expected tooling
+            [33msbx-kit-test:[0m	 Tests the shared kits in a disposable shell sandbox
             [33mupdate-agents-adr-list:[0m	 Updates the generated ADR list in AGENTS.md
             [33mcheck-agents-adr-list:[0m	 Checks the generated ADR list in AGENTS.md
             [33mcs:[0m	  	 	 Runs PHP-CS-Fixer

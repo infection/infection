@@ -1,8 +1,9 @@
-name: Docker
+name: Sandbox kits
 
 on:
   pull_request:
     paths:
+      - .github/workflows/sbx-image.yaml
       - Makefile
       - devTools/sbx/**
   push:
@@ -19,26 +20,10 @@ permissions:
   contents: read
 
 jobs:
-  sbx-image:
-    name: Build and Test Docker Sandbox Image (${{ matrix.platform }})
+  sbx-image-status:
+    name: Docker Sandbox Image Status
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: linux/amd64
-            cache-scope: sbx-image-linux-amd64
-          - platform: linux/arm64
-            cache-scope: sbx-image-linux-arm64
-
-    env:
-      CONTAINER_STRUCTURE_TEST_VERSION: 1.22.1
-      DOCKER_BUILDKIT: 1
-      IMAGE_PLATFORM: ${{ matrix.platform }}
-      IMAGE_CACHE_FROM: ${{ github.event_name != 'release' && format('type=gha,scope={0}', matrix.cache-scope) || '' }}
-      IMAGE_CACHE_TO: ${{ github.event_name != 'release' && format('type=gha,mode=max,ignore-error=true,scope={0}', matrix.cache-scope) || '' }}
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
@@ -46,65 +31,26 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
-      # This is necessary for Buildx to be able to cache images.
-      - name: Expose GitHub runtime for Buildx cache
-        uses: crazy-max/ghaction-github-runtime@04d248b84655b509d8c44dc1d6f990c879747487 # v4.0.0
-
-      - name: Restore container-structure-test
-        id: container-structure-test-cache
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: .tools/container-structure-test
-          key: container-structure-test-${{ runner.os }}-${{ runner.arch }}-${{ env.CONTAINER_STRUCTURE_TEST_VERSION }}
-
-      - name: Install container-structure-test
-        if: steps.container-structure-test-cache.outputs.cache-hit != 'true'
+      # The kit frontend validates sources while building; no sbx login is needed.
+      # Runtime checks use make sbx-kit-test separately.
+      #
+      # We do this instead of `make sbx-kit-validate` because at the time of writing
+      # we cannot configure a kit builder when using `sbx kit validate --offline`
+      # which makes the validation fail as sbx cannot build the kit.
+      - name: Validate sandbox kits
         run: |
-          mkdir -p .tools
-          curl --location --fail --show-error --silent \
-            --output .tools/container-structure-test \
-            "https://github.com/GoogleContainerTools/container-structure-test/releases/download/v${CONTAINER_STRUCTURE_TEST_VERSION}/container-structure-test-linux-amd64"
-          chmod +x .tools/container-structure-test
-
-      - name: Cache container-structure-test
-        if: github.event_name == 'push' && steps.container-structure-test-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: .tools/container-structure-test
-          key: container-structure-test-${{ runner.os }}-${{ runner.arch }}-${{ env.CONTAINER_STRUCTURE_TEST_VERSION }}
-
-      - name: Register container-structure-test
-        run: echo "${GITHUB_WORKSPACE}/.tools" >> "${GITHUB_PATH}"
-
-        # This needs to be done even on cache hit as the permissions are not preserved.
-      - name: Ensures container-structure-test is executable
-        run: chmod +x .tools/container-structure-test
-
-      - name: Ensures container-structure-test works
-        run: container-structure-test version
-
-      - name: Build and test the Docker sandbox image
-        run: ./devTools/sbx/build-image.sh
-
-  # This is a meta job to avoid to have to constantly change the protection rules
-  # whenever we touch the matrix.
-  sbx-image-status:
-    name: Docker Sandbox Image Status
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: sbx-image
-    if: always()
-    steps:
-      - name: Successful run
-        if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'skipped') }}
-        run: exit 0
-
-      - name: Failing run
-        if: ${{ always() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')) }}
-        run: exit 1
+          set -euo pipefail
+          for kit_dir in devTools/sbx/kits/*; do
+            kit_name="${kit_dir##*/}"
+            kit_spec="${kit_dir}/${kit_name}.yaml"
+            if [[ "$kit_name" == project-local || ! -f "$kit_spec" ]]; then
+              continue
+            fi
+            docker buildx build \
+              --file="$kit_spec" \
+              --output=type=cacheonly \
+              "$kit_dir"
+          done
