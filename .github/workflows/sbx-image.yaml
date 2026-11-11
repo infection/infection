@@ -1,8 +1,9 @@
-name: Docker
+name: Sandbox kits
 
 on:
   pull_request:
     paths:
+      - .github/workflows/sbx-image.yaml
       - Makefile
       - devTools/sbx/**
   push:
@@ -19,24 +20,10 @@ permissions:
   contents: read
 
 jobs:
-  sbx-image:
-    name: Build Docker Sandbox Kits (${{ matrix.platform }})
+  sbx-image-status:
+    name: Docker Sandbox Image Status
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: linux/amd64
-            cache-scope: sbx-image-linux-amd64
-          - platform: linux/arm64
-            cache-scope: sbx-image-linux-arm64
-
-    env:
-      DOCKER_BUILDKIT: 1
-      IMAGE_PLATFORM: ${{ matrix.platform }}
-      KIT_CACHE_SCOPE: ${{ matrix.cache-scope }}
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
@@ -44,18 +31,16 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
-      # This is necessary for Buildx to be able to cache images.
-      - name: Expose GitHub runtime for Buildx cache
-        uses: crazy-max/ghaction-github-runtime@04d248b84655b509d8c44dc1d6f990c879747487 # v4.0.0
-
-      # Runtime checks use make sbx-kit-test on a host with a working sbx daemon.
-      - name: Build and validate the kit artifacts
+      # The kit frontend validates sources while building; no sbx login is needed.
+      # Runtime checks use make sbx-kit-test separately.
+      #
+      # We do this instead of `make sbx-kit-validate` because at the time of writing
+      # we cannot configure a kit builder when using `sbx kit validate --offline`
+      # which makes the validation fail as sbx cannot build the kit.
+      - name: Validate sandbox kits
         run: |
           set -euo pipefail
           for kit_dir in devTools/sbx/kits/*; do
@@ -64,31 +49,8 @@ jobs:
             if [[ "$kit_name" == project-local || ! -f "$kit_spec" ]]; then
               continue
             fi
-            test -f "${kit_dir}/test.sh"
-            bash -n "${kit_dir}/test.sh"
-            build_options=(--platform="$IMAGE_PLATFORM")
-            if [[ "$GITHUB_EVENT_NAME" != release ]]; then
-              build_options+=(
-                --cache-from="type=gha,scope=${KIT_CACHE_SCOPE}-${kit_name}"
-                --cache-to="type=gha,mode=max,ignore-error=true,scope=${KIT_CACHE_SCOPE}-${kit_name}"
-              )
-            fi
-            docker buildx build "${build_options[@]}" --file="$kit_spec" "$kit_dir"
+            docker buildx build \
+              --file="$kit_spec" \
+              --output=type=cacheonly \
+              "$kit_dir"
           done
-
-  # This is a meta job to avoid to have to constantly change the protection rules
-  # whenever we touch the matrix.
-  sbx-image-status:
-    name: Docker Sandbox Image Status
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: sbx-image
-    if: always()
-    steps:
-      - name: Successful run
-        if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'skipped') }}
-        run: exit 0
-
-      - name: Failing run
-        if: ${{ always() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')) }}
-        run: exit 1

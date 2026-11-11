@@ -78,8 +78,10 @@ host-shared skills. The telemetry checks cover configuration merging; verifying
 Codex startup and telemetry delivery requires a Codex sandbox. Credential
 approvals must be granted in advance because the harness runs with `--no-input`.
 
-CI builds and validates the kit artefacts for amd64 and arm64. The sandbox
-integration tests run separately on a host with a working sbx daemon.
+CI validates the shared kits with Docker Buildx and the kit frontend on the
+runner’s native architecture. This builds each kit without exporting an image
+or requiring an sbx login. Run the sandbox integration tests separately with
+`make sbx-kit-test` on a host with a working sbx daemon.
 
 ## Personal customisation
 
