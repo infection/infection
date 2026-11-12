@@ -216,6 +216,58 @@ final class CiAwareGitTest extends TestCase
                 ->withExpected('merge-group-base'),
         ];
 
+        yield 'missing merge group base SHA' => [
+            $baseScenario
+                ->withEnvironment([
+                    'GITHUB_ACTIONS' => 'true',
+                    'GITHUB_EVENT_PATH' => '/github/event.json',
+                ])
+                ->withEvent(
+                    <<<'JSON'
+                        {
+                            "merge_group": {
+                                "base_ref": "refs/heads/main",
+                                "head_sha": "merge-group-head"
+                            }
+                        }
+                        JSON,
+                ),
+        ];
+
+        yield 'empty merge group base SHA' => [
+            $baseScenario
+                ->withEnvironment([
+                    'GITHUB_ACTIONS' => 'true',
+                    'GITHUB_EVENT_PATH' => '/github/event.json',
+                ])
+                ->withEvent(
+                    <<<'JSON'
+                        {
+                            "merge_group": {
+                                "base_sha": ""
+                            }
+                        }
+                        JSON,
+                ),
+        ];
+
+        yield 'non-string merge group base SHA' => [
+            $baseScenario
+                ->withEnvironment([
+                    'GITHUB_ACTIONS' => 'true',
+                    'GITHUB_EVENT_PATH' => '/github/event.json',
+                ])
+                ->withEvent(
+                    <<<'JSON'
+                        {
+                            "merge_group": {
+                                "base_sha": 123
+                            }
+                        }
+                        JSON,
+                ),
+        ];
+
         yield 'push event' => [
             $baseScenario
                 ->withEnvironment([
@@ -313,7 +365,7 @@ final class CiAwareGitTest extends TestCase
                 ->withExpectedRecords([
                     [
                         'level' => LogLevel::INFO,
-                        'message' => 'Could not determine the GitHub pull request base from "/github/event.json". Falling back to the default Git base.',
+                        'message' => 'Could not determine the GitHub comparison base from "/github/event.json". Falling back to the default Git base.',
                         'context' => [],
                     ],
                 ]),
@@ -328,7 +380,7 @@ final class CiAwareGitTest extends TestCase
                 ->withExpectedRecords([
                     [
                         'level' => LogLevel::INFO,
-                        'message' => 'Could not determine the GitHub pull request base from "/github/event.json". Falling back to the default Git base.',
+                        'message' => 'Could not determine the GitHub comparison base from "/github/event.json". Falling back to the default Git base.',
                         'context' => [],
                     ],
                 ]),

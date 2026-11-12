@@ -144,7 +144,7 @@ final readonly class CiAwareGit implements Git
         } catch (IOException|JsonException $exception) {
             $this->logger->info(
                 sprintf(
-                    'Could not determine the GitHub pull request base from "%s". Falling back to the default Git base.',
+                    'Could not determine the GitHub comparison base from "%s". Falling back to the default Git base.',
                     $eventPath,
                 ),
                 ['exception' => $exception],
@@ -163,7 +163,13 @@ final readonly class CiAwareGit implements Git
         // payload records the immediate target of this pull request instead.
         // https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/optimizing-ci-for-stacked-pull-requests
         // https://docs.github.com/en/webhooks/webhook-events-and-payloads#pull_request
-        return self::findNonEmptyString($event->pull_request->base->sha ?? null);
+        // Merge groups record the target snapshot for the combined queue changes.
+        // https://docs.github.com/en/webhooks/webhook-events-and-payloads#merge_group
+        return self::findNonEmptyString(
+            $event->pull_request->base->sha
+            ?? $event->merge_group->base_sha
+            ?? null,
+        );
     }
 
     /**

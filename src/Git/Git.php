@@ -64,7 +64,7 @@ interface Git
      * Implementations may use CI metadata to select the base.
      *
      * Examples of output:
-     * - a commit SHA (recorded by GitHub or GitLab for the current request if supported)
+     * - a commit SHA (recorded by GitHub or GitLab for the current PR, merge group or MR if supported)
      * - 'refs/remotes/origin/main'
      * - 'origin/main'
      * - 'origin/master'
