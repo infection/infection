@@ -1,7 +1,6 @@
 {
     "$schema": "./resources/schema.json",
     "timeout": 25,
-    "threads": "max",
     "source": {
         "directories": [
             "src"
