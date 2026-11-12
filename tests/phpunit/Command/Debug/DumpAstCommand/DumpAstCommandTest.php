@@ -43,7 +43,6 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -55,8 +54,6 @@ final class DumpAstCommandTest extends FileSystemTestCase
      * @param array<string, string|null> $command
      */
     #[DataProvider('astProvider')]
-    // CI detection disables progress independently and would hide buffered warnings.
-    #[WithEnvironmentVariable('GITHUB_ACTIONS')]
     public function test_it_outputs_the_ast_of_a_file(
         array $command,
         string $expected,
