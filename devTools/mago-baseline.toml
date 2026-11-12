@@ -1,7 +1,7 @@
 variant = "loose"
 
 [[issues]]
-file = "src/CI/MemoizedCiDetector.php"
+file = "src/Framework/CiDetector/MemoizedCiDetector.php"
 code = "missing-property-type"
 message = "Property `$ci` is missing a type hint."
 count = 1
@@ -4069,9 +4069,9 @@ message = "This condition (type `true`) will always evaluate to true."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/CI/MemoizedCiDetectorTest.php"
+file = "tests/phpunit/Framework/CiDetector/MemoizedCiDetectorTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\CI\ConfigurableEnv::setVariables`: expected `array<string, false|string>`, but possibly received `array{'TRAVIS': true}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Framework\CiDetector\ConfigurableEnv::setVariables`: expected `array<string, false|string>`, but possibly received `array{'TRAVIS': true}`.'''
 count = 1
 
 [[issues]]

@@ -33,32 +33,39 @@
 
 declare(strict_types=1);
 
-namespace Infection\CI;
+namespace Infection\Tests\Framework\CiDetector;
 
-use OndraM\CiDetector\Ci\CiInterface;
-use OndraM\CiDetector\CiDetector;
-use Override;
+use Infection\Framework\CiDetector\MemoizedCiDetector;
+use OndraM\CiDetector\Env;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- *
- * TODO: for now we are forced to extend CiDetector which is not ideal since we need to mind all
- *  the API of the parent. See https://github.com/OndraM/ci-detector/issues/64
- */
-final class MemoizedCiDetector extends CiDetector
+#[CoversClass(MemoizedCiDetector::class)]
+final class MemoizedCiDetectorTest extends TestCase
 {
-    /**
-     * @var CiInterface|false|null
-     */
-    private $ci = false;
-
-    #[Override]
-    protected function detectCurrentCiServer(): ?CiInterface
+    public function test_it_can_be_instantiated_from_environment(): void
     {
-        if ($this->ci === false) {
-            $this->ci = parent::detectCurrentCiServer();
-        }
+        $detector = MemoizedCiDetector::fromEnvironment(new Env());
 
-        return $this->ci;
+        $this->assertInstanceOf(MemoizedCiDetector::class, $detector);
+    }
+
+    public function test_it_runs_the_detection_only_once(): void
+    {
+        $env = new ConfigurableEnv();
+
+        $detector0 = MemoizedCiDetector::fromEnvironment($env);
+        $detector1 = MemoizedCiDetector::fromEnvironment($env);
+
+        $this->assertFalse($detector0->isCiDetected());
+
+        $env->setVariables(['TRAVIS' => true]);
+
+        $this->assertFalse($detector0->isCiDetected());
+        $this->assertTrue($detector1->isCiDetected());
+
+        $env->setVariables([]);
+
+        $this->assertTrue($detector1->isCiDetected());
     }
 }

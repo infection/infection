@@ -1176,16 +1176,16 @@ parameters:
 			path: ../tests/phpunit/BenchmarkSmokeTest.php
 
 		-
-			rawMessage: Infection\Tests\CI\ConfigurableEnv should not exist
+			rawMessage: Infection\Tests\Framework\CiDetector\ConfigurableEnv should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
-			path: ../tests/phpunit/CI/ConfigurableEnv.php
+			path: ../tests/phpunit/Framework/CiDetector/ConfigurableEnv.php
 
 		-
-			rawMessage: 'Parameter #1 $variables of method Infection\Tests\CI\ConfigurableEnv::setVariables() expects array<string, string|false>, array{TRAVIS: true} given.'
+			rawMessage: 'Parameter #1 $variables of method Infection\Tests\Framework\CiDetector\ConfigurableEnv::setVariables() expects array<string, string|false>, array{TRAVIS: true} given.'
 			identifier: argument.type
 			count: 1
-			path: ../tests/phpunit/CI/MemoizedCiDetectorTest.php
+			path: ../tests/phpunit/Framework/CiDetector/MemoizedCiDetectorTest.php
 
 		-
 			rawMessage: 'Property Infection\Tests\Configuration\ConfigurationBuilder::$mutators (array<string, Infection\Mutator\Mutator<PhpParser\Node>>) does not accept array<string, Infection\Mutator\Mutator<covariant PhpParser\Node>>.'
