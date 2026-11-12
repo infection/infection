@@ -90,8 +90,8 @@ use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
-use Infection\Framework\CiDetector\MemoizedCiDetector;
-use Infection\Framework\CiDetector\NullCiDetector;
+use Infection\Framework\CiDetector\CiDetectorFactory;
+use Infection\Framework\CiDetector\DefaultCiDetectorFactory;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
@@ -181,7 +181,6 @@ use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
-use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
@@ -276,6 +275,7 @@ final class Container extends DIContainer
     public static function create(): self
     {
         $container = new self([
+            CiDetectorFactory::class => static fn (): CiDetectorFactory => new DefaultCiDetectorFactory(),
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
             Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
                 $container->getTraceProvider(),
@@ -750,9 +750,7 @@ final class Container extends DIContainer
 
         $clone->offsetSet(
             CiDetectorInterface::class,
-            static fn (): CiDetectorInterface => $forceProgress
-                ? new NullCiDetector()
-                : new MemoizedCiDetector(new CiDetector()),
+            static fn (self $container): CiDetectorInterface => $container->getCiDetectorFactory()->create(disableCiDetection: $forceProgress),
         );
 
         $clone->offsetSet(
@@ -1168,6 +1166,11 @@ final class Container extends DIContainer
     public function getNodeDumper(): NodeDumper
     {
         return $this->get(NodeDumper::class);
+    }
+
+    private function getCiDetectorFactory(): CiDetectorFactory
+    {
+        return $this->get(CiDetectorFactory::class);
     }
 
     private function getStopwatch(): Stopwatch

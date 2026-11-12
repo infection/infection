@@ -41,6 +41,10 @@ use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
 use Infection\Event\EventDispatcher\EventCollectingEventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Framework\CiDetector\CiDetectorFactory;
+use Infection\Framework\CiDetector\MemoizedCiDetector;
+use Infection\Framework\CiDetector\NullCiDetector;
+use Infection\Framework\CiDetector\NullCiDetectorFactory;
 use Infection\Logger\MutationGeneration\MutationGenerationLogger;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\Testing\SingletonContainer;
@@ -108,7 +112,7 @@ final class ContainerTest extends TestCase
     {
         $this->expectNotToPerformAssertions();
 
-        $container = SingletonContainer::getContainer();
+        $container = Container::create();
 
         $container->getSubscriberRegisterer();
         $container->getTestFrameworkFinder();
@@ -152,6 +156,58 @@ final class ContainerTest extends TestCase
             new NullOutput(),
             noProgress: true,
             forceProgress: true,
+        );
+    }
+
+    public function test_it_uses_a_replaced_ci_detector_factory_when_configuring_values(): void
+    {
+        $container = Container::create()
+            ->cloneWithService(
+                CiDetectorFactory::class,
+                new NullCiDetectorFactory(),
+            )
+            ->withValues(
+                logger: new NullLogger(),
+                output: new NullOutput(),
+            )
+        ;
+
+        $this->assertInstanceOf(NullCiDetector::class, $container->getCiDetector());
+    }
+
+    public function test_it_disables_ci_detection_when_forcing_progress(): void
+    {
+        $container = Container::create()->withValues(
+            logger: new NullLogger(),
+            output: new NullOutput(),
+            forceProgress: true,
+        );
+
+        $this->assertInstanceOf(NullCiDetector::class, $container->getCiDetector());
+    }
+
+    public function test_it_restores_ci_detection_when_progress_is_no_longer_forced(): void
+    {
+        $container = Container::create()->withValues(
+            logger: new NullLogger(),
+            output: new NullOutput(),
+            forceProgress: true,
+        );
+
+        $this->assertInstanceOf(
+            NullCiDetector::class,
+            $container->getCiDetector(),
+        );
+
+        $container = $container->withValues(
+            logger: new NullLogger(),
+            output: new NullOutput(),
+            forceProgress: false,
+        );
+
+        $this->assertInstanceOf(
+            MemoizedCiDetector::class,
+            $container->getCiDetector(),
         );
     }
 

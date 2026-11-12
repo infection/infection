@@ -40,9 +40,9 @@ use Infection\Command\Git\GitChangedLinesCommand;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Console\Application;
-use Infection\Container\Container;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Git\Git;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -273,9 +273,10 @@ final class GitChangedLinesCommandTest extends TestCase
 
     private function createCommandTester(Git $git): CommandTester
     {
-        $container = Container::create();
-        $container->set(Git::class, static fn () => $git);
-        $container->set(SchemaConfiguration::class, self::createSchemaConfiguration(...));
+        $container = SingletonContainer::getContainer()
+            ->cloneWithService(Git::class, $git)
+            ->cloneWithService(SchemaConfiguration::class, self::createSchemaConfiguration(...))
+        ;
 
         $application = new Application($container);
 

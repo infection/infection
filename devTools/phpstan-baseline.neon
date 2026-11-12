@@ -1099,12 +1099,6 @@ parameters:
 			path: ../src/Testing/MutatorName.php
 
 		-
-			rawMessage: Infection\Testing\SingletonContainer should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Testing/SingletonContainer.php
-
-		-
 			rawMessage: Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
 			count: 1

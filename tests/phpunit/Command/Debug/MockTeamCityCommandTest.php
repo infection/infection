@@ -40,9 +40,9 @@ use function explode;
 use Infection\Command\Debug\MockTeamCityCommand;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Console\Application;
-use Infection\Container\Container;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\Str;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use InvalidArgumentException;
@@ -183,7 +183,7 @@ final class MockTeamCityCommandTest extends FileSystemTestCase
      */
     private function createCommandTester(?Closure $sleep = null): CommandTester
     {
-        $container = Container::create()
+        $container = SingletonContainer::getContainer()
             ->cloneWithService(
                 SchemaConfiguration::class,
                 SchemaConfigurationBuilder::withMinimalTestData()->build(),

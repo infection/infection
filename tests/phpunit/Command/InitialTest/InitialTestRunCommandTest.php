@@ -46,14 +46,16 @@ use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Framework\Str;
 use Infection\Git\Git;
+use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\chdir;
@@ -63,7 +65,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 #[AllowMockObjectsWithoutExpectations]
 #[Group('integration')]
-#[WithEnvironmentVariable('GITHUB_ACTIONS', 'true')]
 #[CoversClass(InitialTestRunCommand::class)]
 final class InitialTestRunCommandTest extends TestCase
 {
@@ -275,9 +276,16 @@ final class InitialTestRunCommandTest extends TestCase
             );
         }
 
-        $container = Container::create()
+        $container = SingletonContainer::getContainer()
             ->cloneWithService(Git::class, $gitMock)
             ->cloneWithService(EventDispatcher::class, $eventDispatcher)
+            ->cloneWithService(
+                InitialTestsExecutionLogger::class,
+                static fn (Container $container): InitialTestsExecutionLogger => new ConsoleNoProgressLogger(
+                    $container->getTestFramework(),
+                    $container->getOutput(),
+                ),
+            )
         ;
 
         $container->set(

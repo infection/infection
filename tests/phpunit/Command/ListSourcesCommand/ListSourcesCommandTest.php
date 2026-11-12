@@ -38,9 +38,9 @@ namespace Infection\Tests\Command\ListSourcesCommand;
 use const DIRECTORY_SEPARATOR;
 use Infection\Command\ListSourcesCommand;
 use Infection\Console\Application;
-use Infection\Container\Container;
 use Infection\Framework\OperatingSystem;
 use Infection\Framework\Str;
+use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -157,7 +157,7 @@ final class ListSourcesCommandTest extends TestCase
      */
     private function runCommand(array $input): CommandTester
     {
-        $application = new Application(Container::create());
+        $application = new Application(SingletonContainer::getContainer());
         $tester = new CommandTester($application->find('config:list-sources'));
 
         $tester->execute(

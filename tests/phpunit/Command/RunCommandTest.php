@@ -37,7 +37,6 @@ namespace Infection\Tests\Command;
 
 use Infection\Command\RunCommand;
 use Infection\Console\Application;
-use Infection\Container\Container;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
@@ -220,7 +219,7 @@ final class RunCommandTest extends TestCase
     private function createCommandTesterFailingOnStartUp(Throwable $failure): CommandTester
     {
         // Fail on the first service requested in startUp()
-        $container = Container::create()->cloneWithService(
+        $container = SingletonContainer::getContainer()->cloneWithService(
             RootsFileOrDirectoryLocator::class,
             static fn (): never => throw $failure,
         );
