@@ -78,6 +78,11 @@ final class InfectionSelector
         return new InfectionTestCode();
     }
 
+    public static function testCodeCallingContainerCreate(): SelectorInterface
+    {
+        return new TestCodeCallingContainerCreate(self::analyser());
+    }
+
     public static function magoAdapterCandidate(): SelectorInterface
     {
         return Selector::AnyOf(
