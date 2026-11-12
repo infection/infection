@@ -117,14 +117,7 @@ final class CiAwareGitIntegrationTest extends FileSystemTestCase
         $workingDirectory = $this->git->getProjectDirectory();
 
         $changedLines = $this->git->getChangedLinesRangesByFilePaths('AM', $base, ['src'], $workingDirectory);
-
-        $actual = [];
-
-        foreach ($changedLines as $path => $fileChangedLines) {
-            $relativePath = Path::makeRelative($path, $this->tmp);
-
-            $actual[$relativePath] = $fileChangedLines;
-        }
+        $actual = $this->makePathsRelative($changedLines);
 
         $this->assertEquals($expected, $actual);
     }
@@ -606,6 +599,24 @@ final class CiAwareGitIntegrationTest extends FileSystemTestCase
         self::runGit($this->tmp, ['symbolic-ref', 'refs/remotes/origin/HEAD', 'refs/remotes/origin/main']);
 
         return $main;
+    }
+
+    /**
+     * @param array<string, list<ChangedLinesRange>> $changedLines
+     *
+     * @return array<string, list<ChangedLinesRange>>
+     */
+    private function makePathsRelative(array $changedLines): array
+    {
+        $actual = [];
+
+        foreach ($changedLines as $path => $fileChangedLines) {
+            $relativePath = Path::makeRelative($path, $this->tmp);
+
+            $actual[$relativePath] = $fileChangedLines;
+        }
+
+        return $actual;
     }
 
     /**
