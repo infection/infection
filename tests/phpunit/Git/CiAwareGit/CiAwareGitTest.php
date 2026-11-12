@@ -180,6 +180,16 @@ final class CiAwareGitTest extends TestCase
                 ->withExpected('immediate-base'),
         ];
 
+        yield 'GitHub merge queue uses the merge group base' => [
+            $baseScenario
+                ->withEnvironment([
+                    'GITHUB_ACTIONS' => 'true',
+                    'GITHUB_EVENT_PATH' => '/github/event.json',
+                ])
+                ->withEvent('{"action":"checks_requested","merge_group":{"base_ref":"refs/heads/main","base_sha":"merge-group-base","head_sha":"merge-group-head"}}')
+                ->withExpected('merge-group-base'),
+        ];
+
         yield 'push event' => [
             $baseScenario
                 ->withEnvironment([
