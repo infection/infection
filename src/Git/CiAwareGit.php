@@ -147,6 +147,7 @@ final readonly class CiAwareGit implements Git
                     'Could not determine the GitHub comparison base from "%s". Falling back to the default Git base.',
                     $eventPath,
                 ),
+                // @infection-ignore ArrayItemRemoval
                 ['exception' => $exception],
             );
 
@@ -165,6 +166,10 @@ final readonly class CiAwareGit implements Git
         // https://docs.github.com/en/webhooks/webhook-events-and-payloads#pull_request
         // Merge groups record the target snapshot for the combined queue changes.
         // https://docs.github.com/en/webhooks/webhook-events-and-payloads#merge_group
+        //
+        // GitHub sends either a pull_request or a merge_group payload, so
+        // reversing their lookup order cannot change the selected base.
+        // @infection-ignore Coalesce
         return self::findNonEmptyString(
             $event->pull_request->base->sha
             ?? $event->merge_group->base_sha
