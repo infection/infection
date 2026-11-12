@@ -176,7 +176,22 @@ final class CiAwareGitTest extends TestCase
                     'GITHUB_ACTIONS' => 'true',
                     'GITHUB_EVENT_PATH' => '/github/event.json',
                 ])
-                ->withEvent('{"pull_request":{"base":{"sha":"immediate-base"},"stack":{"base":{"sha":"stack-base"}}}}')
+                ->withEvent(
+                    <<<'JSON'
+                        {
+                            "pull_request": {
+                                "base": {
+                                    "sha": "immediate-base"
+                                },
+                                "stack": {
+                                    "base": {
+                                        "sha": "stack-base"
+                                    }
+                                }
+                            }
+                        }
+                        JSON,
+                )
                 ->withExpected('immediate-base'),
         ];
 
@@ -186,7 +201,18 @@ final class CiAwareGitTest extends TestCase
                     'GITHUB_ACTIONS' => 'true',
                     'GITHUB_EVENT_PATH' => '/github/event.json',
                 ])
-                ->withEvent('{"action":"checks_requested","merge_group":{"base_ref":"refs/heads/main","base_sha":"merge-group-base","head_sha":"merge-group-head"}}')
+                ->withEvent(
+                    <<<'JSON'
+                        {
+                            "action": "checks_requested",
+                            "merge_group": {
+                                "base_ref": "refs/heads/main",
+                                "base_sha": "merge-group-base",
+                                "head_sha": "merge-group-head"
+                            }
+                        }
+                        JSON,
+                )
                 ->withExpected('merge-group-base'),
         ];
 
@@ -196,7 +222,11 @@ final class CiAwareGitTest extends TestCase
                     'GITHUB_ACTIONS' => 'true',
                     'GITHUB_EVENT_PATH' => '/github/event.json',
                 ])
-                ->withEvent('{}'),
+                ->withEvent(
+                    <<<'JSON'
+                        {}
+                        JSON,
+                ),
         ];
 
         yield 'missing base SHA' => [
@@ -205,7 +235,17 @@ final class CiAwareGitTest extends TestCase
                     'GITHUB_ACTIONS' => 'true',
                     'GITHUB_EVENT_PATH' => '/github/event.json',
                 ])
-                ->withEvent('{"pull_request":{"base":{"ref":"main"}}}'),
+                ->withEvent(
+                    <<<'JSON'
+                        {
+                            "pull_request": {
+                                "base": {
+                                    "ref": "main"
+                                }
+                            }
+                        }
+                        JSON,
+                ),
         ];
 
         yield 'empty base SHA' => [
@@ -214,7 +254,17 @@ final class CiAwareGitTest extends TestCase
                     'GITHUB_ACTIONS' => 'true',
                     'GITHUB_EVENT_PATH' => '/github/event.json',
                 ])
-                ->withEvent('{"pull_request":{"base":{"sha":""}}}'),
+                ->withEvent(
+                    <<<'JSON'
+                        {
+                            "pull_request": {
+                                "base": {
+                                    "sha": ""
+                                }
+                            }
+                        }
+                        JSON,
+                ),
         ];
 
         yield 'non-string base SHA' => [
@@ -223,7 +273,17 @@ final class CiAwareGitTest extends TestCase
                     'GITHUB_ACTIONS' => 'true',
                     'GITHUB_EVENT_PATH' => '/github/event.json',
                 ])
-                ->withEvent('{"pull_request":{"base":{"sha":123}}}'),
+                ->withEvent(
+                    <<<'JSON'
+                        {
+                            "pull_request": {
+                                "base": {
+                                    "sha": 123
+                                }
+                            }
+                        }
+                        JSON,
+                ),
         ];
 
         yield 'non-object event' => [
@@ -232,7 +292,11 @@ final class CiAwareGitTest extends TestCase
                     'GITHUB_ACTIONS' => 'true',
                     'GITHUB_EVENT_PATH' => '/github/event.json',
                 ])
-                ->withEvent('null'),
+                ->withEvent(
+                    <<<'JSON'
+                        null
+                        JSON,
+                ),
         ];
 
         yield 'corrupt JSON payload' => [
@@ -241,7 +305,11 @@ final class CiAwareGitTest extends TestCase
                     'GITHUB_ACTIONS' => 'true',
                     'GITHUB_EVENT_PATH' => '/github/event.json',
                 ])
-                ->withEvent('{')
+                ->withEvent(
+                    <<<'JSON'
+                        {
+                        JSON,
+                )
                 ->withExpectedRecords([
                     [
                         'level' => LogLevel::INFO,

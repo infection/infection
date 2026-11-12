@@ -45,7 +45,6 @@ use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\GitRepositorySetup;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -63,8 +62,11 @@ use Symfony\Component\Filesystem\Path;
 #[CoversNothing]
 #[RequiresOperatingSystem('Linux|Darwin')]
 #[WithEnvironmentVariable('GITHUB_ACTIONS')]
+#[WithEnvironmentVariable('GITHUB_BASE_REF')]
 #[WithEnvironmentVariable('GITHUB_EVENT_PATH')]
 #[WithEnvironmentVariable('GITLAB_CI')]
+#[WithEnvironmentVariable('CI_MERGE_REQUEST_DIFF_BASE_SHA')]
+#[WithEnvironmentVariable('CI_MERGE_REQUEST_EVENT_TYPE')]
 final class CiAwareGitIntegrationTest extends FileSystemTestCase
 {
     use GitRepositorySetup;
@@ -81,7 +83,14 @@ final class CiAwareGitIntegrationTest extends FileSystemTestCase
         parent::setUp();
 
         $this->scenarioMapping = [
-            Scenario::GITHUB_MERGE_GROUP->name => $this->setUpGitHubMergeGroup(...),
+            Scenario::REPOSITORY_DEFAULT_BASE_OUTSIDE_CI->name => $this->setUpRepositoryDefaultBase(...),
+            Scenario::GITHUB_PULL_REQUEST_TARGETING_NON_DEFAULT_BRANCH->name => $this->setUpGitHubPullRequest(...),
+            Scenario::GITHUB_PULL_REQUEST_MERGE_CHECKOUT_WITH_DIVERGED_TARGET_BRANCH->name => $this->setUpGitHubPullRequestMergeCheckout(...),
+            Scenario::GITHUB_STACKED_PULL_REQUEST_WITH_DISTINCT_STACK_BASE->name => $this->setUpGitHubStackedPullRequest(...),
+            Scenario::GITHUB_MERGE_GROUP_TARGETING_NON_DEFAULT_BRANCH->name => $this->setUpGitHubMergeGroup(...),
+            Scenario::GITLAB_DETACHED_MERGE_REQUEST_WITH_DIVERGED_TARGET_BRANCH->name => $this->setUpGitLabMergeRequest(...),
+            Scenario::GITLAB_MERGED_RESULT_WITH_DIVERGED_TARGET_BRANCH->name => $this->setUpGitLabMergedResult(...),
+            Scenario::GITLAB_MERGE_TRAIN_WITH_NEWER_TARGET_BRANCH_CHANGES->name => $this->setUpGitLabMergeTrain(...),
         ];
 
         $this->git = new CiAwareGit(
@@ -122,13 +131,234 @@ final class CiAwareGitIntegrationTest extends FileSystemTestCase
 
     public static function baseSelectionProvider(): iterable
     {
-        yield 'automatic merge group base' => [
-            Scenario::GITHUB_MERGE_GROUP,
+        yield 'repository default base outside CI' => [
+            Scenario::REPOSITORY_DEFAULT_BASE_OUTSIDE_CI,
+            [
+                'src/Feature.php' => [ChangedLinesRange::forLine(1)],
+            ],
+        ];
+
+        yield 'GitHub pull request targeting a non-default branch' => [
+            Scenario::GITHUB_PULL_REQUEST_TARGETING_NON_DEFAULT_BRANCH,
+            [
+                'src/PullRequest.php' => [ChangedLinesRange::forLine(1)],
+            ],
+        ];
+
+        yield 'GitHub pull request merge checkout excludes newer target changes' => [
+            Scenario::GITHUB_PULL_REQUEST_MERGE_CHECKOUT_WITH_DIVERGED_TARGET_BRANCH,
+            [
+                'src/PullRequest.php' => [ChangedLinesRange::forLine(1)],
+            ],
+        ];
+
+        yield 'GitHub stacked pull request uses its immediate target' => [
+            Scenario::GITHUB_STACKED_PULL_REQUEST_WITH_DISTINCT_STACK_BASE,
+            [
+                'src/PullRequest2.php' => [ChangedLinesRange::forLine(1)],
+            ],
+        ];
+
+        yield 'GitHub merge group targeting a non-default branch' => [
+            Scenario::GITHUB_MERGE_GROUP_TARGETING_NON_DEFAULT_BRANCH,
             [
                 'src/PullRequest1.php' => [ChangedLinesRange::forLine(1)],
                 'src/PullRequest2.php' => [ChangedLinesRange::forLine(1)],
             ],
         ];
+
+        yield 'GitLab detached merge request excludes changes from its diverged target branch' => [
+            Scenario::GITLAB_DETACHED_MERGE_REQUEST_WITH_DIVERGED_TARGET_BRANCH,
+            [
+                'src/MergeRequest.php' => [ChangedLinesRange::forLine(1)],
+            ],
+        ];
+
+        yield 'GitLab merged result includes newer target changes since the MR diff base' => [
+            Scenario::GITLAB_MERGED_RESULT_WITH_DIVERGED_TARGET_BRANCH,
+            [
+                'src/MergeRequest.php' => [ChangedLinesRange::forLine(1)],
+                'src/Target.php' => [ChangedLinesRange::forLine(1)],
+            ],
+        ];
+
+        yield 'GitLab merge train includes earlier merge requests and newer target changes' => [
+            Scenario::GITLAB_MERGE_TRAIN_WITH_NEWER_TARGET_BRANCH_CHANGES,
+            [
+                'src/MergeRequestA.php' => [ChangedLinesRange::forLine(1)],
+                'src/MergeRequestB.php' => [ChangedLinesRange::forLine(1)],
+                'src/Target.php' => [ChangedLinesRange::forLine(1)],
+            ],
+        ];
+    }
+
+    /**
+     * Outside CI, origin/HEAD identifies the repository's default branch.
+     *
+     * D-----F
+     *
+     * D: main, origin/main, origin/HEAD (default comparison base)
+     * F: feature, HEAD; adds Feature.php
+     *
+     * Comparing D to F selects only Feature.php.
+     *
+     * @see https://git-scm.com/docs/git-remote#Documentation/git-remote.txt-set-head
+     */
+    private function setUpRepositoryDefaultBase(): void
+    {
+        // Create main and point origin/HEAD at its remote reference (D).
+        $this->setUpRepositoryDefaultBranch();
+
+        // Check out a feature branch with one change after the default base (F).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'feature']);
+        FS::dumpFile($this->tmp . '/src/Feature.php', '<?php return 1;');
+        self::commitGitChanges($this->tmp, 'Feature branch change');
+    }
+
+    /**
+     * Simulates a pull_request workflow that explicitly checks out the PR head.
+     * Its target branch is release, independently of the default branch main.
+     *
+     * D-----B-----P
+     *
+     * D: main, origin/main, origin/HEAD (repository default branch)
+     * B: release; adds Release.php (pull_request.base.sha)
+     * P: pull-request; adds PullRequest.php (HEAD, pull_request.head.sha)
+     *
+     * Comparing B to P selects only PullRequest.php. Falling back to D also
+     * selects Release.php, which predates the pull request.
+     *
+     * @see https://github.com/actions/checkout#checkout-pull-request-head-commit-instead-of-merge-commit
+     * @see https://docs.github.com/en/webhooks/webhook-events-and-payloads#pull_request
+     */
+    private function setUpGitHubPullRequest(): void
+    {
+        // Create the repository's default branch (D).
+        $this->setUpRepositoryDefaultBranch();
+
+        // Create the pull request's target with an older release change (B).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'release']);
+        FS::dumpFile($this->tmp . '/src/Release.php', '<?php return 1;');
+        $base = self::commitGitChanges($this->tmp, 'Existing release change');
+
+        // Create the pull request and explicitly check out its head for CI (P).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'pull-request']);
+        FS::dumpFile($this->tmp . '/src/PullRequest.php', '<?php return 2;');
+        $head = self::commitGitChanges($this->tmp, 'Pull request change');
+        self::runGit($this->tmp, ['checkout', '--quiet', '--detach', $head]);
+
+        // Supply the recorded target and source commits from the PR event.
+        $this->setGitHubEvent([
+            'action' => 'synchronize',
+            'pull_request' => [
+                'base' => ['ref' => 'release', 'sha' => $base],
+                'head' => ['ref' => 'pull-request', 'sha' => $head],
+            ],
+        ]);
+    }
+
+    /**
+     * Simulates the default pull_request checkout of a temporary merge commit,
+     * with newer target changes already included in the checkout.
+     *
+     * D-----B-----T-----C
+     *        \        /
+     *         P------'
+     *
+     * D: main, origin/main, origin/HEAD (repository default branch)
+     * B: adds Release.php and Target.php before the PR branches off
+     * T: release, origin/release; modifies Target.php (pull_request.base.sha)
+     * P: pull-request; adds PullRequest.php (pull_request.head.sha)
+     * C: refs/pull/1/merge; combines T and P (HEAD)
+     *
+     * Comparing T to C selects only PullRequest.php. Comparing B to C would
+     * also select Target.php, and falling back to D selects Release.php too.
+     *
+     * @see https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request
+     */
+    private function setUpGitHubPullRequestMergeCheckout(): void
+    {
+        // Create the default branch and the PR's original target baseline (D, B).
+        $this->setUpRepositoryDefaultBranch();
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'release']);
+        FS::dumpFile($this->tmp . '/src/Release.php', '<?php return 1;');
+        FS::dumpFile($this->tmp . '/src/Target.php', '<?php return 1;');
+        self::commitGitChanges($this->tmp, 'Existing release change');
+
+        // Create the PR before its target branch advances (P).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'pull-request']);
+        FS::dumpFile($this->tmp . '/src/PullRequest.php', '<?php return 2;');
+        $head = self::commitGitChanges($this->tmp, 'Pull request change');
+
+        // Modify an existing file on the target after the branches diverge (T).
+        self::runGit($this->tmp, ['checkout', '--quiet', 'release']);
+        FS::dumpFile($this->tmp . '/src/Target.php', '<?php return 3;');
+        $target = self::commitGitChanges($this->tmp, 'Newer target branch change');
+        self::runGit($this->tmp, ['update-ref', 'refs/remotes/origin/release', $target]);
+
+        // Construct GitHub's temporary merge ref and check it out detached (C).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'pull-request-merge']);
+        self::runGit($this->tmp, ['merge', '--quiet', '--no-ff', '--no-gpg-sign', '-m', 'Pull request merge result', 'pull-request']);
+        $merge = self::runGit($this->tmp, ['rev-parse', 'HEAD']);
+        self::runGit($this->tmp, ['update-ref', 'refs/pull/1/merge', $merge]);
+        self::runGit($this->tmp, ['checkout', '--quiet', '--detach', 'refs/pull/1/merge']);
+
+        // The event records the PR's target and source, independently of HEAD.
+        $this->setGitHubEvent([
+            'action' => 'synchronize',
+            'pull_request' => [
+                'base' => ['ref' => 'release', 'sha' => $target],
+                'head' => ['ref' => 'pull-request', 'sha' => $head],
+            ],
+        ]);
+    }
+
+    /**
+     * Simulates the upper pull request in a two-PR stack. The job explicitly
+     * checks out its head so that the diff describes that layer's own changes.
+     *
+     * D-----P1-----P2
+     *
+     * D: main, origin/main, origin/HEAD (pull_request.stack.base.sha)
+     * P1: pr-1; adds PullRequest1.php (pull_request.base.sha)
+     * P2: pr-2; adds PullRequest2.php (HEAD, pull_request.head.sha)
+     *
+     * Comparing P1 to P2 selects only PullRequest2.php. Using the stack base D
+     * also selects the lower pull request's PullRequest1.php change.
+     *
+     * @see https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/optimizing-ci-for-stacked-pull-requests
+     * @see https://github.com/actions/checkout#checkout-pull-request-head-commit-instead-of-merge-commit
+     */
+    private function setUpGitHubStackedPullRequest(): void
+    {
+        // Create the branch targeted by the entire stack (D).
+        $stackBase = $this->setUpRepositoryDefaultBranch();
+
+        // Create the lower pull request, which targets main (P1).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'pr-1']);
+        FS::dumpFile($this->tmp . '/src/PullRequest1.php', '<?php return 1;');
+        $immediateBase = self::commitGitChanges($this->tmp, 'Pull request #1');
+
+        // Build the upper pull request on pr-1 and check out its head (P2).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'pr-2']);
+        FS::dumpFile($this->tmp . '/src/PullRequest2.php', '<?php return 2;');
+        $head = self::commitGitChanges($this->tmp, 'Pull request #2');
+        self::runGit($this->tmp, ['checkout', '--quiet', '--detach', $head]);
+
+        // Distinguish the immediate PR target from the stack-wide base.
+        putenv('GITHUB_BASE_REF=main');
+        $this->setGitHubEvent([
+            'action' => 'synchronize',
+            'pull_request' => [
+                'base' => ['ref' => 'pr-1', 'sha' => $immediateBase],
+                'head' => ['ref' => 'pr-2', 'sha' => $head],
+                'stack' => [
+                    'base' => ['ref' => 'main', 'sha' => $stackBase],
+                    'position' => 2,
+                    'size' => 2,
+                ],
+            ],
+        ]);
     }
 
     /**
@@ -158,14 +388,8 @@ final class CiAwareGitIntegrationTest extends FileSystemTestCase
      */
     private function setUpGitHubMergeGroup(): void
     {
-        putenv('GITHUB_ACTIONS=true');
-
         // Create the default branch and its remote references (D).
-        self::initializeGitRepository($this->tmp);
-        FS::dumpFile($this->tmp . '/README.md', 'Repository default branch');
-        $main = self::commitGitChanges($this->tmp, 'Main baseline');
-        self::runGit($this->tmp, ['update-ref', 'refs/remotes/origin/main', $main]);
-        self::runGit($this->tmp, ['symbolic-ref', 'refs/remotes/origin/HEAD', 'refs/remotes/origin/main']);
+        $this->setUpRepositoryDefaultBranch();
 
         // Create the target branch with a change predating both pull requests (B).
         self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'release']);
@@ -192,7 +416,7 @@ final class CiAwareGitIntegrationTest extends FileSystemTestCase
         $head = self::runGit($this->tmp, ['rev-parse', 'HEAD']);
 
         // Supply GitHub's event file using the actual base and queue commit SHAs.
-        $event = json_encode([
+        $this->setGitHubEvent([
             'action' => 'checks_requested',
             'merge_group' => [
                 'base_ref' => 'refs/heads/release',
@@ -201,8 +425,211 @@ final class CiAwareGitIntegrationTest extends FileSystemTestCase
                 'head_sha' => $head,
             ],
         ]);
+    }
+
+    /**
+     * Simulates a detached merge request pipeline, which tests the source branch
+     * without merging the target branch's newer changes into the checkout.
+     *
+     * D-----B-----T
+     *        \
+     *         M
+     *
+     * D: main, origin/main, origin/HEAD (repository default branch)
+     * B: adds Release.php and Target.php (CI_MERGE_REQUEST_DIFF_BASE_SHA)
+     * T: release, origin/release; changes Target.php after the branches diverge
+     * M: merge-request; adds MergeRequest.php (HEAD)
+     *
+     * Comparing B to M selects only MergeRequest.php. Release.php and Target.php
+     * predate the MR, whose checkout retains the older Target.php contents.
+     * Falling back to D includes both files; diffing directly against T instead
+     * of the merge base B also incorrectly selects Target.php.
+     *
+     * @see https://docs.gitlab.com/ci/pipelines/merge_request_pipelines/
+     * @see https://docs.gitlab.com/ci/variables/predefined_variables/#predefined-variables-for-merge-request-pipelines
+     */
+    private function setUpGitLabMergeRequest(): void
+    {
+        // Create the repository's default branch (D).
+        $this->setUpRepositoryDefaultBranch();
+
+        // Create the MR's target branch and the common ancestor of its diff (B).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'release']);
+        FS::dumpFile($this->tmp . '/src/Release.php', '<?php return 1;');
+        FS::dumpFile($this->tmp . '/src/Target.php', '<?php return 1;');
+        $diffBase = self::commitGitChanges($this->tmp, 'Existing release change');
+
+        // Create the merge request's source branch (M).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'merge-request']);
+        FS::dumpFile($this->tmp . '/src/MergeRequest.php', '<?php return 2;');
+        $head = self::commitGitChanges($this->tmp, 'Merge request change');
+
+        // Modify an existing file on the target after the source branches off (T).
+        self::runGit($this->tmp, ['checkout', '--quiet', 'release']);
+        FS::dumpFile($this->tmp . '/src/Target.php', '<?php return 3;');
+        $target = self::commitGitChanges($this->tmp, 'Newer target branch change');
+        self::runGit($this->tmp, ['update-ref', 'refs/remotes/origin/release', $target]);
+
+        // Check out only the source head and supply the detached MR metadata.
+        self::runGit($this->tmp, ['checkout', '--quiet', '--detach', $head]);
+        self::setGitLabEvent('detached', $diffBase);
+    }
+
+    /**
+     * Simulates a merged results pipeline after the target branch advances.
+     * The checkout combines the source and target, but the CI diff base still
+     * identifies their original common ancestor.
+     *
+     * D-----B-----T-----C
+     *        \        /
+     *         M------'
+     *
+     * D: main, origin/main, origin/HEAD (repository default branch)
+     * B: adds Release.php and Target.php (CI_MERGE_REQUEST_DIFF_BASE_SHA)
+     * T: release, origin/release; modifies Target.php after the branches diverge
+     * M: merge-request; adds MergeRequest.php
+     * C: refs/merge-requests/1/merge; combines T and M (HEAD)
+     *
+     * Comparing B to C selects MergeRequest.php and the newer Target.php change.
+     * Falling back to D also selects Release.php. Comparing against T instead
+     * would omit Target.php and change the meaning of the CI diff base.
+     *
+     * @see https://docs.gitlab.com/ci/pipelines/merged_results_pipelines/
+     * @see https://docs.gitlab.com/ci/variables/predefined_variables/#predefined-variables-for-merge-request-pipelines
+     */
+    private function setUpGitLabMergedResult(): void
+    {
+        // Create the default branch and the original MR diff base (D, B).
+        $this->setUpRepositoryDefaultBranch();
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'release']);
+        FS::dumpFile($this->tmp . '/src/Release.php', '<?php return 1;');
+        FS::dumpFile($this->tmp . '/src/Target.php', '<?php return 1;');
+        $diffBase = self::commitGitChanges($this->tmp, 'Existing release change');
+
+        // Create the MR before its target branch advances (M).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'merge-request']);
+        FS::dumpFile($this->tmp . '/src/MergeRequest.php', '<?php return 2;');
+        self::commitGitChanges($this->tmp, 'Merge request change');
+
+        // Modify an existing file on the target after the branches diverge (T).
+        self::runGit($this->tmp, ['checkout', '--quiet', 'release']);
+        FS::dumpFile($this->tmp . '/src/Target.php', '<?php return 3;');
+        $target = self::commitGitChanges($this->tmp, 'Newer target branch change');
+        self::runGit($this->tmp, ['update-ref', 'refs/remotes/origin/release', $target]);
+
+        // Construct GitLab's temporary merge ref and check it out detached (C).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'merged-result']);
+        self::runGit($this->tmp, ['merge', '--quiet', '--no-ff', '--no-gpg-sign', '-m', 'Merge request merged result', 'merge-request']);
+        $merge = self::runGit($this->tmp, ['rev-parse', 'HEAD']);
+        self::runGit($this->tmp, ['update-ref', 'refs/merge-requests/1/merge', $merge]);
+        self::runGit($this->tmp, ['checkout', '--quiet', '--detach', 'refs/merge-requests/1/merge']);
+
+        // The merged checkout retains the MR's original diff base.
+        self::setGitLabEvent('merged_result', $diffBase);
+    }
+
+    /**
+     * Simulates pipeline 2 (A + B) from GitLab's merge train example, targeting
+     * release instead of the default branch. The target also advances after
+     * the source branches diverge, so its newer change is in the train result.
+     *
+     *           A------------.
+     *          /              \
+     * D-------R-------T--------TA-------TAB
+     *          \                       /
+     *           B---------------------'
+     *
+     * D: main, origin/main, origin/HEAD (repository default branch)
+     * R: adds Release.php (MR B's CI_MERGE_REQUEST_DIFF_BASE_SHA)
+     * T: release, origin/release; adds Target.php after the MRs diverge
+     * A: mr-a; adds MergeRequestA.php (first MR in the train)
+     * B: mr-b; adds MergeRequestB.php (second MR in the train)
+     * TA: first train result; target branch + MR A
+     * TAB: second train result; target branch + MRs A and B (HEAD)
+     *
+     * Comparing R to TAB includes both MRs and the newer Target.php change.
+     * Selecting the MR diff base does not isolate MR B from the combined
+     * checkout. Falling back to D also includes the older Release.php change.
+     *
+     * @see https://docs.gitlab.com/ci/pipelines/merge_trains/#merge-train-workflow
+     * @see https://docs.gitlab.com/ci/variables/predefined_variables/#predefined-variables-for-merge-request-pipelines
+     */
+    private function setUpGitLabMergeTrain(): void
+    {
+        // Create the repository's default branch (D).
+        $this->setUpRepositoryDefaultBranch();
+
+        // Create the target branch and the common MR diff base (R).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'release']);
+        FS::dumpFile($this->tmp . '/src/Release.php', '<?php return 1;');
+        $diffBase = self::commitGitChanges($this->tmp, 'Existing release change');
+
+        // Create merge request A from the target branch (A).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'mr-a']);
+        FS::dumpFile($this->tmp . '/src/MergeRequestA.php', '<?php return 2;');
+        self::commitGitChanges($this->tmp, 'Merge request A');
+
+        // Create merge request B independently from the same target branch (B).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'mr-b', 'release']);
+        FS::dumpFile($this->tmp . '/src/MergeRequestB.php', '<?php return 3;');
+        self::commitGitChanges($this->tmp, 'Merge request B');
+
+        // Advance the target before constructing the train's combined results (T).
+        self::runGit($this->tmp, ['checkout', '--quiet', 'release']);
+        FS::dumpFile($this->tmp . '/src/Target.php', '<?php return 4;');
+        $target = self::commitGitChanges($this->tmp, 'Newer target branch change');
+        self::runGit($this->tmp, ['update-ref', 'refs/remotes/origin/release', $target]);
+
+        // Pipeline 1 tests the target branch combined with MR A (TA).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'merge-train-a']);
+        self::runGit($this->tmp, ['merge', '--quiet', '--no-ff', '--no-gpg-sign', '-m', 'Train result for MR A', 'mr-a']);
+
+        // Pipeline 2 also includes MR B, while keeping MR A's changes (TAB).
+        self::runGit($this->tmp, ['checkout', '--quiet', '-b', 'merge-train-b']);
+        self::runGit($this->tmp, ['merge', '--quiet', '--no-ff', '--no-gpg-sign', '-m', 'Train result for MR B', 'mr-b']);
+        $head = self::runGit($this->tmp, ['rev-parse', 'HEAD']);
+
+        // Check out MR B's train result and supply its original MR diff base.
+        self::runGit($this->tmp, ['checkout', '--quiet', '--detach', $head]);
+        self::setGitLabEvent('merge_train', $diffBase);
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private function setUpRepositoryDefaultBranch(): string
+    {
+        self::initializeGitRepository($this->tmp);
+        FS::dumpFile($this->tmp . '/README.md', 'Repository default branch');
+        $main = self::commitGitChanges($this->tmp, 'Main baseline');
+        self::runGit($this->tmp, ['update-ref', 'refs/remotes/origin/main', $main]);
+        self::runGit($this->tmp, ['symbolic-ref', 'refs/remotes/origin/HEAD', 'refs/remotes/origin/main']);
+
+        return $main;
+    }
+
+    /**
+     * @param array<string, mixed> $event
+     */
+    private function setGitHubEvent(array $event): void
+    {
         $eventPath = $this->tmp . '/event.json';
-        FS::dumpFile($eventPath, $event);
+        FS::dumpFile(
+            $eventPath,
+            json_encode($event),
+        );
+        putenv('GITHUB_ACTIONS=true');
         putenv('GITHUB_EVENT_PATH=' . $eventPath);
+    }
+
+    /**
+     * @param 'detached'|'merged_result'|'merge_train' $eventType
+     * @param non-empty-string $diffBase
+     */
+    private static function setGitLabEvent(string $eventType, string $diffBase): void
+    {
+        putenv('GITLAB_CI=true');
+        putenv('CI_MERGE_REQUEST_EVENT_TYPE=' . $eventType);
+        putenv('CI_MERGE_REQUEST_DIFF_BASE_SHA=' . $diffBase);
     }
 }
