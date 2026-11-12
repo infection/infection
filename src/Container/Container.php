@@ -182,6 +182,7 @@ use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
 use OndraM\CiDetector\CiDetector;
+use OndraM\CiDetector\CiDetectorInterface;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinterAbstract;
@@ -748,8 +749,10 @@ final class Container extends DIContainer
         }
 
         $clone->offsetSet(
-            CiDetector::class,
-            static fn (): CiDetector => $forceProgress ? new NullCiDetector() : new MemoizedCiDetector(),
+            CiDetectorInterface::class,
+            static fn (): CiDetectorInterface => $forceProgress
+                ? new NullCiDetector()
+                : new MemoizedCiDetector(new CiDetector()),
         );
 
         $clone->offsetSet(
@@ -1035,9 +1038,9 @@ final class Container extends DIContainer
         return $this->get(AdapterInstaller::class);
     }
 
-    public function getCiDetector(): CiDetector
+    public function getCiDetector(): CiDetectorInterface
     {
-        return $this->get(CiDetector::class);
+        return $this->get(CiDetectorInterface::class);
     }
 
     public function getLogger(): LoggerInterface

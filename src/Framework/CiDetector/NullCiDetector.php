@@ -36,14 +36,14 @@ declare(strict_types=1);
 namespace Infection\Framework\CiDetector;
 
 use OndraM\CiDetector\Ci\CiInterface;
-use OndraM\CiDetector\CiDetector;
+use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use Override;
 
 /**
  * @internal
  */
-final class NullCiDetector extends CiDetector
+final class NullCiDetector implements CiDetectorInterface
 {
     #[Override]
     public function isCiDetected(): bool

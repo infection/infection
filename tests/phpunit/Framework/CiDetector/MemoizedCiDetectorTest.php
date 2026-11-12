@@ -36,36 +36,86 @@ declare(strict_types=1);
 namespace Infection\Tests\Framework\CiDetector;
 
 use Infection\Framework\CiDetector\MemoizedCiDetector;
-use OndraM\CiDetector\Env;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
+use OndraM\CiDetector\Ci\CiInterface;
+use OndraM\CiDetector\CiDetectorInterface;
+use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MemoizedCiDetector::class)]
 final class MemoizedCiDetectorTest extends TestCase
 {
-    public function test_it_can_be_instantiated_from_environment(): void
-    {
-        $detector = MemoizedCiDetector::fromEnvironment(new Env());
+    use ExpectsThrowables;
 
-        $this->assertInstanceOf(MemoizedCiDetector::class, $detector);
+    public function test_it_defers_detection_until_needed(): void
+    {
+        $decoratedDetector = $this->createMock(CiDetectorInterface::class);
+        $decoratedDetector
+            ->expects($this->never())
+            ->method('detect')
+        ;
+
+        new MemoizedCiDetector($decoratedDetector);
     }
 
-    public function test_it_runs_the_detection_only_once(): void
+    #[DataProvider('detectionOrderProvider')]
+    public function test_it_memoizes_the_detected_ci(bool $detectFirst): void
     {
-        $env = new ConfigurableEnv();
+        $ci = $this->createStub(CiInterface::class);
+        $decoratedDetector = $this->createMock(CiDetectorInterface::class);
+        $decoratedDetector
+            ->expects($this->once())
+            ->method('detect')
+            ->willReturn($ci)
+        ;
 
-        $detector0 = MemoizedCiDetector::fromEnvironment($env);
-        $detector1 = MemoizedCiDetector::fromEnvironment($env);
+        $detector = new MemoizedCiDetector($decoratedDetector);
 
-        $this->assertFalse($detector0->isCiDetected());
+        if ($detectFirst) {
+            $this->assertSame($ci, $detector->detect());
+        }
 
-        $env->setVariables(['TRAVIS' => true]);
+        $this->assertTrue($detector->isCiDetected());
+        $this->assertSame($ci, $detector->detect());
+        $this->assertTrue($detector->isCiDetected());
+        $this->assertSame($ci, $detector->detect());
+    }
 
-        $this->assertFalse($detector0->isCiDetected());
-        $this->assertTrue($detector1->isCiDetected());
+    #[DataProvider('detectionOrderProvider')]
+    public function test_it_memoizes_the_absence_of_ci(bool $detectFirst): void
+    {
+        $exception = new CiNotDetectedException('No CI server detected');
 
-        $env->setVariables([]);
+        $decoratedDetector = $this->createMock(CiDetectorInterface::class);
+        $decoratedDetector
+            ->expects($this->once())
+            ->method('detect')
+            ->willThrowException($exception)
+        ;
 
-        $this->assertTrue($detector1->isCiDetected());
+        $detector = new MemoizedCiDetector($decoratedDetector);
+
+        if (!$detectFirst) {
+            $this->assertFalse($detector->isCiDetected());
+        }
+
+        $actual1 = $this->expectToThrow($detector->detect(...));
+
+        $this->assertFalse($detector->isCiDetected());
+        $this->assertFalse($detector->isCiDetected());
+
+        $actual2 = $this->expectToThrow($detector->detect(...));
+
+        $this->assertSame($exception, $actual1);
+        $this->assertSame($exception, $actual2);
+    }
+
+    public static function detectionOrderProvider(): iterable
+    {
+        yield 'detect() called first' => [true];
+
+        yield 'isCiDetected() called first' => [false];
     }
 }

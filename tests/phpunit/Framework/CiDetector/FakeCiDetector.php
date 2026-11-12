@@ -37,18 +37,11 @@ namespace Infection\Tests\Framework\CiDetector;
 
 use Infection\Tests\UnsupportedMethod;
 use OndraM\CiDetector\Ci\CiInterface;
-use OndraM\CiDetector\CiDetector;
-use OndraM\CiDetector\Env;
+use OndraM\CiDetector\CiDetectorInterface;
 use Override;
 
-final class FakeCiDetector extends CiDetector
+final class FakeCiDetector implements CiDetectorInterface
 {
-    #[Override]
-    public static function fromEnvironment(Env $environment): CiDetector
-    {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
-    }
-
     #[Override]
     public function isCiDetected(): bool
     {
