@@ -51,9 +51,6 @@ final class NullCiDetector implements CiDetectorInterface
         return false;
     }
 
-    /**
-     * @throws CiNotDetectedException
-     */
     #[Override]
     public function detect(): CiInterface
     {

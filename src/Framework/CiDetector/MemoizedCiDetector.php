@@ -54,12 +54,7 @@ final readonly class MemoizedCiDetector implements CiDetectorInterface
 
     public function __construct(CiDetectorInterface $decoratedDetector)
     {
-        $this->ci = later(
-            /**
-             * @throws CiNotDetectedException
-             */
-            static fn () => yield $decoratedDetector->detect(),
-        );
+        $this->ci = later(static fn () => yield $decoratedDetector->detect());
     }
 
     #[Override]
