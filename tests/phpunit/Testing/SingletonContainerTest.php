@@ -44,6 +44,7 @@ use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use Psr\Log\NullLogger;
 use function Safe\chdir;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Filesystem\Path;
 
 #[CoversClass(SingletonContainer::class)]
 #[Group('integration')]
@@ -92,7 +93,7 @@ final class SingletonContainerTest extends FileSystemTestCase
             )
         ;
         $configuration = $container->getConfiguration();
-        $expected = dirname(__DIR__, 3);
+        $expected = Path::canonicalize(dirname(__DIR__, 3));
 
         $this->assertSame($expected, $configuration->projectDirectory);
     }
