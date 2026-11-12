@@ -223,10 +223,7 @@ final class RunCommandTest extends TestCase
     public function test_it_passes_the_json_logger_option_to_the_configuration(): void
     {
         $logs = null;
-
-        // Stop on the first service requested in startUp(), once the container has been bound
-        // to the CLI values.
-        $container = Container::create()->cloneWithService(
+        $container = SingletonContainer::getContainer()->cloneWithService(
             RootsFileOrDirectoryLocator::class,
             static function (Container $container) use (&$logs): never {
                 $logs = $container->getConfiguration()->logs;
