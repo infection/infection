@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^12.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Git_Diff_File\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Git_Diff_File\\Tests\\": "tests/"
+        }
+    }
+}

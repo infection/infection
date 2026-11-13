@@ -52,6 +52,8 @@ use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
+use Infection\Configuration\SourceFilter\ChangedLinesFilter;
+use Infection\Configuration\SourceFilter\GitDiffFileFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
@@ -152,6 +154,7 @@ use Infection\Source\Collector\MemoizedSourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
 use Infection\Source\Exception\NoSourceFound;
+use Infection\Source\MatcherLine\ChangedLinesSourceLineMatcher;
 use Infection\Source\MatcherLine\GitDiffSourceLineMatcher;
 use Infection\Source\MatcherLine\NullSourceLineMatcher;
 use Infection\Source\MatcherLine\SourceLineMatcher;
@@ -628,15 +631,17 @@ final class Container extends DIContainer
                 $configuration = $container->getConfiguration();
                 $sourceFilter = $configuration->sourceFilter;
 
-                return $sourceFilter instanceof GitDiffFilter
-                    ? new GitDiffSourceLineMatcher(
+                return match (true) {
+                    $sourceFilter instanceof GitDiffFilter => new GitDiffSourceLineMatcher(
                         $container->getGit(),
                         $sourceFilter->base,
                         $sourceFilter->value,
                         $configuration->source->directories,
                         dirname($configuration->configurationPathname),
-                    )
-                    : new NullSourceLineMatcher();
+                    ),
+                    $sourceFilter instanceof ChangedLinesFilter => new ChangedLinesSourceLineMatcher($sourceFilter->changedLinesRangesByFilePath),
+                    default => new NullSourceLineMatcher(),
+                };
             },
             SourceCollector::class => static fn (self $container): SourceCollector => new LazySourceCollector(
                 static function () use ($container): SourceCollector {
@@ -725,7 +730,7 @@ final class Container extends DIContainer
         ?string $testFrameworkExtraOptions = null,
         ?string $testFrameworkExtraArgs = null,
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
-        PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter = null,
+        PlainFilter|IncompleteGitDiffFilter|GitDiffFileFilter|PositionalPathsFilter|null $sourceFilter = null,
         int|string|null $threadCount = self::DEFAULT_THREAD_COUNT,
         string|int|null $dotsPerRow = self::DEFAULT_DOTS_PER_ROW,
         bool $dryRun = self::DEFAULT_DRY_RUN,

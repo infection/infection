@@ -50,14 +50,18 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\SourceFilter\ChangedLinesFilter;
+use Infection\Configuration\SourceFilter\GitDiffFileFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Configuration\SourceFilter\SourceFileFilter;
+use Infection\Differ\ChangedLinesParser;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Framework\Str;
 use Infection\Git\Git;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
@@ -74,6 +78,7 @@ use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PhpParser\Node;
 use function sprintf;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
@@ -134,7 +139,7 @@ class ConfigurationFactory
         ?string $testFrameworkExtraOptions,
         ?string $testFrameworkExtraArgs,
         ?string $staticAnalysisToolOptions,
-        PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
+        PlainFilter|IncompleteGitDiffFilter|GitDiffFileFilter|PositionalPathsFilter|null $sourceFilter,
         int|string|null $threadCount,
         string|int|null $dotsPerRow,
         bool $dryRun,
@@ -455,10 +460,13 @@ class ConfigurationFactory
     }
 
     /**
+     * @throws IOException
+     * @throws NoSourceFound
+     *
      * @return array{0: SourceFileFilter|null, 1: string|null}
      */
     private function refineFilterIfNecessary(
-        PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
+        PlainFilter|IncompleteGitDiffFilter|GitDiffFileFilter|PositionalPathsFilter|null $sourceFilter,
         SchemaConfiguration $schema,
         ?string $testFrameworkExtraArgs,
     ): array {
@@ -477,7 +485,33 @@ class ConfigurationFactory
             );
         }
 
+        if ($sourceFilter instanceof GitDiffFileFilter) {
+            $sourceFilter = $this->resolveGitDiffFileFilter($sourceFilter, dirname($schema->pathname));
+        }
+
         return [$sourceFilter, $testFrameworkExtraArgs];
+    }
+
+    /**
+     * @throws IOException
+     * @throws NoSourceFound
+     */
+    private function resolveGitDiffFileFilter(GitDiffFileFilter $gitDiffFileFilter, string $configDir): ChangedLinesFilter
+    {
+        $pathname = Path::makeAbsolute($gitDiffFileFilter->pathname, $configDir);
+
+        $diff = $this->fileSystem->readFile($pathname);
+
+        $changedLinesRangesByFilePath = ChangedLinesParser::parse(
+            explode("\n", Str::toUnixLineEndings($diff)),
+            $configDir,
+        );
+
+        if ($changedLinesRangesByFilePath === []) {
+            throw NoSourceFound::noChangedLinesForGitDiffFile($gitDiffFileFilter->pathname);
+        }
+
+        return new ChangedLinesFilter($changedLinesRangesByFilePath);
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath, ?string $summaryJsonLogFilePath): Logs
