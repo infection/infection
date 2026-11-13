@@ -40,6 +40,7 @@ use function array_map;
 use function array_merge;
 use function implode;
 use Infection\Differ\ChangedLinesParser;
+use Infection\Git\Throwable\NoGitProjectFound;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use const PHP_EOL;
