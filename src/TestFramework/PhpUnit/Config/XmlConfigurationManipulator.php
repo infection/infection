@@ -249,6 +249,24 @@ final readonly class XmlConfigurationManipulator
         );
     }
 
+    /**
+     * PHPUnit 13.3+ can warn when PHP is not configured for development, and one of the settings it
+     * checks is `memory_limit=-1` https://github.com/sebastianbergmann/phpunit/issues/6853. The memory
+     * limit that `MemoryLimiter` adds to mutant processes triggers this warning, and stopOnDefect then
+     * stops the run before any test executes: every mutant is reported as killed.
+     *
+     * Only use this for mutant processes: the initial test run uses the PHP configuration of the user,
+     * so the check is meaningful there. Removing the attribute falls back to PHPUnit's default (`false`),
+     * which is why no version check is necessary.
+     */
+    public function removeWarningWhenPhpIsNotConfiguredForDevelopment(SafeDOMXPath $xPath): void
+    {
+        $this->removeAttribute(
+            $xPath,
+            'warnWhenPhpIsNotConfiguredForDevelopment',
+        );
+    }
+
     public function addFailOnAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
     {
         if (version_compare($version, '5.2', '<')) {

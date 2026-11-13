@@ -1361,6 +1361,31 @@ final class XmlConfigurationManipulatorTest extends TestCase
         );
     }
 
+    public function test_it_removes_the_warning_when_php_is_not_configured_for_development(): void
+    {
+        $this->assertItChangesXML(<<<'XML'
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit
+                stopOnFailure="false"
+                warnWhenPhpIsNotConfiguredForDevelopment="true"
+            >
+            </phpunit>
+
+            XML,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->removeWarningWhenPhpIsNotConfiguredForDevelopment($xPath);
+            },
+            <<<'XML'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <phpunit
+                    stopOnFailure="false"
+                >
+                </phpunit>
+
+                XML,
+        );
+    }
+
     public static function schemaProvider(): iterable
     {
         yield 'remote XSD' => ['https://raw.githubusercontent.com/sebastianbergmann/phpunit/7.4.0/phpunit.xsd'];
