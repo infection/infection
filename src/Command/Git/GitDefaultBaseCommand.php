@@ -51,7 +51,7 @@ final class GitDefaultBaseCommand extends BaseCommand
     protected function configure(): void
     {
         $this->setDescription(
-            'Prints the default base branch name for the repository.',
+            'Prints the Git comparison base from CI metadata or the repository default branch.',
         );
     }
 
