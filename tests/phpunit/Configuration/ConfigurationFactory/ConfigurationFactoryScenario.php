@@ -184,6 +184,39 @@ final class ConfigurationFactoryScenario
         ;
     }
 
+    public function forValueForJsonLogFilePath(
+        ?string $jsonFileLogPathInConfig,
+        ?string $jsonFileLogPathFromCliOption,
+        ?string $expectedJsonFileLogPath,
+    ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withLogs(
+                        LogsBuilder::withMinimalTestData()
+                            ->withJsonLogFilePath($jsonFileLogPathInConfig)
+                            ->build(),
+                    ),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withJsonLogFilePath($jsonFileLogPathFromCliOption),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($previousExpected)
+                    ->withLogs(
+                        LogsBuilder::from($previousExpected->logs)
+                            ->withJsonLogFilePath($expectedJsonFileLogPath)
+                            ->build(),
+                    )
+                    ->build(),
+            )
+        ;
+    }
+
     public function forValueForHtmlLogFilePath(
         ?string $htmlFileLogPathInConfig,
         ?string $htmlFileLogPathFromCliOption,
