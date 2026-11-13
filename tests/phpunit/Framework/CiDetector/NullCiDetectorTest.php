@@ -33,39 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\CI;
+namespace Infection\Tests\Framework\CiDetector;
 
-use Infection\CI\MemoizedCiDetector;
+use Infection\Framework\CiDetector\NullCiDetector;
 use OndraM\CiDetector\Env;
+use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MemoizedCiDetector::class)]
-final class MemoizedCiDetectorTest extends TestCase
+#[CoversClass(NullCiDetector::class)]
+final class NullCiDetectorTest extends TestCase
 {
     public function test_it_can_be_instantiated_from_environment(): void
     {
-        $detector = MemoizedCiDetector::fromEnvironment(new Env());
+        $detector = NullCiDetector::fromEnvironment(new Env());
 
-        $this->assertInstanceOf(MemoizedCiDetector::class, $detector);
+        $this->assertInstanceOf(NullCiDetector::class, $detector);
     }
 
-    public function test_it_runs_the_detection_only_once(): void
+    public function test_it_does_not_detect_any__ci(): void
     {
-        $env = new ConfigurableEnv();
+        $detector = new NullCiDetector();
 
-        $detector0 = MemoizedCiDetector::fromEnvironment($env);
-        $detector1 = MemoizedCiDetector::fromEnvironment($env);
+        $this->assertFalse($detector->isCiDetected());
 
-        $this->assertFalse($detector0->isCiDetected());
+        $this->expectException(CiNotDetectedException::class);
+        $this->expectExceptionMessage('No CI server detectable with this detector');
 
-        $env->setVariables(['TRAVIS' => true]);
-
-        $this->assertFalse($detector0->isCiDetected());
-        $this->assertTrue($detector1->isCiDetected());
-
-        $env->setVariables([]);
-
-        $this->assertTrue($detector1->isCiDetected());
+        $detector->detect();
     }
 }

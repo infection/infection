@@ -33,27 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\CI;
+namespace Infection\Tests\Framework\CiDetector;
 
-use OndraM\CiDetector\Ci\CiInterface;
-use OndraM\CiDetector\CiDetector;
-use OndraM\CiDetector\Exception\CiNotDetectedException;
+use function array_key_exists;
+use OndraM\CiDetector\Env;
 use Override;
 
-/**
- * @internal
- */
-final class NullCiDetector extends CiDetector
+final class ConfigurableEnv extends Env
 {
-    #[Override]
-    public function isCiDetected(): bool
+    /**
+     * @var array<string, string|false>
+     */
+    private array $variables = [];
+
+    /**
+     * @param array<string, string|false> $variables
+     */
+    public function setVariables(array $variables): void
     {
-        return false;
+        $this->variables = $variables;
     }
 
     #[Override]
-    public function detect(): CiInterface
+    public function get(string $name)
     {
-        throw new CiNotDetectedException('No CI server detectable with this detector');
+        if (!array_key_exists($name, $this->variables)) {
+            return false;
+        }
+
+        return $this->variables[$name];
     }
 }

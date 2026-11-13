@@ -33,33 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\CI;
+namespace Infection\Framework\CiDetector;
 
-use Infection\CI\NullCiDetector;
-use OndraM\CiDetector\Env;
-use OndraM\CiDetector\Exception\CiNotDetectedException;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use OndraM\CiDetector\Ci\CiInterface;
+use OndraM\CiDetector\CiDetector;
+use Override;
 
-#[CoversClass(NullCiDetector::class)]
-final class NullCiDetectorTest extends TestCase
+/**
+ * @internal
+ *
+ * TODO: for now we are forced to extend CiDetector which is not ideal since we need to mind all
+ *  the API of the parent. See https://github.com/OndraM/ci-detector/issues/64
+ */
+final class MemoizedCiDetector extends CiDetector
 {
-    public function test_it_can_be_instantiated_from_environment(): void
+    /**
+     * @var CiInterface|false|null
+     */
+    private $ci = false;
+
+    #[Override]
+    protected function detectCurrentCiServer(): ?CiInterface
     {
-        $detector = NullCiDetector::fromEnvironment(new Env());
+        if ($this->ci === false) {
+            $this->ci = parent::detectCurrentCiServer();
+        }
 
-        $this->assertInstanceOf(NullCiDetector::class, $detector);
-    }
-
-    public function test_it_does_not_detect_any__ci(): void
-    {
-        $detector = new NullCiDetector();
-
-        $this->assertFalse($detector->isCiDetected());
-
-        $this->expectException(CiNotDetectedException::class);
-        $this->expectExceptionMessage('No CI server detectable with this detector');
-
-        $detector->detect();
+        return $this->ci;
     }
 }
