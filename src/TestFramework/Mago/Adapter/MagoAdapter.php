@@ -38,9 +38,10 @@ namespace Infection\TestFramework\Mago\Adapter;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments as CommonCommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\CommandLineArguments;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
 use RuntimeException;
@@ -86,7 +87,7 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            CommandLineArguments::fromTokens([]),
+            CommonCommandLineArguments::fromTokens([]),
             $options,
         );
     }
@@ -134,8 +135,8 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
     {
         $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            CommandLineArguments::fromTokens([]),
-            CommandLineArguments::fromTokens(['--version']),
+            CommonCommandLineArguments::fromTokens([]),
+            CommonCommandLineArguments::fromTokens(['--version']),
         );
 
         return $this->versionParser->parse(

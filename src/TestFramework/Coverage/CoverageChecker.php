@@ -38,7 +38,7 @@ namespace Infection\TestFramework\Coverage;
 use Composer\XdebugHandler\XdebugHandler;
 use function extension_loaded;
 use function implode;
-use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
+use Infection\TestFramework\Contracts\CommandLineArguments;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use function ini_get as ini_get_unsafe;

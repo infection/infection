@@ -303,6 +303,7 @@ final class ConfigurationFactoryTest extends TestCase
             bootstrap: null,
             initialTestsPhpOptions: CommandLineArguments::fromTokens([]),
             testFrameworkArguments: CommandLineArguments::fromTokens([]),
+            legacyTestFrameworkExtraOptions: '',
             staticAnalysisToolOptions: CommandLineArguments::fromTokens([]),
             coveragePath: Path::normalize(sys_get_temp_dir() . '/infection'),
             skipCoverage: false,
@@ -341,6 +342,33 @@ final class ConfigurationFactoryTest extends TestCase
         );
 
         yield 'minimal' => [$defaultScenario];
+
+        yield 'legacy framework arguments retain their original spelling from configuration' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                TestFrameworkTypes::PHPSPEC,
+                " tests/Jenny's/FooTest.php  --label=\"foo bar\" ",
+                null,
+                " tests/Jenny's/FooTest.php  --label=\"foo bar\" ",
+            ),
+        ];
+
+        yield 'legacy framework arguments retain their original spelling from input' => [
+            $defaultScenario
+                ->withSchema(
+                    $defaultSchemaBuilder
+                        ->withTestFramework(TestFrameworkTypes::CODECEPTION)
+                        ->withTestFrameworkExtraArgs('--verbose'),
+                )
+                ->withInput(
+                    $defaultInputBuilder->withTestFrameworkExtraArgs("tests/Jenny's/FooTest.php --label=\"foo bar\""),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withTestFramework(TestFrameworkTypes::CODECEPTION)
+                        ->withTestFrameworkExtraOptions("tests/Jenny's/FooTest.php --label=\"foo bar\"")
+                        ->build(),
+                ),
+        ];
 
         yield 'relative debug log file path' => [
             $defaultScenario
@@ -1565,6 +1593,7 @@ final class ConfigurationFactoryTest extends TestCase
                     $defaultConfigurationBuilder
                         ->withSourceFilter(null)
                         ->withTestFrameworkExtraOptions('"tests/Foo Test.php"')
+                        ->withLegacyTestFrameworkExtraOptions('tests/Foo Test.php')
                         ->build(),
                 ),
         ];

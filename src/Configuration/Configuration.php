@@ -43,7 +43,7 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\SourceFilter\SourceFileFilter;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
+use Infection\TestFramework\Contracts\CommandLineArguments;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_string;
 use PhpParser\Node;
@@ -84,6 +84,8 @@ readonly class Configuration
         public ?string $bootstrap,
         public CommandLineArguments $initialTestsPhpOptions,
         public CommandLineArguments $testFrameworkArguments,
+        // Preserve the input grammar of adapters still using the legacy string API.
+        public string $legacyTestFrameworkExtraOptions,
         public CommandLineArguments $staticAnalysisToolOptions,
         public string $coveragePath,
         public bool $skipCoverage,

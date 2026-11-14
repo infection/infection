@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\Common;
 
 use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Contracts\CommandLineArguments as CommandLineArgumentsContract;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -129,6 +130,31 @@ final class CommandLineBuilderTest extends TestCase
         );
 
         $this->assertSame(['/custom/php', '-d', '', '0', 'phpunit'], $command);
+    }
+
+    public function test_it_builds_commands_from_argument_contracts(): void
+    {
+        $this->phpExecutableFinderMock->expects($this->once())->method('find')->willReturn('/custom/php');
+
+        $phpArguments = $this->createMock(CommandLineArgumentsContract::class);
+        $phpArguments
+            ->expects($this->once())
+            ->method('toTokens')
+            ->willReturn(['-d', 'memory_limit=-1'])
+        ;
+        $frameworkArguments = $this->createMock(CommandLineArgumentsContract::class);
+        $frameworkArguments
+            ->expects($this->once())
+            ->method('toTokens')
+            ->willReturn(['--filter', 'a test', '', '0'])
+        ;
+
+        $command = $this->commandLineBuilder->build('phpunit', $phpArguments, $frameworkArguments);
+
+        $this->assertSame(
+            ['/custom/php', '-d', 'memory_limit=-1', 'phpunit', '--filter', 'a test', '', '0'],
+            $command,
+        );
     }
 
     public function test_it_uses_the_injected_php_executable_finder_and_caches_its_result(): void

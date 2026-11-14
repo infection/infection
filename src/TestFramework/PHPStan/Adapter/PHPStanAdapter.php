@@ -39,9 +39,10 @@ use function explode;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments as CommonCommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\CommandLineArguments;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PHPStan\Process\PHPStanMutantProcessFactory;
 use RuntimeException;
@@ -106,7 +107,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            CommandLineArguments::fromTokens(self::PHP_EXTRA_ARGS),
+            CommonCommandLineArguments::fromTokens(self::PHP_EXTRA_ARGS),
             $options,
         );
     }
@@ -176,8 +177,8 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     {
         $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            CommandLineArguments::fromTokens(self::PHP_EXTRA_ARGS),
-            CommandLineArguments::fromTokens(['--version']),
+            CommonCommandLineArguments::fromTokens(self::PHP_EXTRA_ARGS),
+            CommonCommandLineArguments::fromTokens(['--version']),
         );
 
         return $this->versionParser->parse(

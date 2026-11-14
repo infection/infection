@@ -143,7 +143,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
                 new TestRunOrderResolver(),
                 $fileSystem,
             ),
-            new ArgumentsAndOptionsBuilder(
+            ArgumentsAndOptionsBuilder::create(
                 $executeOnlyCoveringTestCases,
                 $filteredSourceFilesToMutate,
                 $mapSourceClassToTestStrategy,

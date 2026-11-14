@@ -330,6 +330,14 @@ final class SchemaConfigurationBuilder
         return $clone;
     }
 
+    public function withTestFrameworkExtraArgs(?string $testFrameworkExtraArgs): self
+    {
+        $clone = clone $this;
+        $clone->testFrameworkExtraArgs = $testFrameworkExtraArgs;
+
+        return $clone;
+    }
+
     public function withTestFrameworkExtraOptions(?string $testFrameworkExtraOptions): self
     {
         $clone = clone $this;

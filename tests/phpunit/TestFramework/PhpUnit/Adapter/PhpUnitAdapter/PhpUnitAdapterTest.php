@@ -2034,7 +2034,7 @@ final class PhpUnitAdapterTest extends TestCase
                 new TestRunOrderResolver(),
                 $this->fileSystemMock,
             ),
-            new ArgumentsAndOptionsBuilder(
+            ArgumentsAndOptionsBuilder::create(
                 $executeOnlyCoveringTestCases,
                 $filteredSourceFilesToMutate,
                 $mapSourceClassToTestStrategy,

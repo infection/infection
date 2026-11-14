@@ -48,10 +48,11 @@ use Infection\Mutant\Mutant;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\InitialTestsRunner;
-use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments as CommonCommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\CommandLineArguments;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -209,8 +210,8 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         $phpExtraArgs = array_values(array_filter($phpExtraArgs, static fn (string $argument): bool => $argument !== ''));
 
         return $this->createInitialCommand(
-            CommandLineArguments::fromString($extraOptions),
-            CommandLineArguments::fromTokens($phpExtraArgs),
+            CommonCommandLineArguments::fromString($extraOptions),
+            CommonCommandLineArguments::fromTokens($phpExtraArgs),
             $skipCoverage,
         );
     }
@@ -230,7 +231,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
             $mutatedFilePath,
             $mutationHash,
             $mutationOriginalFilePath,
-            CommandLineArguments::fromString($extraOptions),
+            CommonCommandLineArguments::fromString($extraOptions),
         );
     }
 
@@ -240,8 +241,8 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
             $this->shellCommandRunner->mustRun(
                 $this->commandLineBuilder->build(
                     $this->testFrameworkExecutable,
-                    CommandLineArguments::fromTokens([]),
-                    CommandLineArguments::fromTokens(['--version']),
+                    CommonCommandLineArguments::fromTokens([]),
+                    CommonCommandLineArguments::fromTokens(['--version']),
                 ),
             ),
         );
@@ -385,7 +386,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         CommandLineArguments $arguments,
     ): array {
         return $this->getCommandLine(
-            CommandLineArguments::fromTokens($this->memoryLimiter->getPhpExtraArguments()),
+            CommonCommandLineArguments::fromTokens($this->memoryLimiter->getPhpExtraArguments()),
             $this->argumentsAndOptionsBuilder->buildForMutant(
                 $this->mutationConfigBuilder->build(
                     $coverageTests,
@@ -447,7 +448,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
                 $this->commandLineBuilder->build(
                     $this->testFrameworkExecutable,
                     $phpExtraArgs,
-                    CommandLineArguments::fromTokens([
+                    CommonCommandLineArguments::fromTokens([
                         '--configuration',
                         $this->testFrameworkConfigPath,
                         '--validate-configuration',

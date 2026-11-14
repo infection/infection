@@ -39,8 +39,9 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments as CommonCommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Contracts\CommandLineArguments;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
@@ -106,7 +107,7 @@ final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFac
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            CommandLineArguments::fromTokens(self::PHP_EXTRA_ARGS),
+            CommonCommandLineArguments::fromTokens(self::PHP_EXTRA_ARGS),
             $options,
         );
     }

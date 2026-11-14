@@ -39,8 +39,9 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments as CommonCommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Contracts\CommandLineArguments;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Symfony\Component\Process\Process;
 
@@ -94,7 +95,7 @@ final readonly class MagoMutantProcessFactory implements LazyMutantProcessFactor
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            CommandLineArguments::fromTokens([]),
+            CommonCommandLineArguments::fromTokens([]),
             $options,
         );
     }

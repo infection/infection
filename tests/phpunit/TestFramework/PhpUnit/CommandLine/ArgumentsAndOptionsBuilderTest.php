@@ -57,7 +57,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 {
     public function test_it_can_build_the_command_without_extra_options(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null, false);
+        $builder = ArgumentsAndOptionsBuilder::create(false, [], null, false);
         $configPath = '/config/path';
 
         $actual = $builder->buildForInitialTestsRun($configPath, CommandLineArguments::fromString(''));
@@ -73,7 +73,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     public function test_it_can_build_the_command_with_extra_options(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null, false);
+        $builder = ArgumentsAndOptionsBuilder::create(false, [], null, false);
         $configPath = '/config/path';
 
         $actual = $builder->buildForInitialTestsRun($configPath, CommandLineArguments::fromString('--verbose --debug'));
@@ -91,7 +91,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     public function test_it_can_build_the_command_with_raw_extra_args(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null, false);
+        $builder = ArgumentsAndOptionsBuilder::create(false, [], null, false);
         $configPath = '/config/path';
 
         $actual = $builder->buildForInitialTestsRun(
@@ -113,7 +113,8 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     public function test_it_can_build_the_command_with_filtered_files_for_initial_tests_run(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false,
+        $builder = ArgumentsAndOptionsBuilder::create(
+            false,
             [
                 new SplFileInfo('src/Foo.php'),
                 new SplFileInfo('src/bar/Baz.php'),
@@ -140,7 +141,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     public function test_it_can_build_the_command_with_extra_options_that_contains_spaces(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null, false);
+        $builder = ArgumentsAndOptionsBuilder::create(false, [], null, false);
         $configPath = '/the config/path';
 
         $actual = $builder->buildForInitialTestsRun($configPath, CommandLineArguments::fromString('--path=/a path/with spaces'));
@@ -170,7 +171,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
     ): void {
         $configPath = '/the config/path';
 
-        $builder = new ArgumentsAndOptionsBuilder(
+        $builder = ArgumentsAndOptionsBuilder::create(
             $executeOnlyCoveringTestCases,
             [],
             null,

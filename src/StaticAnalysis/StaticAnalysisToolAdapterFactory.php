@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis;
 
-use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
+use Infection\TestFramework\Contracts\CommandLineArguments;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 
 /**

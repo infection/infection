@@ -38,7 +38,7 @@ namespace Infection\TestFramework\PhpUnit\CommandLine;
 use function array_map;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
+use Infection\TestFramework\Contracts\CommandLineArguments;
 use SplFileInfo;
 use function sprintf;
 use Symfony\Component\Console\Input\InputOption;
@@ -48,29 +48,44 @@ use Symfony\Component\Console\Input\InputOption;
  */
 final readonly class ArgumentsAndOptionsBuilder
 {
-    private InputOption $filter;
-
-    /**
-     * @var list<InputOption>
-     */
-    private array $initialRunOnlyOptions;
-
     /**
      * @param SplFileInfo[] $filteredSourceFilesToMutate
+     * @param list<InputOption> $initialRunOnlyOptions
      */
-    public function __construct(
+    private function __construct(
         private bool $executeOnlyCoveringTestCases,
         private array $filteredSourceFilesToMutate,
         private ?string $mapSourceClassToTestStrategy,
         private bool $useWindowsFilterLimit,
+        private InputOption $filter,
+        private array $initialRunOnlyOptions,
     ) {
-        $this->filter = new InputOption('filter', null, InputOption::VALUE_REQUIRED);
-        $this->initialRunOnlyOptions = [
-            new InputOption('configuration', 'c', InputOption::VALUE_REQUIRED),
-            $this->filter,
-            new InputOption('testsuite', null, InputOption::VALUE_REQUIRED),
-            new InputOption('warn-when-php-is-not-configured-for-development'),
-        ];
+    }
+
+    /**
+     * @param SplFileInfo[] $filteredSourceFilesToMutate
+     */
+    public static function create(
+        bool $executeOnlyCoveringTestCases,
+        array $filteredSourceFilesToMutate,
+        ?string $mapSourceClassToTestStrategy,
+        bool $useWindowsFilterLimit,
+    ): self {
+        $filter = new InputOption('filter', null, InputOption::VALUE_REQUIRED);
+
+        return new self(
+            $executeOnlyCoveringTestCases,
+            $filteredSourceFilesToMutate,
+            $mapSourceClassToTestStrategy,
+            $useWindowsFilterLimit,
+            $filter,
+            [
+                new InputOption('configuration', 'c', InputOption::VALUE_REQUIRED),
+                $filter,
+                new InputOption('testsuite', null, InputOption::VALUE_REQUIRED),
+                new InputOption('warn-when-php-is-not-configured-for-development'),
+            ],
+        );
     }
 
     public function buildForInitialTestsRun(string $configPath, CommandLineArguments $arguments): CommandLineArguments

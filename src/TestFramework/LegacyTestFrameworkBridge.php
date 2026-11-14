@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use function array_map;
 use function array_values;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -49,8 +48,7 @@ use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Process\Exception\RuntimeException;
+use Infection\TestFramework\Legacy\TestFrameworkExtraOptionsFilter;
 
 /**
  * @internal
@@ -66,6 +64,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         private InitialTestsRunner $initialTestsRunner,
         private Configuration $config,
         private MutantProcessContainerFactory $processFactory,
+        private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ) {
     }
 
@@ -91,15 +90,11 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         }
     }
 
-    /**
-     * @throws InitialTestsFailed
-     * @throws RuntimeException
-     */
     public function executeInitialRun(): InitialRunResults
     {
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
             array_values($this->adapter->getInitialTestRunCommandLine(
-                $this->config->testFrameworkArguments->toString(),
+                $this->config->legacyTestFrameworkExtraOptions,
                 $this->config->initialTestsPhpOptions->toTokens(),
                 $this->config->skipCoverage,
             )),
@@ -157,17 +152,12 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
     private function getFilteredExtraOptionsForMutant(): string
     {
         if ($this->adapter instanceof ProvidesInitialRunOnlyOptions) {
-            $options = array_map(
-                static fn (string $name): InputOption => new InputOption($name, null, InputOption::VALUE_REQUIRED),
+            return $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
+                $this->config->legacyTestFrameworkExtraOptions,
                 $this->adapter->getInitialRunOnlyOptions(),
             );
-
-            return $this->config->testFrameworkArguments
-                ->withoutOptions(...$options)
-                ->toString()
-            ;
         }
 
-        return $this->config->testFrameworkArguments->toString();
+        return $this->config->legacyTestFrameworkExtraOptions;
     }
 }

@@ -44,6 +44,8 @@ use function array_values;
 use function count;
 use function explode;
 use function implode;
+use Infection\TestFramework\Contracts\CommandLineArguments as CommandLineArgumentsContract;
+use Override;
 use function sprintf;
 use function str_starts_with;
 use function strcspn;
@@ -59,7 +61,7 @@ use Webmozart\Assert\Assert;
  *
  * @internal
  */
-final readonly class CommandLineArguments
+final readonly class CommandLineArguments implements CommandLineArgumentsContract
 {
     /**
      * @param list<string> $tokens
@@ -84,11 +86,13 @@ final readonly class CommandLineArguments
         return new self(TestFrameworkExtraArgs::parseRawTokens($input));
     }
 
+    #[Override]
     public function withOptionDefinitions(InputOption ...$options): self
     {
         return new self($this->tokens, [...$this->optionDefinitions, ...array_values($options)]);
     }
 
+    #[Override]
     public function withoutOptions(InputOption ...$options): self
     {
         return new self(
@@ -100,6 +104,7 @@ final readonly class CommandLineArguments
         );
     }
 
+    #[Override]
     public function hasOption(InputOption $option): bool
     {
         return $this->findOptionIndexes([$option]) !== [];
@@ -111,6 +116,7 @@ final readonly class CommandLineArguments
      *
      * @param list<string> $tokens
      */
+    #[Override]
     public function append(array $tokens): self
     {
         $optionIndexes = array_flip($this->findOptionIndexes($this->optionDefinitions));
@@ -137,6 +143,7 @@ final readonly class CommandLineArguments
     /**
      * @param list<string> $tokens
      */
+    #[Override]
     public function prepend(array $tokens): self
     {
         return new self([...$tokens, ...$this->tokens], $this->optionDefinitions);
@@ -145,15 +152,17 @@ final readonly class CommandLineArguments
     /**
      * @return list<string>
      */
+    #[Override]
     public function toTokens(): array
     {
         return $this->tokens;
     }
 
     /**
-     * Serializes for legacy adapters that still accept raw argument strings.
-     * Double quotes and escapes follow the tokenizer's grammar, not shell syntax.
+     * Double quotes and escapes follow the tokenizer's grammar, not shell syntax
+     * or legacy adapters' space splitting.
      */
+    #[Override]
     public function toString(): string
     {
         return implode(' ', array_map(

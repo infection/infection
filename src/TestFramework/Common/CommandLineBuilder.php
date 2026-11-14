@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Common;
 
 use function array_merge;
 use Infection\FileSystem\Finder\Exception\FinderException;
-use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
+use Infection\TestFramework\Contracts\CommandLineArguments;
 use function is_executable;
 use const PHP_SAPI;
 use function shell_exec;
