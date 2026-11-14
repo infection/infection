@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use function preg_quote;
 use Safe\Exceptions\PcreException;
 use Safe\Exceptions\StringsException;
 use function Safe\preg_replace;
@@ -50,15 +51,28 @@ class TestFrameworkExtraOptionsFilter
 {
     /**
      * @param string[] $initialRunOnlyOptions
+     * @param string[] $initialRunOnlyFlags
      *
      * @throws PcreException
      * @throws StringsException
      */
-    public function filterForMutantProcess(string $actualExtraOptions, array $initialRunOnlyOptions): string
-    {
+    public function filterForMutantProcess(
+        string $actualExtraOptions,
+        array $initialRunOnlyOptions,
+        array $initialRunOnlyFlags = [],
+    ): string {
         foreach ($initialRunOnlyOptions as $initialRunOnlyOption) {
             $actualExtraOptions = preg_replace(sprintf('/%s[\=| ](?:\"[^\"]*\"|\'[^\']*\'|[^\ ]*)/', $initialRunOnlyOption), '', $actualExtraOptions);
             Assert::notNull($actualExtraOptions);
+        }
+
+        foreach ($initialRunOnlyFlags as $initialRunOnlyFlag) {
+            $actualExtraOptions = preg_replace(
+                sprintf('/(?<!\S)%s(?!\S)/', preg_quote($initialRunOnlyFlag, '/')),
+                '',
+                $actualExtraOptions,
+            );
+            Assert::notNull($actualExtraOptions, 'Filtering initial-run-only flags must return an option string.');
         }
 
         return preg_replace('/\s+/', ' ', trim($actualExtraOptions));
