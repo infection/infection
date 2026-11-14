@@ -35,9 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use function array_filter;
 use function array_key_exists;
-use function explode;
-use function implode;
+use function array_values;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -47,6 +48,7 @@ use Infection\Mutant\Mutant;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
@@ -61,12 +63,10 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Log\PhpUnitLogger;
 use Infection\TestFramework\PhpUnit\MemoryLimiter;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Override;
 use function Safe\preg_match;
 use function sprintf;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
-use function trim;
 use function version_compare;
 use Webmozart\Assert\Assert;
 
@@ -98,7 +98,6 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         private readonly InitialTestsRunner $initialTestsRunner,
         private readonly Configuration $config,
         private readonly MutantProcessContainerFactory $processFactory,
-        private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private readonly MemoryLimiter $memoryLimiter,
         private ?string $version = null,
     ) {
@@ -118,15 +117,20 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         }
     }
 
+    /**
+     * @throws InitialTestsFailed
+     * @throws InvalidPhpUnitConfiguration
+     * @throws InvalidVersion
+     * @throws SymfonyProcessRuntimeException
+     */
     #[Override]
     public function executeInitialRun(): InitialRunResults
     {
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
-            $this,
-            $this->config->testFrameworkExtraOptions,
-            explode(
-                ' ',
-                (string) $this->config->initialTestsPhpOptions,
+            $this->createInitialCommand(
+                $this->config->testFrameworkArguments,
+                $this->config->initialTestsPhpOptions,
+                $this->config->skipCoverage,
             ),
             $this->config->skipCoverage,
         );
@@ -161,15 +165,21 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         return $results;
     }
 
+    /**
+     * @throws InvalidVersion
+     */
     #[Override]
     public function test(Mutant $mutant): MutantProcessContainer
     {
         return $this->processFactory->create(
             $this,
             $mutant,
-            $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
-                $this->config->testFrameworkExtraOptions,
-                $this->getInitialRunOnlyOptions(),
+            $this->createMutantCommand(
+                $mutant->getTests(),
+                $mutant->getFilePath(),
+                $mutant->getMutation()->getHash(),
+                $mutant->getMutation()->getOriginalFilePath(),
+                $this->config->testFrameworkArguments,
             ),
         );
     }
@@ -195,46 +205,19 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         array $phpExtraArgs,
         bool $skipCoverage,
     ): array {
-        $this->validateConfigurationIfSupported($phpExtraArgs);
+        // Legacy callers may supply empty elements from splitting raw PHP options.
+        $phpExtraArgs = array_values(array_filter($phpExtraArgs, static fn (string $argument): bool => $argument !== ''));
 
-        if ($skipCoverage === false) {
-            $generatedOptions = [];
-
-            if (self::supportsExcludingSourceFromCoverage($this->getVersion())) {
-                $generatedOptions[] = '--exclude-source-from-xml-coverage';
-            }
-
-            $generatedOptions[] = '--coverage-xml=' . $this->tmpDir . '/' . self::COVERAGE_DIR;
-            $generatedOptions[] = '--log-junit=' . $this->jUnitFilePath; // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
-
-            $extraOptions = trim(
-                sprintf(
-                    '%s %s',
-                    $extraOptions,
-                    implode(' ', $generatedOptions),
-                ),
-            );
-
-            // PCOV may require an adjusted `pcov.directory` setting to include
-            // all target source code in the coverage report.
-            if ($this->pcovDirectoryProvider->shouldProvide()) {
-                $phpExtraArgs[] = '-d';
-                $phpExtraArgs[] = sprintf(
-                    'pcov.directory=%s',
-                    $this->pcovDirectoryProvider->getDirectory(),
-                );
-            }
-        }
-
-        return $this->getCommandLine(
-            $phpExtraArgs,
-            $this->argumentsAndOptionsBuilder->buildForInitialTestsRun(
-                $this->initialConfigBuilder->build($this->getVersion()),
-                $extraOptions,
-            ),
+        return $this->createInitialCommand(
+            CommandLineArguments::fromString($extraOptions),
+            CommandLineArguments::fromTokens($phpExtraArgs),
+            $skipCoverage,
         );
     }
 
+    /**
+     * @throws InvalidVersion
+     */
     public function getMutantCommandLine(
         array $coverageTests,
         string $mutatedFilePath,
@@ -242,20 +225,12 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         string $mutationOriginalFilePath,
         string $extraOptions,
     ): array {
-        return $this->getCommandLine(
-            $this->memoryLimiter->getPhpExtraArguments(),
-            $this->argumentsAndOptionsBuilder->buildForMutant(
-                $this->mutationConfigBuilder->build(
-                    $coverageTests,
-                    $mutatedFilePath,
-                    $mutationHash,
-                    $mutationOriginalFilePath,
-                    $this->getVersion(),
-                ),
-                $extraOptions,
-                $coverageTests,
-                $this->getVersion(),
-            ),
+        return $this->createMutantCommand(
+            $coverageTests,
+            $mutatedFilePath,
+            $mutationHash,
+            $mutationOriginalFilePath,
+            CommandLineArguments::fromString($extraOptions),
         );
     }
 
@@ -265,8 +240,8 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
             $this->shellCommandRunner->mustRun(
                 $this->commandLineBuilder->build(
                     $this->testFrameworkExecutable,
-                    [],
-                    ['--version'],
+                    CommandLineArguments::fromTokens([]),
+                    CommandLineArguments::fromTokens(['--version']),
                 ),
             ),
         );
@@ -355,11 +330,75 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
     }
 
     /**
-     * @return string[]
+     * @throws InvalidPhpUnitConfiguration
+     * @throws InvalidVersion
+     *
+     * @return list<string>
      */
-    private function getInitialRunOnlyOptions(): array
-    {
-        return ['--configuration', '--filter', '--testsuite'];
+    private function createInitialCommand(
+        CommandLineArguments $arguments,
+        CommandLineArguments $phpExtraArgs,
+        bool $skipCoverage,
+    ): array {
+        $this->validateConfigurationIfSupported($phpExtraArgs);
+
+        $arguments = $this->argumentsAndOptionsBuilder->buildForInitialTestsRun(
+            $this->initialConfigBuilder->build($this->getVersion()),
+            $arguments,
+        );
+
+        if ($skipCoverage === false) {
+            if (self::supportsExcludingSourceFromCoverage($this->getVersion())) {
+                $arguments = $arguments->append(['--exclude-source-from-xml-coverage']);
+            }
+
+            $arguments = $arguments->append([
+                '--coverage-xml=' . $this->tmpDir . '/' . self::COVERAGE_DIR,
+                '--log-junit=' . $this->jUnitFilePath,
+            ]);
+
+            // PCOV may require an adjusted `pcov.directory` setting to include
+            // all target source code in the coverage report.
+            if ($this->pcovDirectoryProvider->shouldProvide()) {
+                $phpExtraArgs = $phpExtraArgs->append([
+                    '-d',
+                    sprintf('pcov.directory=%s', $this->pcovDirectoryProvider->getDirectory()),
+                ]);
+            }
+        }
+
+        return $this->getCommandLine($phpExtraArgs, $arguments);
+    }
+
+    /**
+     * @param TestLocation[] $coverageTests
+     *
+     * @throws InvalidVersion
+     *
+     * @return list<string>
+     */
+    private function createMutantCommand(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
+        CommandLineArguments $arguments,
+    ): array {
+        return $this->getCommandLine(
+            CommandLineArguments::fromTokens($this->memoryLimiter->getPhpExtraArguments()),
+            $this->argumentsAndOptionsBuilder->buildForMutant(
+                $this->mutationConfigBuilder->build(
+                    $coverageTests,
+                    $mutatedFilePath,
+                    $mutationHash,
+                    $mutationOriginalFilePath,
+                    $this->getVersion(),
+                ),
+                $arguments,
+                $coverageTests,
+                $this->getVersion(),
+            ),
+        );
     }
 
     private function getMemoryUsed(string $output): float
@@ -374,12 +413,9 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
     }
 
     /**
-     * @param string[] $phpExtraArgs
-     * @param string[] $testFrameworkArgs
-     *
-     * @return string[]
+     * @return list<string>
      */
-    private function getCommandLine(array $phpExtraArgs, array $testFrameworkArgs): array
+    private function getCommandLine(CommandLineArguments $phpExtraArgs, CommandLineArguments $testFrameworkArgs): array
     {
         return $this->commandLineBuilder->build(
             $this->testFrameworkExecutable,
@@ -394,12 +430,10 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
     }
 
     /**
-     * @param string[] $phpExtraArgs
-     *
      * @throws InvalidPhpUnitConfiguration
      * @throws InvalidVersion
      */
-    private function validateConfigurationIfSupported(array $phpExtraArgs): void
+    private function validateConfigurationIfSupported(CommandLineArguments $phpExtraArgs): void
     {
         // PHPUnit 13.2 introduced validation against its bundled schema, without
         // resolving the schema URL declared in the configuration.
@@ -413,11 +447,11 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
                 $this->commandLineBuilder->build(
                     $this->testFrameworkExecutable,
                     $phpExtraArgs,
-                    [
+                    CommandLineArguments::fromTokens([
                         '--configuration',
                         $this->testFrameworkConfigPath,
                         '--validate-configuration',
-                    ],
+                    ]),
                 ),
                 timeout: self::CONFIGURATION_VALIDATION_TIMEOUT_IN_SECONDS,
             );

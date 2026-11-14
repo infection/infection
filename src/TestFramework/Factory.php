@@ -90,7 +90,6 @@ final readonly class Factory
         private CoverageCheckerFactory $coverageCheckerFactory,
         private InitialTestsRunner $initialTestsRunner,
         private MutantProcessContainerFactory $containerFactory,
-        private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
     ) {
     }
 
@@ -107,7 +106,6 @@ final readonly class Factory
                 $this->initialTestsRunner,
                 $this->infectionConfig,
                 $this->containerFactory,
-                $this->extraOptionsFilter,
             );
     }
 
@@ -175,7 +173,6 @@ final readonly class Factory
                         $this->initialTestsRunner,
                         $configuration,
                         $this->containerFactory,
-                        $this->extraOptionsFilter,
                     )
                     : $factory::create(
                         $this->testFrameworkFinder->find($executableName),

@@ -39,7 +39,6 @@ use Infection\Configuration\Configuration;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
@@ -76,7 +75,6 @@ interface TestFrameworkFactory
         InitialTestsRunner $initialTestsRunner,
         Configuration $configuration,
         MutantProcessContainerFactory $processFactory,
-        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework;
 
     /**

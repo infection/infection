@@ -40,6 +40,7 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
 use Infection\Testing\MutatorName;
@@ -101,14 +102,18 @@ final class MagoMutantProcessFactoryTest extends TestCase
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/mago', [], [
-                '--colors=never',
-                '--threads=1',
-                'analyze',
-                '--reporting-format=short',
-                '--substitute',
-                "$originalFilePath=$mutantFilePath",
-            ])
+            ->with(
+                '/path/to/mago',
+                CommandLineArguments::fromTokens([]),
+                CommandLineArguments::fromTokens([
+                    '--colors=never',
+                    '--threads=1',
+                    'analyze',
+                    '--reporting-format=short',
+                    '--substitute',
+                    "$originalFilePath=$mutantFilePath",
+                ]),
+            )
             ->willReturn(['/path/to/mago'])
         ;
 
@@ -122,7 +127,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
             '/path/to/mago',
             $commandLineBuilder,
             100.0,
-            [],
+            CommandLineArguments::fromTokens([]),
         );
 
         $mutantProcess = $factory->create($mutant);
@@ -186,16 +191,23 @@ final class MagoMutantProcessFactoryTest extends TestCase
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/mago', [], [
-                '--colors=never',
-                '--threads=1',
-                'analyze',
-                '--reporting-format=short',
-                '--substitute',
-                "$originalFilePath=$mutantFilePath",
-                '--no-stubs',
-                '--baseline /path/to/baseline.toml',
-            ])
+            ->with(
+                '/path/to/mago',
+                CommandLineArguments::fromTokens([]),
+                CommandLineArguments::fromTokens([
+                    '--colors=never',
+                    '--threads=1',
+                    'analyze',
+                    '--reporting-format=short',
+                    '--substitute',
+                    "$originalFilePath=$mutantFilePath",
+                    '--no-stubs',
+                    '--baseline',
+                    '/path with spaces/baseline.toml',
+                    '--',
+                    'src with spaces',
+                ]),
+            )
             ->willReturn(['/path/to/mago'])
         ;
 
@@ -209,10 +221,13 @@ final class MagoMutantProcessFactoryTest extends TestCase
             '/path/to/mago',
             $commandLineBuilder,
             100.0,
-            [
+            CommandLineArguments::fromTokens([
                 '--no-stubs',
-                '--baseline /path/to/baseline.toml',
-            ],
+                '--baseline',
+                '/path with spaces/baseline.toml',
+                '--',
+                'src with spaces',
+            ]),
         );
 
         $mutantProcess = $factory->create($mutant);
@@ -275,14 +290,18 @@ final class MagoMutantProcessFactoryTest extends TestCase
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/mago', [], [
-                '--colors=never',
-                '--threads=1',
-                'analyze',
-                '--reporting-format=short',
-                '--substitute',
-                "$originalFilePath=$mutantFilePath",
-            ])
+            ->with(
+                '/path/to/mago',
+                CommandLineArguments::fromTokens([]),
+                CommandLineArguments::fromTokens([
+                    '--colors=never',
+                    '--threads=1',
+                    'analyze',
+                    '--reporting-format=short',
+                    '--substitute',
+                    "$originalFilePath=$mutantFilePath",
+                ]),
+            )
             ->willReturn(['/path/to/mago'])
         ;
 
@@ -296,7 +315,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
             '/path/to/mago',
             $commandLineBuilder,
             100.0,
-            [],
+            CommandLineArguments::fromTokens([]),
         );
 
         $mutantProcess = $factory->create($mutant);

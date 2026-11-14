@@ -37,7 +37,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use function array_values;
-use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
@@ -51,6 +50,7 @@ use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
@@ -79,9 +79,9 @@ final class ConfigurationBuilder
         private array $mutators,
         private string $testFramework,
         private ?string $bootstrap,
-        private ?string $initialTestsPhpOptions,
+        private CommandLineArguments $initialTestsPhpOptions,
         private string $testFrameworkExtraOptions,
-        private ?string $staticAnalysisToolOptions,
+        private CommandLineArguments $staticAnalysisToolOptions,
         private string $coveragePath,
         private bool $skipCoverage,
         private bool $skipInitialTests,
@@ -125,10 +125,8 @@ final class ConfigurationBuilder
             testFramework: $configuration->testFramework,
             bootstrap: $configuration->bootstrap,
             initialTestsPhpOptions: $configuration->initialTestsPhpOptions,
-            testFrameworkExtraOptions: $configuration->testFrameworkExtraOptions,
-            staticAnalysisToolOptions: $configuration->getStaticAnalysisToolOptions() === []
-                ? null
-                : implode(' ', $configuration->getStaticAnalysisToolOptions()),
+            testFrameworkExtraOptions: $configuration->testFrameworkArguments->toString(),
+            staticAnalysisToolOptions: $configuration->staticAnalysisToolOptions,
             coveragePath: $configuration->coveragePath,
             skipCoverage: $configuration->skipCoverage,
             skipInitialTests: $configuration->skipInitialTests,
@@ -171,9 +169,9 @@ final class ConfigurationBuilder
             mutators: [],
             testFramework: TestFrameworkTypes::PHPUNIT,
             bootstrap: null,
-            initialTestsPhpOptions: null,
+            initialTestsPhpOptions: CommandLineArguments::fromTokens([]),
             testFrameworkExtraOptions: '',
-            staticAnalysisToolOptions: null,
+            staticAnalysisToolOptions: CommandLineArguments::fromTokens([]),
             coveragePath: '',
             skipCoverage: false,
             skipInitialTests: false,
@@ -239,9 +237,9 @@ final class ConfigurationBuilder
             ],
             testFramework: TestFrameworkTypes::PHPUNIT,
             bootstrap: 'bootstrap.php',
-            initialTestsPhpOptions: '-d memory_limit=1G',
+            initialTestsPhpOptions: CommandLineArguments::fromString('-d memory_limit=1G'),
             testFrameworkExtraOptions: '--verbose',
-            staticAnalysisToolOptions: '--level=max',
+            staticAnalysisToolOptions: CommandLineArguments::fromString('--level=max'),
             coveragePath: 'coverage',
             skipCoverage: true,
             skipInitialTests: true,
@@ -401,7 +399,7 @@ final class ConfigurationBuilder
     public function withInitialTestsPhpOptions(?string $initialTestsPhpOptions): self
     {
         $clone = clone $this;
-        $clone->initialTestsPhpOptions = $initialTestsPhpOptions;
+        $clone->initialTestsPhpOptions = CommandLineArguments::fromString($initialTestsPhpOptions ?? '');
 
         return $clone;
     }
@@ -417,7 +415,7 @@ final class ConfigurationBuilder
     public function withStaticAnalysisToolOptions(?string $staticAnalysisToolOptions): self
     {
         $clone = clone $this;
-        $clone->staticAnalysisToolOptions = $staticAnalysisToolOptions;
+        $clone->staticAnalysisToolOptions = CommandLineArguments::fromString($staticAnalysisToolOptions ?? '');
 
         return $clone;
     }
@@ -645,7 +643,7 @@ final class ConfigurationBuilder
             testFramework: $this->testFramework,
             bootstrap: $this->bootstrap,
             initialTestsPhpOptions: $this->initialTestsPhpOptions,
-            testFrameworkExtraOptions: $this->testFrameworkExtraOptions,
+            testFrameworkArguments: CommandLineArguments::fromString($this->testFrameworkExtraOptions),
             staticAnalysisToolOptions: $this->staticAnalysisToolOptions,
             coveragePath: $this->coveragePath,
             skipCoverage: $this->skipCoverage,

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Mago\Adapter;
 
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Contracts\FakeShellCommandRunner;
 use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -50,7 +51,7 @@ final class MagoAdapterFactoryTest extends TestCase
             '/path/to/mago',
             32.3,
             '/tmp',
-            [],
+            CommandLineArguments::fromTokens([]),
             new FakeShellCommandRunner(),
         );
 

@@ -74,7 +74,7 @@ final class CoverageCheckerFactoryTest extends TestCase
             new CoverageChecker(
                 true,
                 true,
-                '-d memory_limit=1G',
+                $configuration->initialTestsPhpOptions,
                 'coverage',
                 true,
                 $jUnitReportLocator,

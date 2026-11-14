@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis;
 
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 
 /**
@@ -42,15 +43,12 @@ use Infection\TestFramework\Contracts\ShellCommandRunner;
  */
 interface StaticAnalysisToolAdapterFactory
 {
-    /**
-     * @param list<string> $staticAnalysisToolOptions
-     */
     public static function create(
         string $staticAnalysisConfigPath,
         string $staticAnalysisToolExecutable,
         float $timeout,
         string $tmpDir,
-        array $staticAnalysisToolOptions,
+        CommandLineArguments $staticAnalysisToolOptions,
         ShellCommandRunner $shellCommandRunner,
     ): StaticAnalysisToolAdapter;
 }

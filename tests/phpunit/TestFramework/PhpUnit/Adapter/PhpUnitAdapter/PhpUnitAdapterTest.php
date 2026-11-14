@@ -64,7 +64,6 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\PhpUnit\Log\PhpUnitLogger;
 use Infection\TestFramework\PhpUnit\MemoryLimiter;
 use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Mutant\MutantBuilder;
@@ -160,7 +159,7 @@ final class PhpUnitAdapterTest extends TestCase
 
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $configuration = ConfigurationBuilder::withMinimalTestData()
-            ->withInitialTestsPhpOptions('-d memory_limit=1G')
+            ->withInitialTestsPhpOptions('-d memory_limit=1G -d include_path="/path with  spaces"')
             ->withTestFrameworkExtraOptions('--verbose')
             ->withSkipCoverage(true)
             ->build()
@@ -175,9 +174,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->expects($this->once())
             ->method('run')
             ->with(
-                $adapter,
-                '--verbose',
-                ['-d', 'memory_limit=1G'],
+                [self::PHP_EXECUTABLE, '-d', 'memory_limit=1G', '-d', 'include_path=/path with  spaces', '/path/to/phpunit', '--configuration', '/tmp/phpunitConfiguration.initial.infection.xml', '--verbose'],
                 true,
             )
             ->willReturn($process)
@@ -235,9 +232,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->expects($this->once())
             ->method('run')
             ->with(
-                $adapter,
-                '',
-                [''],
+                $this->isArray(),
                 false,
             )
             ->willReturn($process)
@@ -275,7 +270,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->with(
                 $adapter,
                 $mutant,
-                '--verbose',
+                [self::PHP_EXECUTABLE, '/path/to/phpunit', '--configuration', '/tmp/phpunitConfiguration.' . $mutant->getMutation()->getHash() . '.infection.xml', '--verbose'],
             )
             ->willReturn($processContainer)
         ;
@@ -530,6 +525,24 @@ final class PhpUnitAdapterTest extends TestCase
         );
     }
 
+    public function test_it_preserves_spaces_in_generated_coverage_paths(): void
+    {
+        $this->fileSystemMock->expects($this->once())->method('dumpFile');
+        $this->pcovDirectoryProvider->expects($this->once())->method('shouldProvide')->willReturn(false);
+        $adapter = $this->createAdapter('<phpunit/>', tmpDir: '/tmp/infection reports');
+
+        $command = $adapter->getInitialTestRunCommandLine('', [], false);
+
+        $this->assertSame([
+            self::PHP_EXECUTABLE,
+            '/path/to/phpunit',
+            '--configuration',
+            '/tmp/infection reports/phpunitConfiguration.initial.infection.xml',
+            '--coverage-xml=/tmp/infection reports/coverage-xml',
+            '--log-junit=/tmp/infection/junit.xml',
+        ], $command);
+    }
+
     #[DataProvider('mutantCommandLineProvider')]
     public function test_it_provides_mutant_command_line(
         MutantCommandLineScenario $scenario,
@@ -573,7 +586,7 @@ final class PhpUnitAdapterTest extends TestCase
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $configuration = ConfigurationBuilder::withMinimalTestData()->withSkipCoverage(true)->build();
         $this->fileSystemMock->expects($this->exactly(2))->method('isReadableFile')->willReturn(true);
-        $this->fileSystemMock->expects($this->exactly(2))->method('dumpFile');
+        $this->fileSystemMock->expects($this->exactly(3))->method('dumpFile');
         $environment = $this->createMock(MemoryLimiterEnvironment::class);
         $environment->expects($this->once())->method('hasMemoryLimitSet')->willReturn(false);
         $memoryLimiter = new MemoryLimiter($environment);
@@ -589,7 +602,7 @@ final class PhpUnitAdapterTest extends TestCase
         $initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($adapter, $configuration->testFrameworkExtraOptions, [''], true)
+            ->with([self::PHP_EXECUTABLE, '/path/to/phpunit', '--configuration', '/tmp/phpunitConfiguration.initial.infection.xml'], true)
             ->willReturn($process)
         ;
         $adapter->executeInitialRun();
@@ -992,6 +1005,56 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'a filter value equal to the terminator precedes generated coverage options' => [
+            $default
+                ->withExtraArgs('--filter --')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--filter',
+                    '--',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
+        yield 'test selection and coverage share the same interpretation of an option value equal to the terminator' => [
+            $default
+                ->withFilteredSourceFilesToMutate([new SplFileInfo('src/Other.php')])
+                ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
+                ->withExtraArgs('--testsuite -- --filter Foo')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--testsuite',
+                    '--',
+                    '--filter',
+                    'Foo',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
+        yield 'generated coverage options precede the option terminator' => [
+            $default
+                ->withExtraArgs('--colors=always -- tests/Foo.php')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--colors=always',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                    '--',
+                    'tests/Foo.php',
+                ]),
+        ];
+
         yield 'without generated coverage options when coverage is skipped' => [
             $default
                 ->withExtraOptions('')
@@ -1078,10 +1141,10 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    '--coverage-xml=/tmp/coverage-xml',
-                    '--log-junit=/tmp/infection/junit.xml',
                     '--filter',
                     'FooTest|BazTest',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
                 ]),
         ];
 
@@ -1194,12 +1257,9 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: "--filter=Foo" does not prevent the generated filter from being appended.
                     '--filter=Foo',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
-                    '--filter',
-                    'FooTest|BazTest',
                 ]),
         ];
 
@@ -1216,12 +1276,9 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: "--filter=Foo" does not prevent the generated filter from being appended.
                     '--filter=Foo',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
-                    '--filter',
-                    'FooTest|BazTest',
                 ]),
         ];
 
@@ -1558,7 +1615,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
                     '--group=default',
-                    '--filter=Mailer',
                 ]),
         ];
 
@@ -1571,7 +1627,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
                     '--group=default',
-                    '--filter=Mailer',
                 ]),
         ];
 
@@ -1609,8 +1664,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    '--filter',
-                    'a test with spaces',
                 ]),
         ];
 
@@ -1622,8 +1675,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    '--filter',
-                    'a test with spaces',
                 ]),
         ];
 
@@ -1635,7 +1686,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    '--filter=a test -- with option-like text',
                     '--group=default',
                 ]),
         ];
@@ -1648,7 +1698,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    '--filter=a test -- with option-like text',
                     '--group=default',
                 ]),
         ];
@@ -1662,7 +1711,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
                     'tests/FooTest.php',
-                    '--filter=Foo',
                 ]),
         ];
 
@@ -1675,7 +1723,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
                     'tests/FooTest.php',
-                    '--filter=Foo',
                 ]),
         ];
 
@@ -1687,7 +1734,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    '--configuration=custom-phpunit.xml',
                 ]),
         ];
 
@@ -1699,7 +1745,20 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    '--configuration=custom-phpunit.xml',
+                ]),
+        ];
+
+        yield 'mutant arguments preserve values and positional options after the terminator' => [
+            $default
+                ->withExtraArgs('--warn-when-php-is-not-configured-for-development --exclude-group="a  --filter b" -- --filter=A')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
+                    '--exclude-group=a  --filter b',
+                    '--',
+                    '--filter=A',
                 ]),
         ];
 
@@ -1903,7 +1962,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
                     '--group=default',
-                    '--filter=Foo',
                 ]),
         ];
 
@@ -1916,7 +1974,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
                     '--group=default',
-                    '--filter=Foo',
                 ]),
         ];
     }
@@ -1937,9 +1994,9 @@ final class PhpUnitAdapterTest extends TestCase
         ?InitialTestsRunner $initialTestsRunner = null,
         ?MutantProcessContainerFactory $processFactory = null,
         ?PhpUnitLogger $logger = null,
+        string $tmpDir = '/tmp',
     ): PhpUnitAdapter {
         $configuration ??= ConfigurationBuilder::withMinimalTestData()->build();
-        $tmpDir = '/tmp';
         $projectDir = '/path/to/project';
         $testFrameworkConfigDir = '/path/to/project/tools/phpunit';
         $filteredSourceFilePathsToMutate = array_map(
@@ -2002,7 +2059,6 @@ final class PhpUnitAdapterTest extends TestCase
             $initialTestsRunner ?? $this->createStub(InitialTestsRunner::class),
             $configuration,
             $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
-            new TestFrameworkExtraOptionsFilter(),
             $memoryLimiter ?? new MemoryLimiter($this->createStub(MemoryLimiterEnvironment::class)),
             $version,
         );

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PHPStan\Adapter;
 
 use Infection\FileSystem\FileSystem;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Contracts\FakeShellCommandRunner;
 use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -53,7 +54,7 @@ final class PHPStanAdapterFactoryTest extends TestCase
             '/path/to/phpstan',
             32.3,
             '/tmp',
-            [],
+            CommandLineArguments::fromTokens([]),
             new FakeShellCommandRunner(),
             new FileSystem(),
         );

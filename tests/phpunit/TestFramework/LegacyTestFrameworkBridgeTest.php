@@ -45,13 +45,13 @@ use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter;
 use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
@@ -135,7 +135,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($adapter, '', [''], false)
+            ->with(['/bin/dummy'], false)
             ->willReturn($process)
         ;
 
@@ -165,20 +165,26 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
     public function test_it_forwards_initial_run_options(): void
     {
         $process = $this->createSuccessfulInitialRunProcess('output');
-        $adapter = new DummyTestFrameworkAdapter();
+        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter
+            ->expects($this->once())
+            ->method('getInitialTestRunCommandLine')
+            ->with('--verbose', ['-d', 'include_path=/path with  spaces'], true)
+            ->willReturn(['/bin/legacy', '--verbose'])
+        ;
 
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($adapter, '--verbose', ['-d', 'memory_limit=1G'], true)
+            ->with(['/bin/legacy', '--verbose'], true)
             ->willReturn($process)
         ;
 
         $testFramework = $this->createTestFramework(
             adapter: $adapter,
             initialTestsRunner: $initialTestsRunner,
-            initialTestsPhpOptions: '-d memory_limit=1G',
+            initialTestsPhpOptions: '-d include_path="/path with  spaces"',
             testFrameworkExtraOptions: '--verbose',
             skipCoverage: true,
         );
@@ -287,7 +293,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $processFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with($adapter, $mutant, '')
+            ->with($adapter, $mutant, ['/bin/dummy'])
             ->willReturn($processContainer)
         ;
 
@@ -303,27 +309,30 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $mutant = MutantBuilder::withMinimalTestData()->build();
         $processContainer = $this->createStub(MutantProcessContainer::class);
         $adapter = $this->createInitialRunOnlyOptionsAdapter();
+        $adapter
+            ->expects($this->once())
+            ->method('getMutantCommandLine')
+            ->with(
+                $mutant->getTests(),
+                $mutant->getFilePath(),
+                $mutant->getMutation()->getHash(),
+                $mutant->getMutation()->getOriginalFilePath(),
+                '--filter FooTest',
+            )
+            ->willReturn(['/bin/legacy', '--filter', 'FooTest'])
+        ;
 
         $processFactoryMock = $this->createMock(MutantProcessContainerFactory::class);
         $processFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with($adapter, $mutant, '--filter FooTest')
+            ->with($adapter, $mutant, ['/bin/legacy', '--filter', 'FooTest'])
             ->willReturn($processContainer)
-        ;
-
-        $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
-        $testFrameworkExtraOptionsFilter
-            ->expects($this->once())
-            ->method('filterForMutantProcess')
-            ->with('--configuration phpunit.xml --filter FooTest', ['--configuration'])
-            ->willReturn('--filter FooTest')
         ;
 
         $testFramework = $this->createTestFramework(
             adapter: $adapter,
             processFactory: $processFactoryMock,
-            testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter,
             testFrameworkExtraOptions: '--configuration phpunit.xml --filter FooTest',
         );
 
@@ -338,7 +347,6 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         ?CoverageChecker $coverageChecker = null,
         ?InitialTestsRunner $initialTestsRunner = null,
         ?MutantProcessContainerFactory $processFactory = null,
-        ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter = null,
         bool $skipInitialTests = false,
         ?string $initialTestsPhpOptions = null,
         string $testFrameworkExtraOptions = '',
@@ -356,7 +364,6 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
                 ->withSkipInitialTests($skipInitialTests)
                 ->build(),
             processFactory: $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
-            testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter ?? $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
     }
 
@@ -408,8 +415,9 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         return $process;
     }
 
-    private function createInitialRunOnlyOptionsAdapter(): TestFrameworkAdapter&ProvidesInitialRunOnlyOptions
+    private function createInitialRunOnlyOptionsAdapter(): TestFrameworkAdapter&ProvidesInitialRunOnlyOptions&MockObject
     {
+        /** @var TestFrameworkAdapter&ProvidesInitialRunOnlyOptions&MockObject $adapter */
         $adapter = $this->createMockForIntersectionOfInterfaces([
             TestFrameworkAdapter::class,
             ProvidesInitialRunOnlyOptions::class,

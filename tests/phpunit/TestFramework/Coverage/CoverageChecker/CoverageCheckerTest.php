@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\CoverageChecker;
 
 use function extension_loaded;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageNotFound;
 use Infection\TestFramework\Coverage\Locator\FakeLocator;
@@ -44,6 +45,7 @@ use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\Tests\TestFramework\Coverage\Locator\Throwable\UnknownReportLocatorException;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\Stub;
@@ -71,7 +73,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             true,
-            '',
+            CommandLineArguments::fromTokens([]),
             '',
             false,
             new FakeLocator(),
@@ -93,7 +95,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             true,
-            '',
+            CommandLineArguments::fromTokens([]),
             '',
             true,
             new FixedLocator(self::JUNIT_PATH),
@@ -119,7 +121,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             false,
-            '',
+            CommandLineArguments::fromTokens([]),
             '',
             false,
             new FakeLocator(),
@@ -148,7 +150,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             false,
-            '',
+            CommandLineArguments::fromTokens([]),
             '/path/to/coverage-xml',
             true,
             new FixedLocator(self::JUNIT_PATH),
@@ -159,12 +161,41 @@ final class CoverageCheckerTest extends TestCase
         $checker->checkCoverageExists();
     }
 
+    #[DataProvider('coverageExtensionOptionsProvider')]
+    public function test_it_detects_a_coverage_extension_in_initial_php_options(string $options): void
+    {
+        $this->requireNoPcov();
+        $this->requireNoPhpDbg();
+        $this->requireNoXdebug();
+        $this->expectNotToPerformAssertions();
+
+        $checker = new CoverageChecker(
+            false,
+            false,
+            CommandLineArguments::fromString($options),
+            '',
+            false,
+            new FakeLocator(),
+            'unknown',
+            new FakeLocator(),
+        );
+
+        $checker->checkCoverageRequirements();
+    }
+
+    public static function coverageExtensionOptionsProvider(): iterable
+    {
+        yield 'Xdebug extension path with spaces' => ['-d zend_extension="/path with spaces/xdebug.so"'];
+
+        yield 'PCOV extension path with spaces' => ['-d extension="/path with spaces/pcov.so"'];
+    }
+
     public function test_it_does_not_pass_existence_check_if_xml_index_is_missing_with_lambda_test_framework_adapter(): void
     {
         $checker = new CoverageChecker(
             false,
             false,
-            '',
+            CommandLineArguments::fromTokens([]),
             '/nowhere',
             true,
             new FixedLocator(self::JUNIT_PATH),
@@ -192,7 +223,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             false,
-            '',
+            CommandLineArguments::fromTokens([]),
             '/nowhere',
             true,
             new FixedLocator(self::JUNIT_PATH),
@@ -221,7 +252,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             false,
-            '',
+            CommandLineArguments::fromTokens([]),
             '/nowhere',
             true,
             new FixedLocator(self::JUNIT_PATH),
@@ -252,7 +283,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             false,
-            '',
+            CommandLineArguments::fromTokens([]),
             self::COVERAGE_DIR_PATH,
             false,
             new FakeLocator(),
@@ -268,7 +299,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             false,
-            '',
+            CommandLineArguments::fromTokens([]),
             self::COVERAGE_DIR_PATH,
             true,
             $this->createInvalidJUnitReportLocatorStub(),
@@ -296,7 +327,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             false,
-            '',
+            CommandLineArguments::fromTokens([]),
             self::COVERAGE_DIR_PATH,
             true,
             $this->createInvalidJUnitReportLocatorStub(),
@@ -328,7 +359,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             false,
-            '',
+            CommandLineArguments::fromTokens([]),
             self::COVERAGE_DIR_PATH,
             true,
             $this->createInvalidJUnitReportLocatorStub(),
@@ -359,7 +390,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             false,
-            '',
+            CommandLineArguments::fromTokens([]),
             self::COVERAGE_DIR_PATH,
             true,
             new FixedLocator(self::JUNIT_PATH),
@@ -380,7 +411,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             false,
-            '',
+            CommandLineArguments::fromTokens([]),
             self::COVERAGE_DIR_PATH,
             true,
             new FixedLocator(self::JUNIT_PATH),
@@ -399,7 +430,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             false,
-            '',
+            CommandLineArguments::fromTokens([]),
             '/nowhere',
             true,
             new FixedLocator(self::JUNIT_PATH),
@@ -435,7 +466,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             false,
-            '',
+            CommandLineArguments::fromTokens([]),
             $coveragePath,
             true,
             $this->createInvalidJUnitReportLocatorStub(),
@@ -471,7 +502,7 @@ final class CoverageCheckerTest extends TestCase
         $checker = new CoverageChecker(
             false,
             false,
-            '',
+            CommandLineArguments::fromTokens([]),
             self::COVERAGE_DIR_PATH,
             false,
             new FakeLocator(),

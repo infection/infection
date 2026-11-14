@@ -68,6 +68,7 @@ use Infection\Mutator\NoopMutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Testing\SingletonContainer;
@@ -300,9 +301,9 @@ final class ConfigurationFactoryTest extends TestCase
             mutators: self::getDefaultMutators(),
             testFramework: TestFrameworkTypes::PHPUNIT,
             bootstrap: null,
-            initialTestsPhpOptions: null,
-            testFrameworkExtraOptions: '',
-            staticAnalysisToolOptions: null,
+            initialTestsPhpOptions: CommandLineArguments::fromTokens([]),
+            testFrameworkArguments: CommandLineArguments::fromTokens([]),
+            staticAnalysisToolOptions: CommandLineArguments::fromTokens([]),
             coveragePath: Path::normalize(sys_get_temp_dir() . '/infection'),
             skipCoverage: false,
             skipInitialTests: false,
@@ -1538,7 +1539,7 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
-        yield 'positional test paths become testFrameworkExtraOptions' => [
+        yield 'positional test paths become test framework arguments' => [
             $defaultScenario
                 ->withInput(
                     $defaultInputBuilder->withSourceFilter(
@@ -1549,6 +1550,21 @@ final class ConfigurationFactoryTest extends TestCase
                     $defaultConfigurationBuilder
                         ->withSourceFilter(null)
                         ->withTestFrameworkExtraOptions('tests/FooTest.php tests/BarTest.php')
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional test paths preserve spaces' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalPathsFilter(['tests/Foo Test.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceFilter(null)
+                        ->withTestFrameworkExtraOptions('"tests/Foo Test.php"')
                         ->build(),
                 ),
         ];

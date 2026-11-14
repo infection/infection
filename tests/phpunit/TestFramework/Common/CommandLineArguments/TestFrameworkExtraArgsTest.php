@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\CommandLine;
+namespace Infection\Tests\TestFramework\Common\CommandLineArguments;
 
-use Infection\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraArgs;
+use Infection\TestFramework\Common\CommandLineArguments\TestFrameworkExtraArgs;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

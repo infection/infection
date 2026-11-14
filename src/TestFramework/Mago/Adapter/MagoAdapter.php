@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Mago\Adapter;
 
-use function array_merge;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
@@ -56,9 +56,6 @@ use function version_compare;
  */
 final class MagoAdapter implements StaticAnalysisToolAdapter
 {
-    /**
-     * @param list<string> $staticAnalysisToolOptions
-     */
     public function __construct(
         private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisConfigPath,
@@ -66,7 +63,7 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly VersionParser $versionParser,
         private readonly float $timeout,
-        private readonly array $staticAnalysisToolOptions,
+        private readonly CommandLineArguments $staticAnalysisToolOptions,
         private readonly ShellCommandRunner $shellCommandRunner,
         private ?string $version = null,
     ) {
@@ -82,14 +79,14 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
      */
     public function getInitialRunCommandLine(): array
     {
-        $options = array_merge([
+        $options = $this->staticAnalysisToolOptions->prepend([
             "--config=$this->staticAnalysisConfigPath",
             'analyze',
-        ], $this->staticAnalysisToolOptions);
+        ]);
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            [],
+            CommandLineArguments::fromTokens([]),
             $options,
         );
     }
@@ -137,8 +134,8 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
     {
         $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            [],
-            ['--version'],
+            CommandLineArguments::fromTokens([]),
+            CommandLineArguments::fromTokens(['--version']),
         );
 
         return $this->versionParser->parse(

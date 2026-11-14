@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Mago\Adapter;
 
 use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
@@ -71,7 +72,7 @@ final class MagoAdapterTest extends TestCase
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
-            [],
+            CommandLineArguments::fromTokens([]),
             $this->shellCommandRunner,
             '9.0',
         );
@@ -87,7 +88,11 @@ final class MagoAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/mago', [], ['--config=/path/to/mago-config-path', 'analyze'])
+            ->with(
+                '/path/to/mago',
+                CommandLineArguments::fromTokens([]),
+                CommandLineArguments::fromTokens(['--config=/path/to/mago-config-path', 'analyze']),
+            )
             ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze'])
         ;
 
@@ -107,7 +112,7 @@ final class MagoAdapterTest extends TestCase
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
-            ['--sort'],
+            CommandLineArguments::fromTokens(['--sort']),
             $this->shellCommandRunner,
             '9.0',
         );
@@ -115,11 +120,15 @@ final class MagoAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/mago', [], [
-                '--config=/path/to/mago-config-path',
-                'analyze',
-                '--sort',
-            ])
+            ->with(
+                '/path/to/mago',
+                CommandLineArguments::fromTokens([]),
+                CommandLineArguments::fromTokens([
+                    '--config=/path/to/mago-config-path',
+                    'analyze',
+                    '--sort',
+                ]),
+            )
             ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', '--sort'])
         ;
 
@@ -139,7 +148,7 @@ final class MagoAdapterTest extends TestCase
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
-            ['--no-progress'],
+            CommandLineArguments::fromTokens(['--no-progress']),
             $this->shellCommandRunner,
             '9.0',
         );
@@ -147,11 +156,15 @@ final class MagoAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/mago', [], [
-                '--config=/path/to/mago-config-path',
-                'analyze',
-                '--no-progress',
-            ])
+            ->with(
+                '/path/to/mago',
+                CommandLineArguments::fromTokens([]),
+                CommandLineArguments::fromTokens([
+                    '--config=/path/to/mago-config-path',
+                    'analyze',
+                    '--no-progress',
+                ]),
+            )
             ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze', '--no-progress'])
         ;
 
@@ -163,7 +176,7 @@ final class MagoAdapterTest extends TestCase
         ], $adapter->getInitialRunCommandLine());
     }
 
-    public function test_it_builds_initial_run_command_line_with_complex_options(): void
+    public function test_it_preserves_separate_values_and_positional_arguments(): void
     {
         $adapter = new MagoAdapter(
             $this->createStub(MutantExecutionResultFactory::class),
@@ -172,30 +185,42 @@ final class MagoAdapterTest extends TestCase
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
-            ['--no-stubs', '--baseline /path/to/baseline.toml'],
+            CommandLineArguments::fromString('--no-stubs --baseline "/path with spaces/baseline.toml" -- "src with spaces"'),
             $this->shellCommandRunner,
             '9.0',
         );
 
-        $this->commandLineBuilder
-            ->expects($this->once())
-            ->method('build')
-            ->with('/path/to/mago', [], [
-                '--config=/path/to/mago-config-path',
-                'analyze',
-                '--no-stubs',
-                '--baseline /path/to/baseline.toml',
-            ])
-            ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze', '--no-stubs', '--baseline /path/to/baseline.toml'])
-        ;
-
-        $this->assertSame([
+        $expectedCommandLine = [
             '/path/to/mago',
             '--config=/path/to/mago-config-path',
             'analyze',
             '--no-stubs',
-            '--baseline /path/to/baseline.toml',
-        ], $adapter->getInitialRunCommandLine());
+            '--baseline',
+            '/path with spaces/baseline.toml',
+            '--',
+            'src with spaces',
+        ];
+
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with(
+                '/path/to/mago',
+                CommandLineArguments::fromTokens([]),
+                CommandLineArguments::fromTokens([
+                    '--config=/path/to/mago-config-path',
+                    'analyze',
+                    '--no-stubs',
+                    '--baseline',
+                    '/path with spaces/baseline.toml',
+                    '--',
+                    'src with spaces',
+                ]),
+            )
+            ->willReturn($expectedCommandLine)
+        ;
+
+        $this->assertSame($expectedCommandLine, $adapter->getInitialRunCommandLine());
     }
 
     public function test_it_returns_version(): void
@@ -210,7 +235,11 @@ final class MagoAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/mago', [], ['--version'])
+            ->with(
+                '/path/to/mago',
+                CommandLineArguments::fromTokens([]),
+                CommandLineArguments::fromTokens(['--version']),
+            )
             ->willReturn(['/path/to/mago', '--version'])
         ;
 
@@ -228,7 +257,7 @@ final class MagoAdapterTest extends TestCase
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
-            [],
+            CommandLineArguments::fromTokens([]),
             $shellCommandRunner,
         );
 
@@ -255,7 +284,7 @@ final class MagoAdapterTest extends TestCase
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
-            [],
+            CommandLineArguments::fromTokens([]),
             $this->shellCommandRunner,
             $version,
         );
@@ -274,7 +303,7 @@ final class MagoAdapterTest extends TestCase
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
-            [],
+            CommandLineArguments::fromTokens([]),
             $this->shellCommandRunner,
             $version,
         );

@@ -57,7 +57,6 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\PhpUnit\Log\PsrPhpUnitLogger;
 use Infection\TestFramework\PhpUnit\MemoryLimiter;
 use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
@@ -94,7 +93,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         InitialTestsRunner $initialTestsRunner,
         Configuration $configuration,
         MutantProcessContainerFactory $processFactory,
-        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
         Assert::notEmpty(
@@ -162,7 +160,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $initialTestsRunner,
             $configuration,
             $processFactory,
-            $testFrameworkExtraOptionsFilter,
             new MemoryLimiter(new MemoryLimiterEnvironment()),
         );
     }

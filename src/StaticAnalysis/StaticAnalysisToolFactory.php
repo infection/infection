@@ -112,7 +112,7 @@ final readonly class StaticAnalysisToolFactory
                 ),
                 $timeout,
                 $this->infectionConfig->tmpDir,
-                $this->infectionConfig->getStaticAnalysisToolOptions(),
+                $this->infectionConfig->staticAnalysisToolOptions,
                 $this->shellCommandRunner,
                 $this->fileSystem,
             );
@@ -129,7 +129,7 @@ final readonly class StaticAnalysisToolFactory
                 ),
                 $timeout,
                 $this->infectionConfig->tmpDir,
-                $this->infectionConfig->getStaticAnalysisToolOptions(),
+                $this->infectionConfig->staticAnalysisToolOptions,
                 $this->shellCommandRunner,
             );
         }

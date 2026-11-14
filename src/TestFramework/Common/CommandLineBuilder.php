@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Common;
 
-use function array_filter;
 use function array_merge;
-use function array_values;
 use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use function is_executable;
 use const PHP_SAPI;
 use function shell_exec;
@@ -53,7 +52,7 @@ class CommandLineBuilder
 {
     private const int BAT_EXTENSION_LENGTH = 4;
 
-    /** @var string[]|null */
+    /** @var list<string>|null */
     private ?array $cachedPhpCmdLine = null;
 
     public function __construct(
@@ -62,21 +61,20 @@ class CommandLineBuilder
     }
 
     /**
-     * @param string[] $frameworkArgs
-     * @param string[] $phpExtraArgs
-     *
-     * @return string[]
+     * @return list<string>
      */
-    public function build(string $testFrameworkExecutable, array $phpExtraArgs, array $frameworkArgs): array
-    {
+    public function build(
+        string $testFrameworkExecutable,
+        CommandLineArguments $phpExtraArgs,
+        CommandLineArguments $frameworkArgs,
+    ): array {
+        $frameworkArgs = $frameworkArgs->toTokens();
+
         if ($this->isBatchFile($testFrameworkExecutable)) {
             return array_merge([$testFrameworkExecutable], $frameworkArgs);
         }
 
-        /*
-         * That's an empty options list by all means, we need to see it as such
-         */
-        $phpExtraArgs = array_values(array_filter($phpExtraArgs));
+        $phpExtraArgs = $phpExtraArgs->toTokens();
 
         /*
          * Run an executable as it is if we're using a standard CLI and
@@ -91,18 +89,16 @@ class CommandLineBuilder
         /*
          * In all other cases run it with a chosen PHP interpreter
          */
-        $commandLineArgs = array_merge(
+        return array_merge(
             $this->findPhp(),
             $phpExtraArgs,
             [$testFrameworkExecutable],
             $frameworkArgs,
         );
-
-        return array_values(array_filter($commandLineArgs));
     }
 
     /**
-     * @return string[]
+     * @return list<string>
      */
     private function findPhp(): array
     {

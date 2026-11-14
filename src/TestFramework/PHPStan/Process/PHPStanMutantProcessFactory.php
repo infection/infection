@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PHPStan\Process;
 
-use function array_merge;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use function sprintf;
@@ -51,11 +51,8 @@ use Symfony\Component\Process\Process;
  */
 final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
 {
-    private const array PHP_EXTRA_ARGS = ['-d memory_limit=-1'];
+    private const array PHP_EXTRA_ARGS = ['-d', 'memory_limit=-1'];
 
-    /**
-     * @param list<string> $staticAnalysisToolOptions
-     */
     public function __construct(
         private Filesystem $fileSystem,
         private MutantExecutionResultFactory $mutantExecutionResultFactory,
@@ -64,7 +61,7 @@ final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFac
         private CommandLineBuilder $commandLineBuilder,
         private float $timeout,
         private string $tmpDir,
-        private array $staticAnalysisToolOptions,
+        private CommandLineArguments $staticAnalysisToolOptions,
     ) {
     }
 
@@ -97,7 +94,7 @@ final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFac
         string $mutationOriginalFilePath,
         string $mutantConfigFile,
     ): array {
-        $options = array_merge([
+        $options = $this->staticAnalysisToolOptions->prepend([
             "--tmp-file=$mutatedFilePath",
             "--instead-of=$mutationOriginalFilePath",
             "--configuration=$mutantConfigFile",
@@ -105,11 +102,11 @@ final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFac
             '--no-progress',
             '-vv',
             // todo [phpstan-integration] --stop-on-first-error
-        ], $this->staticAnalysisToolOptions);
+        ]);
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            self::PHP_EXTRA_ARGS,
+            CommandLineArguments::fromTokens(self::PHP_EXTRA_ARGS),
             $options,
         );
     }

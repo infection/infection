@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Process\Factory;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\OriginalPhpProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Symfony\Component\Process\Process;
@@ -47,25 +46,15 @@ use Symfony\Component\Process\Process;
 class InitialTestsRunProcessFactory
 {
     /**
-     * Creates process with enabled debugger as test framework is going to use in the code coverage.
-     *
-     * @param string[] $phpExtraOptions
+     * @param list<string> $command
      */
-    public function createProcess(
-        TestFrameworkAdapter $testFrameworkAdapter,
-        string $testFrameworkExtraOptions,
-        array $phpExtraOptions,
-        bool $skipCoverage,
-    ): Process {
-        // If we're expecting to receive a code coverage, test process must run in a vanilla environment
+    public function createProcess(array $command, bool $skipCoverage): Process
+    {
+        // Coverage must run in the original PHP environment, before Infection's restart.
         $processClass = $skipCoverage ? Process::class : OriginalPhpProcess::class;
 
         return new $processClass(
-            command: $testFrameworkAdapter->getInitialTestRunCommandLine(
-                $testFrameworkExtraOptions,
-                $phpExtraOptions,
-                $skipCoverage,
-            ),
+            command: $command,
             env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
             timeout: null, // Ignore the default timeout of 60 seconds
         );

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\CommandLine;
+namespace Infection\TestFramework\Common\CommandLineArguments;
 
 use Infection\CannotBeInstantiated;
 use function method_exists;
@@ -75,7 +75,7 @@ final readonly class TestFrameworkExtraArgs
             $tokens = self::getRawTokens($value);
         } catch (InvalidArgumentException $exception) {
             throw new InvalidArgumentException(
-                'Could not parse `testFrameworkExtraArgs` / `--test-framework-extra-args`.',
+                'Could not parse command-line arguments.',
                 $exception->getCode(),
                 previous: $exception,
             );

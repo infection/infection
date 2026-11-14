@@ -57,7 +57,7 @@ final readonly class CoverageCheckerFactory
         return new CoverageChecker(
             $this->configuration->skipCoverage,
             $this->configuration->skipInitialTests,
-            $this->configuration->initialTestsPhpOptions ?? '',
+            $this->configuration->initialTestsPhpOptions,
             $this->configuration->coveragePath,
             $adapter->hasJUnitReport(),
             $this->jUnitReportLocator,

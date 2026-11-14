@@ -35,7 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use function explode;
+use function array_map;
+use function array_values;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
@@ -48,6 +49,8 @@ use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * @internal
@@ -63,7 +66,6 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         private InitialTestsRunner $initialTestsRunner,
         private Configuration $config,
         private MutantProcessContainerFactory $processFactory,
-        private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ) {
     }
 
@@ -89,12 +91,18 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         }
     }
 
+    /**
+     * @throws InitialTestsFailed
+     * @throws RuntimeException
+     */
     public function executeInitialRun(): InitialRunResults
     {
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
-            $this->adapter,
-            $this->config->testFrameworkExtraOptions,
-            $this->getInitialTestsPhpOptionsArray(),
+            array_values($this->adapter->getInitialTestRunCommandLine(
+                $this->config->testFrameworkArguments->toString(),
+                $this->config->initialTestsPhpOptions->toTokens(),
+                $this->config->skipCoverage,
+            )),
             $this->config->skipCoverage,
         );
 
@@ -131,7 +139,13 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         return $this->processFactory->create(
             $this->adapter,
             $mutant,
-            $this->getFilteredExtraOptionsForMutant(),
+            array_values($this->adapter->getMutantCommandLine(
+                $mutant->getTests(),
+                $mutant->getFilePath(),
+                $mutant->getMutation()->getHash(),
+                $mutant->getMutation()->getOriginalFilePath(),
+                $this->getFilteredExtraOptionsForMutant(),
+            )),
         );
     }
 
@@ -140,23 +154,20 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         return $this->adapter->hasJUnitReport();
     }
 
-    /**
-     * @return string[]
-     */
-    private function getInitialTestsPhpOptionsArray(): array
-    {
-        return explode(' ', (string) $this->config->initialTestsPhpOptions);
-    }
-
     private function getFilteredExtraOptionsForMutant(): string
     {
         if ($this->adapter instanceof ProvidesInitialRunOnlyOptions) {
-            return $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
-                $this->config->testFrameworkExtraOptions,
+            $options = array_map(
+                static fn (string $name): InputOption => new InputOption($name, null, InputOption::VALUE_REQUIRED),
                 $this->adapter->getInitialRunOnlyOptions(),
             );
+
+            return $this->config->testFrameworkArguments
+                ->withoutOptions(...$options)
+                ->toString()
+            ;
         }
 
-        return $this->config->testFrameworkExtraOptions;
+        return $this->config->testFrameworkArguments->toString();
     }
 }

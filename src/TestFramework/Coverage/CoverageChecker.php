@@ -38,12 +38,13 @@ namespace Infection\TestFramework\Coverage;
 use Composer\XdebugHandler\XdebugHandler;
 use function extension_loaded;
 use function implode;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use function ini_get as ini_get_unsafe;
 use const PHP_EOL;
 use const PHP_SAPI;
-use function Safe\preg_match;
+use function Safe\preg_grep;
 use function sprintf;
 use function strtolower;
 
@@ -62,7 +63,7 @@ class CoverageChecker
     public function __construct(
         private readonly bool $skipCoverage,
         private readonly bool $skipInitialTests,
-        private readonly string $initialTestPhpOptions,
+        private readonly CommandLineArguments $initialTestPhpOptions,
         private readonly string $coveragePath,
         private readonly bool $jUnitReport,
         private readonly ReportLocator $jUnitReportLocator,
@@ -167,18 +168,22 @@ class CoverageChecker
 
     private function isXdebugIncludedInInitialTestPhpOptions(): bool
     {
-        return (bool) preg_match(
+        $extensions = preg_grep(
             '/(zend_extension\s*=.*xdebug.*)/mi',
-            $this->initialTestPhpOptions,
+            $this->initialTestPhpOptions->toTokens(),
         );
+
+        return $extensions !== [];
     }
 
     private function isPcovIncludedInInitialTestPhpOptions(): bool
     {
-        return (bool) preg_match(
+        $extensions = preg_grep(
             '/(extension\s*=.*pcov.*)/mi',
-            $this->initialTestPhpOptions,
+            $this->initialTestPhpOptions->toTokens(),
         );
+
+        return $extensions !== [];
     }
 
     private function checkIndexCoverageReport(): void

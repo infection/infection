@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PHPStan\Adapter;
 
-use function array_merge;
 use function explode;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
@@ -65,15 +65,12 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
      *
      * @see https://github.com/phpstan/phpstan-src/blob/3f716d44cde31076dc33a2f835872d7e2d26f0e7/src/Process/ProcessHelper.php#L41-L44
      */
-    private const array PHP_EXTRA_ARGS = ['-d memory_limit=-1'];
+    private const array PHP_EXTRA_ARGS = ['-d', 'memory_limit=-1'];
 
     private const int VERSION_1 = 1;
 
     private const int VERSION_2 = 2;
 
-    /**
-     * @param list<string> $staticAnalysisToolOptions
-     */
     public function __construct(
         private readonly Filesystem $fileSystem,
         private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
@@ -83,7 +80,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         private readonly VersionParser $versionParser,
         private readonly float $timeout,
         private readonly string $tmpDir,
-        private readonly array $staticAnalysisToolOptions,
+        private readonly CommandLineArguments $staticAnalysisToolOptions,
         private readonly ShellCommandRunner $shellCommandRunner,
         private ?string $version = null,
     ) {
@@ -102,14 +99,14 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         // we can't rely on stderr because it's used for other output (non-error)
         // see https://github.com/phpstan/phpstan/issues/11352#issuecomment-2233403781
 
-        $options = array_merge([
+        $options = $this->staticAnalysisToolOptions->prepend([
             "--configuration=$this->staticAnalysisConfigPath",
             // todo [phpstan-integration] add --stop-on-first-error when it's implemented on PHPStan side
-        ], $this->staticAnalysisToolOptions);
+        ]);
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            self::PHP_EXTRA_ARGS,
+            CommandLineArguments::fromTokens(self::PHP_EXTRA_ARGS),
             $options,
         );
     }
@@ -179,8 +176,8 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     {
         $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            self::PHP_EXTRA_ARGS,
-            ['--version'],
+            CommandLineArguments::fromTokens(self::PHP_EXTRA_ARGS),
+            CommandLineArguments::fromTokens(['--version']),
         );
 
         return $this->versionParser->parse(

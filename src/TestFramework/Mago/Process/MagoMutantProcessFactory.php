@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Mago\Process;
 
-use function array_merge;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Symfony\Component\Process\Process;
@@ -49,15 +49,12 @@ use Symfony\Component\Process\Process;
  */
 final readonly class MagoMutantProcessFactory implements LazyMutantProcessFactory
 {
-    /**
-     * @param list<string> $staticAnalysisToolOptions
-     */
     public function __construct(
         private MutantExecutionResultFactory $mutantExecutionResultFactory,
         private string $staticAnalysisToolExecutable,
         private CommandLineBuilder $commandLineBuilder,
         private float $timeout,
-        private array $staticAnalysisToolOptions,
+        private CommandLineArguments $staticAnalysisToolOptions,
     ) {
     }
 
@@ -86,21 +83,18 @@ final readonly class MagoMutantProcessFactory implements LazyMutantProcessFactor
         string $mutatedFilePath,
         string $originalFilePath,
     ): array {
-        $options = array_merge(
-            [
-                '--colors=never',
-                '--threads=1',
-                'analyze',
-                '--reporting-format=short',
-                '--substitute',
-                "$originalFilePath=$mutatedFilePath",
-            ],
-            $this->staticAnalysisToolOptions,
-        );
+        $options = $this->staticAnalysisToolOptions->prepend([
+            '--colors=never',
+            '--threads=1',
+            'analyze',
+            '--reporting-format=short',
+            '--substitute',
+            "$originalFilePath=$mutatedFilePath",
+        ]);
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            [],
+            CommandLineArguments::fromTokens([]),
             $options,
         );
     }
