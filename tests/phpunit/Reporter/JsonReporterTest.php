@@ -126,6 +126,7 @@ final class JsonReporterTest extends TestCase
                 ],
                 'escaped' => [
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'PregQuote',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -139,6 +140,7 @@ final class JsonReporterTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -154,6 +156,7 @@ final class JsonReporterTest extends TestCase
                 ],
                 'timeouted' => [
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'PregQuote',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -167,6 +170,7 @@ final class JsonReporterTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -182,6 +186,7 @@ final class JsonReporterTest extends TestCase
                 ],
                 'killed' => [
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'PregQuote',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -195,6 +200,7 @@ final class JsonReporterTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -210,6 +216,7 @@ final class JsonReporterTest extends TestCase
                 ],
                 'killedByStaticAnalysis' => [
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'PregQuote',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -225,6 +232,7 @@ final class JsonReporterTest extends TestCase
                 ],
                 'errored' => [
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'PregQuote',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -238,6 +246,7 @@ final class JsonReporterTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -253,6 +262,7 @@ final class JsonReporterTest extends TestCase
                 ],
                 'syntaxErrors' => [
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'PregQuote',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -266,6 +276,7 @@ final class JsonReporterTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -282,6 +293,7 @@ final class JsonReporterTest extends TestCase
                 'uncovered' => [],
                 'ignored' => [
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'PregQuote',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -295,6 +307,7 @@ final class JsonReporterTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -339,6 +352,7 @@ final class JsonReporterTest extends TestCase
                 'syntaxErrors' => [],
                 'uncovered' => [
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -385,6 +399,7 @@ final class JsonReporterTest extends TestCase
                 'uncovered' => [],
                 'ignored' => [
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -429,6 +444,7 @@ final class JsonReporterTest extends TestCase
                 'syntaxErrors' => [],
                 'uncovered' => [
                     [
+                        'mutantHash' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',

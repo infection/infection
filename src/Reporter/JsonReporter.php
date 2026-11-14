@@ -91,7 +91,7 @@ final readonly class JsonReporter implements LineMutationTestingResultsReporter
     /**
      * @param MutantExecutionResult[] $executionResults
      *
-     * @return array<int, array{mutator: array<string, int|string>, diff: string, processOutput: string}>
+     * @return array<int, array{mutantHash: string, mutator: array<string, int|string>, diff: string, processOutput: string}>
      */
     private function getResultsLine(array $executionResults): array
     {
@@ -99,6 +99,7 @@ final readonly class JsonReporter implements LineMutationTestingResultsReporter
 
         foreach ($executionResults as $mutantProcess) {
             $mutatorRows[] = [
+                'mutantHash' => $mutantProcess->getMutantHash(),
                 'mutator' => [
                     'mutatorName' => $mutantProcess->getMutatorName(),
                     'originalSourceCode' => $mutantProcess->getOriginalCode(),

@@ -35,7 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Reporter;
 
+use function array_map;
+use function count;
 use function floor;
+use function implode;
 use Infection\Command\RunCommand;
 use Infection\Metrics\MetricsCalculator;
 use function sprintf;
@@ -59,7 +62,8 @@ final readonly class ShowMetricsReporter implements Reporter
         private OutputInterface $output,
         private MetricsCalculator $metricsCalculator,
         private bool $withUncovered,
-        private ?string $mutantId,
+        /** @var list<string> */
+        private array $mutantIds,
         private bool $ignoreMsiWithNoMutations,
         private ?float $minMsi,
         private ?float $minCoveredMsi,
@@ -140,10 +144,11 @@ final readonly class ShowMetricsReporter implements Reporter
             return;
         }
 
-        if ($this->mutantId !== null) {
+        if ($this->mutantIds !== []) {
             $message = sprintf(
-                'No mutation matches mutant ID "%s". Run Infection without "--%s" to list the current mutations.',
-                $this->mutantId,
+                'No mutation matches mutant %s %s. Run Infection without "--%s" to list the current mutations.',
+                count($this->mutantIds) === 1 ? 'ID' : 'IDs',
+                implode(', ', array_map(static fn (string $id): string => sprintf('"%s"', $id), $this->mutantIds)),
                 RunCommand::OPTION_MUTANT_ID,
             );
         } else {

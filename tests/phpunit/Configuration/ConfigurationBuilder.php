@@ -65,6 +65,7 @@ final class ConfigurationBuilder
      * @param positive-int|'max' $dotsPerRow
      * @param non-empty-string $configPathname
      * @param non-empty-string $projectDirectory
+     * @param list<string> $mutantIds
      */
     private function __construct(
         private float $timeout,
@@ -103,7 +104,7 @@ final class ConfigurationBuilder
         private ?string $mapSourceClassToTestStrategy,
         private string $projectDirectory,
         private ?string $staticAnalysisTool,
-        private ?string $mutantId,
+        private array $mutantIds,
         private string $configPathname,
         private string $debugTestFrameworkLogFile,
     ) {
@@ -150,7 +151,7 @@ final class ConfigurationBuilder
             mapSourceClassToTestStrategy: $configuration->mapSourceClassToTestStrategy,
             projectDirectory: $configuration->projectDirectory,
             staticAnalysisTool: $configuration->staticAnalysisTool,
-            mutantId: $configuration->mutantId,
+            mutantIds: $configuration->mutantIds,
             configPathname: $configuration->configurationPathname,
             debugTestFrameworkLogFile: $configuration->debugTestFrameworkLogFile,
         );
@@ -195,7 +196,7 @@ final class ConfigurationBuilder
             mapSourceClassToTestStrategy: null,
             projectDirectory: '/var/www/project',
             staticAnalysisTool: null,
-            mutantId: null,
+            mutantIds: [],
             configPathname: '/path/to/project/infection.json5',
             debugTestFrameworkLogFile: '/tmp/infection.debug.jsonl',
         );
@@ -265,7 +266,7 @@ final class ConfigurationBuilder
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             projectDirectory: '/var/www/project',
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
-            mutantId: 'abc123def456',
+            mutantIds: ['abc123def456'],
             configPathname: '/path/to/project/infection.json5',
             debugTestFrameworkLogFile: '/debug.jsonl',
         );
@@ -602,10 +603,13 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withMutantId(?string $mutantId): self
+    /**
+     * @param list<string> $mutantIds
+     */
+    public function withMutantIds(array $mutantIds): self
     {
         $clone = clone $this;
-        $clone->mutantId = $mutantId;
+        $clone->mutantIds = $mutantIds;
 
         return $clone;
     }
@@ -668,7 +672,7 @@ final class ConfigurationBuilder
             mapSourceClassToTestStrategy: $this->mapSourceClassToTestStrategy,
             projectDirectory: $this->projectDirectory,
             staticAnalysisTool: $this->staticAnalysisTool,
-            mutantId: $this->mutantId,
+            mutantIds: $this->mutantIds,
             configurationPathname: $this->configPathname,
             debugTestFrameworkLogFile: $this->debugTestFrameworkLogFile,
         );

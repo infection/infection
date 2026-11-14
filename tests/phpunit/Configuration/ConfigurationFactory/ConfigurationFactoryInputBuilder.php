@@ -46,6 +46,7 @@ final class ConfigurationFactoryInputBuilder
      * @param non-empty-string|null $projectDirectory
      * @param positive-int|'auto'|'max'|null $threadCount
      * @param positive-int|'max'|null $dotsPerRow
+     * @param list<string> $mutantIds
      */
     public function __construct(
         private ?string $existingCoveragePath,
@@ -82,7 +83,7 @@ final class ConfigurationFactoryInputBuilder
         private ?string $mapSourceClassToTestStrategy,
         private ?string $projectDirectory,
         private ?string $staticAnalysisTool,
-        private ?string $mutantId,
+        private array $mutantIds,
     ) {
     }
 
@@ -367,10 +368,13 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
-    public function withMutantId(?string $mutantId): self
+    /**
+     * @param list<string> $mutantIds
+     */
+    public function withMutantIds(array $mutantIds): self
     {
         $clone = clone $this;
-        $clone->mutantId = $mutantId;
+        $clone->mutantIds = $mutantIds;
 
         return $clone;
     }
@@ -412,7 +416,7 @@ final class ConfigurationFactoryInputBuilder
      *     32: string|null,
      *     33: non-empty-string|null,
      *     34: string|null,
-     *     35: string|null,
+     *     35: list<string>,
      * }
      */
     public function build(SchemaConfiguration $schema): array
@@ -453,7 +457,7 @@ final class ConfigurationFactoryInputBuilder
             $this->mapSourceClassToTestStrategy,
             $this->projectDirectory,
             $this->staticAnalysisTool,
-            $this->mutantId,
+            $this->mutantIds,
         ];
     }
 }

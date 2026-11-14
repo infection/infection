@@ -213,7 +213,7 @@ final class Container extends DIContainer
 
     public const DEFAULT_FORMATTER_NAME = MutationAnalysisLoggerName::DOT;
 
-    public const null DEFAULT_MUTANT_ID = null;
+    public const array DEFAULT_MUTANT_IDS = [];
 
     public const null DEFAULT_GIT_DIFF_FILTER = null;
 
@@ -512,7 +512,7 @@ final class Container extends DIContainer
                             $output,
                             $container->getMetricsCalculator(),
                             !$config->mutateOnlyCoveredCode(),
-                            $config->mutantId,
+                            $config->mutantIds,
                             $config->ignoreMsiWithNoMutations,
                             $config->minMsi,
                             $config->minCoveredMsi,
@@ -618,7 +618,7 @@ final class Container extends DIContainer
                     $configuration->noProgress,
                     $configuration->processTimeout,
                     $configuration->ignoreSourceCodeMutatorsMap,
-                    $configuration->mutantId,
+                    $configuration->mutantIds,
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
@@ -706,6 +706,7 @@ final class Container extends DIContainer
      * @param non-empty-string|null $projectDirectory Absolute path.
      * @param positive-int|'auto'|'max'|null $threadCount
      * @param positive-int|'max'|null $dotsPerRow
+     * @param list<string> $mutantIds
      */
     public function withValues(
         LoggerInterface $logger,
@@ -747,7 +748,7 @@ final class Container extends DIContainer
         ?string $mapSourceClassToTestStrategy = self::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
         ?string $projectDirectory = self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
         ?string $staticAnalysisTool = self::DEFAULT_STATIC_ANALYSIS_TOOL,
-        ?string $mutantId = self::DEFAULT_MUTANT_ID,
+        array $mutantIds = self::DEFAULT_MUTANT_IDS,
     ): self {
         $clone = clone $this;
 
@@ -832,7 +833,7 @@ final class Container extends DIContainer
                 mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
                 projectDirectory: $projectDirectory,
                 staticAnalysisTool: $staticAnalysisTool,
-                mutantId: $mutantId,
+                mutantIds: $mutantIds,
             ),
         );
 

@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use function array_filter;
+use function array_map;
+use function array_unique;
+use function array_values;
 use function ctype_digit;
 use function getenv;
 use Infection\Container\Container;
@@ -67,6 +71,20 @@ final readonly class RunCommandHelper
         return $optionValue === ''
             ? $default
             : $optionValue;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getStringListOption(string $name): array
+    {
+        /** @var array<string> $optionValues */
+        $optionValues = $this->input->getOption($name);
+
+        return array_values(array_unique(array_filter(
+            array_map(trim(...), $optionValues),
+            static fn (string $value): bool => $value !== '',
+        )));
     }
 
     public function getUseGitHubLogger(): ?bool
