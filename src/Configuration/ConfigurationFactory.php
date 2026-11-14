@@ -109,6 +109,7 @@ class ConfigurationFactory
      * @param non-empty-string|null $projectDirectory Absolute path.
      * @param positive-int|'auto'|'max'|null $threadCount
      * @param positive-int|'max'|null $dotsPerRow
+     * @param list<non-empty-string> $mutantIds
      *
      * @throws FileOrDirectoryNotFound
      * @throws NoSourceFound
@@ -149,7 +150,7 @@ class ConfigurationFactory
         ?string $mapSourceClassToTestStrategy,
         ?string $projectDirectory,
         ?string $staticAnalysisTool,
-        ?string $mutantId,
+        array $mutantIds,
     ): Configuration {
         $configDir = dirname($schema->pathname);
 
@@ -221,7 +222,7 @@ class ConfigurationFactory
             mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
             projectDirectory: $this->retrieveProjectDirectory($projectDirectory),
             staticAnalysisTool: $resultStaticAnalysisTool,
-            mutantId: $mutantId,
+            mutantIds: $mutantIds,
             configurationPathname: $schema->pathname,
             debugTestFrameworkLogFile: self::retrieveDebugTestFrameworkLogFile(
                 $schema->debugTestFrameworkLogFile,

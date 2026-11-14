@@ -66,6 +66,7 @@ readonly class Configuration
     /**
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param list<non-empty-string> $mutantIds
      * @param positive-int $threadCount
      * @param positive-int|'max' $dotsPerRow
      * @param non-empty-string $configurationPathname
@@ -108,7 +109,7 @@ readonly class Configuration
         public ?string $mapSourceClassToTestStrategy,
         public string $projectDirectory,
         public ?string $staticAnalysisTool,
-        public ?string $mutantId,
+        public array $mutantIds,
         public string $configurationPathname,
         public string $debugTestFrameworkLogFile,
     ) {

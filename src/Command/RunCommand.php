@@ -256,9 +256,9 @@ final class RunCommand extends BaseCommand
             ->addOption(
                 self::OPTION_MUTANT_ID,
                 null,
-                InputOption::VALUE_REQUIRED,
-                'Run only one Mutant by its ID. Can be used multiple times. If source code is changed, can be invalidated. Pass all previous options with this one.',
-                Container::DEFAULT_MUTANT_ID,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Run only one Mutant by its ID. Repeat the option to run several Mutants. If source code is changed, can be invalidated. Pass all previous options with this one.',
+                Container::DEFAULT_MUTANT_IDS,
             )
         ;
 
@@ -504,7 +504,7 @@ final class RunCommand extends BaseCommand
             mapSourceClassToTestStrategy: MapSourceClassToTestOption::get($io),
             projectDirectory: $this->getProjectDirectory($io),
             staticAnalysisTool: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL, Container::DEFAULT_STATIC_ANALYSIS_TOOL),
-            mutantId: $commandHelper->getStringOption(self::OPTION_MUTANT_ID, Container::DEFAULT_MUTANT_ID),
+            mutantIds: $commandHelper->getStringListOption(self::OPTION_MUTANT_ID),
         );
     }
 
