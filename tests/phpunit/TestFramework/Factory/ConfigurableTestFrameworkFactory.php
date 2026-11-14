@@ -43,7 +43,6 @@ use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
@@ -105,7 +104,6 @@ final class ConfigurableTestFrameworkFactory implements TestFrameworkFactory
         InitialTestsRunner $initialTestsRunner,
         Configuration $configuration,
         MutantProcessContainerFactory $processFactory,
-        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         $testFramework = self::$testFramework;
         Assert::notNull($testFramework, self::NOT_CONFIGURED_MESSAGE);

@@ -177,7 +177,6 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
@@ -323,7 +322,6 @@ final class Container extends DIContainer
                     $container->getCoverageCheckerFactory(),
                     $container->getInitialTestsRunner(),
                     $container->getMutantProcessContainerFactory(),
-                    $container->getTestFrameworkExtraOptionsFilter(),
                 );
             },
             StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
@@ -1027,11 +1025,6 @@ final class Container extends DIContainer
     public function getStaticAnalysisToolExecutableFinder(): StaticAnalysisToolExecutableFinder
     {
         return $this->get(StaticAnalysisToolExecutableFinder::class);
-    }
-
-    public function getTestFrameworkExtraOptionsFilter(): TestFrameworkExtraOptionsFilter
-    {
-        return $this->get(TestFrameworkExtraOptionsFilter::class);
     }
 
     public function getAdapterInstallationDecider(): AdapterInstallationDecider

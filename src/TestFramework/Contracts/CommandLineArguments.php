@@ -33,34 +33,53 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\TestFramework\Contracts;
 
-use Safe\Exceptions\PcreException;
-use Safe\Exceptions\StringsException;
-use function Safe\preg_replace;
-use function sprintf;
-use function trim;
-use Webmozart\Assert\Assert;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
+ * Immutable, ordered command-line arguments. Transformations preserve unknown
+ * tokens and interpret only explicitly supplied option definitions. Definitions
+ * describe required-value or value-less options; an unknown option's separate
+ * value cannot be distinguished from another option.
+ *
  * @internal
- * @final
  */
-class TestFrameworkExtraOptionsFilter
+interface CommandLineArguments
 {
     /**
-     * @param string[] $initialRunOnlyOptions
-     *
-     * @throws PcreException
-     * @throws StringsException
+     * Retains option definitions for subsequent transformations.
      */
-    public function filterForMutantProcess(string $actualExtraOptions, array $initialRunOnlyOptions): string
-    {
-        foreach ($initialRunOnlyOptions as $initialRunOnlyOption) {
-            $actualExtraOptions = preg_replace(sprintf('/%s[\=| ](?:\"[^\"]*\"|\'[^\']*\'|[^\ ]*)/', $initialRunOnlyOption), '', $actualExtraOptions);
-            Assert::notNull($actualExtraOptions);
-        }
+    public function withOptionDefinitions(InputOption ...$options): self;
 
-        return preg_replace('/\s+/', ' ', trim($actualExtraOptions));
-    }
+    /**
+     * Removes the specified options and their values, retaining other definitions.
+     */
+    public function withoutOptions(InputOption ...$options): self;
+
+    public function hasOption(InputOption $option): bool;
+
+    /**
+     * Adds tokens before the option terminator. Retained definitions distinguish
+     * known option values equal to "--" from the terminator.
+     *
+     * @param list<string> $tokens
+     */
+    public function append(array $tokens): self;
+
+    /**
+     * @param list<string> $tokens
+     */
+    public function prepend(array $tokens): self;
+
+    /**
+     * @return list<string>
+     */
+    public function toTokens(): array;
+
+    /**
+     * Serializes with double quotes and escapes following the tokenizer's grammar,
+     * not shell syntax or legacy adapters' space splitting.
+     */
+    public function toString(): string;
 }

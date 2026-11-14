@@ -51,7 +51,7 @@ final class ConfigurationTest extends TestCase
         Configuration $configuration,
         array $expected,
     ): void {
-        $actual = $configuration->getStaticAnalysisToolOptions();
+        $actual = $configuration->staticAnalysisToolOptions->toTokens();
 
         $this->assertSame($expected, $actual);
     }
@@ -76,7 +76,7 @@ final class ConfigurationTest extends TestCase
             ConfigurationBuilder::withMinimalTestData()
                 ->withStaticAnalysisToolOptions('{u+020}')
                 ->build(),
-            ['--{u+020}'],
+            ['{u+020}'],
         ];
 
         yield 'single option' => [
@@ -86,12 +86,11 @@ final class ConfigurationTest extends TestCase
             ['--memory-limit=-1'],
         ];
 
-        // TODO: this looks weird...
         yield 'not an option' => [
             ConfigurationBuilder::withMinimalTestData()
                 ->withStaticAnalysisToolOptions('src')
                 ->build(),
-            ['--src'],
+            ['src'],
         ];
 
         yield 'multiple options' => [
@@ -101,14 +100,22 @@ final class ConfigurationTest extends TestCase
             ['--memory-limit=2G', '--level=max'],
         ];
 
+        yield 'quoted values and paths' => [
+            ConfigurationBuilder::withMinimalTestData()
+                ->withStaticAnalysisToolOptions('--error-format "a  b" "src with spaces"')
+                ->build(),
+            ['--error-format', 'a  b', 'src with spaces'],
+        ];
+
         yield 'multiple options with one non-option' => [
             ConfigurationBuilder::withMinimalTestData()
                 ->withStaticAnalysisToolOptions('src --memory-limit=2G --level=max tests')
                 ->build(),
             [
-                '--src',
+                'src',
                 '--memory-limit=2G',
-                '--level=max tests',    // TODO: this looks weird...
+                '--level=max',
+                'tests',
             ],
         ];
     }

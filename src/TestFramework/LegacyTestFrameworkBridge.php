@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use function explode;
+use function array_values;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
@@ -48,6 +48,7 @@ use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Legacy\TestFrameworkExtraOptionsFilter;
 
 /**
  * @internal
@@ -92,9 +93,11 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
     public function executeInitialRun(): InitialRunResults
     {
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
-            $this->adapter,
-            $this->config->testFrameworkExtraOptions,
-            $this->getInitialTestsPhpOptionsArray(),
+            array_values($this->adapter->getInitialTestRunCommandLine(
+                $this->config->legacyTestFrameworkExtraOptions,
+                $this->config->initialTestsPhpOptions->toTokens(),
+                $this->config->skipCoverage,
+            )),
             $this->config->skipCoverage,
         );
 
@@ -131,7 +134,13 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         return $this->processFactory->create(
             $this->adapter,
             $mutant,
-            $this->getFilteredExtraOptionsForMutant(),
+            array_values($this->adapter->getMutantCommandLine(
+                $mutant->getTests(),
+                $mutant->getFilePath(),
+                $mutant->getMutation()->getHash(),
+                $mutant->getMutation()->getOriginalFilePath(),
+                $this->getFilteredExtraOptionsForMutant(),
+            )),
         );
     }
 
@@ -140,23 +149,15 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         return $this->adapter->hasJUnitReport();
     }
 
-    /**
-     * @return string[]
-     */
-    private function getInitialTestsPhpOptionsArray(): array
-    {
-        return explode(' ', (string) $this->config->initialTestsPhpOptions);
-    }
-
     private function getFilteredExtraOptionsForMutant(): string
     {
         if ($this->adapter instanceof ProvidesInitialRunOnlyOptions) {
             return $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
-                $this->config->testFrameworkExtraOptions,
+                $this->config->legacyTestFrameworkExtraOptions,
                 $this->adapter->getInitialRunOnlyOptions(),
             );
         }
 
-        return $this->config->testFrameworkExtraOptions;
+        return $this->config->legacyTestFrameworkExtraOptions;
     }
 }

@@ -66,22 +66,19 @@ class MutantProcessContainerFactory
     ) {
     }
 
+    /**
+     * @param list<string> $command
+     */
     public function create(
         TestFrameworkAdapter $testFrameworkAdapter,
         Mutant $mutant,
-        string $testFrameworkExtraOptions = '',
+        array $command,
     ): MutantProcessContainer {
-        // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
+        // Nominal time excludes process creation and test-framework bootstrapping.
         $timeout = min(self::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (self::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime()), $this->timeout);
 
         $process = new Process(
-            command: $testFrameworkAdapter->getMutantCommandLine(
-                $mutant->getTests(),
-                $mutant->getFilePath(),
-                $mutant->getMutation()->getHash(),
-                $mutant->getMutation()->getOriginalFilePath(),
-                $testFrameworkExtraOptions,
-            ),
+            command: $command,
             env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
             timeout: $timeout,
         );

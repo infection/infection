@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PHPStan\Adapter;
 
 use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
@@ -74,7 +75,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
-            [],
+            CommandLineArguments::fromTokens([]),
             $this->shellCommandRunner,
             '9.0',
         );
@@ -90,7 +91,11 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', ['-d memory_limit=-1'], ['--configuration=/path/to/phpstan-config-path'])
+            ->with(
+                '/path/to/phpstan',
+                CommandLineArguments::fromTokens(['-d', 'memory_limit=-1']),
+                CommandLineArguments::fromTokens(['--configuration=/path/to/phpstan-config-path']),
+            )
             ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path'])
         ;
 
@@ -112,7 +117,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
-            ['--memory-limit=1G'],
+            CommandLineArguments::fromTokens(['--memory-limit=1G']),
             $this->shellCommandRunner,
             '9.0',
         );
@@ -120,10 +125,14 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
-                '--configuration=/path/to/phpstan-config-path',
-                '--memory-limit=1G',
-            ])
+            ->with(
+                '/path/to/phpstan',
+                CommandLineArguments::fromTokens(['-d', 'memory_limit=-1']),
+                CommandLineArguments::fromTokens([
+                    '--configuration=/path/to/phpstan-config-path',
+                    '--memory-limit=1G',
+                ]),
+            )
             ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=1G'])
         ;
 
@@ -146,7 +155,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
-            ['--memory-limit=-1', '--no-progress'],
+            CommandLineArguments::fromTokens(['--memory-limit=-1', '--no-progress']),
             $this->shellCommandRunner,
             '9.0',
         );
@@ -154,11 +163,15 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
-                '--configuration=/path/to/phpstan-config-path',
-                '--memory-limit=-1',
-                '--no-progress',
-            ])
+            ->with(
+                '/path/to/phpstan',
+                CommandLineArguments::fromTokens(['-d', 'memory_limit=-1']),
+                CommandLineArguments::fromTokens([
+                    '--configuration=/path/to/phpstan-config-path',
+                    '--memory-limit=-1',
+                    '--no-progress',
+                ]),
+            )
             ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=-1', '--no-progress'])
         ;
 
@@ -171,7 +184,7 @@ final class PHPStanAdapterTest extends TestCase
         ], $adapter->getInitialRunCommandLine());
     }
 
-    public function test_it_builds_initial_run_command_line_with_complex_options(): void
+    public function test_it_preserves_separate_values_and_positional_arguments(): void
     {
         $adapter = new PHPStanAdapter(
             $this->createStub(Filesystem::class),
@@ -182,31 +195,43 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
-            ['--memory-limit=2G', '--level=max', '--no-progress'],
+            CommandLineArguments::fromString('--memory-limit=2G --level max --no-progress -- "src with spaces"'),
             $this->shellCommandRunner,
             '9.0',
         );
 
-        $this->commandLineBuilder
-            ->expects($this->once())
-            ->method('build')
-            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
-                '--configuration=/path/to/phpstan-config-path',
-                '--memory-limit=2G',
-                '--level=max',
-                '--no-progress',
-            ])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=2G', '--level=max', '--no-progress'])
-        ;
-
-        $this->assertSame([
+        $expectedCommandLine = [
             '/usr/bin/php',
             '/path/to/phpstan',
             '--configuration=/path/to/phpstan-config-path',
             '--memory-limit=2G',
-            '--level=max',
+            '--level',
+            'max',
             '--no-progress',
-        ], $adapter->getInitialRunCommandLine());
+            '--',
+            'src with spaces',
+        ];
+
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with(
+                '/path/to/phpstan',
+                CommandLineArguments::fromTokens(['-d', 'memory_limit=-1']),
+                CommandLineArguments::fromTokens([
+                    '--configuration=/path/to/phpstan-config-path',
+                    '--memory-limit=2G',
+                    '--level',
+                    'max',
+                    '--no-progress',
+                    '--',
+                    'src with spaces',
+                ]),
+            )
+            ->willReturn($expectedCommandLine)
+        ;
+
+        $this->assertSame($expectedCommandLine, $adapter->getInitialRunCommandLine());
     }
 
     public function test_it_returns_version(): void
@@ -221,7 +246,11 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', ['-d memory_limit=-1'], ['--version'])
+            ->with(
+                '/path/to/phpstan',
+                CommandLineArguments::fromTokens(['-d', 'memory_limit=-1']),
+                CommandLineArguments::fromTokens(['--version']),
+            )
             ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--version'])
         ;
 
@@ -241,7 +270,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
-            [],
+            CommandLineArguments::fromTokens([]),
             $shellCommandRunner,
         );
 
@@ -270,7 +299,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
-            ['--memory-limit=-1'],
+            CommandLineArguments::fromTokens(['--memory-limit=-1']),
             $this->shellCommandRunner,
             $version,
         );
@@ -291,7 +320,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
-            [],
+            CommandLineArguments::fromTokens([]),
             $this->shellCommandRunner,
             $version,
         );

@@ -43,7 +43,6 @@ use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -178,7 +177,6 @@ final class ConfigurableTestFrameworkFactoryTest extends TestCase
             $this->createStub(InitialTestsRunner::class),
             $configuration,
             $this->createStub(MutantProcessContainerFactory::class),
-            $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
     }
 }

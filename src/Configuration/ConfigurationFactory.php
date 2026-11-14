@@ -67,6 +67,8 @@ use Infection\Mutator\MutatorResolver;
 use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments as CommonCommandLineArguments;
+use Infection\TestFramework\Contracts\CommandLineArguments;
 use Infection\TestFramework\TestFrameworkTypes;
 use function ltrim;
 use OndraM\CiDetector\CiDetector;
@@ -179,6 +181,13 @@ class ConfigurationFactory
             $testFrameworkExtraArgs,
         );
 
+        [$testFrameworkArguments, $legacyTestFrameworkExtraOptions] = self::retrieveTestFrameworkExtraArgs(
+            $testFrameworkExtraOptions,
+            $testFrameworkExtraArgs,
+            $schema,
+            $testFramework,
+        );
+
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
             source: $schema->source,
@@ -192,14 +201,10 @@ class ConfigurationFactory
             mutators: $mutators,
             testFramework: $testFramework,
             bootstrap: $schema->bootstrap,
-            initialTestsPhpOptions: $initialTestsPhpOptions ?? $schema->initialTestsPhpOptions,
-            testFrameworkExtraOptions: self::retrieveTestFrameworkExtraArgs(
-                $testFrameworkExtraOptions,
-                $testFrameworkExtraArgs,
-                $schema,
-                $testFramework,
-            ),
-            staticAnalysisToolOptions: self::retrieveStaticAnalysisToolOptions($staticAnalysisToolOptions, $schema),
+            initialTestsPhpOptions: CommonCommandLineArguments::fromString($initialTestsPhpOptions ?? $schema->initialTestsPhpOptions ?? ''),
+            testFrameworkArguments: $testFrameworkArguments,
+            legacyTestFrameworkExtraOptions: $legacyTestFrameworkExtraOptions,
+            staticAnalysisToolOptions: CommonCommandLineArguments::fromString($staticAnalysisToolOptions ?? $schema->staticAnalysisToolOptions ?? ''),
             coveragePath: $coverageBasePath,
             skipCoverage: $skipCoverage,
             skipInitialTests: $skipInitialTests,
@@ -335,23 +340,32 @@ class ConfigurationFactory
         return sprintf('%s/%s', $configDir, $existingCoveragePath);
     }
 
+    /**
+     * @return array{CommandLineArguments, string}
+     */
     private static function retrieveTestFrameworkExtraArgs(
         ?string $testFrameworkExtraOptions,
-        ?string $testFrameworkExtraArgs,
+        string|CommandLineArguments|null $testFrameworkExtraArgs,
         SchemaConfiguration $schema,
         string $testFramework,
-    ): string {
+    ): array {
+        if ($testFrameworkExtraArgs instanceof CommandLineArguments) {
+            return [$testFrameworkExtraArgs, implode(' ', $testFrameworkExtraArgs->toTokens())];
+        }
+
         $extraArgs = $testFrameworkExtraArgs ?? $schema->testFrameworkExtraArgs ?? '';
 
         if ($extraArgs !== '') {
-            return $extraArgs;
+            return [CommonCommandLineArguments::fromString($extraArgs), $extraArgs];
         }
 
         $extraOptions = $testFrameworkExtraOptions ?? $schema->testFrameworkExtraOptions ?? '';
 
-        return $extraOptions === '' || $testFramework !== TestFrameworkTypes::PHPUNIT
+        $extraOptions = $extraOptions === '' || $testFramework !== TestFrameworkTypes::PHPUNIT
             ? $extraOptions
             : self::retrieveLegacyPhpUnitTestFrameworkExtraOptions($extraOptions);
+
+        return [CommonCommandLineArguments::fromString($extraOptions), $extraOptions];
     }
 
     private static function retrieveLegacyPhpUnitTestFrameworkExtraOptions(string $extraOptions): string
@@ -363,13 +377,6 @@ class ConfigurationFactory
                 explode(' --', ltrim($extraOptions, '-')),
             ),
         );
-    }
-
-    private static function retrieveStaticAnalysisToolOptions(
-        ?string $staticAnalysisToolOptions,
-        SchemaConfiguration $schema,
-    ): ?string {
-        return $staticAnalysisToolOptions ?? $schema->staticAnalysisToolOptions;
     }
 
     private function retrieveNoProgress(bool $noProgress): bool
@@ -427,7 +434,7 @@ class ConfigurationFactory
     }
 
     /**
-     * @return array{0: PlainFilter|null, 1: string|null}
+     * @return array{0: PlainFilter|null, 1: string|CommandLineArguments|null}
      */
     private function resolvePositionalPathsFilter(
         PositionalPathsFilter $sourceFilter,
@@ -449,14 +456,14 @@ class ConfigurationFactory
                 'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
             );
 
-            $testFrameworkExtraArgs = implode(' ', $classified->testPaths);
+            $testFrameworkExtraArgs = CommonCommandLineArguments::fromTokens($classified->testPaths);
         }
 
         return [$resolvedFilter, $testFrameworkExtraArgs];
     }
 
     /**
-     * @return array{0: SourceFileFilter|null, 1: string|null}
+     * @return array{0: SourceFileFilter|null, 1: string|CommandLineArguments|null}
      */
     private function refineFilterIfNecessary(
         PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,

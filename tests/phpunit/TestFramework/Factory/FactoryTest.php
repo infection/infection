@@ -50,7 +50,6 @@ use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Factory;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use InvalidArgumentException;
@@ -181,7 +180,6 @@ final class FactoryTest extends TestCase
             ),
             $this->createStub(InitialTestsRunner::class),
             $this->createStub(MutantProcessContainerFactory::class),
-            $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
     }
 }

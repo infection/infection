@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\CommandLine;
 
 use function array_map;
-use function array_merge;
 use function implode;
-use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Contracts\CommandLineArguments;
 use SplFileInfo;
 use function sprintf;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * @internal
@@ -50,47 +50,74 @@ final readonly class ArgumentsAndOptionsBuilder
 {
     /**
      * @param SplFileInfo[] $filteredSourceFilesToMutate
+     * @param list<InputOption> $initialRunOnlyOptions
      */
-    public function __construct(
+    private function __construct(
         private bool $executeOnlyCoveringTestCases,
         private array $filteredSourceFilesToMutate,
         private ?string $mapSourceClassToTestStrategy,
         private bool $useWindowsFilterLimit,
+        private InputOption $filter,
+        private array $initialRunOnlyOptions,
     ) {
     }
 
     /**
-     * @return list<string>
+     * @param SplFileInfo[] $filteredSourceFilesToMutate
      */
-    public function buildForInitialTestsRun(string $configPath, string $extraOptions): array
+    public static function create(
+        bool $executeOnlyCoveringTestCases,
+        array $filteredSourceFilesToMutate,
+        ?string $mapSourceClassToTestStrategy,
+        bool $useWindowsFilterLimit,
+    ): self {
+        $filter = new InputOption('filter', null, InputOption::VALUE_REQUIRED);
+
+        return new self(
+            $executeOnlyCoveringTestCases,
+            $filteredSourceFilesToMutate,
+            $mapSourceClassToTestStrategy,
+            $useWindowsFilterLimit,
+            $filter,
+            [
+                new InputOption('configuration', 'c', InputOption::VALUE_REQUIRED),
+                $filter,
+                new InputOption('testsuite', null, InputOption::VALUE_REQUIRED),
+                new InputOption('warn-when-php-is-not-configured-for-development'),
+            ],
+        );
+    }
+
+    public function buildForInitialTestsRun(string $configPath, CommandLineArguments $arguments): CommandLineArguments
     {
-        $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
+        $arguments = $arguments->withOptionDefinitions(...$this->initialRunOnlyOptions);
 
         if ($this->filteredSourceFilesToMutate !== []
             && $this->mapSourceClassToTestStrategy !== null
-            && !in_array('--filter', $options, true)
+            && !$arguments->hasOption($this->filter)
         ) {
-            $options[] = '--filter';
-
-            $options[] = implode(
+            $filter = implode(
                 '|',
                 array_map(
                     $this->mapSourceClassToTestClass(...),
                     $this->filteredSourceFilesToMutate,
                 ),
             );
+            $arguments = $arguments->append(['--filter', $filter]);
         }
 
-        return $options;
+        return $arguments->prepend(['--configuration', $configPath]);
     }
 
     /**
      * @param TestLocation[] $tests
-     * @return list<string>
      */
-    public function buildForMutant(string $configPath, string $extraOptions, array $tests, string $testFrameworkVersion): array
+    public function buildForMutant(string $configPath, CommandLineArguments $arguments, array $tests, string $testFrameworkVersion): CommandLineArguments
     {
-        $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
+        $arguments = $arguments
+            ->withOptionDefinitions(...$this->initialRunOnlyOptions)
+            ->withoutOptions(...$this->initialRunOnlyOptions)
+        ;
 
         if ($this->executeOnlyCoveringTestCases && $tests !== []) {
             $filter = $this->createFilterString(
@@ -99,37 +126,16 @@ final readonly class ArgumentsAndOptionsBuilder
             );
 
             if ($filter !== null) {
-                $options[] = '--filter';
-                $options[] = $filter;
+                $arguments = $arguments->append(['--filter', $filter]);
             }
         }
 
-        return $options;
+        return $arguments->prepend(['--configuration', $configPath]);
     }
 
     private function mapSourceClassToTestClass(SplFileInfo $sourceFile): string
     {
         return sprintf('%sTest', $sourceFile->getBasename('.' . $sourceFile->getExtension()));
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function prepareArgumentsAndOptions(string $configPath, string $extraOptions): array
-    {
-        $options = [
-            '--configuration',
-            $configPath,
-        ];
-
-        if ($extraOptions !== '') {
-            $options = array_merge(
-                $options,
-                TestFrameworkExtraArgs::parseRawTokens($extraOptions),
-            );
-        }
-
-        return $options;
     }
 
     /**

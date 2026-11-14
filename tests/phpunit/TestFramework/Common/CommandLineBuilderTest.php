@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Common;
 
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Contracts\CommandLineArguments as CommandLineArgumentsContract;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -46,9 +48,9 @@ use Symfony\Component\Process\PhpExecutableFinder;
 #[CoversClass(CommandLineBuilder::class)]
 final class CommandLineBuilderTest extends TestCase
 {
-    private const array PHP_EXTRA_ARGS = ['-d zend_extension=xdebug.so'];
+    private const array PHP_EXTRA_ARGS = ['-d', 'zend_extension=xdebug.so'];
 
-    private const array TEST_FRAMEWORK_ARGS = ['--filter XYZ', '--exclude-group=integration'];
+    private const array TEST_FRAMEWORK_ARGS = ['--filter', 'XYZ', '--exclude-group=integration'];
 
     private MockObject&PhpExecutableFinder $phpExecutableFinderMock;
 
@@ -69,14 +71,14 @@ final class CommandLineBuilderTest extends TestCase
 
         $commandLine = $this->commandLineBuilder->build(
             'phpunit.bat',
-            self::PHP_EXTRA_ARGS,
-            self::TEST_FRAMEWORK_ARGS,
+            CommandLineArguments::fromTokens(self::PHP_EXTRA_ARGS),
+            CommandLineArguments::fromTokens(self::TEST_FRAMEWORK_ARGS),
         );
 
         $this->assertSame(
             [
                 'phpunit.bat',
-                '--filter XYZ',
+                '--filter', 'XYZ',
                 '--exclude-group=integration',
             ],
             $commandLine,
@@ -94,13 +96,64 @@ final class CommandLineBuilderTest extends TestCase
 
         $commandLine = $this->commandLineBuilder->build(
             testFrameworkExecutable: 'non-executable-phpunit',
-            phpExtraArgs: [],
-            frameworkArgs: self::TEST_FRAMEWORK_ARGS,
+            phpExtraArgs: CommandLineArguments::fromTokens([]),
+            frameworkArgs: CommandLineArguments::fromTokens(self::TEST_FRAMEWORK_ARGS),
         );
 
         $this->assertSame(
-            ['/custom/php', 'non-executable-phpunit', '--filter XYZ', '--exclude-group=integration'],
+            ['/custom/php', 'non-executable-phpunit', '--filter', 'XYZ', '--exclude-group=integration'],
             $commandLine,
+        );
+    }
+
+    public function test_it_preserves_empty_and_zero_argument_values(): void
+    {
+        $this->phpExecutableFinderMock->expects($this->once())->method('find')->willReturn('/custom/php');
+
+        $command = $this->commandLineBuilder->build(
+            'phpunit',
+            CommandLineArguments::fromTokens(['-d', 'memory_limit=-1']),
+            CommandLineArguments::fromTokens(['--filter', '', '0']),
+        );
+
+        $this->assertSame(['/custom/php', '-d', 'memory_limit=-1', 'phpunit', '--filter', '', '0'], $command);
+    }
+
+    public function test_it_preserves_empty_and_zero_php_argument_values(): void
+    {
+        $this->phpExecutableFinderMock->expects($this->once())->method('find')->willReturn('/custom/php');
+
+        $command = $this->commandLineBuilder->build(
+            'phpunit',
+            CommandLineArguments::fromTokens(['-d', '', '0']),
+            CommandLineArguments::fromTokens([]),
+        );
+
+        $this->assertSame(['/custom/php', '-d', '', '0', 'phpunit'], $command);
+    }
+
+    public function test_it_builds_commands_from_argument_contracts(): void
+    {
+        $this->phpExecutableFinderMock->expects($this->once())->method('find')->willReturn('/custom/php');
+
+        $phpArguments = $this->createMock(CommandLineArgumentsContract::class);
+        $phpArguments
+            ->expects($this->once())
+            ->method('toTokens')
+            ->willReturn(['-d', 'memory_limit=-1'])
+        ;
+        $frameworkArguments = $this->createMock(CommandLineArgumentsContract::class);
+        $frameworkArguments
+            ->expects($this->once())
+            ->method('toTokens')
+            ->willReturn(['--filter', 'a test', '', '0'])
+        ;
+
+        $command = $this->commandLineBuilder->build('phpunit', $phpArguments, $frameworkArguments);
+
+        $this->assertSame(
+            ['/custom/php', '-d', 'memory_limit=-1', 'phpunit', '--filter', 'a test', '', '0'],
+            $command,
         );
     }
 
@@ -115,20 +168,20 @@ final class CommandLineBuilderTest extends TestCase
 
         $firstCommandLine = $this->commandLineBuilder->build(
             'vendor/bin/phpunit',
-            self::PHP_EXTRA_ARGS,
-            self::TEST_FRAMEWORK_ARGS,
+            CommandLineArguments::fromTokens(self::PHP_EXTRA_ARGS),
+            CommandLineArguments::fromTokens(self::TEST_FRAMEWORK_ARGS),
         );
         $secondCommandLine = $this->commandLineBuilder->build(
             'vendor/bin/phpunit',
-            self::PHP_EXTRA_ARGS,
-            self::TEST_FRAMEWORK_ARGS,
+            CommandLineArguments::fromTokens(self::PHP_EXTRA_ARGS),
+            CommandLineArguments::fromTokens(self::TEST_FRAMEWORK_ARGS),
         );
 
         $expectedCommandLine = [
             '/custom/php',
-            '-d zend_extension=xdebug.so',
+            '-d', 'zend_extension=xdebug.so',
             'vendor/bin/phpunit',
-            '--filter XYZ',
+            '--filter', 'XYZ',
             '--exclude-group=integration',
         ];
 

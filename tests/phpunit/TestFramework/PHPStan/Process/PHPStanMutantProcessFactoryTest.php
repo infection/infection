@@ -40,6 +40,7 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\Testing\MutatorName;
@@ -101,15 +102,19 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
-                "--tmp-file=$mutantFilePath",
-                "--instead-of=$originalFilePath",
-                '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
-                '--error-format=json',
-                '--no-progress',
-                '-vv',
-                '--memory-limit=-1',
-            ])
+            ->with(
+                '/path/to/phpstan',
+                CommandLineArguments::fromTokens(['-d', 'memory_limit=-1']),
+                CommandLineArguments::fromTokens([
+                    "--tmp-file=$mutantFilePath",
+                    "--instead-of=$originalFilePath",
+                    '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
+                    '--error-format=json',
+                    '--no-progress',
+                    '-vv',
+                    '--memory-limit=-1',
+                ]),
+            )
             ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;
 
@@ -137,7 +142,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             $commandLineBuilder,
             100.0,
             '/tmp',
-            ['--memory-limit=-1'],
+            CommandLineArguments::fromTokens(['--memory-limit=-1']),
         );
 
         $mutantProcess = $factory->create($mutant);
@@ -201,16 +206,23 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
-                "--tmp-file=$mutantFilePath",
-                "--instead-of=$originalFilePath",
-                '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
-                '--error-format=json',
-                '--no-progress',
-                '-vv',
-                '--memory-limit=-1',
-                '--level=max',
-            ])
+            ->with(
+                '/path/to/phpstan',
+                CommandLineArguments::fromTokens(['-d', 'memory_limit=-1']),
+                CommandLineArguments::fromTokens([
+                    "--tmp-file=$mutantFilePath",
+                    "--instead-of=$originalFilePath",
+                    '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
+                    '--error-format=json',
+                    '--no-progress',
+                    '-vv',
+                    '--memory-limit=-1',
+                    '--level',
+                    'max',
+                    '--',
+                    'src with spaces',
+                ]),
+            )
             ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;
 
@@ -238,7 +250,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             $commandLineBuilder,
             100.0,
             '/tmp',
-            ['--memory-limit=-1', '--level=max'],
+            CommandLineArguments::fromString('--memory-limit=-1 --level max -- "src with spaces"'),
         );
 
         $mutantProcess = $factory->create($mutant);
@@ -301,14 +313,18 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
-                "--tmp-file=$mutantFilePath",
-                "--instead-of=$originalFilePath",
-                '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
-                '--error-format=json',
-                '--no-progress',
-                '-vv',
-            ])
+            ->with(
+                '/path/to/phpstan',
+                CommandLineArguments::fromTokens(['-d', 'memory_limit=-1']),
+                CommandLineArguments::fromTokens([
+                    "--tmp-file=$mutantFilePath",
+                    "--instead-of=$originalFilePath",
+                    '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
+                    '--error-format=json',
+                    '--no-progress',
+                    '-vv',
+                ]),
+            )
             ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;
 
@@ -325,7 +341,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             $commandLineBuilder,
             100.0,
             '/tmp',
-            [],
+            CommandLineArguments::fromTokens([]),
         );
 
         $mutantProcess = $factory->create($mutant);

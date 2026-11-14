@@ -40,9 +40,9 @@ use function array_merge;
 use Closure;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Common\CommandLineArguments\CommandLineArguments;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
-use Infection\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraArgs;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -52,27 +52,31 @@ use function str_repeat;
 
 #[CoversClass(ArgumentsAndOptionsBuilder::class)]
 #[CoversClass(FilterBuilder::class)]
-#[CoversClass(TestFrameworkExtraArgs::class)]
+#[CoversClass(CommandLineArguments::class)]
 final class ArgumentsAndOptionsBuilderTest extends TestCase
 {
     public function test_it_can_build_the_command_without_extra_options(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null, false);
+        $builder = ArgumentsAndOptionsBuilder::create(false, [], null, false);
         $configPath = '/config/path';
+
+        $actual = $builder->buildForInitialTestsRun($configPath, CommandLineArguments::fromString(''));
 
         $this->assertSame(
             [
                 '--configuration',
                 $configPath,
             ],
-            $builder->buildForInitialTestsRun($configPath, ''),
+            $actual->toTokens(),
         );
     }
 
     public function test_it_can_build_the_command_with_extra_options(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null, false);
+        $builder = ArgumentsAndOptionsBuilder::create(false, [], null, false);
         $configPath = '/config/path';
+
+        $actual = $builder->buildForInitialTestsRun($configPath, CommandLineArguments::fromString('--verbose --debug'));
 
         $this->assertSame(
             [
@@ -81,14 +85,19 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--verbose',
                 '--debug',
             ],
-            $builder->buildForInitialTestsRun($configPath, '--verbose --debug'),
+            $actual->toTokens(),
         );
     }
 
     public function test_it_can_build_the_command_with_raw_extra_args(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null, false);
+        $builder = ArgumentsAndOptionsBuilder::create(false, [], null, false);
         $configPath = '/config/path';
+
+        $actual = $builder->buildForInitialTestsRun(
+            $configPath,
+            CommandLineArguments::fromString('tests/FooTest.php --filter="a test" --colors=always'),
+        );
 
         $this->assertSame(
             [
@@ -98,16 +107,14 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--filter=a test',
                 '--colors=always',
             ],
-            $builder->buildForInitialTestsRun(
-                $configPath,
-                'tests/FooTest.php --filter="a test" --colors=always',
-            ),
+            $actual->toTokens(),
         );
     }
 
     public function test_it_can_build_the_command_with_filtered_files_for_initial_tests_run(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false,
+        $builder = ArgumentsAndOptionsBuilder::create(
+            false,
             [
                 new SplFileInfo('src/Foo.php'),
                 new SplFileInfo('src/bar/Baz.php'),
@@ -116,6 +123,8 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             false,
         );
         $configPath = '/config/path';
+
+        $actual = $builder->buildForInitialTestsRun($configPath, CommandLineArguments::fromString('--verbose --debug'));
 
         $this->assertSame(
             [
@@ -126,14 +135,16 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--filter',
                 'FooTest|BazTest',
             ],
-            $builder->buildForInitialTestsRun($configPath, '--verbose --debug'),
+            $actual->toTokens(),
         );
     }
 
     public function test_it_can_build_the_command_with_extra_options_that_contains_spaces(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null, false);
+        $builder = ArgumentsAndOptionsBuilder::create(false, [], null, false);
         $configPath = '/the config/path';
+
+        $actual = $builder->buildForInitialTestsRun($configPath, CommandLineArguments::fromString('--path=/a path/with spaces'));
 
         $this->assertSame(
             [
@@ -143,7 +154,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 'path/with',
                 'spaces',
             ],
-            $builder->buildForInitialTestsRun($configPath, '--path=/a path/with spaces'),
+            $actual->toTokens(),
         );
     }
 
@@ -160,7 +171,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
     ): void {
         $configPath = '/the config/path';
 
-        $builder = new ArgumentsAndOptionsBuilder(
+        $builder = ArgumentsAndOptionsBuilder::create(
             $executeOnlyCoveringTestCases,
             [],
             null,
@@ -182,7 +193,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
         $actual = $builder->buildForMutant(
             $configPath,
-            '--path=/a path/with spaces',
+            CommandLineArguments::fromString('--path=/a path/with spaces'),
             array_map(
                 TestLocation::forTestMethod(...),
                 $testCases,
@@ -190,7 +201,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             $phpUnitVersion,
         );
 
-        $this->assertSame($expectedArgumentsAndOptions, $actual);
+        $this->assertSame($expectedArgumentsAndOptions, $actual->toTokens());
     }
 
     public function test_it_can_build_the_filter_string_with_the_default_non_windows_limit(): void

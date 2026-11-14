@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
-use function array_map;
-use function explode;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
@@ -45,9 +43,9 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\SourceFilter\SourceFileFilter;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\Contracts\CommandLineArguments;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_string;
-use function ltrim;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
 
@@ -84,9 +82,11 @@ readonly class Configuration
         public array $mutators,
         public string $testFramework,
         public ?string $bootstrap,
-        public ?string $initialTestsPhpOptions,
-        public string $testFrameworkExtraOptions,
-        public ?string $staticAnalysisToolOptions,
+        public CommandLineArguments $initialTestsPhpOptions,
+        public CommandLineArguments $testFrameworkArguments,
+        // Preserve the input grammar of adapters still using the legacy string API.
+        public string $legacyTestFrameworkExtraOptions,
+        public CommandLineArguments $staticAnalysisToolOptions,
         public string $coveragePath,
         public bool $skipCoverage,
         public bool $skipInitialTests,
@@ -132,31 +132,8 @@ readonly class Configuration
         return $this->staticAnalysisTool !== null;
     }
 
-    /**
-     * @return list<string>
-     */
-    public function getStaticAnalysisToolOptions(): array
-    {
-        if ($this->staticAnalysisToolOptions === null || $this->staticAnalysisToolOptions === '') {
-            return [];
-        }
-
-        return $this->parseStaticAnalysisToolOptions($this->staticAnalysisToolOptions);
-    }
-
     public function mutateOnlyCoveredCode(): bool
     {
         return !$this->withUncovered;
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function parseStaticAnalysisToolOptions(string $extraOptions): array
-    {
-        return array_map(
-            static fn ($option): string => '--' . $option,
-            explode(' --', ltrim($extraOptions, '-')),
-        );
     }
 }

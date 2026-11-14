@@ -535,12 +535,6 @@ parameters:
 			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
 
 		-
-			rawMessage: Infection\Process\Factory\InitialTestsRunProcessFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Process/Factory/InitialTestsRunProcessFactory.php
-
-		-
 			rawMessage: Infection\Process\Factory\MutantProcessContainerFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
 			count: 1
@@ -551,12 +545,6 @@ parameters:
 			identifier: method.childParameterType
 			count: 1
 			path: ../src/Process/OriginalPhpProcess.php
-
-		-
-			rawMessage: Infection\Process\Runner\InitialTestsRunner should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Process/Runner/InitialTestsRunner.php
 
 		-
 			rawMessage: 'Method Infection\Reflection\AnonymousClassReflection::__construct() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
@@ -655,12 +643,6 @@ parameters:
 			path: ../src/TestFramework/AdapterInstaller.php
 
 		-
-			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
-			identifier: arrayFilter.strict
-			count: 2
-			path: ../src/TestFramework/Common/CommandLineBuilder.php
-
-		-
 			rawMessage: Function shell_exec is unsafe to use. It can return FALSE instead of throwing an exception. Please add 'use function Safe\shell_exec;' at the beginning of the file to use the variant provided by the 'thecodingmachine/safe' library.
 			identifier: theCodingMachineSafe.function
 			count: 1
@@ -716,12 +698,6 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\TestFramework\Coverage\CoverageCheckerFactory
-			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\TestFramework\TestFrameworkExtraOptionsFilter
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
@@ -934,12 +910,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\TestFrameworkExtraOptionsFilter
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -965,12 +935,6 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\Coverage\CoverageCheckerFactory
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\TestFrameworkExtraOptionsFilter
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php

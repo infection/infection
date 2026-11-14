@@ -53,6 +53,7 @@ use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
+use Infection\TestFramework\Legacy\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
@@ -90,7 +91,6 @@ final readonly class Factory
         private CoverageCheckerFactory $coverageCheckerFactory,
         private InitialTestsRunner $initialTestsRunner,
         private MutantProcessContainerFactory $containerFactory,
-        private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
     ) {
     }
 
@@ -107,7 +107,7 @@ final readonly class Factory
                 $this->initialTestsRunner,
                 $this->infectionConfig,
                 $this->containerFactory,
-                $this->extraOptionsFilter,
+                new TestFrameworkExtraOptionsFilter(),
             );
     }
 
@@ -175,7 +175,6 @@ final readonly class Factory
                         $this->initialTestsRunner,
                         $configuration,
                         $this->containerFactory,
-                        $this->extraOptionsFilter,
                     )
                     : $factory::create(
                         $this->testFrameworkFinder->find($executableName),

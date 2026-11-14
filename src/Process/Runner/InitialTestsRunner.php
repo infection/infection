@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
+use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -56,20 +56,13 @@ class InitialTestsRunner
     }
 
     /**
-     * @param string[] $phpExtraOptions
+     * @param list<string> $command
+     *
+     * @throws RuntimeException
      */
-    public function run(
-        TestFrameworkAdapter $testFrameworkAdapter,
-        string $testFrameworkExtraOptions,
-        array $phpExtraOptions,
-        bool $skipCoverage,
-    ): Process {
-        $process = $this->processBuilder->createProcess(
-            $testFrameworkAdapter,
-            $testFrameworkExtraOptions,
-            $phpExtraOptions,
-            $skipCoverage,
-        );
+    public function run(array $command, bool $skipCoverage): Process
+    {
+        $process = $this->processBuilder->createProcess($command, $skipCoverage);
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted($process->getCommandLine()));
 

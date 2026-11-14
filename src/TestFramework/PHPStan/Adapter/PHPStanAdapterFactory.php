@@ -40,6 +40,7 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\CommandLineArguments;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Symfony\Component\Filesystem\Filesystem;
@@ -53,15 +54,12 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
 {
     use CannotBeInstantiated;
 
-    /**
-     * @param list<string> $staticAnalysisToolOptions
-     */
     public static function create(
         string $staticAnalysisConfigPath,
         string $staticAnalysisToolExecutable,
         float $timeout,
         string $tmpDir,
-        array $staticAnalysisToolOptions,
+        CommandLineArguments $staticAnalysisToolOptions,
         ShellCommandRunner $shellCommandRunner,
         ?Filesystem $fileSystem = null,
     ): StaticAnalysisToolAdapter {

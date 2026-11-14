@@ -288,7 +288,7 @@ parameters:
         -
             identifier: offsetAccess.notFound
             count: 6
-            path: ../src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php
+            path: ../src/TestFramework/Common/CommandLineArguments/TestFrameworkExtraArgs.php
 
         # This directory contains fixture. It still needs to be scanned by PHPStan though.
         -

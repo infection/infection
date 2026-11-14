@@ -44,7 +44,6 @@ use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -85,7 +84,6 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             initialTestsRunner: $this->createStub(InitialTestsRunner::class),
             configuration: $configuration,
             processFactory: $this->createStub(MutantProcessContainerFactory::class),
-            testFrameworkExtraOptionsFilter: $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 
         $this->assertInstanceOf(PhpUnitAdapter::class, $adapter);

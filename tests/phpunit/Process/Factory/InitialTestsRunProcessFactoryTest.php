@@ -35,44 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Factory;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\OriginalPhpProcess;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(InitialTestsRunProcessFactory::class)]
 final class InitialTestsRunProcessFactoryTest extends TestCase
 {
-    private MockObject&TestFrameworkAdapter $testFrameworkAdapterMock;
-
     private InitialTestsRunProcessFactory $factory;
 
     protected function setUp(): void
     {
-        $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
-
         $this->factory = new InitialTestsRunProcessFactory();
     }
 
     public function test_it_creates_a_process_with_coverage_skipped(): void
     {
-        $testFrameworkExtraOptions = '--stop-on-failure';
-        $phpExtraOptions = ['-d memory_limit=-1'];
-
-        $this->testFrameworkAdapterMock
-            ->method('getInitialTestRunCommandLine')
-            ->with($testFrameworkExtraOptions, $phpExtraOptions, true)
-            ->willReturn(['/usr/bin/php'])
-        ;
-
-        $process = $this->factory->createProcess(
-            $this->testFrameworkAdapterMock,
-            $testFrameworkExtraOptions,
-            $phpExtraOptions,
-            true,
-        );
+        $process = $this->factory->createProcess(['/usr/bin/php'], true);
 
         $this->assertContains($process->getCommandLine(), [
             '\'/usr/bin/php\'',
@@ -88,21 +68,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
 
     public function test_it_creates_a_process_with_coverage(): void
     {
-        $testFrameworkExtraOptions = '--stop-on-failure';
-        $phpExtraOptions = ['-d memory_limit=-1'];
-
-        $this->testFrameworkAdapterMock
-            ->method('getInitialTestRunCommandLine')
-            ->with($testFrameworkExtraOptions, $phpExtraOptions, false)
-            ->willReturn(['/usr/bin/php'])
-        ;
-
-        $process = $this->factory->createProcess(
-            $this->testFrameworkAdapterMock,
-            $testFrameworkExtraOptions,
-            $phpExtraOptions,
-            false,
-        );
+        $process = $this->factory->createProcess(['/usr/bin/php'], false);
 
         $this->assertContains($process->getCommandLine(), [
             '\'/usr/bin/php\'',
