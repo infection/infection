@@ -209,7 +209,7 @@ final class ConfigurationFactoryTest extends TestCase
                 mapSourceClassToTestStrategy: null,
                 projectDirectory: null,
                 staticAnalysisTool: 'non-supported-static-analysis-tool',
-                mutantId: null,
+                mutantIds: [],
             )
         ;
     }
@@ -284,7 +284,7 @@ final class ConfigurationFactoryTest extends TestCase
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             projectDirectory: null,
             staticAnalysisTool: null,
-            mutantId: null,
+            mutantIds: [],
         );
 
         $defaultConfiguration = new Configuration(
@@ -324,7 +324,7 @@ final class ConfigurationFactoryTest extends TestCase
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
             staticAnalysisTool: null,
-            mutantId: null,
+            mutantIds: [],
             configurationPathname: '/path/to/infection.json',
             debugTestFrameworkLogFile: Path::normalize(sys_get_temp_dir() . '/infection.debug.jsonl'),
         );
@@ -1705,7 +1705,7 @@ final class ConfigurationFactoryTest extends TestCase
                     mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
                     projectDirectory: '/path/to/project',
                     staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
-                    mutantId: 'h4sh',
+                    mutantIds: ['h4sh'],
                 ),
                 expected: ConfigurationBuilder::withMinimalTestData()
                     ->withTimeout(10)
@@ -1764,7 +1764,7 @@ final class ConfigurationFactoryTest extends TestCase
                     ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
                     ->withProjectDirectory('/path/to/project')
                     ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
-                    ->withMutantId('h4sh')
+                    ->withMutantIds(['h4sh'])
                     ->withConfigPathname('/path/to/infection.json')
                     ->build(),
             ),

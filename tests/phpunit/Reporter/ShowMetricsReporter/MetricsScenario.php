@@ -39,8 +39,11 @@ use function str_replace;
 
 final class MetricsScenario
 {
+    /**
+     * @param list<non-empty-string> $mutantIds
+     */
     public function __construct(
-        public ?string $mutantId,
+        public array $mutantIds,
         public bool $ignoreMsiWithNoMutations,
         public ?float $minMsi,
         public ?float $minCoveredMsi,
@@ -62,10 +65,13 @@ final class MetricsScenario
     ) {
     }
 
-    public function withMutantId(?string $mutantId): self
+    /**
+     * @param list<non-empty-string> $mutantIds
+     */
+    public function withMutantIds(array $mutantIds): self
     {
         $clone = clone $this;
-        $clone->mutantId = $mutantId;
+        $clone->mutantIds = $mutantIds;
 
         return $clone;
     }
