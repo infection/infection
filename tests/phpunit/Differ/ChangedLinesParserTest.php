@@ -51,7 +51,9 @@ final class ChangedLinesParserTest extends TestCase
     #[DataProvider('diffProvider')]
     public function test_it_parses_the_changed_lines_of_a_diff(string $diff, array $expected): void
     {
-        $actual = ChangedLinesParser::parse(explode("\n", $diff), '/path/to/project');
+        $lines = explode("\n", $diff);
+
+        $actual = ChangedLinesParser::parse($lines, '/path/to/project');
 
         $this->assertEquals($expected, $actual);
     }
