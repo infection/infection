@@ -82,15 +82,15 @@ final readonly class PlainFilter implements SourceFileFilter
      */
     private static function parseValues(string|array $value): array
     {
-        if (is_string($value)) {
-            $value = explode(',', $value);
-        }
+        $arrayValue = is_string($value)
+            ? explode(',', $value)
+            : $value;
 
         return array_unique(
             self::removeEmptyPaths(
                 array_map(
                     trim(...),
-                    $value,
+                    $arrayValue,
                 ),
             ),
         );
