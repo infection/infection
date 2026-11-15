@@ -35,21 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
+
 /**
- * Result of positional path classification: source paths (equivalent to --filter)
- * and test paths (equivalent to --test-framework-extra-args, space-joined).
+ * Groups positional arguments into source paths, test paths, and source symbol selectors.
+ * Source paths and symbol selectors limit the code selected for mutation; test paths limit the tests run.
  *
  * @internal
  */
-final readonly class ClassifiedPaths
+final readonly class ClassifiedPositionalArguments
 {
     /**
      * @param list<non-empty-string> $sourcePaths
      * @param list<non-empty-string> $testPaths
+     * @param list<SourceSymbolSelector> $sourceSelectors
      */
     public function __construct(
         public array $sourcePaths,
         public array $testPaths,
+        public array $sourceSelectors,
     ) {
     }
 }
