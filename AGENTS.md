@@ -371,7 +371,14 @@ file's comments before touching any of these. Each has tests that encode the inv
 `NodeTraverserFactory::createEnrichmentTraverser()` registers ~10 visitors in ONE traverser.
 Correctness depends on the registration order (NameResolver and ParentConnecting before
 ReflectionVisitor; git-diff exclusion before AddTests; AddTests before ExcludeUntested).
-Visitors communicate through node attributes. Do not touch `getAttribute()` directly. Each
+`CollectSourceSymbolsVisitor` owns the lexical class/method context consumed by source
+selection. Register it during enrichment only when selectors are present; resolve and format
+names only when `getSymbols()` is called, memoizing the result until declarations change or
+a new traversal starts. `debug:list-symbols` uses the same discovery prefix
+through `NodeTraverserFactory`, stopping before reflection so inspecting a file does not
+autoload its declarations. Interfaces
+and abstract methods are skipped; discovery does not imply mutation eligibility.
+Visitors expose node attributes through typed accessors. Do not touch `getAttribute()` directly. Each
 visitor owns its `public const string` key plus static typed accessors
 (`AddTestsVisitor::getTests()`, `LabelNodesAsEligibleVisitor::isEligible()`). Exclusion
 NEVER removes nodes. It flips the `eligible` flag only. Removing nodes corrupts name
