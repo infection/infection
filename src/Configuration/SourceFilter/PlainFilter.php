@@ -37,6 +37,7 @@ namespace Infection\Configuration\SourceFilter;
 
 use function array_filter;
 use function array_map;
+use function array_unique;
 use function explode;
 use function implode;
 
@@ -78,10 +79,12 @@ final readonly class PlainFilter implements SourceFileFilter
      */
     private static function parseValues(string $value): array
     {
-        return array_filter(
-            array_map(
-                trim(...),
-                explode(',', $value),
+        return array_unique(
+            array_filter(
+                array_map(
+                    trim(...),
+                    explode(',', $value),
+                ),
             ),
         );
     }
