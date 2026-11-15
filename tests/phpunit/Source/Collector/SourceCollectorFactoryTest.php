@@ -37,10 +37,12 @@ namespace Infection\Tests\Source\Collector;
 
 use Exception;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\SourceFilter\ChangedLinesFilter;
 use Infection\Configuration\SourceFilter\FakeSourceFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFileFilter;
+use Infection\Differ\ChangedLinesRange;
 use Infection\Git\Git;
 use Infection\Source\Collector\BasicSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
@@ -56,12 +58,12 @@ use function sprintf;
 final class SourceCollectorFactoryTest extends TestCase
 {
     /**
-     * @param Exception|class-string<SourceCollector> $exceptionOrExpectedCollectorClassName
+     * @param Exception|SourceCollector|class-string<SourceCollector> $exceptionOrExpectedCollectorClassName
      */
     #[DataProvider('sourceFilterProvider')]
     public function test_it_can_create_a_collector(
         ?SourceFileFilter $sourceFilter,
-        Exception|string $exceptionOrExpectedCollectorClassName,
+        Exception|SourceCollector|string $exceptionOrExpectedCollectorClassName,
     ): void {
         $factory = new SourceCollectorFactory(
             $this->createStub(Git::class),
@@ -77,7 +79,9 @@ final class SourceCollectorFactoryTest extends TestCase
             $sourceFilter,
         );
 
-        if (!($exceptionOrExpectedCollectorClassName instanceof Exception)) {
+        if ($exceptionOrExpectedCollectorClassName instanceof SourceCollector) {
+            $this->assertEquals($exceptionOrExpectedCollectorClassName, $actual);
+        } elseif (!($exceptionOrExpectedCollectorClassName instanceof Exception)) {
             $this->assertSame($actual::class, $exceptionOrExpectedCollectorClassName);
         }
     }
@@ -92,6 +96,18 @@ final class SourceCollectorFactoryTest extends TestCase
         yield 'plain filter' => [
             new PlainFilter(['src/Service']),
             BasicSourceCollector::class,
+        ];
+
+        yield 'changed lines filter' => [
+            new ChangedLinesFilter([
+                '/path/to/project/src/Service.php' => [ChangedLinesRange::forLine(3)],
+            ]),
+            BasicSourceCollector::create(
+                '/path/to/project',
+                ['src', 'lib'],
+                ['vendor', 'tests'],
+                new PlainFilter(['/path/to/project/src/Service.php']),
+            ),
         ];
 
         yield 'git diff filter' => [

@@ -1,0 +1,9 @@
+diff --git a/src/SourceClass.php b/src/SourceClass.php
+index 1111111..2222222 100644
+--- a/src/SourceClass.php
++++ b/src/SourceClass.php
+@@ -6,0 +7,4 @@ class SourceClass
++    public function hello(): string
++    {
++        return 'hello';
++    }
