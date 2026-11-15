@@ -1406,21 +1406,9 @@ count = 1
 
 [[issues]]
 file = "src/Differ/ChangedLinesParser.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Differ\ChangedLinesParser::parseFilePathFromLine`: expected `string`, but found `null|string`.'
-count = 1
-
-[[issues]]
-file = "src/Differ/ChangedLinesParser.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #3 of `Safe\preg_match`: expected `array<array-key, string>|null`, but found `mixed`.'
 count = 2
-
-[[issues]]
-file = "src/Differ/ChangedLinesParser.php"
-code = "nullable-return-statement"
-message = 'Function `Infection\Differ\ChangedLinesParser::parseFilePathFromLine` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`).'
-count = 1
 
 [[issues]]
 file = "src/Differ/ChangedLinesParser.php"
@@ -1432,7 +1420,7 @@ count = 1
 file = "src/Differ/ChangedLinesParser.php"
 code = "possibly-null-array-access"
 message = "Cannot perform array access on possibly `null` value."
-count = 2
+count = 1
 
 [[issues]]
 file = "src/Differ/ChangedLinesParser.php"

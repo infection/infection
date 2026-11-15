@@ -42,6 +42,9 @@ use Infection\CannotBeInstantiated;
 use function Safe\preg_match;
 use function sprintf;
 use function str_starts_with;
+use function stripcslashes;
+use function strlen;
+use function substr;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
@@ -54,7 +57,7 @@ final class ChangedLinesParser
 {
     use CannotBeInstantiated;
 
-    private const string DIFF_LINE_REGEX = '/diff.*a\/.*\sb\/(?<filePath>.*)/';
+    private const string DIFF_LINE_REGEX = '~^diff --git (?:"(?:[^"\\\\]|\\\\.)*"|a/.*) (?<filePath>"b/.*"|b/.*)$~';
 
     private const string DIFF_LINE_PATH_KEY = 'filePath';
 
@@ -109,17 +112,24 @@ final class ChangedLinesParser
     private static function parseFilePathFromLine(string $line): string
     {
         preg_match(self::DIFF_LINE_REGEX, $line, $matches);
+        $filePath = $matches[self::DIFF_LINE_PATH_KEY] ?? null;
 
-        Assert::keyExists(
-            $matches,
-            self::DIFF_LINE_PATH_KEY,
+        Assert::string(
+            $filePath,
             sprintf(
                 'Source file can not be found in the following diff line: "%s"',
                 $line,
             ),
         );
 
-        return $matches[self::DIFF_LINE_PATH_KEY];
+        if (str_starts_with($filePath, '"')) {
+            // Git quotes paths using C-style escapes, including octal-encoded filename bytes.
+            $encodedFilePath = substr($filePath, strlen('"b/'), -strlen('"'));
+
+            return stripcslashes($encodedFilePath);
+        }
+
+        return substr($filePath, strlen('b/'));
     }
 
     /**

@@ -59,29 +59,14 @@ final class ChangedLinesParserTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function test_it_fails_on_a_hunk_before_any_diff_line(): void
+    #[DataProvider('invalidDiffProvider')]
+    public function test_it_rejects_an_invalid_diff(string $diff, InvalidArgumentException $expectedException): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The following hunk line comes before any diff line: "@@ -1 +1 @@"');
+        $lines = explode("\n", $diff);
 
-        ChangedLinesParser::parse(['@@ -1 +1 @@'], '/path/to/project');
-    }
+        $this->expectExceptionObject($expectedException);
 
-    public function test_it_fails_on_a_context_line(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected a diff without context lines, e.g. the output of "git diff --unified=0", but found the following context line: "     return 1;"');
-
-        ChangedLinesParser::parse(
-            [
-                'diff --git a/src/Foo.php b/src/Foo.php',
-                '@@ -10,2 +10,2 @@ final class Foo',
-                '     return 1;',
-                '-    return 2;',
-                '+    return 3;',
-            ],
-            '/path/to/project',
-        );
+        ChangedLinesParser::parse($lines, '/path/to/project');
     }
 
     public static function diffProvider(): iterable
@@ -504,6 +489,110 @@ final class ChangedLinesParserTest extends TestCase
                 index 2a9e281..01cbf04 100644
                 DIFF,
             [],
+        ];
+
+        yield 'unquoted spaces' => [
+            <<<'DIFF'
+                diff --git a/src/Foo Bar.php b/src/Foo Bar.php
+                @@ -1 +1 @@
+                DIFF,
+            ['/path/to/project/src/Foo Bar.php' => [ChangedLinesRange::forLine(1)]],
+        ];
+
+        yield 'quoted paths' => [
+            <<<'DIFF'
+                diff --git "a/src/Foo Bar.php" "b/src/Foo Bar.php"
+                @@ -1 +1 @@
+                DIFF,
+            ['/path/to/project/src/Foo Bar.php' => [ChangedLinesRange::forLine(1)]],
+        ];
+
+        yield 'escaped double quotes' => [
+            <<<'DIFF'
+                diff --git "a/src/Foo\"Bar.php" "b/src/Foo\"Bar.php"
+                @@ -1 +1 @@
+                DIFF,
+            ['/path/to/project/src/Foo"Bar.php' => [ChangedLinesRange::forLine(1)]],
+        ];
+
+        yield 'escaped backslashes' => [
+            <<<'DIFF'
+                diff --git "a/src/Foo\\Bar.php" "b/src/Foo\\Bar.php"
+                @@ -1 +1 @@
+                DIFF,
+            ['/path/to/project/src/Foo\\Bar.php' => [ChangedLinesRange::forLine(1)]],
+        ];
+
+        yield 'escaped control characters' => [
+            <<<'DIFF'
+                diff --git "a/src/Foo\t\n\r\a\b\v\fBar.php" "b/src/Foo\t\n\r\a\b\v\fBar.php"
+                @@ -1 +1 @@
+                DIFF,
+            ["/path/to/project/src/Foo\t\n\r\x07\x08\v\fBar.php" => [ChangedLinesRange::forLine(1)]],
+        ];
+
+        yield 'octal-escaped UTF-8 bytes' => [
+            <<<'DIFF'
+                diff --git "a/src/Foo\303\251.php" "b/src/Foo\303\251.php"
+                @@ -1 +1 @@
+                DIFF,
+            ['/path/to/project/src/Fooé.php' => [ChangedLinesRange::forLine(1)]],
+        ];
+
+        yield 'unquoted UTF-8 with core.quotePath disabled' => [
+            <<<'DIFF'
+                diff --git a/src/Fooé.php b/src/Fooé.php
+                @@ -1 +1 @@
+                DIFF,
+            ['/path/to/project/src/Fooé.php' => [ChangedLinesRange::forLine(1)]],
+        ];
+
+        yield 'renamed from a quoted path to an unquoted path' => [
+            <<<'DIFF'
+                diff --git "a/src/Old\"Name.php" b/src/NewName.php
+                @@ -1 +1 @@
+                DIFF,
+            ['/path/to/project/src/NewName.php' => [ChangedLinesRange::forLine(1)]],
+        ];
+
+        yield 'renamed from an unquoted path to a quoted path' => [
+            <<<'DIFF'
+                diff --git a/src/OldName.php "b/src/New\"Name.php"
+                @@ -1 +1 @@
+                DIFF,
+            ['/path/to/project/src/New"Name.php' => [ChangedLinesRange::forLine(1)]],
+        ];
+
+        yield 'quoted destination contains an escaped quote and the diff path separator' => [
+            <<<'DIFF'
+                diff --git "a/src/Foo\" b/Bar.php" "b/src/Foo\" b/Bar.php"
+                @@ -1 +1 @@
+                DIFF,
+            ['/path/to/project/src/Foo" b/Bar.php' => [ChangedLinesRange::forLine(1)]],
+        ];
+    }
+
+    public static function invalidDiffProvider(): iterable
+    {
+        yield 'hunk before any diff line' => [
+            '@@ -1 +1 @@',
+            new InvalidArgumentException('The following hunk line comes before any diff line: "@@ -1 +1 @@"'),
+        ];
+
+        yield 'diff header without a destination path' => [
+            'diff --git a/src/Foo.php',
+            new InvalidArgumentException('Source file can not be found in the following diff line: "diff --git a/src/Foo.php"'),
+        ];
+
+        yield 'context line' => [
+            <<<'DIFF'
+                diff --git a/src/Foo.php b/src/Foo.php
+                @@ -10,2 +10,2 @@ final class Foo
+                     return 1;
+                -    return 2;
+                +    return 3;
+                DIFF,
+            new InvalidArgumentException('Expected a diff without context lines, e.g. the output of "git diff --unified=0", but found the following context line: "     return 1;"'),
         ];
     }
 }
