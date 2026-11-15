@@ -49,7 +49,7 @@ final class Scenario
 
     /**
      * @param list<non-empty-string> $paths
-     * @param list<non-empty-string> $sourceDirectories
+     * @param non-empty-list<non-empty-string> $sourceDirectories
      * @param list<non-empty-string> $existingFiles
      * @param list<non-empty-string> $existingDirectories
      */
@@ -67,6 +67,7 @@ final class Scenario
     {
         return new self(
             paths: [],
+            // @phpstan-ignore argument.type
             sourceDirectories: [],
             existingFiles: [],
             existingDirectories: [],
@@ -89,7 +90,7 @@ final class Scenario
     }
 
     /**
-     * @param list<non-empty-string> $sourceDirectories
+     * @param non-empty-list<non-empty-string> $sourceDirectories
      */
     public function withSourceDirectories(array $sourceDirectories): self
     {
@@ -152,7 +153,7 @@ final class Scenario
     }
 
     /**
-     * @param list<non-empty-string> $sourceDirectories
+     * @param non-empty-list<non-empty-string> $sourceDirectories
      */
     private static function createSchema(array $sourceDirectories): SchemaConfiguration
     {
