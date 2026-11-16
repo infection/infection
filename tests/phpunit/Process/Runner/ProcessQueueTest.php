@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner;
 
 use DuoClock\TimeSpy;
+use Generator;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\ProcessQueue;
 use Iterator;
@@ -46,6 +47,39 @@ use PHPUnit\Framework\TestCase;
 final class ProcessQueueTest extends TestCase
 {
     private const int SIMULATED_TIME_MICROSECONDS = 1_000_000;
+
+    public function test_it_records_scheduling_before_advancing_the_input(): void
+    {
+        $clock = new TimeSpy(100.25);
+        $container = $this->createMock(MutantProcessContainer::class);
+        $container->expects($this->once())->method('markAsScheduled')->with(100.25);
+        $input = (
+            /**
+             * @return Generator<MutantProcessContainer>
+             */
+            static function () use ($container, $clock): Generator {
+                yield $container;
+
+                $clock->sleep(2);
+            }
+        )();
+        $queue = new ProcessQueue($clock);
+
+        $this->assertSame(2_000_000, $queue->enqueueFrom($input));
+        $this->assertSame($container, $queue->dequeue());
+    }
+
+    public function test_it_records_scheduling_for_directly_enqueued_work(): void
+    {
+        $clock = new TimeSpy(100.5);
+        $container = $this->createMock(MutantProcessContainer::class);
+        $container->expects($this->once())->method('markAsScheduled')->with(100.5);
+        $queue = new ProcessQueue($clock);
+
+        $queue->enqueue($container);
+
+        $this->assertSame($container, $queue->dequeue());
+    }
 
     public function test_new_queue_is_empty(): void
     {
@@ -211,10 +245,10 @@ final class ProcessQueueTest extends TestCase
             ->method('next')
         ;
 
-        // Mock two sequential calls to microtime()
-        $clockMock->expects($this->exactly(2))
+        // The middle clock read records when the container is enqueued.
+        $clockMock->expects($this->exactly(3))
             ->method('microtime')
-            ->willReturnOnConsecutiveCalls(1000.0, 1001.0) // 1 second difference
+            ->willReturnOnConsecutiveCalls(1000.0, 1000.25, 1001.0) // 1 second difference
         ;
 
         $result = $queue->enqueueFrom($iterator);
@@ -246,9 +280,9 @@ final class ProcessQueueTest extends TestCase
             ->method('next')
         ;
 
-        $clockMock->expects($this->exactly(2))
+        $clockMock->expects($this->exactly(3))
             ->method('microtime')
-            ->willReturnOnConsecutiveCalls(1000.0, 1001.0)
+            ->willReturnOnConsecutiveCalls(1000.0, 1000.25, 1001.0)
         ;
 
         $result = $queue->enqueueFrom($iterator);

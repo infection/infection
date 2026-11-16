@@ -96,6 +96,53 @@ final class MutantExecutionResultTest extends TestCase
     }
 
     /**
+     * @param non-empty-list<EvaluationAttemptResult> $history
+     */
+    #[DataProvider('timedHistoryProvider')]
+    public function test_it_sums_completed_process_runtimes_without_changing_the_final_result(array $history, float $activeTime): void
+    {
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+        $original = MutantExecutionResult::createFromEvaluation($mutant, DetectionStatus::ESCAPED, $history);
+        $result = $original->withEvaluationElapsedTime(6.5);
+
+        $this->assertSame($activeTime, $result->getEvaluationActiveTime());
+        $this->assertSame(6.5, $result->getEvaluationElapsedTime());
+        $this->assertSame(DetectionStatus::ESCAPED, $result->getDetectionStatus());
+        $this->assertNull($original->getEvaluationElapsedTime());
+        $this->assertSame($history, $result->getEvaluationHistory());
+        $this->assertSame($original->getProcessRuntime(), $result->getProcessRuntime());
+        $this->assertSame($original->getProcessOutput(), $result->getProcessOutput());
+    }
+
+    public static function timedHistoryProvider(): iterable
+    {
+        $first = new EvaluationAttemptResult('PHPUnit', DetectionStatus::TIMED_OUT, '', new EvaluationProcessDetails('phpunit', 2.0));
+        $retry = new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED, '', new EvaluationProcessDetails('phpunit', 0.5));
+        $direct = new EvaluationAttemptResult('Analyser', DetectionStatus::ERROR, 'Analysis failed', null);
+
+        yield 'single process' => [[$first], 2.0];
+
+        yield 'retry then direct result' => [[$first, $retry, $direct], 2.5];
+
+        yield 'direct result then process' => [[$direct, $retry], 0.5];
+
+        yield 'direct results have no process runtime' => [[$direct, $direct], 0.0];
+
+        yield 'zero process runtime' => [[new EvaluationAttemptResult('Dry run', DetectionStatus::ESCAPED, '', new EvaluationProcessDetails('phpunit', 0.0))], 0.0];
+    }
+
+    public function test_it_uses_the_legacy_process_runtime_when_no_history_is_available(): void
+    {
+        $result = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withProcessRuntime(0.75)
+            ->build()
+        ;
+
+        $this->assertSame(0.75, $result->getEvaluationActiveTime());
+        $this->assertNull($result->getEvaluationElapsedTime());
+    }
+
+    /**
      * @param Closure(Mutant): MutantExecutionResult $createResult
      */
     #[DataProvider('processFreeResultProvider')]
@@ -108,6 +155,8 @@ final class MutantExecutionResultTest extends TestCase
         $this->assertSame('', $result->getProcessCommandLine());
         $this->assertSame('', $result->getProcessOutput());
         $this->assertSame(0.0, $result->getProcessRuntime());
+        $this->assertSame(0.0, $result->getEvaluationActiveTime());
+        $this->assertNull($result->getEvaluationElapsedTime());
     }
 
     public static function processFreeResultProvider(): iterable

@@ -58,6 +58,10 @@ use Webmozart\Assert\Assert;
  */
 class MutantProcessContainer implements MutantEvaluationPipe
 {
+    private ?float $scheduledAt = null;
+
+    private ?float $finishedAt = null;
+
     private MutantProcess|EvaluationAttemptResult|MutantEvaluationPipe|null $current = null;
 
     /**
@@ -167,6 +171,17 @@ class MutantProcessContainer implements MutantEvaluationPipe
         return $this;
     }
 
+    public function markAsScheduled(float $scheduledAt): void
+    {
+        // A follow-up reuses the container, so its queue wait belongs to the same evaluation.
+        $this->scheduledAt ??= $scheduledAt;
+    }
+
+    public function markAsFinished(float $finishedAt): void
+    {
+        $this->finishedAt ??= $finishedAt;
+    }
+
     public function getMutantExecutionResult(): MutantExecutionResult
     {
         Assert::false($this->isCold(), 'Cannot finalize a mutant before evaluation has started.');
@@ -174,11 +189,23 @@ class MutantProcessContainer implements MutantEvaluationPipe
         $decision = $this->decision;
         Assert::isInstanceOf($decision, FinishEvaluation::class, 'Only a finish decision permits construction of a mutant result.');
 
-        return $this->finalResult ??= MutantExecutionResult::createFromEvaluation(
+        if ($this->finalResult !== null) {
+            return $this->finalResult;
+        }
+
+        if ($this->scheduledAt !== null) {
+            Assert::notNull($this->finishedAt, 'Cannot report elapsed evaluation time before the final evaluation has finished.');
+        }
+
+        $result = MutantExecutionResult::createFromEvaluation(
             $this->mutant,
             $decision->detectionStatus,
             $this->evaluationHistory,
         );
+
+        return $this->finalResult = $this->scheduledAt === null
+            ? $result
+            : $result->withEvaluationElapsedTime($this->finishedAt - $this->scheduledAt);
     }
 
     private function evaluate(int $index): MutantProcess|EvaluationAttemptResult|MutantEvaluationPipe

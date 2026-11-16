@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use DuoClock\TimeSpy;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Process\MutantProcess;
@@ -78,19 +79,25 @@ final class DryProcessRunnerTest extends TestCase
 
     public function test_it_finalizes_mixed_evaluations_without_starting_processes(): void
     {
+        $clock = new TimeSpy(100.0);
         $mutant = MutantBuilder::withCompleteTestData()->build();
         $firstProcess = new Process(['must-not-run']);
         $secondProcess = new Process(['must-not-run-either']);
         $factory = new MagoEvaluationAttemptResultFactory(new MagoMutantDetectionStatusResolver());
-        $first = new MutantProcess($firstProcess, $mutant, $factory);
-        $second = new MutantProcess($secondProcess, $mutant, $factory);
+        $first = new MutantProcess($firstProcess, $mutant, $factory, $clock);
+        $second = new MutantProcess($secondProcess, $mutant, $factory, $clock);
         $direct = new EvaluationAttemptResult('Direct', DetectionStatus::ESCAPED, 'direct output', null);
         $pipe = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $first)
-            ->append(static fn (): EvaluationAttemptResult => $direct)
+            ->append(static function () use ($clock, $direct): EvaluationAttemptResult {
+                $clock->sleep(1);
+
+                return $direct;
+            })
             ->append(static fn (): MutantProcess => $second)
         ;
 
-        $completed = iterator_to_array((new DryProcessRunner())->run([$pipe]), false);
+        $completed = iterator_to_array((new DryProcessRunner($clock))->run([$pipe]), false);
+        $clock->sleep(10);
         $result = $completed[0]->getMutantExecutionResult();
         $history = $result->getEvaluationHistory();
 
@@ -104,5 +111,32 @@ final class DryProcessRunnerTest extends TestCase
         $this->assertSame($secondProcess->getCommandLine(), $history[2]->process?->commandLine);
         $this->assertSame(0.0, $history[0]->process?->runtime);
         $this->assertSame(0.0, $history[2]->process?->runtime);
+        $this->assertSame(0.0, $result->getEvaluationActiveTime());
+        $this->assertSame(1.0, $result->getEvaluationElapsedTime());
+    }
+
+    public function test_it_records_elapsed_time_for_a_direct_terminal_result(): void
+    {
+        $clock = new TimeSpy(0.0);
+        $observation = new EvaluationAttemptResult('Direct', DetectionStatus::KILLED_BY_STATIC_ANALYSIS, '', null);
+        $pipe = MutantProcessContainer::from(
+            MutantBuilder::withMinimalTestData()->build(),
+            static function () use ($clock, $observation): EvaluationAttemptResult {
+                $clock->usleep(250_000);
+
+                return $observation;
+            },
+        );
+        $runner = new DryProcessRunner($clock);
+
+        $completed = iterator_to_array($runner->run([$pipe]), false);
+        $clock->sleep(10);
+        $result = $pipe->getMutantExecutionResult();
+
+        $this->assertSame([$pipe], $completed);
+        $this->assertSame([$observation], $result->getEvaluationHistory());
+        $this->assertSame(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, $result->getDetectionStatus());
+        $this->assertSame(0.0, $result->getEvaluationActiveTime());
+        $this->assertSame(0.25, $result->getEvaluationElapsedTime());
     }
 }
