@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Mago\Adapter;
 
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\Process\DryRunAwareProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
@@ -67,7 +67,7 @@ final class MagoAdapterTest extends TestCase
 
         $this->adapter = new MagoAdapter(
             new DryRunAwareProcessFactory(false),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
@@ -104,7 +104,7 @@ final class MagoAdapterTest extends TestCase
     {
         $adapter = new MagoAdapter(
             new DryRunAwareProcessFactory(false),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
@@ -137,7 +137,7 @@ final class MagoAdapterTest extends TestCase
     {
         $adapter = new MagoAdapter(
             new DryRunAwareProcessFactory(false),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
@@ -171,7 +171,7 @@ final class MagoAdapterTest extends TestCase
     {
         $adapter = new MagoAdapter(
             new DryRunAwareProcessFactory(false),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
@@ -228,7 +228,7 @@ final class MagoAdapterTest extends TestCase
 
         $adapter = new MagoAdapter(
             new DryRunAwareProcessFactory(false),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
@@ -256,7 +256,7 @@ final class MagoAdapterTest extends TestCase
 
         $adapter = new MagoAdapter(
             new DryRunAwareProcessFactory(false),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
@@ -276,7 +276,7 @@ final class MagoAdapterTest extends TestCase
     {
         $adapter = new MagoAdapter(
             new DryRunAwareProcessFactory(false),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,

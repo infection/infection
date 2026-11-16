@@ -60,16 +60,20 @@ final class DebugStaticAnalysisMutantProcessFactoryTest extends TestCase
             new DebugCommandLine(new PhpExecutableFinder()),
         );
 
-        $process = $factory
-            ->create(MutantBuilder::withMinimalTestData()->build())
-            ->getProcess()
-        ;
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+        $process = $factory->create($mutant)->getProcess();
 
         $processClass = $process::class;
+        $commandLine = $process->getCommandLine();
+        $mutationHash = $mutant->getMutation()->getHash();
         $this->assertSame($expectedProcessClass, $processClass);
         $this->assertSame(['SHELL_VERBOSITY' => '0'], $process->getEnv());
         $this->assertSame(10.0, $process->getTimeout());
-        $this->assertStringContainsString('static-analysis-mutant', $process->getCommandLine());
+        $this->assertStringContainsString('static-analysis-mutant', $commandLine);
+        $this->assertStringContainsString('--log', $commandLine);
+        $this->assertStringContainsString('/debug.jsonl', $commandLine);
+        $this->assertStringContainsString('--mutationHash', $commandLine);
+        $this->assertStringContainsString($mutationHash, $commandLine);
     }
 
     public static function processModeProvider(): iterable

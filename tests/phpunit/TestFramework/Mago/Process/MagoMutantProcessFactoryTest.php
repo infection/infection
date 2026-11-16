@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Mago\Process;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
@@ -101,7 +101,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
             ->build()
         ;
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
+        $evaluationAttemptResultFactory = $this->createStub(EvaluationAttemptResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -124,7 +124,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
 
         $factory = new MagoMutantProcessFactory(
             new DryRunAwareProcessFactory($dryRun),
-            $phpStanMutantExecutionResultFactory,
+            $evaluationAttemptResultFactory,
             '/path/to/mago',
             $commandLineBuilder,
             100.0,
@@ -197,7 +197,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
             ->build()
         ;
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
+        $evaluationAttemptResultFactory = $this->createStub(EvaluationAttemptResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -222,7 +222,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
 
         $factory = new MagoMutantProcessFactory(
             new DryRunAwareProcessFactory(false),
-            $phpStanMutantExecutionResultFactory,
+            $evaluationAttemptResultFactory,
             '/path/to/mago',
             $commandLineBuilder,
             100.0,
@@ -287,7 +287,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
             ->build()
         ;
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
+        $evaluationAttemptResultFactory = $this->createStub(EvaluationAttemptResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -310,7 +310,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
 
         $factory = new MagoMutantProcessFactory(
             new DryRunAwareProcessFactory(false),
-            $phpStanMutantExecutionResultFactory,
+            $evaluationAttemptResultFactory,
             '/path/to/mago',
             $commandLineBuilder,
             100.0,

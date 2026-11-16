@@ -379,12 +379,6 @@ parameters:
 			path: ../src/Metrics/TargetDetectionStatusesProvider.php
 
 		-
-			rawMessage: Infection\Mutant\MutantExecutionResult should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Mutant/MutantExecutionResult.php
-
-		-
 			rawMessage: Do not use magic number as a function argument. Move to constant with a suitable name.
 			count: 8
 			path: ../src/Mutator/Extensions/BCMath.php
@@ -679,6 +673,12 @@ parameters:
 			path: ../src/TestFramework/Contracts/Mutant/MutantProcessDetectionStatusResolver.php
 
 		-
+			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\EvaluationAttemptResult
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFramework.php
+
+		-
 			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\Mutant
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1
@@ -811,7 +811,7 @@ parameters:
 			path: ../src/TestFramework/Legacy/LegacyMutantDetectionStatusResolver.php
 
 		-
-			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\Mutant\MutantExecutionResultFactory
+			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\Mutant\EvaluationAttemptResultFactory
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Mago/Adapter/MagoAdapter.php
@@ -841,37 +841,43 @@ parameters:
 			path: ../src/TestFramework/Mago/Adapter/MagoAdapterFactory.php
 
 		-
+			rawMessage: Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory should not depend on Infection\Mutant\EvaluationAttemptResult
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/TestFramework/Mago/Mutant/MagoEvaluationAttemptResultFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory should not depend on Infection\Mutant\EvaluationAttemptResultFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Mago/Mutant/MagoEvaluationAttemptResultFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory should not depend on Infection\Mutant\EvaluationProcessDetails
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Mago/Mutant/MagoEvaluationAttemptResultFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory should not depend on Infection\Process\MutantProcess
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Mago/Mutant/MagoEvaluationAttemptResultFactory.php
+
+		-
 			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver should not depend on Infection\Mutant\DetectionStatus
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 5
 			path: ../src/TestFramework/Mago/Mutant/MagoMutantDetectionStatusResolver.php
 
 		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResult
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 2
-			path: ../src/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Process\MutantProcess
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Mutant\Mutant
+			rawMessage: Infection\TestFramework\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Mutant\EvaluationAttemptResultFactory
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Mago/Process/MagoMutantProcessFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
+			rawMessage: Infection\TestFramework\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Mutant\Mutant
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Mago/Process/MagoMutantProcessFactory.php
@@ -1906,36 +1912,6 @@ parameters:
 			identifier: return.deprecatedClass
 			count: 1
 			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
-
-		-
-			rawMessage: Variable $mutantDiff is never read.
-			identifier: variable.unused
-			count: 1
-			path: ../tests/phpunit/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
-
-		-
-			rawMessage: Variable $mutatorName is never read.
-			identifier: variable.unused
-			count: 1
-			path: ../tests/phpunit/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
-
-		-
-			rawMessage: Variable $originalFilePath is never read.
-			identifier: variable.unused
-			count: 1
-			path: ../tests/phpunit/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
-
-		-
-			rawMessage: Variable $originalStartingLine is never read.
-			identifier: variable.unused
-			count: 1
-			path: ../tests/phpunit/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
-
-		-
-			rawMessage: Variable $processCommandLine is never read.
-			identifier: variable.unused
-			count: 1
-			path: ../tests/phpunit/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
 
 		-
 			rawMessage: '''

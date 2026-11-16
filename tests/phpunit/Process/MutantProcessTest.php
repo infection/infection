@@ -35,8 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationAttemptResultFactory;
+use Infection\Mutant\EvaluationProcessDetails;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Tests\Mutant\MutantBuilder;
@@ -44,6 +47,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+use Webmozart\Assert\InvalidArgumentException;
 
 #[CoversClass(MutantProcess::class)]
 final class MutantProcessTest extends TestCase
@@ -58,12 +62,12 @@ final class MutantProcessTest extends TestCase
     {
         $this->processStub = $this->createStub(Process::class);
         $this->mutant = MutantBuilder::withMinimalTestData()->build();
-        $mutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
+        $evaluationAttemptResultFactory = $this->createStub(EvaluationAttemptResultFactory::class);
 
         $this->mutantProcess = new MutantProcess(
             $this->processStub,
             $this->mutant,
-            $mutantExecutionResultFactory,
+            $evaluationAttemptResultFactory,
         );
     }
 
@@ -104,12 +108,41 @@ final class MutantProcessTest extends TestCase
         $mutantProcess = new MutantProcess(
             $process,
             $this->mutant,
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
         );
         $process->start();
         $mutantProcess->markAsFinished();
 
         $this->assertSame(0.0, $mutantProcess->getRuntime());
+    }
+
+    public function test_it_classifies_a_completed_attempt_once_and_retains_the_same_result(): void
+    {
+        $expected = new EvaluationAttemptResult(
+            'PHPUnit',
+            DetectionStatus::ESCAPED,
+            'output',
+            new EvaluationProcessDetails('phpunit', 1.25),
+        );
+        $factory = $this->createMock(EvaluationAttemptResultFactory::class);
+        $process = new MutantProcess($this->processStub, $this->mutant, $factory);
+        $factory->expects($this->once())->method('createFromProcess')->with($this->identicalTo($process))->willReturn($expected);
+        $process->markAsFinished();
+
+        $this->assertSame($expected, $process->getEvaluationAttemptResult());
+        $this->assertSame($expected, $process->getEvaluationAttemptResult());
+    }
+
+    public function test_it_cannot_classify_an_unfinished_attempt(): void
+    {
+        $factory = $this->createMock(EvaluationAttemptResultFactory::class);
+        $factory->expects($this->never())->method('createFromProcess');
+        $process = new MutantProcess($this->processStub, $this->mutant, $factory);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot classify an evaluation before its process has finished.');
+
+        $process->getEvaluationAttemptResult();
     }
 
     private function assertMutantProcessStateIs(

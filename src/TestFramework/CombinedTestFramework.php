@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use BadMethodCallException;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationStrategy;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -53,6 +55,7 @@ final readonly class CombinedTestFramework implements TestFramework
     public function __construct(
         private TestFramework $firstTestFramework,
         private ?TestFramework $followUpTestFramework,
+        private EvaluationStrategy $strategy,
     ) {
     }
 
@@ -78,18 +81,19 @@ final readonly class CombinedTestFramework implements TestFramework
 
     public function test(Mutant $mutant): MutantProcessContainer
     {
-        $evaluation = $this->firstTestFramework->test($mutant);
-
+        $evaluation = MutantProcessContainer::from(
+            $mutant,
+            fn (): MutantProcessContainer|EvaluationAttemptResult => $this->firstTestFramework->test($mutant),
+        );
         $followUpTestFramework = $this->followUpTestFramework;
 
-        if ($followUpTestFramework === null) {
-            return $evaluation;
+        if ($followUpTestFramework !== null) {
+            $evaluation->append(
+                static fn (): MutantProcessContainer|EvaluationAttemptResult => $followUpTestFramework->test($mutant),
+            );
         }
 
-        // Defer the follow-up framework setup until the preceding evaluation has escaped.
-        return $evaluation->append(
-            static fn (): MutantProcessContainer => $followUpTestFramework->test($mutant),
-        );
+        return $evaluation->withStrategy($this->strategy);
     }
 
     public function hasJUnitReport(): bool

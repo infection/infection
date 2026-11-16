@@ -42,6 +42,7 @@ use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\DryRunProcess;
 use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\Process\DryRunAwareProcessFactory;
 use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use Infection\Testing\MutatorName;
@@ -136,7 +137,9 @@ final class MutantProcessContainerFactoryTest extends TestCase
             $testFrameworkExtraOptions,
         );
 
-        $process = $mutantProcess->getCurrent()->getProcess();
+        $attempt = $mutantProcess->getCurrent();
+        $this->assertInstanceOf(MutantProcess::class, $attempt);
+        $process = $attempt->getProcess();
 
         $this->assertContains($process->getCommandLine(), [
             "'/usr/bin/php' 'bin/phpunit' '--filter' '/path/to/acme/FooTest.php'",
@@ -153,8 +156,8 @@ final class MutantProcessContainerFactoryTest extends TestCase
         $processClass = $process::class;
         $this->assertSame($expectedProcessClass, $processClass);
 
-        $this->assertSame($mutant, $mutantProcess->getCurrent()->getMutant());
-        $this->assertFalse($mutantProcess->getCurrent()->isTimedOut());
+        $this->assertSame($mutant, $attempt->getMutant());
+        $this->assertFalse($attempt->isTimedOut());
 
         $this->assertSame([], $eventDispatcher->getEvents());
     }

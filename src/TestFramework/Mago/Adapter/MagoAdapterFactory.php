@@ -42,8 +42,8 @@ use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory;
 use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
-use Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
@@ -67,7 +67,7 @@ final class MagoAdapterFactory implements StaticAnalysisToolAdapterFactory
     ): StaticAnalysisToolAdapter {
         return new MagoAdapter(
             $processFactory,
-            new MagoMutantExecutionResultFactory(
+            new MagoEvaluationAttemptResultFactory(
                 new MagoMutantDetectionStatusResolver(),
             ),
             $staticAnalysisConfigPath,

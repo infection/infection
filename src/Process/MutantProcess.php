@@ -35,11 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantExecutionResultFactory;
 use function microtime;
 use Symfony\Component\Process\Process;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -47,6 +48,8 @@ use Symfony\Component\Process\Process;
  */
 class MutantProcess
 {
+    private ?EvaluationAttemptResult $evaluationAttemptResult = null;
+
     private bool $timedOut = false;
 
     private float $finishedAt = 0.0;
@@ -54,7 +57,7 @@ class MutantProcess
     public function __construct(
         private readonly Process $process,
         private readonly Mutant $mutant,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly EvaluationAttemptResultFactory $evaluationAttemptResultFactory,
     ) {
     }
 
@@ -95,9 +98,10 @@ class MutantProcess
             : $this->finishedAt - $this->process->getStartTime();
     }
 
-    public function getMutantExecutionResult(): MutantExecutionResult
+    public function getEvaluationAttemptResult(): EvaluationAttemptResult
     {
-        // todo [phpstan-integration] cache it
-        return $this->mutantExecutionResultFactory->createFromProcess($this);
+        Assert::greaterThan($this->finishedAt, 0.0, 'Cannot classify an evaluation before its process has finished.');
+
+        return $this->evaluationAttemptResult ??= $this->evaluationAttemptResultFactory->createFromProcess($this);
     }
 }

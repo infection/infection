@@ -39,6 +39,8 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\Process\DryRunProcess;
+use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessContainer;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
@@ -88,7 +90,11 @@ final class StaticAnalysisToolFactoryTest extends TestCase
     ): void {
         $framework = $this->createFactory($dryRun)->create($tool, 30);
         $mutant = MutantBuilder::withMinimalTestData()->build();
-        $process = $framework->test($mutant)->getCurrent()->getProcess();
+        $evaluation = $framework->test($mutant);
+        $this->assertInstanceOf(MutantProcessContainer::class, $evaluation);
+        $attempt = $evaluation->getCurrent();
+        $this->assertInstanceOf(MutantProcess::class, $attempt);
+        $process = $attempt->getProcess();
 
         $processClass = $process::class;
         $this->assertSame($expectedProcessClass, $processClass);

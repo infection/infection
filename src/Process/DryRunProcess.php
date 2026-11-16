@@ -53,11 +53,6 @@ final class DryRunProcess extends Process
 
     private bool $started = false;
 
-    public static function fromProcess(Process $process): self
-    {
-        return self::fromShellCommandline($process->getCommandLine());
-    }
-
     /**
      * @param array<array-key, mixed> $env
      */
