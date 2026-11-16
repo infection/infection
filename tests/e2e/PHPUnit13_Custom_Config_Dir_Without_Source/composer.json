@@ -4,7 +4,7 @@
     },
     "autoload": {
         "psr-4": {
-            "PHPUnit13CustomConfigDirWithoutSource\\": "src/"
+            "PHPUnit13CustomConfigDirWithoutSource\\": ["src/", "extra-src/"]
         }
     },
     "autoload-dev": {
