@@ -35,12 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationStrategy;
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
 
 /**
- * Represents a mutant evaluation as a chain of processes that may require follow-up stages.
- * It exposes the current process and controls whether the evaluation advances to the next one.
+ * Coordinates process-backed or direct evaluations until a strategy selects a final result.
+ * It preserves completed observations and exposes the current work without consuming it.
  *
  * @internal
  */
@@ -49,24 +52,31 @@ interface MutantEvaluationPipe
     public function getMutant(): Mutant;
 
     /**
+     * Returns a cold copy using this strategy between its configured evaluations.
+     * A nested pipe retains its own strategy for its internal follow-ups.
+     */
+    public function withStrategy(EvaluationStrategy $strategy): self;
+
+    /**
      * Whether evaluating the mutant has not started yet.
      */
     public function isCold(): bool;
 
     /**
-     * Retrieving the current process may cause the pipe to no longer be cold.
+     * Creates the first evaluation lazily, then exposes the same current attempt.
      */
-    public function getCurrent(): MutantProcess;
+    public function getCurrent(): MutantProcess|EvaluationAttemptResult;
 
     /**
-     * Determining whether a next process exists may cause the pipe to no longer be cold.
+     * Decides continuation after the current attempt completes. A direct result is
+     * already complete; a process must first be marked as finished by the runner.
      */
     public function hasNext(): bool;
 
     /**
-     * Creating the next process may cause the pipe to no longer be cold.
+     * Executes the selected continuation, preserving a nested pipe's follow-ups.
      */
-    public function createNext(): MutantProcess;
+    public function createNext(): MutantProcess|EvaluationAttemptResult;
 
     /**
      * Merges this pipe with the given pipe, preserving their evaluation order.
@@ -74,4 +84,10 @@ interface MutantEvaluationPipe
      * Both pipes must be cold. The returned pipe is cold and neither input is mutated.
      */
     public function merge(self $other): self;
+
+    /**
+     * Returns a memoized final result only after a finish decision has been locked in.
+     * Does not create processes for unused follow-ups.
+     */
+    public function getMutantExecutionResult(): MutantExecutionResult;
 }

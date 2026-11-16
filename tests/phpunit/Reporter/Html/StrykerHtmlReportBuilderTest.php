@@ -494,6 +494,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             now('<?php $a = 2;'),
             $testLocations,
             0.0,
+            [],
         );
     }
 }

@@ -35,12 +35,31 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\Process\MutantProcess;
+use Closure;
+use Override;
 
 /**
+ * Continues to the next configured evaluator after escape, otherwise keeps its status.
+ *
  * @internal
  */
-interface MutantExecutionResultFactory
+final readonly class SequentialEvaluationStrategy implements EvaluationStrategy
 {
-    public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult;
+    #[Override]
+    public function decide(
+        array $history,
+        array $evaluations,
+        ?Closure $nextEvaluation,
+        DetectionStatus $currentStatus,
+    ): RunEvaluation|FinishEvaluation {
+        if ($currentStatus !== DetectionStatus::ESCAPED) {
+            return new FinishEvaluation($currentStatus);
+        }
+
+        if ($nextEvaluation !== null) {
+            return new RunEvaluation($nextEvaluation);
+        }
+
+        return new FinishEvaluation($currentStatus);
+    }
 }

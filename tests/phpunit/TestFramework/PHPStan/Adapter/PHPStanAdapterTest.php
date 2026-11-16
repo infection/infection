@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PHPStan\Adapter;
 
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
@@ -67,7 +67,7 @@ final class PHPStanAdapterTest extends TestCase
 
         $this->adapter = new PHPStanAdapter(
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -105,7 +105,7 @@ final class PHPStanAdapterTest extends TestCase
     {
         $adapter = new PHPStanAdapter(
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -139,7 +139,7 @@ final class PHPStanAdapterTest extends TestCase
     {
         $adapter = new PHPStanAdapter(
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -175,7 +175,7 @@ final class PHPStanAdapterTest extends TestCase
     {
         $adapter = new PHPStanAdapter(
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -234,7 +234,7 @@ final class PHPStanAdapterTest extends TestCase
 
         $adapter = new PHPStanAdapter(
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -263,7 +263,7 @@ final class PHPStanAdapterTest extends TestCase
 
         $adapter = new PHPStanAdapter(
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -284,7 +284,7 @@ final class PHPStanAdapterTest extends TestCase
     {
         $adapter = new PHPStanAdapter(
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,

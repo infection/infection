@@ -36,8 +36,9 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Mago\Mutant;
 
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationAttemptResultFactory;
+use Infection\Mutant\EvaluationProcessDetails;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\MutantProcessDetectionStatusResolver;
 use function sprintf;
@@ -48,36 +49,25 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final readonly class MagoMutantExecutionResultFactory implements MutantExecutionResultFactory
+final readonly class MagoEvaluationAttemptResultFactory implements EvaluationAttemptResultFactory
 {
     public function __construct(
         private MutantProcessDetectionStatusResolver $detectionStatusResolver,
     ) {
     }
 
-    public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult
+    public function createFromProcess(MutantProcess $mutantProcess): EvaluationAttemptResult
     {
         $process = $mutantProcess->getProcess();
-        $mutant = $mutantProcess->getMutant();
-        $mutation = $mutant->getMutation();
 
-        return new MutantExecutionResult(
-            $process->getCommandLine(),
-            $this->retrieveProcessOutput($process),
+        return new EvaluationAttemptResult(
+            'Mago',
             $this->retrieveDetectionStatus($mutantProcess),
-            $mutant->getDiff(),
-            $mutation->getHash(),
-            $mutation->getMutatorClass(),
-            $mutation->getMutatorName(),
-            $mutation->getOriginalFilePath(),
-            $mutation->getOriginalStartingLine(),
-            $mutation->getOriginalEndingLine(),
-            $mutation->getOriginalStartFilePosition(),
-            $mutation->getOriginalEndFilePosition(),
-            $mutant->getPrettyPrintedOriginalCode(),
-            $mutant->getMutatedCode(),
-            $mutant->getTests(),
-            $mutantProcess->getFinishedAt() - $process->getStartTime(),
+            $this->retrieveProcessOutput($process),
+            new EvaluationProcessDetails(
+                $process->getCommandLine(),
+                $mutantProcess->getRuntime(),
+            ),
         );
     }
 

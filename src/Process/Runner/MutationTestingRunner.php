@@ -44,10 +44,12 @@ use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluatio
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Framework\Iterable\IterableCounter;
+use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
+use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use function Pipeline\take;
@@ -96,7 +98,7 @@ class MutationTestingRunner
             ->filter($this->uncoveredByTest(...))
             ->filter($this->takingTooLong(...))
             ->tap($this->materializeMutant(...))
-            ->cast($this->testFramework->test(...))
+            ->cast($this->evaluateMutant(...))
         ;
 
         take($this->processRunner->run($processContainers))
@@ -105,6 +107,14 @@ class MutationTestingRunner
         ;
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
+    }
+
+    private function evaluateMutant(Mutant $mutant): MutantEvaluationPipe
+    {
+        return MutantProcessContainer::from(
+            $mutant,
+            fn (): MutantEvaluationPipe|EvaluationAttemptResult => $this->testFramework->test($mutant),
+        );
     }
 
     private function mutationToMutant(Mutation $mutation): Mutant
@@ -189,6 +199,6 @@ class MutationTestingRunner
 
     private static function containerToFinishedEvent(MutantEvaluationPipe $container): MutantProcessWasFinished
     {
-        return new MutantProcessWasFinished($container->getCurrent()->getMutantExecutionResult());
+        return new MutantProcessWasFinished($container->getMutantExecutionResult());
     }
 }

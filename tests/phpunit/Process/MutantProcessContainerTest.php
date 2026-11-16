@@ -35,15 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
+use Closure;
+use function count;
 use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationProcessDetails;
+use Infection\Mutant\EvaluationStrategy;
+use Infection\Mutant\FinishEvaluation;
+use Infection\Mutant\RunEvaluation;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\Tests\Mutant\MutantBuilder;
-use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use Webmozart\Assert\InvalidArgumentException;
 
 #[CoversClass(MutantProcessContainer::class)]
 final class MutantProcessContainerTest extends TestCase
@@ -60,17 +68,12 @@ final class MutantProcessContainerTest extends TestCase
         $this->assertFalse($container->isCold());
     }
 
-    public function test_it_has_no_next_process_without_a_follow_up_factory(): void
+    public function test_it_finishes_a_completed_attempt_without_a_follow_up_factory(): void
     {
-        $process = $this->createMock(MutantProcess::class);
-        $process
-            ->expects($this->never())
-            ->method('getMutantExecutionResult')
-        ;
+        $result = new EvaluationAttemptResult('Evaluator', DetectionStatus::ESCAPED, '', null);
+        $container = MutantProcessContainer::from(MutantBuilder::withCompleteTestData()->build(), static fn (): EvaluationAttemptResult => $result);
 
-        $container = MutantProcessContainer::from(MutantBuilder::withMinimalTestData()->build(), static fn (): MutantProcess => $process);
-
-        $this->assertSame($process, $container->getCurrent());
+        $this->assertSame($result, $container->getCurrent());
         $this->assertFalse($container->hasNext());
     }
 
@@ -78,16 +81,19 @@ final class MutantProcessContainerTest extends TestCase
     public function test_only_escaped_mutants_have_a_follow_up_process(DetectionStatus $status, bool $hasNext): void
     {
         $process = $this->createStub(MutantProcess::class);
-        $result = MutantExecutionResultBuilder::withMinimalTestData()
-            ->withDetectionStatus($status)
-            ->build()
-        ;
+        $process->method('getFinishedAt')->willReturn(2.0);
+        $result = new EvaluationAttemptResult(
+            'PHPUnit',
+            $status,
+            'output',
+            new EvaluationProcessDetails('phpunit', 1.0),
+        );
         $process
-            ->method('getMutantExecutionResult')
+            ->method('getEvaluationAttemptResult')
             ->willReturn($result)
         ;
 
-        $container = MutantProcessContainer::from(MutantBuilder::withMinimalTestData()->build(), static fn (): MutantProcess => $process)
+        $container = MutantProcessContainer::from(MutantBuilder::withCompleteTestData()->build(), static fn (): MutantProcess => $process)
             ->append(function (): MutantProcess {
                 $this->fail('Checking for a follow-up must not create its process.');
             })
@@ -101,31 +107,38 @@ final class MutantProcessContainerTest extends TestCase
         $first = $this->createStub(MutantProcess::class);
         $second = $this->createStub(MutantProcess::class);
         $third = $this->createStub(MutantProcess::class);
-        $escaped = MutantExecutionResultBuilder::withMinimalTestData()
-            ->withDetectionStatus(DetectionStatus::ESCAPED)
-            ->build()
-        ;
+        $first->method('getFinishedAt')->willReturn(2.0);
+        $second->method('getFinishedAt')->willReturn(3.0);
+        $third->method('getFinishedAt')->willReturn(4.0);
+        $escaped = new EvaluationAttemptResult(
+            'PHPUnit',
+            DetectionStatus::ESCAPED,
+            'output',
+            new EvaluationProcessDetails('phpunit', 1.0),
+        );
         $first
-            ->method('getMutantExecutionResult')
+            ->method('getEvaluationAttemptResult')
             ->willReturn($escaped)
         ;
         $second
-            ->method('getMutantExecutionResult')
+            ->method('getEvaluationAttemptResult')
             ->willReturn($escaped)
         ;
-        $killed = MutantExecutionResultBuilder::withMinimalTestData()
-            ->withDetectionStatus(DetectionStatus::KILLED_BY_STATIC_ANALYSIS)
-            ->build()
-        ;
+        $killed = new EvaluationAttemptResult(
+            'PHPUnit',
+            DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
+            'output',
+            new EvaluationProcessDetails('phpunit', 1.0),
+        );
         $third
-            ->method('getMutantExecutionResult')
+            ->method('getEvaluationAttemptResult')
             ->willReturn($killed)
         ;
         $calls = new stdClass();
         $calls->first = 0;
         $calls->second = 0;
 
-        $container = MutantProcessContainer::from(MutantBuilder::withMinimalTestData()->build(), static function () use ($first, $calls): MutantProcess {
+        $container = MutantProcessContainer::from(MutantBuilder::withCompleteTestData()->build(), static function () use ($first, $calls): MutantProcess {
             ++$calls->first;
 
             return $first;
@@ -161,6 +174,183 @@ final class MutantProcessContainerTest extends TestCase
         $this->assertFalse($container->hasNext());
     }
 
+    #[DataProvider('completedAttemptsProvider')]
+    public function test_it_finalizes_with_the_last_status_and_retains_every_attempt(DetectionStatus $firstStatus, ?DetectionStatus $secondStatus): void
+    {
+        $mutant = MutantBuilder::withCompleteTestData()->build();
+        $first = new EvaluationAttemptResult(
+            'PHPUnit',
+            $firstStatus,
+            'test output',
+            new EvaluationProcessDetails('phpunit', 1.25),
+        );
+        $firstProcess = $this->createStub(MutantProcess::class);
+        $firstProcess->method('getFinishedAt')->willReturn(2.0);
+        $firstProcess->method('getEvaluationAttemptResult')->willReturn($first);
+        $firstProcess->method('getMutant')->willReturn($mutant);
+        $container = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $firstProcess);
+        $container->getCurrent();
+        $expectedHistory = [$first];
+        $last = $first;
+
+        if ($secondStatus !== null) {
+            $last = new EvaluationAttemptResult(
+                'PHPStan',
+                $secondStatus,
+                'analysis output',
+                new EvaluationProcessDetails('phpstan', 0.25),
+            );
+            $secondProcess = $this->createStub(MutantProcess::class);
+            $secondProcess->method('getFinishedAt')->willReturn(3.0);
+            $secondProcess->method('getEvaluationAttemptResult')->willReturn($last);
+            $secondProcess->method('getMutant')->willReturn($mutant);
+            $container->append(static fn (): MutantProcess => $secondProcess);
+            $this->assertTrue($container->hasNext());
+            $container->createNext();
+            $expectedHistory[] = $last;
+        }
+
+        if ($last->detectionStatus !== DetectionStatus::ESCAPED) {
+            $container->append(function (): MutantProcess {
+                $this->fail('Finalization must not create unused processes.');
+            });
+        }
+
+        $actual = $container->getMutantExecutionResult();
+
+        $this->assertSame($expectedHistory, $actual->getEvaluationHistory());
+        $this->assertSame($last->detectionStatus, $actual->getDetectionStatus());
+        $this->assertSame($last->process?->commandLine, $actual->getProcessCommandLine());
+        $this->assertSame($last->output, $actual->getProcessOutput());
+        $this->assertSame($last->process?->runtime, $actual->getProcessRuntime());
+        $this->assertSame($mutant->getMutation()->getHash(), $actual->getMutantHash());
+    }
+
+    public function test_it_cannot_report_before_creating_a_process(): void
+    {
+        $container = MutantProcessContainer::from(
+            MutantBuilder::withMinimalTestData()->build(),
+            function (): MutantProcess {
+                $this->fail('Reporting must not create a process.');
+            },
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot finalize a mutant before evaluation has started.');
+
+        $container->getMutantExecutionResult();
+    }
+
+    public function test_it_cannot_report_an_unfinished_process(): void
+    {
+        $process = $this->createMock(MutantProcess::class);
+        $process->method('getFinishedAt')->willReturn(0.0);
+        $process->expects($this->never())->method('getEvaluationAttemptResult');
+        $container = MutantProcessContainer::from(
+            MutantBuilder::withMinimalTestData()->build(),
+            static fn (): MutantProcess => $process,
+        );
+        $container->getCurrent();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot collect evaluation history before the process has finished.');
+
+        $container->getMutantExecutionResult();
+    }
+
+    public function test_the_strategy_can_finalize_without_running_the_remaining_evaluator(): void
+    {
+        $mutant = MutantBuilder::withCompleteTestData()->build();
+        $attempt = new EvaluationAttemptResult('Evaluator', DetectionStatus::ESCAPED, 'Attempt output', null);
+        $unused = function (): EvaluationAttemptResult {
+            $this->fail('The strategy has decided that no further evaluation is needed.');
+        };
+        $strategy = $this->createMock(EvaluationStrategy::class);
+        $strategy
+            ->expects($this->once())
+            ->method('decide')
+            ->with(
+                [$attempt],
+                $this->callback(static fn (array $evaluations): bool => count($evaluations) === 2 && isset($evaluations[1])),
+            )
+            ->willReturn(new FinishEvaluation(DetectionStatus::KILLED_BY_TESTS))
+        ;
+        $evaluation = MutantProcessContainer::from($mutant, static fn (): EvaluationAttemptResult => $attempt)
+            ->append($unused)
+            ->withStrategy($strategy)
+        ;
+
+        $this->assertFalse($evaluation->hasNext());
+        $this->assertFalse($evaluation->hasNext());
+        $evaluation->getCurrent();
+        $final = $evaluation->getMutantExecutionResult();
+
+        $this->assertSame(DetectionStatus::KILLED_BY_TESTS, $final->getDetectionStatus());
+        $this->assertSame([$attempt], $final->getEvaluationHistory());
+        $this->assertSame($final, $evaluation->getMutantExecutionResult());
+    }
+
+    public function test_it_finalizes_a_direct_result_without_process_details(): void
+    {
+        $mutant = MutantBuilder::withCompleteTestData()->build();
+        $result = new EvaluationAttemptResult('In-memory analyser', DetectionStatus::KILLED_BY_STATIC_ANALYSIS, 'Type mismatch', null);
+        $evaluation = MutantProcessContainer::from($mutant, static fn (): EvaluationAttemptResult => $result);
+
+        $evaluation->getCurrent();
+        $final = $evaluation->getMutantExecutionResult();
+
+        $this->assertSame($result, $evaluation->getCurrent());
+        $this->assertSame([$result], $final->getEvaluationHistory());
+        $this->assertSame(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, $final->getDetectionStatus());
+        $this->assertSame('Type mismatch', $final->getProcessOutput());
+        $this->assertSame('', $final->getProcessCommandLine());
+        $this->assertSame(0.0, $final->getProcessRuntime());
+        $this->assertSame($mutant->getMutation()->getHash(), $final->getMutantHash());
+    }
+
+    public function test_it_cannot_finalize_while_a_follow_up_is_pending(): void
+    {
+        $process = $this->createStub(MutantProcess::class);
+        $process->method('getFinishedAt')->willReturn(2.0);
+        $process->method('getEvaluationAttemptResult')->willReturn(
+            new EvaluationAttemptResult(
+                'PHPUnit',
+                DetectionStatus::ESCAPED,
+                '',
+                new EvaluationProcessDetails('phpunit', 1.0),
+            ),
+        );
+        $container = MutantProcessContainer::from(MutantBuilder::withCompleteTestData()->build(), static fn (): MutantProcess => $process);
+        $container->getCurrent();
+        $container->append(function (): MutantProcess {
+            $this->fail('Checking completion must not create the pending process.');
+        });
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot finalize a mutant while another evaluation attempt is pending.');
+
+        $container->getMutantExecutionResult();
+    }
+
+    public static function completedAttemptsProvider(): iterable
+    {
+        yield 'tests escape then analysis detects' => [DetectionStatus::ESCAPED, DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
+
+        yield 'both evaluators escape' => [DetectionStatus::ESCAPED, DetectionStatus::ESCAPED];
+
+        yield 'analysis errors' => [DetectionStatus::ESCAPED, DetectionStatus::ERROR];
+
+        yield 'analysis times out' => [DetectionStatus::ESCAPED, DetectionStatus::TIMED_OUT];
+
+        yield 'single escaped stage' => [DetectionStatus::ESCAPED, null];
+
+        yield 'tests kill' => [DetectionStatus::KILLED_BY_TESTS, null];
+
+        yield 'tests error' => [DetectionStatus::ERROR, null];
+
+        yield 'tests time out' => [DetectionStatus::TIMED_OUT, null];
+    }
+
     public static function detectionStatusProvider(): iterable
     {
         yield 'escaped' => [DetectionStatus::ESCAPED, true];
@@ -180,5 +370,65 @@ final class MutantProcessContainerTest extends TestCase
         yield 'not covered' => [DetectionStatus::NOT_COVERED, false];
 
         yield 'ignored' => [DetectionStatus::IGNORED, false];
+    }
+
+    public function test_the_strategy_can_select_another_evaluator_and_retry_it_after_a_nested_history(): void
+    {
+        $mutant = MutantBuilder::withCompleteTestData()->build();
+        $first = new EvaluationAttemptResult('First', DetectionStatus::ESCAPED, '', null);
+        $second = new EvaluationAttemptResult('Second', DetectionStatus::ESCAPED, '', null);
+        $third = new EvaluationAttemptResult('Selected', DetectionStatus::ERROR, 'first result', null);
+        $fourth = new EvaluationAttemptResult('Selected', DetectionStatus::ESCAPED, 'retried result', null);
+        $nested = MutantProcessContainer::from($mutant, static fn (): EvaluationAttemptResult => $first)
+            ->append(static fn (): EvaluationAttemptResult => $second)
+        ;
+        $calls = 0;
+        $selected = static function () use (&$calls, $third, $fourth): EvaluationAttemptResult {
+            return ++$calls === 1
+                ? $third
+                : $fourth;
+        };
+        $strategy = $this->createMock(EvaluationStrategy::class);
+        $strategy->expects($this->exactly(3))->method('decide')->willReturnCallback(
+            function (array $history, array $evaluations, ?Closure $next, DetectionStatus $status) use ($first, $second, $third, $fourth): RunEvaluation|FinishEvaluation {
+                $this->assertCount(3, $evaluations);
+
+                if ($history === [$first, $second]) {
+                    $this->assertSame($evaluations[1], $next);
+
+                    return new RunEvaluation($evaluations[2]);
+                }
+
+                if ($history === [$first, $second, $third]) {
+                    $this->assertNull($next);
+
+                    return new RunEvaluation($evaluations[2]);
+                }
+
+                $this->assertSame([$first, $second, $third, $fourth], $history);
+
+                return new FinishEvaluation(DetectionStatus::KILLED_BY_TESTS);
+            },
+        );
+        $pipe = MutantProcessContainer::from($mutant, static fn (): MutantEvaluationPipe => $nested)
+            ->append(function (): EvaluationAttemptResult {
+                $this->fail('The strategy selected the third evaluator.');
+            })
+            ->append($selected)
+            ->withStrategy($strategy)
+        ;
+
+        $this->assertSame($first, $pipe->getCurrent());
+        $this->assertSame($second, $pipe->createNext());
+        $this->assertTrue($pipe->hasNext());
+        $this->assertSame($third, $pipe->createNext());
+        $this->assertSame($fourth, $pipe->createNext());
+        $this->assertFalse($pipe->hasNext());
+        $result = $pipe->getMutantExecutionResult();
+
+        $this->assertSame(2, $calls);
+        $this->assertSame([$first, $second, $third, $fourth], $result->getEvaluationHistory());
+        $this->assertSame(DetectionStatus::KILLED_BY_TESTS, $result->getDetectionStatus());
+        $this->assertSame($result, $pipe->getMutantExecutionResult());
     }
 }

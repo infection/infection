@@ -35,17 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationAttemptResultFactory;
+use Infection\Mutant\EvaluationProcessDetails;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
 use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+use Webmozart\Assert\InvalidArgumentException;
 
-#[CoversClass(MutantProcessContainer::class)]
+#[CoversClass(MutantProcess::class)]
 final class MutantProcessTest extends TestCase
 {
     private Stub&Process $processStub;
@@ -58,12 +62,12 @@ final class MutantProcessTest extends TestCase
     {
         $this->processStub = $this->createStub(Process::class);
         $this->mutant = MutantBuilder::withMinimalTestData()->build();
-        $mutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
+        $evaluationAttemptResultFactory = $this->createStub(EvaluationAttemptResultFactory::class);
 
         $this->mutantProcess = new MutantProcess(
             $this->processStub,
             $this->mutant,
-            $mutantExecutionResultFactory,
+            $evaluationAttemptResultFactory,
         );
     }
 
@@ -87,6 +91,66 @@ final class MutantProcessTest extends TestCase
             $this->mutant,
             true,
         );
+    }
+
+    public function test_it_classifies_a_completed_attempt_once_and_retains_the_same_result(): void
+    {
+        $expected = new EvaluationAttemptResult(
+            'PHPUnit',
+            DetectionStatus::ESCAPED,
+            'output',
+            new EvaluationProcessDetails('phpunit', 1.25),
+        );
+        $factory = $this->createMock(EvaluationAttemptResultFactory::class);
+        $process = new MutantProcess($this->processStub, $this->mutant, $factory);
+        $factory->expects($this->once())->method('createFromProcess')->with($this->identicalTo($process))->willReturn($expected);
+        $process->markAsFinished();
+
+        $this->assertSame($expected, $process->getEvaluationAttemptResult());
+        $this->assertSame($expected, $process->getEvaluationAttemptResult());
+    }
+
+    public function test_it_cannot_classify_an_unfinished_attempt(): void
+    {
+        $factory = $this->createMock(EvaluationAttemptResultFactory::class);
+        $factory->expects($this->never())->method('createFromProcess');
+        $process = new MutantProcess($this->processStub, $this->mutant, $factory);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot classify an evaluation before its process has finished.');
+
+        $process->getEvaluationAttemptResult();
+    }
+
+    public function test_it_simulates_a_completed_process_for_a_dry_run(): void
+    {
+        $underlying = new Process(['must-not-run']);
+        $attempt = new MutantProcess($underlying, $this->mutant, $this->createStub(EvaluationAttemptResultFactory::class));
+
+        $attempt->simulate();
+
+        $this->assertFalse($underlying->isStarted());
+        $this->assertInstanceOf(DryRunProcess::class, $attempt->getProcess());
+        $this->assertGreaterThan(0.0, $attempt->getFinishedAt());
+        $this->assertSame(0.0, $attempt->getRuntime());
+    }
+
+    public function test_it_cannot_simulate_an_already_completed_process(): void
+    {
+        $this->mutantProcess->markAsFinished();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot simulate an already completed evaluation.');
+
+        $this->mutantProcess->simulate();
+    }
+
+    public function test_it_exposes_the_completed_process_runtime(): void
+    {
+        $this->processStub->method('getStartTime')->willReturn(10.0);
+        $this->mutantProcess->markAsFinished();
+
+        $this->assertSame($this->mutantProcess->getFinishedAt() - 10.0, $this->mutantProcess->getRuntime());
     }
 
     private function assertMutantProcessStateIs(
