@@ -790,12 +790,6 @@ parameters:
 			path: ../src/TestFramework/Mago/Process/MagoMutantProcessFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Process\Factory\LazyMutantProcessFactory
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Process/MagoMutantProcessFactory.php
-
-		-
 			rawMessage: Infection\TestFramework\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Process\MutantProcess
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 2

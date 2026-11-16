@@ -2166,7 +2166,9 @@ final class PhpUnitAdapterTest extends TestCase
                     );
                     $mutantProcess->markAsFinished();
 
-                    return new MutantProcessContainer($mutantProcess, []);
+                    return MutantProcessContainer::from(
+                        static fn (): MutantProcess => $mutantProcess,
+                    );
                 },
             )
         ;

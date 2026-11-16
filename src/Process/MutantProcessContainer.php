@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use function array_key_exists;
+use Closure;
 use Infection\Mutant\DetectionStatus;
-use Infection\Process\Factory\LazyMutantProcessFactory;
 
 /**
  * @internal
@@ -46,20 +46,29 @@ use Infection\Process\Factory\LazyMutantProcessFactory;
 class MutantProcessContainer
 {
     /**
-     * @var list<MutantProcess>
+     * @var array<non-negative-int, MutantProcess>
      */
     private array $processes = [];
 
+    /**
+     * @var non-negative-int
+     */
     private int $currentProcessIndex = 0;
 
     /**
-     * @param list<LazyMutantProcessFactory> $lazyMutantProcessCreators
+     * @param non-empty-list<Closure(): MutantProcess> $mutantProcessFactories
      */
-    public function __construct(
-        MutantProcess $phpUnitMutantProcess,
-        private readonly array $lazyMutantProcessCreators,
+    private function __construct(
+        private array $mutantProcessFactories,
     ) {
-        $this->processes[] = $phpUnitMutantProcess;
+    }
+
+    /**
+     * @param Closure(): MutantProcess $factory
+     */
+    public static function from(Closure $factory): self
+    {
+        return new self([$factory]);
     }
 
     /**
@@ -67,26 +76,30 @@ class MutantProcessContainer
      */
     public function hasNext(): bool
     {
-        return array_key_exists($this->currentProcessIndex, $this->lazyMutantProcessCreators)
+        return array_key_exists($this->currentProcessIndex + 1, $this->mutantProcessFactories)
             && $this->getCurrentMutantProcessDetectionStatus() === DetectionStatus::ESCAPED;
     }
 
     public function createNext(): MutantProcess
     {
-        $newMutantProcess = $this->lazyMutantProcessCreators[$this->currentProcessIndex]->create(
-            $this->processes[0]->getMutant(),
-        );
-
-        $this->processes[] = $newMutantProcess;
-
         ++$this->currentProcessIndex;
 
-        return $newMutantProcess;
+        return $this->getCurrent();
     }
 
     public function getCurrent(): MutantProcess
     {
-        return $this->processes[$this->currentProcessIndex];
+        return $this->processes[$this->currentProcessIndex] ??= ($this->mutantProcessFactories[$this->currentProcessIndex])();
+    }
+
+    /**
+     * @param Closure(): MutantProcess $factory
+     */
+    public function append(Closure $factory): self
+    {
+        $this->mutantProcessFactories[] = $factory;
+
+        return $this;
     }
 
     private function getCurrentMutantProcessDetectionStatus(): DetectionStatus

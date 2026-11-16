@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Testing\TestFramework\Debug;
 
 use Infection\Mutant\Mutant;
+use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
@@ -90,7 +91,9 @@ final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisTestFra
             $this->commandLine,
         );
 
-        return new MutantProcessContainer($factory->create($mutant), []);
+        return MutantProcessContainer::from(
+            static fn (): MutantProcess => $factory->create($mutant),
+        );
     }
 
     #[Override]

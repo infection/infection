@@ -38,7 +38,6 @@ namespace Infection\TestFramework\PHPStan\Process;
 use function array_merge;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
@@ -49,7 +48,7 @@ use Symfony\Component\Process\Process;
 /**
  * @internal
  */
-final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
+final readonly class PHPStanMutantProcessFactory
 {
     private const array PHP_EXTRA_ARGS = ['-d memory_limit=-1'];
 
