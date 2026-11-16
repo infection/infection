@@ -121,7 +121,7 @@ final class ListSourcesCommand extends BaseCommand
     {
         if (
             $configuration->sourceFilter->filtersFiles()
-            || $configuration->testFrameworkExtraOptions !== ''
+            || $configuration->classifiedPositionalArguments->testPaths !== []
         ) {
             return;
         }
