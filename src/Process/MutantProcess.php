@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
+use DuoClock\DuoClock;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
-use function microtime;
 use function sprintf;
 use Symfony\Component\Process\Process;
 use function trim;
@@ -62,6 +62,7 @@ class MutantProcess
         private readonly string $testFrameworkName,
         private readonly MutantProcessDetectionStatusResolver $detectionStatusResolver,
         private readonly bool $includeErrorOutput,
+        private readonly DuoClock $clock = new DuoClock(),
     ) {
     }
 
@@ -92,7 +93,7 @@ class MutantProcess
 
     public function markAsFinished(): void
     {
-        $this->finishedAt = microtime(true);
+        $this->finishedAt = $this->clock->microtime();
     }
 
     public function getFinishedAt(): float

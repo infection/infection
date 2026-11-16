@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
+use function array_map;
 use Closure;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
@@ -89,6 +90,56 @@ final class MutantExecutionResultTest extends TestCase
     }
 
     /**
+     * @param non-empty-list<float> $attempts
+     */
+    #[DataProvider('timedHistoryProvider')]
+    public function test_it_sums_completed_process_runtimes_without_changing_the_final_result(
+        array $attempts,
+        float $activeTime,
+        float $finalRuntime,
+    ): void {
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+        $history = array_map(function (float $runtime): MutantProcess {
+            $process = $this->createStub(MutantProcess::class);
+            $process->method('getRuntime')->willReturn($runtime);
+
+            return $process;
+        }, $attempts);
+        $original = MutantExecutionResult::createFromEvaluation($mutant, DetectionStatus::ESCAPED, $history);
+        $result = $original->withEvaluationElapsedTime(6.5);
+
+        $this->assertSame($activeTime, $result->getEvaluationActiveTime());
+        $this->assertSame(6.5, $result->getEvaluationElapsedTime());
+        $this->assertSame(DetectionStatus::ESCAPED, $result->getDetectionStatus());
+        $this->assertNull($original->getEvaluationElapsedTime());
+        $this->assertSame($history, $result->getEvaluationHistory());
+        $this->assertSame($finalRuntime, $result->getProcessRuntime());
+        $this->assertSame($original->getProcessOutput(), $result->getProcessOutput());
+    }
+
+    public static function timedHistoryProvider(): iterable
+    {
+        yield 'single process' => [[2.0], 2.0, 2.0];
+
+        yield 'two processes' => [[2.0, 0.5], 2.5, 0.5];
+
+        yield 'a process followed by a zero-runtime process' => [[2.0, 0.0], 2.0, 0.0];
+
+        yield 'zero process runtime' => [[0.0], 0.0, 0.0];
+    }
+
+    public function test_it_uses_the_legacy_process_runtime_when_no_history_is_available(): void
+    {
+        $result = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withProcessRuntime(0.75)
+            ->build()
+        ;
+
+        $this->assertSame(0.75, $result->getEvaluationActiveTime());
+        $this->assertNull($result->getEvaluationElapsedTime());
+    }
+
+    /**
      * @param Closure(Mutant): MutantExecutionResult $createResult
      */
     #[DataProvider('processFreeResultProvider')]
@@ -101,6 +152,8 @@ final class MutantExecutionResultTest extends TestCase
         $this->assertSame('', $result->getProcessCommandLine());
         $this->assertSame('', $result->getProcessOutput());
         $this->assertSame(0.0, $result->getProcessRuntime());
+        $this->assertSame(0.0, $result->getEvaluationActiveTime());
+        $this->assertNull($result->getEvaluationElapsedTime());
     }
 
     public static function processFreeResultProvider(): iterable

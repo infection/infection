@@ -83,7 +83,7 @@ class ProcessQueue
         $current = $input->current();
         Assert::notNull($current, 'Input iterator must not produce null values.');
 
-        $this->bucket->enqueue($current);
+        $this->enqueue($current);
         $input->next();
 
         return self::ns2ms($this->clock->microtime() - $start);
@@ -91,6 +91,7 @@ class ProcessQueue
 
     public function enqueue(MutantProcessContainer $container): void
     {
+        $container->markAsScheduled($this->clock->microtime());
         $this->bucket->enqueue($container);
     }
 

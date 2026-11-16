@@ -39,8 +39,6 @@ use function array_map;
 use Infection\Framework\Str;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationProcessDetails;
 use Infection\Reporter\BaseTextFileReporter;
 use Infection\Reporter\GitHubActionsLogTextFileReporter;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -119,15 +117,21 @@ final class GitHubActionsLogTextFileReporterTest extends TestCase
         $this->assertContains($expected, $sections);
     }
 
-    #[DataProvider('directEvaluationHistoryProvider')]
-    public function test_it_groups_mixed_observations_by_the_locked_final_status(
+    #[DataProvider('recordedEvaluationHistoryProvider')]
+    public function test_it_groups_process_history_by_the_recorded_final_status(
         bool $debugVerbosity,
         bool $debugMode,
         string $expectedDetails,
     ): void {
         $history = [
-            new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED, 'Tests pass', new EvaluationProcessDetails('vendor/bin/phpunit', 1.0)),
-            new EvaluationAttemptResult("\r\nIn-memory analyser \r\n", DetectionStatus::ERROR, "\r\nAnalysis failed \r\n", null),
+            self::stubReportedProcess('PHPUnit', DetectionStatus::ESCAPED, 'Tests pass', 'vendor/bin/phpunit', 1.0),
+            self::stubReportedProcess(
+                "\r\nPHPStan \r\n",
+                DetectionStatus::ERROR,
+                "\r\nAnalysis failed \r\n",
+                'vendor/bin/phpstan',
+                0.25,
+            ),
         ];
         $collector = self::createEvaluationHistoryResultsCollector(history: $history);
         $reporter = new GitHubActionsLogTextFileReporter($collector, $debugVerbosity, false, $debugMode);
@@ -144,9 +148,9 @@ final class GitHubActionsLogTextFileReporterTest extends TestCase
         $this->assertSame($history, $collector->getEscapedExecutionResults()[0]->getEvaluationHistory());
     }
 
-    public static function directEvaluationHistoryProvider(): iterable
+    public static function recordedEvaluationHistoryProvider(): iterable
     {
-        yield 'commands and outputs include direct evidence without a fabricated command' => [
+        yield 'debug details show both commands and outputs' => [
             true,
             true,
             <<<'TXT'
@@ -156,7 +160,8 @@ final class GitHubActionsLogTextFileReporterTest extends TestCase
                 $ vendor/bin/phpunit
                   Tests pass
 
-                In-memory analyser:
+                PHPStan:
+                $ vendor/bin/phpstan
                   Analysis failed
                 TXT,
         ];
@@ -170,12 +175,12 @@ final class GitHubActionsLogTextFileReporterTest extends TestCase
                 PHPUnit:
                   Tests pass
 
-                In-memory analyser:
+                PHPStan:
                   Analysis failed
                 TXT,
         ];
 
-        yield 'debug mode retains evaluator labels and only the real command' => [
+        yield 'debug mode retains evaluator labels and both commands' => [
             false,
             true,
             <<<'TXT'
@@ -184,7 +189,8 @@ final class GitHubActionsLogTextFileReporterTest extends TestCase
                 PHPUnit:
                 $ vendor/bin/phpunit
 
-                In-memory analyser:
+                PHPStan:
+                $ vendor/bin/phpstan
                 TXT,
         ];
 

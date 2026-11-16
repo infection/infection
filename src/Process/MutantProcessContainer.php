@@ -49,6 +49,10 @@ use Webmozart\Assert\Assert;
  */
 class MutantProcessContainer
 {
+    private ?float $scheduledAt = null;
+
+    private ?float $finishedAt = null;
+
     private MutantProcess|self|null $current = null;
 
     /**
@@ -139,6 +143,17 @@ class MutantProcessContainer
         return $this->getCurrent();
     }
 
+    public function markAsScheduled(float $scheduledAt): void
+    {
+        // A follow-up reuses the container, so its queue wait belongs to the same evaluation.
+        $this->scheduledAt ??= $scheduledAt;
+    }
+
+    public function markAsFinished(float $finishedAt): void
+    {
+        $this->finishedAt ??= $finishedAt;
+    }
+
     public function getMutantExecutionResult(): MutantExecutionResult
     {
         Assert::false($this->isCold(), 'Cannot finalize a mutant before evaluation has started.');
@@ -147,11 +162,27 @@ class MutantProcessContainer
         $history = $this->evaluationHistory;
         Assert::notEmpty($history, 'Cannot build a final mutant result without a completed evaluation.');
 
-        return $this->finalResult ??= MutantExecutionResult::createFromEvaluation(
+        if ($this->finalResult !== null) {
+            return $this->finalResult;
+        }
+
+        $elapsedTime = null;
+
+        if ($this->scheduledAt !== null) {
+            $finishedAt = $this->finishedAt;
+            Assert::notNull($finishedAt, 'Cannot report elapsed evaluation time before the final evaluation has finished.');
+            $elapsedTime = $finishedAt - $this->scheduledAt;
+        }
+
+        $result = MutantExecutionResult::createFromEvaluation(
             $this->mutant,
             $status,
             $history,
         );
+
+        return $this->finalResult = $elapsedTime === null
+            ? $result
+            : $result->withEvaluationElapsedTime($elapsedTime);
     }
 
     private function evaluate(int $index): MutantProcess|self

@@ -41,18 +41,28 @@ use Infection\Metrics\Collector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationProcessDetails;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Mutator\Regex\PregQuote;
+use Infection\Process\MutantProcess;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use function Later\now;
+use PHPUnit\Framework\MockObject\Stub;
+use Symfony\Component\Process\Process;
 
 trait CreateMetricsCalculator
 {
     private static string $originalFilePrefix = '';
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $type
+     *
+     * @return T&Stub
+     */
+    abstract protected static function createStub(string $type): Stub;
 
     private static function createCompleteMetricsCalculator(): MetricsCalculator
     {
@@ -73,7 +83,7 @@ trait CreateMetricsCalculator
     }
 
     /**
-     * @param non-empty-list<EvaluationAttemptResult>|null $history
+     * @param non-empty-list<MutantProcess>|null $history
      */
     private static function createEvaluationHistoryResultsCollector(
         bool $withTestAttempt = true,
@@ -81,32 +91,34 @@ trait CreateMetricsCalculator
         ?array $history = null,
     ): ResultsCollector {
         if ($history === null) {
-            $history = [new EvaluationAttemptResult(
+            $history = [self::stubReportedProcess(
                 'PHPStan',
                 $status,
                 'PHPStan output',
-                new EvaluationProcessDetails('vendor/bin/phpstan', 0.25),
+                'vendor/bin/phpstan',
+                0.25,
             )];
 
             if ($withTestAttempt) {
                 $history = [
-                    new EvaluationAttemptResult(
+                    self::stubReportedProcess(
                         'PHPUnit',
                         DetectionStatus::ESCAPED,
                         "\nPHPUnit output \r\nnext line \n",
-                        new EvaluationProcessDetails('vendor/bin/phpunit', 1.0),
+                        'vendor/bin/phpunit',
+                        1.0,
                     ),
                     ...$history,
                 ];
             }
         }
 
-        $lastAttempt = $history[array_key_last($history)];
+        $lastProcess = $history[array_key_last($history)];
         $result = MutantExecutionResultBuilder::withMinimalTestData()
             ->withMutantDiff('mutant diff')
-            ->withProcessCommandLine($lastAttempt->process?->commandLine ?? '')
-            ->withProcessOutput($lastAttempt->output)
-            ->withProcessRuntime($lastAttempt->process?->runtime ?? 0.0)
+            ->withProcessCommandLine($lastProcess->getProcess()->getCommandLine())
+            ->withProcessOutput($lastProcess->getResultOutput())
+            ->withProcessRuntime($lastProcess->getRuntime())
             ->withDetectionStatus($status)
             ->withEvaluationHistory($history)
             ->build()
@@ -115,6 +127,25 @@ trait CreateMetricsCalculator
         $collector->collect($result);
 
         return $collector;
+    }
+
+    private static function stubReportedProcess(
+        string $name,
+        DetectionStatus $status,
+        string $output,
+        string $commandLine,
+        float $runtime,
+    ): MutantProcess {
+        $process = self::createStub(Process::class);
+        $process->method('getCommandLine')->willReturn($commandLine);
+        $attempt = self::createStub(MutantProcess::class);
+        $attempt->method('getProcess')->willReturn($process);
+        $attempt->method('getResult')->willReturn($status);
+        $attempt->method('getResultOutput')->willReturn($output);
+        $attempt->method('getRuntime')->willReturn($runtime);
+        $attempt->method('getTestFrameworkName')->willReturn($name);
+
+        return $attempt;
     }
 
     private static function feedCollector(Collector $collector): void

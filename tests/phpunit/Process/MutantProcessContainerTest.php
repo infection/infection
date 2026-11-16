@@ -136,11 +136,15 @@ final class MutantProcessContainerTest extends TestCase
     }
 
     #[DataProvider('completedAttemptsProvider')]
-    public function test_it_finalizes_with_the_last_status_and_retains_every_attempt(DetectionStatus $firstStatus, ?DetectionStatus $secondStatus): void
-    {
+    public function test_it_finalizes_with_the_last_status_and_retains_every_attempt(
+        DetectionStatus $firstStatus,
+        ?DetectionStatus $secondStatus,
+        float $scheduledAt = 100.0,
+    ): void {
         $mutant = MutantBuilder::withCompleteTestData()->build();
         $first = $this->stubCompletedProcess($firstStatus, 'phpunit', 'test output', 1.25);
         $container = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $first);
+        $container->markAsScheduled($scheduledAt);
         $container->getCurrent();
         $expectedHistory = [$first];
         $expectedCommand = 'phpunit';
@@ -155,6 +159,7 @@ final class MutantProcessContainerTest extends TestCase
             $container->append(static fn (): MutantProcess => $second);
             $this->assertTrue($container->hasNext());
             $container->createNext();
+            $container->markAsScheduled($scheduledAt + 2.0);
             $expectedHistory[] = $second;
         }
 
@@ -166,14 +171,49 @@ final class MutantProcessContainerTest extends TestCase
             });
         }
 
+        $container->markAsFinished($scheduledAt + 5.0);
+        $container->markAsFinished($scheduledAt + 20.0);
         $actual = $container->getMutantExecutionResult();
 
         $this->assertSame($expectedHistory, $actual->getEvaluationHistory());
+        $this->assertSame(5.0, $actual->getEvaluationElapsedTime());
+        $expectedActiveTime = $secondStatus === null
+            ? 1.25
+            : 1.5;
+        $this->assertSame($expectedActiveTime, $actual->getEvaluationActiveTime());
         $this->assertSame($expectedStatus, $actual->getDetectionStatus());
         $this->assertSame($expectedCommand, $actual->getProcessCommandLine());
         $this->assertSame($expectedOutput, $actual->getProcessOutput());
         $this->assertSame($expectedRuntime, $actual->getProcessRuntime());
         $this->assertSame($actual, $container->getMutantExecutionResult());
+    }
+
+    public function test_it_leaves_elapsed_time_unknown_when_scheduling_was_not_observed(): void
+    {
+        $process = $this->stubCompletedProcess(DetectionStatus::ESCAPED, 'phpunit', '', 0.5);
+        $container = MutantProcessContainer::from(
+            MutantBuilder::withMinimalTestData()->build(),
+            static fn (): MutantProcess => $process,
+        );
+        $container->getCurrent();
+
+        $this->assertNull($container->getMutantExecutionResult()->getEvaluationElapsedTime());
+    }
+
+    public function test_it_cannot_report_elapsed_time_before_final_completion(): void
+    {
+        $process = $this->stubCompletedProcess(DetectionStatus::ESCAPED, 'phpunit', '', 0.5);
+        $container = MutantProcessContainer::from(
+            MutantBuilder::withMinimalTestData()->build(),
+            static fn (): MutantProcess => $process,
+        );
+        $container->markAsScheduled(0.0);
+        $container->getCurrent();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot report elapsed evaluation time before the final evaluation has finished.');
+
+        $container->getMutantExecutionResult();
     }
 
     public function test_it_cannot_report_before_creating_a_process(): void
@@ -243,6 +283,8 @@ final class MutantProcessContainerTest extends TestCase
         yield 'tests error' => [DetectionStatus::ERROR, null];
 
         yield 'tests time out' => [DetectionStatus::TIMED_OUT, null];
+
+        yield 'scheduling at timestamp zero' => [DetectionStatus::ESCAPED, DetectionStatus::KILLED_BY_STATIC_ANALYSIS, 0.0];
     }
 
     public static function detectionStatusProvider(): iterable
@@ -269,24 +311,28 @@ final class MutantProcessContainerTest extends TestCase
     public function test_it_stops_after_a_nested_follow_up_detects_the_mutant(): void
     {
         $mutant = MutantBuilder::withCompleteTestData()->build();
+        $outer = $this->stubCompletedProcess(DetectionStatus::ESCAPED, 'phpunit', '', 0.5);
         $first = $this->stubCompletedProcess(DetectionStatus::ESCAPED, 'phpunit', 'test output', 1.25);
         $last = $this->stubCompletedProcess(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, 'phpstan', 'analysis output', 0.25);
         $child = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $first)
             ->append(static fn (): MutantProcess => $last)
         ;
-        $container = MutantProcessContainer::from($mutant, static fn (): MutantProcessContainer => $child)
+        $container = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $outer)
+            ->append(static fn (): MutantProcessContainer => $child)
             ->append(function (): MutantProcess {
                 $this->fail('A nested follow-up detected the mutant, so the outer follow-up must stay unused.');
             })
         ;
 
-        $this->assertSame($first, $container->getCurrent());
+        $this->assertSame($outer, $container->getCurrent());
+        $this->assertTrue($container->hasNext());
+        $this->assertSame($first, $container->createNext());
         $this->assertTrue($container->hasNext());
         $this->assertSame($last, $container->createNext());
         $this->assertFalse($container->hasNext());
         $result = $container->getMutantExecutionResult();
 
-        $this->assertSame([$first, $last], $result->getEvaluationHistory());
+        $this->assertSame([$outer, $first, $last], $result->getEvaluationHistory());
         $this->assertSame(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, $result->getDetectionStatus());
     }
 

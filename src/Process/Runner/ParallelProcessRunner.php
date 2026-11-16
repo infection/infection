@@ -69,6 +69,8 @@ class ParallelProcessRunner implements ProcessRunner
 
     private bool $shouldStop = false;
 
+    private readonly ProcessQueue $queue;
+
     /**
      * @param non-negative-int $poll Delay (in milliseconds) to wait in-between two polls
      */
@@ -76,8 +78,9 @@ class ParallelProcessRunner implements ProcessRunner
         private readonly int $threadCount,
         private readonly int $poll = self::POLL_WAIT_IN_MS,
         private readonly DuoClock $clock = new DuoClock(),
-        private readonly ProcessQueue $queue = new ProcessQueue(),
+        ?ProcessQueue $queue = null,
     ) {
+        $this->queue = $queue ?? new ProcessQueue($clock);
     }
 
     public function stop(): void
@@ -214,6 +217,8 @@ class ParallelProcessRunner implements ProcessRunner
             }
 
             // Only pass along processes that are completely done
+            $mutantProcessContainer->markAsFinished($this->clock->microtime());
+
             yield $mutantProcessContainer;
         }
     }
