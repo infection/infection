@@ -45,36 +45,25 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final readonly class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResultFactory
+final readonly class TestFrameworkEvaluationAttemptResultFactory implements EvaluationAttemptResultFactory
 {
     public function __construct(
         private TestFrameworkAdapter $testFrameworkAdapter,
     ) {
     }
 
-    public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult
+    public function createFromProcess(MutantProcess $mutantProcess): EvaluationAttemptResult
     {
         $process = $mutantProcess->getProcess();
-        $mutant = $mutantProcess->getMutant();
-        $mutation = $mutant->getMutation();
 
-        return new MutantExecutionResult(
-            $process->getCommandLine(),
-            $this->retrieveProcessOutput($process),
+        return new EvaluationAttemptResult(
+            $this->testFrameworkAdapter->getName(),
             $this->retrieveDetectionStatus($mutantProcess),
-            $mutant->getDiff(),
-            $mutation->getHash(),
-            $mutation->getMutatorClass(),
-            $mutation->getMutatorName(),
-            $mutation->getOriginalFilePath(),
-            $mutation->getOriginalStartingLine(),
-            $mutation->getOriginalEndingLine(),
-            $mutation->getOriginalStartFilePosition(),
-            $mutation->getOriginalEndFilePosition(),
-            $mutant->getPrettyPrintedOriginalCode(),
-            $mutant->getMutatedCode(),
-            $mutant->getTests(),
-            $mutantProcess->getFinishedAt() - $process->getStartTime(),
+            $this->retrieveProcessOutput($process),
+            new EvaluationProcessDetails(
+                $process->getCommandLine(),
+                $mutantProcess->getRuntime(),
+            ),
         );
     }
 

@@ -101,6 +101,7 @@ trait CreateMutantExecutionResult
             now('<?php $a = 1;'),
             [],
             0.0,
+            [],
         );
     }
 }

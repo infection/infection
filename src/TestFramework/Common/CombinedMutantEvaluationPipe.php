@@ -35,98 +35,85 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Common;
 
-use function array_key_exists;
-use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationStrategy;
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Webmozart\Assert\Assert;
 
-/** @internal */
+/**
+ * Composes whole cold pipes while leaving continuation and finalization to their strategies.
+ *
+ * @internal
+ */
 final class CombinedMutantEvaluationPipe implements MutantEvaluationPipe
 {
-    private int $currentPipeIndex = 0;
-
-    /**
-     * @param non-empty-list<MutantEvaluationPipe> $pipes
-     */
     private function __construct(
-        private readonly array $pipes,
+        private MutantProcessContainer $evaluation,
     ) {
+    }
+
+    public function __clone()
+    {
+        $this->evaluation = clone $this->evaluation;
     }
 
     public static function from(MutantEvaluationPipe $first, MutantEvaluationPipe $second): self
     {
-        self::assertIsCold($first);
-        self::assertIsCold($second);
+        Assert::true($first->isCold(), 'Cannot merge a mutant evaluation pipe after evaluation has started.');
+        Assert::true($second->isCold(), 'Cannot merge a mutant evaluation pipe after evaluation has started.');
+        Assert::same($first->getMutant(), $second->getMutant(), 'Combined evaluation pipes must evaluate the same mutant.');
 
-        return new self([$first, $second]);
-    }
+        $first = clone $first;
+        $second = clone $second;
 
-    public function isCold(): bool
-    {
-        foreach ($this->pipes as $pipe) {
-            if (!$pipe->isCold()) {
-                return false;
-            }
-        }
-
-        return true;
+        // Keep cold templates so a selected retry gets a fresh complete lifecycle.
+        return new self(
+            MutantProcessContainer::from($first->getMutant(), static fn (): MutantEvaluationPipe => clone $first)
+                ->append(static fn (): MutantEvaluationPipe => clone $second),
+        );
     }
 
     public function getMutant(): Mutant
     {
-        return $this->pipes[0]->getMutant();
+        return $this->evaluation->getMutant();
     }
 
-    public function getCurrent(): MutantProcess
+    public function isCold(): bool
     {
-        return $this->getCurrentPipe()->getCurrent();
+        return $this->evaluation->isCold();
+    }
+
+    public function withStrategy(EvaluationStrategy $strategy): self
+    {
+        return new self($this->evaluation->withStrategy($strategy));
+    }
+
+    public function getCurrent(): MutantProcess|EvaluationAttemptResult
+    {
+        return $this->evaluation->getCurrent();
     }
 
     public function hasNext(): bool
     {
-        $currentPipe = $this->getCurrentPipe();
-
-        if ($currentPipe->hasNext()) {
-            return true;
-        }
-
-        return array_key_exists($this->currentPipeIndex + 1, $this->pipes)
-            && $currentPipe->getCurrent()->getMutantExecutionResult()->getDetectionStatus() === DetectionStatus::ESCAPED;
+        return $this->evaluation->hasNext();
     }
 
-    public function createNext(): MutantProcess
+    public function createNext(): MutantProcess|EvaluationAttemptResult
     {
-        $currentPipe = $this->getCurrentPipe();
-
-        if ($currentPipe->hasNext()) {
-            return $currentPipe->createNext();
-        }
-
-        ++$this->currentPipeIndex;
-
-        return $this->getCurrent();
+        return $this->evaluation->createNext();
     }
 
     public function merge(MutantEvaluationPipe $other): MutantEvaluationPipe
     {
-        self::assertIsCold($this);
-        self::assertIsCold($other);
-
-        return new self([$this, $other]);
+        return self::from($this, $other);
     }
 
-    private static function assertIsCold(MutantEvaluationPipe $pipe): void
+    public function getMutantExecutionResult(): MutantExecutionResult
     {
-        Assert::true(
-            $pipe->isCold(),
-            'Cannot merge a mutant evaluation pipe after evaluation has started.',
-        );
-    }
-
-    private function getCurrentPipe(): MutantEvaluationPipe
-    {
-        return $this->pipes[$this->currentPipeIndex];
+        return $this->evaluation->getMutantExecutionResult();
     }
 }

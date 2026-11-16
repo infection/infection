@@ -201,17 +201,26 @@ The phase encompassing [mutant materialisation][mutant-materialisation] and [mut
 
 ### Mutant Evaluation
 
-The execution of tests against the mutant process(es) and recording of the outcome.
+The execution of tests and optional static analysis against a mutant, and recording of their results.
+Each evaluation attempt produces an immutable observation (`EvaluationAttemptResult`),
+with an evaluator identity, a detection status, output, and optional process details.
+A `MutantProcess` represents a process-backed attempt and classifies it once through
+its framework's `MutantProcessDetectionStatusResolver`. A framework can also return
+an observation directly without starting a subprocess.
 
-In Infection, a `MutantEvaluationPipe` controls the sequence of processes for one
-mutant. Frameworks return a cold pipe, which creates processes on demand. The
-runner executes its current process and asks the pipe whether to continue.
-Combined pipes preserve each framework's complete sequence and advance to the
-next framework only when the preceding sequence escapes.
+A `MutantEvaluationPipe` controls the lifecycle for one mutant. It creates evaluations
+lazily and retains complete nested pipes, including their follow-ups. Each pipe's
+`EvaluationStrategy` decides whether to retry an evaluator, select another evaluator,
+or finish. An enclosing strategy receives a nested pipe's complete ordered history
+and selected status when that pipe finishes. The default sequential strategy advances
+to the next configured evaluator after `ESCAPED`.
 
-A framework's `MutantProcessDetectionStatusResolver` interprets process output,
-exit code, and timeout state. Result factories use that classification when
-assembling the mutant's reporting details.
+The selected final status can differ from the last observation's status. Infection
+emits one final `MutantExecutionResult` after the decision is locked in. Its immutable
+history retains every completed observation in execution order for reporting;
+reporting does not rerun classification or strategy decisions. Synthetic results for
+ignored, skipped, and uncovered mutants have no fabricated observations.
+Direct observations consume no process thread slot.
 
 
 ### Mutant Materialisation

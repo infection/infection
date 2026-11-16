@@ -38,7 +38,7 @@ namespace Infection\Process\Factory;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
+use Infection\Mutant\TestFrameworkEvaluationAttemptResultFactory;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
@@ -100,7 +100,7 @@ class MutantProcessContainerFactory
         return new MutantProcess(
             $process,
             $mutant,
-            new TestFrameworkMutantExecutionResultFactory($testFrameworkAdapter),
+            new TestFrameworkEvaluationAttemptResultFactory($testFrameworkAdapter),
         );
     }
 }
