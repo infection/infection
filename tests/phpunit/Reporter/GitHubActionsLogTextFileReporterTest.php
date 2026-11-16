@@ -35,13 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Reporter;
 
+use function array_map;
+use Infection\Framework\Str;
 use Infection\Metrics\ResultsCollector;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationProcessDetails;
+use Infection\Reporter\BaseTextFileReporter;
 use Infection\Reporter\GitHubActionsLogTextFileReporter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(GitHubActionsLogTextFileReporter::class)]
+#[CoversClass(BaseTextFileReporter::class)]
 final class GitHubActionsLogTextFileReporterTest extends TestCase
 {
     use CreateMetricsCalculator;
@@ -79,6 +86,109 @@ final class GitHubActionsLogTextFileReporterTest extends TestCase
         );
 
         $this->assertReportedContentIs($expectedContents, $reporter);
+    }
+
+    public function test_it_groups_both_evaluators_outputs_when_static_analysis_kills_the_mutant(): void
+    {
+        $reporter = new GitHubActionsLogTextFileReporter(
+            self::createEvaluationHistoryResultsCollector(status: DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
+            true,
+            false,
+            true,
+        );
+        $expected = <<<'TXT'
+            ::group::Killed by Static Analysis mutants
+            1) src/Foo.php:10    [M] For_ [ID] abc123def456
+
+            mutant diff
+
+            PHPUnit:
+            $ vendor/bin/phpunit
+              PHPUnit output
+              next line
+
+            PHPStan:
+            $ vendor/bin/phpstan
+              PHPStan output
+            ::endgroup::
+
+            TXT;
+
+        $sections = array_map(Str::toUnixLineEndings(...), $reporter->getLines());
+
+        $this->assertContains($expected, $sections);
+    }
+
+    #[DataProvider('directEvaluationHistoryProvider')]
+    public function test_it_groups_mixed_observations_by_the_locked_final_status(
+        bool $debugVerbosity,
+        bool $debugMode,
+        string $expectedDetails,
+    ): void {
+        $history = [
+            new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED, 'Tests pass', new EvaluationProcessDetails('vendor/bin/phpunit', 1.0)),
+            new EvaluationAttemptResult("\r\nIn-memory analyser \r\n", DetectionStatus::ERROR, "\r\nAnalysis failed \r\n", null),
+        ];
+        $collector = self::createEvaluationHistoryResultsCollector(history: $history);
+        $reporter = new GitHubActionsLogTextFileReporter($collector, $debugVerbosity, false, $debugMode);
+        $prefix = <<<'TXT'
+            ::group::Escaped mutants
+            1) src/Foo.php:10    [M] For_ [ID] abc123def456
+
+            mutant diff
+            TXT;
+        $expected = $prefix . $expectedDetails . "\n::endgroup::\n";
+        $sections = array_map(Str::toUnixLineEndings(...), $reporter->getLines());
+
+        $this->assertContains($expected, $sections);
+        $this->assertSame($history, $collector->getEscapedExecutionResults()[0]->getEvaluationHistory());
+    }
+
+    public static function directEvaluationHistoryProvider(): iterable
+    {
+        yield 'commands and outputs include direct evidence without a fabricated command' => [
+            true,
+            true,
+            <<<'TXT'
+
+
+                PHPUnit:
+                $ vendor/bin/phpunit
+                  Tests pass
+
+                In-memory analyser:
+                  Analysis failed
+                TXT,
+        ];
+
+        yield 'verbosity retains both outputs without commands' => [
+            true,
+            false,
+            <<<'TXT'
+
+
+                PHPUnit:
+                  Tests pass
+
+                In-memory analyser:
+                  Analysis failed
+                TXT,
+        ];
+
+        yield 'debug mode retains evaluator labels and only the real command' => [
+            false,
+            true,
+            <<<'TXT'
+
+
+                PHPUnit:
+                $ vendor/bin/phpunit
+
+                In-memory analyser:
+                TXT,
+        ];
+
+        yield 'neither flag omits evaluator details' => [false, false, ''];
     }
 
     public static function emptyMetricsProvider(): iterable

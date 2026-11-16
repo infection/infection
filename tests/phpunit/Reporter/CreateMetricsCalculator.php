@@ -35,15 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Reporter;
 
+use function array_key_last;
 use Infection\Framework\Str;
 use Infection\Metrics\Collector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationProcessDetails;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Mutator\Regex\PregQuote;
 use Infection\Testing\MutatorName;
+use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use function Later\now;
 
 trait CreateMetricsCalculator
@@ -64,6 +68,51 @@ trait CreateMetricsCalculator
         $collector = new ResultsCollector();
 
         self::feedCollector($collector);
+
+        return $collector;
+    }
+
+    /**
+     * @param non-empty-list<EvaluationAttemptResult>|null $history
+     */
+    private static function createEvaluationHistoryResultsCollector(
+        bool $withTestAttempt = true,
+        DetectionStatus $status = DetectionStatus::ESCAPED,
+        ?array $history = null,
+    ): ResultsCollector {
+        if ($history === null) {
+            $history = [new EvaluationAttemptResult(
+                'PHPStan',
+                $status,
+                'PHPStan output',
+                new EvaluationProcessDetails('vendor/bin/phpstan', 0.25),
+            )];
+
+            if ($withTestAttempt) {
+                $history = [
+                    new EvaluationAttemptResult(
+                        'PHPUnit',
+                        DetectionStatus::ESCAPED,
+                        "\nPHPUnit output \r\nnext line \n",
+                        new EvaluationProcessDetails('vendor/bin/phpunit', 1.0),
+                    ),
+                    ...$history,
+                ];
+            }
+        }
+
+        $lastAttempt = $history[array_key_last($history)];
+        $result = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withMutantDiff('mutant diff')
+            ->withProcessCommandLine($lastAttempt->process?->commandLine ?? '')
+            ->withProcessOutput($lastAttempt->output)
+            ->withProcessRuntime($lastAttempt->process?->runtime ?? 0.0)
+            ->withDetectionStatus($status)
+            ->withEvaluationHistory($history)
+            ->build()
+        ;
+        $collector = new ResultsCollector();
+        $collector->collect($result);
 
         return $collector;
     }
