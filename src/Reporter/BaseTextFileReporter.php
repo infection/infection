@@ -36,12 +36,17 @@ declare(strict_types=1);
 namespace Infection\Reporter;
 
 use function array_map;
+use function array_merge;
+use function array_push;
+use function count;
 use function explode;
 use function implode;
 use Infection\Framework\Str;
 use Infection\Metrics\ResultsCollector;
+use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Mutant\MutantExecutionResult;
 use const PHP_EOL;
+use function Pipeline\take;
 use function sprintf;
 
 /**
@@ -168,18 +173,7 @@ abstract readonly class BaseTextFileReporter implements LineMutationTestingResul
             $lines[] = '';
             $lines[] = Str::cleanForDisplay($executionResult->getMutantDiff());
 
-            if ($this->debugMode) {
-                $lines[] = '';
-                $lines[] = '$ ' . $executionResult->getProcessCommandLine();
-            }
-
-            if ($this->debugVerbosity) {
-                if (!$this->debugMode) {
-                    $lines[] = '';
-                }
-
-                $lines[] = self::getProcessOutputLine($executionResult->getProcessOutput());
-            }
+            array_push($lines, ...$this->getEvaluationLines($executionResult));
 
             $separateSections = true;
         }
@@ -188,6 +182,60 @@ abstract readonly class BaseTextFileReporter implements LineMutationTestingResul
     }
 
     abstract protected function getHeadlineLines(string $headlinePrefix): string;
+
+    /**
+     * @return list<string>
+     */
+    private function getEvaluationLines(MutantExecutionResult $result): array
+    {
+        $history = $result->getEvaluationHistory();
+
+        if ($history === []) {
+            return $this->getProcessLines($result->getProcessCommandLine(), $result->getProcessOutput());
+        }
+
+        $showEvaluator = count($history) > 1;
+        $lines = take($history)
+            ->cast(fn (EvaluationAttemptResult $attempt): array => $this->getProcessLines(
+                $attempt->process?->commandLine,
+                $attempt->output,
+                $showEvaluator
+                    ? $attempt->evaluatorName
+                    : null,
+            ))
+            ->toList()
+        ;
+
+        return array_merge(...$lines);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getProcessLines(?string $commandLine, string $output, ?string $evaluator = null): array
+    {
+        if (!$this->debugMode && !$this->debugVerbosity) {
+            return [];
+        }
+
+        $lines = [];
+
+        if ($evaluator !== null) {
+            $lines[] = Str::cleanForDisplay($evaluator) . ':';
+        }
+
+        if ($this->debugMode && $commandLine !== null) {
+            $lines[] = '$ ' . $commandLine;
+        }
+
+        if ($this->debugVerbosity) {
+            $lines[] = self::getProcessOutputLine($output);
+        }
+
+        return $lines === []
+            ? []
+            : ['', ...$lines];
+    }
 
     private static function getMutatorLine(int $index, MutantExecutionResult $mutantProcess): string
     {
