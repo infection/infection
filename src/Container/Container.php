@@ -126,7 +126,6 @@ use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Factory\TestFrameworkMutantProcessFactory;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -162,6 +161,7 @@ use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
+use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
@@ -579,23 +579,16 @@ final class Container extends DIContainer
                 $container->getConfiguration()->staticAnalysisTool,
                 $container->getConfiguration()->processTimeout,
             ),
-            MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
-                $config = $container->getConfiguration();
-
-                $mutantProcessKillerFactories = [];
-
-                if ($config->isStaticAnalysisEnabled()) {
-                    $mutantProcessKillerFactories[] = new TestFrameworkMutantProcessFactory($container->getStaticAnalysisTestFramework());
-                }
-
-                $configuration = $container->getConfiguration();
-
-                return new MutantProcessContainerFactory(
-                    $configuration->processTimeout,
-                    $mutantProcessKillerFactories,
-                    $container->getConfiguration(),
-                );
-            },
+            CombinedTestFramework::class => static fn (self $container): CombinedTestFramework => new CombinedTestFramework(
+                $container->getTestFramework(),
+                $container->getConfiguration()->isStaticAnalysisEnabled()
+                    ? $container->getStaticAnalysisTestFramework()
+                    : null,
+            ),
+            MutantProcessContainerFactory::class => static fn (self $container): MutantProcessContainerFactory => new MutantProcessContainerFactory(
+                $container->getConfiguration()->processTimeout,
+                $container->getConfiguration(),
+            ),
             MutationGenerator::class => static function (self $container): MutationGenerator {
                 $config = $container->getConfiguration();
 
@@ -610,7 +603,7 @@ final class Container extends DIContainer
                 $configuration = $container->getConfiguration();
 
                 return new MutationTestingRunner(
-                    $container->getTestFramework(),
+                    $container->getCombinedTestFramework(),
                     $container->getMutantFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
@@ -950,6 +943,11 @@ final class Container extends DIContainer
     public function getTestFramework(): TestFramework
     {
         return $this->get(TestFramework::class);
+    }
+
+    public function getCombinedTestFramework(): CombinedTestFramework
+    {
+        return $this->get(CombinedTestFramework::class);
     }
 
     public function getInitialTestRunProcessFactory(): InitialTestsRunProcessFactory

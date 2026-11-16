@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use Infection\Mutant\Mutant;
+use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
@@ -82,9 +83,8 @@ final readonly class LegacyStaticAnalysisBridge implements StaticAnalysisTestFra
 
     public function test(Mutant $mutant): MutantProcessContainer
     {
-        return new MutantProcessContainer(
-            $this->staticAnalysisToolAdapter->createMutantProcessFactory()->create($mutant),
-            [],
+        return MutantProcessContainer::from(
+            fn (): MutantProcess => $this->staticAnalysisToolAdapter->createMutantProcessFactory()->create($mutant),
         );
     }
 
