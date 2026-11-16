@@ -222,6 +222,13 @@ reporting does not rerun classification or strategy decisions. Synthetic results
 ignored, skipped, and uncovered mutants have no fabricated observations.
 Direct observations consume no process thread slot.
 
+Active evaluation time sums the process runtimes retained in completed observations,
+including retries. Direct observations contribute no process runtime. Elapsed
+evaluation time spans first scheduling through final completion, including queue
+waits, evaluator preparation, retries, and nested follow-ups. A zero active time
+does not imply a zero elapsed time. Both measurements leave the selected final
+status and observation history unchanged.
+
 
 ### Mutant Materialisation
 

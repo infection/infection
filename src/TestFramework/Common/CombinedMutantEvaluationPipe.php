@@ -116,4 +116,14 @@ final class CombinedMutantEvaluationPipe implements MutantEvaluationPipe
     {
         return $this->evaluation->getMutantExecutionResult();
     }
+
+    public function markAsScheduled(float $scheduledAt): void
+    {
+        $this->evaluation->markAsScheduled($scheduledAt);
+    }
+
+    public function markAsFinished(float $finishedAt): void
+    {
+        $this->evaluation->markAsFinished($finishedAt);
+    }
 }

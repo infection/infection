@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
+use DuoClock\DuoClock;
 use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\Mutant\Mutant;
-use function microtime;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 
@@ -58,6 +58,7 @@ class MutantProcess
         private Process $process,
         private readonly Mutant $mutant,
         private readonly EvaluationAttemptResultFactory $evaluationAttemptResultFactory,
+        private readonly DuoClock $clock = new DuoClock(),
     ) {
     }
 
@@ -83,7 +84,7 @@ class MutantProcess
 
     public function markAsFinished(): void
     {
-        $this->finishedAt = microtime(true);
+        $this->finishedAt = $this->clock->microtime();
     }
 
     public function getFinishedAt(): float

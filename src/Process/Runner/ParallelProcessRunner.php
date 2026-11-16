@@ -127,6 +127,8 @@ class ParallelProcessRunner implements ProcessRunner
                         $mutantProcessContainer->createNext();
                         $this->queue->enqueue($mutantProcessContainer);
                     } else {
+                        $mutantProcessContainer->markAsFinished($this->clock->microtime());
+
                         yield $mutantProcessContainer;
                     }
                 } else {
@@ -225,6 +227,8 @@ class ParallelProcessRunner implements ProcessRunner
             }
 
             // Only pass along processes that are completely done
+            $mutantProcessContainer->markAsFinished($this->clock->microtime());
+
             yield $mutantProcessContainer;
         }
     }
