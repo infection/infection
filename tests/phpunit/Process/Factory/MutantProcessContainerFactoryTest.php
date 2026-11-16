@@ -124,7 +124,6 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
         $factory = new MutantProcessContainerFactory(
             $processFactoryTimeout,
-            [],
             $configuration,
         );
 
