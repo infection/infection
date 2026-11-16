@@ -36,16 +36,18 @@ declare(strict_types=1);
 namespace Infection\Tests\Git;
 
 use function implode;
-use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
-use Infection\Git\NoGitProjectFound;
+use Infection\Git\Throwable\GitDiffFailed;
+use Infection\Git\Throwable\NoGitProjectFound;
 use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\TestingUtility\FS;
+use Infection\Tests\TestingUtility\GitRepositorySetup;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\chdir;
+use function sprintf;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Webmozart\Assert\Assert;
 
@@ -57,6 +59,8 @@ use Webmozart\Assert\Assert;
 #[CoversClass(CommandLineGit::class)]
 final class CommandLineGitIntegrationTest extends FileSystemTestCase
 {
+    use GitRepositorySetup;
+
     // https://github.com/infection/infection/commit/40d08afda22d5fe6d0d87ffb95fd609dcb01992a
     // At minimum we will have the following files in the entire output:
     // - src/Git/CommandLineGit.php
@@ -77,7 +81,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
 
     public static function setUpBeforeClass(): void
     {
-        if (!self::checkIfCommitReferenceExists()) {
+        if (!self::checkIfCommitReferenceExists(self::COMMIT_REFERENCE)) {
             self::markTestSkipped('Commit reference not found. It may require more history.');
         }
     }
@@ -124,24 +128,8 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         FS::dumpFile($projectDirectory . '/src/SourceClass.php', 'before');
         FS::dumpFile($this->tmp . '/shared/SharedClass.php', 'before');
 
-        $executor = new SymfonyProcessShellCommandRunner();
-        $executor->mustRun(['git', '-C', $this->tmp, 'init', '--quiet']);
-        $executor->mustRun(['git', '-C', $this->tmp, 'add', '.']);
-        $executor->mustRun([
-            'git',
-            '-C',
-            $this->tmp,
-            '-c',
-            'user.name=Infection',
-            '-c',
-            'user.email=infection@infection.github.io',
-            '-c',
-            'commit.gpgsign=false',
-            'commit',
-            '--quiet',
-            '-m',
-            'baseline',
-        ]);
+        self::initializeGitRepository($this->tmp);
+        self::commitGitChanges($this->tmp, 'baseline');
 
         FS::dumpFile($projectDirectory . '/src/SourceClass.php', 'after');
         FS::dumpFile($this->tmp . '/shared/SharedClass.php', 'after');
@@ -154,31 +142,48 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         $actual = $this->git->getChangedFilePaths(
             'M',
             'HEAD',
-            ['src', '../shared'],
+            [$projectDirectory . '/src', $this->tmp . '/shared'],
             $projectDirectory,
         );
 
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_fails_at_getting_the_relative_paths_of_the_changed_files_if_getting_the_merge_base_failed_unexpectedly(): void
+    public function test_it_fails_to_get_changed_files_outside_a_git_repository(): void
+    {
+        $workingDirectory = $this->tmp;
+        Assert::stringNotEmpty(
+            $workingDirectory,
+            'The temporary fixture directory must be initialized before running Git.',
+        );
+
+        $this->expectExceptionObject(
+            new GitDiffFailed(
+                sprintf(
+                    'Could not compute the Git diff against "HEAD" in "%s".',
+                    $workingDirectory,
+                ),
+            ),
+        );
+
+        $this->git->getChangedFilePaths(
+            'AM',
+            'HEAD',
+            ['src'],
+            $workingDirectory,
+        );
+    }
+
+    public function test_it_reports_a_git_diff_failure_when_the_base_is_invalid_for_changed_files(): void
     {
         $badCommitReference = self::BAD_COMMIT_REFERENCE;
 
-        $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage('Exit Code:');
-        $this->expectExceptionMessage('Working directory:');
-        $this->expectExceptionMessage(
-            Str::toSystemLineEndings(
-                <<<EOF
-                    Output:
-                    ================
-
-
-                    Error Output:
-                    ================
-                    fatal: bad revision '{$badCommitReference}'
-                    EOF,
+        $this->expectExceptionObject(
+            new GitDiffFailed(
+                sprintf(
+                    'Could not compute the Git diff against "%s"',
+                    $badCommitReference,
+                ),
             ),
         );
 
@@ -221,24 +226,16 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         $this->assertArrayNotHasKey($this->cwd . '/tests/phpunit/Git/CommandLineGitTest.php', $actual);
     }
 
-    public function test_it_fails_at_getting_the_modified_lines_if_getting_the_merge_base_failed_unexpectedly(): void
+    public function test_it_reports_a_git_diff_failure_when_the_base_is_invalid_for_changed_lines(): void
     {
         $badCommitReference = self::BAD_COMMIT_REFERENCE;
 
-        $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage('Exit Code:');
-        $this->expectExceptionMessage('Working directory:');
-        $this->expectExceptionMessage(
-            Str::toSystemLineEndings(
-                <<<EOF
-                    Output:
-                    ================
-
-
-                    Error Output:
-                    ================
-                    fatal: bad revision '{$badCommitReference}'
-                    EOF,
+        $this->expectExceptionObject(
+            new GitDiffFailed(
+                sprintf(
+                    'Could not compute the Git diff against "%s"',
+                    $badCommitReference,
+                ),
             ),
         );
 
@@ -263,6 +260,10 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
     public function test_it_can_refine_the_base_used(): void
     {
         $originalBase = $this->git->getDefaultBase();
+
+        if (!self::checkIfCommitReferenceExists($originalBase)) {
+            $this->markTestSkipped('Default Git base not found. It may need to be fetched.');
+        }
 
         $refinedBase = $this->git->getBaseReference($originalBase);
 
@@ -295,22 +296,24 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
 
     private function skipIfCommitReferenceIsNotAvailable(): void
     {
-        self::$commitReferenceExists ??= self::checkIfCommitReferenceExists();
+        self::$commitReferenceExists ??= self::checkIfCommitReferenceExists(self::COMMIT_REFERENCE);
 
         if (!self::$commitReferenceExists) {
             $this->markTestSkipped('Commit reference not found. It may require more history.');
         }
     }
 
-    private static function checkIfCommitReferenceExists(): bool
+    private static function checkIfCommitReferenceExists(string $reference): bool
     {
         try {
-            (new SymfonyProcessShellCommandRunner())->mustRun([
-                'git',
-                'cat-file',
-                '-e',
-                self::COMMIT_REFERENCE,
-            ]);
+            self::runGit(
+                '.',
+                [
+                    'cat-file',
+                    '-e',
+                    $reference,
+                ],
+            );
 
             return true;
         } catch (ProcessFailedException) {

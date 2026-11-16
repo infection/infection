@@ -39,8 +39,8 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Console\ConsoleOutput;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
@@ -188,6 +188,19 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
 
     public function test_it_throws_when_the_initial_run_fails(): void
     {
+        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter
+            ->expects($this->once())
+            ->method('getName')
+            ->willReturn('LegacyFramework')
+        ;
+        $adapter
+            ->expects($this->once())
+            ->method('getInitialTestsFailRecommendations')
+            ->with('/tmp/phpunit')
+            ->willReturn('Check the legacy framework configuration.')
+        ;
+
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $initialTestsRunner
             ->expects($this->once())
@@ -202,12 +215,18 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         ;
 
         $testFramework = $this->createTestFramework(
-            adapter: new DummyTestFrameworkAdapter(),
+            adapter: $adapter,
             coverageChecker: $coverageChecker,
             initialTestsRunner: $initialTestsRunner,
         );
 
         $this->expectException(InitialTestsFailed::class);
+        $this->expectExceptionMessage(
+            <<<'MESSAGE'
+                Check the legacy framework configuration.
+                LegacyFramework reported an exit code of 1.
+                MESSAGE,
+        );
 
         $testFramework->executeInitialRun();
     }

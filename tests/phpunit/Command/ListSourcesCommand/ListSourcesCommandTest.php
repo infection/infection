@@ -41,6 +41,7 @@ use Infection\Console\Application;
 use Infection\Container\Container;
 use Infection\Framework\OperatingSystem;
 use Infection\Framework\Str;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -105,6 +106,37 @@ final class ListSourcesCommandTest extends TestCase
             '',
         ];
 
+        yield 'ambiguous short name' => [
+            ['File'],
+            $expectedStdout,
+            '',
+        ];
+
+        yield 'method selector and function names with a source path' => [
+            [
+                'File1.php',
+                'SomeClass::method',
+                'calculateInvoiceTotal',
+                'App\Billing\calculateInvoiceTotal',
+                '\calculateInvoiceTotal',
+                '\App\Billing\calculateInvoiceTotal',
+            ],
+            "File1.php\n",
+            '',
+        ];
+
+        yield 'method selector and qualified function names with a test path' => [
+            [
+                '../ListSourcesCommandTest.php',
+                'SomeClass::method',
+                'App\Billing\calculateInvoiceTotal',
+                '\calculateInvoiceTotal',
+                '\App\Billing\calculateInvoiceTotal',
+            ],
+            $expectedStdout,
+            '',
+        ];
+
         $directory = self::FIXTURES_DIR . DIRECTORY_SEPARATOR . 'SubDir';
         $expectedFilteredStdout = "SubDir/File3.php\n";
 
@@ -150,6 +182,44 @@ final class ListSourcesCommandTest extends TestCase
         $this->assertSame($expectedStdout, $actualStdout);
         $this->assertStringContainsString($expectedStderr, $actualStderr);
         $tester->assertCommandIsSuccessful();
+    }
+
+    /**
+     * @param list<string> $paths
+     */
+    #[DataProvider('symbolSelectorsProvider')]
+    public function test_it_rejects_source_symbol_selectors(array $paths): void
+    {
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Source symbol selectors do not affect which source files are listed and cannot be used on their own with config:list-sources. They are accepted alongside source or test paths so the same arguments can be reused from the run command.',
+            ),
+        );
+
+        $this->runCommand(['paths' => $paths]);
+    }
+
+    public static function symbolSelectorsProvider(): iterable
+    {
+        yield 'namespace prefix selector' => [
+            ['SomeClass\\'],
+        ];
+
+        yield 'method selector alone' => [
+            ['SomeClass::method'],
+        ];
+
+        yield 'namespaced function name alone' => [
+            ['App\Billing\calculateInvoiceTotal'],
+        ];
+
+        yield 'explicit global function name alone' => [
+            ['\calculateInvoiceTotal'],
+        ];
+
+        yield 'fully qualified function name alone' => [
+            ['\App\Billing\calculateInvoiceTotal'],
+        ];
     }
 
     /**

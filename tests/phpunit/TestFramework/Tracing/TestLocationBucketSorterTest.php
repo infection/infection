@@ -52,6 +52,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 use function usort;
 
 /**
@@ -113,11 +114,82 @@ final class TestLocationBucketSorterTest extends TestCase
     }
 
     /**
+     * @param list<float|null> $times
+     * @param list<float|null> $expectedTimes
+     */
+    #[DataProvider('fastestFirstProvider')]
+    public function test_it_puts_the_fastest_test_location_first(
+        array $times,
+        array $expectedTimes,
+    ): void {
+        /** @var non-empty-array<TestLocation> $testLocations */
+        $testLocations = array_map(
+            static fn (?float $time): TestLocation => new TestLocation('', '', $time),
+            $times,
+        );
+
+        $actualTimes = take(TestLocationBucketSorter::bucketSort($testLocations))
+            ->cast(static fn (TestLocation $location): ?float => $location->getExecutionTime())
+            ->toList()
+        ;
+
+        $this->assertSame($expectedTimes, $actualTimes);
+    }
+
+    public static function fastestFirstProvider(): iterable
+    {
+        yield 'within a 4 seconds bucket' => [
+            [11.0, 8.1],
+            [8.1, 11.0],
+        ];
+
+        yield 'within an eighth of a second bucket' => [
+            [0.1, 0.01],
+            [0.01, 0.1],
+        ];
+
+        // Only the fastest test is moved to the front, the rest of the bucket stays unsorted
+        yield 'fastest test added last' => [
+            [0.1, 0.05, 0.01],
+            [0.01, 0.1, 0.05],
+        ];
+
+        yield 'fastest test added first' => [
+            [0.01, 0.1, 0.05],
+            [0.01, 0.1, 0.05],
+        ];
+
+        yield 'test without execution time added last' => [
+            [0.05, null],
+            [null, 0.05],
+        ];
+
+        yield 'test without execution time added first' => [
+            [null, 0.05],
+            [null, 0.05],
+        ];
+    }
+
+    public function test_it_keeps_the_order_of_test_locations_with_the_same_time(): void
+    {
+        $testLocation1 = new TestLocation('first', '', 0.05);
+        $testLocation2 = new TestLocation('second', '', 0.05);
+
+        $sortedTestLocations = iterator_to_array(
+            TestLocationBucketSorter::bucketSort([$testLocation1, $testLocation2]),
+            false,
+        );
+
+        $this->assertSame([$testLocation1, $testLocation2], $sortedTestLocations);
+    }
+
+    /**
      * @param ArrayIterator<array-key, TestLocation> $uniqueTestLocations
      */
     #[DataProvider('locationsArrayProvider')]
     public function test_it_sorts_correctly(ArrayIterator $uniqueTestLocations): void
     {
+        /** @var non-empty-array<TestLocation> $uniqueTestLocations */
         $uniqueTestLocations = $uniqueTestLocations->getArrayCopy();
 
         $sortedTestLocations = iterator_to_array(
@@ -161,6 +233,7 @@ final class TestLocationBucketSorterTest extends TestCase
 
         $uniqueTestLocations = $uniqueTestLocations->getArrayCopy();
 
+        /** @var non-empty-array<TestLocation> $uniqueTestLocations */
         if (self::areConstraintsOrderValid($uniqueTestLocations)) {
             // Ignore silently as to not pollute to the log.
             $this->expectNotToPerformAssertions();

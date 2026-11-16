@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Git;
 
 use Infection\Differ\ChangedLinesRange;
+use Infection\Git\Throwable\GitDiffFailed;
+use Infection\Git\Throwable\NoGitProjectFound;
 use Infection\Source\Exception\NoSourceFound;
 
 /**
@@ -57,9 +59,12 @@ interface Git
     public const DEFAULT_GIT_DIFF_FILTER = 'AM';
 
     /**
-     * Retrieves the default base branch name for the repository.
+     * Retrieves the default base for Git comparisons, as determined by the implementation.
+     *
+     * Implementations may use CI metadata to select the base.
      *
      * Examples of output:
+     * - a commit SHA (recorded by GitHub or GitLab for the current PR, merge group or MR if supported)
      * - 'refs/remotes/origin/main'
      * - 'origin/main'
      * - 'origin/master'
@@ -85,6 +90,7 @@ interface Git
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string $workingDirectory Directory from which to interpret source paths.
      *
+     * @throws GitDiffFailed
      * @throws NoSourceFound
      *
      * @return non-empty-list<non-empty-string>
@@ -114,6 +120,7 @@ interface Git
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string $workingDirectory Directory from which to interpret source paths.
      *
+     * @throws GitDiffFailed
      * @throws NoSourceFound
      *
      * @return non-empty-array<string, list<ChangedLinesRange>>

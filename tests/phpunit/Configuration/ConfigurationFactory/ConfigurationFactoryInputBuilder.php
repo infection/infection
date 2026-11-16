@@ -38,7 +38,7 @@ namespace Infection\Tests\Configuration\ConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\Configuration\SourceFilter\PositionalPathsFilter;
+use Infection\Configuration\SourceFilter\PositionalArgumentsFilter;
 
 final class ConfigurationFactoryInputBuilder
 {
@@ -46,6 +46,7 @@ final class ConfigurationFactoryInputBuilder
      * @param non-empty-string|null $projectDirectory
      * @param positive-int|'auto'|'max'|null $threadCount
      * @param positive-int|'max'|null $dotsPerRow
+     * @param list<non-empty-string> $mutantIds
      */
     public function __construct(
         private ?string $existingCoveragePath,
@@ -67,7 +68,7 @@ final class ConfigurationFactoryInputBuilder
         private ?string $testFrameworkExtraOptions,
         private ?string $testFrameworkExtraArgs,
         private ?string $staticAnalysisToolOptions,
-        private PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
+        private PlainFilter|IncompleteGitDiffFilter|PositionalArgumentsFilter|null $sourceFilter,
         private int|string|null $threadCount,
         private string|int|null $dotsPerRow,
         private bool $dryRun,
@@ -76,12 +77,13 @@ final class ConfigurationFactoryInputBuilder
         private ?string $htmlLogFilePath,
         private ?string $textLogFilePath,
         private ?string $summaryJsonLogFilePath,
+        private ?string $jsonLogFilePath,
         private bool $useNoopMutators,
         private bool $executeOnlyCoveringTestCases,
         private ?string $mapSourceClassToTestStrategy,
         private ?string $projectDirectory,
         private ?string $staticAnalysisTool,
-        private ?string $mutantId,
+        private array $mutantIds,
     ) {
     }
 
@@ -237,7 +239,7 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
-    public function withSourceFilter(PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter): self
+    public function withSourceFilter(PlainFilter|IncompleteGitDiffFilter|PositionalArgumentsFilter|null $sourceFilter): self
     {
         $clone = clone $this;
         $clone->sourceFilter = $sourceFilter;
@@ -315,6 +317,14 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
+    public function withJsonLogFilePath(?string $jsonLogFilePath): self
+    {
+        $clone = clone $this;
+        $clone->jsonLogFilePath = $jsonLogFilePath;
+
+        return $clone;
+    }
+
     public function withUseNoopMutators(bool $useNoopMutators): self
     {
         $clone = clone $this;
@@ -358,10 +368,13 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
-    public function withMutantId(?string $mutantId): self
+    /**
+     * @param list<non-empty-string> $mutantIds
+     */
+    public function withMutantIds(array $mutantIds): self
     {
         $clone = clone $this;
-        $clone->mutantId = $mutantId;
+        $clone->mutantIds = $mutantIds;
 
         return $clone;
     }
@@ -388,7 +401,7 @@ final class ConfigurationFactoryInputBuilder
      *     17: string|null,
      *     18: string|null,
      *     19: string|null,
-     *     20: PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null,
+     *     20: PlainFilter|IncompleteGitDiffFilter|PositionalArgumentsFilter|null,
      *     21: positive-int|'auto'|'max'|null,
      *     22: positive-int|'max'|null,
      *     23: bool,
@@ -397,12 +410,13 @@ final class ConfigurationFactoryInputBuilder
      *     26: string|null,
      *     27: string|null,
      *     28: string|null,
-     *     29: bool,
+     *     29: string|null,
      *     30: bool,
-     *     31: string|null,
-     *     32: non-empty-string|null,
-     *     33: string|null,
+     *     31: bool,
+     *     32: string|null,
+     *     33: non-empty-string|null,
      *     34: string|null,
+     *     35: list<non-empty-string>,
      * }
      */
     public function build(SchemaConfiguration $schema): array
@@ -437,12 +451,13 @@ final class ConfigurationFactoryInputBuilder
             $this->htmlLogFilePath,
             $this->textLogFilePath,
             $this->summaryJsonLogFilePath,
+            $this->jsonLogFilePath,
             $this->useNoopMutators,
             $this->executeOnlyCoveringTestCases,
             $this->mapSourceClassToTestStrategy,
             $this->projectDirectory,
             $this->staticAnalysisTool,
-            $this->mutantId,
+            $this->mutantIds,
         ];
     }
 }

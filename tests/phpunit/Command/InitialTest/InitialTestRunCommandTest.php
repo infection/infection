@@ -46,9 +46,10 @@ use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Framework\Str;
 use Infection\Git\Git;
-use Infection\Process\Runner\InitialTestsFailed;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -215,6 +216,41 @@ final class InitialTestRunCommandTest extends TestCase
             ]),
         ];
 
+        yield 'ambiguous short name also supplies a source filter' => [
+            ['paths' => ['SomeClass']],
+            new PlainFilter(['SomeClass']),
+        ];
+
+        yield 'method selector and function names with a source path' => [
+            [
+                'paths' => [
+                    'Foo.php',
+                    'SomeClass::method',
+                    'calculateInvoiceTotal',
+                    'App\Billing\calculateInvoiceTotal',
+                    '\calculateInvoiceTotal',
+                    '\App\Billing\calculateInvoiceTotal',
+                ],
+            ],
+            new PlainFilter([
+                'Foo.php',
+                'calculateInvoiceTotal',
+            ]),
+        ];
+
+        yield 'method selector and qualified function names with a test path' => [
+            [
+                'paths' => [
+                    '../InitialTestRunCommandTest.php',
+                    'SomeClass::method',
+                    'App\Billing\calculateInvoiceTotal',
+                    '\calculateInvoiceTotal',
+                    '\App\Billing\calculateInvoiceTotal',
+                ],
+            ],
+            null,
+        ];
+
         yield 'Git filtering resolves the default base' => [
             ['--git-diff-filter' => 'AM'],
             new GitDiffFilter(
@@ -244,6 +280,68 @@ final class InitialTestRunCommandTest extends TestCase
                 Git::DEFAULT_GIT_DIFF_FILTER,
                 '<refinedGitReference>',
             ),
+        ];
+    }
+
+    /**
+     * @param list<string> $paths
+     * @param array<string, string> $extraArguments
+     */
+    #[DataProvider('symbolSelectorsProvider')]
+    public function test_it_rejects_source_symbol_selectors_before_running_tests(
+        array $paths,
+        array $extraArguments = [],
+    ): void {
+        $testFramework = $this->createMock(TestFramework::class);
+        $testFramework
+            ->expects($this->never())
+            ->method('executeInitialRun')
+        ;
+
+        $container = Container::create()->cloneWithService(
+            TestFramework::class,
+            $testFramework,
+        );
+        $application = new Application($container);
+        $tester = new CommandTester($application->find('initial-test:run'));
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Source symbol selectors have no effect on the initial test run and cannot be used on their own with initial-test:run. They are accepted alongside source or test paths so the same arguments can be reused from the run command.',
+            ),
+        );
+
+        $tester->execute([
+            'paths' => $paths,
+            ...$extraArguments,
+        ]);
+    }
+
+    public static function symbolSelectorsProvider(): iterable
+    {
+        yield 'explicit class selector' => [
+            ['\SomeClass'],
+        ];
+
+        yield 'method selector with explicit test-framework arguments' => [
+            ['SomeClass::method'],
+            ['--test-framework-extra-args' => '--filter=testSomething'],
+        ];
+
+        yield 'method selector alone' => [
+            ['SomeClass::method'],
+        ];
+
+        yield 'namespaced function name alone' => [
+            ['App\Billing\calculateInvoiceTotal'],
+        ];
+
+        yield 'explicit global function name alone' => [
+            ['\calculateInvoiceTotal'],
+        ];
+
+        yield 'fully qualified function name alone' => [
+            ['\App\Billing\calculateInvoiceTotal'],
         ];
     }
 
@@ -285,7 +383,7 @@ final class InitialTestRunCommandTest extends TestCase
             function (Container $container) use ($testFrameworkMock, $expectedSourceFilter): TestFramework {
                 $this->assertEquals(
                     $expectedSourceFilter,
-                    $container->getConfiguration()->sourceFilter,
+                    $container->getConfiguration()->sourceFilter->fileFilter,
                     'The initial test run should use the requested source filter.',
                 );
 

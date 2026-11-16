@@ -1,0 +1,51 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: Infection gh-stack
+description: Install the GitHub CLI extension and bundled skill for stacked pull requests.
+
+args:
+    skill_revision:
+        default: "bd0a32504f9ae9f795875a9e6bb90ff7408fda08"
+        buildArg: GH_STACK_REVISION
+
+capabilities:
+    -   type: com.docker.sandbox/agent-skill@1
+        optional: true
+        config:
+            path: /usr/share/infection-sbx/skills/gh-stack
+
+    -   type: com.docker.sandbox/network-policy@1
+        config:
+            install:
+                allow:
+                    - api.github.com
+                    - github.com
+                    - release-assets.githubusercontent.com
+            runtime:
+                allow:
+                    - api.github.com
+                    - github.com
+                    - release-assets.githubusercontent.com
+
+    -   type: com.docker.sandbox/credential@1
+        config:
+            service: github
+            phase: [install, runtime]
+            apiKey:
+                name: GH_TOKEN
+                proxyManaged: true
+                inject:
+                    -   domain: api.github.com
+                        scheme: bearer
+
+    -   type: com.docker.sandbox/lifecycle@1
+        config:
+            install:
+                -   command: |
+                        set -eu
+                        gh extension install github/gh-stack
+                        gh stack --version
+                    user: "1000"
+                    env: [GH_TOKEN]
+                    description: Install and verify gh-stack for the agent user.

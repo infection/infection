@@ -68,7 +68,7 @@ final class ShowMetricsReporterTest extends TestCase
     public static function metricsProvider(): iterable
     {
         $emptyScenario = new MetricsScenario(
-            mutantId: null,
+            mutantIds: [],
             ignoreMsiWithNoMutations: false,
             minMsi: null,
             minCoveredMsi: null,
@@ -103,7 +103,7 @@ final class ShowMetricsReporterTest extends TestCase
         );
 
         $completeScenario = new MetricsScenario(
-            mutantId: null,
+            mutantIds: [],
             ignoreMsiWithNoMutations: false,
             minMsi: null,
             minCoveredMsi: null,
@@ -169,7 +169,7 @@ final class ShowMetricsReporterTest extends TestCase
         ;
 
         yield 'unmatched mutant ID' => $emptyScenario
-            ->withMutantId('mutant-id-1')
+            ->withMutantIds(['mutant-id-1'])
             ->withExpected(
                 <<<'DISPLAY'
 
@@ -189,8 +189,29 @@ final class ShowMetricsReporterTest extends TestCase
             ->build()
         ;
 
+        yield 'unmatched mutant IDs' => $emptyScenario
+            ->withMutantIds(['mutant-id-1', 'mutant-id-2'])
+            ->withExpected(
+                <<<'DISPLAY'
+
+
+                    0 mutations were generated:
+                           0 mutants were killed by Test Framework
+
+                    Metrics:
+                             Mutation Code Coverage: <low>0%</low>
+                             Covered Code MSI: <low>0%</low>
+
+                    No mutation matches mutant IDs "mutant-id-1", "mutant-id-2". Run Infection without "--id" to list the current mutations.
+
+
+                    DISPLAY,
+            )
+            ->build()
+        ;
+
         yield 'matched mutant ID' => $completeScenario
-            ->withMutantId('mutant-id-1')
+            ->withMutantIds(['mutant-id-1'])
             ->build()
         ;
 
@@ -423,7 +444,7 @@ final class ShowMetricsReporterTest extends TestCase
             $this->output,
             $this->createMetricsCalculator($scenario),
             $scenario->withUncovered,
-            $scenario->mutantId,
+            $scenario->mutantIds,
             $scenario->ignoreMsiWithNoMutations,
             $scenario->minMsi,
             $scenario->minCoveredMsi,

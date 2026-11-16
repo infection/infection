@@ -46,6 +46,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
 use Infection\Git\Git;
+use Infection\Git\Throwable\GitDiffFailed;
 use function Safe\getcwd;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
@@ -97,7 +98,7 @@ final class GitChangedFilesCommand extends BaseCommand
             );
         }
 
-        $sourceFilter = $container->getConfiguration()->sourceFilter;
+        $sourceFilter = $container->getConfiguration()->sourceFilter->fileFilter;
         Assert::isInstanceOf($sourceFilter, GitDiffFilter::class);
 
         $logger->notice(
@@ -119,6 +120,8 @@ final class GitChangedFilesCommand extends BaseCommand
     }
 
     /**
+     * @throws GitDiffFailed
+     *
      * @return string[]
      */
     private static function getFiles(

@@ -104,7 +104,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         }
 
         // No need to traverse outside of classes
-        if (count($this->classScopeStack) === 0) {
+        if ($this->classScopeStack === []) {
             return null;
         }
 

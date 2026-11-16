@@ -123,7 +123,7 @@ The following table maps the execution phases to the main implementation entry p
 |---------------------|-----------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
 | CLI entry           | `bin/infection`, `src/Command/RunCommand.php`                                                             | Parses CLI input and prepares the runtime configuration.                      |
 | Orchestration       | `src/Engine.php`                                                                                          | Coordinates the mutation-testing run.                                         |
-| Source Collection   | `src/Source/`, `src/Configuration/PositionalPathsClassifier.php`                                          | Finds source and test files.                                                  |
+| Source Collection   | `src/Source/`, `src/Configuration/PositionalArgumentsClassifier.php`                                      | Finds source files, test files, and source symbol selectors.                  |
 | Artefact Collection | `src/Process/OriginalPhpProcess.php`, `src/TestFramework/Coverage/`, `src/TestFramework/Tracing/`         | Runs the initial test suite and loads coverage and trace artefacts.           |
 | AST Processing      | `src/PhpParser/NodeTraverserFactory.php`                                                                  | Parses and enriches the AST, including node eligibility.                      |
 | Mutation Generation | `src/Mutation/FileMutationGenerator.php`, `src/Mutator/NodeMutationGenerator.php`, `src/Mutator/`         | Produces mutations from eligible nodes.                                       |
@@ -226,6 +226,8 @@ The core mutation testing cycle: generate, filter, instantiate, evaluate. Encomp
 ### Mutation Generation
 
 The traversal of the [AST][ast] to yield [mutations][mutation] for each [eligible node][eligible-node].
+
+Infection can exclude specific mutations of an eligible node through `@infection-ignore` annotations. These exclusions apply during generation, after node eligibility has been determined.
 
 
 ### Mutator

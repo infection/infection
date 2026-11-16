@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing;
 
+use function array_fill;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use function log;
@@ -104,6 +105,44 @@ final class TestRunOrderResolverTest extends TestCase
                 '/path/to/test-file-1',
                 '/path/to/test-file-2',
             ],
+        ];
+    }
+
+    /**
+     * @param list<float> $times
+     */
+    #[DataProvider('bucketSortedTimesProvider')]
+    public function test_it_resolves_the_fastest_test_location_first_with_bucket_sort(
+        array $times,
+        string $expectedFirst,
+    ): void {
+        $testLocations = [];
+
+        foreach ($times as $index => $time) {
+            $testLocations[] = new TestLocation(
+                'testMethod' . $index,
+                '/path/to/test-file-' . $index,
+                $time,
+            );
+        }
+
+        $actual = take((new TestRunOrderResolver())->resolve($testLocations))->toList();
+
+        $this->assertSame($expectedFirst, $actual[0]);
+    }
+
+    public static function bucketSortedTimesProvider(): iterable
+    {
+        $slowTimes = array_fill(0, TestRunOrderResolver::USE_BUCKET_SORT_AFTER - 2, 20.0);
+
+        yield 'within a 4 seconds bucket' => [
+            [11.0, 8.1, ...$slowTimes],
+            '/path/to/test-file-1',
+        ];
+
+        yield 'within an eighth of a second bucket' => [
+            [0.1, 0.01, ...$slowTimes],
+            '/path/to/test-file-1',
         ];
     }
 

@@ -126,6 +126,7 @@ final class JsonReporterTest extends TestCase
                 ],
                 'escaped' => [
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'PregQuote',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -139,6 +140,7 @@ final class JsonReporterTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -154,6 +156,7 @@ final class JsonReporterTest extends TestCase
                 ],
                 'timeouted' => [
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'PregQuote',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -167,6 +170,7 @@ final class JsonReporterTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -182,6 +186,7 @@ final class JsonReporterTest extends TestCase
                 ],
                 'killed' => [
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'PregQuote',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -195,6 +200,7 @@ final class JsonReporterTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -210,6 +216,7 @@ final class JsonReporterTest extends TestCase
                 ],
                 'killedByStaticAnalysis' => [
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'PregQuote',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -225,6 +232,7 @@ final class JsonReporterTest extends TestCase
                 ],
                 'errored' => [
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'PregQuote',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -238,6 +246,7 @@ final class JsonReporterTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -253,6 +262,7 @@ final class JsonReporterTest extends TestCase
                 ],
                 'syntaxErrors' => [
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'PregQuote',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -266,6 +276,7 @@ final class JsonReporterTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -282,6 +293,7 @@ final class JsonReporterTest extends TestCase
                 'uncovered' => [],
                 'ignored' => [
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'PregQuote',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -295,6 +307,7 @@ final class JsonReporterTest extends TestCase
                         'processOutput' => 'process output',
                     ],
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -339,6 +352,7 @@ final class JsonReporterTest extends TestCase
                 'syntaxErrors' => [],
                 'uncovered' => [
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -385,6 +399,7 @@ final class JsonReporterTest extends TestCase
                 'uncovered' => [],
                 'ignored' => [
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',
@@ -429,6 +444,7 @@ final class JsonReporterTest extends TestCase
                 'syntaxErrors' => [],
                 'uncovered' => [
                     [
+                        'id' => 'a1b2c3',
                         'mutator' => [
                             'mutatorName' => 'For_',
                             'originalSourceCode' => '<?php $a = 1;',

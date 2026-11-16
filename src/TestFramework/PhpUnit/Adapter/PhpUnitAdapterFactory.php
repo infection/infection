@@ -62,7 +62,6 @@ use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
@@ -114,10 +113,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $tmpDir,
             $jUnitFilePath,
             new PCOVDirectoryProvider(
-                self::makeSourcePathsAbsolute(
-                    $sourceDirectoryBasePath,
-                    $sourceDirectories,
-                ),
+                array_values($sourceDirectories),
             ),
             new InitialConfigBuilder(
                 $tmpDir,
@@ -175,29 +171,5 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
     public static function getExecutableName(): string
     {
         return 'phpunit';
-    }
-
-    /**
-     * @param non-empty-array<string> $sourceDirectories
-     *
-     * @return non-empty-list<string>
-     */
-    private static function makeSourcePathsAbsolute(
-        string $sourceDirectoryBasePath,
-        array $sourceDirectories,
-    ): array {
-        $absolutePaths = array_values(
-            array_map(
-                static fn (string $sourceDirectory): string => Path::makeAbsolute(
-                    $sourceDirectory,
-                    $sourceDirectoryBasePath,
-                ),
-                $sourceDirectories,
-            ),
-        );
-
-        Assert::notEmpty($absolutePaths);
-
-        return $absolutePaths;
     }
 }

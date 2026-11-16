@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use function count;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
@@ -70,7 +69,7 @@ final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasP
 
     public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
     {
-        if (count($event->mutationHashes) > 0) {
+        if ($event->mutationHashes !== []) {
             $this->logger->finishMutationGenerationForFile(
                 $event->sourceFilePath,
                 $event->mutationHashes,

@@ -41,13 +41,15 @@ use Infection\Container\Container;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
-use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Source\Exception\NoSourceFound;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
+use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Throwable;
 
@@ -143,7 +145,9 @@ final class RunCommandTest extends TestCase
     public function test_it_fails_when_a_positional_path_does_not_exist_on_disk(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid path argument "src/DefinitelyDoesNotExist.php": multiple paths must be passed as separate arguments.');
+        $this->expectExceptionMessage(
+            'Invalid positional argument "src/DefinitelyDoesNotExist.php": expected a readable file or directory, a source path filter or a source symbol selector.',
+        );
 
         $app = new Application(SingletonContainer::getContainer());
 
@@ -151,20 +155,6 @@ final class RunCommandTest extends TestCase
 
         $tester->execute([
             'paths' => ['src/DefinitelyDoesNotExist.php'],
-        ]);
-    }
-
-    public function test_it_fails_when_a_positional_argument_is_an_fqcn(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('FQCN-style arguments like "\App\Foo" are not yet supported.');
-
-        $app = new Application(SingletonContainer::getContainer());
-
-        $tester = new CommandTester($app->find('run'));
-
-        $tester->execute([
-            'paths' => ['\App\Foo'],
         ]);
     }
 
@@ -188,6 +178,11 @@ final class RunCommandTest extends TestCase
 
         yield 'initial tests failed' => [
             'failure' => new InitialTestsFailed('Project tests must be in a passing state before running Infection.'),
+        ];
+
+        yield 'custom framework initial run failed' => [
+            'failure' => new class('Custom initial run failed.') extends RuntimeException implements InitialTestsFailedContract {
+            },
         ];
 
         yield 'minimum MSI not reached' => [

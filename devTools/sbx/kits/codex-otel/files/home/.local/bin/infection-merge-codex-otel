@@ -3,15 +3,7 @@
 set -euo pipefail
 
 CONFIG_FILE="${CODEX_CONFIG_FILE:-/home/agent/.codex/config.toml}"
-WORKDIR_FILE="/home/agent/.config/infection-sbx/workdir"
-
-if [[ -f "${WORKDIR_FILE}" ]]; then
-    WORKDIR="$(tr -d '\n' < "${WORKDIR_FILE}")"
-else
-    WORKDIR="${WORKDIR:-${PWD}}"
-fi
-
-OTEL_CONFIG="${CODEX_OTEL_CONFIG_FILE:-${WORKDIR}/devTools/sbx/codex-otel.toml}"
+OTEL_CONFIG="${CODEX_OTEL_CONFIG_FILE:-/usr/share/infection-sbx/codex-otel.toml}"
 
 if [[ ! -f "${OTEL_CONFIG}" ]]; then
     printf 'Codex OTEL config not found: %s\n' "${OTEL_CONFIG}" >&2

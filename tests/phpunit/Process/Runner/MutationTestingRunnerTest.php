@@ -226,6 +226,89 @@ final class MutationTestingRunnerTest extends TestCase
         );
     }
 
+    public function test_it_skips_only_the_mutations_for_which_every_test_is_over_the_timeout(): void
+    {
+        $mutations = [
+            $mutation0 = $this->createMutation(0, [self::TIMEOUT - 1.0, self::TIMEOUT - 1.0]),
+            $mutation1 = $this->createMutation(1, [self::TIMEOUT + 1.0, self::TIMEOUT - 1.0]),
+            $mutation2 = $this->createMutation(2, [self::TIMEOUT, self::TIMEOUT + 1.0]),
+        ];
+        $this->mutantFactoryMock
+            ->method('create')
+            ->with(...WithConsecutive::create(
+                [$mutation0],
+                [$mutation1],
+                [$mutation2],
+            ))
+            ->willReturnOnConsecutiveCalls(
+                $mutant0 = MutantBuilder::withMinimalTestData()
+                    ->withMutantFilePath('/path/to/mutant0')
+                    ->withMutation($mutation0)
+                    ->withMutatedCode('mutated code 0')
+                    ->build(),
+                $mutant1 = MutantBuilder::withMinimalTestData()
+                    ->withMutantFilePath('/path/to/mutant1')
+                    ->withMutation($mutation1)
+                    ->withMutatedCode('mutated code 1')
+                    ->build(),
+                MutantBuilder::withMinimalTestData()
+                    ->withMutation($mutation2)
+                    ->build(),
+            )
+        ;
+
+        $this->fileSystemMock
+            ->expects($this->exactly(2))
+            ->method('dumpFile')
+            ->with(...WithConsecutive::create(
+                ['/path/to/mutant0', 'mutated code 0'],
+                ['/path/to/mutant1', 'mutated code 1'],
+            ))
+        ;
+
+        $this->testFrameworkMock
+            ->method('test')
+            ->with(...WithConsecutive::create(
+                [$mutant0],
+                [$mutant1],
+            ))
+            ->willReturnOnConsecutiveCalls(
+                $process0 = $this->buildCoveredMutantProcessContainer(),
+                $process1 = $this->buildCoveredMutantProcessContainer(),
+            )
+        ;
+
+        $this->processRunnerMock
+            ->expects($this->once())
+            ->method('run')
+            ->with($this->iterableContaining([$process0, $process1]))
+        ;
+
+        $this->runner->run($mutations);
+
+        $this->assertAreSameEvents(
+            [
+                new MutationTestingWasStarted(3, $this->processRunnerMock),
+                new MutationEvaluationWasStarted($mutation0),
+                new MutationEvaluationWasStarted($mutation1),
+                new MutationEvaluationWasStarted($mutation2),
+                new MutantProcessWasFinished(
+                    MutantExecutionResultBuilder::withMinimalTestData()->build(),
+                ),
+                new MutationTestingWasFinished(),
+            ],
+            $this->eventDispatcher->getEvents(),
+        );
+
+        /** @var MutantProcessWasFinished $skippedEvent */
+        $skippedEvent = $this->eventDispatcher->getEvents()[4];
+
+        $this->assertSame(
+            DetectionStatus::SKIPPED,
+            $skippedEvent->executionResult->getDetectionStatus(),
+        );
+    }
+
     public function test_it_applies_and_run_only_matched_by_id_mutants(): void
     {
         $mutations = [
@@ -283,7 +366,7 @@ final class MutationTestingRunnerTest extends TestCase
             false,
             self::TIMEOUT,
             [],
-            'fd952823181329ed33260b45eb3aa956', // mutation with index 0
+            ['fd952823181329ed33260b45eb3aa956'], // mutation with index 0
         );
 
         $this->runner->run($mutations);
@@ -292,6 +375,97 @@ final class MutationTestingRunnerTest extends TestCase
             [
                 new MutationTestingWasStarted(4, $this->processRunnerMock),
                 new MutationEvaluationWasStarted($mutation0),
+                new MutantProcessWasFinished(
+                    MutantExecutionResultBuilder::withMinimalTestData()->build(),
+                ),
+                new MutationTestingWasFinished(),
+            ],
+            $this->eventDispatcher->getEvents(),
+        );
+    }
+
+    public function test_it_applies_and_run_all_mutations_matched_by_any_of_the_ids(): void
+    {
+        $mutations = [
+            $mutation0 = $this->createMutation(0),
+            $this->createMutation(1),
+            $mutation2 = $this->createMutation(2),
+        ];
+
+        $this->mutantFactoryMock
+            ->method('create')
+            ->with(...WithConsecutive::create(
+                [$mutation0],
+                [$mutation2],
+            ))
+            ->willReturnOnConsecutiveCalls(
+                $mutant0 = MutantBuilder::withMinimalTestData()
+                    ->withMutantFilePath('/path/to/mutant0')
+                    ->withMutation($mutation0)
+                    ->withMutatedCode('mutated code 0')
+                    ->build(),
+                $mutant2 = MutantBuilder::withMinimalTestData()
+                    ->withMutantFilePath('/path/to/mutant2')
+                    ->withMutation($mutation2)
+                    ->withMutatedCode('mutated code 2')
+                    ->build(),
+            )
+        ;
+
+        $this->fileSystemMock
+            ->expects($this->exactly(2))
+            ->method('dumpFile')
+            ->with(...WithConsecutive::create(
+                ['/path/to/mutant0', 'mutated code 0'],
+                ['/path/to/mutant2', 'mutated code 2'],
+            ))
+        ;
+
+        $this->testFrameworkMock
+            ->method('test')
+            ->with(...WithConsecutive::create(
+                [$mutant0],
+                [$mutant2],
+            ))
+            ->willReturnOnConsecutiveCalls(
+                $process0 = $this->buildCoveredMutantProcessContainer(),
+                $process2 = $this->buildCoveredMutantProcessContainer(),
+            )
+        ;
+
+        $this->processRunnerMock
+            ->expects($this->once())
+            ->method('run')
+            ->with($this->iterableContaining([$process0, $process2]))
+            ->willReturn([$process0, $process2])
+        ;
+
+        /** @var list<non-empty-string> $mutantIds */
+        $mutantIds = [$mutation0->getHash(), $mutation2->getHash(), 'unknown-hash'];
+
+        $this->runner = new MutationTestingRunner(
+            $this->testFrameworkMock,
+            $this->mutantFactoryMock,
+            $this->processRunnerMock,
+            $this->eventDispatcher,
+            $this->fileSystemMock,
+            $this->diffSourceCodeMatcher,
+            false,
+            self::TIMEOUT,
+            [],
+            $mutantIds,
+        );
+
+        $this->runner->run($mutations);
+
+        $this->assertAreSameEvents(
+            [
+                new MutationTestingWasStarted(3, $this->processRunnerMock),
+                new MutationEvaluationWasStarted($mutation0),
+                new MutationEvaluationWasStarted($mutation2),
+                new MutantProcessWasFinished(
+                    MutantExecutionResultBuilder::withMinimalTestData()->build(),
+                ),
                 new MutantProcessWasFinished(
                     MutantExecutionResultBuilder::withMinimalTestData()->build(),
                 ),
@@ -495,7 +669,7 @@ final class MutationTestingRunnerTest extends TestCase
             [
                 'For_' => ['Assert::.*'],
             ],
-            'mutant-id-1',
+            ['mutant-id-1'],
         );
 
         $this->runner->run($mutations);
@@ -745,7 +919,7 @@ final class MutationTestingRunnerTest extends TestCase
      */
     private function formatExpectedEvents(array $events): string
     {
-        if (count($events) === 0) {
+        if ($events === []) {
             return ' Ø (no events)';
         }
 
@@ -798,8 +972,23 @@ final class MutationTestingRunnerTest extends TestCase
         });
     }
 
-    private function createMutation(int $i, float $time = 0.01, bool $coveredByTests = true): Mutation
+    /**
+     * @param float|list<float> $time Execution time of each test class covering the mutation
+     */
+    private function createMutation(int $i, float|array $time = 0.01, bool $coveredByTests = true): Mutation
     {
+        $tests = [];
+
+        if ($coveredByTests) {
+            foreach ((array) $time as $index => $testTime) {
+                $tests[] = new TestLocation(
+                    sprintf('Foo%dTest::test_it_can_instantiate', $index),
+                    sprintf('/path/to/acme/Foo%dTest.php', $index),
+                    $testTime,
+                );
+            }
+        }
+
         return new Mutation(
             'path/to/Foo' . $i . '.php',
             [],
@@ -816,13 +1005,7 @@ final class MutationTestingRunnerTest extends TestCase
             'Unknown',
             MutatedNode::wrap(new Nop()),
             0,
-            $coveredByTests ? [
-                new TestLocation(
-                    'FooTest::test_it_can_instantiate',
-                    '/path/to/acme/FooTest.php',
-                    $time,
-                ),
-            ] : [],
+            $tests,
             [],
             '',
         );

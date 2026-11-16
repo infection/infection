@@ -1,0 +1,24 @@
+{
+    "$schema": "../../../resources/schema.json",
+    "timeout": 25,
+    "threads": 1,
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "logs": {
+        "summary": "var/infection.log"
+    },
+    "mutators": {
+        "PublicVisibility": true,
+        "ArrayItemRemoval": true,
+        "FalseValue": {
+            "ignore": [
+                "Ignore_Specific_Mutations\\UnrelatedClass"
+            ]
+        },
+        "TrueValue": true
+    },
+    "tmpDir": "var/infection-tmp"
+}

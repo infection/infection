@@ -36,11 +36,12 @@ declare(strict_types=1);
 namespace Infection\Source\Collector;
 
 use function get_debug_type;
-use Infection\Configuration\Entry\Source;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFileFilter;
 use Infection\Git\Git;
+use Infection\Git\Throwable\GitDiffFailed;
 use InvalidArgumentException;
 use function sprintf;
 use const true;
@@ -56,25 +57,20 @@ final readonly class SourceCollectorFactory
     }
 
     /**
-     * @param non-empty-string $configurationPathname
+     * @throws GitDiffFailed
      */
     public function create(
-        string $configurationPathname,
-        Source $source,
+        ResolvedSource $source,
         ?SourceFileFilter $sourceFilter,
     ): SourceCollector {
         return match (true) {
             $sourceFilter instanceof GitDiffFilter => GitDiffSourceCollector::create(
                 $this->git,
-                $configurationPathname,
-                $source->directories,
-                $source->excludes,
+                $source,
                 $sourceFilter,
             ),
-            $sourceFilter === null || $sourceFilter instanceof PlainFilter => BasicSourceCollector::create(
-                $configurationPathname,
-                $source->directories,
-                $source->excludes,
+            $sourceFilter === null || $sourceFilter instanceof PlainFilter => new BasicSourceCollector(
+                $source,
                 $sourceFilter,
             ),
             // @phpstan-ignore infection.invalidArgumentException (Keep the exhaustive match expression.)

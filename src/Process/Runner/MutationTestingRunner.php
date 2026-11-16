@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use function array_key_exists;
+use function in_array;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
@@ -60,6 +61,7 @@ class MutationTestingRunner
 {
     /**
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param list<non-empty-string> $mutantIds
      */
     public function __construct(
         private readonly TestFramework $testFramework,
@@ -71,7 +73,7 @@ class MutationTestingRunner
         private readonly bool $runConcurrently,
         private readonly float $timeout,
         private readonly array $ignoreSourceCodeMutatorsMap,
-        private readonly ?string $mutantId = null,
+        private readonly array $mutantIds = [],
     ) {
     }
 
@@ -119,11 +121,11 @@ class MutationTestingRunner
 
     private function ignoredByMutantId(Mutation $mutation): bool
     {
-        if ($this->mutantId === null) {
+        if ($this->mutantIds === []) {
             return true;
         }
 
-        return $mutation->getHash() === $this->mutantId;
+        return in_array($mutation->getHash(), $this->mutantIds, true);
     }
 
     private function ignoredByRegex(Mutant $mutant): bool
@@ -165,8 +167,8 @@ class MutationTestingRunner
 
     private function takingTooLong(Mutant $mutant): bool
     {
-        // TODO refactor this comparison into a dedicated comparer to make it possible to swap strategies
-        if ($mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout) {
+        // any test running within the timeout may still kill the mutant, so we skip only when all of them are too slow.
+        if ($mutant->getMutation()->getShortestTestExecutionTime() < $this->timeout) {
             return true;
         }
 

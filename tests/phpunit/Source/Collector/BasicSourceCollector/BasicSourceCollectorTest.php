@@ -37,6 +37,8 @@ namespace Infection\Tests\Source\Collector\BasicSourceCollector;
 
 use function array_map;
 use Exception;
+use Infection\Configuration\Entry\Source;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Source\Collector\BasicSourceCollector;
 use Infection\Source\Exception\NoSourceFound;
@@ -67,8 +69,8 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
     }
 
     /**
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string[] $excludedFilesOrDirectories
+     * @param list<non-empty-string> $sourceDirectories
+     * @param list<non-empty-string> $excludedFilesOrDirectories
      * @param list<non-empty-string>|Exception $expected
      */
     #[DataProvider('sourceFilesProvider')]
@@ -78,9 +80,14 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
         array|Exception $expected,
     ): void {
         $collector = new BasicSourceCollector(
-            $sourceDirectories,
-            $excludedFilesOrDirectories,
-            null,
+            source: ResolvedSource::create(
+                new Source(
+                    $sourceDirectories,
+                    $excludedFilesOrDirectories,
+                ),
+                self::FIXTURES_ROOT,
+            ),
+            filter: null,
         );
 
         if ($expected instanceof Exception) {
@@ -127,6 +134,15 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
                 'case0/sub-dir/b.php',
                 'case1/a.php',
                 'case1/sub-dir/b.php',
+            ],
+        ];
+
+        yield 'absolute source paths preserve parent directory resolution after a symlink' => [
+            [self::FIXTURES_ROOT . '/case0/directory-symlink/..'],
+            [],
+            [
+                'case0/directory-symlink/../a.php',
+                'case0/directory-symlink/../sub-dir/b.php',
             ],
         ];
 
@@ -238,10 +254,14 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
             $this->filesystem->dumpFile($filePath, '');
         }
 
-        $collector = BasicSourceCollector::create(
-            configurationPathname: '/path/to/project',
-            sourceDirectories: [$this->tmp],
-            excludedFilesOrDirectories: [],
+        $collector = new BasicSourceCollector(
+            source: ResolvedSource::create(
+                new Source(
+                    [$this->tmp . '/'],
+                    [],
+                ),
+                $this->tmp,
+            ),
             filter: $filter,
         );
 
@@ -365,7 +385,10 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
         foreach ($expectedList as $path) {
             $pathname = Path::normalize($root . '/' . $path);
 
-            $expected[$pathname] = Path::normalize($path);
+            $expected[$pathname] = Path::makeRelative(
+                $pathname,
+                $root,
+            );
         }
 
         return $expected;

@@ -62,10 +62,10 @@ use Infection\Logger\Console\ConsoleLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
-use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\AdapterInstaller;
+use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
 use Infection\TestFramework\TestFrameworkTypes;
 use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
@@ -130,6 +130,8 @@ final class RunCommand extends BaseCommand
 
     private const string OPTION_LOGGER_TEXT = 'logger-text';
 
+    private const string OPTION_LOGGER_JSON = 'logger-json';
+
     private const string OPTION_USE_NOOP_MUTATORS = 'noop';
 
     private const string OPTION_EXECUTE_ONLY_COVERING_TEST_CASES = 'only-covering-test-cases';
@@ -153,7 +155,18 @@ final class RunCommand extends BaseCommand
             ->setDescription('Runs the mutation testing.')
         ;
 
-        PathsArgument::addArgument($this);
+        PathsArgument::addArgument(
+            $this,
+            description: <<<'HELP'
+                Source and test paths, e.g. `src/A.php src/B.php tests/ATest.php`.
+                Existing paths inside the configured source directories select source files; other existing paths select tests.
+
+                Source code can also be selected by class or method, e.g. 'App\Differ', 'Differ::diff' or 'Differ::diff::32'. Line numbers are counted from the start of the source file.
+                Existing paths take precedence over symbol selectors.
+                An unresolved bare name such as `Differ` selects classes named Differ in files whose paths contain Differ.
+                `Differ/` selects paths only, 'Differ\' selects classes under that namespace prefix and '\Differ' selects the global class. Quotes preserve backslashes in shell arguments.
+                HELP,
+        );
 
         TestFrameworkOption::addOption($this)
             ->addOption(
@@ -254,9 +267,9 @@ final class RunCommand extends BaseCommand
             ->addOption(
                 self::OPTION_MUTANT_ID,
                 null,
-                InputOption::VALUE_REQUIRED,
-                'Run only one Mutant by its ID. Can be used multiple times. If source code is changed, can be invalidated. Pass all previous options with this one.',
-                Container::DEFAULT_MUTANT_ID,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Run only one Mutant by its ID. Repeat the option to run several Mutants. If source code is changed, can be invalidated. Pass all previous options with this one.',
+                Container::DEFAULT_MUTANT_IDS,
             )
         ;
 
@@ -284,6 +297,12 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Path to text report file.',
+            )
+            ->addOption(
+                self::OPTION_LOGGER_JSON,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Path to JSON report file, with all mutants, source and mutated code, and test framework output.',
             )
             ->addOption(
                 self::OPTION_LOGGER_SUMMARY_JSON,
@@ -490,12 +509,13 @@ final class RunCommand extends BaseCommand
             htmlLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_HTML, Container::DEFAULT_HTML_LOGGER_PATH),
             textLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_TEXT, Container::DEFAULT_TEXT_LOGGER_PATH),
             summaryJsonLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_SUMMARY_JSON, Container::DEFAULT_SUMMARY_JSON_LOGGER_PATH),
+            jsonLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_JSON, Container::DEFAULT_JSON_LOGGER_PATH),
             useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             mapSourceClassToTestStrategy: MapSourceClassToTestOption::get($io),
             projectDirectory: $this->getProjectDirectory($io),
             staticAnalysisTool: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL, Container::DEFAULT_STATIC_ANALYSIS_TOOL),
-            mutantId: $commandHelper->getStringOption(self::OPTION_MUTANT_ID, Container::DEFAULT_MUTANT_ID),
+            mutantIds: $commandHelper->getStringListOption(self::OPTION_MUTANT_ID),
         );
     }
 

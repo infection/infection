@@ -44,20 +44,93 @@ use PHPUnit\Framework\TestCase;
 final class PlainFilterTest extends TestCase
 {
     /**
-     * @param non-empty-string $value
+     * @param string|array<string> $value
      */
     #[DataProvider('valueProvider')]
-    public function test_it_can_parse_and_normalize_string_filter(
-        string $value,
+    public function test_it_can_parse_and_normalize_filter(
+        string|array $value,
         ?PlainFilter $expected,
     ): void {
         $actual = PlainFilter::tryToCreate($value);
 
-        $this->assertEqualsCanonicalizing($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public static function valueProvider(): iterable
     {
+        yield 'empty array' => [
+            [],
+            null,
+        ];
+
+        yield 'blank array values produce no filter' => [
+            [
+                '',
+                ' ',
+                "\t\n",
+            ],
+            null,
+        ];
+
+        yield 'array values are trimmed and deduplicated after removing blank entries' => [
+            [
+                ' src/Bar.php ',
+                '',
+                'src/Bar.php',
+                ' src/Foo.php',
+                ' ',
+                'src/Foo.php ',
+                'src/Baz.php',
+            ],
+            new PlainFilter([
+                'src/Bar.php',
+                3 => 'src/Foo.php',
+                6 => 'src/Baz.php',
+            ]),
+        ];
+
+        yield 'array values are deduplicated in first occurrence order' => [
+            [
+                'src/Bar.php',
+                'src/Bar.php',
+                'src/Foo.php',
+                'src/Foo.php',
+                'src/Baz.php',
+            ],
+            new PlainFilter([
+                'src/Bar.php',
+                2 => 'src/Foo.php',
+                4 => 'src/Baz.php',
+            ]),
+        ];
+
+        yield 'array normalization preserves commas and zero filenames' => [
+            [
+                ' src/Foo,Bar.php ',
+                ' ',
+                ' 0 ',
+                '0',
+            ],
+            new PlainFilter([
+                'src/Foo,Bar.php',
+                2 => '0',
+            ]),
+        ];
+
+        yield 'zero filename in a string is preserved' => [
+            '0',
+            new PlainFilter([
+                '0',
+            ]),
+        ];
+
+        yield 'zero filenames in a string are trimmed and deduplicated' => [
+            ' 0 ,0',
+            new PlainFilter([
+                '0',
+            ]),
+        ];
+
         yield 'nominal' => [
             'src/Foo.php, src/Bar.php',
             new PlainFilter([
@@ -69,6 +142,23 @@ final class PlainFilterTest extends TestCase
         yield 'blank like string' => [
             ',',
             null,
+        ];
+
+        yield 'repeated values' => [
+            'src/Foo.php,src/Bar.php,src/Foo.php,src/Bar.php',
+            new PlainFilter([
+                'src/Foo.php',
+                'src/Bar.php',
+            ]),
+        ];
+
+        yield 'whitespace-equivalent values with empty entries preserve first occurrence order' => [
+            ' src/Bar.php, ,src/Bar.php , src/Foo.php,, src/Foo.php ,src/Baz.php, src/Bar.php ',
+            new PlainFilter([
+                'src/Bar.php',
+                3 => 'src/Foo.php',
+                6 => 'src/Baz.php',
+            ]),
         ];
 
         yield 'spaces & untrimmed string' => [

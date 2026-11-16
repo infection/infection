@@ -38,41 +38,61 @@ namespace Infection\Tests\Logger\MutationGeneration;
 use Infection\Logger\MutationGeneration\ConsoleNoProgressLogger;
 use Infection\Logger\MutationGeneration\ConsoleProgressBarLogger;
 use Infection\Logger\MutationGeneration\MutationGenerationLoggerFactory;
-use Infection\Tests\Fixtures\Console\FakeOutput;
+use Infection\Logger\MutationGeneration\PsrMutationGenerationDiagnosticLogger;
+use Infection\Tests\Logger\DummyLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
+use Psr\Log\LogLevel;
+use Symfony\Component\Console\Output\NullOutput;
 
 #[CoversClass(MutationGenerationLoggerFactory::class)]
 final class MutationGenerationLoggerFactoryTest extends TestCase
 {
-    public function test_it_creates_a_no_progress_logger_if_skips_the_progress_bar(): void
+    #[DataProvider('provideProgressModes')]
+    public function test_it_buffers_diagnostics_only_when_using_a_progress_bar(bool $noProgress): void
     {
+        $logger = new DummyLogger();
+        $diagnosticLogger = new PsrMutationGenerationDiagnosticLogger(
+            $logger,
+            !$noProgress,
+        );
         $factory = new MutationGenerationLoggerFactory(
-            true,
-            new FakeOutput(),
+            $noProgress,
+            new NullOutput(),
+            $diagnosticLogger,
+        );
+        $progressLogger = $factory->create();
+
+        $this->assertInstanceOf(
+            $noProgress ? ConsoleNoProgressLogger::class : ConsoleProgressBarLogger::class,
+            $progressLogger,
         );
 
-        $logger = $factory->create();
+        $progressLogger->start(1);
 
-        $this->assertInstanceOf(ConsoleNoProgressLogger::class, $logger);
+        $diagnosticLogger->warning('Unknown mutator.');
+
+        $expected = [[LogLevel::WARNING, 'Unknown mutator.', []]];
+
+        $this->assertSame(
+            $noProgress ? $expected : [],
+            $logger->getLogs(),
+        );
+
+        $progressLogger->advance();
+        $progressLogger->finish();
+
+        $this->assertSame(
+            $expected,
+            $logger->getLogs(),
+        );
     }
 
-    public function test_it_creates_a_progress_bar_logger_if_does_not_skip_the_progress_bar(): void
+    public static function provideProgressModes(): iterable
     {
-        $outputStub = $this->createStub(OutputInterface::class);
-        $outputStub
-            ->method('isDecorated')
-            ->willReturn(false)
-        ;
+        yield 'progress enabled' => [false];
 
-        $factory = new MutationGenerationLoggerFactory(
-            false,
-            $outputStub,
-        );
-
-        $logger = $factory->create();
-
-        $this->assertInstanceOf(ConsoleProgressBarLogger::class, $logger);
+        yield 'progress disabled' => [true];
     }
 }

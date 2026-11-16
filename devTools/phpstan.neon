@@ -151,6 +151,12 @@ parameters:
             count: 1
             path: ../tests/phpunit/Process/Runner/DryProcessRunnerTest.php
 
+        # SourceSymbolMatcher requires an enriched AST and is covered by ExcludeNonSelectedSourceNodesVisitorTest.
+        -
+            identifier: phpat.testConcreteSourceClassesHaveTests
+            count: 1
+            path: ../src/Source/Matcher/SourceSymbolMatcher.php
+
         # Permanent PHPat exceptions: these PHPUnit support classes are intentionally not tested directly.
         -
             identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
@@ -236,7 +242,7 @@ parameters:
         -
             message: "#Do not use magic number as a function argument. Move to constant with a suitable name.#"
             count: 1
-            path: ../src/Git/CommandLineGit.php
+            path: ../src/Differ/ChangedLinesParser.php
 
         # PHPStan cannot really properly infer that we throw those here
         -
@@ -254,12 +260,6 @@ parameters:
             message: '#getDefaultLocation#'
             identifier: shipmonk.deadMethod
             path: ../src/TestFramework/Coverage/Locator/FakeLocator.php
-
-        # PHPStan cannot really properly infer the types here
-        -
-            message: '#BasicSourceCollector::makePathsAbsolute\(\)#'
-            identifier: return.type
-            path: ../src/Source/Collector/BasicSourceCollector.php
 
         # False-positive: the value cannot be -1 with our configuration.
         -

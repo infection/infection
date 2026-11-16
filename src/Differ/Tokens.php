@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Differ;
 
 use function array_slice;
-use function count;
 use function current;
 use function end;
 use function implode;
@@ -82,7 +81,7 @@ final class Tokens
 
     public function getLines(): string
     {
-        if (count($this->changedIndexes) === 0) {
+        if ($this->changedIndexes === []) {
             return '';
         }
 

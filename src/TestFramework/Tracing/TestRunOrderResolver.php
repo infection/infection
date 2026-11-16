@@ -105,6 +105,8 @@ final readonly class TestRunOrderResolver
             return self::sortedLocationsGenerator($uniqueTestLocations);
         }
 
+        /** @var non-empty-array<TestLocation> $uniqueTestLocations */
+
         /*
          * For large number of tests use a more efficient algorithm.
          */

@@ -38,6 +38,7 @@ namespace Infection\Source\MatcherLine;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Framework\OperatingSystem;
 use Infection\Git\Git;
+use Infection\Git\Throwable\GitDiffFailed;
 use Infection\Source\Exception\NoSourceFound;
 use Symfony\Component\Filesystem\Path;
 
@@ -64,6 +65,10 @@ final class GitDiffSourceLineMatcher implements SourceLineMatcher
     ) {
     }
 
+    /**
+     * @throws GitDiffFailed
+     * @throws NoSourceFound
+     */
     public function touches(string $fileRealPath, int $startLine, int $endLine): bool
     {
         foreach ($this->getChangedLinesRanges($fileRealPath) as $changedLinesRange) {
@@ -76,6 +81,7 @@ final class GitDiffSourceLineMatcher implements SourceLineMatcher
     }
 
     /**
+     * @throws GitDiffFailed
      * @throws NoSourceFound
      *
      * @return list<ChangedLinesRange>

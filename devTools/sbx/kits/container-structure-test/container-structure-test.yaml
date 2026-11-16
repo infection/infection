@@ -1,0 +1,10 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: Infection container-structure-test
+description: Install the container-structure-test CLI.
+
+args:
+    version:
+        default: "1.22.1"
+        buildArg: TOOL_VERSION

@@ -36,10 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser;
 
 use function array_map;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
+use Infection\Logger\MutationGeneration\PsrMutationGenerationDiagnosticLogger;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\CollectSourceSymbolsVisitor;
+use Infection\PhpParser\Visitor\ExcludeIgnoredMutatorsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
+use Infection\PhpParser\Visitor\ExcludeNonSelectedSourceNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
 use Infection\PhpParser\Visitor\ExcludeUntestedNodesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
@@ -50,7 +55,10 @@ use Infection\Source\MatcherLine\NullSourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\Testing\FileSystem\MockSplFileInfo;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Interface_;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
@@ -60,6 +68,9 @@ use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
+use Psr\Log\Test\TestLogger;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -68,17 +79,61 @@ final class NodeTraverserFactoryTest extends TestCase
 {
     private static ?ReflectionProperty $visitorsReflection = null;
 
+    public function test_it_supplies_the_logger_file_and_known_mutators_to_ignore_annotations(): void
+    {
+        $logger = new TestLogger();
+        $sourceFile = MockSplFileInfo::create('/source.php');
+        $factory = new NodeTraverserFactory(
+            sourceLineMatcher: new NullSourceLineMatcher(),
+            lineRangeCalculator: new LineRangeCalculator(),
+            onlyCovered: false,
+            diagnosticLogger: new PsrMutationGenerationDiagnosticLogger(
+                $logger,
+                false,
+            ),
+            knownMutatorNames: ['CustomAlias'],
+            sourceSymbolSelectors: [],
+        );
+        $nodes = SingletonContainer::getContainer()->getParser()->parse(<<<'PHP'
+            <?php
+            // @infection-ignore FalseValue, CustomAlias, UnknownMutator
+            return false;
+            PHP);
+        $this->assertNotNull($nodes);
+
+        $factory->createEnrichmentTraverser(
+            $sourceFile,
+            new EmptyTrace($sourceFile),
+        )->traverse($nodes);
+
+        $this->assertSame(
+            [
+                [
+                    'level' => LogLevel::WARNING,
+                    'message' => 'Unknown mutator "UnknownMutator" in @infection-ignore at /source.php:3.',
+                    'context' => [],
+                ],
+            ],
+            $logger->records,
+        );
+    }
+
     /**
      * @param list<class-string<NodeVisitor>> $expected
+     * @param list<SourceSymbolSelector> $sourceSymbolSelectors
      */
     #[DataProvider('visitorProvider')]
     public function test_it_can_create_a_traverser_for_enriching_the_ast(
         bool $onlyCovered,
         array $expected,
+        array $sourceSymbolSelectors = [],
     ): void {
         $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
 
-        $factory = self::createTraverserFactory($onlyCovered);
+        $factory = self::createTraverserFactory(
+            $onlyCovered,
+            $sourceSymbolSelectors,
+        );
 
         $traverser = $factory->createEnrichmentTraverser(
             $sourceFile,
@@ -97,24 +152,81 @@ final class NodeTraverserFactoryTest extends TestCase
             SkipIgnoredNodesVisitor::class,
             NameResolver::class,
             ParentConnectingVisitor::class,
+            ExcludeIgnoredMutatorsVisitor::class,
             ReflectionVisitor::class,
             ExcludeNonMutableCodeVisitor::class,
             ExcludeUnchangedLinesVisitor::class,
-            AddTestsVisitor::class,
         ];
 
         yield 'without only covered' => [
             false,
-            $baseVisitors,
+            [
+                ...$baseVisitors,
+                AddTestsVisitor::class,
+            ],
         ];
 
         yield 'with only covered' => [
             true,
             [
                 ...$baseVisitors,
+                AddTestsVisitor::class,
                 ExcludeUntestedNodesVisitor::class,
             ],
         ];
+
+        yield 'with source selection' => [
+            false,
+            [
+                NextConnectingVisitor::class,
+                LabelNodesAsEligibleVisitor::class,
+                ExcludeIgnoredNodesVisitor::class,
+                SkipIgnoredNodesVisitor::class,
+                NameResolver::class,
+                CollectSourceSymbolsVisitor::class,
+                ParentConnectingVisitor::class,
+                ExcludeIgnoredMutatorsVisitor::class,
+                ReflectionVisitor::class,
+                ExcludeNonMutableCodeVisitor::class,
+                ExcludeUnchangedLinesVisitor::class,
+                ExcludeNonSelectedSourceNodesVisitor::class,
+                AddTestsVisitor::class,
+            ],
+            [
+                new SourceSymbolSelector('Vendor\\Package\\ClassName', 'method', 42),
+            ],
+        ];
+    }
+
+    public function test_it_can_create_a_traverser_for_collecting_source_symbols(): void
+    {
+        $symbolsVisitor = new CollectSourceSymbolsVisitor();
+
+        $traverser = NodeTraverserFactory::createSourceSymbolTraverser(
+            $symbolsVisitor,
+        );
+
+        $nodes = [
+            new Interface_('Contract'),
+            new Class_('Example'),
+        ];
+        $expectedSymbols = ['Example'];
+
+        $this->assertTraverserVisitorsAre(
+            $traverser,
+            [
+                NextConnectingVisitor::class,
+                LabelNodesAsEligibleVisitor::class,
+                ExcludeIgnoredNodesVisitor::class,
+                SkipIgnoredNodesVisitor::class,
+                NameResolver::class,
+                CollectSourceSymbolsVisitor::class,
+            ],
+        );
+
+        $traverser->traverse($nodes);
+
+        $this->assertSame($expectedSymbols, $symbolsVisitor->getSymbols());
     }
 
     public function test_it_can_create_a_traverser_for_generating_mutations(): void
@@ -167,12 +279,23 @@ final class NodeTraverserFactoryTest extends TestCase
         return self::$visitorsReflection ??= (new ReflectionClass(NodeTraverser::class))->getProperty('visitors');
     }
 
-    private static function createTraverserFactory(bool $onlyCovered): NodeTraverserFactory
-    {
+    /**
+     * @param list<SourceSymbolSelector> $sourceSymbolSelectors
+     */
+    private static function createTraverserFactory(
+        bool $onlyCovered,
+        array $sourceSymbolSelectors = [],
+    ): NodeTraverserFactory {
         return new NodeTraverserFactory(
             sourceLineMatcher: new NullSourceLineMatcher(),
             lineRangeCalculator: new LineRangeCalculator(),
             onlyCovered: $onlyCovered,
+            diagnosticLogger: new PsrMutationGenerationDiagnosticLogger(
+                new NullLogger(),
+                false,
+            ),
+            knownMutatorNames: [],
+            sourceSymbolSelectors: $sourceSymbolSelectors,
         );
     }
 }

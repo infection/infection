@@ -185,12 +185,12 @@ final class TeamCityLoggerState
             return false;
         }
 
-        return count($this->remainingTestIdsByTestSuiteSourceFilePath[$sourceFilePath]) === 0;
+        return $this->remainingTestIdsByTestSuiteSourceFilePath[$sourceFilePath] === [];
     }
 
     public function assertAllTestSuitesAreClosed(): void
     {
-        if (count($this->openedTestSuitesBySourceFilePath) > 0) {
+        if ($this->openedTestSuitesBySourceFilePath !== []) {
             throw new LogicException(
                 sprintf(
                     'Expected all test suites to be closed. Found: %s',

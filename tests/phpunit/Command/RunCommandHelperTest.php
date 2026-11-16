@@ -251,4 +251,38 @@ final class RunCommandHelperTest extends TestCase
 
         yield 'value with default returns value' => ['custom.json', 'custom.json', 'default.json'];
     }
+
+    /**
+     * @param list<non-empty-string> $expected
+     */
+    #[DataProvider('providesGetStringListOption')]
+    public function test_it_returns_string_list_option(mixed $optionValue, array $expected): void
+    {
+        $this->inputMock
+            ->expects($this->once())
+            ->method('getOption')
+            ->with('test-option')
+            ->willReturn($optionValue)
+        ;
+
+        $commandHelper = new RunCommandHelper($this->inputMock);
+        $this->assertSame($expected, $commandHelper->getStringListOption('test-option'));
+    }
+
+    public static function providesGetStringListOption(): iterable
+    {
+        yield 'empty array' => [[], []];
+
+        yield 'single value' => [['abc'], ['abc']];
+
+        yield 'several values' => [['abc', 'def'], ['abc', 'def']];
+
+        yield 'values are trimmed' => [['  abc ', 'def  '], ['abc', 'def']];
+
+        yield 'blank values are dropped' => [['', '   ', 'abc'], ['abc']];
+
+        yield 'zero is kept' => [['0'], ['0']];
+
+        yield 'duplicates are dropped and keys are reindexed' => [['abc', 'abc', 'def'], ['abc', 'def']];
+    }
 }

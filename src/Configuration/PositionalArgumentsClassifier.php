@@ -1,0 +1,204 @@
+<?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
+
+namespace Infection\Configuration;
+
+use function array_map;
+use function ctype_upper;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelectorParser;
+use Infection\FileSystem\FileSystem;
+use function sprintf;
+use function str_contains;
+use function str_ends_with;
+use function str_starts_with;
+use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
+
+/**
+ * Classifies positional arguments into source paths, test paths, and source
+ * symbol selectors.
+ *
+ * @internal
+ */
+final readonly class PositionalArgumentsClassifier
+{
+    private const string KIND_SOURCE = 'source';
+
+    private const string KIND_TEST = 'test';
+
+    public function __construct(
+        private FileSystem $fileSystem,
+        private SourceSymbolSelectorParser $sourceSymbolSelectorParser,
+    ) {
+    }
+
+    /**
+     * @param list<non-empty-string> $paths
+     */
+    public function classify(
+        array $paths,
+        ResolvedSource $source,
+    ): ClassifiedPositionalArguments {
+        if ($paths === []) {
+            return new ClassifiedPositionalArguments([], [], []);
+        }
+
+        $absoluteSourceDirs = array_map(
+            Path::canonicalize(...),
+            $source->directories,
+        );
+
+        $sourcePaths = [];
+        $testPaths = [];
+        $sourceSelectors = [];
+
+        foreach ($paths as $path) {
+            $absolutePath = Path::isAbsolute($path)
+                ? $path
+                : Path::join($source->basePath, $path);
+            $isExplicitPath = str_ends_with($path, '/');
+
+            // Existing files and directories take precedence over symbol selectors, so Windows
+            // paths such as C:\project\src\Foo.php are not confused with source symbols.
+            if (!$isExplicitPath && !$this->isValidPath($absolutePath)) {
+                $selector = $this->sourceSymbolSelectorParser->parse($path);
+
+                if ($selector !== null) {
+                    $sourceSelectors[] = $selector;
+
+                    // Use bare names as both files/paths and short class names.
+                    if (self::isBareClassName($path)) {
+                        $sourcePaths[] = $path;
+                    }
+
+                    continue;
+                }
+            }
+
+            $kind = $this->classifyPathKind($path, $absoluteSourceDirs, $source->basePath);
+
+            if ($kind === self::KIND_SOURCE) {
+                $sourcePaths[] = $path;
+            } else {
+                $testPaths[] = $path;
+            }
+        }
+
+        return new ClassifiedPositionalArguments(
+            $sourcePaths,
+            $testPaths,
+            $sourceSelectors,
+        );
+    }
+
+    /**
+     * @param list<string> $absoluteSourceDirs
+     */
+    private static function isInsideSourceDirectories(
+        string $path,
+        array $absoluteSourceDirs,
+    ): bool {
+        if ($absoluteSourceDirs === []) {
+            return false;
+        }
+
+        $candidate = Path::canonicalize($path);
+
+        foreach ($absoluteSourceDirs as $sourceDir) {
+            if ($candidate === $sourceDir || str_starts_with($candidate, $sourceDir . '/')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param list<string> $absoluteSourceDirs
+     *
+     * @return self::KIND_SOURCE|self::KIND_TEST
+     */
+    private function classifyPathKind(
+        string $path,
+        array $absoluteSourceDirs,
+        string $configDir,
+    ): string {
+        $absolutePath = Path::isAbsolute($path)
+            ? $path
+            : Path::join($configDir, $path);
+
+        $isValidPath = $this->isValidPath($absolutePath);
+        $isInsideSourceDirectories = self::isInsideSourceDirectories($absolutePath, $absoluteSourceDirs);
+
+        if ($isValidPath) {
+            return $isInsideSourceDirectories
+                ? self::KIND_SOURCE
+                : self::KIND_TEST;
+        }
+
+        // Unresolved directory fragments and bare names behave as --filter values.
+        Assert::true(
+            self::looksLikePathFilter($path),
+            sprintf(
+                'Invalid positional argument "%s": expected a readable file or directory, a source path filter or a source symbol selector.',
+                $path,
+            ),
+        );
+
+        return self::KIND_SOURCE;
+    }
+
+    private static function isBareClassName(string $value): bool
+    {
+        return !str_contains($value, '\\')
+            && !str_contains($value, '::');
+    }
+
+    private static function looksLikePathFilter(string $value): bool
+    {
+        if (str_ends_with($value, '/')) {
+            return true;
+        }
+
+        return ctype_upper($value[0])   // Class and file names start with PascalCase (A-Z only, not digits).
+            && !str_contains($value, '/')
+            && !str_contains($value, '\\');
+    }
+
+    private function isValidPath(string $absolutePath): bool
+    {
+        return $this->fileSystem->isReadableFile($absolutePath) || $this->fileSystem->isReadableDirectory($absolutePath);
+    }
+}

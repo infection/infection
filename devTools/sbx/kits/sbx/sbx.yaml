@@ -1,0 +1,63 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: Infection sbx
+description: Install the sbx CLI and Docker’s official agent skills.
+
+args:
+    version:
+        default: "0.51.0"
+        buildArg: TOOL_VERSION
+    skills_revision:
+        default: "56001ac500fef948ee2e48459090a62b9c6c28b5"
+        buildArg: SKILLS_REVISION
+
+capabilities:
+    -   type: com.docker.sandbox/agent-skill@1
+        optional: true
+        config:
+            path: /usr/share/infection-sbx/skills/docker-agent-config
+    -   type: com.docker.sandbox/agent-skill@1
+        optional: true
+        config:
+            path: /usr/share/infection-sbx/skills/docker-agent-deploy
+    -   type: com.docker.sandbox/agent-skill@1
+        optional: true
+        config:
+            path: /usr/share/infection-sbx/skills/docker-agent-run
+    -   type: com.docker.sandbox/agent-skill@1
+        optional: true
+        config:
+            path: /usr/share/infection-sbx/skills/docker-build-strategies
+    -   type: com.docker.sandbox/agent-skill@1
+        optional: true
+        config:
+            path: /usr/share/infection-sbx/skills/docker-compose-patterns
+    -   type: com.docker.sandbox/agent-skill@1
+        optional: true
+        config:
+            path: /usr/share/infection-sbx/skills/docker-destructive-guardrails
+    -   type: com.docker.sandbox/agent-skill@1
+        optional: true
+        config:
+            path: /usr/share/infection-sbx/skills/docker-docs
+    -   type: com.docker.sandbox/agent-skill@1
+        optional: true
+        config:
+            path: /usr/share/infection-sbx/skills/docker-project-foundations
+    -   type: com.docker.sandbox/agent-skill@1
+        optional: true
+        config:
+            path: /usr/share/infection-sbx/skills/docker-sandboxes-env
+    -   type: com.docker.sandbox/agent-skill@1
+        optional: true
+        config:
+            path: /usr/share/infection-sbx/skills/docker-sandboxes-kits
+    -   type: com.docker.sandbox/agent-skill@1
+        optional: true
+        config:
+            path: /usr/share/infection-sbx/skills/docker-sandboxes-lifecycle
+    -   type: com.docker.sandbox/agent-skill@1
+        optional: true
+        config:
+            path: /usr/share/infection-sbx/skills/docker-sandboxes-network-credentials

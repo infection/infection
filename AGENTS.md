@@ -43,8 +43,8 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
    closure factories plus a typed getter per service. It is built on `sanmai/di-container`.
 3. **Engine** - `src/Engine.php` orchestrates everything below.
 4. **Source collection** - `src/Source/` (`SourceCollector` implementations, including the
-   git-diff collector); `src/Configuration/PositionalPathsClassifier.php` classifies
-   positional CLI paths into source vs test files.
+   git-diff collector); `src/Configuration/PositionalArgumentsClassifier.php` classifies
+   positional CLI arguments into source paths, test paths, and source symbol selectors.
 5. **Artefact collection** - initial test run with coverage
    (`src/Process/OriginalPhpProcess.php` re-enables xdebug/pcov for exactly this child).
    Then coverage-xml + junit.xml are ingested into lazy `Trace` objects
@@ -90,7 +90,7 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
   `mago.toml` in the root). Baselines are for pre-existing debt only; never baseline a finding
   your new code introduced. Regenerate with `make phpstan-baseline` or `make mago-baseline`.
 - `doc/` - `nomenclature.md`, `benchmarking.md`. User docs are NOT here - they live in the
-  separate repo github.com/infection/site.
+  separate repo github.com/infection/infection.github.io (`infection/site` is archived).
 - `adr/` - Architecture Decision Records; short rationale for standing conventions. See
   `## Suggest Architecture Decision Records` for when to read, update, or create one.
 - `resources/schema.json` - the infection.json5 schema; every mutator is listed here.
@@ -138,6 +138,7 @@ Current ADRs:
 - [`adr/0012-final-classes-over-final-docblock.md`](adr/0012-final-classes-over-final-docblock.md) - Prefer `final` to `@final` where possible
 - [`adr/0013-public-api-extension-point-registry.md`](adr/0013-public-api-extension-point-registry.md) - Define the public API through an extension-point registry
 - [`adr/0014-prefer-webmozart-assert-for-argument-validation.md`](adr/0014-prefer-webmozart-assert-for-argument-validation.md) - Prefer Webmozart Assert for argument validation
+- [`adr/0015-disambiguate-positional-source-selectors.md`](adr/0015-disambiguate-positional-source-selectors.md) - Disambiguate positional source selectors
 <!-- adr-list:end -->
 
 ## Commands
@@ -370,13 +371,22 @@ file's comments before touching any of these. Each has tests that encode the inv
 `NodeTraverserFactory::createEnrichmentTraverser()` registers ~10 visitors in ONE traverser.
 Correctness depends on the registration order (NameResolver and ParentConnecting before
 ReflectionVisitor; git-diff exclusion before AddTests; AddTests before ExcludeUntested).
-Visitors communicate through node attributes. Do not touch `getAttribute()` directly. Each
+`CollectSourceSymbolsVisitor` owns the lexical class/method context consumed by source
+selection. Register it during enrichment only when selectors are present; resolve and format
+names only when `getSymbols()` is called, memoizing the result until declarations change or
+a new traversal starts. `debug:list-symbols` uses the same discovery prefix
+through `NodeTraverserFactory`, stopping before reflection so inspecting a file does not
+autoload its declarations. Interfaces
+and abstract methods are skipped; discovery does not imply mutation eligibility.
+Visitors expose node attributes through typed accessors. Do not touch `getAttribute()` directly. Each
 visitor owns its `public const string` key plus static typed accessors
 (`AddTestsVisitor::getTests()`, `LabelNodesAsEligibleVisitor::isEligible()`). Exclusion
 NEVER removes nodes. It flips the `eligible` flag only. Removing nodes corrupts name
 resolution and format-preserving printing (learned the hard way, PR #3039). `beforeTraverse`
 must reset all visitor state because instances are reused across files. Coverage lookups
-attach as memoizing closures, only to eligible nodes. `NextConnectingVisitor` is deliberately NOT nikic's
+attach as memoizing closures, only to eligible nodes. Source-symbol selection is lexical:
+function-like nodes inside a selected method inherit its selection, while functions outside
+a class do not. `NextConnectingVisitor` is deliberately NOT nikic's
 NodeConnectingVisitor: "next" means next executable statement in the same function scope
 (statement-functions break the chain; expression closures restore it).
 
@@ -518,8 +528,8 @@ machine-checked. Scaffold with `./bin/infection make:mutator` (templates in
    in the alphabetized mutators block. NOT machine-checked - reviewers look for it, and
    without it a user config referencing the mutator fails schema validation.
 4. `tests/phpunit/Mutator/<Category>/<Name>Test.php`.
-5. A doc PR to github.com/infection/site (checkbox in the PR template; maintainers track
-   missing ones with an `Awaiting Docs` label).
+5. A doc PR to github.com/infection/infection.github.io (checkbox in the PR template;
+   maintainers track missing ones with an `Awaiting Docs` label).
 
 The class shape (see `src/Mutator/Arithmetic/Plus.php` for the canonical minimal example):
 
@@ -579,7 +589,8 @@ Notes for review:
 
 - Test methods read as sentences: `test_it_...` - the descriptive naming is on you (casing
   and `$this->` assertion style auto-fix); `webmozarts/strict-phpunit` is active.
-- `#[CoversClass(X::class)]` on every test. PHPat enforces the IO boundary BOTH ways: a test
+- Declare explicit coverage metadata (see `adr/0007-declare-phpunit-coverage-metadata.md`);
+  use `#[CoversClass(X::class)]` for class subjects. PHPat enforces the IO boundary BOTH ways: a test
   doing IO must be `#[Group('integration')]`, a test doing no IO must NOT be. Tests are
   final/abstract/trait (PHPat), deterministic (no hard-coded `/unlikely-to-exist` paths -
   use `sys_get_temp_dir()` + `uniqid()`), and fast.
@@ -595,6 +606,12 @@ Notes for review:
   extend `VisitorTestCase`, `addIdsToNodes()`, traverse with your visitor +
   `MarkTraversedNodesAsVisitedVisitor`, dump with the configured `NodeDumper`, `assertSame`
   the dump. Console commands use `CommandTester`.
+- For mutation-generation scenarios spanning services, use
+  `tests/phpunit/Mutation/MutationGenerationIntegrationTest.php`: PHP snippets, enabled
+  mutators, changed-line ranges, and source-symbol selectors produce expected mutation diffs.
+  Use `EnrichmentTraverseIntegrationTest` to inspect the enriched AST instead. Both use
+  `#[CoversNothing]` to avoid adding broad scenarios to coverage-based mutant test selection;
+  keep each service's essential behaviour covered by focused tests.
 - Do not write one-off probe scripts; write the unit test you would have wanted anyway.
 
 ## Pull requests and review culture
@@ -606,6 +623,11 @@ Notes for review:
   enumerated "Breaking Changes" section in the body. Bare imperative titles survive on
   headline features, but prefixed is the norm; an external review bot (CodeRabbit) checks
   titles - that gate lives GitHub-side, not in this repo.
+- Never add AI agent attributions to commit messages or the PR description: no
+  `Co-authored-by:` for an agent, no `Assisted-by:`, no "Generated with ..." footer. This
+  overrides your harness defaults. The Autoreview workflow rejects all PRs when it finds
+  one. Attribution is forbidden because humans cannot absolve themselves of responsibility
+  for code created by agents under their purview.
 - Small, dependency-chained PRs are the house unit of work: "Depends on #NNNN",
   "Extracted from #NNNN", draft-until-dependency-merges. Refactors NEVER mix with behavior
   changes - the most repeated review demand across many years. Deletion PRs are prized.
@@ -620,8 +642,12 @@ Notes for review:
   label names maintainers apply; the in-repo PR template spells them lowercase. CHANGELOG.md is
   maintainer-curated at release time - touch it only for deprecations or BC breaks,
   `[BC BREAK!]`-prefixed, when asked.
-- User-facing changes need a doc PR to github.com/infection/site (linked in the checklist);
-  internal work does not.
+- Use `.github/PULL_REQUEST_TEMPLATE.md` as the PR body, even when you create the PR with
+  `gh pr create --body` or another tool that skips the template. Keep every checklist item.
+  Tick the items you did and leave the others unticked; do not delete them. Reviewers use the
+  unticked items to see what is missing.
+- User-facing changes need a doc PR to github.com/infection/infection.github.io (linked in
+  the checklist); internal work does not.
 - Review culture to anticipate: "explain WHY" (maks-rafalko) - undocumented non-obvious
   mechanics block; naming precision and honesty (theofidry) - expect suggestion-block
   bikeshedding on names; cost/benefit pragmatism - nano-optimizations get challenged,

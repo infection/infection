@@ -1,0 +1,10 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: Infection PHP tooling
+description: PHP runtime, coverage drivers, Composer, PIE, and extension build tools for Infection.
+
+args:
+    php_version:
+        default: "8.4"
+        buildArg: PHP_VERSION

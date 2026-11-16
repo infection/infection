@@ -53,12 +53,17 @@ final class PathsArgument
 
     public const string NAME = 'paths';
 
-    public static function addArgument(Command $command): Command
-    {
+    public static function addArgument(
+        Command $command,
+        string $description = <<<'HELP'
+            Source and test paths, e.g. `src/A.php src/B.php tests/ATest.php`.
+            Existing paths inside the configured source directories select source files; other existing paths select tests.
+            HELP,
+    ): Command {
         return $command->addArgument(
             self::NAME,
             InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
-            'Limit mutation testing to the given source and/or test paths. Path kind is inferred from the configured source directories and test-like paths. Pass as many paths as needed: `infection run src/A.php src/B.php tests/ATest.php`.',
+            $description,
         );
     }
 

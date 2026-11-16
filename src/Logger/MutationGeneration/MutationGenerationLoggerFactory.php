@@ -45,6 +45,7 @@ final readonly class MutationGenerationLoggerFactory
     public function __construct(
         private bool $skipProgressBar,
         private OutputInterface $output,
+        private MutationGenerationDiagnosticLogger $diagnosticLogger,
     ) {
     }
 
@@ -52,6 +53,9 @@ final readonly class MutationGenerationLoggerFactory
     {
         return $this->skipProgressBar
             ? new ConsoleNoProgressLogger($this->output)
-            : new ConsoleProgressBarLogger($this->output);
+            : new ConsoleProgressBarLogger(
+                $this->output,
+                $this->diagnosticLogger,
+            );
     }
 }

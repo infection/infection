@@ -38,15 +38,18 @@ namespace Infection\Tests\Configuration;
 
 use function array_values;
 use function implode;
+use Infection\Configuration\ClassifiedPositionalArguments;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFileFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
@@ -65,11 +68,13 @@ final class ConfigurationBuilder
      * @param positive-int|'max' $dotsPerRow
      * @param non-empty-string $configPathname
      * @param non-empty-string $projectDirectory
+     * @param list<non-empty-string> $mutantIds
      */
     private function __construct(
         private float $timeout,
-        private Source $source,
-        private ?SourceFileFilter $sourceFilter,
+        private ResolvedSource $source,
+        private SourceFilter $sourceFilter,
+        private ClassifiedPositionalArguments $classifiedPositionalArguments,
         private Logs $logs,
         private string $logVerbosity,
         private string $tmpDir,
@@ -103,7 +108,7 @@ final class ConfigurationBuilder
         private ?string $mapSourceClassToTestStrategy,
         private string $projectDirectory,
         private ?string $staticAnalysisTool,
-        private ?string $mutantId,
+        private array $mutantIds,
         private string $configPathname,
         private string $debugTestFrameworkLogFile,
     ) {
@@ -115,6 +120,7 @@ final class ConfigurationBuilder
             timeout: $configuration->processTimeout,
             source: $configuration->source,
             sourceFilter: $configuration->sourceFilter,
+            classifiedPositionalArguments: $configuration->classifiedPositionalArguments,
             logs: $configuration->logs,
             logVerbosity: $configuration->logVerbosity,
             tmpDir: $configuration->tmpDir,
@@ -150,7 +156,7 @@ final class ConfigurationBuilder
             mapSourceClassToTestStrategy: $configuration->mapSourceClassToTestStrategy,
             projectDirectory: $configuration->projectDirectory,
             staticAnalysisTool: $configuration->staticAnalysisTool,
-            mutantId: $configuration->mutantId,
+            mutantIds: $configuration->mutantIds,
             configPathname: $configuration->configurationPathname,
             debugTestFrameworkLogFile: $configuration->debugTestFrameworkLogFile,
         );
@@ -160,8 +166,9 @@ final class ConfigurationBuilder
     {
         return new self(
             timeout: 10.0,
-            source: new Source(),
-            sourceFilter: null,
+            source: ResolvedSourceBuilder::withMinimalTestData()->build(),
+            sourceFilter: new SourceFilter(null, []),
+            classifiedPositionalArguments: new ClassifiedPositionalArguments([], [], []),
             logs: Logs::createEmpty(),
             logVerbosity: 'none',
             tmpDir: '/tmp/infection',
@@ -195,7 +202,7 @@ final class ConfigurationBuilder
             mapSourceClassToTestStrategy: null,
             projectDirectory: '/var/www/project',
             staticAnalysisTool: null,
-            mutantId: null,
+            mutantIds: [],
             configPathname: '/path/to/project/infection.json5',
             debugTestFrameworkLogFile: '/tmp/infection.debug.jsonl',
         );
@@ -205,14 +212,15 @@ final class ConfigurationBuilder
     {
         return new self(
             timeout: 5.0,
-            source: new Source(
-                ['src', 'lib'],
-                ['vendor', 'tests'],
+            source: ResolvedSourceBuilder::withCompleteTestData()->build(),
+            sourceFilter: new SourceFilter(
+                new PlainFilter([
+                    'src/Foo.php',
+                    'src/Bar.php',
+                ]),
+                [],
             ),
-            sourceFilter: new PlainFilter([
-                'src/Foo.php',
-                'src/Bar.php',
-            ]),
+            classifiedPositionalArguments: new ClassifiedPositionalArguments([], [], []),
             logs: new Logs(
                 textLogFilePath: 'text.log',
                 htmlLogFilePath: 'report.html',
@@ -265,7 +273,7 @@ final class ConfigurationBuilder
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             projectDirectory: '/var/www/project',
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
-            mutantId: 'abc123def456',
+            mutantIds: ['abc123def456'],
             configPathname: '/path/to/project/infection.json5',
             debugTestFrameworkLogFile: '/debug.jsonl',
         );
@@ -279,7 +287,7 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withSource(Source $source): self
+    public function withSource(ResolvedSource $source): self
     {
         $clone = clone $this;
         $clone->source = $source;
@@ -292,13 +300,11 @@ final class ConfigurationBuilder
      */
     public function withSourceDirectories(string ...$sourceDirectories): self
     {
-        $clone = clone $this;
-        $clone->source = new Source(
-            array_values($sourceDirectories),
-            $this->source->excludes,
+        return $this->withSource(
+            ResolvedSourceBuilder::from($this->source)
+                ->withDirectories(...$sourceDirectories)
+                ->build(),
         );
-
-        return $clone;
     }
 
     /**
@@ -306,11 +312,17 @@ final class ConfigurationBuilder
      */
     public function withSourceFilesExcludes(string ...$sourceFilesExcludes): self
     {
-        $clone = clone $this;
-        $clone->source = new Source(
-            $this->source->directories,
-            array_values($sourceFilesExcludes),
+        return $this->withSource(
+            ResolvedSourceBuilder::from($this->source)
+                ->withExcludes(...$sourceFilesExcludes)
+                ->build(),
         );
+    }
+
+    public function withClassifiedPositionalArguments(ClassifiedPositionalArguments $classifiedPositionalArguments): self
+    {
+        $clone = clone $this;
+        $clone->classifiedPositionalArguments = $classifiedPositionalArguments;
 
         return $clone;
     }
@@ -318,7 +330,18 @@ final class ConfigurationBuilder
     public function withSourceFilter(?SourceFileFilter $sourceFilter): self
     {
         $clone = clone $this;
-        $clone->sourceFilter = $sourceFilter;
+        $clone->sourceFilter = new SourceFilter($sourceFilter, $this->sourceFilter->symbolSelectors);
+
+        return $clone;
+    }
+
+    public function withSourceSymbolSelectors(SourceSymbolSelector ...$sourceSymbolSelectors): self
+    {
+        $clone = clone $this;
+        $clone->sourceFilter = new SourceFilter(
+            $this->sourceFilter->fileFilter,
+            array_values($sourceSymbolSelectors),
+        );
 
         return $clone;
     }
@@ -602,10 +625,13 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withMutantId(?string $mutantId): self
+    /**
+     * @param list<non-empty-string> $mutantIds
+     */
+    public function withMutantIds(array $mutantIds): self
     {
         $clone = clone $this;
-        $clone->mutantId = $mutantId;
+        $clone->mutantIds = $mutantIds;
 
         return $clone;
     }
@@ -635,6 +661,7 @@ final class ConfigurationBuilder
             processTimeout: $this->timeout,
             source: $this->source,
             sourceFilter: $this->sourceFilter,
+            classifiedPositionalArguments: $this->classifiedPositionalArguments,
             logs: $this->logs,
             logVerbosity: $this->logVerbosity,
             tmpDir: $this->tmpDir,
@@ -668,7 +695,7 @@ final class ConfigurationBuilder
             mapSourceClassToTestStrategy: $this->mapSourceClassToTestStrategy,
             projectDirectory: $this->projectDirectory,
             staticAnalysisTool: $this->staticAnalysisTool,
-            mutantId: $this->mutantId,
+            mutantIds: $this->mutantIds,
             configurationPathname: $this->configPathname,
             debugTestFrameworkLogFile: $this->debugTestFrameworkLogFile,
         );
