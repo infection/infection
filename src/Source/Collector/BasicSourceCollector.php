@@ -115,11 +115,7 @@ final readonly class BasicSourceCollector implements SourceCollector
         // TODO: to check if we really need to re-apply the excluded files.
         //   could be necessary due to a Finder bug for example.
         if ($this->source->excludes !== []) {
-            $iterator = new PathFilterIterator(
-                $iterator,
-                [],
-                $this->source->excludes,
-            );
+            $iterator = new PathFilterIterator($iterator, [], $this->source->excludes);
         }
 
         return $iterator;

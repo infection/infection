@@ -107,11 +107,7 @@ final readonly class PositionalArgumentsClassifier
                 }
             }
 
-            $kind = $this->classifyPathKind(
-                $path,
-                $absoluteSourceDirs,
-                $source->basePath,
-            );
+            $kind = $this->classifyPathKind($path, $absoluteSourceDirs, $source->basePath);
 
             if ($kind === self::KIND_SOURCE) {
                 $sourcePaths[] = $path;
