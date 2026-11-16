@@ -101,7 +101,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             Paths::makeAbsolute(
                 $sourceDirectories,
                 $sourceDirectoryBasePath,
-                canonicalize: true,
             ),
         );
         Assert::notEmpty(
@@ -127,7 +126,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
                 $fileSystem,
-                $sourceDirectories,
+                $absoluteSourceDirectories,
                 array_map(
                     static function (SplFileInfo $fileInfo): string {
                         $realPath = $fileInfo->getRealPath();
