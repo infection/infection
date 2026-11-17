@@ -43,9 +43,7 @@ use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 
 /**
- * Composes mutant evaluation by the test suite and optional static analysis.
- * Initial runs, requirement checks and framework identity still use the individual
- * frameworks until the rest of the test-framework migration is complete.
+ * Composes test frameworks into a single mutant-evaluation workflow.
  *
  * @internal
  */
@@ -54,8 +52,8 @@ final readonly class CombinedTestFramework implements TestFramework
     private const string UNSUPPORTED_OPERATION_MESSAGE = 'CombinedTestFramework only supports mutant evaluation.';
 
     public function __construct(
-        private TestFramework $testFramework,
-        private ?TestFramework $staticAnalysis,
+        private TestFramework $firstTestFramework,
+        private ?TestFramework $followUpTestFramework,
     ) {
     }
 
@@ -81,17 +79,17 @@ final readonly class CombinedTestFramework implements TestFramework
 
     public function test(Mutant $mutant): MutantProcessContainer
     {
-        $evaluation = $this->testFramework->test($mutant);
+        $evaluation = $this->firstTestFramework->test($mutant);
 
-        $staticAnalysis = $this->staticAnalysis;
+        $followUpTestFramework = $this->followUpTestFramework;
 
-        if ($staticAnalysis === null) {
+        if ($followUpTestFramework === null) {
             return $evaluation;
         }
 
-        // Defer static-analysis setup until the preceding evaluation has escaped.
+        // Defer the follow-up framework setup until the preceding evaluation has escaped.
         return $evaluation->append(
-            static fn (): MutantProcess => $staticAnalysis->test($mutant)->getCurrent(),
+            static fn (): MutantProcess => $followUpTestFramework->test($mutant)->getCurrent(),
         );
     }
 
