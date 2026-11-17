@@ -138,6 +138,7 @@ final class PHPStanAdapter implements StaticAnalysisTestFramework
         );
 
         return MutantProcessContainer::from(
+            $mutant,
             static fn (): MutantProcess => $factory->create($mutant),
         );
     }

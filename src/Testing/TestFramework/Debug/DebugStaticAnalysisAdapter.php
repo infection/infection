@@ -92,6 +92,7 @@ final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisTestFra
         );
 
         return MutantProcessContainer::from(
+            $mutant,
             static fn (): MutantProcess => $factory->create($mutant),
         );
     }

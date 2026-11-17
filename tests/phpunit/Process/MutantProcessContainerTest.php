@@ -38,6 +38,7 @@ namespace Infection\Tests\Process;
 use Infection\Mutant\DetectionStatus;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -46,6 +47,18 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(MutantProcessContainer::class)]
 final class MutantProcessContainerTest extends TestCase
 {
+    public function test_it_exposes_the_mutant_without_starting_evaluation(): void
+    {
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+        $process = $this->createStub(MutantProcess::class);
+        $container = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $process);
+
+        $this->assertSame($mutant, $container->getMutant());
+        $this->assertTrue($container->isCold());
+        $this->assertSame($process, $container->getCurrent());
+        $this->assertFalse($container->isCold());
+    }
+
     public function test_it_has_no_next_process_without_a_follow_up_factory(): void
     {
         $process = $this->createMock(MutantProcess::class);
@@ -54,7 +67,7 @@ final class MutantProcessContainerTest extends TestCase
             ->method('getMutantExecutionResult')
         ;
 
-        $container = MutantProcessContainer::from(static fn (): MutantProcess => $process);
+        $container = MutantProcessContainer::from(MutantBuilder::withMinimalTestData()->build(), static fn (): MutantProcess => $process);
 
         $this->assertSame($process, $container->getCurrent());
         $this->assertFalse($container->hasNext());
@@ -73,7 +86,7 @@ final class MutantProcessContainerTest extends TestCase
             ->willReturn($result)
         ;
 
-        $container = MutantProcessContainer::from(static fn (): MutantProcess => $process)
+        $container = MutantProcessContainer::from(MutantBuilder::withMinimalTestData()->build(), static fn (): MutantProcess => $process)
             ->append(function (): MutantProcess {
                 $this->fail('Checking for a follow-up must not create its process.');
             })
@@ -113,7 +126,7 @@ final class MutantProcessContainerTest extends TestCase
             public int $second = 0;
         };
 
-        $container = MutantProcessContainer::from(static function () use ($first, $calls): MutantProcess {
+        $container = MutantProcessContainer::from(MutantBuilder::withMinimalTestData()->build(), static function () use ($first, $calls): MutantProcess {
             ++$calls->first;
 
             return $first;

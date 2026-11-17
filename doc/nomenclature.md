@@ -203,6 +203,12 @@ The phase encompassing [mutant materialisation][mutant-materialisation] and [mut
 
 The execution of tests against the mutant process(es) and recording of the outcome.
 
+In Infection, a `MutantEvaluationPipe` controls the sequence of processes for one
+mutant. Frameworks return a cold pipe, which creates processes on demand. The
+runner executes its current process and asks the pipe whether to continue.
+Combined pipes preserve each framework's complete sequence and advance to the
+next framework only when the preceding sequence escapes.
+
 
 ### Mutant Materialisation
 
