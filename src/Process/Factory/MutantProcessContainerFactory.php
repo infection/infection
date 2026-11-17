@@ -73,6 +73,7 @@ class MutantProcessContainerFactory
         Closure $testsPass,
         ?Closure $isSyntaxError = null,
     ): MutantProcessContainer {
+<<<<<<< HEAD
         return MutantProcessContainer::from(
             $mutant,
             fn (): MutantProcess => $this->createProcess($command, $mutant, $testsPass, $isSyntaxError),
@@ -90,6 +91,8 @@ class MutantProcessContainerFactory
         Closure $testsPass,
         ?Closure $isSyntaxError,
     ): MutantProcess {
+=======
+>>>>>>> f39d59d4f (remove the interface)
         // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
         $timeout = min(self::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (self::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime()), $this->timeout);
 
@@ -103,10 +106,19 @@ class MutantProcessContainerFactory
             $process = DryRunProcess::fromProcess($process);
         }
 
+<<<<<<< HEAD
         return new MutantProcess(
             $process,
             $mutant,
             new TestFrameworkMutantExecutionResultFactory($testsPass, $isSyntaxError),
+=======
+        return MutantProcessContainer::from(
+            static fn (): MutantProcess => new MutantProcess(
+                $process,
+                $mutant,
+                new TestFrameworkMutantExecutionResultFactory($testFrameworkAdapter),
+            ),
+>>>>>>> f39d59d4f (remove the interface)
         );
     }
 }

@@ -89,6 +89,22 @@ final class Scenario
         $clone = clone $this;
         $clone->expectedRecords = $expectedRecords;
 
+<<<<<<< HEAD:tests/phpunit/Git/CiAwareGit/Scenario.php
         return $clone;
+=======
+        return new InitialRunResults('', null);
+    }
+
+    public function test(Mutant $mutant): MutantProcessContainer
+    {
+        return MutantProcessContainer::from(
+            fn (): MutantProcess => $this->staticAnalysisToolAdapter->createMutantProcessFactory()->create($mutant),
+        );
+    }
+
+    public function hasJUnitReport(): bool
+    {
+        return false;
+>>>>>>> f39d59d4f (remove the interface):src/TestFramework/LegacyStaticAnalysisBridge.php
     }
 }
