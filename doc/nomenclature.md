@@ -207,6 +207,10 @@ In Infection, `MutantProcessContainer` creates processes lazily and preserves
 the complete follow-up sequence of nested containers. Evaluation advances to
 another process or container only when the preceding sequence escapes.
 
+A framework's `MutantProcessDetectionStatusResolver` interprets process output,
+exit code, and timeout state. Result factories use that classification when
+assembling the mutant's reporting details.
+
 
 ### Mutant Materialisation
 

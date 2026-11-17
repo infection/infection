@@ -409,7 +409,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
             ->willReturn(DryRunProcess::PASSING_TEST_OUTPUT)
         ;
         $processMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getExitCode')
             ->willReturn(0)
         ;
@@ -496,7 +496,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
             ->willReturn('Tests failed!')
         ;
         $processMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getExitCode')
             ->willReturn(0)
         ;
@@ -592,7 +592,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
             ->willReturn('Tests passed! OK (10 tests, 32 assertions)')
         ;
         $processMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getExitCode')
             ->willReturn(1) // PHPUnit says tests passed, but return code is non-zero
         ;

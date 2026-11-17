@@ -42,6 +42,7 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\MutantProcess;
+use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
 use Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
@@ -64,7 +65,9 @@ final class MagoMutantExecutionResultFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->resultFactory = new MagoMutantExecutionResultFactory();
+        $this->resultFactory = new MagoMutantExecutionResultFactory(
+            new MagoMutantDetectionStatusResolver(),
+        );
     }
 
     public function test_it_can_create_a_result_from_a_time_out_mutant_process(): void
