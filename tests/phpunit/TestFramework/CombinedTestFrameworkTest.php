@@ -47,7 +47,6 @@ use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 #[CoversClass(CombinedTestFramework::class)]
 final class CombinedTestFrameworkTest extends TestCase
@@ -70,7 +69,7 @@ final class CombinedTestFrameworkTest extends TestCase
     }
 
     #[DataProvider('evaluationStatusProvider')]
-    public function test_it_only_evaluates_static_analysis_after_the_tests_escape(DetectionStatus $status, bool $hasNext): void
+    public function test_it_only_creates_static_analysis_processes_after_the_tests_escape(DetectionStatus $status, bool $hasNext): void
     {
         $mutant = MutantBuilder::withMinimalTestData()->build();
         $testProcess = $this->createStub(MutantProcess::class);
@@ -79,47 +78,34 @@ final class CombinedTestFrameworkTest extends TestCase
             ->withDetectionStatus($status)
             ->build()
         ;
-        $testProcess
-            ->method('getMutantExecutionResult')
-            ->willReturn($result)
-        ;
-        $testEvaluation = MutantProcessContainer::from(static fn (): MutantProcess => $testProcess);
+        $testProcess->method('getMutantExecutionResult')->willReturn($result);
+        $testEvaluation = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $testProcess);
         $testFramework = $this->createMock(TestFramework::class);
-        $testFramework
-            ->expects($this->once())
-            ->method('test')
-            ->with($this->identicalTo($mutant))
-            ->willReturn($testEvaluation)
-        ;
-        $staticAnalysis = $this->createMock(TestFramework::class);
-        $state = new stdClass();
-        $state->testsFinished = false;
-        $staticAnalysis
-            ->expects(
-                $hasNext
-                    ? $this->once()
-                    : $this->never(),
-            )
-            ->method('test')
-            ->with($this->identicalTo($mutant))
-            ->willReturnCallback(function () use ($state, $staticAnalysisProcess): MutantProcessContainer {
-                $this->assertTrue($state->testsFinished);
+        $testFramework->expects($this->once())->method('test')->with($this->identicalTo($mutant))->willReturn($testEvaluation);
+        $created = false;
+        $staticEvaluation = MutantProcessContainer::from(
+            $mutant,
+            static function () use (&$created, $staticAnalysisProcess): MutantProcess {
+                $created = true;
 
-                return MutantProcessContainer::from(static fn (): MutantProcess => $staticAnalysisProcess);
-            })
-        ;
+                return $staticAnalysisProcess;
+            },
+        );
+        $staticAnalysis = $this->createMock(TestFramework::class);
+        $staticAnalysis->expects($this->once())->method('test')->with($this->identicalTo($mutant))->willReturn($staticEvaluation);
 
         $framework = new CombinedTestFramework($testFramework, $staticAnalysis);
         $evaluation = $framework->test($mutant);
 
-        $this->assertSame($testEvaluation, $evaluation);
+        $this->assertTrue($evaluation->isCold());
         $this->assertSame($testProcess, $evaluation->getCurrent());
         $this->assertSame($hasNext, $evaluation->hasNext());
-        $state->testsFinished = true;
+        $this->assertFalse($created);
 
         if ($hasNext) {
             $this->assertSame($staticAnalysisProcess, $evaluation->createNext());
             $this->assertSame($staticAnalysisProcess, $evaluation->getCurrent());
+            $this->assertTrue($created);
             $this->assertFalse($evaluation->hasNext());
         }
     }

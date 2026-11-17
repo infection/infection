@@ -37,7 +37,6 @@ namespace Infection\TestFramework\Contracts;
 
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Mutant\Mutant;
-use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 
@@ -84,10 +83,10 @@ interface TestFramework
     /**
      * Evaluates the Mutant. Some test frameworks may be able to do this in-memory, e.g.
      * Psalm, or it requires to launch a process in which case the process execution is
-     * delegated to an orchestrator. A process encapsulates how the result of the process
-     * is interpreted.
+     * delegated to an orchestrator. The returned pipe must be cold; processes are created on demand.
+     * A process encapsulates how its result is interpreted.
      */
-    public function test(Mutant $mutant): MutantProcessContainer;
+    public function test(Mutant $mutant): MutantEvaluationPipe;
 
     /**
      * @deprecated This is only for making the migration easier, to be removed.

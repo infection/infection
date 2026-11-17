@@ -37,9 +37,8 @@ namespace Infection\TestFramework;
 
 use BadMethodCallException;
 use Infection\Mutant\Mutant;
-use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 
 /**
@@ -79,7 +78,7 @@ final readonly class CombinedTestFramework implements TestFramework
         throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
     }
 
-    public function test(Mutant $mutant): MutantProcessContainer
+    public function test(Mutant $mutant): MutantEvaluationPipe
     {
         $evaluation = $this->testFramework->test($mutant);
 
@@ -89,10 +88,7 @@ final readonly class CombinedTestFramework implements TestFramework
             return $evaluation;
         }
 
-        // Defer static-analysis setup until the preceding evaluation has escaped.
-        return $evaluation->append(
-            static fn (): MutantProcess => $staticAnalysis->test($mutant)->getCurrent(),
-        );
+        return $evaluation->merge($staticAnalysis->test($mutant));
     }
 
     public function hasJUnitReport(): bool
