@@ -38,6 +38,9 @@ namespace Infection\Process;
 use function array_key_exists;
 use Closure;
 use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\Mutant;
+use Infection\TestFramework\Common\CombinedMutantEvaluationPipe;
+use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 
 /**
  * @phpstan-type MutantProcessFactory = Closure(): MutantProcess
@@ -45,7 +48,7 @@ use Infection\Mutant\DetectionStatus;
  * @internal
  * @final
  */
-class MutantProcessContainer
+class MutantProcessContainer implements MutantEvaluationPipe
 {
     /**
      * @var array<non-negative-int, MutantProcess>
@@ -61,6 +64,7 @@ class MutantProcessContainer
      * @param non-empty-list<MutantProcessFactory> $factories
      */
     private function __construct(
+        private readonly Mutant $mutant,
         private array $factories,
     ) {
     }
@@ -68,9 +72,24 @@ class MutantProcessContainer
     /**
      * @param MutantProcessFactory $factory
      */
-    public static function from(Closure $factory): self
+    public static function from(Mutant $mutant, Closure $factory): self
     {
-        return new self([$factory]);
+        return new self($mutant, [$factory]);
+    }
+
+    public function getMutant(): Mutant
+    {
+        return $this->mutant;
+    }
+
+    public function isCold(): bool
+    {
+        return $this->processes === [];
+    }
+
+    public function merge(MutantEvaluationPipe $other): MutantEvaluationPipe
+    {
+        return CombinedMutantEvaluationPipe::from($this, $other);
     }
 
     /**
