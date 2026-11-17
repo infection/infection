@@ -189,6 +189,6 @@ class MutationTestingRunner
 
     private static function containerToFinishedEvent(MutantProcessContainer $container): MutantProcessWasFinished
     {
-        return new MutantProcessWasFinished($container->getCurrent()->getMutantExecutionResult());
+        return new MutantProcessWasFinished($container->getMutantExecutionResult());
     }
 }
