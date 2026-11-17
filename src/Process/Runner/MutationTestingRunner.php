@@ -48,7 +48,7 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\TestFramework;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
@@ -187,8 +187,8 @@ class MutationTestingRunner
         );
     }
 
-    private static function containerToFinishedEvent(MutantEvaluationPipe $container): MutantProcessWasFinished
+    private static function containerToFinishedEvent(MutantProcessContainer $container): MutantProcessWasFinished
     {
-        return new MutantProcessWasFinished($container->getCurrent()->getMutantExecutionResult());
+        return new MutantProcessWasFinished($container->getMutantExecutionResult());
     }
 }

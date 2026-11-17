@@ -507,7 +507,7 @@ final class ParallelProcessRunnerTest extends TestCase
                 false,
             );
 
-            $processes[] = MutantProcessContainer::from(MutantBuilder::withMinimalTestData()->build(), static fn (): MutantProcess => $mutantProcess);
+            $processes[] = MutantProcessContainer::from(static fn (): MutantProcess => $mutantProcess);
         }
 
         // Run the processes - the while loop should execute because hasProcessesThatCouldBeFreed returns true
@@ -573,7 +573,7 @@ final class ParallelProcessRunnerTest extends TestCase
                 false,
             );
 
-            $processes[] = MutantProcessContainer::from(MutantBuilder::withMinimalTestData()->build(), static fn (): MutantProcess => $mutantProcess);
+            $processes[] = MutantProcessContainer::from(static fn (): MutantProcess => $mutantProcess);
         }
 
         // Setup queue mock to return the processes
@@ -633,7 +633,6 @@ final class ParallelProcessRunnerTest extends TestCase
     private function createDummyMutantProcessContainer(Process $processMock): MutantProcessContainer
     {
         return MutantProcessContainer::from(
-            MutantBuilder::withMinimalTestData()->build(),
             fn (): MutantProcess => new DummyMutantProcess(
                 $processMock,
                 MutantBuilder::withMinimalTestData()->build(),
@@ -699,7 +698,6 @@ final class ParallelProcessRunnerTest extends TestCase
         $mutant = MutantBuilder::withMinimalTestData()->build();
 
         return MutantProcessContainer::from(
-            MutantBuilder::withMinimalTestData()->build(),
             static fn (): MutantProcess => new DummyMutantProcess(
                 $phpUnitProcessMock,
                 $mutant,
@@ -735,7 +733,6 @@ final class ParallelProcessRunnerTest extends TestCase
         ;
 
         return MutantProcessContainer::from(
-            MutantBuilder::withMinimalTestData()->build(),
             fn (): MutantProcess => new DummyMutantProcess(
                 $processMock,
                 MutantBuilder::withMinimalTestData()->build(),

@@ -37,20 +37,17 @@ namespace Infection\Process;
 
 use function array_key_exists;
 use Closure;
-use function count;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\Mutant;
-use Infection\TestFramework\Common\CombinedMutantEvaluationPipe;
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\Mutant\MutantExecutionResult;
 
 /**
  * @internal
  * @final
  */
-class MutantProcessContainer implements MutantEvaluationPipe
+class MutantProcessContainer
 {
     /**
-     * @var array<non-negative-int, MutantProcess>
+     * @var array<non-negative-int, MutantProcess|self>
      */
     private array $processes = [];
 
@@ -60,48 +57,48 @@ class MutantProcessContainer implements MutantEvaluationPipe
     private int $currentProcessIndex = 0;
 
     /**
-     * @param non-empty-list<Closure(): MutantProcess> $mutantProcessFactories
+     * @param non-empty-list<Closure(): (MutantProcess|self)> $mutantProcessFactories
      */
     private function __construct(
-        private readonly Mutant $mutant,
         private array $mutantProcessFactories,
     ) {
     }
 
     /**
-     * @param Closure(): MutantProcess $factory
+     * @param Closure(): (MutantProcess|self) $factory
      */
-    public static function from(Mutant $mutant, Closure $factory): self
+    public static function from(Closure $factory): self
     {
-        return new self($mutant, [$factory]);
-    }
-
-    public function getMutant(): Mutant
-    {
-        return $this->mutant;
-    }
-
-    public function isCold(): bool
-    {
-        return count($this->processes) === 0;
-    }
-
-    public function merge(MutantEvaluationPipe $other): MutantEvaluationPipe
-    {
-        return CombinedMutantEvaluationPipe::from($this, $other);
+        return new self([$factory]);
     }
 
     /**
-     * Container has a next process only if Mutant is Escaped
+     * Completes nested follow-ups before advancing to another factory after escape.
      */
     public function hasNext(): bool
     {
+        $current = $this->getCurrentEvaluation();
+
+        if ($current instanceof self
+            && $current->hasNext()
+        ) {
+            return true;
+        }
+
         return array_key_exists($this->currentProcessIndex + 1, $this->mutantProcessFactories)
-            && $this->getCurrentMutantProcessDetectionStatus() === DetectionStatus::ESCAPED;
+            && $this->getMutantExecutionResult()->getDetectionStatus() === DetectionStatus::ESCAPED;
     }
 
     public function createNext(): MutantProcess
     {
+        $current = $this->getCurrentEvaluation();
+
+        if ($current instanceof self
+            && $current->hasNext()
+        ) {
+            return $current->createNext();
+        }
+
         ++$this->currentProcessIndex;
 
         return $this->getCurrent();
@@ -109,11 +106,15 @@ class MutantProcessContainer implements MutantEvaluationPipe
 
     public function getCurrent(): MutantProcess
     {
-        return $this->processes[$this->currentProcessIndex] ??= ($this->mutantProcessFactories[$this->currentProcessIndex])();
+        $current = $this->getCurrentEvaluation();
+
+        return $current instanceof self
+            ? $current->getCurrent()
+            : $current;
     }
 
     /**
-     * @param Closure(): MutantProcess $factory
+     * @param Closure(): (MutantProcess|self) $factory
      */
     public function append(Closure $factory): self
     {
@@ -122,8 +123,13 @@ class MutantProcessContainer implements MutantEvaluationPipe
         return $this;
     }
 
-    private function getCurrentMutantProcessDetectionStatus(): DetectionStatus
+    public function getMutantExecutionResult(): MutantExecutionResult
     {
-        return $this->getCurrent()->getMutantExecutionResult()->getDetectionStatus();
+        return $this->getCurrent()->getMutantExecutionResult();
+    }
+
+    private function getCurrentEvaluation(): MutantProcess|self
+    {
+        return $this->processes[$this->currentProcessIndex] ??= ($this->mutantProcessFactories[$this->currentProcessIndex])();
     }
 }

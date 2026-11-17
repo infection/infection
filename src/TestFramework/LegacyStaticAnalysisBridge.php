@@ -84,7 +84,6 @@ final readonly class LegacyStaticAnalysisBridge implements StaticAnalysisTestFra
     public function test(Mutant $mutant): MutantProcessContainer
     {
         return MutantProcessContainer::from(
-            $mutant,
             fn (): MutantProcess => $this->staticAnalysisToolAdapter->createMutantProcessFactory()->create($mutant),
         );
     }
