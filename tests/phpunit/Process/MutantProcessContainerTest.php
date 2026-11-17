@@ -49,13 +49,8 @@ final class MutantProcessContainerTest extends TestCase
 {
     public function test_it_has_no_next_process_without_a_follow_up_factory(): void
     {
-        $process = $this->createMock(MutantProcess::class);
-        $process
-            ->expects($this->never())
-            ->method('getMutantExecutionResult')
-        ;
-
-        $container = MutantProcessContainer::from(static fn (): MutantProcess => $process);
+        $process = $this->createProcessWithoutResultRetrieval();
+        $container = self::createContainer($process);
 
         $this->assertSame($process, $container->getCurrent());
         $this->assertFalse($container->hasNext());
@@ -64,17 +59,8 @@ final class MutantProcessContainerTest extends TestCase
     #[DataProvider('detectionStatusProvider')]
     public function test_only_escaped_mutants_have_a_follow_up_process(DetectionStatus $status, bool $hasNext): void
     {
-        $process = $this->createStub(MutantProcess::class);
-        $result = MutantExecutionResultBuilder::withMinimalTestData()
-            ->withDetectionStatus($status)
-            ->build()
-        ;
-        $process
-            ->method('getMutantExecutionResult')
-            ->willReturn($result)
-        ;
-
-        $container = MutantProcessContainer::from(static fn (): MutantProcess => $process)
+        $process = $this->createProcessWithStatus($status);
+        $container = self::createContainer($process)
             ->append(function (): MutantProcess {
                 $this->fail('Checking for a follow-up must not create its process.');
             })
@@ -85,29 +71,9 @@ final class MutantProcessContainerTest extends TestCase
 
     public function test_it_creates_each_process_lazily_once_and_advances_in_order(): void
     {
-        $first = $this->createStub(MutantProcess::class);
-        $second = $this->createStub(MutantProcess::class);
-        $third = $this->createStub(MutantProcess::class);
-        $escaped = MutantExecutionResultBuilder::withMinimalTestData()
-            ->withDetectionStatus(DetectionStatus::ESCAPED)
-            ->build()
-        ;
-        $first
-            ->method('getMutantExecutionResult')
-            ->willReturn($escaped)
-        ;
-        $second
-            ->method('getMutantExecutionResult')
-            ->willReturn($escaped)
-        ;
-        $killed = MutantExecutionResultBuilder::withMinimalTestData()
-            ->withDetectionStatus(DetectionStatus::KILLED_BY_STATIC_ANALYSIS)
-            ->build()
-        ;
-        $third
-            ->method('getMutantExecutionResult')
-            ->willReturn($killed)
-        ;
+        $first = $this->createProcessWithStatus(DetectionStatus::ESCAPED);
+        $second = $this->createProcessWithStatus(DetectionStatus::ESCAPED);
+        $third = $this->createProcessWithStatus(DetectionStatus::KILLED_BY_STATIC_ANALYSIS);
         $calls = new stdClass();
         $calls->first = 0;
         $calls->second = 0;
@@ -150,23 +116,16 @@ final class MutantProcessContainerTest extends TestCase
 
     public function test_it_preserves_nested_follow_ups_without_another_outer_factory(): void
     {
-        $escaped = MutantExecutionResultBuilder::withMinimalTestData()
-            ->withDetectionStatus(DetectionStatus::ESCAPED)
-            ->build()
-        ;
-        $first = $this->createStub(MutantProcess::class);
-        $first->method('getMutantExecutionResult')->willReturn($escaped);
-        $second = $this->createStub(MutantProcess::class);
-        $nested = MutantProcessContainer::from(static fn (): MutantProcess => $first)
-            ->append(static fn (): MutantProcess => $second)
-        ;
-        $container = MutantProcessContainer::from(static fn (): MutantProcessContainer => $nested);
+        $first = $this->createProcessWithStatus(DetectionStatus::ESCAPED);
+        $second = $this->createProcessWithoutResultRetrieval();
+        $nested = self::createContainer($first, $second);
 
-        $this->assertSame($first, $container->getCurrent());
-        $this->assertTrue($container->hasNext());
-        $this->assertSame($second, $container->createNext());
-        $this->assertSame($second, $container->getCurrent());
-        $this->assertFalse($container->hasNext());
+        $container = self::createContainer($nested);
+
+        $expected = [$first, $second];
+        $actual = self::collectProcesses($container);
+
+        $this->assertSame($expected, $actual);
     }
 
     #[DataProvider('detectionStatusProvider')]
@@ -174,44 +133,23 @@ final class MutantProcessContainerTest extends TestCase
         DetectionStatus $status,
         bool $hasNext,
     ): void {
-        $escaped = MutantExecutionResultBuilder::withMinimalTestData()
-            ->withDetectionStatus(DetectionStatus::ESCAPED)
-            ->build()
-        ;
-        $result = MutantExecutionResultBuilder::withMinimalTestData()
-            ->withDetectionStatus($status)
-            ->build()
-        ;
-        $first = $this->createStub(MutantProcess::class);
-        $first->method('getMutantExecutionResult')->willReturn($escaped);
-        $second = $this->createStub(MutantProcess::class);
-        $second->method('getMutantExecutionResult')->willReturn($result);
-        $third = $this->createStub(MutantProcess::class);
-        $third->method('getMutantExecutionResult')->willReturn($escaped);
+        $first = $this->createProcessWithStatus(DetectionStatus::ESCAPED);
+        $second = $this->createProcessWithStatus($status);
+        $third = $this->createProcessWithStatus(DetectionStatus::ESCAPED);
 
-        $nested = MutantProcessContainer::from(static fn (): MutantProcess => $first)
-            ->append(static fn (): MutantProcess => $second)
-        ;
-        $container = MutantProcessContainer::from(static fn (): MutantProcessContainer => $nested)
-            ->append(static fn (): MutantProcess => $third)
-        ;
+        $nested = self::createContainer($first, $second);
+        $container = self::createContainer($nested, $third);
 
-        $this->assertSame($first, $container->getCurrent());
-        $this->assertTrue($container->hasNext());
-        $this->assertSame($second, $container->createNext());
-        $this->assertSame($second, $container->getCurrent());
-        $this->assertSame($result, $container->getMutantExecutionResult());
+        $expectedProcesses = $hasNext
+            ? [$first, $second, $third]
+            : [$first, $second];
+        $expectedResult = $hasNext
+            ? $third->getMutantExecutionResult()
+            : $second->getMutantExecutionResult();
+        $processes = self::collectProcesses($container);
 
-        if (!$hasNext) {
-            $this->assertFalse($container->hasNext());
-
-            return;
-        }
-
-        $this->assertTrue($container->hasNext());
-        $this->assertSame($third, $container->createNext());
-        $this->assertSame($escaped, $container->getMutantExecutionResult());
-        $this->assertFalse($container->hasNext());
+        $this->assertSame($expectedProcesses, $processes);
+        $this->assertSame($expectedResult, $container->getMutantExecutionResult());
     }
 
     public static function detectionStatusProvider(): iterable
@@ -233,5 +171,59 @@ final class MutantProcessContainerTest extends TestCase
         yield 'not covered' => [DetectionStatus::NOT_COVERED, false];
 
         yield 'ignored' => [DetectionStatus::IGNORED, false];
+    }
+
+    private function createProcessWithStatus(DetectionStatus $status): MutantProcess
+    {
+        $result = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withDetectionStatus($status)
+            ->build()
+        ;
+
+        $process = $this->createStub(MutantProcess::class);
+        $process
+            ->method('getMutantExecutionResult')
+            ->willReturn($result)
+        ;
+
+        return $process;
+    }
+
+    private function createProcessWithoutResultRetrieval(): MutantProcess
+    {
+        $process = $this->createMock(MutantProcess::class);
+        $process
+            ->expects($this->never())
+            ->method('getMutantExecutionResult')
+        ;
+
+        return $process;
+    }
+
+    private static function createContainer(
+        MutantProcess|MutantProcessContainer $process,
+        MutantProcess|MutantProcessContainer ...$processes,
+    ): MutantProcessContainer {
+        $container = MutantProcessContainer::from(static fn (): MutantProcess|MutantProcessContainer => $process);
+
+        foreach ($processes as $process) {
+            $container->append(static fn (): MutantProcess|MutantProcessContainer => $process);
+        }
+
+        return $container;
+    }
+
+    /**
+     * @return non-empty-list<MutantProcess>
+     */
+    private static function collectProcesses(MutantProcessContainer $container): array
+    {
+        $processes = [$container->getCurrent()];
+
+        while ($container->hasNext()) {
+            $processes[] = $container->createNext();
+        }
+
+        return $processes;
     }
 }
