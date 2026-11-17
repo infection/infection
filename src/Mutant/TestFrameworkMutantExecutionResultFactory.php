@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\MutantProcess;
+use Infection\TestFramework\LegacyMutantDetectionStatusResolver;
 use function sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
@@ -47,8 +47,6 @@ use Webmozart\Assert\Assert;
  */
 final readonly class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResultFactory
 {
-    private const int PROCESS_MIN_ERROR_CODE = 100;
-
     public function __construct(
         private TestFrameworkAdapter $testFrameworkAdapter,
     ) {
@@ -95,34 +93,19 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
 
     private function retrieveDetectionStatus(MutantProcess $mutantProcess): DetectionStatus
     {
-        if (!$mutantProcess->getMutant()->isCoveredByTest()) {
-            return DetectionStatus::NOT_COVERED;
-        }
-
-        if ($mutantProcess->isTimedOut()) {
-            return self::isTimeoutExpected($mutantProcess)
-                ? DetectionStatus::SKIPPED
-                : DetectionStatus::TIMED_OUT;
-        }
-
         $process = $mutantProcess->getProcess();
+        $resolver = new LegacyMutantDetectionStatusResolver(
+            $this->testFrameworkAdapter,
+            $mutantProcess->getMutant()->isCoveredByTest(),
+            $mutantProcess->isTimedOut() && self::isTimeoutExpected($mutantProcess),
+        );
 
-        if ($process->getExitCode() > self::PROCESS_MIN_ERROR_CODE) {
-            // See \Symfony\Component\Process\Process::$exitCodes
-            return DetectionStatus::ERROR;
-        }
-
-        $output = $this->retrieveProcessOutput($process);
-
-        if ($process->getExitCode() === 0 && $this->testFrameworkAdapter->testsPass($output)) {
-            return DetectionStatus::ESCAPED;
-        }
-
-        if ($this->testFrameworkAdapter instanceof SyntaxErrorAware && $this->testFrameworkAdapter->isSyntaxError($output)) {
-            return DetectionStatus::SYNTAX_ERROR;
-        }
-
-        return DetectionStatus::KILLED_BY_TESTS;
+        return $resolver->resolve(
+            $process->getOutput(),
+            $process->getErrorOutput(),
+            $process->getExitCode(),
+            $mutantProcess->isTimedOut(),
+        );
     }
 
     /**
