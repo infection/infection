@@ -38,6 +38,7 @@ namespace Infection\Tests\Configuration\ConfigurationFactory;
 use Exception;
 use Fidry\CpuCoreCounter\CpuCoreCounter;
 use Fidry\CpuCoreCounter\Finder\DummyCpuCoreFinder;
+use Infection\Configuration\ClassifiedPositionalArguments;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
@@ -48,6 +49,7 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\PositionalArgumentsClassifier;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
@@ -77,6 +79,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
+use Infection\Tests\Configuration\ResolvedSourceBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
@@ -293,8 +296,12 @@ final class ConfigurationFactoryTest extends TestCase
 
         $defaultConfiguration = new Configuration(
             processTimeout: 10,
-            source: new Source(),
+            source: ResolvedSource::create(
+                new Source(),
+                '/path/to',
+            ),
             sourceFilter: new SourceFilter(new GitDiffFilter('AM', 'reference(master)'), []),
+            classifiedPositionalArguments: new ClassifiedPositionalArguments([], [], []),
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
             tmpDir: Path::normalize(sys_get_temp_dir() . '/infection'),
@@ -1528,6 +1535,53 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
+        yield 'source directories resolve against the Infection configuration directory' => [
+            $defaultScenario
+                ->withSchema(
+                    $defaultSchemaBuilder->withSource(
+                        new Source(
+                            ['src/'],
+                            ['vendor/', 'Generated.php'],
+                        ),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceDirectories('/path/to/src')
+                        ->withSourceFilesExcludes(
+                            'vendor/',
+                            'Generated.php',
+                        )
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional classification uses resolved source directories' => [
+            $defaultScenario
+                ->withSchema(
+                    $defaultSchemaBuilder->withSource(
+                        new Source(
+                            ['tests/'],
+                            [],
+                        ),
+                    ),
+                )
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalArgumentsFilter(['tests/FooTest.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceDirectories('/path/to/tests')
+                        ->withSourceFilter(new PlainFilter(['tests/FooTest.php']))
+                        ->withClassifiedPositionalArguments(
+                            new ClassifiedPositionalArguments(['tests/FooTest.php'], [], []),
+                        )
+                        ->build(),
+                ),
+        ];
+
         yield 'positional source paths become a PlainFilter (with deduplication)' => [
             $defaultScenario
                 ->withInput(
@@ -1538,6 +1592,13 @@ final class ConfigurationFactoryTest extends TestCase
                 ->withExpected(
                     $defaultConfigurationBuilder
                         ->withSourceFilter(new PlainFilter(['Foo.php', 'Bar.php']))
+                        ->withClassifiedPositionalArguments(
+                            new ClassifiedPositionalArguments(
+                                ['Foo.php', 'Bar.php', 'Foo.php'],
+                                [],
+                                [],
+                            ),
+                        )
                         ->build(),
                 ),
         ];
@@ -1553,6 +1614,13 @@ final class ConfigurationFactoryTest extends TestCase
                     $defaultConfigurationBuilder
                         ->withSourceFilter(null)
                         ->withTestFrameworkExtraOptions('tests/FooTest.php tests/BarTest.php')
+                        ->withClassifiedPositionalArguments(
+                            new ClassifiedPositionalArguments(
+                                [],
+                                ['tests/FooTest.php', 'tests/BarTest.php'],
+                                [],
+                            ),
+                        )
                         ->build(),
                 ),
         ];
@@ -1568,8 +1636,21 @@ final class ConfigurationFactoryTest extends TestCase
                     $defaultConfigurationBuilder
                         ->withSourceFilter(new PlainFilter(['Foo.php']))
                         ->withTestFrameworkExtraOptions('tests/FooTest.php')
+                        ->withClassifiedPositionalArguments(
+                            new ClassifiedPositionalArguments(['Foo.php'], ['tests/FooTest.php'], []),
+                        )
                         ->build(),
                 ),
+        ];
+
+        $sourceSelectors = [
+            new SourceSymbolSelector('Differ', 'diff'),
+            new SourceSymbolSelector('UnifiedDiffOutputBuilder'),
+            new SourceSymbolSelector(Differ::class, 'diffToArray'),
+            new SourceSymbolSelector('calculateInvoiceTotal'),
+            new SourceSymbolSelector('App\Billing\calculateInvoiceTotal'),
+            new SourceSymbolSelector('\calculateInvoiceTotal'),
+            new SourceSymbolSelector('\App\Billing\calculateInvoiceTotal'),
         ];
 
         yield 'positional source selectors and function names preserve path filters and test paths' => [
@@ -1596,22 +1677,15 @@ final class ConfigurationFactoryTest extends TestCase
                                 'calculateInvoiceTotal',
                             ]),
                         )
-                        ->withSourceSymbolSelectors(
-                            new SourceSymbolSelector(
-                                'Differ',
-                                'diff',
-                            ),
-                            new SourceSymbolSelector('UnifiedDiffOutputBuilder'),
-                            new SourceSymbolSelector(
-                                Differ::class,
-                                'diffToArray',
-                            ),
-                            new SourceSymbolSelector('calculateInvoiceTotal'),
-                            new SourceSymbolSelector('App\Billing\calculateInvoiceTotal'),
-                            new SourceSymbolSelector('\calculateInvoiceTotal'),
-                            new SourceSymbolSelector('\App\Billing\calculateInvoiceTotal'),
-                        )
+                        ->withSourceSymbolSelectors(...$sourceSelectors)
                         ->withTestFrameworkExtraOptions('tests/FooTest.php')
+                        ->withClassifiedPositionalArguments(
+                            new ClassifiedPositionalArguments(
+                                sourcePaths: ['UnifiedDiffOutputBuilder', 'calculateInvoiceTotal'],
+                                testPaths: ['tests/FooTest.php'],
+                                sourceSelectors: $sourceSelectors,
+                            ),
+                        )
                         ->build(),
                 ),
         ];
@@ -1756,15 +1830,21 @@ final class ConfigurationFactoryTest extends TestCase
                     mutantIds: ['h4sh'],
                 ),
                 expected: ConfigurationBuilder::withMinimalTestData()
+                    ->withConfigPathname('/path/to/infection.json')
                     ->withTimeout(10)
-                    ->withSourceDirectories('src/')
+                    ->withSource(
+                        ResolvedSourceBuilder::withMinimalTestData()
+                            ->withDirectories('/path/to/src')
+                            ->withExcludes('vendor/')
+                            ->withBasePath('/path/to')
+                            ->build(),
+                    )
                     ->withSourceFilter(
                         new PlainFilter([
                             'src/Foo.php',
                             'src/Bar.php',
                         ]),
                     )
-                    ->withSourceFilesExcludes('vendor/')
                     ->withLogs(
                         LogsBuilder::withMinimalTestData()
                             ->withTextLogFilePath('/text.log')
@@ -1813,7 +1893,6 @@ final class ConfigurationFactoryTest extends TestCase
                     ->withProjectDirectory('/path/to/project')
                     ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
                     ->withMutantIds(['h4sh'])
-                    ->withConfigPathname('/path/to/infection.json')
                     ->build(),
             ),
         ];

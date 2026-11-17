@@ -359,6 +359,18 @@ final class MutationConfigBuilderTest extends TestCase
             $createConfiguration('backupGlobals="false" backupStaticAttributes="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" executionOrder="default" failOnRisky="true" failOnWarning="true" stopOnFailure="true" stderr="false"'),
         ];
 
+        yield 'PHPUnit 13.3 does not warn about the memory limit of mutant processes' => [
+            <<<'XML'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <phpunit warnWhenPhpIsNotConfiguredForDevelopment="true">
+                  <testsuites/>
+                </phpunit>
+                XML,
+            [],
+            '13.3',
+            $createConfiguration('recordTestRunHistory="true" cacheDirectory="/tmp/infection/.phpunit.result.cache.a1b2c3" executionOrder="defects" failOnRisky="true" failOnWarning="true" stopOnDefect="true" colors="false" stderr="false" bootstrap="/tmp/infection/interceptor.autoload.a1b2c3.infection.php"'),
+        ];
+
         yield 'PHPUnit 7.3 enables result caching and defect ordering' => [
             $loadFixture('phpunit_with_order_set.xml'),
             [],

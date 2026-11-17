@@ -170,6 +170,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
             $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
                 $this->config->testFrameworkExtraOptions,
                 $this->getInitialRunOnlyOptions(),
+                ['--warn-when-php-is-not-configured-for-development'],
             ),
         );
     }

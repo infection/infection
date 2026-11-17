@@ -300,7 +300,7 @@ final class TestLocationBucketSorterTest extends TestCase
     /**
      * @param TestLocation[] $uniqueTestLocations
      */
-    private static function quicksort(&$uniqueTestLocations): void
+    private static function quicksort(array &$uniqueTestLocations): void
     {
         usort(
             $uniqueTestLocations,

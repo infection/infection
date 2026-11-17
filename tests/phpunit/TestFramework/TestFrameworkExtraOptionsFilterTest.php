@@ -43,12 +43,22 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(TestFrameworkExtraOptionsFilter::class)]
 final class TestFrameworkExtraOptionsFilterTest extends TestCase
 {
+    /**
+     * @param string[] $initialRunOnlyFlags
+     */
     #[DataProvider('mutantProcessProvider')]
-    public function test_it_skips_filter_for_mutant_process(string $actualExtraOptions, string $expectedExtraOptions): void
-    {
+    public function test_it_skips_filter_for_mutant_process(
+        string $actualExtraOptions,
+        string $expectedExtraOptions,
+        array $initialRunOnlyFlags = [],
+    ): void {
         $filter = new TestFrameworkExtraOptionsFilter();
 
-        $filteredOptions = $filter->filterForMutantProcess($actualExtraOptions, ['--configuration', '--filter', '--testsuite']);
+        $filteredOptions = $filter->filterForMutantProcess(
+            $actualExtraOptions,
+            ['--configuration', '--filter', '--testsuite'],
+            $initialRunOnlyFlags,
+        );
 
         $this->assertSame($expectedExtraOptions, $filteredOptions);
     }
@@ -86,5 +96,23 @@ final class TestFrameworkExtraOptionsFilterTest extends TestCase
         yield ['--a --configuration=\'some Test#2\' --b=value', '--a --b=value'];
 
         yield ['--configuration phpunit.xml --filter="a test" tests/FooTest.php --colors=always', 'tests/FooTest.php --colors=always'];
+
+        yield 'flag on its own' => ['--initial-only', '', ['--initial-only']];
+
+        yield 'flag before a positional argument' => ['--initial-only tests/FooTest.php', 'tests/FooTest.php', ['--initial-only']];
+
+        yield 'flag between options' => ['--a --initial-only --b=value', '--a --b=value', ['--initial-only']];
+
+        yield 'flag at the end' => ['--a --initial-only', '--a', ['--initial-only']];
+
+        yield 'repeated flags' => ['--initial-only --a --initial-only', '--a', ['--initial-only']];
+
+        yield 'multiple initial run only flags' => ['--initial-only --a --another-initial-only', '--a', ['--initial-only', '--another-initial-only']];
+
+        yield 'flag separated by tabs' => ["--a\t--initial-only\t--b", '--a --b', ['--initial-only']];
+
+        yield 'similar options are preserved' => ['--no-initial-only --initial-only-extra --value=--initial-only', '--no-initial-only --initial-only-extra --value=--initial-only', ['--initial-only']];
+
+        yield 'unlisted flags are preserved' => ['--initial-only --a', '--initial-only --a'];
     }
 }
