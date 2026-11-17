@@ -33,34 +33,68 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Factory;
+namespace Infection\TestFramework;
 
-use Infection\Process\Factory\TestFrameworkMutantProcessFactory;
+use BadMethodCallException;
+use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
-use Infection\Tests\Mutant\MutantBuilder;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
 
-#[CoversClass(TestFrameworkMutantProcessFactory::class)]
-final class TestFrameworkMutantProcessFactoryTest extends TestCase
+/**
+ * Composes test frameworks into a single mutant-evaluation workflow.
+ *
+ * @internal
+ */
+final readonly class CombinedTestFramework implements TestFramework
 {
-    public function test_it_creates_the_framework_process_for_the_mutant(): void
+    private const string UNSUPPORTED_OPERATION_MESSAGE = 'CombinedTestFramework only supports mutant evaluation.';
+
+    public function __construct(
+        private TestFramework $firstTestFramework,
+        private ?TestFramework $followUpTestFramework,
+    ) {
+    }
+
+    public function getName(): string
     {
-        $mutant = MutantBuilder::withMinimalTestData()->build();
-        $process = $this->createStub(MutantProcess::class);
+        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
+    }
 
-        $testFramework = $this->createMock(TestFramework::class);
-        $testFramework
-            ->expects($this->once())
-            ->method('test')
-            ->with($mutant)
-            ->willReturn(new MutantProcessContainer($process, []))
-        ;
+    public function getVersion(): string
+    {
+        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
+    }
 
-        $factory = new TestFrameworkMutantProcessFactory($testFramework);
+    public function checkRequirements(): void
+    {
+        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
+    }
 
-        $this->assertSame($process, $factory->create($mutant));
+    public function executeInitialRun(): InitialRunResults
+    {
+        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
+    }
+
+    public function test(Mutant $mutant): MutantProcessContainer
+    {
+        $evaluation = $this->firstTestFramework->test($mutant);
+
+        $followUpTestFramework = $this->followUpTestFramework;
+
+        if ($followUpTestFramework === null) {
+            return $evaluation;
+        }
+
+        // Defer the follow-up framework setup until the preceding evaluation has escaped.
+        return $evaluation->append(
+            static fn (): MutantProcess => $followUpTestFramework->test($mutant)->getCurrent(),
+        );
+    }
+
+    public function hasJUnitReport(): bool
+    {
+        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
     }
 }

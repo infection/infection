@@ -36,141 +36,136 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\Mutant;
-use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
-use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
+use stdClass;
 
-#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(MutantProcessContainer::class)]
 final class MutantProcessContainerTest extends TestCase
 {
-    private MockObject&MutantProcess $phpUnitMutantProcess;
-
-    private Mutant $mutant;
-
-    private MockObject&LazyMutantProcessFactory $lazyMutantProcessCreator;
-
-    protected function setUp(): void
+    public function test_it_has_no_next_process_without_a_follow_up_factory(): void
     {
-        $this->mutant = MutantBuilder::withMinimalTestData()->build();
-        $this->phpUnitMutantProcess = $this->createMock(MutantProcess::class);
-        $this->lazyMutantProcessCreator = $this->createMock(LazyMutantProcessFactory::class);
-    }
+        $process = $this->createMock(MutantProcess::class);
+        $process
+            ->expects($this->never())
+            ->method('getMutantExecutionResult')
+        ;
 
-    public function test_it_returns_false_when_there_is_no_next_process_to_kill_mutant(): void
-    {
-        $container = new MutantProcessContainer($this->phpUnitMutantProcess, []);
+        $container = MutantProcessContainer::from(static fn (): MutantProcess => $process);
 
+        $this->assertSame($process, $container->getCurrent());
         $this->assertFalse($container->hasNext());
     }
 
-    public function test_it_returns_true_when_there_is_next_process_to_kill_mutant(): void
+    #[DataProvider('detectionStatusProvider')]
+    public function test_only_escaped_mutants_have_a_follow_up_process(DetectionStatus $status, bool $hasNext): void
     {
-        $container = new MutantProcessContainer(
-            $this->phpUnitMutantProcess,
-            [$this->lazyMutantProcessCreator],
-        );
-
-        // Build the first next process to advance the index
-        $newMutantProcess = $this->createStub(MutantProcess::class);
-
-        $this->phpUnitMutantProcess
-            ->expects($this->once())
-            ->method('getMutant')
-            ->willReturn($this->mutant)
+        $process = $this->createStub(MutantProcess::class);
+        $result = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withDetectionStatus($status)
+            ->build()
+        ;
+        $process
+            ->method('getMutantExecutionResult')
+            ->willReturn($result)
         ;
 
-        $mutantExecutionResult = MutantExecutionResultBuilder::withMinimalTestData()
+        $container = MutantProcessContainer::from(static fn (): MutantProcess => $process)
+            ->append(function (): MutantProcess {
+                $this->fail('Checking for a follow-up must not create its process.');
+            })
+        ;
+
+        $this->assertSame($hasNext, $container->hasNext());
+    }
+
+    public function test_it_creates_each_process_lazily_once_and_advances_in_order(): void
+    {
+        $first = $this->createStub(MutantProcess::class);
+        $second = $this->createStub(MutantProcess::class);
+        $third = $this->createStub(MutantProcess::class);
+        $escaped = MutantExecutionResultBuilder::withMinimalTestData()
             ->withDetectionStatus(DetectionStatus::ESCAPED)
             ->build()
         ;
-
-        $this->phpUnitMutantProcess
-            ->expects($this->once())
+        $first
             ->method('getMutantExecutionResult')
-            ->willReturn($mutantExecutionResult)
+            ->willReturn($escaped)
+        ;
+        $second
+            ->method('getMutantExecutionResult')
+            ->willReturn($escaped)
+        ;
+        $killed = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withDetectionStatus(DetectionStatus::KILLED_BY_STATIC_ANALYSIS)
+            ->build()
+        ;
+        $third
+            ->method('getMutantExecutionResult')
+            ->willReturn($killed)
+        ;
+        $calls = new stdClass();
+        $calls->first = 0;
+        $calls->second = 0;
+
+        $container = MutantProcessContainer::from(static function () use ($first, $calls): MutantProcess {
+            ++$calls->first;
+
+            return $first;
+        });
+        $appended = $container->append(static function () use ($second, $calls): MutantProcess {
+            ++$calls->second;
+
+            return $second;
+        });
+        $container
+            ->append(static fn (): MutantProcess => $third)
+            ->append(function (): MutantProcess {
+                $this->fail('A killed mutant must not advance to the remaining process.');
+            })
         ;
 
-        $this->lazyMutantProcessCreator
-            ->expects($this->once())
-            ->method('create')
-            ->with($this->mutant)
-            ->willReturn($newMutantProcess)
-        ;
+        $this->assertSame($container, $appended);
+        $this->assertSame(0, $calls->first);
+        $this->assertSame(0, $calls->second);
+        $this->assertSame($first, $container->getCurrent());
+        $this->assertSame($first, $container->getCurrent());
+        $this->assertTrue($container->hasNext());
+        $this->assertSame(1, $calls->first);
+        $this->assertSame(0, $calls->second);
 
+        $this->assertSame($second, $container->createNext());
+        $this->assertSame($second, $container->getCurrent());
+        $this->assertSame(1, $calls->second);
         $this->assertTrue($container->hasNext());
 
-        $container->createNext();
-
+        $this->assertSame($third, $container->createNext());
+        $this->assertSame($third, $container->getCurrent());
         $this->assertFalse($container->hasNext());
     }
 
-    public function test_it_builds_next_process_to_kill_mutant(): void
+    public static function detectionStatusProvider(): iterable
     {
-        $container = new MutantProcessContainer(
-            $this->phpUnitMutantProcess,
-            [$this->lazyMutantProcessCreator],
-        );
+        yield 'escaped' => [DetectionStatus::ESCAPED, true];
 
-        $newMutantProcess = $this->createStub(MutantProcess::class);
+        yield 'killed by tests' => [DetectionStatus::KILLED_BY_TESTS, false];
 
-        $this->phpUnitMutantProcess
-            ->expects($this->once())
-            ->method('getMutant')
-            ->willReturn($this->mutant)
-        ;
+        yield 'killed by static analysis' => [DetectionStatus::KILLED_BY_STATIC_ANALYSIS, false];
 
-        $this->lazyMutantProcessCreator
-            ->expects($this->once())
-            ->method('create')
-            ->with($this->mutant)
-            ->willReturn($newMutantProcess)
-        ;
+        yield 'error' => [DetectionStatus::ERROR, false];
 
-        $result = $container->createNext();
+        yield 'timeout' => [DetectionStatus::TIMED_OUT, false];
 
-        $this->assertSame($newMutantProcess, $result);
-    }
+        yield 'syntax error' => [DetectionStatus::SYNTAX_ERROR, false];
 
-    public function test_it_returns_current_mutant_process(): void
-    {
-        $container = new MutantProcessContainer($this->phpUnitMutantProcess, []);
+        yield 'skipped' => [DetectionStatus::SKIPPED, false];
 
-        $this->assertSame($this->phpUnitMutantProcess, $container->getCurrent());
-    }
+        yield 'not covered' => [DetectionStatus::NOT_COVERED, false];
 
-    public function test_it_returns_next_mutant_process_after_building_it(): void
-    {
-        $container = new MutantProcessContainer(
-            $this->phpUnitMutantProcess,
-            [$this->lazyMutantProcessCreator],
-        );
-
-        $newMutantProcess = $this->createStub(MutantProcess::class);
-
-        $this->phpUnitMutantProcess
-            ->expects($this->once())
-            ->method('getMutant')
-            ->willReturn($this->mutant)
-        ;
-
-        $this->lazyMutantProcessCreator
-            ->expects($this->once())
-            ->method('create')
-            ->with($this->mutant)
-            ->willReturn($newMutantProcess)
-        ;
-
-        $container->createNext();
-
-        $this->assertSame($newMutantProcess, $container->getCurrent());
+        yield 'ignored' => [DetectionStatus::IGNORED, false];
     }
 }
