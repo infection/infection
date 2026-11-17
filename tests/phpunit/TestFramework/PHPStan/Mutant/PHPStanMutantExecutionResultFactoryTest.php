@@ -42,6 +42,7 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\MutantProcess;
+use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantDetectionStatusResolver;
 use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
@@ -63,7 +64,9 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->resultFactory = new PHPStanMutantExecutionResultFactory();
+        $this->resultFactory = new PHPStanMutantExecutionResultFactory(
+            new PHPStanMutantDetectionStatusResolver(),
+        );
     }
 
     public function test_it_can_create_a_result_from_a_time_out_mutant_process(): void
@@ -235,7 +238,7 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
             ->willReturn('OK')
         ;
         $processMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getExitCode')
             ->willReturn(0)
         ;
@@ -316,7 +319,7 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
             ->willReturn('failed')
         ;
         $processMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getExitCode')
             ->willReturn($errorCode)
         ;
