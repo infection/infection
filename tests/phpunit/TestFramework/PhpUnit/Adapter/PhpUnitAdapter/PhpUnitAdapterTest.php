@@ -161,7 +161,7 @@ final class PhpUnitAdapterTest extends TestCase
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $configuration = ConfigurationBuilder::withMinimalTestData()
             ->withInitialTestsPhpOptions('-d memory_limit=1G')
-            ->withTestFrameworkExtraOptions('--verbose')
+            ->withTestFrameworkExtraOptions('--verbose --warn-when-php-is-not-configured-for-development')
             ->withSkipCoverage(true)
             ->build()
         ;
@@ -176,7 +176,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('run')
             ->with(
                 $adapter,
-                '--verbose',
+                '--verbose --warn-when-php-is-not-configured-for-development',
                 ['-d', 'memory_limit=1G'],
                 true,
             )
@@ -265,7 +265,7 @@ final class PhpUnitAdapterTest extends TestCase
         $adapter = $this->createAdapter(
             '<phpunit/>',
             configuration: ConfigurationBuilder::withMinimalTestData()
-                ->withTestFrameworkExtraOptions('--configuration phpunit.xml --filter Foo --testsuite unit --verbose')
+                ->withTestFrameworkExtraOptions('--configuration phpunit.xml --filter Foo --testsuite unit --warn-when-php-is-not-configured-for-development --verbose')
                 ->build(),
             processFactory: $processFactory,
         );
