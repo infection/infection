@@ -36,7 +36,10 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use BadMethodCallException;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationStrategy;
 use Infection\Mutant\Mutant;
+use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -55,6 +58,7 @@ final readonly class CombinedTestFramework implements TestFramework
     public function __construct(
         private TestFramework $testFramework,
         private ?TestFramework $staticAnalysis,
+        private EvaluationStrategy $strategy,
     ) {
     }
 
@@ -80,15 +84,19 @@ final readonly class CombinedTestFramework implements TestFramework
 
     public function test(Mutant $mutant): MutantEvaluationPipe
     {
-        $evaluation = $this->testFramework->test($mutant);
-
+        $evaluation = MutantProcessContainer::from(
+            $mutant,
+            fn (): MutantEvaluationPipe|EvaluationAttemptResult => $this->testFramework->test($mutant),
+        );
         $staticAnalysis = $this->staticAnalysis;
 
-        if ($staticAnalysis === null) {
-            return $evaluation;
+        if ($staticAnalysis !== null) {
+            $evaluation->append(
+                static fn (): MutantEvaluationPipe|EvaluationAttemptResult => $staticAnalysis->test($mutant),
+            );
         }
 
-        return $evaluation->merge($staticAnalysis->test($mutant));
+        return $evaluation->withStrategy($this->strategy);
     }
 
     public function hasJUnitReport(): bool

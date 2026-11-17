@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Infection\Process\MutantProcess;
+
 /**
  * @internal
  */
@@ -43,6 +45,20 @@ final class DryProcessRunner implements ProcessRunner
     public function run(iterable $processContainers): iterable
     {
         foreach ($processContainers as $processContainer) {
+            while (true) {
+                $attempt = $processContainer->getCurrent();
+
+                if ($attempt instanceof MutantProcess) {
+                    $attempt->simulate();
+                }
+
+                if (!$processContainer->hasNext()) {
+                    break;
+                }
+
+                $processContainer->createNext();
+            }
+
             yield $processContainer;
         }
     }

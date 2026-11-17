@@ -39,8 +39,8 @@ use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\PHPStan\Mutant\PHPStanEvaluationAttemptResultFactory;
 use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantDetectionStatusResolver;
-use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Symfony\Component\Process\Process;
 
 /**
@@ -74,7 +74,7 @@ final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMuta
             ),
             $mutant,
             // There is not enough differences to warrant a different factory yet at the time of writing.
-            new PHPStanMutantExecutionResultFactory(
+            new PHPStanEvaluationAttemptResultFactory(
                 new PHPStanMutantDetectionStatusResolver(),
             ),
         );
