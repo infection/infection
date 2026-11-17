@@ -148,6 +148,72 @@ final class MutantProcessContainerTest extends TestCase
         $this->assertFalse($container->hasNext());
     }
 
+    public function test_it_preserves_nested_follow_ups_without_another_outer_factory(): void
+    {
+        $escaped = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withDetectionStatus(DetectionStatus::ESCAPED)
+            ->build()
+        ;
+        $first = $this->createStub(MutantProcess::class);
+        $first->method('getMutantExecutionResult')->willReturn($escaped);
+        $second = $this->createStub(MutantProcess::class);
+        $nested = MutantProcessContainer::from(static fn (): MutantProcess => $first)
+            ->append(static fn (): MutantProcess => $second)
+        ;
+        $container = MutantProcessContainer::from(static fn (): MutantProcessContainer => $nested);
+
+        $this->assertSame($first, $container->getCurrent());
+        $this->assertTrue($container->hasNext());
+        $this->assertSame($second, $container->createNext());
+        $this->assertSame($second, $container->getCurrent());
+        $this->assertFalse($container->hasNext());
+    }
+
+    #[DataProvider('detectionStatusProvider')]
+    public function test_it_completes_a_nested_container_before_considering_the_next_process(
+        DetectionStatus $status,
+        bool $hasNext,
+    ): void {
+        $escaped = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withDetectionStatus(DetectionStatus::ESCAPED)
+            ->build()
+        ;
+        $result = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withDetectionStatus($status)
+            ->build()
+        ;
+        $first = $this->createStub(MutantProcess::class);
+        $first->method('getMutantExecutionResult')->willReturn($escaped);
+        $second = $this->createStub(MutantProcess::class);
+        $second->method('getMutantExecutionResult')->willReturn($result);
+        $third = $this->createStub(MutantProcess::class);
+        $third->method('getMutantExecutionResult')->willReturn($escaped);
+
+        $nested = MutantProcessContainer::from(static fn (): MutantProcess => $first)
+            ->append(static fn (): MutantProcess => $second)
+        ;
+        $container = MutantProcessContainer::from(static fn (): MutantProcessContainer => $nested)
+            ->append(static fn (): MutantProcess => $third)
+        ;
+
+        $this->assertSame($first, $container->getCurrent());
+        $this->assertTrue($container->hasNext());
+        $this->assertSame($second, $container->createNext());
+        $this->assertSame($second, $container->getCurrent());
+        $this->assertSame($result, $container->getMutantExecutionResult());
+
+        if (!$hasNext) {
+            $this->assertFalse($container->hasNext());
+
+            return;
+        }
+
+        $this->assertTrue($container->hasNext());
+        $this->assertSame($third, $container->createNext());
+        $this->assertSame($escaped, $container->getMutantExecutionResult());
+        $this->assertFalse($container->hasNext());
+    }
+
     public static function detectionStatusProvider(): iterable
     {
         yield 'escaped' => [DetectionStatus::ESCAPED, true];

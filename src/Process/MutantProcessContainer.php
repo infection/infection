@@ -38,6 +38,7 @@ namespace Infection\Process;
 use function array_key_exists;
 use Closure;
 use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\MutantExecutionResult;
 
 /**
  * @internal
@@ -46,7 +47,7 @@ use Infection\Mutant\DetectionStatus;
 class MutantProcessContainer
 {
     /**
-     * @var array<non-negative-int, MutantProcess>
+     * @var array<non-negative-int, MutantProcess|self>
      */
     private array $processes = [];
 
@@ -56,7 +57,7 @@ class MutantProcessContainer
     private int $currentProcessIndex = 0;
 
     /**
-     * @param non-empty-list<Closure(): MutantProcess> $mutantProcessFactories
+     * @param non-empty-list<Closure(): (MutantProcess|self)> $mutantProcessFactories
      */
     private function __construct(
         private array $mutantProcessFactories,
@@ -64,7 +65,7 @@ class MutantProcessContainer
     }
 
     /**
-     * @param Closure(): MutantProcess $factory
+     * @param Closure(): (MutantProcess|self) $factory
      */
     public static function from(Closure $factory): self
     {
@@ -72,16 +73,32 @@ class MutantProcessContainer
     }
 
     /**
-     * Container has a next process only if Mutant is Escaped
+     * Completes nested follow-ups before advancing to another factory after escape.
      */
     public function hasNext(): bool
     {
+        $current = $this->getCurrentEvaluation();
+
+        if ($current instanceof self
+            && $current->hasNext()
+        ) {
+            return true;
+        }
+
         return array_key_exists($this->currentProcessIndex + 1, $this->mutantProcessFactories)
-            && $this->getCurrentMutantProcessDetectionStatus() === DetectionStatus::ESCAPED;
+            && $this->getMutantExecutionResult()->getDetectionStatus() === DetectionStatus::ESCAPED;
     }
 
     public function createNext(): MutantProcess
     {
+        $current = $this->getCurrentEvaluation();
+
+        if ($current instanceof self
+            && $current->hasNext()
+        ) {
+            return $current->createNext();
+        }
+
         ++$this->currentProcessIndex;
 
         return $this->getCurrent();
@@ -89,11 +106,15 @@ class MutantProcessContainer
 
     public function getCurrent(): MutantProcess
     {
-        return $this->processes[$this->currentProcessIndex] ??= ($this->mutantProcessFactories[$this->currentProcessIndex])();
+        $current = $this->getCurrentEvaluation();
+
+        return $current instanceof self
+            ? $current->getCurrent()
+            : $current;
     }
 
     /**
-     * @param Closure(): MutantProcess $factory
+     * @param Closure(): (MutantProcess|self) $factory
      */
     public function append(Closure $factory): self
     {
@@ -102,8 +123,13 @@ class MutantProcessContainer
         return $this;
     }
 
-    private function getCurrentMutantProcessDetectionStatus(): DetectionStatus
+    public function getMutantExecutionResult(): MutantExecutionResult
     {
-        return $this->getCurrent()->getMutantExecutionResult()->getDetectionStatus();
+        return $this->getCurrent()->getMutantExecutionResult();
+    }
+
+    private function getCurrentEvaluation(): MutantProcess|self
+    {
+        return $this->processes[$this->currentProcessIndex] ??= ($this->mutantProcessFactories[$this->currentProcessIndex])();
     }
 }
