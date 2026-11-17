@@ -67,17 +67,6 @@ class MutantProcessContainerFactory
         Mutant $mutant,
         string $testFrameworkExtraOptions = '',
     ): MutantProcessContainer {
-        return MutantProcessContainer::from(
-            $mutant,
-            fn (): MutantProcess => $this->createProcess($testFrameworkAdapter, $mutant, $testFrameworkExtraOptions),
-        );
-    }
-
-    private function createProcess(
-        TestFrameworkAdapter $testFrameworkAdapter,
-        Mutant $mutant,
-        string $testFrameworkExtraOptions,
-    ): MutantProcess {
         // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
         $timeout = min(self::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (self::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime()), $this->timeout);
 
@@ -97,10 +86,12 @@ class MutantProcessContainerFactory
             $process = DryRunProcess::fromProcess($process);
         }
 
-        return new MutantProcess(
-            $process,
-            $mutant,
-            new TestFrameworkMutantExecutionResultFactory($testFrameworkAdapter),
+        return MutantProcessContainer::from(
+            static fn (): MutantProcess => new MutantProcess(
+                $process,
+                $mutant,
+                new TestFrameworkMutantExecutionResultFactory($testFrameworkAdapter),
+            ),
         );
     }
 }

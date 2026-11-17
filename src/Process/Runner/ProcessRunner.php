@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\Process\MutantProcessContainer;
 
 /**
  * @internal
@@ -43,9 +43,9 @@ use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 interface ProcessRunner
 {
     /**
-     * @param iterable<MutantEvaluationPipe> $processContainers
+     * @param iterable<MutantProcessContainer> $processContainers
      *
-     * @return iterable<MutantEvaluationPipe>
+     * @return iterable<MutantProcessContainer>
      */
     public function run(iterable $processContainers): iterable;
 

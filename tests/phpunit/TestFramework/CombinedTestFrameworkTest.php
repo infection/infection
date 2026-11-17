@@ -47,6 +47,7 @@ use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 #[CoversClass(CombinedTestFramework::class)]
 final class CombinedTestFrameworkTest extends TestCase
@@ -71,7 +72,7 @@ final class CombinedTestFrameworkTest extends TestCase
     }
 
     #[DataProvider('evaluationStatusProvider')]
-    public function test_it_only_creates_follow_up_processes_after_the_first_evaluation_escapes(
+    public function test_it_only_evaluates_the_follow_up_framework_after_the_first_evaluation_escapes(
         DetectionStatus $status,
         bool $hasNext,
     ): void {
@@ -84,13 +85,22 @@ final class CombinedTestFrameworkTest extends TestCase
 
         $followUpTestFramework = $this->createMock(TestFramework::class);
         $followUpProcess = $this->createStub(MutantProcess::class);
+        $followUpProcess
+            ->method('getMutantExecutionResult')
+            ->willReturn(
+                MutantExecutionResultBuilder::withMinimalTestData()
+                    ->withDetectionStatus(DetectionStatus::ESCAPED)
+                    ->build(),
+            )
+        ;
+        $lastProcess = $this->createStub(MutantProcess::class);
 
         $firstProcess = $this->createStub(MutantProcess::class);
         $firstProcess
             ->method('getMutantExecutionResult')
             ->willReturn($result)
         ;
-        $firstEvaluation = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $firstProcess);
+        $firstEvaluation = MutantProcessContainer::from(static fn (): MutantProcess => $firstProcess);
         $firstTestFramework = $this->createMock(TestFramework::class);
         $firstTestFramework
             ->expects($this->once())
@@ -99,29 +109,39 @@ final class CombinedTestFrameworkTest extends TestCase
             ->willReturn($firstEvaluation)
         ;
 
-        $followUpEvaluation = MutantProcessContainer::from(
-            $mutant,
-            static fn (): MutantProcess => $followUpProcess,
-        );
+        $state = new stdClass();
+        $state->firstEvaluationFinished = false;
         $followUpTestFramework
-            ->expects($this->once())
+            ->expects(
+                $hasNext
+                    ? $this->once()
+                    : $this->never(),
+            )
             ->method('test')
             ->with($this->identicalTo($mutant))
-            ->willReturn($followUpEvaluation)
+            ->willReturnCallback(function () use ($state, $followUpProcess, $lastProcess): MutantProcessContainer {
+                $this->assertTrue($state->firstEvaluationFinished);
+
+                return MutantProcessContainer::from(static fn (): MutantProcess => $followUpProcess)
+                    ->append(static fn (): MutantProcess => $lastProcess)
+                ;
+            })
         ;
 
         $framework = new CombinedTestFramework($firstTestFramework, $followUpTestFramework);
         $evaluation = $framework->test($mutant);
 
-        $this->assertTrue($evaluation->isCold());
+        $this->assertSame($firstEvaluation, $evaluation);
         $this->assertSame($firstProcess, $evaluation->getCurrent());
         $this->assertSame($hasNext, $evaluation->hasNext());
-        $this->assertTrue($followUpEvaluation->isCold());
+        $state->firstEvaluationFinished = true;
 
         if ($hasNext) {
             $this->assertSame($followUpProcess, $evaluation->createNext());
             $this->assertSame($followUpProcess, $evaluation->getCurrent());
-            $this->assertFalse($followUpEvaluation->isCold());
+            $this->assertTrue($evaluation->hasNext());
+            $this->assertSame($lastProcess, $evaluation->createNext());
+            $this->assertSame($lastProcess, $evaluation->getCurrent());
             $this->assertFalse($evaluation->hasNext());
         }
     }
