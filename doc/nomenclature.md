@@ -203,10 +203,6 @@ The phase encompassing [mutant materialisation][mutant-materialisation] and [mut
 
 The execution of tests against the mutant process(es) and recording of the outcome.
 
-In Infection, `MutantProcessContainer` creates processes lazily and preserves
-the complete follow-up sequence of nested containers. Evaluation advances to
-another process or container only when the preceding sequence escapes.
-
 
 ### Mutant Materialisation
 

@@ -806,6 +806,7 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $event = $this->invokeMethod('containerToFinishedEvent', $container);
+
         $this->assertInstanceOf(MutantProcessWasFinished::class, $event);
         $this->assertSame($result, $event->executionResult);
     }
