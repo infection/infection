@@ -38,9 +38,11 @@ namespace Infection\Tests\Process\Runner;
 use function array_search;
 use function count;
 use DuoClock\TimeSpy;
+use Generator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Mutant\EvaluationAttemptResultFactory;
+use Infection\Mutant\EvaluationProcessDetails;
 use Infection\Mutant\EvaluationStrategy;
 use Infection\Mutant\FinishEvaluation;
 use Infection\Mutant\Mutant;
@@ -50,6 +52,7 @@ use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessQueue;
+use Infection\TestFramework\Common\CombinedMutantEvaluationPipe;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Infection\Tests\Mutant\MutantBuilder;
 use function iterator_count;
@@ -67,6 +70,70 @@ use Symfony\Component\Process\Process;
 final class ParallelProcessRunnerTest extends TestCase
 {
     private const int SIMULATED_TIME_MICROSECONDS = 1_000;
+
+    #[DataProvider('timedEvaluationProvider')]
+    public function test_it_measures_the_whole_evaluation_including_queue_and_follow_up_waits(?DetectionStatus $followUpStatus): void
+    {
+        $clock = new TimeSpy(100.0);
+        $firstStatus = $followUpStatus === null
+            ? DetectionStatus::KILLED_BY_TESTS
+            : DetectionStatus::ESCAPED;
+        $first = $this->createTimedProcess($clock, 'PHPUnit', $firstStatus, 2.0);
+        $container = MutantProcessContainer::from(MutantBuilder::withMinimalTestData()->build(), static fn (): MutantProcess => $first);
+
+        if ($followUpStatus !== null) {
+            $container->append(function () use ($clock, $followUpStatus): MutantProcess {
+                // Follow-up preparation is part of elapsed time, outside process execution.
+                $clock->sleep(1);
+
+                return $this->createTimedProcess($clock, 'PHPStan', $followUpStatus, 0.5);
+            });
+        }
+
+        $input = (
+            /**
+             * @return Generator<MutantProcessContainer>
+             */
+            static function () use ($container, $clock): Generator {
+                yield $container;
+
+                // Advancing the stream prepares more work while this container waits in the queue.
+                $clock->sleep(3);
+            }
+        )();
+        $runner = new ParallelProcessRunner(1, 0, $clock, new ProcessQueue($clock));
+        $finished = iterator_to_array($runner->run($input), false);
+        $clock->sleep(10);
+        $result = $container->getMutantExecutionResult();
+
+        $this->assertSame([$container], $finished);
+        $this->assertSame($followUpStatus ?? $firstStatus, $result->getDetectionStatus());
+        $expectedRuntime = $followUpStatus === null
+            ? 2.0
+            : 0.5;
+        $expectedActiveTime = $followUpStatus === null
+            ? 2.0
+            : 2.5;
+        $expectedElapsedTime = $followUpStatus === null
+            ? 5.0
+            : 6.5;
+        $this->assertSame($expectedRuntime, $result->getProcessRuntime());
+        $this->assertSame($expectedActiveTime, $result->getEvaluationActiveTime());
+        $this->assertSame($expectedElapsedTime, $result->getEvaluationElapsedTime());
+    }
+
+    public static function timedEvaluationProvider(): iterable
+    {
+        yield 'single attempt' => [null];
+
+        yield 'follow-up escapes' => [DetectionStatus::ESCAPED];
+
+        yield 'follow-up kills' => [DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
+
+        yield 'follow-up errors' => [DetectionStatus::ERROR];
+
+        yield 'follow-up times out' => [DetectionStatus::TIMED_OUT];
+    }
 
     public function test_it_does_nothing_when_no_process_is_given(): void
     {
@@ -643,53 +710,220 @@ final class ParallelProcessRunnerTest extends TestCase
     }
 
     #[DataProvider('mixedAttemptsProvider')]
-    public function test_it_finishes_mixed_attempts_once_in_execution_order(bool $firstUsesProcess, bool $lastUsesProcess): void
-    {
+    public function test_it_finishes_mixed_attempts_once_in_execution_order(
+        bool $firstUsesProcess,
+        bool $lastUsesProcess,
+        float $expectedActiveTime,
+        float $expectedElapsedTime,
+    ): void {
+        $clock = new TimeSpy(100.0);
         $mutant = MutantBuilder::withCompleteTestData()->build();
-        $first = new EvaluationAttemptResult('First evaluator', DetectionStatus::ESCAPED, 'First output', null);
-        $last = new EvaluationAttemptResult('Second evaluator', DetectionStatus::KILLED_BY_STATIC_ANALYSIS, 'Second output', null);
-        $createAttempt = function (EvaluationAttemptResult $result, bool $usesProcess) use ($mutant): MutantProcess|EvaluationAttemptResult {
-            if (!$usesProcess) {
+        $first = new EvaluationAttemptResult(
+            'First evaluator',
+            DetectionStatus::ESCAPED,
+            'First output',
+            $firstUsesProcess
+                ? new EvaluationProcessDetails('first', 2.0)
+                : null,
+        );
+        $last = new EvaluationAttemptResult(
+            'Second evaluator',
+            DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
+            'Second output',
+            $lastUsesProcess
+                ? new EvaluationProcessDetails('second', 0.5)
+                : null,
+        );
+        $createAttempt = function (EvaluationAttemptResult $result) use ($mutant, $clock): MutantProcess|EvaluationAttemptResult {
+            // Evaluator preparation contributes elapsed time for both attempt kinds.
+            $clock->sleep(1);
+
+            if ($result->process === null) {
                 return $result;
             }
 
+            $runtime = $result->process->runtime;
             $process = $this->createMock(Process::class);
             $process->expects($this->once())->method('start')->with(null, ['INFECTION' => '1', 'TEST_TOKEN' => 1]);
-            $process->expects($this->once())->method('isRunning')->willReturn(false);
+            $process->expects($this->once())->method('isRunning')->willReturnCallback(static function () use ($clock, $runtime): bool {
+                $clock->setTime($clock->microtime() + $runtime);
+
+                return false;
+            });
             $process->expects($this->never())->method('checkTimeout');
             $factory = $this->createMock(EvaluationAttemptResultFactory::class);
             $factory->expects($this->once())->method('createFromProcess')->willReturn($result);
 
-            return new MutantProcess($process, $mutant, $factory);
+            return new MutantProcess($process, $mutant, $factory, $clock);
         };
+        $evaluation = MutantProcessContainer::from($mutant, static fn (): MutantProcess|EvaluationAttemptResult => $createAttempt($first))
+            ->append(static fn (): MutantProcess|EvaluationAttemptResult => $createAttempt($last))
+        ;
+        $input = (static function () use ($evaluation, $clock): Generator {
+            yield $evaluation;
 
-        if ($firstUsesProcess) {
-            $firstProcess = $createAttempt($first, true);
-            $this->assertInstanceOf(MutantProcess::class, $firstProcess);
-            $evaluation = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $firstProcess);
-        } else {
-            $evaluation = MutantProcessContainer::from($mutant, static fn (): EvaluationAttemptResult => $first);
-        }
+            $clock->sleep(3);
+        })();
+        $runner = new ParallelProcessRunner(1, 0, $clock, new ProcessQueue($clock));
 
-        $evaluation->append(static fn (): MutantProcess|EvaluationAttemptResult => $createAttempt($last, $lastUsesProcess));
-        $runner = new ParallelProcessRunner(1, 0, new TimeSpy());
-
-        $finished = iterator_to_array($runner->run([$evaluation]), false);
+        $finished = iterator_to_array($runner->run($input), false);
+        $clock->sleep(10);
+        $result = $evaluation->getMutantExecutionResult();
 
         $this->assertSame([$evaluation], $finished);
-        $this->assertSame([$first, $last], $finished[0]->getMutantExecutionResult()->getEvaluationHistory());
-        $this->assertSame(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, $finished[0]->getMutantExecutionResult()->getDetectionStatus());
+        $this->assertSame([$first, $last], $result->getEvaluationHistory());
+        $this->assertSame(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, $result->getDetectionStatus());
+        $this->assertSame($expectedActiveTime, $result->getEvaluationActiveTime());
+        $this->assertSame($expectedElapsedTime, $result->getEvaluationElapsedTime());
     }
 
     public static function mixedAttemptsProvider(): iterable
     {
-        yield 'direct result then another direct result' => [false, false];
+        yield 'direct result then another direct result' => [false, false, 0.0, 5.0];
 
-        yield 'direct result then a process' => [false, true];
+        yield 'direct result then a process' => [false, true, 0.5, 5.5];
 
-        yield 'process then another process' => [true, true];
+        yield 'process then another process' => [true, true, 2.5, 7.5];
 
-        yield 'process then a direct result' => [true, false];
+        yield 'process then a direct result' => [true, false, 2.0, 7.0];
+    }
+
+    #[DataProvider('timedRetryProvider')]
+    public function test_it_times_fresh_retries_and_keeps_the_strategy_selected_status(bool $usesProcess, float $activeTime, float $elapsedTime): void
+    {
+        $clock = new TimeSpy(100.0);
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+        $calls = 0;
+        $evaluate = function () use ($clock, $usesProcess, &$calls): MutantProcess|EvaluationAttemptResult {
+            ++$calls;
+            $clock->usleep(250_000);
+            $status = $calls === 1
+                ? DetectionStatus::TIMED_OUT
+                : DetectionStatus::ERROR;
+            $runtime = $calls === 1
+                ? 2.0
+                : 0.5;
+
+            return $usesProcess
+                ? $this->createTimedProcess($clock, 'Evaluator', $status, $runtime)
+                : new EvaluationAttemptResult('Evaluator', $status, '', null);
+        };
+        $strategy = $this->createMock(EvaluationStrategy::class);
+        $strategy->expects($this->exactly(2))->method('decide')->willReturnCallback(
+            static fn (array $history, array $evaluations): RunEvaluation|FinishEvaluation => count($history) === 1
+                ? new RunEvaluation($evaluations[0])
+                : new FinishEvaluation(DetectionStatus::ESCAPED),
+        );
+        $evaluation = MutantProcessContainer::from($mutant, $evaluate)->withStrategy($strategy);
+        $runner = new ParallelProcessRunner(1, 0, $clock, new ProcessQueue($clock));
+
+        $finished = iterator_to_array($runner->run([$evaluation]), false);
+        $result = $evaluation->getMutantExecutionResult();
+        $history = $result->getEvaluationHistory();
+
+        $this->assertSame([$evaluation], $finished);
+        $this->assertSame(2, $calls);
+        $this->assertCount(2, $history);
+        $this->assertSame(DetectionStatus::TIMED_OUT, $history[0]->detectionStatus);
+        $this->assertSame(DetectionStatus::ERROR, $history[1]->detectionStatus);
+        $this->assertNotSame($history[0], $history[1]);
+        $this->assertSame(DetectionStatus::ESCAPED, $result->getDetectionStatus());
+        $this->assertSame($activeTime, $result->getEvaluationActiveTime());
+        $this->assertSame($elapsedTime, $result->getEvaluationElapsedTime());
+        $this->assertSame($result, $evaluation->getMutantExecutionResult());
+    }
+
+    public static function timedRetryProvider(): iterable
+    {
+        yield 'direct retry' => [false, 0.0, 0.5];
+
+        yield 'process retry' => [true, 2.5, 3.0];
+    }
+
+    public function test_it_times_nested_combined_pipes_without_losing_their_follow_ups(): void
+    {
+        $clock = new TimeSpy(0.0);
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+        $firstObservation = new EvaluationAttemptResult('Direct', DetectionStatus::ESCAPED, 'First', null);
+        $thirdObservation = new EvaluationAttemptResult('Direct', DetectionStatus::ESCAPED, 'Third', null);
+        $first = MutantProcessContainer::from($mutant, static function () use ($clock, $firstObservation): EvaluationAttemptResult {
+            $clock->sleep(1);
+
+            return $firstObservation;
+        })->append(function () use ($clock): MutantProcess {
+            $clock->usleep(500_000);
+
+            return $this->createTimedProcess($clock, 'First process', DetectionStatus::ESCAPED, 2.0);
+        });
+        $second = MutantProcessContainer::from($mutant, static function () use ($clock, $thirdObservation): EvaluationAttemptResult {
+            $clock->usleep(250_000);
+
+            return $thirdObservation;
+        });
+        $third = MutantProcessContainer::from($mutant, fn (): MutantProcess => $this->createTimedProcess($clock, 'Last process', DetectionStatus::KILLED_BY_STATIC_ANALYSIS, 0.5));
+        $combined = $first->merge($second->merge($third));
+        $runner = new ParallelProcessRunner(1, 0, $clock, new ProcessQueue($clock));
+
+        $finished = iterator_to_array($runner->run([$combined]), false);
+        $clock->sleep(10);
+        $result = $combined->getMutantExecutionResult();
+        $history = $result->getEvaluationHistory();
+
+        $this->assertInstanceOf(CombinedMutantEvaluationPipe::class, $combined);
+        $this->assertSame([$combined], $finished);
+        $this->assertCount(4, $history);
+        $this->assertSame($firstObservation, $history[0]);
+        $this->assertSame('First process', $history[1]->evaluatorName);
+        $this->assertSame($thirdObservation, $history[2]);
+        $this->assertSame('Last process', $history[3]->evaluatorName);
+        $this->assertSame(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, $result->getDetectionStatus());
+        $this->assertSame(2.5, $result->getEvaluationActiveTime());
+        $this->assertSame(4.25, $result->getEvaluationElapsedTime());
+        $this->assertSame($result, $combined->getMutantExecutionResult());
+    }
+
+    public function test_it_includes_a_requeued_follow_ups_wait_behind_another_mutant(): void
+    {
+        $clock = new TimeSpy(100.0);
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+        $evaluation = MutantProcessContainer::from($mutant, fn (): MutantProcess => $this->createTimedProcess($clock, 'Tests', DetectionStatus::ESCAPED, 2.0))
+            ->append(static function () use ($clock): EvaluationAttemptResult {
+                $clock->sleep(1);
+
+                return new EvaluationAttemptResult('Direct', DetectionStatus::ERROR, '', null);
+            })
+        ;
+        $competitor = MutantProcessContainer::from($mutant, fn (): MutantProcess => $this->createTimedProcess($clock, 'Other mutant', DetectionStatus::KILLED_BY_TESTS, 4.0));
+        $runner = new ParallelProcessRunner(1, 0, $clock, new ProcessQueue($clock));
+
+        $finished = iterator_to_array($runner->run([$evaluation, $competitor]), false);
+        $result = $evaluation->getMutantExecutionResult();
+
+        $this->assertSame([$competitor, $evaluation], $finished);
+        $this->assertSame(2.0, $result->getEvaluationActiveTime());
+        $this->assertSame(7.0, $result->getEvaluationElapsedTime());
+        $this->assertSame(0.0, $result->getProcessRuntime());
+        $this->assertSame(DetectionStatus::ERROR, $result->getDetectionStatus());
+    }
+
+    private function createTimedProcess(TimeSpy $clock, string $evaluator, DetectionStatus $status, float $runtime): MutantProcess
+    {
+        $process = $this->createMock(Process::class);
+        $process->expects($this->once())->method('start');
+        $process
+            ->expects($this->once())
+            ->method('isRunning')
+            ->willReturnCallback(static function () use ($clock, $runtime): bool {
+                $clock->setTime($clock->microtime() + $runtime);
+
+                return false;
+            })
+        ;
+        $result = new EvaluationAttemptResult($evaluator, $status, '', new EvaluationProcessDetails($evaluator, $runtime));
+        $factory = $this->createMock(EvaluationAttemptResultFactory::class);
+        $factory->expects($this->once())->method('createFromProcess')->willReturn($result);
+
+        return new MutantProcess($process, MutantBuilder::withMinimalTestData()->build(), $factory, $clock);
     }
 
     private function runWithAllKindsOfProcesses(int $threadCount): void

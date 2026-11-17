@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
+use DuoClock\TimeSpy;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Mutant\EvaluationAttemptResultFactory;
@@ -58,16 +59,20 @@ final class MutantProcessTest extends TestCase
 
     private MutantProcess $mutantProcess;
 
+    private TimeSpy $clock;
+
     protected function setUp(): void
     {
         $this->processStub = $this->createStub(Process::class);
         $this->mutant = MutantBuilder::withMinimalTestData()->build();
         $evaluationAttemptResultFactory = $this->createStub(EvaluationAttemptResultFactory::class);
+        $this->clock = new TimeSpy(100.0);
 
         $this->mutantProcess = new MutantProcess(
             $this->processStub,
             $this->mutant,
             $evaluationAttemptResultFactory,
+            $this->clock,
         );
     }
 
@@ -151,6 +156,17 @@ final class MutantProcessTest extends TestCase
         $this->mutantProcess->markAsFinished();
 
         $this->assertSame($this->mutantProcess->getFinishedAt() - 10.0, $this->mutantProcess->getRuntime());
+    }
+
+    public function test_it_records_when_completion_is_observed(): void
+    {
+        $this->assertSame(0.0, $this->mutantProcess->getFinishedAt());
+
+        $this->clock->usleep(250_000);
+        $this->mutantProcess->markAsFinished();
+        $this->clock->sleep(2);
+
+        $this->assertSame(100.25, $this->mutantProcess->getFinishedAt());
     }
 
     private function assertMutantProcessStateIs(

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use DuoClock\DuoClock;
 use Infection\Process\MutantProcess;
 
 /**
@@ -42,9 +43,16 @@ use Infection\Process\MutantProcess;
  */
 final class DryProcessRunner implements ProcessRunner
 {
+    public function __construct(
+        private readonly DuoClock $clock = new DuoClock(),
+    ) {
+    }
+
     public function run(iterable $processContainers): iterable
     {
         foreach ($processContainers as $processContainer) {
+            $processContainer->markAsScheduled($this->clock->microtime());
+
             while (true) {
                 $attempt = $processContainer->getCurrent();
 
@@ -58,6 +66,8 @@ final class DryProcessRunner implements ProcessRunner
 
                 $processContainer->createNext();
             }
+
+            $processContainer->markAsFinished($this->clock->microtime());
 
             yield $processContainer;
         }

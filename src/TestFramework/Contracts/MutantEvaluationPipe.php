@@ -86,6 +86,16 @@ interface MutantEvaluationPipe
     public function merge(self $other): self;
 
     /**
+     * Records the first enqueue time, preserving it when follow-ups are requeued.
+     */
+    public function markAsScheduled(float $scheduledAt): void;
+
+    /**
+     * Records final completion after the strategy has selected a finish decision.
+     */
+    public function markAsFinished(float $finishedAt): void;
+
+    /**
      * Returns a memoized final result only after a finish decision has been locked in.
      * Does not create processes for unused follow-ups.
      */

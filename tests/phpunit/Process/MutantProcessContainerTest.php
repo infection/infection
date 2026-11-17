@@ -175,8 +175,11 @@ final class MutantProcessContainerTest extends TestCase
     }
 
     #[DataProvider('completedAttemptsProvider')]
-    public function test_it_finalizes_with_the_last_status_and_retains_every_attempt(DetectionStatus $firstStatus, ?DetectionStatus $secondStatus): void
-    {
+    public function test_it_finalizes_with_the_last_status_and_retains_every_attempt(
+        DetectionStatus $firstStatus,
+        ?DetectionStatus $secondStatus,
+        float $scheduledAt = 100.0,
+    ): void {
         $mutant = MutantBuilder::withCompleteTestData()->build();
         $first = new EvaluationAttemptResult(
             'PHPUnit',
@@ -185,10 +188,11 @@ final class MutantProcessContainerTest extends TestCase
             new EvaluationProcessDetails('phpunit', 1.25),
         );
         $firstProcess = $this->createStub(MutantProcess::class);
-        $firstProcess->method('getFinishedAt')->willReturn(2.0);
+        $firstProcess->method('getFinishedAt')->willReturn($scheduledAt + 2.0);
         $firstProcess->method('getEvaluationAttemptResult')->willReturn($first);
         $firstProcess->method('getMutant')->willReturn($mutant);
         $container = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $firstProcess);
+        $container->markAsScheduled($scheduledAt);
         $container->getCurrent();
         $expectedHistory = [$first];
         $last = $first;
@@ -201,12 +205,13 @@ final class MutantProcessContainerTest extends TestCase
                 new EvaluationProcessDetails('phpstan', 0.25),
             );
             $secondProcess = $this->createStub(MutantProcess::class);
-            $secondProcess->method('getFinishedAt')->willReturn(3.0);
+            $secondProcess->method('getFinishedAt')->willReturn($scheduledAt + 3.0);
             $secondProcess->method('getEvaluationAttemptResult')->willReturn($last);
             $secondProcess->method('getMutant')->willReturn($mutant);
             $container->append(static fn (): MutantProcess => $secondProcess);
             $this->assertTrue($container->hasNext());
             $container->createNext();
+            $container->markAsScheduled($scheduledAt + 2.0);
             $expectedHistory[] = $last;
         }
 
@@ -216,14 +221,51 @@ final class MutantProcessContainerTest extends TestCase
             });
         }
 
+        $container->markAsFinished($scheduledAt + 5.0);
         $actual = $container->getMutantExecutionResult();
 
         $this->assertSame($expectedHistory, $actual->getEvaluationHistory());
+        $this->assertSame(5.0, $actual->getEvaluationElapsedTime());
+        $expectedActiveTime = $secondStatus === null
+            ? 1.25
+            : 1.5;
+        $this->assertSame($expectedActiveTime, $actual->getEvaluationActiveTime());
+        $container->markAsFinished($scheduledAt + 20.0);
+        $this->assertSame($actual, $container->getMutantExecutionResult());
+        $this->assertSame(5.0, $actual->getEvaluationElapsedTime());
         $this->assertSame($last->detectionStatus, $actual->getDetectionStatus());
         $this->assertSame($last->process?->commandLine, $actual->getProcessCommandLine());
         $this->assertSame($last->output, $actual->getProcessOutput());
         $this->assertSame($last->process?->runtime, $actual->getProcessRuntime());
         $this->assertSame($mutant->getMutation()->getHash(), $actual->getMutantHash());
+    }
+
+    public function test_it_leaves_elapsed_time_unknown_when_scheduling_was_not_observed(): void
+    {
+        $observation = new EvaluationAttemptResult('Analyser', DetectionStatus::ESCAPED, '', null);
+        $container = MutantProcessContainer::from(
+            MutantBuilder::withMinimalTestData()->build(),
+            static fn (): EvaluationAttemptResult => $observation,
+        );
+        $container->getCurrent();
+
+        $this->assertNull($container->getMutantExecutionResult()->getEvaluationElapsedTime());
+    }
+
+    public function test_it_cannot_report_elapsed_time_before_final_completion(): void
+    {
+        $observation = new EvaluationAttemptResult('Analyser', DetectionStatus::ESCAPED, '', null);
+        $container = MutantProcessContainer::from(
+            MutantBuilder::withMinimalTestData()->build(),
+            static fn (): EvaluationAttemptResult => $observation,
+        );
+        $container->markAsScheduled(0.0);
+        $container->getCurrent();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot report elapsed evaluation time before the final evaluation has finished.');
+
+        $container->getMutantExecutionResult();
     }
 
     public function test_it_cannot_report_before_creating_a_process(): void
@@ -349,6 +391,8 @@ final class MutantProcessContainerTest extends TestCase
         yield 'tests error' => [DetectionStatus::ERROR, null];
 
         yield 'tests time out' => [DetectionStatus::TIMED_OUT, null];
+
+        yield 'scheduling at timestamp zero' => [DetectionStatus::ESCAPED, DetectionStatus::KILLED_BY_STATIC_ANALYSIS, 0.0];
     }
 
     public static function detectionStatusProvider(): iterable
