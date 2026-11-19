@@ -40,6 +40,8 @@ use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Symfony\Component\Process\Process;
 
 /**
+ * @deprecated Should be removed with TestFrameworkAdapter.
+ *
  * @internal
  * @final
  */

@@ -41,8 +41,9 @@ use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ * @final
  */
-final class InitialRunProcessFactory
+class InitialRunProcessFactory
 {
     /**
      * @param array<string> $commandLine

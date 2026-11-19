@@ -47,8 +47,8 @@ use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -67,6 +67,7 @@ use Override;
 use function Safe\preg_match;
 use function sprintf;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
+use Symfony\Component\Process\Process;
 use function trim;
 use function version_compare;
 use Webmozart\Assert\Assert;
@@ -82,6 +83,9 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
 
     private readonly CoverageChecker $coverageChecker;
 
+    /**
+     * @param Closure(): MutantProcessContainerFactory $processFactory
+     */
     public function __construct(
         private readonly string $testFrameworkExecutable,
         private readonly string $tmpDir,
@@ -96,9 +100,9 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         private readonly string $testFrameworkConfigPath,
         private readonly PhpUnitLogger $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
-        private readonly InitialTestsRunner $initialTestsRunner,
+        private readonly InitialRunProcessFactory $initialRunProcessFactory,
         private readonly Configuration $config,
-        private readonly MutantProcessContainerFactory $processFactory,
+        private readonly Closure $processFactory,
         private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private readonly MemoryLimiter $memoryLimiter,
         private ?string $version = null,
@@ -119,19 +123,37 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         }
     }
 
+    /**
+     * @throws SymfonyProcessRuntimeException
+     * @throws InitialTestsFailed
+     * @throws InvalidVersion
+     * @throws InvalidPhpUnitConfiguration
+     */
     #[Override]
-    public function executeInitialRun(?Closure $onProgress = null): InitialRunResults
+    public function executeInitialRun(?Closure $onProgress = null, ?Closure $onStart = null): InitialRunResults
     {
-        $initialTestSuiteProcess = $this->initialTestsRunner->run(
-            $this,
-            $this->config->testFrameworkExtraOptions,
-            explode(
-                ' ',
-                (string) $this->config->initialTestsPhpOptions,
+        $initialTestSuiteProcess = $this->initialRunProcessFactory->create(
+            $this->getInitialTestRunCommandLine(
+                $this->config->testFrameworkExtraOptions,
+                explode(' ', (string) $this->config->initialTestsPhpOptions),
+                $this->config->skipCoverage,
             ),
-            $this->config->skipCoverage,
-            $onProgress,
+            !$this->config->skipCoverage,
         );
+
+        $onStart?->__invoke($initialTestSuiteProcess->getCommandLine());
+
+        $initialTestSuiteProcess->run(static function (string $type) use ($initialTestSuiteProcess, $onProgress): void {
+            if ($type === Process::ERR) {
+                // Infection forces PHPUnit's `stderr` configuration to false, so stderr is not
+                // expected test-run output. Stop immediately on bootstrap or configuration errors
+                // instead of waiting for the rest of the suite. This is PHPUnit-specific: tools
+                // such as PHPStan legitimately use stderr for non-error output.
+                $initialTestSuiteProcess->stop();
+            }
+
+            $onProgress?->__invoke();
+        });
 
         if (!$initialTestSuiteProcess->isSuccessful()) {
             throw InitialTestsFailed::fromProcess(
@@ -166,7 +188,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
     #[Override]
     public function test(Mutant $mutant): MutantProcessContainer
     {
-        return $this->processFactory->create(
+        return ($this->processFactory)()->create(
             $this,
             $mutant,
             $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(

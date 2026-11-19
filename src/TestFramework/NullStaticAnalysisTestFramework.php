@@ -64,7 +64,7 @@ final readonly class NullStaticAnalysisTestFramework implements StaticAnalysisTe
     {
     }
 
-    public function executeInitialRun(?Closure $onProgress = null): InitialRunResults
+    public function executeInitialRun(?Closure $onProgress = null, ?Closure $onStart = null): InitialRunResults
     {
         return new InitialRunResults('', null);
     }

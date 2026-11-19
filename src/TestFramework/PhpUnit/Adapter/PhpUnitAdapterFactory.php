@@ -37,12 +37,12 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
 use function array_values;
+use Closure;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
-use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -90,9 +90,8 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         Filesystem $fileSystem,
         LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
-        InitialTestsRunner $initialTestsRunner,
         Configuration $configuration,
-        MutantProcessContainerFactory $processFactory,
+        Closure $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
@@ -155,7 +154,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $testFrameworkConfigPath,
             new PsrPhpUnitLogger($logger),
             $coverageCheckerFactory,
-            $initialTestsRunner,
+            new InitialRunProcessFactory(),
             $configuration,
             $processFactory,
             $testFrameworkExtraOptionsFilter,

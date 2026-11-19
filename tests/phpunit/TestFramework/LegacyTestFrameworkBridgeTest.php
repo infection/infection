@@ -35,11 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
+use Closure;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Console\ConsoleOutput;
+use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -52,6 +53,8 @@ use Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter;
 use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
@@ -128,13 +131,27 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
 
     public function test_it_executes_initial_run_and_reports_memory_usage(): void
     {
+        $startedCommands = [];
+        $onStart = static function (string $commandLine) use (&$startedCommands): void {
+            $startedCommands[] = $commandLine;
+        };
         $process = $this->createSuccessfulInitialRunProcess('output');
-        $adapter = new FakeAwareAdapter(42.0);
-
-        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
-        $initialTestsRunner
+        $process
             ->expects($this->once())
             ->method('run')
+            ->with($this->isInstanceOf(Closure::class))
+            ->willReturnCallback(function () use (&$startedCommands): int {
+                $this->assertSame(['/tmp/phpunit'], $startedCommands);
+
+                return 0;
+            })
+        ;
+        $adapter = new FakeAwareAdapter(42.0);
+
+        $initialRunProcessFactory = $this->createMock(InitialTestsRunProcessFactory::class);
+        $initialRunProcessFactory
+            ->expects($this->once())
+            ->method('createProcess')
             ->with($adapter, '', [''], false)
             ->willReturn($process)
         ;
@@ -149,7 +166,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $testFramework = $this->createTestFramework(
             adapter: $adapter,
             coverageChecker: $coverageChecker,
-            initialTestsRunner: $initialTestsRunner,
+            initialRunProcessFactory: $initialRunProcessFactory,
         );
 
         $expected = new InitialRunResults(
@@ -157,34 +174,33 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             memoryUsage: 42.0,
         );
 
-        $actual = $testFramework->executeInitialRun();
+        $actual = $testFramework->executeInitialRun(onStart: $onStart);
 
         $this->assertEquals($expected, $actual);
     }
 
     public function test_it_forwards_initial_run_options(): void
     {
-        $onProgress = static function (): void {};
         $process = $this->createSuccessfulInitialRunProcess('output');
         $adapter = new DummyTestFrameworkAdapter();
 
-        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
-        $initialTestsRunner
+        $initialRunProcessFactory = $this->createMock(InitialTestsRunProcessFactory::class);
+        $initialRunProcessFactory
             ->expects($this->once())
-            ->method('run')
-            ->with($adapter, '--verbose', ['-d', 'memory_limit=1G'], true, $onProgress)
+            ->method('createProcess')
+            ->with($adapter, '--verbose', ['-d', 'memory_limit=1G'], true)
             ->willReturn($process)
         ;
 
         $testFramework = $this->createTestFramework(
             adapter: $adapter,
-            initialTestsRunner: $initialTestsRunner,
+            initialRunProcessFactory: $initialRunProcessFactory,
             initialTestsPhpOptions: '-d memory_limit=1G',
             testFrameworkExtraOptions: '--verbose',
             skipCoverage: true,
         );
 
-        $testFramework->executeInitialRun($onProgress);
+        $testFramework->executeInitialRun();
     }
 
     public function test_it_throws_when_the_initial_run_fails(): void
@@ -202,10 +218,10 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             ->willReturn('Check the legacy framework configuration.')
         ;
 
-        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
-        $initialTestsRunner
+        $initialRunProcessFactory = $this->createMock(InitialTestsRunProcessFactory::class);
+        $initialRunProcessFactory
             ->expects($this->once())
-            ->method('run')
+            ->method('createProcess')
             ->willReturn($this->createFailedInitialRunProcess())
         ;
 
@@ -218,7 +234,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $testFramework = $this->createTestFramework(
             adapter: $adapter,
             coverageChecker: $coverageChecker,
-            initialTestsRunner: $initialTestsRunner,
+            initialRunProcessFactory: $initialRunProcessFactory,
         );
 
         $this->expectException(InitialTestsFailed::class);
@@ -234,15 +250,15 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
 
     public function test_it_reports_unknown_memory_usage_when_the_legacy_adapter_does_not_report_it(): void
     {
-        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
-        $initialTestsRunner
-            ->method('run')
+        $initialRunProcessFactory = $this->createMock(InitialTestsRunProcessFactory::class);
+        $initialRunProcessFactory
+            ->method('createProcess')
             ->willReturn($this->createSuccessfulInitialRunProcess('output'))
         ;
 
         $testFramework = $this->createTestFramework(
             adapter: new DummyTestFrameworkAdapter(),
-            initialTestsRunner: $initialTestsRunner,
+            initialRunProcessFactory: $initialRunProcessFactory,
         );
 
         $expected = new InitialRunResults(
@@ -257,15 +273,15 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
 
     public function test_it_normalizes_unknown_legacy_memory_usage(): void
     {
-        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
-        $initialTestsRunner
-            ->method('run')
+        $initialRunProcessFactory = $this->createMock(InitialTestsRunProcessFactory::class);
+        $initialRunProcessFactory
+            ->method('createProcess')
             ->willReturn($this->createSuccessfulInitialRunProcess('output'))
         ;
 
         $testFramework = $this->createTestFramework(
             adapter: new FakeAwareAdapter(-1.0),
-            initialTestsRunner: $initialTestsRunner,
+            initialRunProcessFactory: $initialRunProcessFactory,
         );
 
         $expected = new InitialRunResults(
@@ -333,11 +349,71 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $this->assertSame($processContainer, $actual);
     }
 
+    #[DataProvider('progressOutputProvider')]
+    public function test_it_reports_progress_and_stops_on_stderr(string $outputType, bool $reportProgress): void
+    {
+        $progressCount = 0;
+        $stopCount = 0;
+        $onProgress = static function () use (&$progressCount): void {
+            ++$progressCount;
+        };
+        $process = $this->createMock(Process::class);
+        $process->method('isSuccessful')->willReturn(true);
+        $process
+            ->method('stop')
+            ->willReturnCallback(static function () use (&$stopCount): int {
+                ++$stopCount;
+
+                return 0;
+            })
+        ;
+        $process
+            ->expects($this->once())
+            ->method('run')
+            ->willReturnCallback(static function (Closure $callback) use ($outputType): int {
+                $callback($outputType, 'output');
+
+                return 0;
+            })
+        ;
+        $factory = $this->createStub(InitialTestsRunProcessFactory::class);
+        $factory->method('createProcess')->willReturn($process);
+        $framework = $this->createTestFramework(initialRunProcessFactory: $factory);
+
+        $framework->executeInitialRun(
+            $reportProgress
+                ? $onProgress
+                : null,
+        );
+
+        $this->assertSame(
+            $reportProgress
+                ? 1
+                : 0,
+            $progressCount,
+        );
+        $this->assertSame(
+            $outputType === Process::ERR
+                ? 1
+                : 0,
+            $stopCount,
+        );
+    }
+
+    public static function progressOutputProvider(): iterable
+    {
+        yield 'stdout with progress callback' => [Process::OUT, true];
+
+        yield 'stderr with progress callback' => [Process::ERR, true];
+
+        yield 'stdout without progress callback' => [Process::OUT, false];
+    }
+
     private function createTestFramework(
         ?TestFrameworkAdapter $adapter = null,
         ?ConsoleOutput $consoleOutput = null,
         ?CoverageChecker $coverageChecker = null,
-        ?InitialTestsRunner $initialTestsRunner = null,
+        ?InitialTestsRunProcessFactory $initialRunProcessFactory = null,
         ?MutantProcessContainerFactory $processFactory = null,
         ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter = null,
         bool $skipInitialTests = false,
@@ -349,7 +425,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             adapter: $adapter ?? new FakeAwareAdapter(1.0),
             consoleOutput: $consoleOutput ?? $this->createStub(ConsoleOutput::class),
             coverageChecker: $coverageChecker ?? $this->createStub(CoverageChecker::class),
-            initialTestsRunner: $initialTestsRunner ?? $this->createStub(InitialTestsRunner::class),
+            initialRunProcessFactory: $initialRunProcessFactory ?? $this->createStub(InitialTestsRunProcessFactory::class),
             config: ConfigurationBuilder::withMinimalTestData()
                 ->withInitialTestsPhpOptions($initialTestsPhpOptions)
                 ->withTestFrameworkExtraOptions($testFrameworkExtraOptions)
@@ -361,7 +437,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         );
     }
 
-    private function createSuccessfulInitialRunProcess(string $output): Process
+    private function createSuccessfulInitialRunProcess(string $output): Process&MockObject
     {
         $process = $this->createMock(Process::class);
         $process

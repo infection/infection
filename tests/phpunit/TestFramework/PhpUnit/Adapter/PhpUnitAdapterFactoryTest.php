@@ -37,7 +37,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use Infection\FileSystem\FileSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
@@ -82,9 +81,8 @@ final class PhpUnitAdapterFactoryTest extends TestCase
                 JUnitReportLocator::create($fileSystem, ''),
                 IndexXmlCoverageLocator::create($fileSystem, ''),
             ),
-            initialTestsRunner: $this->createStub(InitialTestsRunner::class),
             configuration: $configuration,
-            processFactory: $this->createStub(MutantProcessContainerFactory::class),
+            processFactory: fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             testFrameworkExtraOptionsFilter: $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
 

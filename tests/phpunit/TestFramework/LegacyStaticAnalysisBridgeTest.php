@@ -37,23 +37,23 @@ namespace Infection\Tests\TestFramework;
 
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\LegacyStaticAnalysisBridge;
 use Infection\Tests\Mutant\MutantBuilder;
-use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(LegacyStaticAnalysisBridge::class)]
 final class LegacyStaticAnalysisBridgeTest extends TestCase
 {
-    private InitialStaticAnalysisRunner&MockObject $runner;
+    private InitialRunProcessFactory&MockObject $processFactory;
 
     private StaticAnalysisToolAdapter&MockObject $staticAnalysisToolAdapter;
 
@@ -61,43 +61,62 @@ final class LegacyStaticAnalysisBridgeTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->runner = $this->createMock(InitialStaticAnalysisRunner::class);
+        $this->processFactory = $this->createMock(InitialRunProcessFactory::class);
         $this->staticAnalysisToolAdapter = $this->createMock(StaticAnalysisToolAdapter::class);
-        $this->bridge = new LegacyStaticAnalysisBridge($this->runner, $this->staticAnalysisToolAdapter);
+        $this->bridge = new LegacyStaticAnalysisBridge($this->processFactory, $this->staticAnalysisToolAdapter);
     }
 
-    public function test_it_executes_the_initial_run_and_returns_empty_results(): void
+    public function test_it_executes_the_initial_run_and_returns_the_output(): void
     {
         $onProgress = static function (): void {};
-
-        $this->runner
+        $command = ['phpstan', 'analyse', '--configuration=some config.neon'];
+        $commandLine = "'phpstan' 'analyse' '--configuration=some config.neon'";
+        $startedCommands = [];
+        $onStart = static function (string $commandLine) use (&$startedCommands): void {
+            $startedCommands[] = $commandLine;
+        };
+        $process = $this->createMock(Process::class);
+        $process
             ->expects($this->once())
             ->method('run')
             ->with($onProgress)
+            ->willReturnCallback(function () use (&$startedCommands, $commandLine): int {
+                $this->assertSame([$commandLine], $startedCommands);
+
+                return 0;
+            })
+        ;
+        $process->method('getCommandLine')->willReturn($commandLine);
+        $process->method('isSuccessful')->willReturn(true);
+        $process->method('getOutput')->willReturn('static-analysis output');
+        $this->staticAnalysisToolAdapter->method('getInitialRunCommandLine')->willReturn($command);
+        $this->processFactory
+            ->expects($this->once())
+            ->method('create')
+            ->with($command, false)
+            ->willReturn($process)
         ;
 
-        $this->assertEquals(new InitialRunResults('', null), $this->bridge->executeInitialRun($onProgress));
+        $actual = $this->bridge->executeInitialRun($onProgress, $onStart);
+
+        $this->assertEquals(new InitialRunResults('static-analysis output', null), $actual);
     }
 
-    public function test_it_preserves_initial_run_failures(): void
+    public function test_it_reports_initial_run_failures(): void
     {
-        $process = CompletedProcessBuilder::withMinimalTestData()
-            ->withExitCode(3)
-            ->build()
-        ;
-        $failure = InitialTestsFailed::fromCompletedProcess(
-            $process,
-            'PHPStan',
-            'static analysis',
-            '',
-        );
-        $this->runner
-            ->expects($this->once())
-            ->method('run')
-            ->willThrowException($failure)
-        ;
+        $process = $this->createMock(Process::class);
+        $process->expects($this->once())->method('run')->with(null);
+        $process->method('isSuccessful')->willReturn(false);
+        $process->method('getExitCode')->willReturn(3);
+        $process->method('getErrorOutput')->willReturn('Invalid configuration');
+        $this->staticAnalysisToolAdapter->method('getName')->willReturn('PHPStan');
+        $this->staticAnalysisToolAdapter->method('getInitialRunCommandLine')->willReturn(['phpstan', 'analyse']);
+        $this->processFactory->method('create')->willReturn($process);
 
-        $this->expectExceptionObject($failure);
+        $this->expectException(InitialTestsFailed::class);
+        $this->expectExceptionMessage('Project static analysis must be in a passing state before running Infection.');
+        $this->expectExceptionMessage('PHPStan reported an exit code of 3.');
+        $this->expectExceptionMessage('Invalid configuration');
 
         $this->bridge->executeInitialRun();
     }

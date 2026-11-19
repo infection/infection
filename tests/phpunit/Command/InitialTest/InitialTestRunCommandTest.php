@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command\InitialTest;
 
+use Closure;
 use Infection\Command\InitialTest\InitialTestRunCommand;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
@@ -365,7 +366,9 @@ final class InitialTestRunCommandTest extends TestCase
             $executeInitialRunExpectation->willThrowException($failure);
         } else {
             $executeInitialRunExpectation->willReturnCallback(
-                static function () use ($eventDispatcher): InitialRunResults {
+                static function (?Closure $onProgress = null, ?Closure $onStart = null) use ($eventDispatcher): InitialRunResults {
+                    $onStart?->__invoke('test-framework initialConfig');
+
                     $eventDispatcher->dispatch(new InitialTestSuiteWasStarted('test-framework initialConfig', 'DemoTestFramework', '1.0'));
 
                     return new InitialRunResults('', null);

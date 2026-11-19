@@ -59,6 +59,10 @@ $eventsByName = array_combine(
     $events,
 );
 
+if (!str_contains($eventsByName['InitialTestSuiteWasStarted']['data']['commandLine'] ?? '', 'phpunit')) {
+    throw new RuntimeException('The initial test start event must report the PHPUnit command line.');
+}
+
 if ($eventsByName['MutantProcessWasFinished']['data']['executionResult']['detectionStatus'] !== 'killed by tests') {
     throw new RuntimeException('The trace must record that PHPUnit killed the mutant.');
 }

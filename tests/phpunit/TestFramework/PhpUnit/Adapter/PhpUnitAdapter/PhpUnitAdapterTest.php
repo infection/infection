@@ -37,14 +37,15 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
 use function array_map;
 use function array_slice;
+use Closure;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\FileSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -149,7 +150,22 @@ final class PhpUnitAdapterTest extends TestCase
         ?float $memoryUsage,
     ): void {
         $onProgress = static function (): void {};
-        $process = $this->createStub(Process::class);
+        $startedCommands = [];
+        $onStart = static function (string $commandLine) use (&$startedCommands): void {
+            $startedCommands[] = $commandLine;
+        };
+        $process = $this->createMock(Process::class);
+        $process->method('getCommandLine')->willReturn("'phpunit' '--config=some config.xml'");
+        $process
+            ->expects($this->once())
+            ->method('run')
+            ->with($this->isInstanceOf(Closure::class))
+            ->willReturnCallback(function () use (&$startedCommands): int {
+                $this->assertSame(["'phpunit' '--config=some config.xml'"], $startedCommands);
+
+                return 0;
+            })
+        ;
         $process
             ->method('isSuccessful')
             ->willReturn(true)
@@ -159,7 +175,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->willReturn($output)
         ;
 
-        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
+        $initialRunProcessFactory = $this->createMock(InitialRunProcessFactory::class);
         $configuration = ConfigurationBuilder::withMinimalTestData()
             ->withInitialTestsPhpOptions('-d memory_limit=1G')
             ->withTestFrameworkExtraOptions('--verbose --warn-when-php-is-not-configured-for-development')
@@ -169,19 +185,13 @@ final class PhpUnitAdapterTest extends TestCase
         $adapter = $this->createAdapter(
             '<phpunit/>',
             configuration: $configuration,
-            initialTestsRunner: $initialTestsRunner,
+            initialRunProcessFactory: $initialRunProcessFactory,
         );
 
-        $initialTestsRunner
+        $initialRunProcessFactory
             ->expects($this->once())
-            ->method('run')
-            ->with(
-                $adapter,
-                '--verbose --warn-when-php-is-not-configured-for-development',
-                ['-d', 'memory_limit=1G'],
-                true,
-                $onProgress,
-            )
+            ->method('create')
+            ->with($this->isArray(), false)
             ->willReturn($process)
         ;
         $this->fileSystemMock
@@ -195,7 +205,7 @@ final class PhpUnitAdapterTest extends TestCase
                 $output,
                 $memoryUsage,
             ),
-            $adapter->executeInitialRun($onProgress),
+            $adapter->executeInitialRun($onProgress, $onStart),
             'The initial run must preserve the output and normalize unknown memory usage.',
         );
     }
@@ -228,20 +238,15 @@ final class PhpUnitAdapterTest extends TestCase
             ->willReturn('vendor/bin/phpunit --configuration failing.xml')
         ;
 
-        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
+        $initialRunProcessFactory = $this->createMock(InitialRunProcessFactory::class);
         $adapter = $this->createAdapter(
             '<phpunit/>',
-            initialTestsRunner: $initialTestsRunner,
+            initialRunProcessFactory: $initialRunProcessFactory,
         );
-        $initialTestsRunner
+        $initialRunProcessFactory
             ->expects($this->once())
-            ->method('run')
-            ->with(
-                $adapter,
-                '',
-                [''],
-                false,
-            )
+            ->method('create')
+            ->with($this->isArray(), true)
             ->willReturn($process)
         ;
         $this->fileSystemMock
@@ -572,10 +577,10 @@ final class PhpUnitAdapterTest extends TestCase
         $process = $this->createStub(Process::class);
         $process->method('isSuccessful')->willReturn(true);
         $process->method('getOutput')->willReturn('Memory: 12.50MB');
-        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
+        $initialRunProcessFactory = $this->createMock(InitialRunProcessFactory::class);
         $configuration = ConfigurationBuilder::withMinimalTestData()->withSkipCoverage(true)->build();
         $this->fileSystemMock->expects($this->exactly(2))->method('isReadableFile')->willReturn(true);
-        $this->fileSystemMock->expects($this->exactly(2))->method('dumpFile');
+        $this->fileSystemMock->expects($this->exactly(3))->method('dumpFile');
         $environment = $this->createMock(MemoryLimiterEnvironment::class);
         $environment->expects($this->once())->method('hasMemoryLimitSet')->willReturn(false);
         $memoryLimiter = new MemoryLimiter($environment);
@@ -586,12 +591,12 @@ final class PhpUnitAdapterTest extends TestCase
                 XML,
             memoryLimiter: $memoryLimiter,
             configuration: $configuration,
-            initialTestsRunner: $initialTestsRunner,
+            initialRunProcessFactory: $initialRunProcessFactory,
         );
-        $initialTestsRunner
+        $initialRunProcessFactory
             ->expects($this->once())
-            ->method('run')
-            ->with($adapter, $configuration->testFrameworkExtraOptions, [''], true)
+            ->method('create')
+            ->with($this->isArray(), false)
             ->willReturn($process)
         ;
         $adapter->executeInitialRun();
@@ -1923,6 +1928,71 @@ final class PhpUnitAdapterTest extends TestCase
         ];
     }
 
+    #[DataProvider('progressOutputProvider')]
+    public function test_it_reports_progress_and_stops_on_stderr(string $outputType, bool $reportProgress): void
+    {
+        $progressCount = 0;
+        $stopCount = 0;
+        $onProgress = static function () use (&$progressCount): void {
+            ++$progressCount;
+        };
+        $process = $this->createMock(Process::class);
+        $process->method('isSuccessful')->willReturn(true);
+        $process
+            ->method('stop')
+            ->willReturnCallback(static function () use (&$stopCount): int {
+                ++$stopCount;
+
+                return 0;
+            })
+        ;
+        $process
+            ->expects($this->once())
+            ->method('run')
+            ->willReturnCallback(static function (Closure $callback) use ($outputType): int {
+                $callback($outputType, 'output');
+
+                return 0;
+            })
+        ;
+        $factory = $this->createStub(InitialRunProcessFactory::class);
+        $factory->method('create')->willReturn($process);
+        $this->fileSystemMock->method('isReadableFile')->willReturn(true);
+        $framework = $this->createAdapter(
+            '<phpunit/>',
+            configuration: ConfigurationBuilder::withMinimalTestData()->withSkipCoverage(true)->build(),
+            initialRunProcessFactory: $factory,
+        );
+
+        $framework->executeInitialRun(
+            $reportProgress
+                ? $onProgress
+                : null,
+        );
+
+        $this->assertSame(
+            $reportProgress
+                ? 1
+                : 0,
+            $progressCount,
+        );
+        $this->assertSame(
+            $outputType === Process::ERR
+                ? 1
+                : 0,
+            $stopCount,
+        );
+    }
+
+    public static function progressOutputProvider(): iterable
+    {
+        yield 'stdout with progress callback' => [Process::OUT, true];
+
+        yield 'stderr with progress callback' => [Process::ERR, true];
+
+        yield 'stdout without progress callback' => [Process::OUT, false];
+    }
+
     /**
      * @param SplFileInfo[] $filteredSourceFilesToMutate
      * @param MapSourceClassToTestStrategy::*|null $mapSourceClassToTestStrategy
@@ -1936,7 +2006,7 @@ final class PhpUnitAdapterTest extends TestCase
         ?ShellCommandRunner $shellCommandRunner = null,
         ?MemoryLimiter $memoryLimiter = null,
         ?Configuration $configuration = null,
-        ?InitialTestsRunner $initialTestsRunner = null,
+        ?InitialRunProcessFactory $initialRunProcessFactory = null,
         ?MutantProcessContainerFactory $processFactory = null,
         ?PhpUnitLogger $logger = null,
     ): PhpUnitAdapter {
@@ -2001,9 +2071,9 @@ final class PhpUnitAdapterTest extends TestCase
                     '',
                 ),
             ),
-            $initialTestsRunner ?? $this->createStub(InitialTestsRunner::class),
+            $initialRunProcessFactory ?? $this->createStub(InitialRunProcessFactory::class),
             $configuration,
-            $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
+            fn (): MutantProcessContainerFactory => $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
             new TestFrameworkExtraOptionsFilter(),
             $memoryLimiter ?? new MemoryLimiter($this->createStub(MemoryLimiterEnvironment::class)),
             $version,

@@ -37,10 +37,9 @@ namespace Infection\StaticAnalysis;
 
 use function implode;
 use Infection\Configuration\Configuration;
-use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
@@ -68,7 +67,7 @@ final readonly class StaticAnalysisToolFactory
         private ShellCommandRunner $shellCommandRunner,
         private PhpExecutableFinder $phpExecutableFinder,
         private FileSystem $fileSystem,
-        private EventDispatcher $eventDispatcher,
+        private InitialRunProcessFactory $initialRunProcessFactory,
     ) {
     }
 
@@ -81,11 +80,7 @@ final readonly class StaticAnalysisToolFactory
         $adapter = $this->createAdapter($adapterName, $timeout);
 
         return new LegacyStaticAnalysisBridge(
-            new InitialStaticAnalysisRunner(
-                $this->shellCommandRunner,
-                $this->eventDispatcher,
-                $adapter,
-            ),
+            $this->initialRunProcessFactory,
             $adapter,
         );
     }

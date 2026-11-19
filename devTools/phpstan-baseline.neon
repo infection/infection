@@ -535,18 +535,6 @@ parameters:
 			path: ../src/Process/OriginalPhpProcess.php
 
 		-
-			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
-			identifier: catch.neverThrown
-			count: 1
-			path: ../src/Process/Runner/InitialTestsRunner.php
-
-		-
-			rawMessage: Infection\Process\Runner\InitialTestsRunner should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Process/Runner/InitialTestsRunner.php
-
-		-
 			rawMessage: 'Method Infection\Reflection\AnonymousClassReflection::__construct() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
 			identifier: missingType.generics
 			count: 1
@@ -667,12 +655,6 @@ parameters:
 			path: ../src/TestFramework/Config/TestFrameworkConfigLocator.php
 
 		-
-			rawMessage: Property Infection\TestFramework\Contracts\InitialRunResults::$output is never read
-			identifier: shipmonk.deadProperty.neverRead
-			count: 1
-			path: ../src/TestFramework/Contracts/InitialRunResults.php
-
-		-
 			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\Mutant
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1
@@ -692,12 +674,6 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\Process\Factory\MutantProcessContainerFactory
-			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\Process\Runner\InitialTestsRunner
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
@@ -913,12 +889,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\Runner\InitialTestsRunner
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\Coverage\CoverageChecker
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -944,18 +914,6 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Configuration\Configuration
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Process\Factory\MutantProcessContainerFactory
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Process\Runner\InitialTestsRunner
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php

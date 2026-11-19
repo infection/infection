@@ -41,6 +41,7 @@ use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
+use InvalidArgumentException;
 
 /**
  * A test framework is the tool that will be used to evaluate mutations to check if they are
@@ -59,6 +60,7 @@ interface TestFramework
     public function getName(): string;
 
     /**
+     * @throws InvalidArgumentException
      * @throws InvalidVersion
      */
     public function getVersion(): string;
@@ -79,10 +81,11 @@ interface TestFramework
      * an up-to-date cache.
      *
      * @param Closure(): void|null $onProgress
+     * @param Closure(string): void|null $onStart Called with the prepared command line before executing a process.
      *
      * @throws InitialTestsFailed
      */
-    public function executeInitialRun(?Closure $onProgress = null): InitialRunResults;
+    public function executeInitialRun(?Closure $onProgress = null, ?Closure $onStart = null): InitialRunResults;
 
     /**
      * Evaluates the Mutant. Some test frameworks may be able to do this in-memory, e.g.

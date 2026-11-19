@@ -40,8 +40,8 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
@@ -179,8 +179,8 @@ final class FactoryTest extends TestCase
                 JUnitReportLocator::create($fileSystem, ''),
                 IndexXmlCoverageLocator::create($fileSystem, ''),
             ),
-            $this->createStub(InitialTestsRunner::class),
-            $this->createStub(MutantProcessContainerFactory::class),
+            fn (): InitialTestsRunProcessFactory => $this->createStub(InitialTestsRunProcessFactory::class),
+            fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
     }
