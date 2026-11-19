@@ -164,6 +164,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
 
     public function test_it_forwards_initial_run_options(): void
     {
+        $onProgress = static function (): void {};
         $process = $this->createSuccessfulInitialRunProcess('output');
         $adapter = new DummyTestFrameworkAdapter();
 
@@ -171,7 +172,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($adapter, '--verbose', ['-d', 'memory_limit=1G'], true)
+            ->with($adapter, '--verbose', ['-d', 'memory_limit=1G'], true, $onProgress)
             ->willReturn($process)
         ;
 
@@ -183,7 +184,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             skipCoverage: true,
         );
 
-        $testFramework->executeInitialRun();
+        $testFramework->executeInitialRun($onProgress);
     }
 
     public function test_it_throws_when_the_initial_run_fails(): void

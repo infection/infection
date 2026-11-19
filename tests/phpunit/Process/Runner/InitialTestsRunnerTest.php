@@ -87,9 +87,12 @@ final class InitialTestsRunnerTest extends TestCase
         $this->testFrameworkAdapter = $this->createStub(TestFrameworkAdapter::class);
     }
 
-    #[DataProvider('versionProvider')]
-    public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(?string $version, string $expectedVersion): void
-    {
+    #[DataProvider('initialRunProvider')]
+    public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(
+        ?string $version,
+        string $expectedVersion,
+        bool $reportProgress,
+    ): void {
         $this->testFrameworkAdapter
             ->method('getName')
             ->willReturn('PHPUnit')
@@ -118,7 +121,21 @@ final class InitialTestsRunnerTest extends TestCase
             ->willReturn($process)
         ;
 
-        $this->runner->run($this->testFrameworkAdapter, $testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
+        $progressCount = 0;
+        $onProgress = $reportProgress
+            ? static function () use (&$progressCount): void {
+                ++$progressCount;
+            }
+        : null;
+
+        $this->runner->run($this->testFrameworkAdapter, $testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage, $onProgress);
+
+        $completedCount = count(array_filter(
+            $this->eventDispatcher->getEvents(),
+            static fn ($event) => $event instanceof InitialTestCaseWasCompleted,
+        ));
+
+        $this->assertSame($reportProgress ? $completedCount : 0, $progressCount);
 
         $this->assertSame(
             [
@@ -193,11 +210,15 @@ final class InitialTestsRunnerTest extends TestCase
         $this->assertLessThanOrEqual(4, $completedCount, 'Should stop after error, max 4 outputs');
     }
 
-    public static function versionProvider(): iterable
+    public static function initialRunProvider(): iterable
     {
-        yield 'known version' => ['6.5.4', '6.5.4'];
+        yield 'known version without progress callback' => ['6.5.4', '6.5.4', false];
 
-        yield 'unknown version' => [null, 'unknown'];
+        yield 'known version with progress callback' => ['6.5.4', '6.5.4', true];
+
+        yield 'unknown version without progress callback' => [null, 'unknown', false];
+
+        yield 'unknown version with progress callback' => [null, 'unknown', true];
     }
 
     private function createProcessForCode(string $code): Process

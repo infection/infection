@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
+use Closure;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
@@ -77,9 +78,11 @@ interface TestFramework
      * in the first place and generate the required code coverage or PHPStan to generate
      * an up-to-date cache.
      *
+     * @param Closure(): void|null $onProgress
+     *
      * @throws InitialTestsFailed
      */
-    public function executeInitialRun(): InitialRunResults;
+    public function executeInitialRun(?Closure $onProgress = null): InitialRunResults;
 
     /**
      * Evaluates the Mutant. Some test frameworks may be able to do this in-memory, e.g.

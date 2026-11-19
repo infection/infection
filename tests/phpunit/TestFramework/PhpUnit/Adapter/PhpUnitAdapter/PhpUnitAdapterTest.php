@@ -148,6 +148,7 @@ final class PhpUnitAdapterTest extends TestCase
         string $output,
         ?float $memoryUsage,
     ): void {
+        $onProgress = static function (): void {};
         $process = $this->createStub(Process::class);
         $process
             ->method('isSuccessful')
@@ -179,6 +180,7 @@ final class PhpUnitAdapterTest extends TestCase
                 '--verbose --warn-when-php-is-not-configured-for-development',
                 ['-d', 'memory_limit=1G'],
                 true,
+                $onProgress,
             )
             ->willReturn($process)
         ;
@@ -193,7 +195,7 @@ final class PhpUnitAdapterTest extends TestCase
                 $output,
                 $memoryUsage,
             ),
-            $adapter->executeInitialRun(),
+            $adapter->executeInitialRun($onProgress),
             'The initial run must preserve the output and normalize unknown memory usage.',
         );
     }

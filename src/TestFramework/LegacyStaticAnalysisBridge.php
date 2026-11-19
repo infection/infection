@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Closure;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
@@ -73,9 +74,9 @@ final readonly class LegacyStaticAnalysisBridge implements StaticAnalysisTestFra
         $this->staticAnalysisToolAdapter->assertMinimumVersionSatisfied();
     }
 
-    public function executeInitialRun(): InitialRunResults
+    public function executeInitialRun(?Closure $onProgress = null): InitialRunResults
     {
-        $this->initialStaticAnalysisRunner->run();
+        $this->initialStaticAnalysisRunner->run($onProgress);
 
         return new InitialRunResults('', null);
     }

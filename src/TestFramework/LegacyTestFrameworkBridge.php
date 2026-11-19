@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Closure;
 use function explode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -89,13 +90,14 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         }
     }
 
-    public function executeInitialRun(): InitialRunResults
+    public function executeInitialRun(?Closure $onProgress = null): InitialRunResults
     {
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
             $this->adapter,
             $this->config->testFrameworkExtraOptions,
             $this->getInitialTestsPhpOptionsArray(),
             $this->config->skipCoverage,
+            $onProgress,
         );
 
         if (!$initialTestSuiteProcess->isSuccessful()) {

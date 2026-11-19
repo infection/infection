@@ -78,9 +78,12 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
         );
     }
 
-    #[DataProvider('versionProvider')]
-    public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(?string $version, string $expectedVersion): void
-    {
+    #[DataProvider('initialRunProvider')]
+    public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(
+        ?string $version,
+        string $expectedVersion,
+        bool $reportProgress,
+    ): void {
         $this->staticAnalysisToolAdapter
             ->method('getName')
             ->willReturn('PHPStan')
@@ -122,7 +125,16 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             })
         ;
 
-        $this->runner->run();
+        $progressCount = 0;
+        $onProgress = $reportProgress
+            ? static function () use (&$progressCount): void {
+                ++$progressCount;
+            }
+        : null;
+
+        $this->runner->run($onProgress);
+
+        $this->assertSame($reportProgress ? 1 : 0, $progressCount);
 
         $this->assertEquals(
             [
@@ -132,6 +144,17 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             ],
             $this->eventDispatcher->getEvents(),
         );
+    }
+
+    public static function initialRunProvider(): iterable
+    {
+        yield 'known version without progress callback' => ['2.1.0', '2.1.0', false];
+
+        yield 'known version with progress callback' => ['2.1.0', '2.1.0', true];
+
+        yield 'unknown version without progress callback' => [null, 'unknown', false];
+
+        yield 'unknown version with progress callback' => [null, 'unknown', true];
     }
 
     public function test_it_throws_when_the_static_analysis_process_fails(): void
@@ -178,12 +201,5 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
         );
 
         $this->runner->run();
-    }
-
-    public static function versionProvider(): iterable
-    {
-        yield 'known version' => ['2.1.0', '2.1.0'];
-
-        yield 'unknown version' => [null, 'unknown'];
     }
 }

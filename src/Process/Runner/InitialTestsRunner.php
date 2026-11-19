@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Closure;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
@@ -58,12 +59,14 @@ class InitialTestsRunner
 
     /**
      * @param string[] $phpExtraOptions
+     * @param Closure(): void|null $onProgress
      */
     public function run(
         TestFrameworkAdapter $testFrameworkAdapter,
         string $testFrameworkExtraOptions,
         array $phpExtraOptions,
         bool $skipCoverage,
+        ?Closure $onProgress = null,
     ): Process {
         $process = $this->processBuilder->createProcess(
             $testFrameworkAdapter,
@@ -82,13 +85,23 @@ class InitialTestsRunner
             ),
         );
 
+<<<<<<< HEAD
         $process->run(function (string $type) use ($process, $testFrameworkName): void {
+=======
+        $process->run(function (string $type) use ($process, $onProgress): void {
+>>>>>>> 84c4a5f6b (refactor(test-framework): Add an optional progress callback to initial runs)
             if ($type === Process::ERR) {
                 // Stop on the first error encountered
                 $process->stop();
             }
 
+<<<<<<< HEAD
             $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted($testFrameworkName));
+=======
+            $onProgress?->__invoke();
+
+            $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted(isStaticAnalysis: false));
+>>>>>>> 84c4a5f6b (refactor(test-framework): Add an optional progress callback to initial runs)
         });
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($testFrameworkName, $process->getOutput()));

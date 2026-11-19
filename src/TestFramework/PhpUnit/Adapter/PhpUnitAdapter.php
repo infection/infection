@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function array_key_exists;
+use Closure;
 use function explode;
 use function implode;
 use Infection\AbstractTestFramework\InvalidVersion;
@@ -119,7 +120,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
     }
 
     #[Override]
-    public function executeInitialRun(): InitialRunResults
+    public function executeInitialRun(?Closure $onProgress = null): InitialRunResults
     {
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
             $this,
@@ -129,6 +130,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
                 (string) $this->config->initialTestsPhpOptions,
             ),
             $this->config->skipCoverage,
+            $onProgress,
         );
 
         if (!$initialTestSuiteProcess->isSuccessful()) {

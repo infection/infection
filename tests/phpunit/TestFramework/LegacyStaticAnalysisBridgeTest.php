@@ -68,12 +68,15 @@ final class LegacyStaticAnalysisBridgeTest extends TestCase
 
     public function test_it_executes_the_initial_run_and_returns_empty_results(): void
     {
+        $onProgress = static function (): void {};
+
         $this->runner
             ->expects($this->once())
             ->method('run')
+            ->with($onProgress)
         ;
 
-        $this->assertEquals(new InitialRunResults('', null), $this->bridge->executeInitialRun());
+        $this->assertEquals(new InitialRunResults('', null), $this->bridge->executeInitialRun($onProgress));
     }
 
     public function test_it_preserves_initial_run_failures(): void

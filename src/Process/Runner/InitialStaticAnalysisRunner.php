@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Closure;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
@@ -64,9 +65,11 @@ readonly class InitialStaticAnalysisRunner
     }
 
     /**
+     * @param Closure(): void|null $onProgress
+     *
      * @throws InitialTestsFailed
      */
-    public function run(): void
+    public function run(?Closure $onProgress = null): void
     {
         $command = $this->staticAnalysisToolAdapter->getInitialRunCommandLine();
         // TODO: unlike InitialTestsRunner, we do not use InitialTestsRunProcessFactory
@@ -87,7 +90,15 @@ readonly class InitialStaticAnalysisRunner
 
         $process = $this->shellCommandRunner->run(
             command: $command,
+<<<<<<< HEAD
             callback: fn () => $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted($testFrameworkName)),
+=======
+            callback: function () use ($onProgress): void {
+                $onProgress?->__invoke();
+
+                $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted(isStaticAnalysis: true));
+            },
+>>>>>>> 84c4a5f6b (refactor(test-framework): Add an optional progress callback to initial runs)
             timeout: null,
         );
 
