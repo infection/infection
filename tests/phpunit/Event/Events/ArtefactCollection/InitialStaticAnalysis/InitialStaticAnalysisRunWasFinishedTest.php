@@ -46,8 +46,9 @@ final class InitialStaticAnalysisRunWasFinishedTest extends TestCase
     {
         $text = 'foo-bar-baz';
 
-        $class = new InitialStaticAnalysisRunWasFinished($text);
+        $class = new InitialStaticAnalysisRunWasFinished('PHPStan', $text);
 
+        $this->assertSame('PHPStan', $class->testFrameworkName);
         $this->assertSame($text, $class->outputText);
     }
 }

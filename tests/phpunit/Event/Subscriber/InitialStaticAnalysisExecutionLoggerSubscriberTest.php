@@ -83,10 +83,11 @@ final class InitialStaticAnalysisExecutionLoggerSubscriberTest extends TestCase
         $this->loggerMock
             ->expects($this->once())
             ->method('advance')
+            ->with('PHPStan')
         ;
 
         $this->dispatcher->dispatch(
-            new InitialStaticAnalysisSubStepWasCompleted(),
+            new InitialStaticAnalysisSubStepWasCompleted('PHPStan'),
         );
     }
 
@@ -95,13 +96,11 @@ final class InitialStaticAnalysisExecutionLoggerSubscriberTest extends TestCase
         $this->loggerMock
             ->expects($this->once())
             ->method('finish')
-            ->with($this->identicalTo('output'))
+            ->with('PHPStan', 'output')
         ;
 
         $this->dispatcher->dispatch(
-            new InitialStaticAnalysisRunWasFinished(
-                'output',
-            ),
+            new InitialStaticAnalysisRunWasFinished('PHPStan', 'output'),
         );
     }
 }

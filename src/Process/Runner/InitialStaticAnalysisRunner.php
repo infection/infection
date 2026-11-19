@@ -75,21 +75,23 @@ readonly class InitialStaticAnalysisRunner
         //  but will be done in a future PR.
         $commandLine = (new Process($command))->getCommandLine();
 
+        $testFrameworkName = $this->staticAnalysisToolAdapter->getName();
+
         $this->eventDispatcher->dispatch(
             new InitialStaticAnalysisRunWasStarted(
                 commandLine: $commandLine,
-                testFrameworkName: $this->staticAnalysisToolAdapter->getName(),
+                testFrameworkName: $testFrameworkName,
                 testFrameworkVersion: $this->getVersion(),
             ),
         );
 
         $process = $this->shellCommandRunner->run(
             command: $command,
-            callback: fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()),
+            callback: fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted($testFrameworkName)),
             timeout: null,
         );
 
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($process->stdout));
+        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($testFrameworkName, $process->stdout));
 
         if (!$process->isSuccessful()) {
             throw InitialTestsFailed::fromCompletedProcess(

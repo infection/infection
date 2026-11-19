@@ -83,10 +83,11 @@ final class InitialTestsExecutionLoggerSubscriberTest extends TestCase
         $this->loggerMock
             ->expects($this->once())
             ->method('advance')
+            ->with('PHPUnit')
         ;
 
         $this->dispatcher->dispatch(
-            new InitialTestCaseWasCompleted(),
+            new InitialTestCaseWasCompleted('PHPUnit'),
         );
     }
 
@@ -95,13 +96,11 @@ final class InitialTestsExecutionLoggerSubscriberTest extends TestCase
         $this->loggerMock
             ->expects($this->once())
             ->method('finish')
-            ->with($this->identicalTo('output'))
+            ->with('PHPUnit', 'output')
         ;
 
         $this->dispatcher->dispatch(
-            new InitialTestSuiteWasFinished(
-                'output',
-            ),
+            new InitialTestSuiteWasFinished('PHPUnit', 'output'),
         );
     }
 }

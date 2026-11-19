@@ -35,12 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\ArtefactCollection;
 
+use Infection\Framework\Str;
 use Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -73,46 +76,80 @@ final class ConsoleProgressBarLoggerTest extends TestCase
         $this->createLogger(debug: false)->start('PHPUnit', '6.5.4');
     }
 
-    public function test_it_does_not_output_the_initial_process_text_if_in_debug_mode_on_finish(): void
+    public function test_it_displays_progress_when_a_framework_starts(): void
     {
-        $testOutput = 'PHPUnit Test suite ...';
+        $output = new BufferedOutput(decorated: true);
+        $logger = new ConsoleProgressBarLogger($output, false);
 
-        $this->outputMock
-            ->expects($this->once())
-            ->method('writeln')
-            ->with('')
-        ;
+        $logger->start('PHPUnit', '6.5.4');
 
-        $this->outputMock
-            ->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET)
-        ;
-
-        $this->createLogger(debug: false)->finish($testOutput);
+        $this->assertMatchesRegularExpression('/0 \[.*\]\s+\S/', $output->fetch());
     }
 
-    public function test_it_outputs_the_initial_process_text_if_in_debug_mode_on_finish(): void
+    #[DataProvider('debugProvider')]
+    public function test_it_logs_the_finished_run(bool $debug, string $expectedOutput): void
     {
-        $testOutput = 'PHPUnit Test suite ...';
+        $output = new BufferedOutput();
+        $logger = new ConsoleProgressBarLogger($output, $debug);
+        $logger->start('PHPUnit', '6.5.4');
+        $output->fetch();
 
-        $this->outputMock
-            ->expects($this->exactly(2))
-            ->method('writeln')
-        ;
+        $logger->finish('PHPUnit', 'PHPUnit Test suite ...');
 
-        $this->outputMock
-            ->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET)
-        ;
+        $actualOutput = Str::toUnixLineEndings($output->fetch());
 
-        $this->createLogger(debug: true)->finish($testOutput);
+        $this->assertSame($expectedOutput, $actualOutput);
+    }
+
+    public function test_it_tracks_progress_separately_for_each_framework(): void
+    {
+        $output = new BufferedOutput(decorated: true);
+        $logger = new ConsoleProgressBarLogger($output, false);
+        $logger->start('PHPUnit', '6.5.4');
+        $logger->advance('PHPUnit');
+        $logger->start('Pest', '3.0.0');
+        $logger->advance('Pest');
+        $logger->advance('PHPUnit');
+        $output->fetch();
+
+        $logger->finish('PHPUnit', 'PHPUnit output');
+        $phpunitOutput = $output->fetch();
+        $logger->finish('Pest', 'Pest output');
+        $pestOutput = $output->fetch();
+
+        $this->assertMatchesRegularExpression('/2 \[.*\]\s+\S/', $phpunitOutput);
+        $this->assertMatchesRegularExpression('/1 \[.*\]\s+\S/', $pestOutput);
+        $this->assertStringNotContainsString('PHPUnit output', $phpunitOutput);
+        $this->assertStringNotContainsString('Pest output', $pestOutput);
+    }
+
+    public function test_it_starts_a_fresh_progress_bar_for_a_repeated_framework(): void
+    {
+        $output = new BufferedOutput(decorated: true);
+        $logger = new ConsoleProgressBarLogger($output, false);
+        $logger->start('PHPUnit', '6.5.4');
+        $logger->advance('PHPUnit');
+        $logger->advance('PHPUnit');
+        $logger->finish('PHPUnit', 'First run');
+        $output->fetch();
+
+        $logger->start('PHPUnit', '6.5.4');
+        $logger->advance('PHPUnit');
+        $output->fetch();
+        $logger->finish('PHPUnit', 'Second run');
+
+        $this->assertMatchesRegularExpression('/1 \[.*\]\s+\S/', $output->fetch());
+    }
+
+    public static function debugProvider(): iterable
+    {
+        yield 'debug disabled' => [false, "\n"];
+
+        yield 'debug enabled' => [true, "\n\nPHPUnit Test suite ...\n"];
     }
 
     private function createLogger(bool $debug): InitialTestsExecutionLogger
     {
-        return new ConsoleProgressBarLogger(
-            $this->outputMock,
-            $debug,
-        );
+        return new ConsoleProgressBarLogger($this->outputMock, $debug);
     }
 }

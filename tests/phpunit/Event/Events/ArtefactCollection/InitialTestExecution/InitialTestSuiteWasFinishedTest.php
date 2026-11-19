@@ -46,8 +46,9 @@ final class InitialTestSuiteWasFinishedTest extends TestCase
     {
         $text = 'foo-bar-baz';
 
-        $class = new InitialTestSuiteWasFinished($text);
+        $class = new InitialTestSuiteWasFinished('PHPUnit', $text);
 
+        $this->assertSame('PHPUnit', $class->testFrameworkName);
         $this->assertSame($text, $class->outputText);
     }
 }

@@ -132,6 +132,14 @@ final class InitialTestsRunnerTest extends TestCase
             new InitialTestSuiteWasStarted($process->getCommandLine(), 'PHPUnit', $expectedVersion),
             $this->eventDispatcher->getEvents()[0],
         );
+
+        $events = $this->eventDispatcher->getEvents();
+
+        $this->assertContainsEquals(new InitialTestCaseWasCompleted('PHPUnit'), $events);
+        $this->assertEquals(
+            new InitialTestSuiteWasFinished('PHPUnit', 'pingpong'),
+            end($events),
+        );
     }
 
     public function test_it_stops_the_process_execution_on_the_first_error(): void
