@@ -36,8 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process\Factory;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Process\OriginalPhpProcess;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Symfony\Component\Process\Process;
 
 /**
@@ -57,17 +56,13 @@ class InitialTestsRunProcessFactory
         array $phpExtraOptions,
         bool $skipCoverage,
     ): Process {
-        // If we're expecting to receive a code coverage, test process must run in a vanilla environment
-        $processClass = $skipCoverage ? Process::class : OriginalPhpProcess::class;
-
-        return new $processClass(
-            command: $testFrameworkAdapter->getInitialTestRunCommandLine(
+        return (new InitialRunProcessFactory())->create(
+            $testFrameworkAdapter->getInitialTestRunCommandLine(
                 $testFrameworkExtraOptions,
                 $phpExtraOptions,
                 $skipCoverage,
             ),
-            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
-            timeout: null, // Ignore the default timeout of 60 seconds
+            !$skipCoverage,
         );
     }
 }
