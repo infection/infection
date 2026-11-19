@@ -43,6 +43,7 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSu
 use Infection\Event\Subscriber\InitialTestsExecutionLoggerSubscriber;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -65,42 +66,55 @@ final class InitialTestsExecutionLoggerSubscriberTest extends TestCase
         $this->dispatcher->addSubscriber($subscriber);
     }
 
-    public function test_it_reacts_on_initial_test_suite_was_started(): void
+    #[DataProvider('frameworkNamesProvider')]
+    public function test_it_reacts_on_initial_test_suite_was_started(string $testFrameworkName): void
     {
         $this->loggerMock
             ->expects($this->once())
             ->method('start')
-            ->with('PHPUnit', '6.5.4')
+            ->with($testFrameworkName, '6.5.4')
         ;
 
         $this->dispatcher->dispatch(
-            new InitialTestSuiteWasStarted('<command line>', 'PHPUnit', '6.5.4'),
+            new InitialTestSuiteWasStarted('<command line>', $testFrameworkName, '6.5.4'),
         );
     }
 
-    public function test_it_reacts_on_initial_test_case_was_completed(): void
+    #[DataProvider('frameworkNamesProvider')]
+    public function test_it_reacts_on_initial_test_case_was_completed(string $testFrameworkName): void
     {
         $this->loggerMock
             ->expects($this->once())
             ->method('advance')
-            ->with('PHPUnit')
+            ->with($testFrameworkName)
         ;
 
         $this->dispatcher->dispatch(
-            new InitialTestCaseWasCompleted('PHPUnit'),
+            new InitialTestCaseWasCompleted($testFrameworkName),
         );
     }
 
-    public function test_it_reacts_on_initial_test_suite_was_finished(): void
+    #[DataProvider('frameworkNamesProvider')]
+    public function test_it_reacts_on_initial_test_suite_was_finished(string $testFrameworkName): void
     {
         $this->loggerMock
             ->expects($this->once())
             ->method('finish')
-            ->with('PHPUnit', 'output')
+            ->with($testFrameworkName, 'output')
         ;
 
         $this->dispatcher->dispatch(
-            new InitialTestSuiteWasFinished('PHPUnit', 'output'),
+            new InitialTestSuiteWasFinished($testFrameworkName, 'output'),
         );
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function frameworkNamesProvider(): iterable
+    {
+        yield 'test suite' => ['PHPUnit'];
+
+        yield 'static analysis' => ['PHPStan'];
     }
 }

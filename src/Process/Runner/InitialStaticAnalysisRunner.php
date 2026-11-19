@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
@@ -78,7 +78,7 @@ readonly class InitialStaticAnalysisRunner
         $testFrameworkName = $this->staticAnalysisToolAdapter->getName();
 
         $this->eventDispatcher->dispatch(
-            new InitialStaticAnalysisRunWasStarted(
+            new InitialTestSuiteWasStarted(
                 commandLine: $commandLine,
                 testFrameworkName: $testFrameworkName,
                 testFrameworkVersion: $this->getVersion(),
@@ -87,11 +87,11 @@ readonly class InitialStaticAnalysisRunner
 
         $process = $this->shellCommandRunner->run(
             command: $command,
-            callback: fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted($testFrameworkName)),
+            callback: fn () => $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted($testFrameworkName)),
             timeout: null,
         );
 
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($testFrameworkName, $process->stdout));
+        $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($testFrameworkName, $process->stdout));
 
         if (!$process->isSuccessful()) {
             throw InitialTestsFailed::fromCompletedProcess(

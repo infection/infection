@@ -39,9 +39,6 @@ use Infection\Event\EventDispatcher\EventCollectingEventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
 use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
@@ -143,14 +140,22 @@ final class DebugEventsDataProducerTest extends TestCase
         foreach ([
             new ApplicationExecutionWasStarted(),
             new ApplicationExecutionWasFinished(),
-            new InitialTestCaseWasCompleted('PHPUnit'),
-            new InitialStaticAnalysisSubStepWasCompleted('PHPStan'),
             new MutationGenerationWasFinished(),
             new MutationTestingWasFinished(),
             new stdClass(),
         ] as $event) {
             yield $event::class => [$event, []];
         }
+
+        yield 'initial test progress' => [
+            new InitialTestCaseWasCompleted('PHPUnit'),
+            ['testFrameworkName' => 'PHPUnit'],
+        ];
+
+        yield 'initial static analysis progress' => [
+            new InitialTestCaseWasCompleted('PHPStan'),
+            ['testFrameworkName' => 'PHPStan'],
+        ];
 
         yield 'initial test command' => [
             new InitialTestSuiteWasStarted('phpunit --coverage-xml=coverage', 'PHPUnit', '6.5.4'),
@@ -162,7 +167,7 @@ final class DebugEventsDataProducerTest extends TestCase
         ];
 
         yield 'initial static analysis command' => [
-            new InitialStaticAnalysisRunWasStarted('phpstan analyse', 'PHPStan', '2.1.0'),
+            new InitialTestSuiteWasStarted('phpstan analyse', 'PHPStan', '2.1.0'),
             [
                 'commandLine' => 'phpstan analyse',
                 'testFrameworkName' => 'PHPStan',
@@ -172,22 +177,22 @@ final class DebugEventsDataProducerTest extends TestCase
 
         yield 'initial test output with newlines' => [
             new InitialTestSuiteWasFinished('PHPUnit', "Tests: 2\nOK"),
-            ['outputText' => "Tests: 2\nOK"],
+            ['testFrameworkName' => 'PHPUnit', 'outputText' => "Tests: 2\nOK"],
         ];
 
         yield 'initial test output with invalid UTF-8' => [
             new InitialTestSuiteWasFinished('PHPUnit', "output: \xFF"),
-            ['outputText' => "output: \u{FFFD}"],
+            ['testFrameworkName' => 'PHPUnit', 'outputText' => "output: \u{FFFD}"],
         ];
 
         yield 'initial static analysis output' => [
-            new InitialStaticAnalysisRunWasFinished('PHPStan', 'No errors'),
-            ['outputText' => 'No errors'],
+            new InitialTestSuiteWasFinished('PHPStan', 'No errors'),
+            ['testFrameworkName' => 'PHPStan', 'outputText' => 'No errors'],
         ];
 
         yield 'initial static analysis output with invalid UTF-8' => [
-            new InitialStaticAnalysisRunWasFinished('PHPStan', "output: \xFF"),
-            ['outputText' => "output: \u{FFFD}"],
+            new InitialTestSuiteWasFinished('PHPStan', "output: \xFF"),
+            ['testFrameworkName' => 'PHPStan', 'outputText' => "output: \u{FFFD}"],
         ];
 
         yield 'mutation generation count' => [

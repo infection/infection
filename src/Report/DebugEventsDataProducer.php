@@ -36,8 +36,7 @@ declare(strict_types=1);
 namespace Infection\Report;
 
 use Infection\Event\EventDispatcher\EventCollectingEventDispatcher;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
@@ -90,15 +89,17 @@ final readonly class DebugEventsDataProducer implements DataProducer
         // must not be traversed or forced just to report an event. Custom events are
         // recorded by name; their payloads have no known serialization contract.
         return match (true) {
-            $event instanceof InitialTestSuiteWasStarted,
-            $event instanceof InitialStaticAnalysisRunWasStarted => [
+            $event instanceof InitialTestSuiteWasStarted => [
                 'commandLine' => $event->commandLine,
                 'testFrameworkName' => $event->testFrameworkName,
                 'testFrameworkVersion' => $event->testFrameworkVersion,
             ],
-            $event instanceof InitialTestSuiteWasFinished,
-            $event instanceof InitialStaticAnalysisRunWasFinished => [
+            $event instanceof InitialTestSuiteWasFinished => [
+                'testFrameworkName' => $event->testFrameworkName,
                 'outputText' => $event->outputText,
+            ],
+            $event instanceof InitialTestCaseWasCompleted => [
+                'testFrameworkName' => $event->testFrameworkName,
             ],
             $event instanceof MutationGenerationWasStarted => [
                 'mutableFilesCount' => $event->mutableFilesCount,

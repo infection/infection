@@ -40,7 +40,12 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
 use Infection\Event\EventDispatcher\EventCollectingEventDispatcher;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 use Infection\Logger\MutationGeneration\MutationGenerationLogger;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\Testing\SingletonContainer;
@@ -188,6 +193,45 @@ final class ContainerTest extends TestCase
             EventCollectingEventDispatcher::class,
             $container->getEventDispatcher(),
         );
+    }
+
+    #[DataProvider('provideStaticAnalysisModes')]
+    public function test_it_logs_initial_runs_with_the_same_logger(?string $staticAnalysisTool): void
+    {
+        $testsLogger = $this->createMock(InitialTestsExecutionLogger::class);
+        $testsLogger->expects($this->exactly(2))->method('start');
+        $testsLogger->expects($this->exactly(2))->method('advance');
+        $testsLogger->expects($this->exactly(2))->method('finish');
+
+        $dispatcher = new SyncEventDispatcher();
+        $container = Container::create()
+            ->withValues(
+                new NullLogger(),
+                new NullOutput(),
+                staticAnalysisTool: $staticAnalysisTool,
+            )
+            ->cloneWithService(EventDispatcher::class, $dispatcher)
+            ->cloneWithService(InitialTestsExecutionLogger::class, $testsLogger)
+        ;
+
+        $container->getSubscriberRegisterer()->registerSubscribers();
+
+        $dispatcher->dispatch(new InitialTestSuiteWasStarted('phpunit', 'PHPUnit', '6.5.4'));
+        $dispatcher->dispatch(new InitialTestSuiteWasStarted('phpstan analyse', 'PHPStan', '2.1.0'));
+        $dispatcher->dispatch(new InitialTestCaseWasCompleted('PHPUnit'));
+        $dispatcher->dispatch(new InitialTestCaseWasCompleted('PHPStan'));
+        $dispatcher->dispatch(new InitialTestSuiteWasFinished('PHPUnit', 'Tests passed'));
+        $dispatcher->dispatch(new InitialTestSuiteWasFinished('PHPStan', 'No errors'));
+    }
+
+    /**
+     * @return iterable<string, array{?string}>
+     */
+    public static function provideStaticAnalysisModes(): iterable
+    {
+        yield 'static analysis disabled' => [null];
+
+        yield 'static analysis enabled' => ['debug'];
     }
 
     #[DataProvider('provideMutationGenerationProgressModes')]
