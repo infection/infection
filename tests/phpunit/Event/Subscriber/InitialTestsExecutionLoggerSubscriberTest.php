@@ -70,10 +70,11 @@ final class InitialTestsExecutionLoggerSubscriberTest extends TestCase
         $this->loggerMock
             ->expects($this->once())
             ->method('start')
+            ->with('PHPUnit', '6.5.4')
         ;
 
         $this->dispatcher->dispatch(
-            new InitialTestSuiteWasStarted('<command line>'),
+            new InitialTestSuiteWasStarted('<command line>', 'PHPUnit', '6.5.4'),
         );
     }
 

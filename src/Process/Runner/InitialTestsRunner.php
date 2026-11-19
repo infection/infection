@@ -41,6 +41,7 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCa
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
+use InvalidArgumentException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -71,7 +72,13 @@ class InitialTestsRunner
             $skipCoverage,
         );
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted($process->getCommandLine()));
+        $this->eventDispatcher->dispatch(
+            new InitialTestSuiteWasStarted(
+                commandLine: $process->getCommandLine(),
+                testFrameworkName: $testFrameworkAdapter->getName(),
+                testFrameworkVersion: $this->getVersion($testFrameworkAdapter),
+            ),
+        );
 
         $process->run(function (string $type) use ($process): void {
             if ($type === Process::ERR) {
@@ -85,5 +92,14 @@ class InitialTestsRunner
         $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($process->getOutput()));
 
         return $process;
+    }
+
+    public function getVersion(TestFrameworkAdapter $testFrameworkAdapter): string
+    {
+        try {
+            return $testFrameworkAdapter->getVersion();
+        } catch (InvalidArgumentException) {
+            return 'unknown';
+        }
     }
 }

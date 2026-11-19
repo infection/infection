@@ -42,6 +42,8 @@ final readonly class InitialTestSuiteWasStarted
 {
     public function __construct(
         public string $commandLine,
+        public string $testFrameworkName,
+        public string $testFrameworkVersion,
     ) {
     }
 }

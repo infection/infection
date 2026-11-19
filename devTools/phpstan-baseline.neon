@@ -301,18 +301,6 @@ parameters:
 			path: ../src/Git/Throwable/NoGitProjectFound.php
 
 		-
-			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
-			identifier: catch.neverThrown
-			count: 1
-			path: ../src/Logger/ArtefactCollection/ConsoleNoProgressLogger.php
-
-		-
-			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
-			identifier: catch.neverThrown
-			count: 1
-			path: ../src/Logger/ArtefactCollection/ConsoleProgressBarLogger.php
-
-		-
 			rawMessage: 'Parameter #1 $level (string) of method Infection\Logger\Console\ConsoleLogger::log() should be contravariant with parameter $level (mixed) of method Psr\Log\AbstractLogger::log()'
 			identifier: method.childParameterType
 			count: 1
@@ -545,6 +533,12 @@ parameters:
 			identifier: method.childParameterType
 			count: 1
 			path: ../src/Process/OriginalPhpProcess.php
+
+		-
+			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
+			identifier: catch.neverThrown
+			count: 1
+			path: ../src/Process/Runner/InitialTestsRunner.php
 
 		-
 			rawMessage: Infection\Process\Runner\InitialTestsRunner should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter

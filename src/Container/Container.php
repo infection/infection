@@ -428,7 +428,6 @@ final class Container extends DIContainer
 
                 return new InitialTestsExecutionLoggerFactory(
                     $config->noProgress,
-                    $container->getTestFramework(),
                     $config->isDebugEnabled,
                     $container->getOutput(),
                 );
@@ -440,7 +439,6 @@ final class Container extends DIContainer
                 return new InitialStaticAnalysisExecutionLoggerFactory(
                     $config->noProgress,
                     $config->isDebugEnabled,
-                    $container->getStaticAnalysisTestFramework(),
                     $container->getOutput(),
                 );
             },

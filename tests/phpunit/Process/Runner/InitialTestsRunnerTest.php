@@ -50,9 +50,12 @@ use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
+use InvalidArgumentException;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use function str_contains;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -68,7 +71,7 @@ final class InitialTestsRunnerTest extends TestCase
 
     private InitialTestsRunner $runner;
 
-    private TestFrameworkAdapter $testFrameworkAdapter;
+    private TestFrameworkAdapter&Stub $testFrameworkAdapter;
 
     protected function setUp(): void
     {
@@ -84,8 +87,21 @@ final class InitialTestsRunnerTest extends TestCase
         $this->testFrameworkAdapter = $this->createStub(TestFrameworkAdapter::class);
     }
 
-    public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(): void
+    #[DataProvider('versionProvider')]
+    public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(?string $version, string $expectedVersion): void
     {
+        $this->testFrameworkAdapter
+            ->method('getName')
+            ->willReturn('PHPUnit')
+        ;
+        $versionExpectation = $this->testFrameworkAdapter->method('getVersion');
+
+        if ($version === null) {
+            $versionExpectation->willThrowException(new InvalidArgumentException('Invalid version output.'));
+        } else {
+            $versionExpectation->willReturn($version);
+        }
+
         $testFrameworkExtraOptions = '--stop-on-failure';
         $phpExtraOptions = ['-d memory_limit=-1'];
         $skipCoverage = false;
@@ -112,7 +128,10 @@ final class InitialTestsRunnerTest extends TestCase
             ],
             array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
         );
-        $this->assertSame($process->getCommandLine(), $this->eventDispatcher->getEvents()[0]->commandLine);
+        $this->assertEquals(
+            new InitialTestSuiteWasStarted($process->getCommandLine(), 'PHPUnit', $expectedVersion),
+            $this->eventDispatcher->getEvents()[0],
+        );
     }
 
     public function test_it_stops_the_process_execution_on_the_first_error(): void
@@ -164,6 +183,13 @@ final class InitialTestsRunnerTest extends TestCase
         ));
         $this->assertGreaterThanOrEqual(1, $completedCount, 'Should process at least one output');
         $this->assertLessThanOrEqual(4, $completedCount, 'Should stop after error, max 4 outputs');
+    }
+
+    public static function versionProvider(): iterable
+    {
+        yield 'known version' => ['6.5.4', '6.5.4'];
+
+        yield 'unknown version' => [null, 'unknown'];
     }
 
     private function createProcessForCode(string $code): Process

@@ -42,10 +42,12 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(InitialStaticAnalysisRunWasStarted::class)]
 final class InitialStaticAnalysisRunWasStartedTest extends TestCase
 {
-    public function test_it_exposes_the_command_line(): void
+    public function test_it_exposes_the_run_details(): void
     {
-        $event = new InitialStaticAnalysisRunWasStarted('phpstan analyse');
+        $event = new InitialStaticAnalysisRunWasStarted('phpstan analyse', 'PHPStan', '2.1.0');
 
         $this->assertSame('phpstan analyse', $event->commandLine);
+        $this->assertSame('PHPStan', $event->testFrameworkName);
+        $this->assertSame('2.1.0', $event->testFrameworkVersion);
     }
 }

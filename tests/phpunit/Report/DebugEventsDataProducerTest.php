@@ -153,13 +153,21 @@ final class DebugEventsDataProducerTest extends TestCase
         }
 
         yield 'initial test command' => [
-            new InitialTestSuiteWasStarted('phpunit --coverage-xml=coverage'),
-            ['commandLine' => 'phpunit --coverage-xml=coverage'],
+            new InitialTestSuiteWasStarted('phpunit --coverage-xml=coverage', 'PHPUnit', '6.5.4'),
+            [
+                'commandLine' => 'phpunit --coverage-xml=coverage',
+                'testFrameworkName' => 'PHPUnit',
+                'testFrameworkVersion' => '6.5.4',
+            ],
         ];
 
         yield 'initial static analysis command' => [
-            new InitialStaticAnalysisRunWasStarted('phpstan analyse'),
-            ['commandLine' => 'phpstan analyse'],
+            new InitialStaticAnalysisRunWasStarted('phpstan analyse', 'PHPStan', '2.1.0'),
+            [
+                'commandLine' => 'phpstan analyse',
+                'testFrameworkName' => 'PHPStan',
+                'testFrameworkVersion' => '2.1.0',
+            ],
         ];
 
         yield 'initial test output with newlines' => [

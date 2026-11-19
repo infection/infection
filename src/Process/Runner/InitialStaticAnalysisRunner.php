@@ -42,6 +42,7 @@ use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStati
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use InvalidArgumentException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -68,9 +69,19 @@ readonly class InitialStaticAnalysisRunner
     public function run(): void
     {
         $command = $this->staticAnalysisToolAdapter->getInitialRunCommandLine();
+        // TODO: unlike InitialTestsRunner, we do not use InitialTestsRunProcessFactory
+        //  here and we use ShellCommandRunner, resulting in requiring this
+        //  new Process to get the actual command line used. This should be normalized/fixed
+        //  but will be done in a future PR.
         $commandLine = (new Process($command))->getCommandLine();
 
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted($commandLine));
+        $this->eventDispatcher->dispatch(
+            new InitialStaticAnalysisRunWasStarted(
+                commandLine: $commandLine,
+                testFrameworkName: $this->staticAnalysisToolAdapter->getName(),
+                testFrameworkVersion: $this->getVersion(),
+            ),
+        );
 
         $process = $this->shellCommandRunner->run(
             command: $command,
@@ -87,6 +98,15 @@ readonly class InitialStaticAnalysisRunner
                 'static analysis',
                 '',
             );
+        }
+    }
+
+    private function getVersion(): string
+    {
+        try {
+            return $this->staticAnalysisToolAdapter->getVersion();
+        } catch (InvalidArgumentException) {
+            return 'unknown';
         }
     }
 }

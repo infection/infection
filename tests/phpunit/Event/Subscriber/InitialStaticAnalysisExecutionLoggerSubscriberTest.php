@@ -70,10 +70,11 @@ final class InitialStaticAnalysisExecutionLoggerSubscriberTest extends TestCase
         $this->loggerMock
             ->expects($this->once())
             ->method('start')
+            ->with('PHPStan', '2.1.0')
         ;
 
         $this->dispatcher->dispatch(
-            new InitialStaticAnalysisRunWasStarted('phpstan analyse'),
+            new InitialStaticAnalysisRunWasStarted('phpstan analyse', 'PHPStan', '2.1.0'),
         );
     }
 

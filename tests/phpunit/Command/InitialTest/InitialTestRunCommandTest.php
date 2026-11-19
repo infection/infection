@@ -366,7 +366,7 @@ final class InitialTestRunCommandTest extends TestCase
         } else {
             $executeInitialRunExpectation->willReturnCallback(
                 static function () use ($eventDispatcher): InitialRunResults {
-                    $eventDispatcher->dispatch(new InitialTestSuiteWasStarted('test-framework initialConfig'));
+                    $eventDispatcher->dispatch(new InitialTestSuiteWasStarted('test-framework initialConfig', 'DemoTestFramework', '1.0'));
 
                     return new InitialRunResults('', null);
                 },

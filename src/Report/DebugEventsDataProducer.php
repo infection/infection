@@ -93,6 +93,8 @@ final readonly class DebugEventsDataProducer implements DataProducer
             $event instanceof InitialTestSuiteWasStarted,
             $event instanceof InitialStaticAnalysisRunWasStarted => [
                 'commandLine' => $event->commandLine,
+                'testFrameworkName' => $event->testFrameworkName,
+                'testFrameworkVersion' => $event->testFrameworkVersion,
             ],
             $event instanceof InitialTestSuiteWasFinished,
             $event instanceof InitialStaticAnalysisRunWasFinished => [
