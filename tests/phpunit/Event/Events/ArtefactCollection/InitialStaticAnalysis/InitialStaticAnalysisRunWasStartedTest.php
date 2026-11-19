@@ -42,13 +42,10 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(InitialStaticAnalysisRunWasStarted::class)]
 final class InitialStaticAnalysisRunWasStartedTest extends TestCase
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_instantiated(): void
+    public function test_it_exposes_the_command_line(): void
     {
-        $class = new InitialStaticAnalysisRunWasStarted();
+        $event = new InitialStaticAnalysisRunWasStarted('phpstan analyse');
 
-        $this->assertInstanceOf(InitialStaticAnalysisRunWasStarted::class, $class);
+        $this->assertSame('phpstan analyse', $event->commandLine);
     }
 }

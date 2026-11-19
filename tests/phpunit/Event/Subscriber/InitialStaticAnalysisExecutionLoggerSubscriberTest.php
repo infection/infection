@@ -73,7 +73,7 @@ final class InitialStaticAnalysisExecutionLoggerSubscriberTest extends TestCase
         ;
 
         $this->dispatcher->dispatch(
-            new InitialStaticAnalysisRunWasStarted(),
+            new InitialStaticAnalysisRunWasStarted('phpstan analyse'),
         );
     }
 

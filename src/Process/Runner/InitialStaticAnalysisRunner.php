@@ -42,6 +42,7 @@ use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStati
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Symfony\Component\Process\Process;
 
 /**
  * This is needed for 2 purposes:
@@ -66,10 +67,13 @@ readonly class InitialStaticAnalysisRunner
      */
     public function run(): void
     {
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
+        $command = $this->staticAnalysisToolAdapter->getInitialRunCommandLine();
+        $commandLine = (new Process($command))->getCommandLine();
+
+        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted($commandLine));
 
         $process = $this->shellCommandRunner->run(
-            command: $this->staticAnalysisToolAdapter->getInitialRunCommandLine(),
+            command: $command,
             callback: fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()),
             timeout: null,
         );

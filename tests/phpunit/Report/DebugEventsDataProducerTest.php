@@ -144,7 +144,6 @@ final class DebugEventsDataProducerTest extends TestCase
             new ApplicationExecutionWasStarted(),
             new ApplicationExecutionWasFinished(),
             new InitialTestCaseWasCompleted(),
-            new InitialStaticAnalysisRunWasStarted(),
             new InitialStaticAnalysisSubStepWasCompleted(),
             new MutationGenerationWasFinished(),
             new MutationTestingWasFinished(),
@@ -156,6 +155,11 @@ final class DebugEventsDataProducerTest extends TestCase
         yield 'initial test command' => [
             new InitialTestSuiteWasStarted('phpunit --coverage-xml=coverage'),
             ['commandLine' => 'phpunit --coverage-xml=coverage'],
+        ];
+
+        yield 'initial static analysis command' => [
+            new InitialStaticAnalysisRunWasStarted('phpstan analyse'),
+            ['commandLine' => 'phpstan analyse'],
         ];
 
         yield 'initial test output with newlines' => [

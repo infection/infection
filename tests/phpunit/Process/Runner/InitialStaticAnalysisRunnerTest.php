@@ -78,7 +78,8 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
     public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(): void
     {
-        $command = ['phpstan', 'analyse'];
+        $command = ['phpstan', 'analyse', '--configuration=some config.neon'];
+        $commandLine = "'phpstan' 'analyse' '--configuration=some config.neon'";
 
         $this->staticAnalysisToolAdapter
             ->expects($this->once())
@@ -90,11 +91,16 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             ->expects($this->once())
             ->method('run')
             ->with($command, $this->isInstanceOf(Closure::class), null, [], null, null)
-            ->willReturnCallback(static function (array $_command, Closure $callback): CompletedProcess {
+            ->willReturnCallback(function (array $_command, Closure $callback) use ($command, $commandLine): CompletedProcess {
+                $this->assertEquals(
+                    [new InitialStaticAnalysisRunWasStarted($commandLine)],
+                    $this->eventDispatcher->getEvents(),
+                );
+
                 $callback();
 
                 return CompletedProcessBuilder::withMinimalTestData()
-                    ->withCommand(['phpstan', 'analyse'])
+                    ->withCommand($command)
                     ->withStdout('pingpong')
                     ->build()
                 ;
@@ -105,7 +111,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
         $this->assertEquals(
             [
-                new InitialStaticAnalysisRunWasStarted(),
+                new InitialStaticAnalysisRunWasStarted($commandLine),
                 new InitialStaticAnalysisSubStepWasCompleted(),
                 new InitialStaticAnalysisRunWasFinished('pingpong'),
             ],
