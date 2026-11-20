@@ -37,16 +37,20 @@ namespace Infection\TestFramework\Mago\Adapter;
 
 use function array_merge;
 use Infection\AbstractTestFramework\InvalidVersion;
+use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\Throwable\UnsupportedVersion;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Mago\Logger\MagoLogger;
 use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
+use Override;
 use function sprintf;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use function version_compare;
@@ -54,7 +58,7 @@ use function version_compare;
 /**
  * @internal
  */
-final class MagoAdapter implements StaticAnalysisToolAdapter
+final class MagoAdapter implements StaticAnalysisTestFramework
 {
     /**
      * @param list<string> $staticAnalysisToolOptions
@@ -68,44 +72,45 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
         private readonly float $timeout,
         private readonly array $staticAnalysisToolOptions,
         private readonly ShellCommandRunner $shellCommandRunner,
+        private readonly InitialStaticAnalysisRunner $initialStaticAnalysisRunner,
         private readonly MagoLogger $logger,
         private ?string $version = null,
     ) {
     }
 
+    #[Override]
     public function getName(): string
     {
         return 'Mago';
     }
 
-    /**
-     * @return string[]
-     */
-    public function getInitialRunCommandLine(): array
+    #[Override]
+    public function executeInitialRun(): InitialRunResults
     {
-        $options = array_merge([
-            "--config=$this->staticAnalysisConfigPath",
-            'analyze',
-        ], $this->staticAnalysisToolOptions);
-
-        return $this->commandLineBuilder->build(
-            $this->staticAnalysisToolExecutable,
-            [],
-            $options,
-        );
+        return $this->initialStaticAnalysisRunner->run($this, $this->getInitialRunCommandLine());
     }
 
-    public function createMutantProcessFactory(): LazyMutantProcessFactory
+    #[Override]
+    public function test(Mutant $mutant): MutantProcessContainer
     {
-        return new MagoMutantProcessFactory(
+        $factory = new MagoMutantProcessFactory(
             $this->mutantExecutionResultFactory,
             $this->staticAnalysisToolExecutable,
             $this->commandLineBuilder,
             $this->timeout,
             $this->staticAnalysisToolOptions,
         );
+
+        return new MutantProcessContainer($factory->create($mutant), []);
     }
 
+    #[Override]
+    public function hasJUnitReport(): bool
+    {
+        return false;
+    }
+
+    #[Override]
     public function getVersion(): string
     {
         if ($this->version !== null) {
@@ -123,7 +128,8 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
         return $this->version;
     }
 
-    public function assertMinimumVersionSatisfied(): void
+    #[Override]
+    public function checkRequirements(): void
     {
         try {
             $version = $this->getVersion();
@@ -146,6 +152,23 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
             'Infection requires Mago version >=1.23.0, but "%s" is installed.',
             $version,
         ));
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getInitialRunCommandLine(): array
+    {
+        $options = array_merge([
+            "--config=$this->staticAnalysisConfigPath",
+            'analyze',
+        ], $this->staticAnalysisToolOptions);
+
+        return $this->commandLineBuilder->build(
+            $this->staticAnalysisToolExecutable,
+            [],
+            $options,
+        );
     }
 
     /**

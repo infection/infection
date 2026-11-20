@@ -44,7 +44,6 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
-use Infection\TestFramework\LegacyStaticAnalysisBridge;
 use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
 use Infection\TestFramework\NullStaticAnalysisTestFramework;
 use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapterFactory;
@@ -80,26 +79,13 @@ final readonly class StaticAnalysisToolFactory
             return new NullStaticAnalysisTestFramework();
         }
 
-        $adapter = $this->createAdapter($adapterName, $timeout);
-
-        return new LegacyStaticAnalysisBridge(
-            new InitialStaticAnalysisRunner(
-                $this->shellCommandRunner,
-                $this->testFrameworkLogger,
-                $adapter,
-            ),
-            $adapter,
-        );
-    }
-
-    private function createAdapter(string $adapterName, float $timeout): StaticAnalysisToolAdapter
-    {
         if ($adapterName === StaticAnalysisToolTypes::DEBUG) {
             return new DebugStaticAnalysisAdapter(
                 self::DEBUG_RUNTIME_SCRIPT,
                 $this->infectionConfig->debugTestFrameworkLogFile,
                 $timeout,
                 new DebugCommandLine($this->phpExecutableFinder),
+                new InitialStaticAnalysisRunner($this->shellCommandRunner, $this->testFrameworkLogger),
             );
         }
 
@@ -116,6 +102,7 @@ final readonly class StaticAnalysisToolFactory
                 $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
                 $this->shellCommandRunner,
+                $this->testFrameworkLogger,
                 $this->logger,
                 $this->fileSystem,
             );
@@ -131,9 +118,9 @@ final readonly class StaticAnalysisToolFactory
                     (string) $this->infectionConfig->mago->customPath,
                 ),
                 $timeout,
-                $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
                 $this->shellCommandRunner,
+                $this->testFrameworkLogger,
                 $this->logger,
             );
         }

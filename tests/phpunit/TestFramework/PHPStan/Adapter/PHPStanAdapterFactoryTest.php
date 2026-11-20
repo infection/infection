@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\PHPStan\Adapter;
 
 use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Contracts\FakeShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -56,6 +57,7 @@ final class PHPStanAdapterFactoryTest extends TestCase
             '/tmp',
             [],
             new FakeShellCommandRunner(),
+            $this->createStub(TestFrameworkLogger::class),
             new NullLogger(),
             new FileSystem(),
         );

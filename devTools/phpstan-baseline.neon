@@ -595,30 +595,6 @@ parameters:
 			path: ../src/StaticAnalysis/Config/StaticAnalysisConfigLocator.php
 
 		-
-			rawMessage: Unused Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory::create
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: ../src/StaticAnalysis/StaticAnalysisToolAdapterFactory.php
-
-		-
-			rawMessage: '''
-				Call to method __construct() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: method.deprecatedClass
-			count: 1
-			path: ../src/StaticAnalysis/StaticAnalysisToolFactory.php
-
-		-
-			rawMessage: '''
-				Instantiation of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: new.deprecatedClass
-			count: 1
-			path: ../src/StaticAnalysis/StaticAnalysisToolFactory.php
-
-		-
 			rawMessage: '''
 				Instantiation of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
 				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
@@ -799,31 +775,40 @@ parameters:
 			path: ../src/TestFramework/Factory.php
 
 		-
+			rawMessage: '''
+				Class Infection\TestFramework\Mago\Adapter\MagoAdapter implements deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
+				Remove once CombinedTestFramework composes static analysis with the test suite.
+			'''
+			identifier: class.implementsDeprecatedInterface
+			count: 1
+			path: ../src/TestFramework/Mago/Adapter/MagoAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\Mutant\Mutant
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Mago/Adapter/MagoAdapter.php
+
+		-
 			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\Mutant\MutantExecutionResultFactory
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Mago/Adapter/MagoAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\Process\Factory\LazyMutantProcessFactory
+			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\Process\MutantProcessContainer
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/TestFramework/Mago/Adapter/MagoAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\Process\Runner\InitialStaticAnalysisRunner
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Mago/Adapter/MagoAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Adapter/MagoAdapter.php
-
-		-
-			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Adapter/MagoAdapterFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory
+			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapterFactory should not depend on Infection\Process\Runner\InitialStaticAnalysisRunner
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Mago/Adapter/MagoAdapterFactory.php
@@ -875,6 +860,15 @@ parameters:
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 2
 			path: ../src/TestFramework/Mago/Process/MagoMutantProcessFactory.php
+
+		-
+			rawMessage: '''
+				Class Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter implements deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
+				Remove once CombinedTestFramework composes static analysis with the test suite.
+			'''
+			identifier: class.implementsDeprecatedInterface
+			count: 1
+			path: ../src/TestFramework/PHPStan/Adapter/PHPStanAdapter.php
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
@@ -1100,6 +1094,15 @@ parameters:
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/Testing/SingletonContainer.php
+
+		-
+			rawMessage: '''
+				Class Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter implements deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
+				Remove once CombinedTestFramework composes static analysis with the test suite.
+			'''
+			identifier: class.implementsDeprecatedInterface
+			count: 1
+			path: ../src/Testing/TestFramework/Debug/DebugStaticAnalysisAdapter.php
 
 		-
 			rawMessage: Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
@@ -1735,87 +1738,6 @@ parameters:
 
 		-
 			rawMessage: '''
-				Call to method __construct() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: method.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
-
-		-
-			rawMessage: '''
-				Call to method checkRequirements() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: method.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
-
-		-
-			rawMessage: '''
-				Call to method executeInitialRun() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: method.deprecatedClass
-			count: 2
-			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
-
-		-
-			rawMessage: '''
-				Call to method getName() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: method.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
-
-		-
-			rawMessage: '''
-				Call to method getVersion() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: method.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
-
-		-
-			rawMessage: '''
-				Call to method test() of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: method.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
-
-		-
-			rawMessage: '''
-				Fetching class constant class of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
-
-		-
-			rawMessage: '''
-				Instantiation of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: new.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
-
-		-
-			rawMessage: '''
-				Property $bridge references deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge in its type:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: property.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
-
-		-
-			rawMessage: '''
 				Call to method __construct() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
@@ -1840,6 +1762,15 @@ parameters:
 			identifier: new.deprecatedClass
 			count: 1
 			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method hasJUnitReport() of class Infection\TestFramework\Mago\Adapter\MagoAdapter:
+				This is only for making the migration easier, to be removed.
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: ../tests/phpunit/TestFramework/Mago/Adapter/MagoAdapterTest.php
 
 		-
 			rawMessage: Variable $mutantDiff is never read.
@@ -1888,6 +1819,15 @@ parameters:
 			identifier: new.deprecatedClass
 			count: 1
 			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method hasJUnitReport() of class Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter:
+				This is only for making the migration easier, to be removed.
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: ../tests/phpunit/TestFramework/PHPStan/Adapter/PHPStanAdapterTest.php
 
 		-
 			rawMessage: '''
@@ -1978,6 +1918,15 @@ parameters:
 			identifier: property.notFound
 			count: 2
 			path: ../tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method hasJUnitReport() of class Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter:
+				This is only for making the migration easier, to be removed.
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: ../tests/phpunit/Testing/TestFramework/Debug/DebugStaticAnalysisAdapterTest.php
 
 		-
 			rawMessage: Infection\Tests\TestingUtility\Console\Command\TestOptionCommand should not exist

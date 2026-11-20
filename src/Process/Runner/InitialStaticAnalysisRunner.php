@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use Infection\AbstractTestFramework\InvalidVersion;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
+use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
@@ -57,27 +57,27 @@ readonly class InitialStaticAnalysisRunner
     public function __construct(
         private ShellCommandRunner $shellCommandRunner,
         private TestFrameworkLogger $testFrameworkLogger,
-        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
     ) {
     }
 
     /**
+     * @param string[] $command
+     *
      * @throws InitialTestsFailed
      */
-    public function run(): void
+    public function run(TestFramework $testFramework, array $command): InitialRunResults
     {
-        $command = $this->staticAnalysisToolAdapter->getInitialRunCommandLine();
         // TODO: unlike InitialTestsRunner, we do not use InitialTestsRunProcessFactory
         //  here and we use ShellCommandRunner, resulting in requiring this
         //  new Process to get the actual command line used. This should be normalized/fixed
         //  but will be done in a future PR.
         $commandLine = (new Process($command))->getCommandLine();
 
-        $testFrameworkName = $this->staticAnalysisToolAdapter->getName();
+        $testFrameworkName = $testFramework->getName();
 
         $this->testFrameworkLogger->initialRunStarted(
             $testFrameworkName,
-            $this->getVersion(),
+            $this->getVersion($testFramework),
             $commandLine,
         );
 
@@ -92,17 +92,19 @@ readonly class InitialStaticAnalysisRunner
         if (!$process->isSuccessful()) {
             throw InitialTestsFailed::fromCompletedProcess(
                 $process,
-                $this->staticAnalysisToolAdapter->getName(),
+                $testFramework->getName(),
                 'static analysis',
                 '',
             );
         }
+
+        return new InitialRunResults($process->stdout, null);
     }
 
-    private function getVersion(): string
+    private function getVersion(TestFramework $testFramework): string
     {
         try {
-            return $this->staticAnalysisToolAdapter->getVersion();
+            return $testFramework->getVersion();
         } catch (InvalidVersion) {
             return TestFramework::UNKNOWN_VERSION;
         }

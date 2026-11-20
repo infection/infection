@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Mago\Adapter;
 
 use Infection\TestFramework\Contracts\FakeShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -50,9 +51,9 @@ final class MagoAdapterFactoryTest extends TestCase
             '/path/to/mago-config-path',
             '/path/to/mago',
             32.3,
-            '/tmp',
             [],
             new FakeShellCommandRunner(),
+            $this->createStub(TestFrameworkLogger::class),
             new NullLogger(),
         );
 

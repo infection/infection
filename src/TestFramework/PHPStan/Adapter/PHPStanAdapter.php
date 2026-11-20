@@ -38,16 +38,20 @@ namespace Infection\TestFramework\PHPStan\Adapter;
 use function array_merge;
 use function explode;
 use Infection\AbstractTestFramework\InvalidVersion;
+use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\Throwable\UnsupportedVersion;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\PHPStan\Logger\PHPStanLogger;
 use Infection\TestFramework\PHPStan\Process\PHPStanMutantProcessFactory;
+use Override;
 use function sprintf;
 use function str_starts_with;
 use Symfony\Component\Filesystem\Filesystem;
@@ -57,7 +61,7 @@ use function version_compare;
 /**
  * @internal
  */
-final class PHPStanAdapter implements StaticAnalysisToolAdapter
+final class PHPStanAdapter implements StaticAnalysisTestFramework
 {
     /**
      * At the time of writing, `-d memory_limit`, which sets the main process's memory limit, is
@@ -89,39 +93,28 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         private readonly string $tmpDir,
         private readonly array $staticAnalysisToolOptions,
         private readonly ShellCommandRunner $shellCommandRunner,
+        private readonly InitialStaticAnalysisRunner $initialStaticAnalysisRunner,
         private readonly PHPStanLogger $logger,
         private ?string $version = null,
     ) {
     }
 
+    #[Override]
     public function getName(): string
     {
         return 'PHPStan';
     }
 
-    /**
-     * @return string[]
-     */
-    public function getInitialRunCommandLine(): array
+    #[Override]
+    public function executeInitialRun(): InitialRunResults
     {
-        // we can't rely on stderr because it's used for other output (non-error)
-        // see https://github.com/phpstan/phpstan/issues/11352#issuecomment-2233403781
-
-        $options = array_merge([
-            "--configuration=$this->staticAnalysisConfigPath",
-            // todo [phpstan-integration] add --stop-on-first-error when it's implemented on PHPStan side
-        ], $this->staticAnalysisToolOptions);
-
-        return $this->commandLineBuilder->build(
-            $this->staticAnalysisToolExecutable,
-            self::PHP_EXTRA_ARGS,
-            $options,
-        );
+        return $this->initialStaticAnalysisRunner->run($this, $this->getInitialRunCommandLine());
     }
 
-    public function createMutantProcessFactory(): LazyMutantProcessFactory
+    #[Override]
+    public function test(Mutant $mutant): MutantProcessContainer
     {
-        return new PHPStanMutantProcessFactory(
+        $factory = new PHPStanMutantProcessFactory(
             $this->fileSystem,
             $this->mutantExecutionResultFactory,
             $this->staticAnalysisConfigPath,
@@ -131,8 +124,17 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
             $this->tmpDir,
             $this->staticAnalysisToolOptions,
         );
+
+        return new MutantProcessContainer($factory->create($mutant), []);
     }
 
+    #[Override]
+    public function hasJUnitReport(): bool
+    {
+        return false;
+    }
+
+    #[Override]
     public function getVersion(): string
     {
         if ($this->version !== null) {
@@ -150,7 +152,8 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         return $this->version;
     }
 
-    public function assertMinimumVersionSatisfied(): void
+    #[Override]
+    public function checkRequirements(): void
     {
         try {
             $version = $this->getVersion();
@@ -201,6 +204,26 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
             'Infection requires PHPStan version >=1.12.27 or >=2.1.17, but "%s" is installed.',
             $version,
         ));
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getInitialRunCommandLine(): array
+    {
+        // we can't rely on stderr because it's used for other output (non-error)
+        // see https://github.com/phpstan/phpstan/issues/11352#issuecomment-2233403781
+
+        $options = array_merge([
+            "--configuration=$this->staticAnalysisConfigPath",
+            // todo [phpstan-integration] add --stop-on-first-error when it's implemented on PHPStan side
+        ], $this->staticAnalysisToolOptions);
+
+        return $this->commandLineBuilder->build(
+            $this->staticAnalysisToolExecutable,
+            self::PHP_EXTRA_ARGS,
+            $options,
+        );
     }
 
     /**
