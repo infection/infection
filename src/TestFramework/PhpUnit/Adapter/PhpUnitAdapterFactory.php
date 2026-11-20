@@ -37,16 +37,17 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
 use function array_values;
-use Closure;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
-use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
@@ -88,10 +89,12 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         string $sourceDirectoryBasePath,
         bool $useWindowsFilterLimit,
         Filesystem $fileSystem,
+        TestFrameworkLogger $testFrameworkLogger,
         LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
+        InitialTestsRunner $initialTestsRunner,
         Configuration $configuration,
-        Closure $processFactory,
+        MutantProcessContainerFactory $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
@@ -154,11 +157,12 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $testFrameworkConfigPath,
             new PsrPhpUnitLogger($logger),
             $coverageCheckerFactory,
-            new InitialRunProcessFactory(),
+            $initialTestsRunner,
             $configuration,
             $processFactory,
             $testFrameworkExtraOptionsFilter,
             new MemoryLimiter(new MemoryLimiterEnvironment()),
+            $testFrameworkLogger,
         );
     }
 

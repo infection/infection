@@ -1,0 +1,190 @@
+<?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
+
+namespace Infection\Tests\Process\Runner;
+
+use Closure;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
+use Infection\TestFramework\Contracts\CompletedProcess;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Logger\EventDispatchingTestFrameworkLogger;
+use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
+use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(InitialStaticAnalysisRunner::class)]
+final class InitialStaticAnalysisRunnerTest extends TestCase
+{
+    private ShellCommandRunner&MockObject $shellCommandRunner;
+
+    private EventDispatcherCollector $eventDispatcher;
+
+    private StaticAnalysisToolAdapter&MockObject $staticAnalysisToolAdapter;
+
+    private InitialStaticAnalysisRunner $runner;
+
+    protected function setUp(): void
+    {
+        $this->shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+
+        $this->eventDispatcher = new EventDispatcherCollector();
+
+        $this->staticAnalysisToolAdapter = $this->createMock(StaticAnalysisToolAdapter::class);
+
+        $this->runner = new InitialStaticAnalysisRunner(
+            $this->shellCommandRunner,
+            new EventDispatchingTestFrameworkLogger($this->eventDispatcher),
+            $this->staticAnalysisToolAdapter,
+        );
+    }
+
+    #[DataProvider('versionProvider')]
+    public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(?string $version, string $expectedVersion): void
+    {
+        $this->staticAnalysisToolAdapter
+            ->method('getName')
+            ->willReturn('PHPStan')
+        ;
+        $versionExpectation = $this->staticAnalysisToolAdapter->method('getVersion');
+
+        if ($version === null) {
+            $versionExpectation->willThrowException(new InvalidArgumentException('Invalid version output.'));
+        } else {
+            $versionExpectation->willReturn($version);
+        }
+
+        $command = ['phpstan', 'analyse', '--configuration=some config.neon'];
+        $commandLine = "'phpstan' 'analyse' '--configuration=some config.neon'";
+
+        $this->staticAnalysisToolAdapter
+            ->expects($this->once())
+            ->method('getInitialRunCommandLine')
+            ->willReturn($command)
+        ;
+
+        $this->shellCommandRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with($command, $this->isInstanceOf(Closure::class), null, [], null, null)
+            ->willReturnCallback(function (array $_command, Closure $callback) use ($command, $commandLine, $expectedVersion): CompletedProcess {
+                $this->assertEquals(
+                    [new InitialTestSuiteWasStarted($commandLine, 'PHPStan', $expectedVersion)],
+                    $this->eventDispatcher->getEvents(),
+                );
+
+                $callback();
+
+                return CompletedProcessBuilder::withMinimalTestData()
+                    ->withCommand($command)
+                    ->withStdout('pingpong')
+                    ->build()
+                ;
+            })
+        ;
+
+        $this->runner->run();
+
+        $this->assertEquals(
+            [
+                new InitialTestSuiteWasStarted($commandLine, 'PHPStan', $expectedVersion),
+                new InitialTestCaseWasCompleted('PHPStan'),
+                new InitialTestSuiteWasFinished('PHPStan', 'pingpong'),
+            ],
+            $this->eventDispatcher->getEvents(),
+        );
+    }
+
+    public function test_it_throws_when_the_static_analysis_process_fails(): void
+    {
+        $command = ['phpstan', 'analyse'];
+
+        $this->staticAnalysisToolAdapter
+            ->expects($this->once())
+            ->method('getInitialRunCommandLine')
+            ->willReturn($command)
+        ;
+        $this->staticAnalysisToolAdapter
+            ->expects($this->exactly(2))
+            ->method('getName')
+            ->willReturn('phpstan')
+        ;
+        $this->shellCommandRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with(
+                $command,
+                $this->isInstanceOf(Closure::class),
+                null,
+                [],
+                null,
+                null,
+            )
+            ->willReturn(
+                CompletedProcessBuilder::withMinimalTestData()
+                    ->withCommand($command)
+                    ->withExitCode(3)
+                    ->build(),
+            )
+        ;
+
+        $this->expectException(InitialTestsFailed::class);
+        $this->expectExceptionMessage(
+            <<<'MESSAGE'
+                Project static analysis must be in a passing state before running Infection.
+
+                phpstan reported an exit code of 3.
+                Refer to the phpstan's output below:
+                MESSAGE,
+        );
+
+        $this->runner->run();
+    }
+
+    public static function versionProvider(): iterable
+    {
+        yield 'known version' => ['2.1.0', '2.1.0'];
+
+        yield 'unknown version' => [null, 'unknown'];
+    }
+}

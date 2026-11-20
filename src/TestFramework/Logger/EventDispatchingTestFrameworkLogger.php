@@ -33,42 +33,55 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Common;
+namespace Infection\TestFramework\Logger;
 
-use Infection\Process\OriginalPhpProcess;
-use Infection\TestFramework\Common\InitialRunProcessFactory;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
+use Override;
 
-#[CoversClass(InitialRunProcessFactory::class)]
-final class InitialRunProcessFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class EventDispatchingTestFrameworkLogger implements TestFrameworkLogger
 {
-    /**
-     * @param class-string<Process> $expectedProcessClass
-     */
-    #[DataProvider('phpConfigurationProvider')]
-    public function test_it_preserves_the_command_environment_and_timeout(
-        bool $useOriginalPhpConfig,
-        string $expectedProcessClass,
-    ): void {
-        $command = ['php', '/path with spaces/test.php', '--filter', 'test with spaces'];
-        $factory = new InitialRunProcessFactory();
-        $process = $factory->create($command, $useOriginalPhpConfig);
-        $expectedCommandLine = (new Process($command))->getCommandLine();
-        $actualProcessClass = $process::class;
-
-        $this->assertSame($expectedProcessClass, $actualProcessClass);
-        $this->assertSame($expectedCommandLine, $process->getCommandLine());
-        $this->assertSame(['SHELL_VERBOSITY' => '0'], $process->getEnv());
-        $this->assertNull($process->getTimeout());
+    public function __construct(private EventDispatcher $eventDispatcher)
+    {
     }
 
-    public static function phpConfigurationProvider(): iterable
-    {
-        yield 'regular PHP configuration' => [false, Process::class];
+    #[Override]
+    public function initialRunStarted(
+        string $testFrameworkName,
+        string $testFrameworkVersion,
+        string $commandLine,
+    ): void {
+        $this->eventDispatcher->dispatch(
+            new InitialTestSuiteWasStarted(
+                $commandLine,
+                $testFrameworkName,
+                $testFrameworkVersion,
+            ),
+        );
+    }
 
-        yield 'original PHP configuration for coverage' => [true, OriginalPhpProcess::class];
+    #[Override]
+    public function initialRunProgressed(string $testFrameworkName): void
+    {
+        $this->eventDispatcher->dispatch(
+            new InitialTestCaseWasCompleted($testFrameworkName),
+        );
+    }
+
+    #[Override]
+    public function initialRunFinished(string $testFrameworkName, string $executionOutput): void
+    {
+        $this->eventDispatcher->dispatch(
+            new InitialTestSuiteWasFinished(
+                $testFrameworkName,
+                $executionOutput,
+            ),
+        );
     }
 }

@@ -35,22 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Closure;
 use function explode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Mutant;
-use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageChecker;
-use Symfony\Component\Process\Exception\RuntimeException;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -63,10 +61,11 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         private TestFrameworkAdapter $adapter,
         private ConsoleOutput $consoleOutput,
         private CoverageChecker $coverageChecker,
-        private InitialTestsRunProcessFactory $initialRunProcessFactory,
+        private InitialTestsRunner $initialTestsRunner,
         private Configuration $config,
         private MutantProcessContainerFactory $processFactory,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private TestFrameworkLogger $testFrameworkLogger,
     ) {
     }
 
@@ -92,27 +91,15 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         }
     }
 
-    /**
-     * @throws RuntimeException
-     * @throws InitialTestsFailed
-     */
-    public function executeInitialRun(?Closure $onProgress = null, ?Closure $onStart = null): InitialRunResults
+    public function executeInitialRun(): InitialRunResults
     {
-        $initialTestSuiteProcess = $this->initialRunProcessFactory->createProcess(
+        $initialTestSuiteProcess = $this->initialTestsRunner->run(
             $this->adapter,
             $this->config->testFrameworkExtraOptions,
             $this->getInitialTestsPhpOptionsArray(),
             $this->config->skipCoverage,
+            $this->testFrameworkLogger,
         );
-        $onStart?->__invoke($initialTestSuiteProcess->getCommandLine());
-
-        $initialTestSuiteProcess->run(static function (string $type) use ($initialTestSuiteProcess, $onProgress): void {
-            if ($type === Process::ERR) {
-                $initialTestSuiteProcess->stop();
-            }
-
-            $onProgress?->__invoke();
-        });
 
         if (!$initialTestSuiteProcess->isSuccessful()) {
             throw InitialTestsFailed::fromProcess(

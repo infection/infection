@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Closure;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -64,7 +63,7 @@ final readonly class NullStaticAnalysisTestFramework implements StaticAnalysisTe
     {
     }
 
-    public function executeInitialRun(?Closure $onProgress = null, ?Closure $onStart = null): InitialRunResults
+    public function executeInitialRun(): InitialRunResults
     {
         return new InitialRunResults('', null);
     }

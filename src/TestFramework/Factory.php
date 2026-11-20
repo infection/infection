@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use function array_merge;
-use Closure;
 use function dirname;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -46,13 +45,14 @@ use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
-use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
@@ -74,8 +74,6 @@ final readonly class Factory
 
     /**
      * @param array<string, array<string, mixed>> $installedExtensions
-     * @param Closure(): InitialTestsRunProcessFactory $initialRunProcessFactory
-     * @param Closure(): MutantProcessContainerFactory $containerFactory
      */
     public function __construct(
         private string $tmpDir,
@@ -89,10 +87,11 @@ final readonly class Factory
         private ShellCommandRunner $shellCommandRunner,
         private FileSystem $fileSystem,
         private ConsoleOutput $consoleOutput,
+        private TestFrameworkLogger $testFrameworkLogger,
         private LoggerInterface $logger,
         private CoverageCheckerFactory $coverageCheckerFactory,
-        private Closure $initialRunProcessFactory,
-        private Closure $containerFactory,
+        private InitialTestsRunner $initialTestsRunner,
+        private MutantProcessContainerFactory $containerFactory,
         private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
     ) {
     }
@@ -107,10 +106,11 @@ final readonly class Factory
                 $testFramework,
                 $this->consoleOutput,
                 $this->coverageCheckerFactory->create($testFramework),
-                ($this->initialRunProcessFactory)(),
+                $this->initialTestsRunner,
                 $this->infectionConfig,
-                ($this->containerFactory)(),
+                $this->containerFactory,
                 $this->extraOptionsFilter,
+                $this->testFrameworkLogger,
             );
     }
 
@@ -173,8 +173,10 @@ final readonly class Factory
                         dirname($configuration->configurationPathname),
                         OperatingSystem::isWindows(),
                         $this->fileSystem,
+                        $this->testFrameworkLogger,
                         $this->logger,
                         $this->coverageCheckerFactory,
+                        $this->initialTestsRunner,
                         $configuration,
                         $this->containerFactory,
                         $this->extraOptionsFilter,

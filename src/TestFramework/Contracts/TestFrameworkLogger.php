@@ -33,31 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Common;
-
-use Infection\Process\OriginalPhpProcess;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Symfony\Component\Process\Process;
+namespace Infection\TestFramework\Contracts;
 
 /**
+ * Reports structured observations from test-framework adapters independently of their execution mechanism.
+ *
+ * Progress reports activity rather than a completed test case. Framework names identify runs.
+ *
  * @internal
- * @final
  */
-class InitialRunProcessFactory
+interface TestFrameworkLogger
 {
-    /**
-     * @param array<string> $commandLine
-     */
-    public function create(array $commandLine, bool $useOriginalPhpConfig): Process
-    {
-        $processClass = $useOriginalPhpConfig
-            ? OriginalPhpProcess::class
-            : Process::class;
+    public function initialRunStarted(
+        string $testFrameworkName,
+        string $testFrameworkVersion,
+        string $commandLine,
+    ): void;
 
-        return new $processClass(
-            $commandLine,
-            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
-            timeout: null,
-        );
-    }
+    public function initialRunProgressed(string $testFrameworkName): void;
+
+    public function initialRunFinished(string $testFrameworkName, string $executionOutput): void;
 }

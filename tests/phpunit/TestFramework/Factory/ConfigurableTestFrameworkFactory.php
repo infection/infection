@@ -35,12 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Factory;
 
-use Closure;
 use Infection\CannotBeInstantiated;
 use Infection\Configuration\Configuration;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Psr\Log\LoggerInterface;
@@ -99,10 +101,12 @@ final class ConfigurableTestFrameworkFactory implements TestFrameworkFactory
         string $sourceDirectoryBasePath,
         bool $useWindowsFilterLimit,
         Filesystem $fileSystem,
+        TestFrameworkLogger $testFrameworkLogger,
         LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
+        InitialTestsRunner $initialTestsRunner,
         Configuration $configuration,
-        Closure $processFactory,
+        MutantProcessContainerFactory $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         $testFramework = self::$testFramework;

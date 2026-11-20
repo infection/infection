@@ -45,6 +45,8 @@ use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Command\Option\TestFrameworkOption;
 use Infection\Configuration\Configuration;
 use Infection\Console\IO;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
 use Infection\Logger\Console\ConsoleLogger;
 use function sprintf;
 use Webmozart\Assert\Assert;
@@ -96,16 +98,27 @@ final class InitialTestRunCommand extends BaseCommand
 
         self::assertNoSymbolSelectors($container->getConfiguration());
 
-        $container->getSubscriberRegisterer()->registerSubscribers();
+        // TODO: this is not very elegant but done this way for now to keep the same behaviour
+        //   as we migrate to the new test framework API.
+        $container->getEventDispatcher()->addSubscriber(
+            new readonly class($io) implements InitialTestSuiteWasStartedSubscriber {
+                public function __construct(
+                    private IO $io,
+                ) {
+                }
 
-        $container->getTestFramework()->executeInitialRun(
-            onStart: static function (string $commandLine) use ($io): void {
-                $io->writeln([
-                    'Command executed:',
-                    $commandLine,
-                ]);
+                public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
+                {
+                    $this->io->writeln([
+                        'Command executed:',
+                        $event->commandLine,
+                    ]);
+                }
             },
         );
+        $container->getSubscriberRegisterer()->registerSubscribers();
+
+        $container->getTestFramework()->executeInitialRun();
 
         $io->newLine();
         $io->success('Initial test run successfully executed.');

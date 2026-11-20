@@ -37,8 +37,10 @@ namespace Infection\Tests\TestFramework\Factory;
 
 use Infection\FileSystem\FileSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
@@ -168,14 +170,16 @@ final class ConfigurableTestFrameworkFactoryTest extends TestCase
             '',
             false,
             $fileSystem,
+            $this->createStub(TestFrameworkLogger::class),
             $this->createStub(LoggerInterface::class),
             new CoverageCheckerFactory(
                 $configuration,
                 JUnitReportLocator::create($fileSystem, ''),
                 IndexXmlCoverageLocator::create($fileSystem, ''),
             ),
+            $this->createStub(InitialTestsRunner::class),
             $configuration,
-            fn (): MutantProcessContainerFactory => $this->createStub(MutantProcessContainerFactory::class),
+            $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
     }

@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
-use Closure;
 use Infection\Configuration\Configuration;
 use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Psr\Log\LoggerInterface;
@@ -54,7 +54,6 @@ interface TestFrameworkFactory
     /**
      * @param string[] $sourceDirectories Absolute paths.
      * @param SplFileInfo[] $filteredSourceFilesToMutate
-     * @param Closure(): MutantProcessContainerFactory $processFactory
      */
     public static function create(
         string $testFrameworkExecutable,
@@ -72,10 +71,12 @@ interface TestFrameworkFactory
         string $sourceDirectoryBasePath,
         bool $useWindowsFilterLimit,
         Filesystem $fileSystem,
+        TestFrameworkLogger $testFrameworkLogger,
         LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
+        InitialTestsRunner $initialTestsRunner,
         Configuration $configuration,
-        Closure $processFactory,
+        MutantProcessContainerFactory $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework;
 

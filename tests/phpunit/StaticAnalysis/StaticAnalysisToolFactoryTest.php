@@ -39,10 +39,10 @@ use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\Common\InitialRunProcessFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\NullStaticAnalysisTestFramework;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use InvalidArgumentException;
@@ -85,7 +85,7 @@ final class StaticAnalysisToolFactoryTest extends TestCase
             $this->createStub(ShellCommandRunner::class),
             $this->createStub(PhpExecutableFinder::class),
             $this->createStub(FileSystem::class),
-            $this->createStub(InitialRunProcessFactory::class),
+            $this->createStub(TestFrameworkLogger::class),
         );
     }
 }

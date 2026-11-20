@@ -35,15 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Closure;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\TestFramework\Common\InitialRunProcessFactory;
-use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
-use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * Compatibility layer for the built-in static-analysis adapters. No third-party adapter
@@ -56,7 +53,7 @@ use Symfony\Component\Process\Exception\RuntimeException;
 final readonly class LegacyStaticAnalysisBridge implements StaticAnalysisTestFramework
 {
     public function __construct(
-        private InitialRunProcessFactory $initialRunProcessFactory,
+        private InitialStaticAnalysisRunner $initialStaticAnalysisRunner,
         private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
     ) {
     }
@@ -76,30 +73,11 @@ final readonly class LegacyStaticAnalysisBridge implements StaticAnalysisTestFra
         $this->staticAnalysisToolAdapter->assertMinimumVersionSatisfied();
     }
 
-    /**
-     * @throws RuntimeException
-     * @throws InitialTestsFailed
-     */
-    public function executeInitialRun(?Closure $onProgress = null, ?Closure $onStart = null): InitialRunResults
+    public function executeInitialRun(): InitialRunResults
     {
-        $process = $this->initialRunProcessFactory->create(
-            $this->staticAnalysisToolAdapter->getInitialRunCommandLine(),
-            false,
-        );
-        $onStart?->__invoke($process->getCommandLine());
+        $this->initialStaticAnalysisRunner->run();
 
-        $process->run($onProgress);
-
-        if (!$process->isSuccessful()) {
-            throw InitialTestsFailed::fromProcess(
-                $process,
-                $this->getName(),
-                'static analysis',
-                '',
-            );
-        }
-
-        return new InitialRunResults($process->getOutput(), null);
+        return new InitialRunResults('', null);
     }
 
     public function test(Mutant $mutant): MutantProcessContainer
