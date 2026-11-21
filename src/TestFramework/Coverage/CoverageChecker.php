@@ -36,9 +36,10 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Composer\XdebugHandler\XdebugHandler;
-use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use function extension_loaded;
 use function implode;
+use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
+use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use function ini_get as ini_get_unsafe;
@@ -101,12 +102,18 @@ class CoverageChecker
         }
     }
 
+    /**
+     * @throws RequirementChecksFailed
+     */
     public function checkCoverageExists(): void
     {
         $this->checkIndexCoverageReport();
         $this->checkJUnitReport();
     }
 
+    /**
+     * @throws InitialTestsFailed
+     */
     public function checkCoverageHasBeenGenerated(
         string $initialTestSuiteCommandLine,
         string $initialTestSuiteOutput,
@@ -155,7 +162,7 @@ class CoverageChecker
             implode(PHP_EOL, $errors),
         );
 
-        throw new CoverageNotFound($message);
+        throw new CoverageGenerationFailed($message);
     }
 
     private function hasCoverageGeneratorEnabled(): bool
@@ -185,6 +192,9 @@ class CoverageChecker
         );
     }
 
+    /**
+     * @throws RequirementChecksFailed
+     */
     private function checkIndexCoverageReport(): void
     {
         try {
@@ -213,6 +223,9 @@ class CoverageChecker
         throw new CoverageNotFound($message, 0, $exception);
     }
 
+    /**
+     * @throws RequirementChecksFailed
+     */
     private function checkJUnitReport(): void
     {
         if (!$this->jUnitReport) {

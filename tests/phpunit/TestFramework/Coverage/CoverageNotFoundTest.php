@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
+use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\Coverage\CoverageNotFound;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 #[CoversClass(CoverageNotFound::class)]
 final class CoverageNotFoundTest extends TestCase
@@ -46,6 +48,8 @@ final class CoverageNotFoundTest extends TestCase
     {
         $exception = new CoverageNotFound('Hello', 12);
 
+        $this->assertInstanceOf(RequirementChecksFailed::class, $exception);
+        $this->assertInstanceOf(RuntimeException::class, $exception);
         $this->assertSame('Hello', $exception->getMessage());
         $this->assertSame(12, $exception->getCode());
     }
