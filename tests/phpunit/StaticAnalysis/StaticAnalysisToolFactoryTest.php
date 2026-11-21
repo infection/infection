@@ -47,7 +47,13 @@ use Infection\TestFramework\NullStaticAnalysisTestFramework;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+use Psr\Log\Test\TestLogger;
+use function sprintf;
+use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 #[CoversClass(StaticAnalysisToolFactory::class)]
@@ -76,16 +82,71 @@ final class StaticAnalysisToolFactoryTest extends TestCase
         $this->assertSame('Debug', $framework->getName());
     }
 
-    private function createFactory(): StaticAnalysisToolFactory
+    #[DataProvider('builtInAdapterProvider')]
+    public function test_it_connects_built_in_adapter_version_warnings_to_the_logger(string $adapterName, string $expectedName): void
     {
+        $configLocator = $this->createMock(TestFrameworkConfigLocatorInterface::class);
+        $configLocator
+            ->expects($this->once())
+            ->method('locate')
+            ->with($adapterName)
+            ->willReturn('/path/to/config')
+        ;
+        $executableFinder = $this->createMock(StaticAnalysisToolExecutableFinder::class);
+        $executableFinder
+            ->expects($this->once())
+            ->method('find')
+            ->with($adapterName, '')
+            ->willReturn('/path/to/tool.bat')
+        ;
+        $exception = new SymfonyProcessRuntimeException('Could not launch the version command.');
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->expects($this->once())
+            ->method('mustRun')
+            ->with(['/path/to/tool.bat', '--version'])
+            ->willThrowException($exception)
+        ;
+        $logger = new TestLogger();
+        $factory = $this->createFactory($executableFinder, $configLocator, $shellCommandRunner, $logger);
+
+        $framework = $factory->create($adapterName, 30);
+
+        $this->assertSame($expectedName, $framework->getName());
+        $this->assertSame(TestFramework::UNKNOWN_VERSION, $framework->getVersion());
+        $this->assertSame(TestFramework::UNKNOWN_VERSION, $framework->getVersion());
+
+        $expected = [[
+            'level' => LogLevel::WARNING,
+            'message' => sprintf('Could not determine the %s version. Continuing with an unknown version.', $expectedName),
+            'context' => ['exception' => $exception],
+        ]];
+
+        $this->assertSame($expected, $logger->records);
+    }
+
+    public static function builtInAdapterProvider(): iterable
+    {
+        yield 'PHPStan' => [StaticAnalysisToolTypes::PHPSTAN, 'PHPStan'];
+
+        yield 'Mago' => [StaticAnalysisToolTypes::MAGO, 'Mago'];
+    }
+
+    private function createFactory(
+        ?StaticAnalysisToolExecutableFinder $executableFinder = null,
+        ?TestFrameworkConfigLocatorInterface $configLocator = null,
+        ?ShellCommandRunner $shellCommandRunner = null,
+        ?LoggerInterface $logger = null,
+    ): StaticAnalysisToolFactory {
         return new StaticAnalysisToolFactory(
             ConfigurationBuilder::withMinimalTestData()->build(),
-            $this->createStub(StaticAnalysisToolExecutableFinder::class),
-            $this->createStub(TestFrameworkConfigLocatorInterface::class),
-            $this->createStub(ShellCommandRunner::class),
+            $executableFinder ?? $this->createStub(StaticAnalysisToolExecutableFinder::class),
+            $configLocator ?? $this->createStub(TestFrameworkConfigLocatorInterface::class),
+            $shellCommandRunner ?? $this->createStub(ShellCommandRunner::class),
             $this->createStub(PhpExecutableFinder::class),
             $this->createStub(FileSystem::class),
             $this->createStub(TestFrameworkLogger::class),
+            $logger ?? $this->createStub(LoggerInterface::class),
         );
     }
 }

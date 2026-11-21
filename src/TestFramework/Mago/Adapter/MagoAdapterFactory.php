@@ -41,7 +41,9 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Mago\Logger\PsrMagoLogger;
 use Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
@@ -61,6 +63,7 @@ final class MagoAdapterFactory implements StaticAnalysisToolAdapterFactory
         string $tmpDir,
         array $staticAnalysisToolOptions,
         ShellCommandRunner $shellCommandRunner,
+        LoggerInterface $logger,
     ): StaticAnalysisToolAdapter {
         return new MagoAdapter(
             new MagoMutantExecutionResultFactory(),
@@ -69,10 +72,11 @@ final class MagoAdapterFactory implements StaticAnalysisToolAdapterFactory
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
-            new VersionParser(),
+            new VersionParser('Mago'),
             $timeout,
             $staticAnalysisToolOptions,
             $shellCommandRunner,
+            new PsrMagoLogger($logger),
         );
     }
 }

@@ -52,6 +52,8 @@ use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
  */
 interface TestFramework
 {
+    public const string UNKNOWN_VERSION = 'unknown';
+
     /**
      * Name of the test framework, e.g. "PHPUnit" or "PHPStan".
      */

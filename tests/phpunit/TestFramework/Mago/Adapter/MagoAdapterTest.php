@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Mago\Adapter;
 
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Mago\Adapter\MagoAdapter;
+use Infection\TestFramework\Mago\Logger\MagoLogger;
 use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -48,6 +51,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use function sprintf;
+use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(MagoAdapter::class)]
@@ -69,10 +73,11 @@ final class MagoAdapterTest extends TestCase
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
-            new VersionParser(),
+            new VersionParser('Mago'),
             31.0,
             [],
             $this->shellCommandRunner,
+            $this->createStub(MagoLogger::class),
             '9.0',
         );
     }
@@ -105,10 +110,11 @@ final class MagoAdapterTest extends TestCase
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
-            new VersionParser(),
+            new VersionParser('Mago'),
             31.0,
             ['--sort'],
             $this->shellCommandRunner,
+            $this->createStub(MagoLogger::class),
             '9.0',
         );
 
@@ -137,10 +143,11 @@ final class MagoAdapterTest extends TestCase
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
-            new VersionParser(),
+            new VersionParser('Mago'),
             31.0,
             ['--no-progress'],
             $this->shellCommandRunner,
+            $this->createStub(MagoLogger::class),
             '9.0',
         );
 
@@ -170,10 +177,11 @@ final class MagoAdapterTest extends TestCase
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
-            new VersionParser(),
+            new VersionParser('Mago'),
             31.0,
             ['--no-stubs', '--baseline /path/to/baseline.toml'],
             $this->shellCommandRunner,
+            $this->createStub(MagoLogger::class),
             '9.0',
         );
 
@@ -226,13 +234,80 @@ final class MagoAdapterTest extends TestCase
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
-            new VersionParser(),
+            new VersionParser('Mago'),
             31.0,
             [],
             $shellCommandRunner,
+            $this->createStub(MagoLogger::class),
         );
 
         $this->assertSame('1.23.0', $adapter->getVersion());
+        $this->assertSame('1.23.0', $adapter->getVersion());
+    }
+
+    public function test_it_memoizes_an_unknown_version_when_the_version_command_fails(): void
+    {
+        $exception = new SymfonyProcessRuntimeException('Could not launch the version command.');
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->expects($this->once())
+            ->method('mustRun')
+            ->willThrowException($exception)
+        ;
+        $logger = $this->createMock(MagoLogger::class);
+        $logger
+            ->expects($this->once())
+            ->method('logVersionDetectionFailure')
+            ->with($exception)
+        ;
+
+        $adapter = new MagoAdapter(
+            $this->createStub(MutantExecutionResultFactory::class),
+            '/path/to/config',
+            '/path/to/executable',
+            $this->commandLineBuilder,
+            new VersionParser('Mago'),
+            31.0,
+            [],
+            $shellCommandRunner,
+            $logger,
+        );
+
+        $this->assertSame(TestFramework::UNKNOWN_VERSION, $adapter->getVersion());
+        $this->assertSame(TestFramework::UNKNOWN_VERSION, $adapter->getVersion());
+
+        $adapter->assertMinimumVersionSatisfied();
+    }
+
+    public function test_it_rejects_unrecognizable_version_output(): void
+    {
+        $shellCommandRunner = $this->createStub(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->method('mustRun')
+            ->willReturn('unrecognizable output')
+        ;
+        $logger = $this->createMock(MagoLogger::class);
+        $logger
+            ->expects($this->never())
+            ->method('logVersionDetectionFailure')
+        ;
+
+        $adapter = new MagoAdapter(
+            $this->createStub(MutantExecutionResultFactory::class),
+            '/path/to/config',
+            '/path/to/executable',
+            $this->commandLineBuilder,
+            new VersionParser('Mago'),
+            31.0,
+            [],
+            $shellCommandRunner,
+            $logger,
+        );
+
+        $this->expectException(InvalidVersion::class);
+        $this->expectExceptionMessage('Could not recognise the test framework version for Mago for the value "unrecognizable output".');
+
+        $adapter->getVersion();
     }
 
     public function test_it_creates_mutant_process_creator(): void
@@ -253,10 +328,11 @@ final class MagoAdapterTest extends TestCase
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
-            new VersionParser(),
+            new VersionParser('Mago'),
             31.0,
             [],
             $this->shellCommandRunner,
+            $this->createStub(MagoLogger::class),
             $version,
         );
 
@@ -272,10 +348,11 @@ final class MagoAdapterTest extends TestCase
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
-            new VersionParser(),
+            new VersionParser('Mago'),
             31.0,
             [],
             $this->shellCommandRunner,
+            $this->createStub(MagoLogger::class),
             $version,
         );
 

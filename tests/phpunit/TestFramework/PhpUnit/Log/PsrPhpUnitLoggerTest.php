@@ -41,6 +41,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Psr\Log\Test\TestLogger;
+use RuntimeException;
 
 #[CoversClass(PsrPhpUnitLogger::class)]
 final class PsrPhpUnitLoggerTest extends TestCase
@@ -67,5 +68,22 @@ final class PsrPhpUnitLoggerTest extends TestCase
         $actual = $logger->records;
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_warns_when_version_detection_fails(): void
+    {
+        $logger = new TestLogger();
+        $frameworkLogger = new PsrPhpUnitLogger($logger);
+        $exception = new RuntimeException('Could not launch the version command.');
+
+        $frameworkLogger->logVersionDetectionFailure($exception);
+
+        $expected = [[
+            'level' => LogLevel::WARNING,
+            'message' => 'Could not determine the PHPUnit version. Continuing with an unknown version.',
+            'context' => ['exception' => $exception],
+        ]];
+
+        $this->assertSame($expected, $logger->records);
     }
 }

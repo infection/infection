@@ -41,6 +41,7 @@ use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 
 #[Group('integration')]
 #[CoversClass(PHPStanAdapterFactory::class)]
@@ -55,6 +56,7 @@ final class PHPStanAdapterFactoryTest extends TestCase
             '/tmp',
             [],
             new FakeShellCommandRunner(),
+            new NullLogger(),
             new FileSystem(),
         );
 

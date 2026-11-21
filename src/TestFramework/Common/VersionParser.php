@@ -35,28 +35,33 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Common;
 
+use Infection\AbstractTestFramework\InvalidVersion;
+use Infection\TestFramework\Common\Throwable\InvalidVersionFactory;
 use function Safe\preg_match;
-use function sprintf;
-use function str_replace;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class VersionParser
+final readonly class VersionParser
 {
     private const string VERSION_REGEX = '/(?<version>\d+\.\d+\.?\w*|dev)(?<prerelease>-[0-9a-zA-Z.]+)?(?<build>[\+|@][0-9a-zA-Z.]+)?/';
 
-    public function parse(string $content): string
+    public function __construct(
+        private string $name,
+    ) {
+    }
+
+    /**
+     * @throws InvalidVersion
+     */
+    public function parse(string $value): string
     {
         $matches = [];
-        $matched = preg_match(self::VERSION_REGEX, $content, $matches);
+        $matched = preg_match(self::VERSION_REGEX, $value, $matches);
 
-        Assert::notSame(
-            $matched,
-            0,
-            sprintf('Expected "%s" to be contain a valid SemVer (sub)string value.', str_replace('%', '%%', $content)),
-        );
+        if ($matched === 0) {
+            throw InvalidVersionFactory::create($this->name, $value);
+        }
 
         return $matches[0];
     }

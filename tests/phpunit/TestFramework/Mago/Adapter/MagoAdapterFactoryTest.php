@@ -39,6 +39,7 @@ use Infection\TestFramework\Contracts\FakeShellCommandRunner;
 use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 
 #[CoversClass(MagoAdapterFactory::class)]
 final class MagoAdapterFactoryTest extends TestCase
@@ -52,6 +53,7 @@ final class MagoAdapterFactoryTest extends TestCase
             '/tmp',
             [],
             new FakeShellCommandRunner(),
+            new NullLogger(),
         );
 
         $this->assertSame('Mago', $adapter->getName());

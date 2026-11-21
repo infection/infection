@@ -35,10 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Log;
 
+use Throwable;
+
 /**
  * @internal
  */
 interface PhpUnitLogger
 {
     public function logSkippingInitialTests(): void;
+
+    public function logVersionDetectionFailure(Throwable $throwable): void;
 }

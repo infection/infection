@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Common;
 
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\TestFramework\Common\VersionParser;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -49,7 +49,7 @@ final class VersionParserTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->versionParser = new VersionParser();
+        $this->versionParser = new VersionParser('TestFramework');
     }
 
     #[DataProvider('versionProvider')]
@@ -63,16 +63,13 @@ final class VersionParserTest extends TestCase
     #[DataProvider('invalidVersionProvider')]
     public function test_it_throws_exception_when_content_has_no_version_substring(string $content): void
     {
-        try {
-            $this->versionParser->parse($content);
+        $this->expectException(InvalidVersion::class);
+        $this->expectExceptionMessage(sprintf(
+            'Could not recognise the test framework version for TestFramework for the value "%s".',
+            $content,
+        ));
 
-            $this->fail();
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                sprintf('Expected "%s" to be contain a valid SemVer (sub)string value.', $content),
-                $exception->getMessage(),
-            );
-        }
+        $this->versionParser->parse($content);
     }
 
     public static function versionProvider(): iterable

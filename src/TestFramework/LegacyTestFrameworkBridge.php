@@ -49,23 +49,29 @@ use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Logger\LegacyTestFrameworkLogger;
+use InvalidArgumentException;
+use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 
 /**
  * @internal
  *
  * @deprecated This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
  */
-final readonly class LegacyTestFrameworkBridge implements TestFramework
+final class LegacyTestFrameworkBridge implements TestFramework
 {
-    public function __construct(
-        private TestFrameworkAdapter $adapter,
-        private ConsoleOutput $consoleOutput,
-        private CoverageChecker $coverageChecker,
-        private InitialTestsRunner $initialTestsRunner,
-        private Configuration $config,
-        private MutantProcessContainerFactory $processFactory,
-        private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
-        private TestFrameworkLogger $testFrameworkLogger,
+    private ?string $version = null;
+
+    publi c function __construct(
+        private readonly TestFrameworkAdapter $adapter,
+        private readonly ConsoleOutput $consoleOutput,
+        private readonly CoverageChecker $coverageChecker,
+        private readonly InitialTestsRunner $initialTestsRunner,
+        private readonly Configuration $config,
+        private readonly MutantProcessContainerFactory $processFactory,
+        private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private readonly TestFrameworkLogger $testFrameworkLogger,
+        private readonly LegacyTestFrameworkLogger $logger,
     ) {
     }
 
@@ -76,7 +82,19 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
 
     public function getVersion(): string
     {
-        return $this->adapter->getVersion();
+        if ($this->version !== null) {
+            return $this->version;
+        }
+
+        try {
+            $this->version = $this->adapter->getVersion();
+        } catch (InvalidArgumentException|SymfonyProcessRuntimeException $exception) { // @phpstan-ignore catch.neverThrown, catch.neverThrown (Legacy third-party adapters may throw undocumented version detection failures.)
+            $this->logger->logVersionDetectionFailure($this->getName(), $exception);
+
+            $this->version = TestFramework::UNKNOWN_VERSION;
+        }
+
+        return $this->version;
     }
 
     public function checkRequirements(): void

@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use function array_map;
 use function array_slice;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\FileSystem;
@@ -49,6 +50,7 @@ use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
@@ -320,6 +322,59 @@ final class PhpUnitAdapterTest extends TestCase
         yield 'initial tests are skipped' => [true];
     }
 
+    public function test_it_memoizes_an_unknown_version_when_the_version_command_fails(): void
+    {
+        $exception = new SymfonyProcessRuntimeException('Could not launch the version command.');
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->expects($this->once())
+            ->method('mustRun')
+            ->willThrowException($exception)
+        ;
+        $logger = $this->createMock(PhpUnitLogger::class);
+        $logger
+            ->expects($this->once())
+            ->method('logVersionDetectionFailure')
+            ->with($exception)
+        ;
+
+        $adapter = $this->createAdapter(
+            '<phpunit/>',
+            version: null,
+            shellCommandRunner: $shellCommandRunner,
+            logger: $logger,
+        );
+
+        $this->assertSame(TestFramework::UNKNOWN_VERSION, $adapter->getVersion());
+        $this->assertSame(TestFramework::UNKNOWN_VERSION, $adapter->getVersion());
+    }
+
+    public function test_it_rejects_unrecognizable_version_output(): void
+    {
+        $shellCommandRunner = $this->createStub(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->method('mustRun')
+            ->willReturn('unrecognizable output')
+        ;
+        $logger = $this->createMock(PhpUnitLogger::class);
+        $logger
+            ->expects($this->never())
+            ->method('logVersionDetectionFailure')
+        ;
+
+        $adapter = $this->createAdapter(
+            '<phpunit/>',
+            version: null,
+            shellCommandRunner: $shellCommandRunner,
+            logger: $logger,
+        );
+
+        $this->expectException(InvalidVersion::class);
+        $this->expectExceptionMessage('Could not recognise the test framework version for PHPUnit for the value "unrecognizable output".');
+
+        $adapter->getVersion();
+    }
+
     public function test_it_retrieves_version(): void
     {
         $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
@@ -344,6 +399,7 @@ final class PhpUnitAdapterTest extends TestCase
         $actual = $adapter->getVersion();
 
         $this->assertSame($expected, $actual);
+        $this->assertSame($expected, $adapter->getVersion());
     }
 
     #[DataProvider('passOutputProvider')]
@@ -1985,7 +2041,7 @@ final class PhpUnitAdapterTest extends TestCase
                 false,
             ),
             $shellCommandRunner ?? $this->createStub(ShellCommandRunner::class),
-            new VersionParser(),    // won't be used since we pass the version
+            new VersionParser('PHPUnit'),    // won't be used since we pass the version
             new CommandLineBuilder($this->phpExecutableFinderMock),
             '/path/to/project/tools/phpunit/phpunit.xml',
             $logger ?? $this->createStub(PhpUnitLogger::class),

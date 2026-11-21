@@ -35,11 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
-use InvalidArgumentException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -102,8 +103,8 @@ readonly class InitialStaticAnalysisRunner
     {
         try {
             return $this->staticAnalysisToolAdapter->getVersion();
-        } catch (InvalidArgumentException) {
-            return 'unknown';
+        } catch (InvalidVersion) {
+            return TestFramework::UNKNOWN_VERSION;
         }
     }
 }
