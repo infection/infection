@@ -67,6 +67,7 @@ use Override;
 use function Safe\preg_match;
 use function sprintf;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
+use Symfony\Component\Process\Process;
 use function trim;
 use function version_compare;
 use Webmozart\Assert\Assert;
@@ -134,21 +135,23 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
             $this->testFrameworkLogger,
         );
 
+        $commandLine = (new Process($initialTestSuiteProcess->command))->getCommandLine();
+
         if (!$initialTestSuiteProcess->isSuccessful()) {
-            throw InitialTestsFailed::fromProcess(
+            throw InitialTestsFailed::fromCompletedProcess(
                 $initialTestSuiteProcess,
                 $this->getName(),
                 'tests',
                 $this->getInitialTestsFailRecommendations(
-                    $initialTestSuiteProcess->getCommandLine(),
+                    $commandLine,
                 ),
             );
         }
 
-        $output = $initialTestSuiteProcess->getOutput();
+        $output = $initialTestSuiteProcess->stdout;
 
         $this->coverageChecker->checkCoverageHasBeenGenerated(
-            $initialTestSuiteProcess->getCommandLine(),
+            $commandLine,
             $output,
         );
 

@@ -67,10 +67,6 @@ readonly class InitialStaticAnalysisRunner
      */
     public function run(TestFramework $testFramework, array $command): InitialRunResults
     {
-        // TODO: unlike InitialTestsRunner, we do not use InitialTestsRunProcessFactory
-        //  here and we use ShellCommandRunner, resulting in requiring this
-        //  new Process to get the actual command line used. This should be normalized/fixed
-        //  but will be done in a future PR.
         $commandLine = (new Process($command))->getCommandLine();
 
         $testFrameworkName = $testFramework->getName();

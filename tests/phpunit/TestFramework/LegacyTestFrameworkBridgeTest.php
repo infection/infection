@@ -41,6 +41,7 @@ use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
+use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
@@ -53,6 +54,7 @@ use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter;
 use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -174,6 +176,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
     public function test_it_executes_initial_run_and_reports_memory_usage(): void
     {
         $process = $this->createSuccessfulInitialRunProcess('output');
+        $commandLine = (new Process($process->command))->getCommandLine();
         $adapter = new FakeAwareAdapter(42.0);
 
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
@@ -188,7 +191,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $coverageChecker
             ->expects($this->once())
             ->method('checkCoverageHasBeenGenerated')
-            ->with('/tmp/phpunit', 'output')
+            ->with($commandLine, 'output')
         ;
 
         $testFramework = $this->createTestFramework(
@@ -233,6 +236,8 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
 
     public function test_it_throws_when_the_initial_run_fails(): void
     {
+        $process = $this->createFailedInitialRunProcess();
+        $commandLine = (new Process($process->command))->getCommandLine();
         $adapter = $this->createMock(TestFrameworkAdapter::class);
         $adapter
             ->expects($this->once())
@@ -242,7 +247,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $adapter
             ->expects($this->once())
             ->method('getInitialTestsFailRecommendations')
-            ->with('/tmp/phpunit')
+            ->with($commandLine)
             ->willReturn('Check the legacy framework configuration.')
         ;
 
@@ -250,7 +255,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->willReturn($this->createFailedInitialRunProcess())
+            ->willReturn($process)
         ;
 
         $coverageChecker = $this->createMock(CoverageChecker::class);
@@ -408,52 +413,24 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         );
     }
 
-    private function createSuccessfulInitialRunProcess(string $output): Process
+    private function createSuccessfulInitialRunProcess(string $output): CompletedProcess
     {
-        $process = $this->createMock(Process::class);
-        $process
-            ->expects($this->once())
-            ->method('isSuccessful')
-            ->willReturn(true)
+        return CompletedProcessBuilder::withMinimalTestData()
+            ->withCommand(['/tmp/phpunit'])
+            ->withStdout($output)
+            ->build()
         ;
-        $process
-            ->method('getOutput')
-            ->willReturn($output)
-        ;
-        $process
-            ->method('getCommandLine')
-            ->willReturn('/tmp/phpunit')
-        ;
-
-        return $process;
     }
 
-    private function createFailedInitialRunProcess(): Process
+    private function createFailedInitialRunProcess(): CompletedProcess
     {
-        $process = $this->createMock(Process::class);
-        $process
-            ->expects($this->once())
-            ->method('isSuccessful')
-            ->willReturn(false)
+        return CompletedProcessBuilder::withMinimalTestData()
+            ->withCommand(['/tmp/phpunit'])
+            ->withExitCode(1)
+            ->withStdout('output')
+            ->withStderr('error')
+            ->build()
         ;
-        $process
-            ->method('getExitCode')
-            ->willReturn(1)
-        ;
-        $process
-            ->method('getCommandLine')
-            ->willReturn('/tmp/phpunit')
-        ;
-        $process
-            ->method('getOutput')
-            ->willReturn('output')
-        ;
-        $process
-            ->method('getErrorOutput')
-            ->willReturn('error')
-        ;
-
-        return $process;
     }
 
     private function createInitialRunOnlyOptionsAdapter(): TestFrameworkAdapter&ProvidesInitialRunOnlyOptions

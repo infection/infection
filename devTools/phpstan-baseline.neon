@@ -517,12 +517,6 @@ parameters:
 			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
 
 		-
-			rawMessage: Infection\Process\Factory\InitialTestsRunProcessFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Process/Factory/InitialTestsRunProcessFactory.php
-
-		-
 			rawMessage: Infection\Process\Factory\MutantProcessContainerFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
 			count: 1
@@ -533,12 +527,6 @@ parameters:
 			identifier: method.childParameterType
 			count: 1
 			path: ../src/Process/OriginalPhpProcess.php
-
-		-
-			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
-			identifier: catch.neverThrown
-			count: 1
-			path: ../src/Process/Runner/InitialTestsRunner.php
 
 		-
 			rawMessage: Infection\Process\Runner\InitialTestsRunner should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
