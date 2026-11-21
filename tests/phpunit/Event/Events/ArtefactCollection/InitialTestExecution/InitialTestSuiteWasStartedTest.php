@@ -44,9 +44,8 @@ final class InitialTestSuiteWasStartedTest extends TestCase
 {
     public function test_it_exposes_the_run_details(): void
     {
-        $event = new InitialTestSuiteWasStarted('phpunit --configuration phpunit.xml', 'PHPUnit', '6.5.4');
+        $event = new InitialTestSuiteWasStarted('PHPUnit', '6.5.4');
 
-        $this->assertSame('phpunit --configuration phpunit.xml', $event->commandLine);
         $this->assertSame('PHPUnit', $event->testFrameworkName);
         $this->assertSame('6.5.4', $event->testFrameworkVersion);
     }

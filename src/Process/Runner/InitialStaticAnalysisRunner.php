@@ -41,7 +41,6 @@ use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
-use Symfony\Component\Process\Process;
 
 /**
  * This is needed for 2 purposes:
@@ -67,14 +66,11 @@ readonly class InitialStaticAnalysisRunner
      */
     public function run(TestFramework $testFramework, array $command): InitialRunResults
     {
-        $commandLine = (new Process($command))->getCommandLine();
-
         $testFrameworkName = $testFramework->getName();
 
         $this->testFrameworkLogger->initialRunStarted(
             $testFrameworkName,
             $this->getVersion($testFramework),
-            $commandLine,
         );
 
         $process = $this->shellCommandRunner->run(
@@ -83,7 +79,11 @@ readonly class InitialStaticAnalysisRunner
             timeout: null,
         );
 
-        $this->testFrameworkLogger->initialRunFinished($testFrameworkName, $process->stdout);
+        $this->testFrameworkLogger->initialRunFinished(
+            $testFrameworkName,
+            $process->command,
+            $process->stdout,
+        );
 
         if (!$process->isSuccessful()) {
             throw InitialTestsFailed::fromCompletedProcess(

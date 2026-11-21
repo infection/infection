@@ -46,9 +46,10 @@ final class InitialTestSuiteWasFinishedTest extends TestCase
     {
         $text = 'foo-bar-baz';
 
-        $class = new InitialTestSuiteWasFinished('PHPUnit', $text);
+        $class = new InitialTestSuiteWasFinished('PHPUnit', 'phpunit run', $text);
 
         $this->assertSame('PHPUnit', $class->testFrameworkName);
+        $this->assertSame('phpunit run', $class->commandLine);
         $this->assertSame($text, $class->outputText);
     }
 }

@@ -47,10 +47,16 @@ interface TestFrameworkLogger
     public function initialRunStarted(
         string $testFrameworkName,
         string $testFrameworkVersion,
-        string $commandLine,
     ): void;
 
     public function initialRunProgressed(string $testFrameworkName): void;
 
-    public function initialRunFinished(string $testFrameworkName, string $executionOutput): void;
+    /**
+     * @param string[] $command
+     */
+    public function initialRunFinished(
+        string $testFrameworkName,
+        array $command,
+        string $executionOutput,
+    ): void;
 }

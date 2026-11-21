@@ -43,6 +43,7 @@ use Infection\Console\Application;
 use Infection\Container\Container;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Framework\Str;
 use Infection\Git\Git;
@@ -111,10 +112,10 @@ final class InitialTestRunCommandTest extends TestCase
         yield 'default parameters with successful tests' => [
             'arguments' => [],
             'expectedStdout' => <<<STDOUT
-                Command executed:
-                test-framework initialConfig
 
                 Running initial tests with DemoTestFramework version 1.0
+                Command executed:
+                test-framework initialConfig
 
                  [OK] Initial test run successfully executed.
 
@@ -124,10 +125,10 @@ final class InitialTestRunCommandTest extends TestCase
 
                 STDERR,
             'expectedDisplay' => <<<DISPLAY
-                Command executed:
-                test-framework initialConfig
 
                 Running initial tests with DemoTestFramework version 1.0
+                Command executed:
+                test-framework initialConfig
 
                  [OK] Initial test run successfully executed.
 
@@ -366,7 +367,8 @@ final class InitialTestRunCommandTest extends TestCase
         } else {
             $executeInitialRunExpectation->willReturnCallback(
                 static function () use ($eventDispatcher): InitialRunResults {
-                    $eventDispatcher->dispatch(new InitialTestSuiteWasStarted('test-framework initialConfig', 'DemoTestFramework', '1.0'));
+                    $eventDispatcher->dispatch(new InitialTestSuiteWasStarted('DemoTestFramework', '1.0'));
+                    $eventDispatcher->dispatch(new InitialTestSuiteWasFinished('DemoTestFramework', 'test-framework initialConfig', ''));
 
                     return new InitialRunResults('', null);
                 },

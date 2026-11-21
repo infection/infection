@@ -96,22 +96,23 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
         }
 
         $command = ['phpstan', 'analyse', '--configuration=some config.neon'];
-        $commandLine = "'phpstan' 'analyse' '--configuration=some config.neon'";
+        $executedCommand = ['/usr/bin/php', 'phpstan', 'analyse', '--configuration=some config.neon'];
+        $commandLine = "'/usr/bin/php' 'phpstan' 'analyse' '--configuration=some config.neon'";
 
         $this->shellCommandRunner
             ->expects($this->once())
             ->method('run')
             ->with($command, $this->isInstanceOf(Closure::class), null, [], null, null)
-            ->willReturnCallback(function (array $_command, Closure $callback) use ($command, $commandLine, $expectedVersion): CompletedProcess {
+            ->willReturnCallback(function (array $_command, Closure $callback) use ($executedCommand, $expectedVersion): CompletedProcess {
                 $this->assertEquals(
-                    [new InitialTestSuiteWasStarted($commandLine, 'PHPStan', $expectedVersion)],
+                    [new InitialTestSuiteWasStarted('PHPStan', $expectedVersion)],
                     $this->eventDispatcher->getEvents(),
                 );
 
                 $callback();
 
                 return CompletedProcessBuilder::withMinimalTestData()
-                    ->withCommand($command)
+                    ->withCommand($executedCommand)
                     ->withStdout('pingpong')
                     ->build()
                 ;
@@ -124,9 +125,9 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
         $this->assertEquals(
             [
-                new InitialTestSuiteWasStarted($commandLine, 'PHPStan', $expectedVersion),
+                new InitialTestSuiteWasStarted('PHPStan', $expectedVersion),
                 new InitialTestCaseWasCompleted('PHPStan'),
-                new InitialTestSuiteWasFinished('PHPStan', 'pingpong'),
+                new InitialTestSuiteWasFinished('PHPStan', $commandLine, 'pingpong'),
             ],
             $this->eventDispatcher->getEvents(),
         );

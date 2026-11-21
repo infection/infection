@@ -105,7 +105,7 @@ final class EventCollectingEventDispatcherTest extends TestCase
         );
 
         $started = new ApplicationExecutionWasStarted();
-        $finished = new InitialTestSuiteWasFinished('PHPUnit', 'Test output');
+        $finished = new InitialTestSuiteWasFinished('PHPUnit', 'phpunit run', 'Test output');
         $custom = new stdClass();
         $custom->payload = 'Custom event payload';
 
