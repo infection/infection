@@ -57,6 +57,7 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
         mixed $input = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
         ?float $idleTimeout = null,
+        bool $useOriginalPhpConfiguration = false,
     ): string {
         $process = self::createProcess(
             $command,
@@ -65,6 +66,7 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
             $input,
             $timeout,
             $idleTimeout,
+            $useOriginalPhpConfiguration,
         );
 
         return trim($process->mustRun($callback)->getOutput());
@@ -78,6 +80,7 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
         mixed $input = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
         ?float $idleTimeout = null,
+        bool $useOriginalPhpConfiguration = false,
     ): CompletedProcess {
         $process = self::createProcess(
             $command,
@@ -86,6 +89,7 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
             $input,
             $timeout,
             $idleTimeout,
+            $useOriginalPhpConfiguration,
         );
 
         $process->run($callback);
@@ -112,14 +116,13 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
         mixed $input,
         ?float $timeout,
         ?float $idleTimeout,
+        bool $useOriginalPhpConfiguration,
     ): Process {
-        $process = new Process(
-            $command,
-            $cwd,
-            array_merge(['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY], $env),
-            $input,
-            $timeout,
-        );
+        $env = array_merge(['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY], $env);
+        $process = $useOriginalPhpConfiguration
+            ? new OriginalPhpProcess($command, $cwd, $env, $input, $timeout)
+            : new Process($command, $cwd, $env, $input, $timeout);
+
         $process->setIdleTimeout($idleTimeout);
 
         return $process;

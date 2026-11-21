@@ -58,6 +58,7 @@ final readonly class DummyShellCommandRunner implements ShellCommandRunner
         mixed $input = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
         ?float $idleTimeout = null,
+        bool $useOriginalPhpConfiguration = false,
     ): string {
         if ($command === ['git', '-C', $this->workingDirectory, 'rev-parse', '--show-toplevel']) {
             return $this->workingDirectory;
@@ -74,6 +75,7 @@ final readonly class DummyShellCommandRunner implements ShellCommandRunner
         mixed $input = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
         ?float $idleTimeout = null,
+        bool $useOriginalPhpConfiguration = false,
     ): CompletedProcess {
         return new CompletedProcess(
             command: $command,
