@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Process\Factory;
 
+use function extension_loaded;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\OriginalPhpProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use const PHP_SAPI;
 use Symfony\Component\Process\Process;
 
 /**
@@ -59,6 +61,14 @@ class InitialTestsRunProcessFactory
     ): Process {
         // If we're expecting to receive a code coverage, test process must run in a vanilla environment
         $processClass = $skipCoverage ? Process::class : OriginalPhpProcess::class;
+        $env = ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY];
+
+        if (
+            !$skipCoverage
+            && self::shouldEnableXdebugCoverage()
+        ) {
+            $env['XDEBUG_MODE'] = 'coverage';
+        }
 
         return new $processClass(
             command: $testFrameworkAdapter->getInitialTestRunCommandLine(
@@ -66,8 +76,14 @@ class InitialTestsRunProcessFactory
                 $phpExtraOptions,
                 $skipCoverage,
             ),
-            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
+            env: $env,
             timeout: null, // Ignore the default timeout of 60 seconds
         );
+    }
+
+    private static function shouldEnableXdebugCoverage(): bool
+    {
+        // Prefer PCOV and phpdbg over enabling Xdebug for coverage.
+        return !extension_loaded('pcov') && PHP_SAPI !== 'phpdbg';
     }
 }
