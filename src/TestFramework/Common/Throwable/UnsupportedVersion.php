@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Common\Throwable;
 
-use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed as RequirementChecksFailedContract;
+use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use RuntimeException;
 
 /**
  * @internal
  */
-final class RequirementChecksFailed extends RuntimeException implements RequirementChecksFailedContract
+final class UnsupportedVersion extends RuntimeException implements RequirementChecksFailed
 {
 }

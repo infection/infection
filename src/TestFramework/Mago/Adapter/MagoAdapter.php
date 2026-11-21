@@ -41,7 +41,7 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\CommandLineBuilder;
-use Infection\TestFramework\Common\Throwable\RequirementChecksFailed;
+use Infection\TestFramework\Common\Throwable\UnsupportedVersion;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -128,7 +128,7 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
         try {
             $version = $this->getVersion();
         } catch (InvalidVersion $exception) {
-            throw new RequirementChecksFailed(
+            throw new UnsupportedVersion(
                 $exception->getMessage(),
                 previous: $exception,
             );
@@ -142,7 +142,7 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
             return;
         }
 
-        throw new RequirementChecksFailed(sprintf(
+        throw new UnsupportedVersion(sprintf(
             'Infection requires Mago version >=1.23.0, but "%s" is installed.',
             $version,
         ));

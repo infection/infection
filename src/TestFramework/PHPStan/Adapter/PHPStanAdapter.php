@@ -42,7 +42,7 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\CommandLineBuilder;
-use Infection\TestFramework\Common\Throwable\RequirementChecksFailed;
+use Infection\TestFramework\Common\Throwable\UnsupportedVersion;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -155,7 +155,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         try {
             $version = $this->getVersion();
         } catch (InvalidVersion $exception) {
-            throw new RequirementChecksFailed(
+            throw new UnsupportedVersion(
                 $exception->getMessage(),
                 previous: $exception,
             );
@@ -197,7 +197,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
             return;
         }
 
-        throw new RequirementChecksFailed(sprintf(
+        throw new UnsupportedVersion(sprintf(
             'Infection requires PHPStan version >=1.12.27 or >=2.1.17, but "%s" is installed.',
             $version,
         ));
