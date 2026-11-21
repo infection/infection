@@ -41,15 +41,16 @@ use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\Mago\Adapter\MagoAdapter;
 use Infection\TestFramework\Mago\Logger\MagoLogger;
 use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use function sprintf;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 
@@ -57,6 +58,8 @@ use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntim
 #[CoversClass(MagoAdapter::class)]
 final class MagoAdapterTest extends TestCase
 {
+    use ExpectsThrowables;
+
     private MagoAdapter $adapter;
 
     private CommandLineBuilder&MockObject $commandLineBuilder;
@@ -310,6 +313,47 @@ final class MagoAdapterTest extends TestCase
         $adapter->getVersion();
     }
 
+    public function test_it_reports_version_detection_failure_as_a_requirement_failure(): void
+    {
+        $shellCommandRunner = $this->createStub(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->method('mustRun')
+            ->willReturn('unrecognizable output')
+        ;
+        $logger = $this->createMock(MagoLogger::class);
+        $logger
+            ->expects($this->never())
+            ->method('logVersionDetectionFailure')
+        ;
+
+        $adapter = new MagoAdapter(
+            $this->createStub(MutantExecutionResultFactory::class),
+            '/path/to/config',
+            '/path/to/executable',
+            $this->commandLineBuilder,
+            new VersionParser('Mago'),
+            31.0,
+            [],
+            $shellCommandRunner,
+            $logger,
+        );
+
+        $exception = $this->expectToThrow(
+            static fn () => $adapter->assertMinimumVersionSatisfied(),
+        );
+
+        $this->assertInstanceOf(RequirementChecksFailed::class, $exception);
+        $this->assertSame(
+            'Could not recognise the test framework version for Mago for the value "unrecognizable output".',
+            $exception->getMessage(),
+        );
+
+        $previous = $exception->getPrevious();
+
+        $this->assertInstanceOf(InvalidVersion::class, $previous);
+        $this->assertSame($exception->getMessage(), $previous->getMessage());
+    }
+
     public function test_it_creates_mutant_process_creator(): void
     {
         $this->assertInstanceOf(
@@ -356,7 +400,7 @@ final class MagoAdapterTest extends TestCase
             $version,
         );
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(RequirementChecksFailed::class);
         $this->expectExceptionMessage(sprintf(
             'Infection requires Mago version >=1.23.0, but "%s" is installed.',
             $version,

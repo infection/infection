@@ -41,12 +41,12 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Mago\Logger\MagoLogger;
 use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
-use RuntimeException;
 use function sprintf;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use function version_compare;
@@ -125,7 +125,14 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
 
     public function assertMinimumVersionSatisfied(): void
     {
-        $version = $this->getVersion();
+        try {
+            $version = $this->getVersion();
+        } catch (InvalidVersion $exception) {
+            throw new RequirementChecksFailed(
+                $exception->getMessage(),
+                previous: $exception,
+            );
+        }
 
         if ($version === TestFramework::UNKNOWN_VERSION) {
             return;
@@ -135,7 +142,7 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
             return;
         }
 
-        throw new RuntimeException(sprintf(
+        throw new RequirementChecksFailed(sprintf(
             'Infection requires Mago version >=1.23.0, but "%s" is installed.',
             $version,
         ));

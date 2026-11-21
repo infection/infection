@@ -41,15 +41,16 @@ use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter;
 use Infection\TestFramework\PHPStan\Logger\PHPStanLogger;
 use Infection\TestFramework\PHPStan\Process\PHPStanMutantProcessFactory;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
@@ -58,6 +59,8 @@ use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntim
 #[CoversClass(PHPStanAdapter::class)]
 final class PHPStanAdapterTest extends TestCase
 {
+    use ExpectsThrowables;
+
     private PHPStanAdapter $adapter;
 
     private CommandLineBuilder&MockObject $commandLineBuilder;
@@ -327,6 +330,49 @@ final class PHPStanAdapterTest extends TestCase
         $adapter->getVersion();
     }
 
+    public function test_it_reports_version_detection_failure_as_a_requirement_failure(): void
+    {
+        $shellCommandRunner = $this->createStub(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->method('mustRun')
+            ->willReturn('unrecognizable output')
+        ;
+        $logger = $this->createMock(PHPStanLogger::class);
+        $logger
+            ->expects($this->never())
+            ->method('logVersionDetectionFailure')
+        ;
+
+        $adapter = new PHPStanAdapter(
+            $this->createStub(Filesystem::class),
+            $this->createStub(MutantExecutionResultFactory::class),
+            '/path/to/config',
+            '/path/to/executable',
+            $this->commandLineBuilder,
+            new VersionParser('PHPStan'),
+            31.0,
+            '/tmp',
+            [],
+            $shellCommandRunner,
+            $logger,
+        );
+
+        $exception = $this->expectToThrow(
+            static fn () => $adapter->assertMinimumVersionSatisfied(),
+        );
+
+        $this->assertInstanceOf(RequirementChecksFailed::class, $exception);
+        $this->assertSame(
+            'Could not recognise the test framework version for PHPStan for the value "unrecognizable output".',
+            $exception->getMessage(),
+        );
+
+        $previous = $exception->getPrevious();
+
+        $this->assertInstanceOf(InvalidVersion::class, $previous);
+        $this->assertSame($exception->getMessage(), $previous->getMessage());
+    }
+
     public function test_it_creates_mutant_process_creator(): void
     {
         $this->assertInstanceOf(
@@ -377,7 +423,7 @@ final class PHPStanAdapterTest extends TestCase
             $version,
         );
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(RequirementChecksFailed::class);
         $this->expectExceptionMessage(sprintf(
             'Infection requires PHPStan version >=1.12.27 or >=2.1.17, but "%s" is installed.',
             $version,
