@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Composer\XdebugHandler\XdebugHandler;
+use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use function extension_loaded;
 use function implode;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
@@ -72,6 +73,9 @@ class CoverageChecker
         $this->frameworkAdapterName = strtolower($testFrameworkAdapterName);
     }
 
+    /**
+     * @throws RequirementChecksFailed
+     */
     public function checkCoverageRequirements(): void
     {
         if ($this->skipInitialTests && !$this->skipCoverage) {
