@@ -33,16 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Contracts;
+namespace Infection\Container\Builder;
+
+use DIContainer\Builder;
+use Infection\Configuration\Configuration;
+use Infection\StaticAnalysis\StaticAnalysisToolFactory;
+use Infection\TestFramework\CombinedTestFramework;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Factory;
 
 /**
- * Temporary type hint for the static-analysis framework in the container. Remove this
- * interface once CombinedTestFramework composes static analysis with the test suite.
- *
  * @internal
- *
- * @deprecated Remove once CombinedTestFramework composes static analysis with the test suite.
+ * @implements Builder<TestFramework>
  */
-interface StaticAnalysisTestFramework extends TestFramework
+final readonly class TestFrameworkBuilder implements Builder
 {
+    public function __construct(
+        private Configuration $configuration,
+        private Factory $testFrameworkFactory,
+        private StaticAnalysisToolFactory $staticAnalysisToolFactory,
+    ) {
+    }
+
+    public function build(): TestFramework
+    {
+        $testFramework = $this->testFrameworkFactory->create(
+            $this->configuration->testFramework,
+            $this->configuration->skipCoverage,
+        );
+
+        if (!$this->configuration->isStaticAnalysisEnabled()) {
+            return $testFramework;
+        }
+
+        return new CombinedTestFramework(
+            $testFramework,
+            $this->staticAnalysisToolFactory->create(
+                $this->configuration->staticAnalysisTool,
+                $this->configuration->processTimeout,
+            ),
+        );
+    }
 }

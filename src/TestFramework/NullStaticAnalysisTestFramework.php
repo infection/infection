@@ -38,16 +38,16 @@ namespace Infection\TestFramework;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\InitialRunResults;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use Infection\TestFramework\Contracts\TestFramework;
 use LogicException;
 
 /**
  * Takes the place of the static-analysis framework when no analyser is configured.
  *
- * @deprecated To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
+ * @deprecated The DI builder skips static analysis when no analyser is configured.
  * @internal
  */
-final readonly class NullStaticAnalysisTestFramework implements StaticAnalysisTestFramework
+final readonly class NullStaticAnalysisTestFramework implements TestFramework
 {
     public function getName(): string
     {

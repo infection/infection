@@ -47,7 +47,6 @@ use Infection\TestFramework\Common\Throwable\UnsupportedVersion;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Mago\Logger\MagoLogger;
 use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
@@ -59,7 +58,7 @@ use function version_compare;
 /**
  * @internal
  */
-final class MagoAdapter implements StaticAnalysisTestFramework
+final class MagoAdapter implements TestFramework
 {
     /**
      * @param list<string> $staticAnalysisToolOptions

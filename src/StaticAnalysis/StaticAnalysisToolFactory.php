@@ -42,7 +42,7 @@ use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
 use Infection\TestFramework\NullStaticAnalysisTestFramework;
@@ -73,7 +73,7 @@ final readonly class StaticAnalysisToolFactory
     ) {
     }
 
-    public function create(?string $adapterName, float $timeout): StaticAnalysisTestFramework
+    public function create(?string $adapterName, float $timeout): TestFramework
     {
         if ($adapterName === null) {
             return new NullStaticAnalysisTestFramework();

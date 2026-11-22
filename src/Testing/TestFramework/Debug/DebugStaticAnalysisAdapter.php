@@ -41,14 +41,14 @@ use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use Infection\TestFramework\Contracts\TestFramework;
 use Override;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * @internal
  */
-final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisTestFramework
+final readonly class DebugStaticAnalysisAdapter implements TestFramework
 {
     public function __construct(
         private string $runtime,

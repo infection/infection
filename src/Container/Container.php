@@ -60,6 +60,7 @@ use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
+use Infection\Container\Builder\TestFrameworkBuilder;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
@@ -155,10 +156,8 @@ use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
-use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
@@ -540,7 +539,7 @@ final class Container extends DIContainer
             },
             Engine::class => static fn (self $container): Engine => new Engine(
                 $container->getConfiguration(),
-                $container->getCombinedTestFramework(),
+                $container->getTestFramework(),
                 $container->getEventDispatcher(),
                 $container->getMutationGenerator(),
                 $container->getMutationTestingRunner(),
@@ -554,16 +553,6 @@ final class Container extends DIContainer
                 $container->get(MemoizedTestFileDataProvider::class),
             ),
             TestFrameworkLogger::class => static fn (self $container): TestFrameworkLogger => new EventDispatchingTestFrameworkLogger($container->getEventDispatcher()),
-            StaticAnalysisTestFramework::class => static fn (self $container) => $container->getStaticAnalysisToolFactory()->create(
-                $container->getConfiguration()->staticAnalysisTool,
-                $container->getConfiguration()->processTimeout,
-            ),
-            CombinedTestFramework::class => static fn (self $container): CombinedTestFramework => new CombinedTestFramework(
-                $container->getTestFramework(),
-                ...($container->getConfiguration()->isStaticAnalysisEnabled()
-                    ? [$container->getStaticAnalysisTestFramework()]
-                    : []),
-            ),
             MutantProcessContainerFactory::class => static fn (self $container): MutantProcessContainerFactory => new MutantProcessContainerFactory(
                 $container->getConfiguration()->processTimeout,
                 $container->getConfiguration(),
@@ -582,7 +571,7 @@ final class Container extends DIContainer
                 $configuration = $container->getConfiguration();
 
                 return new MutationTestingRunner(
-                    $container->getCombinedTestFramework(),
+                    $container->getTestFramework(),
                     $container->getMutantFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
@@ -659,14 +648,7 @@ final class Container extends DIContainer
                 ),
                 new CurrentWorkingDirectoryProvider(),
             ),
-            TestFramework::class => static function (self $container): TestFramework {
-                $config = $container->getConfiguration();
-
-                return $container->getFactory()->create(
-                    $config->testFramework,
-                    $config->skipCoverage,
-                );
-            },
+            TestFramework::class => TestFrameworkBuilder::class,
         ]);
 
         return $container->withValues(
@@ -922,16 +904,6 @@ final class Container extends DIContainer
     public function getTestFramework(): TestFramework
     {
         return $this->get(TestFramework::class);
-    }
-
-    public function getCombinedTestFramework(): CombinedTestFramework
-    {
-        return $this->get(CombinedTestFramework::class);
-    }
-
-    public function getStaticAnalysisTestFramework(): StaticAnalysisTestFramework
-    {
-        return $this->get(StaticAnalysisTestFramework::class);
     }
 
     public function getMutantProcessContainerFactory(): MutantProcessContainerFactory
@@ -1198,17 +1170,6 @@ final class Container extends DIContainer
     private function getMutantFactory(): MutantFactory
     {
         return $this->get(MutantFactory::class);
-    }
-
-    // TODO: maybe worth to rename to `::getTestFrameworkFactory()` to make it a bit less ambiguous.
-    private function getFactory(): Factory
-    {
-        return $this->get(Factory::class);
-    }
-
-    private function getStaticAnalysisToolFactory(): StaticAnalysisToolFactory
-    {
-        return $this->get(StaticAnalysisToolFactory::class);
     }
 
     private function getJUnitTestExecutionInfoAdder(): JUnitTestExecutionInfoAdder

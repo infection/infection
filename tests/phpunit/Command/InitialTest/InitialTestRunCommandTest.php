@@ -400,26 +400,18 @@ final class InitialTestRunCommandTest extends TestCase
 
         $container->set(
             TestFramework::class,
-            function (Container $container) use ($testFrameworkMock, $expectedSourceFilter): TestFramework {
+            function (Container $container) use ($testFrameworkMock, $expectedSourceFilter, $staticAnalysis): TestFramework {
                 $this->assertEquals(
                     $expectedSourceFilter,
                     $container->getConfiguration()->sourceFilter->fileFilter,
                     'The initial test run should use the requested source filter.',
                 );
 
-                return $testFrameworkMock;
+                return $staticAnalysis === null
+                    ? $testFrameworkMock
+                    : new CombinedTestFramework($testFrameworkMock, $staticAnalysis);
             },
         );
-
-        if ($staticAnalysis !== null) {
-            $container->set(
-                CombinedTestFramework::class,
-                static fn (Container $container): CombinedTestFramework => new CombinedTestFramework(
-                    $container->getTestFramework(),
-                    $staticAnalysis,
-                ),
-            );
-        }
 
         $application = new Application($container);
 
