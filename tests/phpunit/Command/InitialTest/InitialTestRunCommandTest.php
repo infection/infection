@@ -47,6 +47,7 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSu
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Framework\Str;
 use Infection\Git\Git;
+use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -105,6 +106,22 @@ final class InitialTestRunCommandTest extends TestCase
         $this->assertSame($expectedStdout, $actualStdout);
         $this->assertSame($expectedStderr, $actualStderr);
         $this->assertSame($expectedDisplay, $actualDisplay);
+    }
+
+    public function test_it_executes_the_combined_initial_run(): void
+    {
+        $staticAnalysis = $this->createMock(TestFramework::class);
+        $staticAnalysis
+            ->expects($this->once())
+            ->method('executeInitialRun')
+            ->willReturn(new InitialRunResults('static analysis output', null))
+        ;
+
+        $tester = $this->createCommandTester(staticAnalysis: $staticAnalysis);
+
+        $exitCode = $tester->execute([]);
+
+        $this->assertSame(0, $exitCode);
     }
 
     public static function successfulCommandExecutionProvider(): iterable
@@ -350,6 +367,7 @@ final class InitialTestRunCommandTest extends TestCase
         ?InitialTestsFailed $failure = null,
         ?SourceFileFilter $expectedSourceFilter = null,
         string $expectedGitBase = 'main',
+        ?TestFramework $staticAnalysis = null,
     ): CommandTester {
         $gitMock = $this->createGitMock($expectedSourceFilter, $expectedGitBase);
 
@@ -392,6 +410,16 @@ final class InitialTestRunCommandTest extends TestCase
                 return $testFrameworkMock;
             },
         );
+
+        if ($staticAnalysis !== null) {
+            $container->set(
+                CombinedTestFramework::class,
+                static fn (Container $container): CombinedTestFramework => new CombinedTestFramework(
+                    $container->getTestFramework(),
+                    $staticAnalysis,
+                ),
+            );
+        }
 
         $application = new Application($container);
 

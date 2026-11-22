@@ -47,11 +47,9 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Source\PreloadedSourceChecker;
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Contracts\InitialRunResults;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
-use Infection\TestFramework\NullStaticAnalysisTestFramework;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -176,11 +174,10 @@ final class EngineTest extends TestCase
     }
 
     #[DataProvider('skipInitialTestsProvider')]
-    public function test_it_executes_static_analysis_before_mutation_generation(bool $skipInitialTests): void
+    public function test_it_orchestrates_all_frameworks_before_mutation_generation(bool $skipInitialTests): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
             ->withSkipInitialTests($skipInitialTests)
-            ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
             ->withUncovered(true)
             ->build()
         ;
@@ -196,7 +193,11 @@ final class EngineTest extends TestCase
             })
         ;
         $this->testFramework
-            ->expects($skipInitialTests ? $this->never() : $this->once())
+            ->expects(
+                $skipInitialTests
+                    ? $this->never()
+                    : $this->once(),
+            )
             ->method('executeInitialRun')
             ->willReturnCallback(static function () use (&$callOrder, $initialRunResults): InitialRunResults {
                 $callOrder[] = 'initialTests';
@@ -205,7 +206,7 @@ final class EngineTest extends TestCase
             })
         ;
 
-        $initialStaticAnalysis = $this->createMock(StaticAnalysisTestFramework::class);
+        $initialStaticAnalysis = $this->createMock(TestFramework::class);
         $initialStaticAnalysis
             ->expects($this->once())
             ->method('checkRequirements')
@@ -214,7 +215,11 @@ final class EngineTest extends TestCase
             })
         ;
         $initialStaticAnalysis
-            ->expects($this->once())
+            ->expects(
+                $skipInitialTests
+                    ? $this->never()
+                    : $this->once(),
+            )
             ->method('executeInitialRun')
             ->willReturnCallback(static function () use (&$callOrder): InitialRunResults {
                 $callOrder[] = 'staticAnalysis';
@@ -260,25 +265,20 @@ final class EngineTest extends TestCase
 
         $engine = $this->createEngine(
             $config,
-            $initialStaticAnalysis,
+            new CombinedTestFramework($this->testFramework, $initialStaticAnalysis),
         );
 
         $engine->execute();
 
-        $expectedCallOrder = ['staticAnalysisRequirements', 'testRequirements'];
+        $expectedCallOrder = ['testRequirements', 'staticAnalysisRequirements'];
 
         if (!$skipInitialTests) {
             $expectedCallOrder[] = 'initialTests';
+            $expectedCallOrder[] = 'staticAnalysis';
         }
-
-        $expectedCallOrder[] = 'staticAnalysis';
         $expectedCallOrder[] = 'generate';
 
-        $this->assertSame(
-            $expectedCallOrder,
-            $callOrder,
-            'Requirements must be checked before initial runs, and static analysis must run before mutation generation.',
-        );
+        $this->assertSame($expectedCallOrder, $callOrder);
     }
 
     public function test_it_stops_when_static_analysis_requirements_are_not_satisfied(): void
@@ -289,7 +289,7 @@ final class EngineTest extends TestCase
         ;
 
         $failure = new RuntimeException('Unsupported static analyser version.');
-        $staticAnalysis = $this->createMock(StaticAnalysisTestFramework::class);
+        $staticAnalysis = $this->createMock(TestFramework::class);
         $staticAnalysis
             ->expects($this->once())
             ->method('checkRequirements')
@@ -306,7 +306,11 @@ final class EngineTest extends TestCase
 
         $this->expectExceptionObject($failure);
 
-        $this->createEngine(staticAnalysisTestFramework: $staticAnalysis)->execute();
+        $engine = $this->createEngine(
+            testFramework: new CombinedTestFramework($this->testFramework, $staticAnalysis),
+        );
+
+        $engine->execute();
     }
 
     public static function skipInitialTestsProvider(): iterable
@@ -484,14 +488,14 @@ final class EngineTest extends TestCase
 
     private function createEngine(
         ?Configuration $config = null,
-        ?StaticAnalysisTestFramework $staticAnalysisTestFramework = null,
+        ?TestFramework $testFramework = null,
     ): Engine {
         return new Engine(
             config: $config ?? ConfigurationBuilder::withMinimalTestData()
                 ->withSkipInitialTests(false)
                 ->withUncovered(true)
                 ->build(),
-            testFramework: $this->testFramework,
+            testFramework: $testFramework ?? $this->testFramework,
             eventDispatcher: $this->eventDispatcher,
             mutationGenerator: $this->mutationGenerator,
             mutationTestingRunner: $this->mutationTestingRunner,
@@ -499,7 +503,6 @@ final class EngineTest extends TestCase
             maxTimeoutsChecker: $this->maxTimeoutsChecker,
             metricsCalculator: $this->metricsCalculator,
             preloadedSourceChecker: $this->preloadedSourceChecker,
-            staticAnalysisTestFramework: $staticAnalysisTestFramework ?? new NullStaticAnalysisTestFramework(),
         );
     }
 }

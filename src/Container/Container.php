@@ -538,10 +538,9 @@ final class Container extends DIContainer
                     $config->timeoutsAsEscaped,
                 );
             },
-            // Autowiring also matches StaticAnalysisTestFramework when resolving TestFramework.
             Engine::class => static fn (self $container): Engine => new Engine(
                 $container->getConfiguration(),
-                $container->getTestFramework(),
+                $container->getCombinedTestFramework(),
                 $container->getEventDispatcher(),
                 $container->getMutationGenerator(),
                 $container->getMutationTestingRunner(),
@@ -549,7 +548,6 @@ final class Container extends DIContainer
                 $container->getMaxTimeoutsChecker(),
                 $container->getMetricsCalculator(),
                 $container->getPreloadedSourceChecker(),
-                $container->getStaticAnalysisTestFramework(),
             ),
             JUnitTestExecutionInfoAdder::class => static fn (self $container): JUnitTestExecutionInfoAdder => new JUnitTestExecutionInfoAdder(
                 $container->getTestFramework(),

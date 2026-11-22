@@ -118,7 +118,7 @@ final class InitialTestRunCommand extends BaseCommand
         );
         $container->getSubscriberRegisterer()->registerSubscribers();
 
-        $container->getTestFramework()->executeInitialRun();
+        $container->getCombinedTestFramework()->executeInitialRun();
 
         $io->newLine();
         $io->success('Initial test run successfully executed.');

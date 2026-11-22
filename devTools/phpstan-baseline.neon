@@ -205,24 +205,6 @@ parameters:
 			path: ../src/Differ/UnifiedDiffOutputBuilder.php
 
 		-
-			rawMessage: '''
-				Parameter $staticAnalysisTestFramework of method Infection\Engine::__construct() has typehint with deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
-				Remove once CombinedTestFramework composes static analysis with the test suite.
-			'''
-			identifier: parameter.deprecatedInterface
-			count: 1
-			path: ../src/Engine.php
-
-		-
-			rawMessage: '''
-				Property $staticAnalysisTestFramework references deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework in its type:
-				Remove once CombinedTestFramework composes static analysis with the test suite.
-			'''
-			identifier: property.deprecatedInterface
-			count: 1
-			path: ../src/Engine.php
-
-		-
 			rawMessage: 'Call to method maybe() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
 			identifier: method.internalClass
 			count: 1
@@ -1162,33 +1144,6 @@ parameters:
 			identifier: method.dynamicName
 			count: 1
 			path: ../tests/phpunit/Container/ContainerTest.php
-
-		-
-			rawMessage: '''
-				Fetching class constant class of deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
-				Remove once CombinedTestFramework composes static analysis with the test suite.
-			'''
-			identifier: classConstant.deprecatedInterface
-			count: 2
-			path: ../tests/phpunit/EngineTest.php
-
-		-
-			rawMessage: '''
-				Instantiation of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
-				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
-			'''
-			identifier: new.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/EngineTest.php
-
-		-
-			rawMessage: '''
-				Parameter $staticAnalysisTestFramework of method Infection\Tests\EngineTest::createEngine() has typehint with deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
-				Remove once CombinedTestFramework composes static analysis with the test suite.
-			'''
-			identifier: parameter.deprecatedInterface
-			count: 1
-			path: ../tests/phpunit/EngineTest.php
 
 		-
 			rawMessage: 'Call to static method createFromBoolean() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
