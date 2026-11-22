@@ -35,65 +35,103 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use BadMethodCallException;
+use function array_map;
+use function array_reduce;
+use function array_slice;
+use function array_values;
+use function implode;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 
 /**
- * Composes test frameworks into a single mutant-evaluation workflow.
+ * Composes test frameworks into one ordered workflow.
  *
  * @internal
  */
 final readonly class CombinedTestFramework implements TestFramework
 {
-    private const string UNSUPPORTED_OPERATION_MESSAGE = 'CombinedTestFramework only supports mutant evaluation.';
+    /**
+     * @var non-empty-list<TestFramework>
+     */
+    private array $testFrameworks;
 
     public function __construct(
-        private TestFramework $firstTestFramework,
-        private ?TestFramework $followUpTestFramework,
+        TestFramework $firstTestFramework,
+        TestFramework ...$followUpTestFrameworks,
     ) {
+        $this->testFrameworks = [
+            $firstTestFramework,
+            ...array_values($followUpTestFrameworks),
+        ];
     }
 
     public function getName(): string
     {
-        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
+        return implode(
+            ', ',
+            array_map(
+                static fn (TestFramework $framework): string => $framework->getName(),
+                $this->testFrameworks,
+            ),
+        );
     }
 
     public function getVersion(): string
     {
-        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
+        return implode(
+            ', ',
+            array_map(
+                static fn (TestFramework $framework): string => $framework->getVersion(),
+                $this->testFrameworks,
+            ),
+        );
     }
 
     public function checkRequirements(): void
     {
-        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
+        foreach ($this->testFrameworks as $framework) {
+            $framework->checkRequirements();
+        }
     }
 
     public function executeInitialRun(): InitialRunResults
     {
-        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
+        foreach ($this->testFrameworks as $framework) {
+            $framework->executeInitialRun();
+        }
+
+        // Individual results need an explicit collection if callers need them; no single
+        // framework's output or memory usage represents the combined run.
+        return new InitialRunResults('', null);
     }
 
     public function test(Mutant $mutant): MutantProcessContainer
     {
-        $evaluation = $this->firstTestFramework->test($mutant);
-
-        $followUpTestFramework = $this->followUpTestFramework;
-
-        if ($followUpTestFramework === null) {
-            return $evaluation;
-        }
-
-        // Defer the follow-up framework setup until the preceding evaluation has escaped.
-        return $evaluation->append(
-            static fn (): MutantProcessContainer => $followUpTestFramework->test($mutant),
+        // Defer each follow-up framework setup until the preceding evaluation has escaped.
+        return array_reduce(
+            array_slice($this->testFrameworks, 1),
+            static fn (
+                MutantProcessContainer $evaluation,
+                TestFramework $framework,
+            ): MutantProcessContainer => $evaluation->append(
+                static fn (): MutantProcessContainer => $framework->test($mutant),
+            ),
+            $this->testFrameworks[0]->test($mutant),
         );
     }
 
     public function hasJUnitReport(): bool
     {
-        throw new BadMethodCallException(self::UNSUPPORTED_OPERATION_MESSAGE);
+        foreach ($this->testFrameworks as $framework) {
+            // Preserve the legacy capability until it is removed from the contract.
+            // @mago-expect analysis:deprecated-method
+            if ($framework->hasJUnitReport()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
