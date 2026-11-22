@@ -156,7 +156,6 @@ use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
-use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
@@ -320,7 +319,6 @@ final class Container extends DIContainer
                     $container->get(TestFrameworkLogger::class),
                     $container->getLogger(),
                     $container->getCoverageCheckerFactory(),
-                    $container->getInitialTestsRunner(),
                     $container->getMutantProcessContainerFactory(),
                     $container->getTestFrameworkExtraOptionsFilter(),
                 );
@@ -933,11 +931,6 @@ final class Container extends DIContainer
     public function getTestFramework(): TestFramework
     {
         return $this->get(TestFramework::class);
-    }
-
-    public function getInitialTestsRunner(): InitialTestsRunner
-    {
-        return $this->get(InitialTestsRunner::class);
     }
 
     public function getStaticAnalysisTestFramework(): StaticAnalysisTestFramework

@@ -35,10 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
+use Infection\Configuration\Configuration;
 use Infection\FileSystem\FileSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\SymfonyProcessShellCommandRunner;
-use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
@@ -47,6 +49,7 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -58,40 +61,53 @@ final class PhpUnitAdapterFactoryTest extends TestCase
 {
     public function test_it_can_create_an_adapter(): void
     {
-        $configuration = ConfigurationBuilder::withMinimalTestData()->build();
-        $fileSystem = $this->createStub(FileSystem::class);
-
-        $adapter = PhpUnitAdapterFactory::create(
-            '/path/to/phpunit',
-            '/tmp',
-            __FILE__,   // the FS is not mocked so it needs a real file; the content doesn't matter for this test though.
-            '/path/to/config-dir',
-            '/path/to/junit.xml',
-            '/path/to/project',
-            ['/path/to/project/src'],
-            true,
-            executeOnlyCoveringTestCases: false,
-            filteredSourceFilesToMutate: [],
-            mapSourceClassToTestStrategy: null,
-            shellCommandRunner: new SymfonyProcessShellCommandRunner(),
-            sourceDirectoryBasePath: '/path/to/project',
-            useWindowsFilterLimit: false,
-            fileSystem: new FileSystem(),
-            testFrameworkLogger: $this->createStub(TestFrameworkLogger::class),
-            logger: $this->createStub(LoggerInterface::class),
-            coverageCheckerFactory: new CoverageCheckerFactory(
-                $configuration,
-                JUnitReportLocator::create($fileSystem, ''),
-                IndexXmlCoverageLocator::create($fileSystem, ''),
-            ),
-            initialTestsRunner: $this->createStub(InitialTestsRunner::class),
-            configuration: $configuration,
-            processFactory: $this->createStub(MutantProcessContainerFactory::class),
-            testFrameworkExtraOptionsFilter: $this->createStub(TestFrameworkExtraOptionsFilter::class),
+        $adapter = $this->createAdapter(
+            new SymfonyProcessShellCommandRunner(),
+            $this->createStub(TestFrameworkLogger::class),
+            new FileSystem(),
         );
 
         $this->assertInstanceOf(PhpUnitAdapter::class, $adapter);
         $this->assertSame('PHPUnit', $adapter->getName());
+    }
+
+    public function test_it_creates_a_runner_using_the_supplied_shell_runner_and_logger(): void
+    {
+        $result = CompletedProcessBuilder::withMinimalTestData()
+            ->withStdout('phpunit output')
+            ->build()
+        ;
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->expects($this->once())
+            ->method('mustRun')
+            ->willReturn('PHPUnit 12.5.0')
+        ;
+        $shellCommandRunner
+            ->expects($this->once())
+            ->method('run')
+            ->willReturn($result)
+        ;
+        $testFrameworkLogger = $this->createMock(TestFrameworkLogger::class);
+        $testFrameworkLogger
+            ->expects($this->once())
+            ->method('initialRunStarted')
+            ->with('PHPUnit', '12.5.0')
+        ;
+        $testFrameworkLogger
+            ->expects($this->once())
+            ->method('initialRunFinished')
+            ->with('PHPUnit', $result->command, 'phpunit output')
+        ;
+        $fileSystem = $this->createStub(FileSystem::class);
+        $fileSystem->method('readFile')->willReturn('<phpunit/>');
+        $fileSystem->method('isReadableFile')->willReturn(true);
+        $configuration = ConfigurationBuilder::withMinimalTestData()->withSkipCoverage(true)->build();
+        $adapter = $this->createAdapter($shellCommandRunner, $testFrameworkLogger, $fileSystem, $configuration);
+
+        $initialRun = $adapter->executeInitialRun();
+
+        $this->assertSame('phpunit output', $initialRun->output);
     }
 
     public function test_it_has_a_name(): void
@@ -102,5 +118,42 @@ final class PhpUnitAdapterFactoryTest extends TestCase
     public function test_it_has_an_executable(): void
     {
         $this->assertSame('phpunit', PhpUnitAdapterFactory::getExecutableName());
+    }
+
+    private function createAdapter(
+        ShellCommandRunner $shellCommandRunner,
+        TestFrameworkLogger $testFrameworkLogger,
+        FileSystem $fileSystem,
+        ?Configuration $configuration = null,
+    ): TestFramework {
+        $configuration ??= ConfigurationBuilder::withMinimalTestData()->build();
+
+        return PhpUnitAdapterFactory::create(
+            '/path/to/phpunit',
+            '/tmp',
+            __FILE__,
+            '/path/to/config-dir',
+            '/path/to/junit.xml',
+            '/path/to/project',
+            ['/path/to/project/src'],
+            true,
+            executeOnlyCoveringTestCases: false,
+            filteredSourceFilesToMutate: [],
+            mapSourceClassToTestStrategy: null,
+            shellCommandRunner: $shellCommandRunner,
+            sourceDirectoryBasePath: '/path/to/project',
+            useWindowsFilterLimit: false,
+            fileSystem: $fileSystem,
+            testFrameworkLogger: $testFrameworkLogger,
+            logger: $this->createStub(LoggerInterface::class),
+            coverageCheckerFactory: new CoverageCheckerFactory(
+                $configuration,
+                JUnitReportLocator::create($fileSystem, ''),
+                IndexXmlCoverageLocator::create($fileSystem, ''),
+            ),
+            configuration: $configuration,
+            processFactory: $this->createStub(MutantProcessContainerFactory::class),
+            testFrameworkExtraOptionsFilter: $this->createStub(TestFrameworkExtraOptionsFilter::class),
+        );
     }
 }

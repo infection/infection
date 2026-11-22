@@ -37,7 +37,6 @@ namespace Infection\TestFramework\Contracts;
 
 use Infection\Configuration\Configuration;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Psr\Log\LoggerInterface;
@@ -74,7 +73,6 @@ interface TestFrameworkFactory
         TestFrameworkLogger $testFrameworkLogger,
         LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
-        InitialTestsRunner $initialTestsRunner,
         Configuration $configuration,
         MutantProcessContainerFactory $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
