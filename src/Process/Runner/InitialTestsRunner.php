@@ -35,10 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
-use InvalidArgumentException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -95,8 +96,8 @@ class InitialTestsRunner
     {
         try {
             return $testFrameworkAdapter->getVersion();
-        } catch (InvalidArgumentException) {
-            return 'unknown';
+        } catch (InvalidVersion) {
+            return TestFramework::UNKNOWN_VERSION;
         }
     }
 }

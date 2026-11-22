@@ -42,6 +42,7 @@ use function array_values;
 use function count;
 use function end;
 use function extension_loaded;
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
@@ -51,7 +52,6 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Logger\EventDispatchingTestFrameworkLogger;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
-use InvalidArgumentException;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -101,7 +101,7 @@ final class InitialTestsRunnerTest extends TestCase
         $versionExpectation = $this->testFrameworkAdapter->method('getVersion');
 
         if ($version === null) {
-            $versionExpectation->willThrowException(new InvalidArgumentException('Invalid version output.'));
+            $versionExpectation->willThrowException(new InvalidVersion('Invalid version output.'));
         } else {
             $versionExpectation->willReturn($version);
         }

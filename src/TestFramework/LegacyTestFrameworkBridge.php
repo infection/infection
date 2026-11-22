@@ -62,7 +62,7 @@ final class LegacyTestFrameworkBridge implements TestFramework
 {
     private ?string $version = null;
 
-    publi c function __construct(
+    public function __construct(
         private readonly TestFrameworkAdapter $adapter,
         private readonly ConsoleOutput $consoleOutput,
         private readonly CoverageChecker $coverageChecker,
