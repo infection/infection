@@ -89,6 +89,7 @@ class CoverageChecker
                 Coverage needs to be generated but no code coverage generator (pcov, phpdbg, xdebug or turbocov) has been detected. Please either:
                 - Enable pcov and run Infection again
                 - Use phpdbg, e.g. `phpdbg -qrr infection`
+                - Enable turbocov (requires PHPUnit 13.3+ with the `ShipMonk\Turbocov\TurbocovDriver` coverage driver configured) and run Infection again
                 - Enable Xdebug (in case of using Xdebug 3 check that `xdebug.mode` or environment variable XDEBUG_MODE set to `coverage`) and run Infection again
                 - Use the "--coverage" option with path to the existing coverage report
                 - Enable the code generator tool for the initial test run only, e.g. with `--initial-tests-php-options -d zend_extension=xdebug.so`
@@ -186,7 +187,7 @@ class CoverageChecker
     private function isTurbocovIncludedInInitialTestPhpOptions(): bool
     {
         return (bool) preg_match(
-            '/(extension\s*=.*turbocov.*)/mi',
+            '/extension\s*=\s*\S*turbocov/i',
             $this->initialTestPhpOptions,
         );
     }

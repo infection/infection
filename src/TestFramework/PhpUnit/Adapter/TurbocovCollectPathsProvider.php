@@ -38,6 +38,8 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 use function implode;
 use Safe\Exceptions\InfoException;
 use function Safe\ini_get;
+use function Safe\preg_match;
+use Webmozart\Assert\Assert;
 
 /**
  * When used as the coverage driver, turbocov only collects the coverage of the
@@ -49,7 +51,8 @@ use function Safe\ini_get;
  * `ini_set()`. It has to be passed to the initial test run process instead.
  *
  * Infection knows which source code it targets and can therefore provide this
- * setting when it is not configured.
+ * setting when it is not configured, be it in the PHP configuration or in the
+ * initial tests PHP options.
  *
  * @see https://github.com/shipmonk-rnd/turbocov#settings
  *
@@ -63,30 +66,73 @@ readonly class TurbocovCollectPathsProvider
     // turbocov accepts a list of paths separated by a colon.
     private const string PATH_SEPARATOR = ':';
 
-    private ?string $phpConfiguredCollectPaths;
+    /**
+     * @param non-empty-array<string> $sourceDirectoryPaths
+     * @param string|null $phpConfiguredCollectPaths The `turbocov.collect_paths` setting of the Infection process; `null` if turbocov is not loaded in it.
+     */
+    public function __construct(
+        private array $sourceDirectoryPaths,
+        private string $initialTestsPhpOptions,
+        private ?string $phpConfiguredCollectPaths,
+    ) {
+    }
 
     /**
      * @param non-empty-array<string> $sourceDirectoryPaths
      */
-    public function __construct(
-        private array $sourceDirectoryPaths,
-        ?string $iniValue = null,
-    ) {
+    public static function create(
+        array $sourceDirectoryPaths,
+        ?string $initialTestsPhpOptions,
+    ): self {
         try {
-            $this->phpConfiguredCollectPaths = $iniValue ?? ini_get('turbocov.collect_paths');
+            $phpConfiguredCollectPaths = ini_get('turbocov.collect_paths');
         } catch (InfoException) {
-            // Probably not using turbocov
-            $this->phpConfiguredCollectPaths = null;
+            // turbocov is not loaded in the Infection process
+            $phpConfiguredCollectPaths = null;
         }
+
+        return new self(
+            $sourceDirectoryPaths,
+            (string) $initialTestsPhpOptions,
+            $phpConfiguredCollectPaths,
+        );
     }
 
     public function shouldProvide(): bool
     {
-        return $this->phpConfiguredCollectPaths === self::DEFAULT_COLLECT_PATHS;
+        // A setting explicitly passed for the initial test run takes precedence.
+        if ($this->isCollectPathsSetInInitialTestsPhpOptions()) {
+            return false;
+        }
+
+        if ($this->phpConfiguredCollectPaths !== null) {
+            return $this->phpConfiguredCollectPaths === self::DEFAULT_COLLECT_PATHS;
+        }
+
+        // turbocov may be loaded for the initial test run only.
+        return $this->isTurbocovLoadedInInitialTestsPhpOptions();
     }
 
     public function getCollectPaths(): string
     {
+        foreach ($this->sourceDirectoryPaths as $sourceDirectoryPath) {
+            Assert::notContains(
+                $sourceDirectoryPath,
+                self::PATH_SEPARATOR,
+                'Cannot configure turbocov coverage: the source directory %s contains %s, which turbocov uses as a path separator. Configure the PHP ini setting `turbocov.collect_paths` explicitly, e.g. with `--initial-tests-php-options="-d turbocov.collect_paths=@paths.txt"`.',
+            );
+        }
+
         return implode(self::PATH_SEPARATOR, $this->sourceDirectoryPaths);
+    }
+
+    private function isCollectPathsSetInInitialTestsPhpOptions(): bool
+    {
+        return preg_match('/turbocov\.collect_paths\s*=/', $this->initialTestsPhpOptions) === 1;
+    }
+
+    private function isTurbocovLoadedInInitialTestsPhpOptions(): bool
+    {
+        return preg_match('/extension\s*=\s*\S*turbocov/', $this->initialTestsPhpOptions) === 1;
     }
 }

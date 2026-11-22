@@ -42,8 +42,8 @@ jobs:
           - { operating-system: 'ubuntu-latest', php-version: '8.5', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.6', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.6', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
-          # turbocov needs PHPUnit 13.3+ (unlike most E2E tests), so only the E2E tests for it are executed
-          - { operating-system: 'ubuntu-latest', php-version: '8.4', composer: 'composer', coverage-driver: 'turbocov', e2e-runner: 'bin/infection' }
+          # The other E2E tests do not configure the turbocov PHPUnit driver, so only the turbocov ones are executed
+          - { operating-system: 'ubuntu-latest', php-version: '8.4', dependencies: 'locked', composer: 'composer', coverage-driver: 'turbocov', e2e-runner: 'bin/infection' }
 
     name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependencies }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
@@ -159,7 +159,10 @@ jobs:
         if: runner.os != 'Windows' && matrix.coverage-driver == 'turbocov'
         env:
           TERM: xterm-256color
-        run: ./tests/e2e_tests bin/infection Turbocov
+        run: |
+          # Unit tests that only run with turbocov loaded
+          vendor/bin/phpunit tests/phpunit/TestFramework/PhpUnit/Adapter/TurbocovCollectPathsProviderTest.php
+          ./tests/e2e_tests bin/infection Turbocov
 
       - name: Compile the prefixed PHAR
         if: &prefixed-phar-condition runner.os != 'Windows' && matrix.e2e-runner == 'dist/infection.phar' && matrix.php-version == '8.3'

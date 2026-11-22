@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use function extension_loaded;
 use Infection\TestFramework\PhpUnit\Adapter\TurbocovCollectPathsProvider;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -46,31 +47,122 @@ use function Safe\ini_get;
 #[CoversClass(TurbocovCollectPathsProvider::class)]
 final class TurbocovCollectPathsProviderTest extends TestCase
 {
+    #[DataProvider('shouldProvideProvider')]
+    public function test_it_tells_if_the_collect_paths_should_be_provided(
+        string $initialTestsPhpOptions,
+        ?string $phpConfiguredCollectPaths,
+        bool $expected,
+    ): void {
+        $provider = new TurbocovCollectPathsProvider(
+            ['/project/src'],
+            $initialTestsPhpOptions,
+            $phpConfiguredCollectPaths,
+        );
+
+        $this->assertSame($expected, $provider->shouldProvide());
+    }
+
+    public static function shouldProvideProvider(): iterable
+    {
+        yield 'turbocov not loaded' => [
+            'initialTestsPhpOptions' => '',
+            'phpConfiguredCollectPaths' => null,
+            'expected' => false,
+        ];
+
+        yield 'turbocov loaded without collect paths' => [
+            'initialTestsPhpOptions' => '',
+            'phpConfiguredCollectPaths' => '',
+            'expected' => true,
+        ];
+
+        yield 'turbocov loaded with configured collect paths' => [
+            'initialTestsPhpOptions' => '',
+            'phpConfiguredCollectPaths' => 'src',
+            'expected' => false,
+        ];
+
+        yield 'turbocov loaded with collect paths set for the initial test run' => [
+            'initialTestsPhpOptions' => '-d memory_limit=-1 -d turbocov.collect_paths=@paths.txt',
+            'phpConfiguredCollectPaths' => '',
+            'expected' => false,
+        ];
+
+        yield 'turbocov loaded for the initial test run only' => [
+            'initialTestsPhpOptions' => '-d memory_limit=-1 -d extension=/path/to/turbocov.so',
+            'phpConfiguredCollectPaths' => null,
+            'expected' => true,
+        ];
+
+        yield 'turbocov loaded for the initial test run only with collect paths' => [
+            'initialTestsPhpOptions' => '-d extension=turbocov -d turbocov.collect_paths=src',
+            'phpConfiguredCollectPaths' => null,
+            'expected' => false,
+        ];
+
+        yield 'another extension loaded for the initial test run' => [
+            'initialTestsPhpOptions' => '-d extension=pcov.so -d pcov.directory=src',
+            'phpConfiguredCollectPaths' => null,
+            'expected' => false,
+        ];
+    }
+
     /**
      * @param non-empty-array<string> $sourceDirectoryPaths
      */
     #[DataProvider('sourceDirectoryPathsProvider')]
     public function test_it_provides_the_source_directories(
         array $sourceDirectoryPaths,
-        ?string $iniValue,
-        bool $expectedShouldProvide,
-        string $expectedCollectPaths,
+        string $expected,
     ): void {
-        $provider = new TurbocovCollectPathsProvider($sourceDirectoryPaths, $iniValue);
+        $provider = new TurbocovCollectPathsProvider($sourceDirectoryPaths, '', '');
 
-        $this->assertSame($expectedShouldProvide, $provider->shouldProvide());
-        $this->assertSame($expectedCollectPaths, $provider->getCollectPaths());
+        $this->assertSame($expected, $provider->getCollectPaths());
+    }
+
+    public static function sourceDirectoryPathsProvider(): iterable
+    {
+        yield 'one source directory path' => [
+            'sourceDirectoryPaths' => ['/project/src'],
+            'expected' => '/project/src',
+        ];
+
+        yield 'several source directory paths' => [
+            'sourceDirectoryPaths' => [
+                '/path/to/project/src',
+                '/path/to/project/packages/package-a/src',
+                '/elsewhere/lib',
+            ],
+            'expected' => '/path/to/project/src:/path/to/project/packages/package-a/src:/elsewhere/lib',
+        ];
+
+        yield 'source directory paths with spaces' => [
+            'sourceDirectoryPaths' => ['/path/to/my project/src'],
+            'expected' => '/path/to/my project/src',
+        ];
+    }
+
+    public function test_it_throws_when_a_source_directory_contains_the_path_separator(): void
+    {
+        $provider = new TurbocovCollectPathsProvider(
+            ['/project/src', '/project/a:b/src'],
+            '',
+            '',
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot configure turbocov coverage: the source directory "/project/a:b/src" contains ":"');
+
+        $provider->getCollectPaths();
     }
 
     #[RequiresPhpExtension('turbocov')]
     public function test_it_reads_the_collect_paths_from_the_ini_configuration(): void
     {
-        $provider = new TurbocovCollectPathsProvider(['/project/src']);
+        $provider = TurbocovCollectPathsProvider::create(['/project/src'], null);
 
-        // Note that `turbocov.collect_paths` is applied when PHP compiles a
-        // file, so it cannot be set at runtime.
-        // As a result, this test is a bit light, but being more thorough would
-        // be too expensive infrastructure-wise.
+        // `turbocov.collect_paths` is applied when PHP compiles a file, so it
+        // cannot be set at runtime: this test depends on the PHP configuration.
         $expected = ini_get('turbocov.collect_paths') === '';
 
         $this->assertSame($expected, $provider->shouldProvide());
@@ -82,36 +174,8 @@ final class TurbocovCollectPathsProviderTest extends TestCase
             $this->markTestSkipped('Test requires turbocov to be disabled to run.');
         }
 
-        $provider = new TurbocovCollectPathsProvider(['/project/src']);
+        $provider = TurbocovCollectPathsProvider::create(['/project/src'], null);
 
         $this->assertFalse($provider->shouldProvide());
-    }
-
-    public static function sourceDirectoryPathsProvider(): iterable
-    {
-        yield 'one source directory path' => [
-            'sourceDirectoryPaths' => ['/project/src'],
-            'iniValue' => '',
-            'expectedShouldProvide' => true,
-            'expectedCollectPaths' => '/project/src',
-        ];
-
-        yield 'several source directory paths' => [
-            'sourceDirectoryPaths' => [
-                '/path/to/project/src',
-                '/path/to/project/packages/package-a/src',
-                '/elsewhere/lib',
-            ],
-            'iniValue' => '',
-            'expectedShouldProvide' => true,
-            'expectedCollectPaths' => '/path/to/project/src:/path/to/project/packages/package-a/src:/elsewhere/lib',
-        ];
-
-        yield 'configured collect paths' => [
-            'sourceDirectoryPaths' => ['/project/src'],
-            'iniValue' => 'src:config/services.php',
-            'expectedShouldProvide' => false,
-            'expectedCollectPaths' => '/project/src',
-        ];
     }
 }

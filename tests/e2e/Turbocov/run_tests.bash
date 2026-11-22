@@ -17,7 +17,9 @@ readonly INFECTION=../../../${1}
 
 set -eo pipefail
 
-php $INFECTION
+# Force an empty `turbocov.collect_paths` so that Infection has to provide it,
+# whatever the local PHP configuration is.
+php -d turbocov.collect_paths= $INFECTION
 
 if [ -n "$GOLDEN" ]; then
     cp -v var/infection.log expected-output.txt

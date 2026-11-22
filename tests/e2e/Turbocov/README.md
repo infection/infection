@@ -5,9 +5,9 @@ coverage driver, through its PHPUnit 13.3+ driver
 `ShipMonk\Turbocov\TurbocovDriver` configured in `phpunit.xml`.
 
 turbocov only instruments the paths listed in the `turbocov.collect_paths` INI
-setting, which cannot be changed at runtime. It is not set here: this checks
-that Infection detects turbocov and provides the setting from its source
-directories (`src` and `lib`) for the initial test run.
+setting, which cannot be changed at runtime. `run_tests.bash` forces it to be
+empty: this checks that Infection detects turbocov and provides the setting from
+its source directories (`src` and `lib`) for the initial test run.
 
 `Calculator::subtract()` is not covered by any test, so no mutant is generated
 for it: 2 mutants are expected (`Calculator::add()` in `src` and `Counter::next()`

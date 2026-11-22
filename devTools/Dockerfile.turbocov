@@ -41,8 +41,7 @@ RUN --mount=type=bind,from=ghcr.io/php/pie:bin,source=/pie,target=/usr/local/bin
     apk add --no-cache --virtual .app-phpexts-rundeps ${runDeps}; \
     apk del .build-deps; \
     php --ri turbocov; \
-    ! php -m | grep -qix pcov; \
-    ! php -m | grep -qix xdebug
+    if php -m | grep -qiE '^(pcov|xdebug)$'; then echo 'turbocov cannot run alongside PCOV or Xdebug' >&2; exit 1; fi
 
 RUN apk add --no-cache \
         ncurses \
