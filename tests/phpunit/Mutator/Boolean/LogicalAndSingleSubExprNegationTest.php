@@ -75,6 +75,26 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
             ),
         ];
 
+        yield 'It does not negate the final operand of a grouped statement' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a && ($b && $c);
+                    PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        !$a && ($b && $c);
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a && (!$b && $c);
+                        PHP,
+                ),
+            ],
+        ];
+
         yield 'It still negates the first operand when the final operand is not simple' => [
             self::wrapCodeInMethod(
                 <<<'PHP'

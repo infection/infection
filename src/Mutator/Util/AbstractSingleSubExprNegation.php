@@ -60,11 +60,15 @@ abstract class AbstractSingleSubExprNegation implements Mutator
     {
         $subExpressionsToNegateCount = $this->countSubExpressionsToNegate($node);
 
-        /** @var Node\Expr\BinaryOp $binaryOpNode */
-        $binaryOpNode = $node;
+        // The final operand is the right-most leaf, also through grouped operands such as `$a && ($b && $c)`
+        $finalOperand = $node;
+
+        while ($finalOperand instanceof Node\Expr\BinaryOp && $this->isSupportedBinaryOpExpr($finalOperand)) {
+            $finalOperand = $finalOperand->right;
+        }
 
         if (ParentConnector::findParent($node) instanceof Node\Stmt\Expression
-            && $this->isSingleOperandExpression($binaryOpNode->right)
+            && $this->isSingleOperandExpression($finalOperand)
         ) {
             // Negating the final operand only changes the discarded result.
             --$subExpressionsToNegateCount;
