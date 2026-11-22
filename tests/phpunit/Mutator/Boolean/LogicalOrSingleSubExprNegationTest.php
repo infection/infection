@@ -54,6 +54,40 @@ final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
 
     public static function mutationsProvider(): iterable
     {
+        yield 'It does not negate the final method call in a statement' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    isset($key) || $this->save($key);
+                    PHP,
+            ),
+        ];
+
+        yield 'It only negates the first operand in a statement with two simple operands' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a || $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    !$a || $b;
+                    PHP,
+            ),
+        ];
+
+        yield 'It still negates the first operand when the final operand is not simple' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a || isset($b);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    !$a || isset($b);
+                    PHP,
+            ),
+        ];
+
         yield 'It mutates array item fetch' => [
             self::wrapCodeInMethod(
                 <<<'PHP'

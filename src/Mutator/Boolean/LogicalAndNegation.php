@@ -92,6 +92,11 @@ final class LogicalAndNegation implements Mutator
 
         $parent = ParentConnector::findParent($node);
 
+        // A statement discards the result, so negating it has no effect.
+        if ($parent instanceof Node\Stmt\Expression) {
+            return false;
+        }
+
         if ($parent instanceof Node\Expr\BinaryOp\BooleanAnd) {
             return false;
         }
