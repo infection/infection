@@ -520,7 +520,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->willReturn($scenario->turbocovCollectPaths !== '')
         ;
         $this->turbocovCollectPathsProvider
-            ->expects($this->atMost(1))
+            ->expects(!$scenario->skipCoverage && $scenario->turbocovCollectPaths !== '' ? $this->once() : $this->never())
             ->method('getCollectPaths')
             ->willReturn($scenario->turbocovCollectPaths)
         ;
@@ -1082,7 +1082,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
-        yield 'with turbocov collect paths' => [
+        yield 'with turbocov collect paths added after the PHP extra args' => [
             $default
                 ->withPhpExtraArgs(['-d', 'memory_limit=-1'])
                 ->withTurbocovCollectPaths('/path/to/project/src:/path/to/project/lib')
@@ -1407,7 +1407,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
-        yield 'with skipped coverage and turbocov collect paths' => [
+        yield 'with skipped coverage: no turbocov collect paths added' => [
             $default
                 ->withSkipCoverage(true)
                 ->withTurbocovCollectPaths('/path/to/project/src')

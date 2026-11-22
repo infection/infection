@@ -160,7 +160,7 @@ jobs:
         env:
           TERM: xterm-256color
         run: |
-          # Unit tests that only run with turbocov loaded
+          # Includes a unit test that requires turbocov to be loaded
           vendor/bin/phpunit tests/phpunit/TestFramework/PhpUnit/Adapter/TurbocovCollectPathsProviderTest.php
           ./tests/e2e_tests bin/infection Turbocov
 

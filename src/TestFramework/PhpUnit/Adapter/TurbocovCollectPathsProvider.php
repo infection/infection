@@ -54,6 +54,11 @@ use Webmozart\Assert\Assert;
  * setting when it is not configured, be it in the PHP configuration or in the
  * initial tests PHP options.
  *
+ * When it is configured for the Infection process only, e.g. with
+ * `php -d turbocov.collect_paths=src infection`, it is forwarded to the initial
+ * test run: unlike the PHP configuration, the `-d` options of the Infection
+ * process are not inherited by it.
+ *
  * @see https://github.com/shipmonk-rnd/turbocov#settings
  *
  * @internal
@@ -105,8 +110,10 @@ readonly class TurbocovCollectPathsProvider
             return false;
         }
 
+        // turbocov is loaded in the Infection process: its setting is either
+        // provided or forwarded.
         if ($this->phpConfiguredCollectPaths !== null) {
-            return $this->phpConfiguredCollectPaths === self::DEFAULT_COLLECT_PATHS;
+            return true;
         }
 
         // turbocov may be loaded for the initial test run only.
@@ -115,6 +122,12 @@ readonly class TurbocovCollectPathsProvider
 
     public function getCollectPaths(): string
     {
+        if ($this->phpConfiguredCollectPaths !== null
+            && $this->phpConfiguredCollectPaths !== self::DEFAULT_COLLECT_PATHS
+        ) {
+            return $this->phpConfiguredCollectPaths;
+        }
+
         foreach ($this->sourceDirectoryPaths as $sourceDirectoryPath) {
             Assert::notContains(
                 $sourceDirectoryPath,

@@ -187,7 +187,7 @@ class CoverageChecker
     private function isTurbocovIncludedInInitialTestPhpOptions(): bool
     {
         return (bool) preg_match(
-            '/extension\s*=\s*\S*turbocov/i',
+            '/extension\s*=\s*\S*turbocov/',
             $this->initialTestPhpOptions,
         );
     }

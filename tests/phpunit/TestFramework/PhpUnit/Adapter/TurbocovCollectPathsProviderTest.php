@@ -44,66 +44,87 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use function Safe\ini_get;
 
+
+/**
+ * The initial test run is a separate PHP process: it reads the PHP configuration
+ * (php.ini) again, but does not inherit the `-d` options of the Infection process.
+ */
 #[CoversClass(TurbocovCollectPathsProvider::class)]
 final class TurbocovCollectPathsProviderTest extends TestCase
 {
-    #[DataProvider('shouldProvideProvider')]
-    public function test_it_tells_if_the_collect_paths_should_be_provided(
+    private const array SOURCE_DIRECTORIES = ['/project/src', '/project/lib'];
+
+    /**
+     * @param string|null $infectionProcessCollectPaths `null` when turbocov is not loaded in the Infection process
+     * @param string|null $expectedCollectPathsPassedToInitialTestRun `null` when no `-d turbocov.collect_paths=…` is added
+     */
+    #[DataProvider('collectPathsProvider')]
+    public function test_it_passes_the_collect_paths_to_the_initial_test_run(
+        ?string $infectionProcessCollectPaths,
         string $initialTestsPhpOptions,
-        ?string $phpConfiguredCollectPaths,
-        bool $expected,
+        ?string $expectedCollectPathsPassedToInitialTestRun,
     ): void {
         $provider = new TurbocovCollectPathsProvider(
-            ['/project/src'],
+            self::SOURCE_DIRECTORIES,
             $initialTestsPhpOptions,
-            $phpConfiguredCollectPaths,
+            $infectionProcessCollectPaths,
         );
 
-        $this->assertSame($expected, $provider->shouldProvide());
+        $actual = $provider->shouldProvide()
+            ? $provider->getCollectPaths()
+            : null;
+
+        $this->assertSame($expectedCollectPathsPassedToInitialTestRun, $actual);
     }
 
-    public static function shouldProvideProvider(): iterable
+    public static function collectPathsProvider(): iterable
     {
-        yield 'turbocov not loaded' => [
+        yield 'turbocov not loaded anywhere: nothing passed' => [
+            'infectionProcessCollectPaths' => null,
             'initialTestsPhpOptions' => '',
-            'phpConfiguredCollectPaths' => null,
-            'expected' => false,
+            'expectedCollectPathsPassedToInitialTestRun' => null,
         ];
 
-        yield 'turbocov loaded without collect paths' => [
-            'initialTestsPhpOptions' => '',
-            'phpConfiguredCollectPaths' => '',
-            'expected' => true,
-        ];
-
-        yield 'turbocov loaded with configured collect paths' => [
-            'initialTestsPhpOptions' => '',
-            'phpConfiguredCollectPaths' => 'src',
-            'expected' => false,
-        ];
-
-        yield 'turbocov loaded with collect paths set for the initial test run' => [
-            'initialTestsPhpOptions' => '-d memory_limit=-1 -d turbocov.collect_paths=@paths.txt',
-            'phpConfiguredCollectPaths' => '',
-            'expected' => false,
-        ];
-
-        yield 'turbocov loaded for the initial test run only' => [
-            'initialTestsPhpOptions' => '-d memory_limit=-1 -d extension=/path/to/turbocov.so',
-            'phpConfiguredCollectPaths' => null,
-            'expected' => true,
-        ];
-
-        yield 'turbocov loaded for the initial test run only with collect paths' => [
-            'initialTestsPhpOptions' => '-d extension=turbocov -d turbocov.collect_paths=src',
-            'phpConfiguredCollectPaths' => null,
-            'expected' => false,
-        ];
-
-        yield 'another extension loaded for the initial test run' => [
+        yield 'another extension loaded for the initial test run: nothing passed' => [
+            'infectionProcessCollectPaths' => null,
             'initialTestsPhpOptions' => '-d extension=pcov.so -d pcov.directory=src',
-            'phpConfiguredCollectPaths' => null,
-            'expected' => false,
+            'expectedCollectPathsPassedToInitialTestRun' => null,
+        ];
+
+        yield 'turbocov loaded without collect paths: source directories passed' => [
+            'infectionProcessCollectPaths' => '',
+            'initialTestsPhpOptions' => '',
+            'expectedCollectPathsPassedToInitialTestRun' => '/project/src:/project/lib',
+        ];
+
+        yield 'turbocov loaded with collect paths (php.ini or `php -d` for Infection): forwarded as is' => [
+            'infectionProcessCollectPaths' => 'src:config/services.php',
+            'initialTestsPhpOptions' => '',
+            'expectedCollectPathsPassedToInitialTestRun' => 'src:config/services.php',
+        ];
+
+        yield 'turbocov loaded, collect paths set in the initial tests PHP options: nothing passed, the option is used' => [
+            'infectionProcessCollectPaths' => '',
+            'initialTestsPhpOptions' => '-d memory_limit=-1 -d turbocov.collect_paths=@paths.txt',
+            'expectedCollectPathsPassedToInitialTestRun' => null,
+        ];
+
+        yield 'turbocov loaded with collect paths, also set in the initial tests PHP options: nothing passed, the option wins' => [
+            'infectionProcessCollectPaths' => 'src',
+            'initialTestsPhpOptions' => '-d turbocov.collect_paths=@paths.txt',
+            'expectedCollectPathsPassedToInitialTestRun' => null,
+        ];
+
+        yield 'turbocov loaded in the initial tests PHP options only: source directories passed' => [
+            'infectionProcessCollectPaths' => null,
+            'initialTestsPhpOptions' => '-d memory_limit=-1 -d extension=/path/to/turbocov.so',
+            'expectedCollectPathsPassedToInitialTestRun' => '/project/src:/project/lib',
+        ];
+
+        yield 'turbocov and collect paths both in the initial tests PHP options: nothing passed, the option is used' => [
+            'infectionProcessCollectPaths' => null,
+            'initialTestsPhpOptions' => '-d extension=turbocov -d turbocov.collect_paths=src',
+            'expectedCollectPathsPassedToInitialTestRun' => null,
         ];
     }
 
@@ -111,7 +132,7 @@ final class TurbocovCollectPathsProviderTest extends TestCase
      * @param non-empty-array<string> $sourceDirectoryPaths
      */
     #[DataProvider('sourceDirectoryPathsProvider')]
-    public function test_it_provides_the_source_directories(
+    public function test_it_joins_the_source_directories_with_the_turbocov_path_separator(
         array $sourceDirectoryPaths,
         string $expected,
     ): void {
@@ -122,12 +143,12 @@ final class TurbocovCollectPathsProviderTest extends TestCase
 
     public static function sourceDirectoryPathsProvider(): iterable
     {
-        yield 'one source directory path' => [
+        yield 'one source directory' => [
             'sourceDirectoryPaths' => ['/project/src'],
             'expected' => '/project/src',
         ];
 
-        yield 'several source directory paths' => [
+        yield 'several source directories' => [
             'sourceDirectoryPaths' => [
                 '/path/to/project/src',
                 '/path/to/project/packages/package-a/src',
@@ -136,13 +157,13 @@ final class TurbocovCollectPathsProviderTest extends TestCase
             'expected' => '/path/to/project/src:/path/to/project/packages/package-a/src:/elsewhere/lib',
         ];
 
-        yield 'source directory paths with spaces' => [
+        yield 'source directory with spaces' => [
             'sourceDirectoryPaths' => ['/path/to/my project/src'],
             'expected' => '/path/to/my project/src',
         ];
     }
 
-    public function test_it_throws_when_a_source_directory_contains_the_path_separator(): void
+    public function test_it_rejects_a_source_directory_containing_the_turbocov_path_separator(): void
     {
         $provider = new TurbocovCollectPathsProvider(
             ['/project/src', '/project/a:b/src'],
@@ -157,18 +178,21 @@ final class TurbocovCollectPathsProviderTest extends TestCase
     }
 
     #[RequiresPhpExtension('turbocov')]
-    public function test_it_reads_the_collect_paths_from_the_ini_configuration(): void
+    public function test_it_reads_the_collect_paths_of_the_infection_process_when_turbocov_is_loaded(): void
     {
         $provider = TurbocovCollectPathsProvider::create(['/project/src'], null);
 
         // `turbocov.collect_paths` is applied when PHP compiles a file, so it
-        // cannot be set at runtime: this test depends on the PHP configuration.
-        $expected = ini_get('turbocov.collect_paths') === '';
+        // cannot be set at runtime: the expected value depends on the PHP configuration.
+        $expected = ini_get('turbocov.collect_paths') === ''
+            ? '/project/src'
+            : ini_get('turbocov.collect_paths');
 
-        $this->assertSame($expected, $provider->shouldProvide());
+        $this->assertTrue($provider->shouldProvide());
+        $this->assertSame($expected, $provider->getCollectPaths());
     }
 
-    public function test_it_does_not_provide_the_collect_paths_without_turbocov(): void
+    public function test_it_passes_nothing_when_turbocov_is_not_loaded_in_the_infection_process(): void
     {
         if (extension_loaded('turbocov')) {
             $this->markTestSkipped('Test requires turbocov to be disabled to run.');
