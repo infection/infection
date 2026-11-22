@@ -66,7 +66,7 @@ readonly class TurbocovCollectPathsProvider
     private ?string $phpConfiguredCollectPaths;
 
     /**
-     * @param non-empty-list<string> $sourceDirectoryPaths
+     * @param non-empty-array<string> $sourceDirectoryPaths
      */
     public function __construct(
         private array $sourceDirectoryPaths,

@@ -47,7 +47,7 @@ use function Safe\ini_get;
 final class TurbocovCollectPathsProviderTest extends TestCase
 {
     /**
-     * @param non-empty-list<string> $sourceDirectoryPaths
+     * @param non-empty-array<string> $sourceDirectoryPaths
      */
     #[DataProvider('sourceDirectoryPathsProvider')]
     public function test_it_provides_the_source_directories(
