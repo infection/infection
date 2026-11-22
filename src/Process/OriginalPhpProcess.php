@@ -78,8 +78,9 @@ final class OriginalPhpProcess extends Process
     {
         // Most obvious cases when we don't want to add XDEBUG_MODE=coverage:
         // - PCOV is loaded
+        // - turbocov is loaded
         // - PHPDBG is in use
-        if (extension_loaded('pcov') || PHP_SAPI === 'phpdbg') {
+        if (extension_loaded('pcov') || extension_loaded('turbocov') || PHP_SAPI === 'phpdbg') {
             return false;
         }
 

@@ -115,6 +115,9 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             new PCOVDirectoryProvider(
                 array_values($sourceDirectories),
             ),
+            new TurbocovCollectPathsProvider(
+                array_values($sourceDirectories),
+            ),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,

@@ -44,6 +44,7 @@ use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\Tests\TestFramework\Coverage\Locator\Throwable\UnknownReportLocatorException;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\Stub;
@@ -115,6 +116,7 @@ final class CoverageCheckerTest extends TestCase
         $this->requireNoPcov();
         $this->requireNoPhpDbg();
         $this->requireNoXdebug();
+        $this->requireNoTurbocov();
 
         $checker = new CoverageChecker(
             false,
@@ -129,7 +131,7 @@ final class CoverageCheckerTest extends TestCase
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(<<<TXT
-            Coverage needs to be generated but no code coverage generator (pcov, phpdbg or xdebug) has been detected. Please either:
+            Coverage needs to be generated but no code coverage generator (pcov, phpdbg, xdebug or turbocov) has been detected. Please either:
             - Enable pcov and run Infection again
             - Use phpdbg, e.g. `phpdbg -qrr infection`
             - Enable Xdebug (in case of using Xdebug 3 check that `xdebug.mode` or environment variable XDEBUG_MODE set to `coverage`) and run Infection again
@@ -139,6 +141,42 @@ final class CoverageCheckerTest extends TestCase
         );
 
         $checker->checkCoverageRequirements();
+    }
+
+    #[DataProvider('coverageGeneratorInInitialTestPhpOptionsProvider')]
+    public function test_it_accepts_a_code_coverage_generator_enabled_for_the_initial_test_run_only(
+        string $initialTestPhpOptions,
+    ): void {
+        $this->requireNoPcov();
+        $this->requireNoPhpDbg();
+        $this->requireNoXdebug();
+        $this->requireNoTurbocov();
+
+        $checker = new CoverageChecker(
+            false,
+            false,
+            $initialTestPhpOptions,
+            '',
+            false,
+            new FakeLocator(),
+            'unknown',
+            new FakeLocator(),
+        );
+
+        $this->expectNotToPerformAssertions();
+
+        $checker->checkCoverageRequirements();
+    }
+
+    public static function coverageGeneratorInInitialTestPhpOptionsProvider(): iterable
+    {
+        yield 'Xdebug' => ['-d zend_extension=xdebug.so'];
+
+        yield 'PCOV' => ['-d extension=pcov.so'];
+
+        yield 'turbocov' => ['-d extension=turbocov.so'];
+
+        yield 'turbocov with other options' => ['-d memory_limit=-1 -d extension=/path/to/turbocov.so -d turbocov.collect_paths=src'];
     }
 
     public function test_it_passes_existence_check_if_xml_index_and_junit_files_are_found_with_junit_report(): void
@@ -496,6 +534,13 @@ final class CoverageCheckerTest extends TestCase
     {
         if (extension_loaded('xdebug')) {
             $this->markTestSkipped('Test requires xdebug to be disabled to run.');
+        }
+    }
+
+    private function requireNoTurbocov(): void
+    {
+        if (extension_loaded('turbocov')) {
+            $this->markTestSkipped('Test requires turbocov to be disabled to run.');
         }
     }
 

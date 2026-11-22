@@ -638,6 +638,8 @@ final class RunCommand extends BaseCommand
             $consoleOutput->logRunningWithDebugger('Xdebug');
         } elseif (extension_loaded('pcov')) {
             $consoleOutput->logRunningWithDebugger('PCOV');
+        } elseif (extension_loaded('turbocov')) {
+            $consoleOutput->logRunningWithDebugger('turbocov');
         }
     }
 

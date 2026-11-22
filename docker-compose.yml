@@ -36,6 +36,18 @@ services:
     volumes:
       - .:/opt/infection
 
+  # turbocov (https://github.com/shipmonk-rnd/turbocov) as the only coverage
+  # driver: no Xdebug nor PCOV installed. Requires PHP 8.4+ and PHPUnit 13.3+.
+  php84-turbocov:
+    build:
+      context: devTools
+      dockerfile: Dockerfile.turbocov
+      args:
+        PHP_VERSION: '8.4'
+        TURBOCOV_VERSION: '0.1.1'
+    volumes:
+      - .:/opt/infection
+
   php86:
     build:
       context: devTools

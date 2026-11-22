@@ -68,6 +68,7 @@ final class OriginalPhpProcessTest extends TestCase
 
         if (
             !extension_loaded('pcov')
+            && !extension_loaded('turbocov')
             && PHP_SAPI !== 'phpdbg'
             && (
                 ini_get_unsafe('xdebug.mode') === false

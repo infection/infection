@@ -1,0 +1,19 @@
+{
+    "$schema": "../../../resources/schema.json",
+    "timeout": 25,
+    "threads": 1,
+    "source": {
+        "directories": [
+            "src",
+            "lib"
+        ]
+    },
+    "logs": {
+        "summary": "var/infection.log"
+    },
+    "mutators": {
+        "Plus": true,
+        "Minus": true
+    },
+    "tmpDir": "var/infection-tmp"
+}

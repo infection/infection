@@ -56,6 +56,7 @@ final class InitialTestRunScenario
         public array $phpExtraArgs,
         public bool $skipCoverage,
         public string $pcovDirectory,
+        public string $turbocovCollectPaths,
         public array $expected,
     ) {
     }
@@ -145,6 +146,14 @@ final class InitialTestRunScenario
     {
         $clone = clone $this;
         $clone->pcovDirectory = $pcovDirectory;
+
+        return $clone;
+    }
+
+    public function withTurbocovCollectPaths(string $turbocovCollectPaths): self
+    {
+        $clone = clone $this;
+        $clone->turbocovCollectPaths = $turbocovCollectPaths;
 
         return $clone;
     }

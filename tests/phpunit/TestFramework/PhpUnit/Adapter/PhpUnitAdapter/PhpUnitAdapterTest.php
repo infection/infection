@@ -54,6 +54,7 @@ use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\TestFramework\PhpUnit\Adapter\TurbocovCollectPathsProvider;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
@@ -93,6 +94,8 @@ final class PhpUnitAdapterTest extends TestCase
 
     private MockObject&PCOVDirectoryProvider $pcovDirectoryProvider;
 
+    private MockObject&TurbocovCollectPathsProvider $turbocovCollectPathsProvider;
+
     private MockObject&FileSystem $fileSystemMock;
 
     private MockObject&PhpExecutableFinder $phpExecutableFinderMock;
@@ -100,6 +103,7 @@ final class PhpUnitAdapterTest extends TestCase
     protected function setUp(): void
     {
         $this->pcovDirectoryProvider = $this->createMock(PCOVDirectoryProvider::class);
+        $this->turbocovCollectPathsProvider = $this->createMock(TurbocovCollectPathsProvider::class);
         $this->fileSystemMock = $this->createMock(FileSystem::class);
         $this->phpExecutableFinderMock = $this->createMock(PhpExecutableFinder::class);
         $this->phpExecutableFinderMock
@@ -510,6 +514,17 @@ final class PhpUnitAdapterTest extends TestCase
             ->willReturn($scenario->pcovDirectory)
         ;
 
+        $this->turbocovCollectPathsProvider
+            ->expects($scenario->skipCoverage ? $this->never() : $this->once())
+            ->method('shouldProvide')
+            ->willReturn($scenario->turbocovCollectPaths !== '')
+        ;
+        $this->turbocovCollectPathsProvider
+            ->expects($this->atMost(1))
+            ->method('getCollectPaths')
+            ->willReturn($scenario->turbocovCollectPaths)
+        ;
+
         $adapter = $this->createAdapter(
             testFrameworkConfigContent: $scenario->testFrameworkConfigContent,
             version: $scenario->version,
@@ -695,6 +710,7 @@ final class PhpUnitAdapterTest extends TestCase
             phpExtraArgs: [],
             skipCoverage: false,
             pcovDirectory: '',
+            turbocovCollectPaths: '',
             expected: [
                 self::PHP_EXECUTABLE,
                 '/path/to/phpunit',
@@ -1066,6 +1082,24 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with turbocov collect paths' => [
+            $default
+                ->withPhpExtraArgs(['-d', 'memory_limit=-1'])
+                ->withTurbocovCollectPaths('/path/to/project/src:/path/to/project/lib')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '-d',
+                    'memory_limit=-1',
+                    '-d',
+                    'turbocov.collect_paths=/path/to/project/src:/path/to/project/lib',
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
         yield 'with filtered source files and class-to-test mapping' => [
             $default
                 ->withFilteredSourceFilesToMutate([
@@ -1365,6 +1399,18 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withSkipCoverage(true)
                 ->withPcovDirectory('.')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                ]),
+        ];
+
+        yield 'with skipped coverage and turbocov collect paths' => [
+            $default
+                ->withSkipCoverage(true)
+                ->withTurbocovCollectPaths('/path/to/project/src')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
@@ -1960,6 +2006,7 @@ final class PhpUnitAdapterTest extends TestCase
             $tmpDir,
             '/tmp/infection/junit.xml',
             $this->pcovDirectoryProvider,
+            $this->turbocovCollectPathsProvider,
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
