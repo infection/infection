@@ -1821,7 +1821,7 @@ count = 1
 [[issues]]
 file = "src/Mutant/TestFrameworkMutantExecutionResultFactory.php"
 code = "mixed-operand"
-message = "Right operand in `&&` operation has `mixed` type."
+message = "Casting `mixed` to `bool`."
 count = 1
 
 [[issues]]
@@ -4762,12 +4762,6 @@ count = 2
 file = "tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php"
 code = "deprecated-class"
 message = 'Class `Infection\TestFramework\LegacyTestFrameworkBridge` is deprecated and should no longer be used.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Tests\TestFramework\LegacyTestFrameworkBridgeTest::createInitialRunOnlyOptionsAdapter`: expected `Infection\AbstractTestFramework\TestFrameworkAdapter&Infection\TestFramework\ProvidesInitialRunOnlyOptions`, but found `PHPUnit\Framework\MockObject\MockObject`.'
 count = 1
 
 [[issues]]

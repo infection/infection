@@ -38,12 +38,17 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use function array_map;
 use function array_slice;
 use Closure;
+use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\FileSystem;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\Mutant;
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
@@ -73,6 +78,7 @@ use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\Mutation\MutationBuilder;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -238,7 +244,8 @@ final class PhpUnitAdapterTest extends TestCase
         $adapter->executeInitialRun();
     }
 
-    public function test_it_throws_when_the_initial_run_fails(): void
+    #[DataProvider('initialRunFailureProvider')]
+    public function test_it_throws_when_the_initial_run_fails(string $version, string $recommendations): void
     {
         $process = CompletedProcessBuilder::withMinimalTestData()
             ->withCommand(['vendor/bin/phpunit', '--configuration', 'failing.xml'])
@@ -250,9 +257,9 @@ final class PhpUnitAdapterTest extends TestCase
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $adapter = $this->createAdapter(
             '<phpunit/>',
+            version: $version,
             initialTestsRunner: $initialTestsRunner,
         );
-        $recommendations = $adapter->getInitialTestsFailRecommendations($commandLine);
         $failure = InitialTestsFailed::fromCompletedProcess($process, 'PHPUnit', 'tests', $recommendations);
         $initialTestsRunner
             ->expects($this->once())
@@ -269,14 +276,19 @@ final class PhpUnitAdapterTest extends TestCase
                 ],
                 false,
                 'tests',
-                $this->callback(function (Closure $getRecommendations) use ($commandLine, $recommendations): bool {
-                    $this->assertSame(
-                        $recommendations,
-                        $getRecommendations($commandLine),
-                    );
+                $this->callback(
+                    /**
+                     * @param Closure(string): string $getRecommendations
+                     */
+                    function (Closure $getRecommendations) use ($commandLine, $recommendations): bool {
+                        $this->assertThat(
+                            $getRecommendations($commandLine),
+                            $this->stringContains($recommendations),
+                        );
 
-                    return true;
-                }),
+                        return true;
+                    },
+                ),
             )
             ->willThrowException($failure)
         ;
@@ -288,6 +300,34 @@ final class PhpUnitAdapterTest extends TestCase
         $this->expectExceptionObject($failure);
 
         $adapter->executeInitialRun();
+    }
+
+    public static function initialRunFailureProvider(): iterable
+    {
+        yield 'no random execution before PHPUnit 7.2' => [
+            '7.1',
+            <<<'TEXT'
+                Check the executed command to identify the problem:
+                TEXT,
+        ];
+
+        yield 'random execution from PHPUnit 7.2' => [
+            '7.2',
+            <<<'TEXT'
+                Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.
+
+                You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="random" resolveDependencies="true" ...
+                TEXT,
+        ];
+
+        yield 'defects and random execution on PHPUnit 12.2.7' => [
+            '12.2.7',
+            <<<'TEXT'
+                Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.
+
+                You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="defects,random" resolveDependencies="true" ...
+                TEXT,
+        ];
     }
 
     public function test_it_filters_initial_run_only_options_from_mutant_evaluation(): void
@@ -306,9 +346,16 @@ final class PhpUnitAdapterTest extends TestCase
             ->expects($this->once())
             ->method('create')
             ->with(
-                $adapter,
+                [
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.' . $mutant->getMutation()->getHash() . '.infection.xml',
+                    '--verbose',
+                ],
                 $mutant,
-                '--verbose',
+                $this->isInstanceOf(Closure::class),
+                $this->isInstanceOf(Closure::class),
             )
             ->willReturn($processContainer)
         ;
@@ -318,6 +365,25 @@ final class PhpUnitAdapterTest extends TestCase
             $adapter->test($mutant),
             'Mutant evaluation must use the process factory with initial-run options removed.',
         );
+    }
+
+    #[DataProvider('mutantOutputProvider')]
+    public function test_it_classifies_mutant_output(string $output, int $exitCode, DetectionStatus $expected): void
+    {
+        $actual = $this->classifyMutantOutput($output, $exitCode);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function mutantOutputProvider(): iterable
+    {
+        yield 'passing tests let the mutant escape' => ['OK (1 test, 1 assertion)', 0, DetectionStatus::ESCAPED];
+
+        yield 'no matching tests let the mutant escape' => ['No tests executed!', 0, DetectionStatus::ESCAPED];
+
+        yield 'test failures kill the mutant' => ['FAILURES!', 1, DetectionStatus::KILLED_BY_TESTS];
+
+        yield 'syntax errors are reported separately' => ['ParseError: syntax error', 1, DetectionStatus::SYNTAX_ERROR];
     }
 
     #[DataProvider('skipInitialTestsProvider')]
@@ -465,41 +531,19 @@ final class PhpUnitAdapterTest extends TestCase
     }
 
     #[DataProvider('passOutputProvider')]
-    public function test_it_can_tell_if_tests_pass_from_the_output(
-        string $output,
-        bool $expected,
-    ): void {
-        $this->fileSystemMock
-            ->expects($this->never())
-            ->method('dumpFile')
-        ;
-        $this->pcovDirectoryProvider
-            ->expects($this->never())
-            ->method('shouldProvide')
-        ;
+    public function test_it_can_tell_if_tests_pass_from_the_output(string $output, bool $expected): void
+    {
+        $status = $this->classifyMutantOutput($output, 0);
 
-        $actual = $this->adapter->testsPass($output);
-
-        $this->assertSame($expected, $actual);
+        $this->assertSame($expected, $status === DetectionStatus::ESCAPED);
     }
 
     #[DataProvider('syntaxErrorOutputProvider')]
-    public function test_it_can_tell_if_there_is_a_syntax_error_from_the_output(
-        string $output,
-        bool $expected,
-    ): void {
-        $this->fileSystemMock
-            ->expects($this->never())
-            ->method('dumpFile')
-        ;
-        $this->pcovDirectoryProvider
-            ->expects($this->never())
-            ->method('shouldProvide')
-        ;
+    public function test_it_can_tell_if_there_is_a_syntax_error_from_the_output(string $output, bool $expected): void
+    {
+        $status = $this->classifyMutantOutput($output, 1);
 
-        $actual = $this->adapter->isSyntaxError($output);
-
-        $this->assertSame($expected, $actual);
+        $this->assertSame($expected, $status === DetectionStatus::SYNTAX_ERROR);
     }
 
     #[DataProvider('configurationValidationProvider')]
@@ -528,23 +572,37 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('dumpFile')
         ;
 
+        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
+        $initialTestsRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with(
+                $this->isInstanceOf(TestFramework::class),
+                [
+                    self::PHP_EXECUTABLE,
+                    '-d',
+                    'memory_limit=512M',
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                ],
+                true,
+            )
+            ->willReturn(CompletedProcessBuilder::withMinimalTestData()->build())
+        ;
         $adapter = $this->createAdapter(
             '<phpunit/>',
             version: $version,
             shellCommandRunner: $shellCommandRunner,
+            configuration: ConfigurationBuilder::withMinimalTestData()
+                ->withInitialTestsPhpOptions('-d memory_limit=512M')
+                ->withSkipCoverage(true)
+                ->build(),
+            initialTestsRunner: $initialTestsRunner,
         );
 
-        $command = $adapter->getInitialTestRunCommandLine(
-            extraOptions: '',
-            phpExtraArgs: ['-d', 'memory_limit=512M'],
-            skipCoverage: true,
-        );
-
-        $this->assertNotContains(
-            '--validate-configuration',
-            $command,
-            'The initial test command must run tests after the separate validation command.',
-        );
+        $this->fileSystemMock->method('isReadableFile')->willReturn(true);
+        $adapter->executeInitialRun();
     }
 
     public function test_it_stops_before_building_the_initial_configuration_when_validation_fails(): void
@@ -580,11 +638,7 @@ final class PhpUnitAdapterTest extends TestCase
         );
 
         $exception = $this->expectToThrow(
-            static fn () => $adapter->getInitialTestRunCommandLine(
-                extraOptions: '',
-                phpExtraArgs: [],
-                skipCoverage: true,
-            ),
+            static fn () => $adapter->executeInitialRun(),
         );
 
         $this->assertInstanceOf(InvalidPhpUnitConfiguration::class, $exception);
@@ -629,24 +683,31 @@ final class PhpUnitAdapterTest extends TestCase
             ->willReturn($scenario->pcovDirectory)
         ;
 
+        $process = CompletedProcessBuilder::withMinimalTestData()->build();
+        $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
+        $initialTestsRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with($this->isInstanceOf(TestFramework::class), $scenario->expected, $scenario->skipCoverage)
+            ->willReturn($process)
+        ;
+        $this->fileSystemMock->method('isReadableFile')->willReturn(true);
+
         $adapter = $this->createAdapter(
             testFrameworkConfigContent: $scenario->testFrameworkConfigContent,
             version: $scenario->version,
             filteredSourceFilesToMutate: $scenario->filteredSourceFilesToMutate,
             executeOnlyCoveringTestCases: $scenario->executeOnlyCoveringTestCases,
             mapSourceClassToTestStrategy: $scenario->mapSourceClassToTestStrategy,
+            configuration: ConfigurationBuilder::withMinimalTestData()
+                ->withTestFrameworkExtraOptions($scenario->extraOptions)
+                ->withInitialTestsPhpOptions(implode(' ', $scenario->phpExtraArgs))
+                ->withSkipCoverage($scenario->skipCoverage)
+                ->build(),
+            initialTestsRunner: $initialTestsRunner,
         );
 
-        $actual = $adapter->getInitialTestRunCommandLine(
-            extraOptions: $scenario->extraOptions,
-            phpExtraArgs: $scenario->phpExtraArgs,
-            skipCoverage: $scenario->skipCoverage,
-        );
-
-        $this->assertSame(
-            $scenario->expected,
-            $actual,
-        );
+        $adapter->executeInitialRun();
     }
 
     #[DataProvider('mutantCommandLineProvider')]
@@ -664,24 +725,44 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('shouldProvide')
         ;
 
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutantFilePath($scenario->mutatedFilePath)
+            ->withMutation(
+                MutationBuilder::withMinimalTestData()
+                    ->withHash($scenario->mutationHash)
+                    ->withOriginalFilePath($scenario->mutationOriginalFilePath)
+                    ->withTests($scenario->coverageTests)
+                    ->build(),
+            )
+            ->build()
+        ;
+        $processContainer = $this->createStub(MutantProcessContainer::class);
+        $processFactory = $this->createMock(MutantProcessContainerFactory::class);
+        $processFactory
+            ->expects($this->once())
+            ->method('create')
+            ->with(
+                $scenario->expected,
+                $mutant,
+                $this->isInstanceOf(Closure::class),
+                $this->isInstanceOf(Closure::class),
+            )
+            ->willReturn($processContainer)
+        ;
+
         $adapter = $this->createAdapter(
             testFrameworkConfigContent: $scenario->testFrameworkConfigContent,
             version: $scenario->version,
             executeOnlyCoveringTestCases: $scenario->executeOnlyCoveringTestCases,
+            configuration: ConfigurationBuilder::withMinimalTestData()
+                ->withTestFrameworkExtraOptions($scenario->extraOptions)
+                ->build(),
+            processFactory: $processFactory,
         );
 
-        $actual = $adapter->getMutantCommandLine(
-            coverageTests: $scenario->coverageTests,
-            mutatedFilePath: $scenario->mutatedFilePath,
-            mutationHash: $scenario->mutationHash,
-            mutationOriginalFilePath: $scenario->mutationOriginalFilePath,
-            extraOptions: $scenario->extraOptions,
-        );
+        $actual = $adapter->test($mutant);
 
-        $this->assertSame(
-            $scenario->expected,
-            $actual,
-        );
+        $this->assertSame($processContainer, $actual);
     }
 
     public function test_it_applies_the_initial_run_memory_usage_to_mutant_commands(): void
@@ -697,6 +778,17 @@ final class PhpUnitAdapterTest extends TestCase
         $environment = $this->createMock(MemoryLimiterEnvironment::class);
         $environment->expects($this->once())->method('hasMemoryLimitSet')->willReturn(false);
         $memoryLimiter = new MemoryLimiter($environment);
+        $processFactory = $this->createMock(MutantProcessContainerFactory::class);
+        $processContainer = $this->createStub(MutantProcessContainer::class);
+        $processFactory
+            ->expects($this->once())
+            ->method('create')
+            ->willReturnCallback(function (array $command) use ($processContainer): MutantProcessContainer {
+                $this->assertSame(['-d', 'memory_limit=25M'], array_slice($command, 1, 2));
+
+                return $processContainer;
+            })
+        ;
         $adapter = $this->createAdapter(
             testFrameworkConfigContent: <<<'XML'
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -705,6 +797,7 @@ final class PhpUnitAdapterTest extends TestCase
             memoryLimiter: $memoryLimiter,
             configuration: $configuration,
             initialTestsRunner: $initialTestsRunner,
+            processFactory: $processFactory,
         );
         $initialTestsRunner
             ->expects($this->once())
@@ -718,9 +811,7 @@ final class PhpUnitAdapterTest extends TestCase
         ;
         $adapter->executeInitialRun();
 
-        $command = $adapter->getMutantCommandLine([], '/mutant.php', 'hash', '/original.php', '');
-
-        $this->assertSame(['-d', 'memory_limit=25M'], array_slice($command, 1, 2));
+        $adapter->test(MutantBuilder::withMinimalTestData()->build());
     }
 
     public static function passOutputProvider(): iterable
@@ -734,6 +825,16 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['ERRORS!', false];
 
         yield ['No tests executed!', true];
+
+        yield 'unrecognized output does not indicate a pass' => ['Unexpected output', false];
+
+        yield 'warnings can accompany passing tests' => ['WARNINGS!', true];
+
+        yield 'no tests output is case insensitive' => ['NO TESTS EXECUTED!', true];
+
+        yield 'failures take precedence over warnings' => ['FAILURES! WARNINGS!', false];
+
+        yield 'errors take precedence over warnings' => ['ERRORS! WARNINGS!', false];
     }
 
     public static function syntaxErrorOutputProvider(): iterable
@@ -741,6 +842,8 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['OK, but incomplete, skipped, or risky tests!', false];
 
         yield ['ParseError: syntax error, unexpected ">"', true];
+
+        yield 'syntax error output is case insensitive' => ['PARSEERROR: SYNTAX ERROR', true];
     }
 
     #[DataProvider('executionOrderProvider')]
@@ -787,23 +890,6 @@ final class PhpUnitAdapterTest extends TestCase
         yield [false, '14.0'];
     }
 
-    #[DataProvider('coverageWithoutSourceProvider')]
-    public function test_supports_coverage_without_source(string $version, bool $expected): void
-    {
-        $this->assertSame($expected, PhpUnitAdapter::supportsExcludingSourceFromCoverage($version));
-    }
-
-    public static function coverageWithoutSourceProvider(): iterable
-    {
-        yield ['11.5.599', false];
-
-        yield ['12.0', false];
-
-        yield ['12.5', true];
-
-        yield ['13.0', true];
-    }
-
     public static function initialTestRunProvider(): iterable
     {
         $default = new InitialTestRunScenario(
@@ -830,6 +916,24 @@ final class PhpUnitAdapterTest extends TestCase
         );
 
         yield 'default' => [$default];
+
+        yield 'coverage retains source on PHPUnit 11.5' => [$default->withVersion('11.5.599')];
+
+        yield 'coverage retains source on PHPUnit 12.0' => [$default->withVersion('12.0')];
+
+        yield 'coverage excludes source on PHPUnit 13.0' => [
+            $default
+                ->withVersion('13.0')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--exclude-source-from-xml-coverage',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
 
         yield 'with extra PHP arguments' => [
             $default
@@ -1682,7 +1786,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
                     '--group=default',
-                    '--filter=Mailer',
                 ]),
         ];
 
@@ -1695,7 +1798,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
                     '--group=default',
-                    '--filter=Mailer',
                 ]),
         ];
 
@@ -1727,52 +1829,52 @@ final class PhpUnitAdapterTest extends TestCase
 
         yield 'with option value separated by a space' => [
             $default
-                ->withExtraOptions('--filter "a test with spaces"')
+                ->withExtraOptions('--group "a test with spaces"')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    '--filter',
+                    '--group',
                     'a test with spaces',
                 ]),
         ];
 
         yield 'with arg value separated by a space' => [
             $default
-                ->withExtraArgs('--filter "a test with spaces"')
+                ->withExtraArgs('--group "a test with spaces"')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    '--filter',
+                    '--group',
                     'a test with spaces',
                 ]),
         ];
 
         yield 'with option value containing option-like text' => [
             $default
-                ->withExtraOptions('--filter="a test -- with option-like text" --group=default')
+                ->withExtraOptions('--exclude-group="a test -- with option-like text" --group=default')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    '--filter=a test -- with option-like text',
+                    '--exclude-group=a test -- with option-like text',
                     '--group=default',
                 ]),
         ];
 
         yield 'with arg value containing arg-like text' => [
             $default
-                ->withExtraArgs('--filter="a test -- with option-like text" --group=default')
+                ->withExtraArgs('--exclude-group="a test -- with option-like text" --group=default')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    '--filter=a test -- with option-like text',
+                    '--exclude-group=a test -- with option-like text',
                     '--group=default',
                 ]),
         ];
@@ -1786,7 +1888,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
                     'tests/FooTest.php',
-                    '--filter=Foo',
                 ]),
         ];
 
@@ -1799,7 +1900,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
                     'tests/FooTest.php',
-                    '--filter=Foo',
                 ]),
         ];
 
@@ -1811,7 +1911,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    '--configuration=custom-phpunit.xml',
                 ]),
         ];
 
@@ -1823,7 +1922,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    '--configuration=custom-phpunit.xml',
                 ]),
         ];
 
@@ -2027,7 +2125,6 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
                     '--group=default',
-                    '--filter=Foo',
                 ]),
         ];
 
@@ -2040,9 +2137,44 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
                     '--group=default',
-                    '--filter=Foo',
                 ]),
         ];
+    }
+
+    private function classifyMutantOutput(string $output, int $exitCode): DetectionStatus
+    {
+        $mutant = MutantBuilder::withCompleteTestData()->build();
+        $process = $this->createStub(Process::class);
+        $process->method('isTerminated')->willReturn(true);
+        $process->method('getOutput')->willReturn($output);
+        $process->method('getExitCode')->willReturn($exitCode);
+        $process->method('getStartTime')->willReturn(0.0);
+        $processFactory = $this->createMock(MutantProcessContainerFactory::class);
+        $processFactory
+            ->expects($this->once())
+            ->method('create')
+            ->willReturnCallback(
+                /**
+                 * @param Closure(string): bool $testsPass
+                 * @param (Closure(string): mixed)|null $isSyntaxError
+                 */
+                static function (array $_command, Mutant $mutant, Closure $testsPass, ?Closure $isSyntaxError) use ($process): MutantProcessContainer {
+                    $mutantProcess = new MutantProcess(
+                        $process,
+                        $mutant,
+                        new TestFrameworkMutantExecutionResultFactory($testsPass, $isSyntaxError),
+                    );
+                    $mutantProcess->markAsFinished();
+
+                    return new MutantProcessContainer($mutantProcess, []);
+                },
+            )
+        ;
+        $adapter = $this->createAdapter('<phpunit/>', processFactory: $processFactory);
+
+        $result = $adapter->test($mutant)->getCurrent()->getMutantExecutionResult();
+
+        return $result->getDetectionStatus();
     }
 
     /**

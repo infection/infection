@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Factory;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
@@ -59,9 +58,9 @@ final class MutantProcessContainerFactoryTest extends TestCase
     public function test_it_creates_a_process_with_timeout(float $expectedProcessTimeout, float $testLocationExecutionTime, int $processFactoryTimeout): void
     {
         $mutant = MutantBuilder::withMinimalTestData()
-            ->withMutantFilePath($mutantFilePath = '/path/to/mutant')
+            ->withMutantFilePath('/path/to/mutant')
             ->withMutation(new Mutation(
-                $originalFilePath = 'path/to/Foo.php',
+                'path/to/Foo.php',
                 [],
                 For_::class,
                 MutatorName::getName(For_::class),
@@ -76,7 +75,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
                 'Unknown',
                 MutatedNode::wrap(new Nop()),
                 0,
-                $tests = [
+                [
                     new TestLocation(
                         'FooTest::test_it_can_instantiate',
                         '/path/to/acme/FooTest.php',
@@ -100,20 +99,8 @@ final class MutantProcessContainerFactoryTest extends TestCase
             ->build()
         ;
 
-        $testFrameworkExtraOptions = '--verbose';
-
-        $testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
-        $testFrameworkAdapterMock
-            ->method('getMutantCommandLine')
-            ->with(
-                $tests,
-                $mutantFilePath,
-                $this->isString(),
-                $originalFilePath,
-                $testFrameworkExtraOptions,
-            )
-            ->willReturn(['/usr/bin/php', 'bin/phpunit', '--filter', '/path/to/acme/FooTest.php'])
-        ;
+        $command = ['/usr/bin/php', 'bin/phpunit', '--filter', '/path/to/acme/FooTest.php'];
+        $testsPass = static fn (string $output): bool => $output === 'OK';
 
         $eventDispatcher = new EventDispatcherCollector();
 
@@ -128,7 +115,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
             $configuration,
         );
 
-        $mutantProcess = $factory->create($testFrameworkAdapterMock, $mutant, $testFrameworkExtraOptions);
+        $mutantProcess = $factory->create($command, $mutant, $testsPass);
 
         $process = $mutantProcess->getCurrent()->getProcess();
 

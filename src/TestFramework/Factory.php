@@ -106,7 +106,10 @@ final readonly class Factory
             : new LegacyTestFrameworkBridge(
                 $testFramework,
                 $this->consoleOutput,
-                $this->coverageCheckerFactory->create($testFramework),
+                $this->coverageCheckerFactory->create(
+                    $testFramework->getName(),
+                    $testFramework->hasJUnitReport(),
+                ),
                 $this->initialTestsRunner,
                 $this->infectionConfig,
                 $this->containerFactory,

@@ -69,7 +69,38 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
     {
         $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
 
-        $this->resultFactory = new TestFrameworkMutantExecutionResultFactory($this->testFrameworkAdapterMock);
+        $this->resultFactory = new TestFrameworkMutantExecutionResultFactory($this->testFrameworkAdapterMock->testsPass(...));
+    }
+
+    #[DataProvider('syntaxErrorOutputProvider')]
+    public function test_it_uses_the_supplied_syntax_error_check(string $output, DetectionStatus $expected): void
+    {
+        $resultFactory = new TestFrameworkMutantExecutionResultFactory(
+            static fn (string $output): bool => $output === 'Passed!',
+            static fn (string $output): bool => $output === 'Syntax error!',
+        );
+        $process = $this->createStub(Process::class);
+        $process->method('isTerminated')->willReturn(true);
+        $process->method('getOutput')->willReturn($output);
+        $process->method('getExitCode')->willReturn(1);
+        $process->method('getStartTime')->willReturn(0.0);
+        $mutantProcess = new MutantProcess(
+            $process,
+            MutantBuilder::withCompleteTestData()->build(),
+            $resultFactory,
+        );
+        $mutantProcess->markAsFinished();
+
+        $result = $resultFactory->createFromProcess($mutantProcess);
+
+        $this->assertSame($expected, $result->getDetectionStatus());
+    }
+
+    public static function syntaxErrorOutputProvider(): iterable
+    {
+        yield 'syntax error recognized by the supplied check' => ['Syntax error!', DetectionStatus::SYNTAX_ERROR];
+
+        yield 'test failure without a syntax error' => ['Failed!', DetectionStatus::KILLED_BY_TESTS];
     }
 
     public function test_it_can_create_a_result_from_a_non_covered_mutant_process(): void
