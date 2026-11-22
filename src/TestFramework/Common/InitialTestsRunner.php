@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Common;
 
 use Closure;
-use Stringable;
 use function extension_loaded;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
@@ -45,7 +44,8 @@ use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use const PHP_SAPI;
-use Symfony\Component\Process\Exception\RuntimeException;
+use Stringable;
+use Symfony\Component\Process\Exception\RuntimeException as ProcessException;
 
 /**
  * @internal
@@ -64,7 +64,6 @@ readonly class InitialTestsRunner
      * @param (Closure(string): string)|null $buildFailureRecommendations
      *
      * @throws InitialTestsFailed
-     * @throws RuntimeException When the initial command cannot complete.
      */
     public function run(
         TestFramework $testFramework,
@@ -81,13 +80,7 @@ readonly class InitialTestsRunner
             $this->getVersion($testFramework),
         );
 
-        $result = $this->shellCommandRunner->run(
-            command: $command,
-            callback: fn () => $this->testFrameworkLogger->initialRunProgressed($testFrameworkName),
-            env: $this->buildProcessEnvironmentOverrides($skipCoverage),
-            timeout: null,
-            useOriginalPhpConfiguration: !$skipCoverage,
-        );
+        $result = $this->runCommand($command, $testFrameworkName, $skipCoverage);
 
         $this->testFrameworkLogger->initialRunFinished(
             $testFrameworkName,
@@ -107,6 +100,43 @@ readonly class InitialTestsRunner
         return $result;
     }
 
+    /**
+     * @return array<string, string|Stringable|false>
+     */
+    public function buildProcessEnvironmentOverrides(bool $skipCoverage): array
+    {
+        return !$skipCoverage && self::shouldEnableXdebugCoverage()
+            ? ['XDEBUG_MODE' => 'coverage']
+            : [];
+    }
+
+    /**
+     * @param string[] $command
+     *
+     * @throws InitialTestsFailed
+     */
+    private function runCommand(
+        array $command,
+        string $testFrameworkName,
+        bool $skipCoverage,
+    ): CompletedProcess {
+        try {
+            return $this->shellCommandRunner->run(
+                command: $command,
+                callback: fn () => $this->testFrameworkLogger->initialRunProgressed($testFrameworkName),
+                env: $this->buildProcessEnvironmentOverrides($skipCoverage),
+                timeout: null,
+                useOriginalPhpConfiguration: !$skipCoverage,
+            );
+        } catch (ProcessException $exception) {
+            throw new InitialTestsFailed(
+                $exception->getMessage(),
+                $exception->getCode(),
+                previous: $exception,
+            );
+        }
+    }
+
     private function getVersion(TestFramework $testFramework): string
     {
         try {
@@ -120,17 +150,5 @@ readonly class InitialTestsRunner
     {
         // Prefer PCOV and phpdbg over enabling Xdebug for coverage.
         return !extension_loaded('pcov') && PHP_SAPI !== 'phpdbg';
-    }
-
-    /**
-     * @param bool $skipCoverage
-     *
-     * @return array<string, string|Stringable|false>
-     */
-    public function buildProcessEnvironmentOverrides(bool $skipCoverage): array
-    {
-        return !$skipCoverage && self::shouldEnableXdebugCoverage()
-            ? ['XDEBUG_MODE' => 'coverage']
-            : [];
     }
 }

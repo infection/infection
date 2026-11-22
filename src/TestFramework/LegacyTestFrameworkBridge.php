@@ -107,10 +107,6 @@ final class LegacyTestFrameworkBridge implements TestFramework
         }
     }
 
-    /**
-     * @throws InitialTestsFailedContract
-     * @throws SymfonyProcessRuntimeException When the initial command cannot complete.
-     */
     public function executeInitialRun(): InitialRunResults
     {
         $command = $this->adapter->getInitialTestRunCommandLine(

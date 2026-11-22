@@ -85,10 +85,6 @@ final class MagoAdapter implements StaticAnalysisTestFramework
         return 'Mago';
     }
 
-    /**
-     * @throws InitialTestsFailed
-     * @throws SymfonyProcessRuntimeException When the initial command cannot complete.
-     */
     #[Override]
     public function executeInitialRun(): InitialRunResults
     {
