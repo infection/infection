@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Common;
 
 use Closure;
+use Stringable;
 use function extension_loaded;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
@@ -80,19 +81,10 @@ readonly class InitialTestsRunner
             $this->getVersion($testFramework),
         );
 
-        $env = [];
-
-        if (
-            !$skipCoverage
-            && self::shouldEnableXdebugCoverage()
-        ) {
-            $env['XDEBUG_MODE'] = 'coverage';
-        }
-
         $result = $this->shellCommandRunner->run(
             command: $command,
             callback: fn () => $this->testFrameworkLogger->initialRunProgressed($testFrameworkName),
-            env: $env,
+            env: $this->buildProcessEnvironmentOverrides($skipCoverage),
             timeout: null,
             useOriginalPhpConfiguration: !$skipCoverage,
         );
@@ -128,5 +120,17 @@ readonly class InitialTestsRunner
     {
         // Prefer PCOV and phpdbg over enabling Xdebug for coverage.
         return !extension_loaded('pcov') && PHP_SAPI !== 'phpdbg';
+    }
+
+    /**
+     * @param bool $skipCoverage
+     *
+     * @return array<string, string|Stringable|false>
+     */
+    public function buildProcessEnvironmentOverrides(bool $skipCoverage): array
+    {
+        return !$skipCoverage && self::shouldEnableXdebugCoverage()
+            ? ['XDEBUG_MODE' => 'coverage']
+            : [];
     }
 }
