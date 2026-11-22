@@ -44,7 +44,6 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use function Safe\ini_get;
 
-
 /**
  * The initial test run is a separate PHP process: it reads the PHP configuration
  * (php.ini) again, but does not inherit the `-d` options of the Infection process.
