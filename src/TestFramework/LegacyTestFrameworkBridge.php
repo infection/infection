@@ -43,16 +43,14 @@ use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\InitialTestsRunner;
-use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
+use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
-use Infection\TestFramework\Contracts\TestFrameworkLogger;
+use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Logger\LegacyTestFrameworkLogger;
 use InvalidArgumentException;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -71,7 +69,6 @@ final class LegacyTestFrameworkBridge implements TestFramework
         private readonly Configuration $config,
         private readonly MutantProcessContainerFactory $processFactory,
         private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
-        private readonly TestFrameworkLogger $testFrameworkLogger,
         private readonly LegacyTestFrameworkLogger $logger,
     ) {
     }
@@ -110,33 +107,28 @@ final class LegacyTestFrameworkBridge implements TestFramework
         }
     }
 
+    /**
+     * @throws InitialTestsFailedContract
+     * @throws SymfonyProcessRuntimeException When the initial command cannot complete.
+     */
     public function executeInitialRun(): InitialRunResults
     {
-        $initialTestSuiteProcess = $this->initialTestsRunner->run(
-            $this->adapter,
+        $command = $this->adapter->getInitialTestRunCommandLine(
             $this->config->testFrameworkExtraOptions,
             $this->getInitialTestsPhpOptionsArray(),
             $this->config->skipCoverage,
-            $this->testFrameworkLogger,
         );
 
-        $commandLine = (new Process($initialTestSuiteProcess->command))->getCommandLine();
-
-        if (!$initialTestSuiteProcess->isSuccessful()) {
-            throw InitialTestsFailed::fromCompletedProcess(
-                $initialTestSuiteProcess,
-                $this->getName(),
-                'tests',
-                $this->adapter->getInitialTestsFailRecommendations(
-                    $commandLine,
-                ),
-            );
-        }
-
-        $output = $initialTestSuiteProcess->stdout;
+        $result = $this->initialTestsRunner->run(
+            $this,
+            $command,
+            skipCoverage: $this->config->skipCoverage,
+            buildFailureRecommendations: $this->adapter->getInitialTestsFailRecommendations(...),
+        );
+        $output = $result->stdout;
 
         $this->coverageChecker->checkCoverageHasBeenGenerated(
-            $commandLine,
+            $result->commandLine,
             $output,
         );
 

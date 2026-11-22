@@ -33,19 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Runner;
+namespace Infection\Tests\TestFramework\Common;
 
 use Closure;
 use function extension_loaded;
 use Infection\AbstractTestFramework\InvalidVersion;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\SymfonyProcessShellCommandRunner;
+use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Logger\EventDispatchingTestFrameworkLogger;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
@@ -69,17 +70,15 @@ final class InitialTestsRunnerTest extends TestCase
 
     private InitialTestsRunner $runner;
 
-    private EventDispatchingTestFrameworkLogger $testFrameworkLogger;
-
-    private TestFrameworkAdapter&MockObject $testFrameworkAdapter;
+    private TestFramework&MockObject $testFramework;
 
     protected function setUp(): void
     {
         $this->shellCommandRunner = $this->createMock(ShellCommandRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();
-        $this->testFrameworkLogger = new EventDispatchingTestFrameworkLogger($this->eventDispatcher);
-        $this->runner = new InitialTestsRunner($this->shellCommandRunner);
-        $this->testFrameworkAdapter = $this->createMock(TestFrameworkAdapter::class);
+        $testFrameworkLogger = new EventDispatchingTestFrameworkLogger($this->eventDispatcher);
+        $this->runner = new InitialTestsRunner($this->shellCommandRunner, $testFrameworkLogger);
+        $this->testFramework = $this->createMock(TestFramework::class);
     }
 
     #[DataProvider('initialRunProvider')]
@@ -87,14 +86,14 @@ final class InitialTestsRunnerTest extends TestCase
         ?string $version,
         string $expectedVersion,
         bool $skipCoverage,
-        int $exitCode,
+        bool $useDefaultCoverage = false,
     ): void {
-        $this->testFrameworkAdapter
+        $this->testFramework
             ->expects($this->once())
             ->method('getName')
             ->willReturn('PHPUnit')
         ;
-        $versionExpectation = $this->testFrameworkAdapter->expects($this->once())->method('getVersion');
+        $versionExpectation = $this->testFramework->expects($this->once())->method('getVersion');
 
         if ($version === null) {
             $versionExpectation->willThrowException(new InvalidVersion('Invalid version output.'));
@@ -102,24 +101,14 @@ final class InitialTestsRunnerTest extends TestCase
             $versionExpectation->willReturn($version);
         }
 
-        $testFrameworkExtraOptions = '--stop-on-failure';
-        $phpExtraOptions = ['-d', 'memory_limit=-1'];
         $command = ['php', '-d', 'memory_limit=-1', 'phpunit', '--configuration=some config.xml'];
         $executedCommand = ['/usr/bin/php', '-d', 'memory_limit=-1', 'phpunit', '--configuration=some config.xml'];
         $commandLine = (new Process($executedCommand))->getCommandLine();
         $expected = CompletedProcessBuilder::withMinimalTestData()
             ->withCommand($executedCommand)
-            ->withExitCode($exitCode)
             ->withStdout('pingpong')
             ->withStderr('warning')
             ->build()
-        ;
-
-        $this->testFrameworkAdapter
-            ->expects($this->once())
-            ->method('getInitialTestRunCommandLine')
-            ->with($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage)
-            ->willReturn($command)
         ;
 
         $expectedEnv = $skipCoverage || extension_loaded('pcov') || PHP_SAPI === 'phpdbg'
@@ -144,13 +133,9 @@ final class InitialTestsRunnerTest extends TestCase
             })
         ;
 
-        $actual = $this->runner->run(
-            $this->testFrameworkAdapter,
-            $testFrameworkExtraOptions,
-            $phpExtraOptions,
-            $skipCoverage,
-            $this->testFrameworkLogger,
-        );
+        $actual = $useDefaultCoverage
+            ? $this->runner->run($this->testFramework, $command)
+            : $this->runner->run($this->testFramework, $command, $skipCoverage);
 
         $this->assertSame($expected, $actual);
         $this->assertEquals(
@@ -165,11 +150,93 @@ final class InitialTestsRunnerTest extends TestCase
         );
     }
 
+    #[DataProvider('failureProvider')]
+    public function test_it_reports_failed_initial_runs(
+        string $testFrameworkType,
+        ?string $recommendations,
+    ): void {
+        $command = ['phpunit'];
+        $executedCommand = ['/usr/bin/php', '/path with spaces/phpunit'];
+        $commandLine = "'/usr/bin/php' '/path with spaces/phpunit'";
+        $process = CompletedProcessBuilder::withMinimalTestData()
+            ->withCommand($executedCommand)
+            ->withExitCode(3)
+            ->withStdout('failed tests')
+            ->withStderr('diagnostic')
+            ->build()
+        ;
+        $this->testFramework->expects($this->once())->method('getName')->willReturn('Framework');
+        $this->shellCommandRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with($command, $this->isInstanceOf(Closure::class), null, [], null, null, null, false)
+            ->willReturn($process)
+        ;
+        $logger = $this->createMock(TestFrameworkLogger::class);
+        $logger
+            ->expects($this->once())
+            ->method('initialRunFinished')
+            ->with('Framework', $executedCommand, 'failed tests')
+        ;
+        $runner = new InitialTestsRunner($this->shellCommandRunner, $logger);
+        $getFailureRecommendations = $recommendations === null
+            ? null
+            : function (string $actualCommandLine) use ($commandLine, $recommendations): string {
+                $this->assertSame($commandLine, $actualCommandLine);
+
+                return $recommendations;
+            };
+        $expectedMessage = <<<MESSAGE
+            Project $testFrameworkType must be in a passing state before running Infection.
+            $recommendations
+            Framework reported an exit code of 3.
+            Refer to the Framework's output below:
+            STDOUT:
+            failed tests
+            STDERR:
+            diagnostic
+            MESSAGE;
+
+        $this->expectException(InitialTestsFailed::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $runner->run(
+            $this->testFramework,
+            $command,
+            testFrameworkType: $testFrameworkType,
+            buildFailureRecommendations: $getFailureRecommendations,
+        );
+    }
+
+    public function test_it_does_not_request_failure_recommendations_for_successful_runs(): void
+    {
+        $this->testFramework->expects($this->once())->method('getName')->willReturn('Framework');
+        $process = CompletedProcessBuilder::withMinimalTestData()->build();
+        $this->shellCommandRunner->expects($this->once())->method('run')->willReturn($process);
+
+        $actual = $this->runner->run(
+            $this->testFramework,
+            ['phpunit'],
+            buildFailureRecommendations: fn (): never => $this->fail('A successful initial run does not need failure recommendations.'),
+        );
+
+        $this->assertSame($process, $actual);
+    }
+
+    public static function failureProvider(): iterable
+    {
+        yield 'test failure without recommendations' => ['tests', null];
+
+        yield 'test failure with recommendations' => ['tests', 'Check the test configuration.'];
+
+        yield 'static-analysis failure' => ['static analysis', null];
+    }
+
     #[DataProvider('exitCodeProvider')]
     #[Group('integration')]
-    public function test_it_continues_after_stderr_output_and_preserves_the_exit_code(int $exitCode): void
+    public function test_it_continues_after_stderr_output_and_reports_the_exit_code(int $exitCode): void
     {
-        $this->testFrameworkAdapter->method('getName')->willReturn('PHPUnit');
+        $this->testFramework->expects($this->once())->method('getName')->willReturn('PHPUnit');
         // Wait for the progress notification before continuing after stderr output.
         $input = new InputStream();
         $command = [
@@ -182,12 +249,6 @@ final class InitialTestsRunnerTest extends TestCase
                 exit($exitCode);
                 PHP,
         ];
-        $this->testFrameworkAdapter
-            ->expects($this->once())
-            ->method('getInitialTestRunCommandLine')
-            ->willReturn($command)
-        ;
-
         $shellCommandRunner = new SymfonyProcessShellCommandRunner();
         $this->shellCommandRunner
             ->expects($this->once())
@@ -224,9 +285,26 @@ final class InitialTestsRunnerTest extends TestCase
         $logger
             ->expects($this->once())
             ->method('initialRunFinished')
-            ->with('PHPUnit', 'continued')
+            ->with('PHPUnit', $command, 'continued')
         ;
-        $actual = $this->runner->run($this->testFrameworkAdapter, '', [], false, $logger);
+        $runner = new InitialTestsRunner($this->shellCommandRunner, $logger);
+
+        if ($exitCode !== 0) {
+            $this->expectException(InitialTestsFailed::class);
+            $expectedMessage = <<<MESSAGE
+                Project tests must be in a passing state before running Infection.
+
+                PHPUnit reported an exit code of $exitCode.
+                Refer to the PHPUnit's output below:
+                STDOUT:
+                continued
+                STDERR:
+                diagnostic
+                MESSAGE;
+            $this->expectExceptionMessage($expectedMessage);
+        }
+
+        $actual = $runner->run($this->testFramework, $command, false);
 
         $this->assertSame($command, $actual->command);
         $this->assertSame($exitCode, $actual->exitCode);
@@ -243,12 +321,12 @@ final class InitialTestsRunnerTest extends TestCase
 
     public static function initialRunProvider(): iterable
     {
-        yield 'coverage with a known version' => ['6.5.4', '6.5.4', false, 0];
+        yield 'coverage with a known version' => ['6.5.4', '6.5.4', false];
 
-        yield 'coverage with an unknown version' => [null, 'unknown', false, 0];
+        yield 'coverage with an unknown version' => [null, 'unknown', false];
 
-        yield 'coverage skipped' => ['6.5.4', '6.5.4', true, 0];
+        yield 'coverage skipped by default' => ['6.5.4', '6.5.4', true, true];
 
-        yield 'unsuccessful command' => ['6.5.4', '6.5.4', false, 3];
+        yield 'coverage skipped' => ['6.5.4', '6.5.4', true];
     }
 }

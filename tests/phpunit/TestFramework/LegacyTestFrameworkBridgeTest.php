@@ -35,16 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
+use Closure;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Console\ConsoleOutput;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
-use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
 use Infection\TestFramework\Logger\LegacyTestFrameworkLogger;
@@ -180,12 +180,6 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $adapter = new FakeAwareAdapter(42.0);
 
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
-        $initialTestsRunner
-            ->expects($this->once())
-            ->method('run')
-            ->with($adapter, '', [''], false)
-            ->willReturn($process)
-        ;
 
         $coverageChecker = $this->createMock(CoverageChecker::class);
         $coverageChecker
@@ -200,6 +194,13 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             initialTestsRunner: $initialTestsRunner,
         );
 
+        $initialTestsRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with($testFramework, ['/bin/dummy'], false)
+            ->willReturn($process)
+        ;
+
         $expected = new InitialRunResults(
             output: 'output',
             memoryUsage: 42.0,
@@ -213,15 +214,15 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
     public function test_it_forwards_initial_run_options(): void
     {
         $process = $this->createSuccessfulInitialRunProcess('output');
-        $adapter = new DummyTestFrameworkAdapter();
+        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter
+            ->expects($this->once())
+            ->method('getInitialTestRunCommandLine')
+            ->with('--verbose', ['-d', 'memory_limit=1G'], true)
+            ->willReturn(['/bin/dummy', '--verbose'])
+        ;
 
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
-        $initialTestsRunner
-            ->expects($this->once())
-            ->method('run')
-            ->with($adapter, '--verbose', ['-d', 'memory_limit=1G'], true)
-            ->willReturn($process)
-        ;
 
         $testFramework = $this->createTestFramework(
             adapter: $adapter,
@@ -230,6 +231,13 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             testFrameworkExtraOptions: '--verbose',
             skipCoverage: true,
         );
+
+        $initialTestsRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with($testFramework, ['/bin/dummy', '--verbose'], true)
+            ->willReturn($process)
+        ;
 
         $testFramework->executeInitialRun();
     }
@@ -241,21 +249,31 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $adapter = $this->createMock(TestFrameworkAdapter::class);
         $adapter
             ->expects($this->once())
-            ->method('getName')
-            ->willReturn('LegacyFramework')
-        ;
-        $adapter
-            ->expects($this->once())
             ->method('getInitialTestsFailRecommendations')
             ->with($commandLine)
             ->willReturn('Check the legacy framework configuration.')
         ;
 
+        $failure = InitialTestsFailed::fromCompletedProcess($process, 'LegacyFramework', 'tests', 'Check the legacy framework configuration.');
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->willReturn($process)
+            ->with(
+                $this->isInstanceOf(TestFramework::class),
+                [],
+                false,
+                'tests',
+                $this->callback(function (Closure $recommendations) use ($commandLine): bool {
+                    $this->assertSame(
+                        'Check the legacy framework configuration.',
+                        $recommendations($commandLine),
+                    );
+
+                    return true;
+                }),
+            )
+            ->willThrowException($failure)
         ;
 
         $coverageChecker = $this->createMock(CoverageChecker::class);
@@ -270,13 +288,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             initialTestsRunner: $initialTestsRunner,
         );
 
-        $this->expectException(InitialTestsFailed::class);
-        $this->expectExceptionMessage(
-            <<<'MESSAGE'
-                Check the legacy framework configuration.
-                LegacyFramework reported an exit code of 1.
-                MESSAGE,
-        );
+        $this->expectExceptionObject($failure);
 
         $testFramework->executeInitialRun();
     }
@@ -408,7 +420,6 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
                 ->build(),
             processFactory: $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter ?? $this->createStub(TestFrameworkExtraOptionsFilter::class),
-            testFrameworkLogger: $this->createStub(TestFrameworkLogger::class),
             logger: $logger ?? $this->createStub(LegacyTestFrameworkLogger::class),
         );
     }

@@ -40,8 +40,9 @@ use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\Throwable\UnsupportedVersion;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -72,7 +73,7 @@ final class MagoAdapter implements StaticAnalysisTestFramework
         private readonly float $timeout,
         private readonly array $staticAnalysisToolOptions,
         private readonly ShellCommandRunner $shellCommandRunner,
-        private readonly InitialStaticAnalysisRunner $initialStaticAnalysisRunner,
+        private readonly InitialTestsRunner $initialTestsRunner,
         private readonly MagoLogger $logger,
         private ?string $version = null,
     ) {
@@ -84,10 +85,20 @@ final class MagoAdapter implements StaticAnalysisTestFramework
         return 'Mago';
     }
 
+    /**
+     * @throws InitialTestsFailed
+     * @throws SymfonyProcessRuntimeException When the initial command cannot complete.
+     */
     #[Override]
     public function executeInitialRun(): InitialRunResults
     {
-        return $this->initialStaticAnalysisRunner->run($this, $this->getInitialRunCommandLine());
+        $result = $this->initialTestsRunner->run(
+            $this,
+            $this->getInitialRunCommandLine(),
+            testFrameworkType: 'static analysis',
+        );
+
+        return new InitialRunResults($result->stdout, null);
     }
 
     #[Override]

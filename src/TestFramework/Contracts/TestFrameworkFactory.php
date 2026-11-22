@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Contracts;
 
 use Infection\Configuration\Configuration;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Psr\Log\LoggerInterface;

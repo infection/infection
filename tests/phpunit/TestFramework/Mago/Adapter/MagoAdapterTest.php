@@ -37,8 +37,8 @@ namespace Infection\Tests\TestFramework\Mago\Adapter;
 
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -70,13 +70,13 @@ final class MagoAdapterTest extends TestCase
 
     private ShellCommandRunner $shellCommandRunner;
 
-    private InitialStaticAnalysisRunner&MockObject $initialStaticAnalysisRunner;
+    private InitialTestsRunner&MockObject $initialTestsRunner;
 
     protected function setUp(): void
     {
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $this->shellCommandRunner = $this->createStub(ShellCommandRunner::class);
-        $this->initialStaticAnalysisRunner = $this->createMock(InitialStaticAnalysisRunner::class);
+        $this->initialTestsRunner = $this->createMock(InitialTestsRunner::class);
 
         $this->adapter = new MagoAdapter(
             $this->createStub(MutantExecutionResultFactory::class),
@@ -87,7 +87,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             [],
             $this->shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $this->createStub(MagoLogger::class),
             '9.0',
         );
@@ -107,19 +107,25 @@ final class MagoAdapterTest extends TestCase
             ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze'])
         ;
 
+        $process = CompletedProcessBuilder::withMinimalTestData()->withStdout('Analysis passed.')->build();
         $result = new InitialRunResults('Analysis passed.', null);
-        $this->initialStaticAnalysisRunner
+        $this->initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($this->adapter, [
-                '/path/to/mago',
-                '--config=/path/to/mago-config-path',
-                'analyze',
-            ])
-            ->willReturn($result)
+            ->with(
+                $this->adapter,
+                [
+                    '/path/to/mago',
+                    '--config=/path/to/mago-config-path',
+                    'analyze',
+                ],
+                true,
+                'static analysis',
+            )
+            ->willReturn($process)
         ;
 
-        $this->assertSame($result, $this->adapter->executeInitialRun());
+        $this->assertEquals($result, $this->adapter->executeInitialRun());
     }
 
     public function test_it_builds_initial_run_command_line_with_single_option(): void
@@ -133,7 +139,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             ['--sort'],
             $this->shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $this->createStub(MagoLogger::class),
             '9.0',
         );
@@ -149,19 +155,25 @@ final class MagoAdapterTest extends TestCase
             ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', '--sort'])
         ;
 
+        $process = CompletedProcessBuilder::withMinimalTestData()->withStdout('Analysis passed.')->build();
         $result = new InitialRunResults('Analysis passed.', null);
-        $this->initialStaticAnalysisRunner
+        $this->initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($adapter, [
-                '/path/to/mago',
-                '--config=/path/to/mago-config-path',
-                '--sort',
-            ])
-            ->willReturn($result)
+            ->with(
+                $adapter,
+                [
+                    '/path/to/mago',
+                    '--config=/path/to/mago-config-path',
+                    '--sort',
+                ],
+                true,
+                'static analysis',
+            )
+            ->willReturn($process)
         ;
 
-        $this->assertSame($result, $adapter->executeInitialRun());
+        $this->assertEquals($result, $adapter->executeInitialRun());
     }
 
     public function test_it_builds_initial_run_command_line_with_multiple_options(): void
@@ -175,7 +187,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             ['--no-progress'],
             $this->shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $this->createStub(MagoLogger::class),
             '9.0',
         );
@@ -191,20 +203,26 @@ final class MagoAdapterTest extends TestCase
             ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze', '--no-progress'])
         ;
 
+        $process = CompletedProcessBuilder::withMinimalTestData()->withStdout('Analysis passed.')->build();
         $result = new InitialRunResults('Analysis passed.', null);
-        $this->initialStaticAnalysisRunner
+        $this->initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($adapter, [
-                '/path/to/mago',
-                '--config=/path/to/mago-config-path',
-                'analyze',
-                '--no-progress',
-            ])
-            ->willReturn($result)
+            ->with(
+                $adapter,
+                [
+                    '/path/to/mago',
+                    '--config=/path/to/mago-config-path',
+                    'analyze',
+                    '--no-progress',
+                ],
+                true,
+                'static analysis',
+            )
+            ->willReturn($process)
         ;
 
-        $this->assertSame($result, $adapter->executeInitialRun());
+        $this->assertEquals($result, $adapter->executeInitialRun());
     }
 
     public function test_it_builds_initial_run_command_line_with_complex_options(): void
@@ -218,7 +236,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             ['--no-stubs', '--baseline /path/to/baseline.toml'],
             $this->shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $this->createStub(MagoLogger::class),
             '9.0',
         );
@@ -235,21 +253,27 @@ final class MagoAdapterTest extends TestCase
             ->willReturn(['/path/to/mago', '--config=/path/to/mago-config-path', 'analyze', '--no-stubs', '--baseline /path/to/baseline.toml'])
         ;
 
+        $process = CompletedProcessBuilder::withMinimalTestData()->withStdout('Analysis passed.')->build();
         $result = new InitialRunResults('Analysis passed.', null);
-        $this->initialStaticAnalysisRunner
+        $this->initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($adapter, [
-                '/path/to/mago',
-                '--config=/path/to/mago-config-path',
-                'analyze',
-                '--no-stubs',
-                '--baseline /path/to/baseline.toml',
-            ])
-            ->willReturn($result)
+            ->with(
+                $adapter,
+                [
+                    '/path/to/mago',
+                    '--config=/path/to/mago-config-path',
+                    'analyze',
+                    '--no-stubs',
+                    '--baseline /path/to/baseline.toml',
+                ],
+                true,
+                'static analysis',
+            )
+            ->willReturn($process)
         ;
 
-        $this->assertSame($result, $adapter->executeInitialRun());
+        $this->assertEquals($result, $adapter->executeInitialRun());
     }
 
     public function test_it_returns_version(): void
@@ -284,7 +308,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             [],
             $shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $this->createStub(MagoLogger::class),
         );
 
@@ -317,7 +341,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             [],
             $shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $logger,
         );
 
@@ -349,7 +373,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             [],
             $shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $logger,
         );
 
@@ -381,7 +405,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             [],
             $shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $logger,
         );
 
@@ -438,10 +462,15 @@ final class MagoAdapterTest extends TestCase
             ->method('build')
             ->willReturn(['/path/to/mago'])
         ;
-        $this->initialStaticAnalysisRunner
+        $this->initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($this->adapter, ['/path/to/mago'])
+            ->with(
+                $this->adapter,
+                ['/path/to/mago'],
+                true,
+                'static analysis',
+            )
             ->willThrowException($failure)
         ;
 
@@ -464,7 +493,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             [],
             $this->shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $this->createStub(MagoLogger::class),
             $version,
         );
@@ -485,7 +514,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             [],
             $this->shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $this->createStub(MagoLogger::class),
             $version,
         );

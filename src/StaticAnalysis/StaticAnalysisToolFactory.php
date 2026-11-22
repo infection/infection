@@ -39,7 +39,7 @@ use function implode;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
@@ -85,7 +85,7 @@ final readonly class StaticAnalysisToolFactory
                 $this->infectionConfig->debugTestFrameworkLogFile,
                 $timeout,
                 new DebugCommandLine($this->phpExecutableFinder),
-                new InitialStaticAnalysisRunner($this->shellCommandRunner, $this->testFrameworkLogger),
+                new InitialTestsRunner($this->shellCommandRunner, $this->testFrameworkLogger),
             );
         }
 

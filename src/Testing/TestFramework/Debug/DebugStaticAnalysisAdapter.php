@@ -37,10 +37,12 @@ namespace Infection\Testing\TestFramework\Debug;
 
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Override;
+use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * @internal
@@ -52,7 +54,7 @@ final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisTestFra
         private string $logFile,
         private float $timeout,
         private DebugCommandLine $commandLine,
-        private InitialStaticAnalysisRunner $initialStaticAnalysisRunner,
+        private InitialTestsRunner $initialTestsRunner,
     ) {
     }
 
@@ -62,10 +64,20 @@ final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisTestFra
         return 'Debug';
     }
 
+    /**
+     * @throws InitialTestsFailed
+     * @throws RuntimeException When the initial command cannot complete.
+     */
     #[Override]
     public function executeInitialRun(): InitialRunResults
     {
-        return $this->initialStaticAnalysisRunner->run($this, $this->getInitialRunCommandLine());
+        $process = $this->initialTestsRunner->run(
+            $this,
+            $this->getInitialRunCommandLine(),
+            testFrameworkType: 'static analysis',
+        );
+
+        return new InitialRunResults($process->stdout, null);
     }
 
     #[Override]

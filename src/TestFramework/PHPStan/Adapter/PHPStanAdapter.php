@@ -41,8 +41,9 @@ use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\Throwable\UnsupportedVersion;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -93,7 +94,7 @@ final class PHPStanAdapter implements StaticAnalysisTestFramework
         private readonly string $tmpDir,
         private readonly array $staticAnalysisToolOptions,
         private readonly ShellCommandRunner $shellCommandRunner,
-        private readonly InitialStaticAnalysisRunner $initialStaticAnalysisRunner,
+        private readonly InitialTestsRunner $initialTestsRunner,
         private readonly PHPStanLogger $logger,
         private ?string $version = null,
     ) {
@@ -105,10 +106,20 @@ final class PHPStanAdapter implements StaticAnalysisTestFramework
         return 'PHPStan';
     }
 
+    /**
+     * @throws InitialTestsFailed
+     * @throws SymfonyProcessRuntimeException When the initial command cannot complete.
+     */
     #[Override]
     public function executeInitialRun(): InitialRunResults
     {
-        return $this->initialStaticAnalysisRunner->run($this, $this->getInitialRunCommandLine());
+        $process = $this->initialTestsRunner->run(
+            $this,
+            $this->getInitialRunCommandLine(),
+            testFrameworkType: 'static analysis',
+        );
+
+        return new InitialRunResults($process->stdout, null);
     }
 
     #[Override]

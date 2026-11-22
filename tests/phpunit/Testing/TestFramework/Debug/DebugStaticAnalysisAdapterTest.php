@@ -36,11 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\Testing\TestFramework\Debug;
 
 use function array_slice;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
 use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -50,7 +52,7 @@ final class DebugStaticAnalysisAdapterTest extends TestCase
 {
     public function test_it_builds_debug_processes(): void
     {
-        $adapter = $this->createAdapter($this->createStub(InitialStaticAnalysisRunner::class));
+        $adapter = $this->createAdapter($this->createStub(InitialTestsRunner::class));
         $mutant = MutantBuilder::withMinimalTestData()->build();
 
         $container = $adapter->test($mutant);
@@ -70,8 +72,9 @@ final class DebugStaticAnalysisAdapterTest extends TestCase
 
     public function test_it_executes_the_initial_run(): void
     {
-        $runner = $this->createMock(InitialStaticAnalysisRunner::class);
+        $runner = $this->createMock(InitialTestsRunner::class);
         $adapter = $this->createAdapter($runner);
+        $process = CompletedProcessBuilder::withMinimalTestData()->withStdout('Analysis passed.')->build();
         $result = new InitialRunResults('Analysis passed.', null);
         $runner
             ->expects($this->once())
@@ -93,16 +96,39 @@ final class DebugStaticAnalysisAdapterTest extends TestCase
 
                     return true;
                 }),
+                true,
+                'static analysis',
             )
-            ->willReturn($result)
+            ->willReturn($process)
         ;
 
-        $this->assertSame($result, $adapter->executeInitialRun());
+        $this->assertEquals($result, $adapter->executeInitialRun());
+    }
+
+    public function test_it_preserves_initial_run_failures(): void
+    {
+        $runner = $this->createMock(InitialTestsRunner::class);
+        $adapter = $this->createAdapter($runner);
+        $process = CompletedProcessBuilder::withMinimalTestData()
+            ->withExitCode(3)
+            ->build()
+        ;
+        $failure = InitialTestsFailed::fromCompletedProcess($process, 'Debug', 'static analysis', '');
+        $runner
+            ->expects($this->once())
+            ->method('run')
+            ->with($adapter, $this->isArray(), true, 'static analysis')
+            ->willThrowException($failure)
+        ;
+
+        $this->expectExceptionObject($failure);
+
+        $adapter->executeInitialRun();
     }
 
     public function test_it_exposes_its_identity_and_requirements(): void
     {
-        $adapter = $this->createAdapter($this->createStub(InitialStaticAnalysisRunner::class));
+        $adapter = $this->createAdapter($this->createStub(InitialTestsRunner::class));
 
         $this->assertSame('Debug', $adapter->getName());
         $this->assertSame('1.0.0', $adapter->getVersion());
@@ -110,7 +136,7 @@ final class DebugStaticAnalysisAdapterTest extends TestCase
         $adapter->checkRequirements();
     }
 
-    private function createAdapter(InitialStaticAnalysisRunner $runner): DebugStaticAnalysisAdapter
+    private function createAdapter(InitialTestsRunner $runner): DebugStaticAnalysisAdapter
     {
         $phpExecutableFinder = $this->createStub(PhpExecutableFinder::class);
         $phpExecutableFinder

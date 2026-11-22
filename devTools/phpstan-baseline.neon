@@ -529,12 +529,6 @@ parameters:
 			path: ../src/Process/OriginalPhpProcess.php
 
 		-
-			rawMessage: Infection\Process\Runner\InitialTestsRunner should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 2
-			path: ../src/Process/Runner/InitialTestsRunner.php
-
-		-
 			rawMessage: 'Method Infection\Reflection\AnonymousClassReflection::__construct() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
 			identifier: missingType.generics
 			count: 1
@@ -661,7 +655,7 @@ parameters:
 			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\Process\Runner\InitialTestsRunner
+			rawMessage: Infection\TestFramework\Contracts\TestFrameworkFactory should not depend on Infection\TestFramework\Common\InitialTestsRunner
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Contracts/TestFrameworkFactory.php
@@ -790,18 +784,6 @@ parameters:
 			path: ../src/TestFramework/Mago/Adapter/MagoAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\Process\Runner\InitialStaticAnalysisRunner
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Adapter/MagoAdapter.php
-
-		-
-			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapterFactory should not depend on Infection\Process\Runner\InitialStaticAnalysisRunner
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Adapter/MagoAdapterFactory.php
-
-		-
 			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\DetectionStatus
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 5
@@ -895,12 +877,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\Runner\InitialTestsRunner
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\Coverage\CoverageChecker
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -932,12 +908,6 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Process\Factory\MutantProcessContainerFactory
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Process\Runner\InitialTestsRunner
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php

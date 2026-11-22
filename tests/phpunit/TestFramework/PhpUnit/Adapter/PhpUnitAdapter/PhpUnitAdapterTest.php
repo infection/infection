@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
 use function array_map;
 use function array_slice;
+use Closure;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
@@ -44,14 +45,13 @@ use Infection\Configuration\Configuration;
 use Infection\FileSystem\FileSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
-use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
@@ -172,13 +172,22 @@ final class PhpUnitAdapterTest extends TestCase
             initialTestsRunner: $initialTestsRunner,
         );
 
+        $expectedCommand = [
+            self::PHP_EXECUTABLE,
+            '-d',
+            'memory_limit=1G',
+            '/path/to/phpunit',
+            '--configuration',
+            '/tmp/phpunitConfiguration.initial.infection.xml',
+            '--verbose',
+            '--warn-when-php-is-not-configured-for-development',
+        ];
         $initialTestsRunner
             ->expects($this->once())
             ->method('run')
             ->with(
                 $adapter,
-                '--verbose --warn-when-php-is-not-configured-for-development',
-                ['-d', 'memory_limit=1G'],
+                $expectedCommand,
                 true,
             )
             ->willReturn($process)
@@ -243,26 +252,40 @@ final class PhpUnitAdapterTest extends TestCase
             '<phpunit/>',
             initialTestsRunner: $initialTestsRunner,
         );
+        $recommendations = $adapter->getInitialTestsFailRecommendations($commandLine);
+        $failure = InitialTestsFailed::fromCompletedProcess($process, 'PHPUnit', 'tests', $recommendations);
         $initialTestsRunner
             ->expects($this->once())
             ->method('run')
             ->with(
                 $adapter,
-                '',
-                [''],
+                [
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ],
                 false,
+                'tests',
+                $this->callback(function (Closure $getRecommendations) use ($commandLine, $recommendations): bool {
+                    $this->assertSame(
+                        $recommendations,
+                        $getRecommendations($commandLine),
+                    );
+
+                    return true;
+                }),
             )
-            ->willReturn($process)
+            ->willThrowException($failure)
         ;
         $this->fileSystemMock
             ->expects($this->never())
             ->method('isReadableFile')
         ;
 
-        $this->expectException(InitialTestsFailed::class);
-        $this->expectExceptionMessage(
-            $adapter->getInitialTestsFailRecommendations($commandLine),
-        );
+        $this->expectExceptionObject($failure);
 
         $adapter->executeInitialRun();
     }
@@ -670,7 +693,7 @@ final class PhpUnitAdapterTest extends TestCase
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $configuration = ConfigurationBuilder::withMinimalTestData()->withSkipCoverage(true)->build();
         $this->fileSystemMock->expects($this->exactly(2))->method('isReadableFile')->willReturn(true);
-        $this->fileSystemMock->expects($this->exactly(2))->method('dumpFile');
+        $this->fileSystemMock->expects($this->exactly(3))->method('dumpFile');
         $environment = $this->createMock(MemoryLimiterEnvironment::class);
         $environment->expects($this->once())->method('hasMemoryLimitSet')->willReturn(false);
         $memoryLimiter = new MemoryLimiter($environment);
@@ -686,7 +709,11 @@ final class PhpUnitAdapterTest extends TestCase
         $initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($adapter, $configuration->testFrameworkExtraOptions, [''], true)
+            ->with(
+                $adapter,
+                [self::PHP_EXECUTABLE, '/path/to/phpunit', '--configuration', '/tmp/phpunitConfiguration.initial.infection.xml'],
+                true,
+            )
             ->willReturn($process)
         ;
         $adapter->executeInitialRun();
@@ -2101,7 +2128,6 @@ final class PhpUnitAdapterTest extends TestCase
             $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
             new TestFrameworkExtraOptionsFilter(),
             $memoryLimiter ?? new MemoryLimiter($this->createStub(MemoryLimiterEnvironment::class)),
-            $this->createStub(TestFrameworkLogger::class),
             $version,
         );
     }
