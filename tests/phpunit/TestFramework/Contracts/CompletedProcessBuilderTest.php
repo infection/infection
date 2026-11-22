@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Contracts;
 
+use const DIRECTORY_SEPARATOR;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -46,6 +47,7 @@ final class CompletedProcessBuilderTest extends TestCase
     {
         $expected = new CompletedProcess(
             command: [],
+            commandLine: '',
             exitCode: 0,
             stdout: '',
             stderr: '',
@@ -59,8 +61,12 @@ final class CompletedProcessBuilderTest extends TestCase
     {
         $originalBuilder = CompletedProcessBuilder::withMinimalTestData();
 
+        $expectedCommandLine = DIRECTORY_SEPARATOR === '\\'
+            ? 'php --version'
+            : "'php' '--version'";
         $expectedOverriddenCompletedProcess = new CompletedProcess(
             ['php', '--version'],
+            $expectedCommandLine,
             1,
             'stdout',
             'stderr',
@@ -75,6 +81,7 @@ final class CompletedProcessBuilderTest extends TestCase
 
         $expectedOriginalCompletedProcess = new CompletedProcess(
             command: [],
+            commandLine: '',
             exitCode: 0,
             stdout: '',
             stderr: '',

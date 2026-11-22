@@ -99,6 +99,7 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
 
         return new CompletedProcess(
             $command,
+            $process->getCommandLine(),
             $exitCode,
             trim($process->getOutput()),
             trim($process->getErrorOutput()),
