@@ -33,17 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PHPStan\Process;
+namespace Infection\TestFramework\PHPStan\Mutant;
 
 use function array_merge;
+use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -56,8 +55,9 @@ final readonly class PHPStanMutantProcessFactory
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
+        private ProcessFactory $processFactory,
         private Filesystem $fileSystem,
-        private MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private EvaluationAttemptResultFactory $evaluationAttemptResultFactory,
         private string $staticAnalysisConfigPath,
         private string $staticAnalysisToolExecutable,
         private CommandLineBuilder $commandLineBuilder,
@@ -69,7 +69,7 @@ final readonly class PHPStanMutantProcessFactory
 
     public function create(Mutant $mutant): MutantProcess
     {
-        $process = new Process(
+        $process = $this->processFactory->create(
             command: $this->getMutantCommandLine(
                 $mutant->getFilePath(),
                 $mutant->getMutation()->getOriginalFilePath(),
@@ -77,14 +77,16 @@ final readonly class PHPStanMutantProcessFactory
                     $mutant->getMutation()->getHash(),
                 ),
             ),
-            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
+            cwd: null,
+            env: [],
+            input: null,
             timeout: $this->timeout,
         );
 
         return new MutantProcess(
             $process,
             $mutant,
-            $this->mutantExecutionResultFactory,
+            $this->evaluationAttemptResultFactory,
         );
     }
 

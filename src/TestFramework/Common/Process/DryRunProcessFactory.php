@@ -33,27 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process;
+namespace Infection\TestFramework\Common\Process;
 
-use Infection\Process\DryRunProcess;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
+use function array_merge;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Override;
 
-#[CoversClass(DryRunProcess::class)]
-final class DryRunProcessTest extends TestCase
+/**
+ * @internal
+ */
+final class DryRunProcessFactory implements ProcessFactory
 {
-    public function test_it_presents_process_as_expected(): void
-    {
-        $realProcess = new Process(['php', 'vendor/bin/phpunit']);
-        $dryRunProcess = DryRunProcess::fromProcess($realProcess);
+    #[Override]
+    public function create(
+        array $command,
+        ?string $cwd,
+        array $env,
+        mixed $input,
+        ?float $timeout,
+    ): DryRunProcess {
+        $env = array_merge(['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY], $env);
 
-        $this->assertTrue($dryRunProcess->isTerminated());
-        $this->assertTrue($dryRunProcess->isStarted());
-        $this->assertSame(DryRunProcess::PASSING_TEST_OUTPUT, $dryRunProcess->getOutput());
-        $this->assertSame(0.0, $dryRunProcess->getStartTime());
-        $this->assertSame(0, $dryRunProcess->getExitCode());
-        $this->assertSame(Process::STATUS_TERMINATED, $dryRunProcess->getStatus());
-        $this->assertSame($realProcess->getCommandLine(), $dryRunProcess->getCommandLine());
+        return new DryRunProcess($command, $cwd, $env, $input, $timeout);
     }
 }

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Contracts;
 
 use Infection\AbstractTestFramework\InvalidVersion;
+use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
@@ -84,12 +85,11 @@ interface TestFramework
     public function executeInitialRun(): InitialRunResults;
 
     /**
-     * Evaluates the Mutant. Some test frameworks may be able to do this in-memory, e.g.
-     * Psalm, or it requires to launch a process in which case the process execution is
-     * delegated to an orchestrator. A process encapsulates how the result of the process
-     * is interpreted.
+     * Supplies a complete evaluation container or an immutable result from direct evaluation.
+     * A returned container must be cold; the runner executes its processes on demand.
+     * Calling test() again must perform a fresh evaluation, including for direct results.
      */
-    public function test(Mutant $mutant): MutantProcessContainer;
+    public function test(Mutant $mutant): MutantProcessContainer|EvaluationAttemptResult;
 
     /**
      * @deprecated This is only for making the migration easier, to be removed.

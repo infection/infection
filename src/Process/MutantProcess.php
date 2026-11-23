@@ -35,11 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\TestFramework\Common\Process\DryRunProcess;
 use function microtime;
 use Symfony\Component\Process\Process;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -47,14 +49,16 @@ use Symfony\Component\Process\Process;
  */
 class MutantProcess
 {
+    private ?EvaluationAttemptResult $evaluationAttemptResult = null;
+
     private bool $timedOut = false;
 
     private float $finishedAt = 0.0;
 
     public function __construct(
-        private readonly Process $process,
+        private Process $process,
         private readonly Mutant $mutant,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly EvaluationAttemptResultFactory $evaluationAttemptResultFactory,
     ) {
     }
 
@@ -88,9 +92,32 @@ class MutantProcess
         return $this->finishedAt;
     }
 
-    public function getMutantExecutionResult(): MutantExecutionResult
+    public function getRuntime(): float
     {
-        // todo [phpstan-integration] cache it
-        return $this->mutantExecutionResultFactory->createFromProcess($this);
+        return $this->process instanceof DryRunProcess
+            ? 0.0
+            : $this->finishedAt - $this->process->getStartTime();
+    }
+
+    public function simulate(): void
+    {
+        Assert::true(
+            $this->process instanceof DryRunProcess || !$this->process->isStarted(),
+            'Cannot simulate a process after it has started.',
+        );
+        Assert::same($this->finishedAt, 0.0, 'Cannot simulate an already completed evaluation.');
+
+        if (!$this->process instanceof DryRunProcess) {
+            $this->process = DryRunProcess::fromProcess($this->process);
+        }
+
+        $this->markAsFinished();
+    }
+
+    public function getEvaluationAttemptResult(): EvaluationAttemptResult
+    {
+        Assert::greaterThan($this->finishedAt, 0.0, 'Cannot classify an evaluation before its process has finished.');
+
+        return $this->evaluationAttemptResult ??= $this->evaluationAttemptResultFactory->createFromProcess($this);
     }
 }

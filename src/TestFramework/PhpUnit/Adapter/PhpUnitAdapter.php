@@ -125,7 +125,8 @@ final class PhpUnitAdapter implements TestFramework
     #[Override]
     public function executeInitialRun(): InitialRunResults
     {
-        $command = $this->getInitialTestRunCommandLine(
+        // TODO: rename ::getInitialTestsRunCommandLine() to ::getInitialRunCommandLine() separately.
+        $command = $this->getInitialRunCommandLine(
             $this->config->testFrameworkExtraOptions,
             explode(
                 ' ',
@@ -174,7 +175,13 @@ final class PhpUnitAdapter implements TestFramework
             ),
         );
 
-        return $this->processFactory->create($command, $mutant, $this->testsPass(...), $this->isSyntaxError(...));
+        return $this->processFactory->create(
+            $command,
+            $mutant,
+            $this->getName(),
+            $this->testsPass(...),
+            $this->isSyntaxError(...),
+        );
     }
 
     public function hasJUnitReport(): bool
@@ -227,7 +234,7 @@ final class PhpUnitAdapter implements TestFramework
      *
      * @return string[]
      */
-    private function getInitialTestRunCommandLine(
+    private function getInitialRunCommandLine(
         string $extraOptions,
         array $phpExtraArgs,
         bool $skipCoverage,

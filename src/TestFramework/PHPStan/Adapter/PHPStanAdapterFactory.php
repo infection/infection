@@ -37,16 +37,19 @@ namespace Infection\TestFramework\PHPStan\Adapter;
 
 use Infection\CannotBeInstantiated;
 use Infection\Configuration\Configuration;
-use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Process\DryRunProcessFactory;
+use Infection\TestFramework\Common\Process\SymfonyProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PHPStan\Logger\PsrPHPStanLogger;
-use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
+use Infection\TestFramework\PHPStan\Mutant\PHPStanEvaluationAttemptResultFactory;
+use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantDetectionStatusResolver;
+use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantProcessFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Override;
 use Psr\Log\LoggerInterface;
@@ -81,21 +84,36 @@ final class PHPStanAdapterFactory implements TestFrameworkFactory
         LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
         Configuration $configuration,
-        MutantProcessContainerFactory $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): PHPStanAdapter {
-        return new PHPStanAdapter(
+        $commandLineBuilder = new CommandLineBuilder(new PhpExecutableFinder());
+        $staticAnalysisToolOptions = $configuration->getStaticAnalysisToolOptions();
+
+        $processFactory = $configuration->isDryRun
+            ? new DryRunProcessFactory()
+            : new SymfonyProcessFactory();
+
+        $mutantProcessFactory = new PHPStanMutantProcessFactory(
+            $processFactory,
             $fileSystem,
-            new PHPStanMutantExecutionResultFactory(),
+            new PHPStanEvaluationAttemptResultFactory(
+                new PHPStanMutantDetectionStatusResolver(),
+            ),
             $testFrameworkConfigPath,
             $testFrameworkExecutable,
-            new CommandLineBuilder(
-                new PhpExecutableFinder(),
-            ),
-            new VersionParser('PHPStan'),
+            $commandLineBuilder,
             $configuration->processTimeout,
             $tmpDir,
-            $configuration->getStaticAnalysisToolOptions(),
+            $staticAnalysisToolOptions,
+        );
+
+        return new PHPStanAdapter(
+            $mutantProcessFactory,
+            $testFrameworkConfigPath,
+            $testFrameworkExecutable,
+            $commandLineBuilder,
+            new VersionParser('PHPStan'),
+            $staticAnalysisToolOptions,
             $shellCommandRunner,
             new InitialTestsRunner($shellCommandRunner, $testFrameworkLogger),
             new PsrPHPStanLogger($logger),

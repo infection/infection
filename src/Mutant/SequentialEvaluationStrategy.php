@@ -33,66 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\Mutant;
 
+use Closure;
 use Override;
-use Symfony\Component\Process\Process;
 
 /**
+ * Continues to the next configured evaluator after escape, otherwise keeps its status.
+ *
  * @internal
- *
- * Wraps a real Process to simulate a terminated process for dry-run mode.
- *
- * The real process is constructed normally but never started. This wrapper
- * presents it as already terminated with passing test output, causing
- * all mutants to be marked as ESCAPED.
  */
-final class DryRunProcess extends Process
+final readonly class SequentialEvaluationStrategy implements EvaluationStrategy
 {
-    /**
-     * Output that TestFrameworkAdapter::testsPass() recognizes as passing tests.
-     * The pattern "OK (" triggers testsPass() to return true, causing ESCAPED status.
-     */
-    public const string PASSING_TEST_OUTPUT = 'OK (0 tests, 0 assertions)';
-
-    public static function fromProcess(Process $process): self
-    {
-        return self::fromShellCommandline($process->getCommandLine());
-    }
-
     #[Override]
-    public function isTerminated(): bool
-    {
-        return true;
-    }
+    public function decide(
+        array $history,
+        array $evaluations,
+        ?Closure $nextEvaluation,
+        DetectionStatus $currentStatus,
+    ): RunEvaluation|FinishEvaluation {
+        if ($currentStatus !== DetectionStatus::ESCAPED) {
+            return new FinishEvaluation($currentStatus);
+        }
 
-    #[Override]
-    public function isStarted(): bool
-    {
-        return true;
-    }
+        if ($nextEvaluation !== null) {
+            return new RunEvaluation($nextEvaluation);
+        }
 
-    #[Override]
-    public function getOutput(): string
-    {
-        return self::PASSING_TEST_OUTPUT;
-    }
-
-    #[Override]
-    public function getStartTime(): float
-    {
-        return 0.0;
-    }
-
-    #[Override]
-    public function getExitCode(): int
-    {
-        return 0;
-    }
-
-    #[Override]
-    public function getStatus(): string
-    {
-        return Process::STATUS_TERMINATED;
+        return new FinishEvaluation($currentStatus);
     }
 }

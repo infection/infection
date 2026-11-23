@@ -47,6 +47,7 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSu
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Framework\Str;
 use Infection\Git\Git;
+use Infection\Mutant\SequentialEvaluationStrategy;
 use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -409,7 +410,7 @@ final class InitialTestRunCommandTest extends TestCase
 
                 return $staticAnalysis === null
                     ? $testFrameworkMock
-                    : new CombinedTestFramework($testFrameworkMock, $staticAnalysis);
+                    : new CombinedTestFramework(new SequentialEvaluationStrategy(), $testFrameworkMock, $staticAnalysis);
             },
         );
 

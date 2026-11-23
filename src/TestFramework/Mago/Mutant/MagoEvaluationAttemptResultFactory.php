@@ -33,74 +33,63 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Mago\Process;
+namespace Infection\TestFramework\Mago\Mutant;
 
-use function array_merge;
-use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\Common\CommandLineBuilder;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Common\MutantProcessDetectionStatusResolver;
+use function sprintf;
 use Symfony\Component\Process\Process;
+use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final readonly class MagoMutantProcessFactory
+final readonly class MagoEvaluationAttemptResultFactory implements EvaluationAttemptResultFactory
 {
-    /**
-     * @param list<string> $staticAnalysisToolOptions
-     */
+    /** @param MutantProcessDetectionStatusResolver<DetectionStatus> $detectionStatusResolver */
     public function __construct(
-        private MutantExecutionResultFactory $mutantExecutionResultFactory,
-        private string $staticAnalysisToolExecutable,
-        private CommandLineBuilder $commandLineBuilder,
-        private float $timeout,
-        private array $staticAnalysisToolOptions,
+        private MutantProcessDetectionStatusResolver $detectionStatusResolver,
     ) {
     }
 
-    public function create(Mutant $mutant): MutantProcess
+    public function createFromProcess(MutantProcess $mutantProcess): EvaluationAttemptResult
     {
-        $process = new Process(
-            command: $this->getMutantCommandLine(
-                $mutant->getFilePath(),
-                $mutant->getMutation()->getOriginalFilePath(),
-            ),
-            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
-            timeout: $this->timeout,
-        );
+        $process = $mutantProcess->getProcess();
 
-        return new MutantProcess(
-            $process,
-            $mutant,
-            $this->mutantExecutionResultFactory,
+        return EvaluationAttemptResult::fromProcess(
+            'Mago',
+            $this->retrieveDetectionStatus($mutantProcess),
+            $this->retrieveProcessOutput($process),
+            $mutantProcess,
         );
     }
 
-    /**
-     * @return string[]
-     */
-    private function getMutantCommandLine(
-        string $mutatedFilePath,
-        string $originalFilePath,
-    ): array {
-        $options = array_merge(
-            [
-                '--colors=never',
-                '--threads=1',
-                'analyze',
-                '--reporting-format=short',
-                '--substitute',
-                "$originalFilePath=$mutatedFilePath",
-            ],
-            $this->staticAnalysisToolOptions,
+    private function retrieveProcessOutput(Process $process): string
+    {
+        Assert::true(
+            $process->isTerminated(),
+            sprintf(
+                'Cannot retrieve a non-terminated process output. Got "%s"',
+                $process->getStatus(),
+            ),
         );
 
-        return $this->commandLineBuilder->build(
-            $this->staticAnalysisToolExecutable,
-            [],
-            $options,
+        return trim($process->getOutput() . "\n\n" . $process->getErrorOutput());
+    }
+
+    private function retrieveDetectionStatus(MutantProcess $mutantProcess): DetectionStatus
+    {
+        $process = $mutantProcess->getProcess();
+
+        return $this->detectionStatusResolver->resolve(
+            $process->getOutput(),
+            $process->getErrorOutput(),
+            $process->getExitCode(),
+            $mutantProcess->isTimedOut(),
         );
     }
 }

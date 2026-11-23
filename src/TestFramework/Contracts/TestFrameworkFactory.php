@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Contracts;
 
 use Infection\Configuration\Configuration;
-use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Psr\Log\LoggerInterface;
@@ -74,7 +73,6 @@ interface TestFrameworkFactory
         LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
         Configuration $configuration,
-        MutantProcessContainerFactory $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework;
 

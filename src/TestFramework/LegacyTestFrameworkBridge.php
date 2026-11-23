@@ -151,6 +151,7 @@ final class LegacyTestFrameworkBridge implements TestFramework
                 $this->getFilteredExtraOptionsForMutant(),
             ),
             $mutant,
+            $adapter->getName(),
             $adapter->testsPass(...),
             $adapter instanceof SyntaxErrorAware ? $adapter->isSyntaxError(...) : null,
         );

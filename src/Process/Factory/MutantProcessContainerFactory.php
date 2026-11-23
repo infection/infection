@@ -36,15 +36,12 @@ declare(strict_types=1);
 namespace Infection\Process\Factory;
 
 use Closure;
-use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
-use Infection\Process\DryRunProcess;
+use Infection\Mutant\TestFrameworkEvaluationAttemptResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 use function min;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -58,7 +55,7 @@ class MutantProcessContainerFactory
 
     public function __construct(
         private readonly float $timeout,
-        private readonly Configuration $configuration,
+        private readonly ProcessFactory $processFactory,
     ) {
     }
 
@@ -70,27 +67,27 @@ class MutantProcessContainerFactory
     public function create(
         array $command,
         Mutant $mutant,
+        string $evaluatorName,
         Closure $testsPass,
         ?Closure $isSyntaxError = null,
     ): MutantProcessContainer {
         // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
         $timeout = min(self::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (self::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime()), $this->timeout);
 
-        $process = new Process(
+        $process = $this->processFactory->create(
             command: $command,
-            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
+            cwd: null,
+            env: [],
+            input: null,
             timeout: $timeout,
         );
 
-        if ($this->configuration->isDryRun) {
-            $process = DryRunProcess::fromProcess($process);
-        }
-
         return MutantProcessContainer::from(
+            $mutant,
             static fn (): MutantProcess => new MutantProcess(
                 $process,
                 $mutant,
-                new TestFrameworkMutantExecutionResultFactory($testsPass, $isSyntaxError),
+                new TestFrameworkEvaluationAttemptResultFactory($evaluatorName, $testsPass, $isSyntaxError),
             ),
         );
     }

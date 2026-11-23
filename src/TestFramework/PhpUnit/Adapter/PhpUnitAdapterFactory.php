@@ -43,6 +43,8 @@ use Infection\Configuration\Configuration;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Process\DryRunProcessFactory;
+use Infection\TestFramework\Common\Process\SymfonyProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -93,7 +95,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
         Configuration $configuration,
-        MutantProcessContainerFactory $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
@@ -108,6 +109,10 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             new PathReplacer($fileSystem, $testFrameworkConfigDir),
             $testFrameworkConfigDir,
         );
+
+        $processFactory = $configuration->isDryRun
+            ? new DryRunProcessFactory()
+            : new SymfonyProcessFactory();
 
         return new PhpUnitAdapter(
             $testFrameworkExecutable,
@@ -158,7 +163,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $coverageCheckerFactory,
             new InitialTestsRunner($shellCommandRunner, $testFrameworkLogger),
             $configuration,
-            $processFactory,
+            new MutantProcessContainerFactory($configuration->processTimeout, $processFactory),
             $testFrameworkExtraOptionsFilter,
             new MemoryLimiter(new MemoryLimiterEnvironment()),
         );

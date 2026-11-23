@@ -36,71 +36,32 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Mago\Mutant;
 
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\MutantProcess;
-use function sprintf;
-use Symfony\Component\Process\Process;
-use function trim;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\Common\MutantProcessDetectionStatusResolver;
+use Override;
 
 /**
+ * @implements MutantProcessDetectionStatusResolver<DetectionStatus>
+ *
  * @internal
  */
-final class MagoMutantExecutionResultFactory implements MutantExecutionResultFactory
+final class MagoMutantDetectionStatusResolver implements MutantProcessDetectionStatusResolver
 {
     private const int PROCESS_MIN_ERROR_CODE = 100;
 
-    public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult
-    {
-        $process = $mutantProcess->getProcess();
-        $mutant = $mutantProcess->getMutant();
-        $mutation = $mutant->getMutation();
-
-        return new MutantExecutionResult(
-            $process->getCommandLine(),
-            $this->retrieveProcessOutput($process),
-            $this->retrieveDetectionStatus($mutantProcess),
-            $mutant->getDiff(),
-            $mutation->getHash(),
-            $mutation->getMutatorClass(),
-            $mutation->getMutatorName(),
-            $mutation->getOriginalFilePath(),
-            $mutation->getOriginalStartingLine(),
-            $mutation->getOriginalEndingLine(),
-            $mutation->getOriginalStartFilePosition(),
-            $mutation->getOriginalEndFilePosition(),
-            $mutant->getPrettyPrintedOriginalCode(),
-            $mutant->getMutatedCode(),
-            $mutant->getTests(),
-            $mutantProcess->getFinishedAt() - $process->getStartTime(),
-        );
-    }
-
-    private function retrieveProcessOutput(Process $process): string
-    {
-        Assert::true(
-            $process->isTerminated(),
-            sprintf(
-                'Cannot retrieve a non-terminated process output. Got "%s"',
-                $process->getStatus(),
-            ),
-        );
-
-        return trim($process->getOutput() . "\n\n" . $process->getErrorOutput());
-    }
-
-    private function retrieveDetectionStatus(MutantProcess $mutantProcess): DetectionStatus
-    {
-        if ($mutantProcess->isTimedOut()) {
+    #[Override]
+    public function resolve(
+        string $stdout,
+        string $stderr,
+        ?int $exitCode,
+        bool $timedOut,
+    ): DetectionStatus {
+        if ($timedOut) {
             return DetectionStatus::TIMED_OUT;
         }
 
-        $process = $mutantProcess->getProcess();
-
-        $exitCode = $process->getExitCode();
-
-        if ($exitCode !== null && $exitCode > self::PROCESS_MIN_ERROR_CODE) {
+        if ($exitCode !== null
+            && $exitCode > self::PROCESS_MIN_ERROR_CODE
+        ) {
             // See \Symfony\Component\Process\Process::$exitCodes
             return DetectionStatus::ERROR;
         }

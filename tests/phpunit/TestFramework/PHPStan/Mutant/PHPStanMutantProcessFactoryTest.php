@@ -33,15 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PHPStan\Process;
+namespace Infection\Tests\TestFramework\PHPStan\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\TestFramework\Common\CommandLineBuilder;
-use Infection\TestFramework\PHPStan\Process\PHPStanMutantProcessFactory;
+use Infection\TestFramework\Common\Process\SymfonyProcessFactory;
+use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantProcessFactory;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
 use PhpParser\Node\Stmt\Nop;
@@ -96,7 +97,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             ->build()
         ;
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
+        $phpStanEvaluationAttemptResultFactory = $this->createStub(EvaluationAttemptResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -130,8 +131,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
         ;
 
         $factory = new PHPStanMutantProcessFactory(
+            new SymfonyProcessFactory(),
             $filesystem,
-            $phpStanMutantExecutionResultFactory,
+            $phpStanEvaluationAttemptResultFactory,
             '/path/to/phpstan-config-folder',
             '/path/to/phpstan',
             $commandLineBuilder,
@@ -196,7 +198,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             ->build()
         ;
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
+        $phpStanEvaluationAttemptResultFactory = $this->createStub(EvaluationAttemptResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -231,8 +233,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
         ;
 
         $factory = new PHPStanMutantProcessFactory(
+            new SymfonyProcessFactory(),
             $filesystem,
-            $phpStanMutantExecutionResultFactory,
+            $phpStanEvaluationAttemptResultFactory,
             '/path/to/phpstan-config-folder',
             '/path/to/phpstan',
             $commandLineBuilder,
@@ -296,7 +299,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             ->build()
         ;
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
+        $phpStanEvaluationAttemptResultFactory = $this->createStub(EvaluationAttemptResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -318,8 +321,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
         ;
 
         $factory = new PHPStanMutantProcessFactory(
+            new SymfonyProcessFactory(),
             $filesystem,
-            $phpStanMutantExecutionResultFactory,
+            $phpStanEvaluationAttemptResultFactory,
             '/path/to/phpstan-config-folder',
             '/path/to/phpstan',
             $commandLineBuilder,

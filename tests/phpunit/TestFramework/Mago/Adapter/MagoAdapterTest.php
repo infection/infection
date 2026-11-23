@@ -36,9 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Mago\Adapter;
 
 use Infection\AbstractTestFramework\InvalidVersion;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\EvaluationAttemptResultFactory;
+use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Process\SymfonyProcessFactory;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -47,6 +49,7 @@ use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\Mago\Adapter\MagoAdapter;
 use Infection\TestFramework\Mago\Logger\MagoLogger;
+use Infection\TestFramework\Mago\Mutant\MagoMutantProcessFactory;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
@@ -79,12 +82,11 @@ final class MagoAdapterTest extends TestCase
         $this->initialTestsRunner = $this->createMock(InitialTestsRunner::class);
 
         $this->adapter = new MagoAdapter(
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createMutantProcessFactory(),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser('Mago'),
-            31.0,
             [],
             $this->shellCommandRunner,
             $this->initialTestsRunner,
@@ -131,12 +133,11 @@ final class MagoAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_single_option(): void
     {
         $adapter = new MagoAdapter(
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createMutantProcessFactory(options: ['--sort']),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser('Mago'),
-            31.0,
             ['--sort'],
             $this->shellCommandRunner,
             $this->initialTestsRunner,
@@ -179,12 +180,11 @@ final class MagoAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_multiple_options(): void
     {
         $adapter = new MagoAdapter(
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createMutantProcessFactory(options: ['--no-progress']),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser('Mago'),
-            31.0,
             ['--no-progress'],
             $this->shellCommandRunner,
             $this->initialTestsRunner,
@@ -228,12 +228,11 @@ final class MagoAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_complex_options(): void
     {
         $adapter = new MagoAdapter(
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createMutantProcessFactory(options: ['--no-stubs', '--baseline /path/to/baseline.toml']),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser('Mago'),
-            31.0,
             ['--no-stubs', '--baseline /path/to/baseline.toml'],
             $this->shellCommandRunner,
             $this->initialTestsRunner,
@@ -300,12 +299,11 @@ final class MagoAdapterTest extends TestCase
         ;
 
         $adapter = new MagoAdapter(
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createMutantProcessFactory(),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser('Mago'),
-            31.0,
             [],
             $shellCommandRunner,
             $this->initialTestsRunner,
@@ -333,12 +331,11 @@ final class MagoAdapterTest extends TestCase
         ;
 
         $adapter = new MagoAdapter(
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createMutantProcessFactory('/path/to/executable'),
             '/path/to/config',
             '/path/to/executable',
             $this->commandLineBuilder,
             new VersionParser('Mago'),
-            31.0,
             [],
             $shellCommandRunner,
             $this->initialTestsRunner,
@@ -365,12 +362,11 @@ final class MagoAdapterTest extends TestCase
         ;
 
         $adapter = new MagoAdapter(
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createMutantProcessFactory('/path/to/executable'),
             '/path/to/config',
             '/path/to/executable',
             $this->commandLineBuilder,
             new VersionParser('Mago'),
-            31.0,
             [],
             $shellCommandRunner,
             $this->initialTestsRunner,
@@ -397,12 +393,11 @@ final class MagoAdapterTest extends TestCase
         ;
 
         $adapter = new MagoAdapter(
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createMutantProcessFactory('/path/to/executable'),
             '/path/to/config',
             '/path/to/executable',
             $this->commandLineBuilder,
             new VersionParser('Mago'),
-            31.0,
             [],
             $shellCommandRunner,
             $this->initialTestsRunner,
@@ -437,13 +432,13 @@ final class MagoAdapterTest extends TestCase
 
         $container = $this->adapter->test($mutant);
         $mutantProcess = $container->getCurrent();
+        $this->assertInstanceOf(MutantProcess::class, $mutantProcess);
         $process = $mutantProcess->getProcess();
 
         $this->assertSame($mutant, $mutantProcess->getMutant());
         $this->assertSame("'/path/to/mago' 'analyze'", $process->getCommandLine());
         $this->assertSame(31.0, $process->getTimeout());
         $this->assertFalse($process->isStarted());
-        $this->assertFalse($container->hasNext());
     }
 
     public function test_it_has_no_junit_report(): void
@@ -485,12 +480,11 @@ final class MagoAdapterTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $adapter = new MagoAdapter(
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createMutantProcessFactory(),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser('Mago'),
-            31.0,
             [],
             $this->shellCommandRunner,
             $this->initialTestsRunner,
@@ -506,12 +500,11 @@ final class MagoAdapterTest extends TestCase
     public function test_it_rejects_invalid_versions(string $version): void
     {
         $adapter = new MagoAdapter(
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createMutantProcessFactory(),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser('Mago'),
-            31.0,
             [],
             $this->shellCommandRunner,
             $this->initialTestsRunner,
@@ -548,5 +541,22 @@ final class MagoAdapterTest extends TestCase
         yield 'major version 0' => ['0.12.0'];
 
         yield 'dev version 1.0.x' => ['1.0.x-dev@cfa0299'];
+    }
+
+    /**
+     * @param list<string> $options
+     */
+    private function createMutantProcessFactory(
+        string $executable = '/path/to/mago',
+        array $options = [],
+    ): MagoMutantProcessFactory {
+        return new MagoMutantProcessFactory(
+            new SymfonyProcessFactory(),
+            $this->createStub(EvaluationAttemptResultFactory::class),
+            $executable,
+            $this->commandLineBuilder,
+            31.0,
+            $options,
+        );
     }
 }

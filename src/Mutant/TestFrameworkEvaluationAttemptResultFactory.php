@@ -37,6 +37,7 @@ namespace Infection\Mutant;
 
 use Closure;
 use Infection\Process\MutantProcess;
+use Infection\TestFramework\LegacyMutantDetectionStatusResolver;
 use function sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
@@ -44,43 +45,28 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final readonly class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResultFactory
+final readonly class TestFrameworkEvaluationAttemptResultFactory implements EvaluationAttemptResultFactory
 {
-    private const int PROCESS_MIN_ERROR_CODE = 100;
-
     /**
      * @param Closure(string): bool $testsPass
      * @param (Closure(string): mixed)|null $isSyntaxError Legacy adapters do not declare a return type.
      */
     public function __construct(
+        private string $evaluatorName,
         private Closure $testsPass,
         private ?Closure $isSyntaxError = null,
     ) {
     }
 
-    public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult
+    public function createFromProcess(MutantProcess $mutantProcess): EvaluationAttemptResult
     {
         $process = $mutantProcess->getProcess();
-        $mutant = $mutantProcess->getMutant();
-        $mutation = $mutant->getMutation();
 
-        return new MutantExecutionResult(
-            $process->getCommandLine(),
-            $this->retrieveProcessOutput($process),
+        return EvaluationAttemptResult::fromProcess(
+            $this->evaluatorName,
             $this->retrieveDetectionStatus($mutantProcess),
-            $mutant->getDiff(),
-            $mutation->getHash(),
-            $mutation->getMutatorClass(),
-            $mutation->getMutatorName(),
-            $mutation->getOriginalFilePath(),
-            $mutation->getOriginalStartingLine(),
-            $mutation->getOriginalEndingLine(),
-            $mutation->getOriginalStartFilePosition(),
-            $mutation->getOriginalEndFilePosition(),
-            $mutant->getPrettyPrintedOriginalCode(),
-            $mutant->getMutatedCode(),
-            $mutant->getTests(),
-            $mutantProcess->getFinishedAt() - $process->getStartTime(),
+            $this->retrieveProcessOutput($process),
+            $mutantProcess,
         );
     }
 
@@ -99,34 +85,22 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
 
     private function retrieveDetectionStatus(MutantProcess $mutantProcess): DetectionStatus
     {
-        if (!$mutantProcess->getMutant()->isCoveredByTest()) {
-            return DetectionStatus::NOT_COVERED;
-        }
-
-        if ($mutantProcess->isTimedOut()) {
-            return self::isTimeoutExpected($mutantProcess)
-                ? DetectionStatus::SKIPPED
-                : DetectionStatus::TIMED_OUT;
-        }
-
         $process = $mutantProcess->getProcess();
+        $hasTests = $mutantProcess->getMutant()->isCoveredByTest();
+        $timedOut = $mutantProcess->isTimedOut();
+        $resolver = new LegacyMutantDetectionStatusResolver(
+            $this->testsPass,
+            $hasTests,
+            $hasTests && $timedOut && self::isTimeoutExpected($mutantProcess),
+            $this->isSyntaxError,
+        );
 
-        if ($process->getExitCode() > self::PROCESS_MIN_ERROR_CODE) {
-            // See \Symfony\Component\Process\Process::$exitCodes
-            return DetectionStatus::ERROR;
-        }
-
-        $output = $this->retrieveProcessOutput($process);
-
-        if ($process->getExitCode() === 0 && ($this->testsPass)($output)) {
-            return DetectionStatus::ESCAPED;
-        }
-
-        if ($this->isSyntaxError !== null && (bool) ($this->isSyntaxError)($output)) {
-            return DetectionStatus::SYNTAX_ERROR;
-        }
-
-        return DetectionStatus::KILLED_BY_TESTS;
+        return $resolver->resolve(
+            $process->getOutput(),
+            $process->getErrorOutput(),
+            $process->getExitCode(),
+            $timedOut,
+        );
     }
 
     /**

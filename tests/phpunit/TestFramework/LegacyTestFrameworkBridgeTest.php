@@ -350,7 +350,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $processFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with(['/bin/dummy'], $mutant, $this->isInstanceOf(Closure::class), null)
+            ->with(['/bin/dummy'], $mutant, 'dummy', $this->isInstanceOf(Closure::class), null)
             ->willReturn($processContainer)
         ;
 
@@ -388,7 +388,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $processFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with(['/bin/dummy'], $mutant, $this->isInstanceOf(Closure::class), null)
+            ->with(['/bin/dummy'], $mutant, '', $this->isInstanceOf(Closure::class), null)
             ->willReturn($processContainer)
         ;
 

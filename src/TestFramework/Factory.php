@@ -203,7 +203,6 @@ final readonly class Factory
                         $this->logger,
                         $this->coverageCheckerFactory,
                         $configuration,
-                        $this->containerFactory,
                         $this->extraOptionsFilter,
                     )
                     : $factory::create(

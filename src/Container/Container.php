@@ -155,6 +155,8 @@ use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
+use Infection\TestFramework\Common\Process\DryRunProcessFactory;
+use Infection\TestFramework\Common\Process\SymfonyProcessFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -541,7 +543,9 @@ final class Container extends DIContainer
             TestFrameworkLogger::class => static fn (self $container): TestFrameworkLogger => new EventDispatchingTestFrameworkLogger($container->getEventDispatcher()),
             MutantProcessContainerFactory::class => static fn (self $container): MutantProcessContainerFactory => new MutantProcessContainerFactory(
                 $container->getConfiguration()->processTimeout,
-                $container->getConfiguration(),
+                $container->getConfiguration()->isDryRun
+                    ? new DryRunProcessFactory()
+                    : new SymfonyProcessFactory(),
             ),
             MutationGenerator::class => static function (self $container): MutationGenerator {
                 $config = $container->getConfiguration();

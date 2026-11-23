@@ -46,7 +46,7 @@ use Infection\Configuration\Configuration;
 use Infection\FileSystem\FileSystem;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
+use Infection\Mutant\TestFrameworkEvaluationAttemptResultFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
@@ -354,6 +354,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '--verbose',
                 ],
                 $mutant,
+                'PHPUnit',
                 $this->isInstanceOf(Closure::class),
                 $this->isInstanceOf(Closure::class),
             )
@@ -744,6 +745,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->with(
                 $scenario->expected,
                 $mutant,
+                'PHPUnit',
                 $this->isInstanceOf(Closure::class),
                 $this->isInstanceOf(Closure::class),
             )
@@ -2158,15 +2160,16 @@ final class PhpUnitAdapterTest extends TestCase
                  * @param Closure(string): bool $testsPass
                  * @param (Closure(string): mixed)|null $isSyntaxError
                  */
-                static function (array $_command, Mutant $mutant, Closure $testsPass, ?Closure $isSyntaxError) use ($process): MutantProcessContainer {
+                static function (array $_command, Mutant $mutant, string $evaluatorName, Closure $testsPass, ?Closure $isSyntaxError) use ($process): MutantProcessContainer {
                     $mutantProcess = new MutantProcess(
                         $process,
                         $mutant,
-                        new TestFrameworkMutantExecutionResultFactory($testsPass, $isSyntaxError),
+                        new TestFrameworkEvaluationAttemptResultFactory($evaluatorName, $testsPass, $isSyntaxError),
                     );
                     $mutantProcess->markAsFinished();
 
                     return MutantProcessContainer::from(
+                        $mutant,
                         static fn (): MutantProcess => $mutantProcess,
                     );
                 },
@@ -2174,9 +2177,11 @@ final class PhpUnitAdapterTest extends TestCase
         ;
         $adapter = $this->createAdapter('<phpunit/>', processFactory: $processFactory);
 
-        $result = $adapter->test($mutant)->getCurrent()->getMutantExecutionResult();
+        $attempt = $adapter->test($mutant)->getCurrent();
+        $this->assertInstanceOf(MutantProcess::class, $attempt);
+        $result = $attempt->getEvaluationAttemptResult();
 
-        return $result->getDetectionStatus();
+        return $result->detectionStatus;
     }
 
     /**

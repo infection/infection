@@ -40,6 +40,8 @@ use function array_reduce;
 use function array_slice;
 use function array_values;
 use function implode;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationStrategy;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -58,6 +60,7 @@ final readonly class CombinedTestFramework implements TestFramework
     private array $testFrameworks;
 
     public function __construct(
+        private EvaluationStrategy $strategy,
         TestFramework $firstTestFramework,
         TestFramework ...$followUpTestFrameworks,
     ) {
@@ -116,9 +119,12 @@ final readonly class CombinedTestFramework implements TestFramework
                 MutantProcessContainer $evaluation,
                 TestFramework $framework,
             ): MutantProcessContainer => $evaluation->append(
-                static fn (): MutantProcessContainer => $framework->test($mutant),
+                static fn (): MutantProcessContainer|EvaluationAttemptResult => $framework->test($mutant),
             ),
-            $this->testFrameworks[0]->test($mutant),
+            MutantProcessContainer::from(
+                $mutant,
+                fn (): MutantProcessContainer|EvaluationAttemptResult => $this->testFrameworks[0]->test($mutant),
+            )->withStrategy($this->strategy),
         );
     }
 

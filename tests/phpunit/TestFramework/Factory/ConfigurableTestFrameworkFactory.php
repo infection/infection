@@ -37,7 +37,6 @@ namespace Infection\Tests\TestFramework\Factory;
 
 use Infection\CannotBeInstantiated;
 use Infection\Configuration\Configuration;
-use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
@@ -104,7 +103,6 @@ final class ConfigurableTestFrameworkFactory implements TestFrameworkFactory
         LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
         Configuration $configuration,
-        MutantProcessContainerFactory $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): TestFramework {
         $testFramework = self::$testFramework;

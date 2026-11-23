@@ -37,16 +37,19 @@ namespace Infection\TestFramework\Mago\Adapter;
 
 use Infection\CannotBeInstantiated;
 use Infection\Configuration\Configuration;
-use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Process\DryRunProcessFactory;
+use Infection\TestFramework\Common\Process\SymfonyProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Mago\Logger\PsrMagoLogger;
-use Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory;
+use Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory;
+use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
+use Infection\TestFramework\Mago\Mutant\MagoMutantProcessFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Override;
 use Psr\Log\LoggerInterface;
@@ -81,19 +84,33 @@ final class MagoAdapterFactory implements TestFrameworkFactory
         LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
         Configuration $configuration,
-        MutantProcessContainerFactory $processFactory,
         TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): MagoAdapter {
+        $commandLineBuilder = new CommandLineBuilder(new PhpExecutableFinder());
+        $staticAnalysisToolOptions = $configuration->getStaticAnalysisToolOptions();
+
+        $processFactory = $configuration->isDryRun
+            ? new DryRunProcessFactory()
+            : new SymfonyProcessFactory();
+
+        $mutantProcessFactory = new MagoMutantProcessFactory(
+            $processFactory,
+            new MagoEvaluationAttemptResultFactory(
+                new MagoMutantDetectionStatusResolver(),
+            ),
+            $testFrameworkExecutable,
+            $commandLineBuilder,
+            $configuration->processTimeout,
+            $staticAnalysisToolOptions,
+        );
+
         return new MagoAdapter(
-            new MagoMutantExecutionResultFactory(),
+            $mutantProcessFactory,
             $testFrameworkConfigPath,
             $testFrameworkExecutable,
-            new CommandLineBuilder(
-                new PhpExecutableFinder(),
-            ),
+            $commandLineBuilder,
             new VersionParser('Mago'),
-            $configuration->processTimeout,
-            $configuration->getStaticAnalysisToolOptions(),
+            $staticAnalysisToolOptions,
             $shellCommandRunner,
             new InitialTestsRunner($shellCommandRunner, $testFrameworkLogger),
             new PsrMagoLogger($logger),

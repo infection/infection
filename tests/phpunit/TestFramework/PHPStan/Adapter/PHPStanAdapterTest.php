@@ -36,9 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PHPStan\Adapter;
 
 use Infection\AbstractTestFramework\InvalidVersion;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\EvaluationAttemptResultFactory;
+use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Process\SymfonyProcessFactory;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -47,6 +49,7 @@ use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter;
 use Infection\TestFramework\PHPStan\Logger\PHPStanLogger;
+use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantProcessFactory;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
@@ -67,6 +70,8 @@ final class PHPStanAdapterTest extends TestCase
 
     private PHPStanAdapter $adapter;
 
+    private PHPStanMutantProcessFactory $mutantProcessFactory;
+
     private CommandLineBuilder&MockObject $commandLineBuilder;
 
     private ShellCommandRunner $shellCommandRunner;
@@ -79,15 +84,24 @@ final class PHPStanAdapterTest extends TestCase
         $this->shellCommandRunner = $this->createStub(ShellCommandRunner::class);
         $this->initialTestsRunner = $this->createMock(InitialTestsRunner::class);
 
-        $this->adapter = new PHPStanAdapter(
+        $this->mutantProcessFactory = new PHPStanMutantProcessFactory(
+            new SymfonyProcessFactory(),
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(EvaluationAttemptResultFactory::class),
+            '/path/to/phpstan-config-path',
+            '/path/to/phpstan',
+            $this->commandLineBuilder,
+            31.0,
+            '/tmp',
+            [],
+        );
+
+        $this->adapter = new PHPStanAdapter(
+            $this->mutantProcessFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
             new VersionParser('PHPStan'),
-            31.0,
-            '/tmp',
             [],
             $this->shellCommandRunner,
             $this->initialTestsRunner,
@@ -134,14 +148,11 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_single_option(): void
     {
         $adapter = new PHPStanAdapter(
-            $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->mutantProcessFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
             new VersionParser('PHPStan'),
-            31.0,
-            '/tmp',
             ['--memory-limit=1G'],
             $this->shellCommandRunner,
             $this->initialTestsRunner,
@@ -184,14 +195,11 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_multiple_options(): void
     {
         $adapter = new PHPStanAdapter(
-            $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->mutantProcessFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
             new VersionParser('PHPStan'),
-            31.0,
-            '/tmp',
             ['--memory-limit=-1', '--no-progress'],
             $this->shellCommandRunner,
             $this->initialTestsRunner,
@@ -236,14 +244,11 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_complex_options(): void
     {
         $adapter = new PHPStanAdapter(
-            $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->mutantProcessFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
             new VersionParser('PHPStan'),
-            31.0,
-            '/tmp',
             ['--memory-limit=2G', '--level=max', '--no-progress'],
             $this->shellCommandRunner,
             $this->initialTestsRunner,
@@ -311,14 +316,11 @@ final class PHPStanAdapterTest extends TestCase
         ;
 
         $adapter = new PHPStanAdapter(
-            $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->mutantProcessFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
             new VersionParser('PHPStan'),
-            31.0,
-            '/tmp',
             [],
             $shellCommandRunner,
             $this->initialTestsRunner,
@@ -346,14 +348,11 @@ final class PHPStanAdapterTest extends TestCase
         ;
 
         $adapter = new PHPStanAdapter(
-            $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->mutantProcessFactory,
             '/path/to/config',
             '/path/to/executable',
             $this->commandLineBuilder,
             new VersionParser('PHPStan'),
-            31.0,
-            '/tmp',
             [],
             $shellCommandRunner,
             $this->initialTestsRunner,
@@ -380,14 +379,11 @@ final class PHPStanAdapterTest extends TestCase
         ;
 
         $adapter = new PHPStanAdapter(
-            $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->mutantProcessFactory,
             '/path/to/config',
             '/path/to/executable',
             $this->commandLineBuilder,
             new VersionParser('PHPStan'),
-            31.0,
-            '/tmp',
             [],
             $shellCommandRunner,
             $this->initialTestsRunner,
@@ -414,14 +410,11 @@ final class PHPStanAdapterTest extends TestCase
         ;
 
         $adapter = new PHPStanAdapter(
-            $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->mutantProcessFactory,
             '/path/to/config',
             '/path/to/executable',
             $this->commandLineBuilder,
             new VersionParser('PHPStan'),
-            31.0,
-            '/tmp',
             [],
             $shellCommandRunner,
             $this->initialTestsRunner,
@@ -456,13 +449,13 @@ final class PHPStanAdapterTest extends TestCase
 
         $container = $this->adapter->test($mutant);
         $mutantProcess = $container->getCurrent();
+        $this->assertInstanceOf(MutantProcess::class, $mutantProcess);
         $process = $mutantProcess->getProcess();
 
         $this->assertSame($mutant, $mutantProcess->getMutant());
         $this->assertSame("'/path/to/phpstan' 'analyze'", $process->getCommandLine());
         $this->assertSame(31.0, $process->getTimeout());
         $this->assertFalse($process->isStarted());
-        $this->assertFalse($container->hasNext());
     }
 
     public function test_it_has_no_junit_report(): void
@@ -504,14 +497,11 @@ final class PHPStanAdapterTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $adapter = new PHPStanAdapter(
-            $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->mutantProcessFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
             new VersionParser('PHPStan'),
-            31.0,
-            '/tmp',
             ['--memory-limit=-1'],
             $this->shellCommandRunner,
             $this->initialTestsRunner,
@@ -527,14 +517,11 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_rejects_invalid_versions(string $version): void
     {
         $adapter = new PHPStanAdapter(
-            $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->mutantProcessFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
             new VersionParser('PHPStan'),
-            31.0,
-            '/tmp',
             [],
             $this->shellCommandRunner,
             $this->initialTestsRunner,
