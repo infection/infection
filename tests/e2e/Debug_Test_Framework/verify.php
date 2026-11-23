@@ -1,12 +1,5 @@
 <?php
 
-const STAGES = [
-    'test-framework-initial',
-    'static-analysis-initial',
-    'test-framework-mutant',
-    'static-analysis-mutant',
-];
-
 /**
  * @phpstan-type Record = array{
  *     stage: string,
@@ -53,72 +46,20 @@ final class DebugRecords
             flags: JSON_THROW_ON_ERROR,
         );
     }
-
-    /**
-     * @param list<Record> $records
-     * @return array<string, Record>
-     */
-    public static function indexByStage(array $records): array
-    {
-        $recordsByStage = [];
-
-        foreach ($records as $record) {
-            $stage = $record['stage'];
-
-            if (isset($recordsByStage[$stage])) {
-                throw new RuntimeException(
-                    sprintf(
-                        'Expected one "%s" record. Got: %s',
-                        $stage,
-                        json_encode($records),
-                    ),
-                );
-            }
-
-            $recordsByStage[$stage] = $record;
-        }
-
-        foreach (STAGES as $stage) {
-            if (!isset($recordsByStage[$stage])) {
-                throw new RuntimeException(
-                    sprintf(
-                        'Expected one "%s" record. Got: %s',
-                        $stage,
-                        json_encode($records),
-                    ),
-                );
-            }
-        }
-
-        return $recordsByStage;
-    }
-
-    /**
-     * @param list<ExpectedRecord> $records
-     * @return array<string, ExpectedRecord>
-     */
-    public static function indexExpectedByStage(array $records): array
-    {
-        $recordsByStage = [];
-
-        foreach ($records as $record) {
-            $recordsByStage[$record['stage']] = $record;
-        }
-
-        return $recordsByStage;
-    }
 }
 
 $records = DebugRecords::load($argv[1]);
-$recordsByStage = DebugRecords::indexByStage($records);
-$expectedRecordsByStage = DebugRecords::indexExpectedByStage(DebugRecords::loadExpected($argv[2]));
+$expectedRecords = DebugRecords::loadExpected($argv[2]);
 
-foreach ($expectedRecordsByStage as $stage => $expectedRecord) {
-    if (!isset($recordsByStage[$stage])) {
-        throw new RuntimeException(sprintf('No actual record found for stage "%s".', $stage));
-    }
+if (count($records) !== count($expectedRecords)) {
+    throw new RuntimeException(
+        sprintf('Expected %d debug records, got %d.', count($expectedRecords), count($records)),
+    );
+}
 
-    assertJsonSubset($expectedRecord, $recordsByStage[$stage], $stage);
+foreach ($expectedRecords as $index => $expectedRecord) {
+    $path = sprintf('record[%d]', $index);
+    assertJsonSubset($expectedRecord, $records[$index], $path);
 }
 
 /**
@@ -153,10 +94,10 @@ function assertJsonSubset(array $expected, array $actual, string $path): void
     }
 }
 
-$testMutant = $recordsByStage['test-framework-mutant'];
-$staticAnalysisMutant = $recordsByStage['static-analysis-mutant'];
+$testMutant = $records[2];
+$staticAnalysisMutant = $records[3];
 
-if ($testMutant['mutationHash'] !== $staticAnalysisMutant['mutationHash']) {
+if ($testMutant['mutationHash'] === null || $testMutant['mutationHash'] !== $staticAnalysisMutant['mutationHash']) {
     throw new RuntimeException(
         'The test framework and static analysis did not evaluate the same mutant.',
     );

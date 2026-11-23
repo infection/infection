@@ -23,7 +23,7 @@
         }
     },
     {
-        "stage": "static-analysis-initial",
+        "stage": "test-framework-initial",
         "php": {
             "extensions": {
                 "pcov": true,
@@ -69,7 +69,7 @@
         }
     },
     {
-        "stage": "static-analysis-mutant",
+        "stage": "test-framework-mutant",
         "php": {
             "extensions": {
                 "pcov": true,

@@ -58,7 +58,6 @@ use Infection\TestFramework\Factory;
 use Infection\TestFramework\Mago\Adapter\MagoAdapter;
 use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
@@ -88,7 +87,7 @@ final class FactoryTest extends TestCase
 
         $this->expectExceptionObject(
             new InvalidArgumentException(
-                'Invalid name of test framework "Fake Test Framework". Available names are: debug, debug-static-analysis, phpunit, phpstan, mago',
+                'Invalid name of test framework "Fake Test Framework". Available names are: debug, phpunit, phpstan, mago',
             ),
         );
 
@@ -215,8 +214,6 @@ final class FactoryTest extends TestCase
         yield 'PHPStan' => [StaticAnalysisToolTypes::PHPSTAN, PHPStanAdapter::class];
 
         yield 'Mago' => [StaticAnalysisToolTypes::MAGO, MagoAdapter::class];
-
-        yield 'debug' => [Factory::DEBUG_STATIC_ANALYSIS, DebugStaticAnalysisAdapter::class];
     }
 
     #[DataProvider('builtInAdapterProvider')]

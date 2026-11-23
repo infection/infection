@@ -39,6 +39,7 @@ use Infection\Container\Builder\TestFrameworkBuilder;
 use Infection\Container\Container;
 use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -50,6 +51,7 @@ use Symfony\Component\Console\Output\NullOutput;
 
 #[CoversClass(TestFrameworkBuilder::class)]
 #[CoversClass(Container::class)]
+#[CoversClass(Factory::class)]
 #[Group('integration')]
 final class TestFrameworkBuilderTest extends TestCase
 {
