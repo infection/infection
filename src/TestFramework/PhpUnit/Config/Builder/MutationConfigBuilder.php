@@ -97,6 +97,7 @@ final class MutationConfigBuilder
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);
         $this->configManipulator->removeDefaultTestSuite($xPath);
+        $this->configManipulator->removeWarningWhenPhpIsNotConfiguredForDevelopment($xPath);
 
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',

@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use function array_map;
 use function ctype_upper;
-use function dirname;
-use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelectorParser;
 use Infection\FileSystem\FileSystem;
 use function sprintf;
@@ -70,14 +69,16 @@ final readonly class PositionalArgumentsClassifier
      */
     public function classify(
         array $paths,
-        SchemaConfiguration $schema,
+        ResolvedSource $source,
     ): ClassifiedPositionalArguments {
         if ($paths === []) {
             return new ClassifiedPositionalArguments([], [], []);
         }
 
-        $configDir = dirname($schema->pathname);
-        $absoluteSourceDirs = self::resolveAbsoluteSourceDirectories($schema, $configDir);
+        $absoluteSourceDirs = array_map(
+            Path::canonicalize(...),
+            $source->directories,
+        );
 
         $sourcePaths = [];
         $testPaths = [];
@@ -86,7 +87,7 @@ final readonly class PositionalArgumentsClassifier
         foreach ($paths as $path) {
             $absolutePath = Path::isAbsolute($path)
                 ? $path
-                : Path::join($configDir, $path);
+                : Path::join($source->basePath, $path);
             $isExplicitPath = str_ends_with($path, '/');
 
             // Existing files and directories take precedence over symbol selectors, so Windows
@@ -106,7 +107,7 @@ final readonly class PositionalArgumentsClassifier
                 }
             }
 
-            $kind = $this->classifyPathKind($path, $absoluteSourceDirs, $configDir);
+            $kind = $this->classifyPathKind($path, $absoluteSourceDirs, $source->basePath);
 
             if ($kind === self::KIND_SOURCE) {
                 $sourcePaths[] = $path;
@@ -123,29 +124,7 @@ final readonly class PositionalArgumentsClassifier
     }
 
     /**
-     * @return list<non-empty-string>
-     */
-    private static function resolveAbsoluteSourceDirectories(
-        SchemaConfiguration $schema,
-        string $configDir,
-    ): array {
-        $absolute = [];
-
-        foreach ($schema->source->directories as $directory) {
-            $canonical = Path::isAbsolute($directory)
-                ? Path::canonicalize($directory)
-                : Path::join($configDir, $directory);
-
-            if ($canonical !== '') {
-                $absolute[] = $canonical;
-            }
-        }
-
-        return $absolute;
-    }
-
-    /**
-     * @param list<non-empty-string> $absoluteSourceDirs
+     * @param list<string> $absoluteSourceDirs
      */
     private static function isInsideSourceDirectories(
         string $path,
@@ -167,7 +146,7 @@ final readonly class PositionalArgumentsClassifier
     }
 
     /**
-     * @param list<non-empty-string> $absoluteSourceDirs
+     * @param list<string> $absoluteSourceDirs
      *
      * @return self::KIND_SOURCE|self::KIND_TEST
      */

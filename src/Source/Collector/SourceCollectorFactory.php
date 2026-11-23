@@ -37,7 +37,7 @@ namespace Infection\Source\Collector;
 
 use function array_keys;
 use function get_debug_type;
-use Infection\Configuration\Entry\Source;
+use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\SourceFilter\ChangedLinesFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
@@ -59,33 +59,24 @@ final readonly class SourceCollectorFactory
     }
 
     /**
-     * @param non-empty-string $configurationPathname
-     *
      * @throws GitDiffFailed
      */
     public function create(
-        string $configurationPathname,
-        Source $source,
+        ResolvedSource $source,
         ?SourceFileFilter $sourceFilter,
     ): SourceCollector {
         return match (true) {
             $sourceFilter instanceof GitDiffFilter => GitDiffSourceCollector::create(
                 $this->git,
-                $configurationPathname,
-                $source->directories,
-                $source->excludes,
+                $source,
                 $sourceFilter,
             ),
-            $sourceFilter instanceof ChangedLinesFilter => BasicSourceCollector::create(
-                $configurationPathname,
-                $source->directories,
-                $source->excludes,
+            $sourceFilter instanceof ChangedLinesFilter => new BasicSourceCollector(
+                $source,
                 new PlainFilter(array_keys($sourceFilter->changedLinesRangesByFilePath)),
             ),
-            $sourceFilter === null || $sourceFilter instanceof PlainFilter => BasicSourceCollector::create(
-                $configurationPathname,
-                $source->directories,
-                $source->excludes,
+            $sourceFilter === null || $sourceFilter instanceof PlainFilter => new BasicSourceCollector(
+                $source,
                 $sourceFilter,
             ),
             // @phpstan-ignore infection.invalidArgumentException (Keep the exhaustive match expression.)

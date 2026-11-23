@@ -133,18 +133,18 @@ parameters:
 			path: ../src/Console/XdebugHandler.php
 
 		-
+			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
+			identifier: arrayFilter.strict
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
 			rawMessage: '''
-				Access to constant on deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
+				Fetching class constant class of deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
 				Remove once CombinedTestFramework composes static analysis with the test suite.
 			'''
 			identifier: classConstant.deprecatedInterface
 			count: 2
-			path: ../src/Container/Container.php
-
-		-
-			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
-			identifier: arrayFilter.strict
-			count: 1
 			path: ../src/Container/Container.php
 
 		-
@@ -443,7 +443,7 @@ parameters:
 
 		-
 			rawMessage: '''
-				Access to constant on deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
+				Fetching class constant class of deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
 				This mutator is a semantic addition
 			'''
 			identifier: classConstant.deprecatedClass
@@ -767,6 +767,15 @@ parameters:
 
 		-
 			rawMessage: '''
+				Call to deprecated method getExecutableName() of interface Infection\TestFramework\Contracts\TestFrameworkFactory:
+				It is here only to smoothen the migration, should be removed.
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: ../src/TestFramework/Factory.php
+
+		-
+			rawMessage: '''
 				Call to method __construct() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
@@ -1026,7 +1035,7 @@ parameters:
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator should not depend on Infection\TestFramework\XML\SafeDOMXPath
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 23
+			count: 24
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
 
 		-
@@ -1243,7 +1252,7 @@ parameters:
 
 		-
 			rawMessage: '''
-				Access to constant on deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
+				Fetching class constant class of deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
 				Remove once CombinedTestFramework composes static analysis with the test suite.
 			'''
 			identifier: classConstant.deprecatedInterface
@@ -1354,7 +1363,7 @@ parameters:
 
 		-
 			rawMessage: '''
-				Access to constant on deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
+				Fetching class constant class of deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
 				This mutator is a semantic addition
 			'''
 			identifier: classConstant.deprecatedClass
@@ -1441,7 +1450,7 @@ parameters:
 
 		-
 			rawMessage: '''
-				Access to constant on deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
+				Fetching class constant class of deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
 				This mutator is a semantic addition
 			'''
 			identifier: classConstant.deprecatedClass
@@ -1519,6 +1528,12 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
+
+		-
+			rawMessage: 'Parameter $mutatorsByName of class Infection\Mutator\NodeMutationGenerator constructor expects array<string, Infection\Mutator\Mutator<PhpParser\Node>>, non-empty-array<string, Infection\Mutator\Mutator<PhpParser\Node>|Infection\Mutator\Removal\ArrayItemRemoval> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/NodeMutationGeneratorTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\Mutator\ProfileListProvider::getProfiles() return type has no value type specified in iterable type array.'
@@ -1695,12 +1710,6 @@ parameters:
 			path: ../tests/phpunit/Reporter/StrykerReporterFactoryTest.php
 
 		-
-			rawMessage: 'Parameter $sourceDirectories of static method Infection\Source\Collector\BasicSourceCollector::create() expects array<non-empty-string>, array{string} given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
-
-		-
 			rawMessage: 'Unable to resolve the template type TMapKey in call to method Pipeline\Standard<(int|string),Symfony\Component\Finder\SplFileInfo>::map()'
 			identifier: argument.templateType
 			count: 1
@@ -1708,7 +1717,7 @@ parameters:
 
 		-
 			rawMessage: '''
-				Access to constant on deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				Fetching class constant class of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
 				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
 			'''
 			identifier: classConstant.deprecatedClass
@@ -1729,15 +1738,6 @@ parameters:
 			identifier: staticMethod.deprecated
 			count: 3
 			path: ../tests/phpunit/TestFramework/Factory/ConfigurableTestFrameworkFactoryTest.php
-
-		-
-			rawMessage: '''
-				Access to constant on deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
 
 		-
 			rawMessage: '''
@@ -1795,6 +1795,15 @@ parameters:
 
 		-
 			rawMessage: '''
+				Fetching class constant class of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
+
+		-
+			rawMessage: '''
 				Instantiation of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
 				Remove once the built-in static-analysis adapters implement TestFramework directly.
 			'''
@@ -1810,15 +1819,6 @@ parameters:
 			identifier: property.deprecatedClass
 			count: 1
 			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
-
-		-
-			rawMessage: '''
-				Access to constant on deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
-				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
 
 		-
 			rawMessage: '''
@@ -1876,6 +1876,15 @@ parameters:
 
 		-
 			rawMessage: '''
+				Fetching class constant class of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
+
+		-
+			rawMessage: '''
 				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
@@ -1924,7 +1933,7 @@ parameters:
 
 		-
 			rawMessage: '''
-				Access to constant on deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				Fetching class constant class of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
 				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
 			'''
 			identifier: classConstant.deprecatedClass
