@@ -43,6 +43,7 @@ use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
+use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
@@ -55,8 +56,11 @@ use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Logger\PsrLegacyTestFrameworkLogger;
+use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
+use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapterFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
+use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
 use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
 use InvalidArgumentException;
 use function is_a;
@@ -71,6 +75,9 @@ use Webmozart\Assert\Assert;
  */
 final readonly class Factory
 {
+    // Both CLI options use `debug`, but they select different adapters.
+    public const string DEBUG_STATIC_ANALYSIS = 'debug-static-analysis';
+
     private const string DEBUG_RUNTIME_SCRIPT = __DIR__ . '/../../resources/debug-runtime.php';
 
     /**
@@ -93,6 +100,8 @@ final readonly class Factory
         private CoverageCheckerFactory $coverageCheckerFactory,
         private MutantProcessContainerFactory $containerFactory,
         private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
+        private StaticAnalysisToolExecutableFinder $staticAnalysisExecutableFinder,
+        private TestFrameworkConfigLocatorInterface $staticAnalysisConfigLocator,
     ) {
     }
 
@@ -127,10 +136,24 @@ final readonly class Factory
             );
         }
 
-        $availableTestFrameworks = [TestFrameworkTypes::DEBUG];
+        if ($adapterName === self::DEBUG_STATIC_ANALYSIS) {
+            return new DebugStaticAnalysisAdapter(
+                self::DEBUG_RUNTIME_SCRIPT,
+                $this->infectionConfig->debugTestFrameworkLogFile,
+                $this->infectionConfig->processTimeout,
+                new DebugCommandLine(new PhpExecutableFinder()),
+                new InitialTestsRunner($this->shellCommandRunner, $this->testFrameworkLogger),
+            );
+        }
+
+        $availableTestFrameworks = [TestFrameworkTypes::DEBUG, self::DEBUG_STATIC_ANALYSIS];
 
         $installedExtensions = array_merge(
-            [['extra' => ['class' => PhpUnitAdapterFactory::class]]],
+            [
+                ['extra' => ['class' => PhpUnitAdapterFactory::class]],
+                ['extra' => ['class' => PHPStanAdapterFactory::class]],
+                ['extra' => ['class' => MagoAdapterFactory::class]],
+            ],
             $this->installedExtensions,
         );
 
@@ -152,13 +175,25 @@ final readonly class Factory
                 $configuration = $this->infectionConfig;
                 $executableName = $factory::getExecutableName();
                 $isPhpUnit = $factory === PhpUnitAdapterFactory::class;
-                $configPath = $this->configLocator->locate($factory::getAdapterName());
-                $customPath = $isPhpUnit ? (string) $configuration->phpUnit->customPath : '';
+                $isStaticAnalysis = $factory === PHPStanAdapterFactory::class || $factory === MagoAdapterFactory::class;
+                $configLocator = $isStaticAnalysis
+                    ? $this->staticAnalysisConfigLocator
+                    : $this->configLocator;
+                $executableFinder = $isStaticAnalysis
+                    ? $this->staticAnalysisExecutableFinder
+                    : $this->testFrameworkFinder;
+                $configPath = $configLocator->locate($factory::getAdapterName());
+                $customPath = match ($factory) {
+                    PhpUnitAdapterFactory::class => (string) $configuration->phpUnit->customPath,
+                    PHPStanAdapterFactory::class => (string) $configuration->phpStan->customPath,
+                    MagoAdapterFactory::class => (string) $configuration->mago->customPath,
+                    default => '',
+                };
                 $configDir = $isPhpUnit ? (string) $configuration->phpUnit->configDir : null;
 
                 return is_a($factory, TestFrameworkFactory::class, true)
                     ? $factory::create(
-                        $this->testFrameworkFinder->find(
+                        $executableFinder->find(
                             $executableName,
                             $customPath,
                         ),
@@ -170,7 +205,9 @@ final readonly class Factory
                         $configuration->source->directories,
                         $skipCoverage,
                         $configuration->executeOnlyCoveringTestCases,
-                        $this->getFilteredSourceFilesToMutate(),
+                        $isStaticAnalysis
+                            ? []
+                            : $this->getFilteredSourceFilesToMutate(),
                         $configuration->mapSourceClassToTestStrategy,
                         $this->shellCommandRunner,
                         dirname($configuration->configurationPathname),
@@ -184,7 +221,7 @@ final readonly class Factory
                         $this->extraOptionsFilter,
                     )
                     : $factory::create(
-                        $this->testFrameworkFinder->find($executableName),
+                        $executableFinder->find($executableName),
                         $this->tmpDir,
                         $configPath,
                         null,

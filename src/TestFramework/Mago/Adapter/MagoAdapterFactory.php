@@ -36,48 +36,79 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Mago\Adapter;
 
 use Infection\CannotBeInstantiated;
+use Infection\Configuration\Configuration;
+use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Mago\Logger\PsrMagoLogger;
 use Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Override;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * @internal
  */
-final class MagoAdapterFactory
+final class MagoAdapterFactory implements TestFrameworkFactory
 {
     use CannotBeInstantiated;
 
-    /**
-     * @param list<string> $staticAnalysisToolOptions
-     */
+    #[Override]
     public static function create(
-        string $staticAnalysisConfigPath,
-        string $staticAnalysisToolExecutable,
-        float $timeout,
-        array $staticAnalysisToolOptions,
+        string $testFrameworkExecutable,
+        string $tmpDir,
+        string $testFrameworkConfigPath,
+        ?string $testFrameworkConfigDir,
+        string $jUnitFilePath,
+        string $projectDir,
+        array $sourceDirectories,
+        bool $skipCoverage,
+        bool $executeOnlyCoveringTestCases,
+        array $filteredSourceFilesToMutate,
+        ?string $mapSourceClassToTestStrategy,
         ShellCommandRunner $shellCommandRunner,
+        string $sourceDirectoryBasePath,
+        bool $useWindowsFilterLimit,
+        Filesystem $fileSystem,
         TestFrameworkLogger $testFrameworkLogger,
         LoggerInterface $logger,
+        CoverageCheckerFactory $coverageCheckerFactory,
+        Configuration $configuration,
+        MutantProcessContainerFactory $processFactory,
+        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): MagoAdapter {
         return new MagoAdapter(
             new MagoMutantExecutionResultFactory(),
-            $staticAnalysisConfigPath,
-            $staticAnalysisToolExecutable,
+            $testFrameworkConfigPath,
+            $testFrameworkExecutable,
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
             new VersionParser('Mago'),
-            $timeout,
-            $staticAnalysisToolOptions,
+            $configuration->processTimeout,
+            $configuration->getStaticAnalysisToolOptions(),
             $shellCommandRunner,
             new InitialTestsRunner($shellCommandRunner, $testFrameworkLogger),
             new PsrMagoLogger($logger),
         );
+    }
+
+    #[Override]
+    public static function getAdapterName(): string
+    {
+        return 'mago';
+    }
+
+    #[Override]
+    public static function getExecutableName(): string
+    {
+        return 'mago';
     }
 }

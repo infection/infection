@@ -35,9 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Mago\Adapter;
 
-use Infection\TestFramework\Contracts\FakeShellCommandRunner;
+use Infection\FileSystem\FileSystem;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\Mago\Adapter\MagoAdapter;
 use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -45,18 +55,100 @@ use Psr\Log\NullLogger;
 #[CoversClass(MagoAdapterFactory::class)]
 final class MagoAdapterFactoryTest extends TestCase
 {
-    public function test_it_can_create_an_adapter(): void
+    public function test_it_can_create_an_adapter_with_the_configured_options(): void
     {
-        $adapter = MagoAdapterFactory::create(
-            '/path/to/mago-config-path',
-            '/path/to/mago',
-            32.3,
-            [],
-            new FakeShellCommandRunner(),
-            $this->createStub(TestFrameworkLogger::class),
-            new NullLogger(),
-        );
+        $result = CompletedProcessBuilder::withMinimalTestData()->withStdout('Analysis passed.')->build();
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->expects($this->once())
+            ->method('mustRun')
+            ->with(['/path/to/mago.bat', '--version'])
+            ->willReturn('Mago 1.23.0')
+        ;
+        $shellCommandRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with(['/path/to/mago.bat', '--config=/path/to/config', 'analyze', '--sort'])
+            ->willReturn($result)
+        ;
+        $testFrameworkLogger = $this->createMock(TestFrameworkLogger::class);
+        $testFrameworkLogger
+            ->expects($this->once())
+            ->method('initialRunStarted')
+            ->with('Mago', '1.23.0')
+        ;
+        $testFrameworkLogger
+            ->expects($this->once())
+            ->method('initialRunFinished')
+            ->with('Mago', $result->command, 'Analysis passed.')
+        ;
+        $adapter = $this->createAdapter($shellCommandRunner, $testFrameworkLogger);
 
         $this->assertSame('Mago', $adapter->getName());
+        $initialRun = $adapter->executeInitialRun();
+
+        $this->assertSame('Analysis passed.', $initialRun->output);
+    }
+
+    public function test_it_uses_the_configured_timeout_for_mutants(): void
+    {
+        $adapter = $this->createAdapter(
+            $this->createStub(ShellCommandRunner::class),
+            $this->createStub(TestFrameworkLogger::class),
+        );
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+        $process = $adapter->test($mutant)->getCurrent()->getProcess();
+
+        $this->assertSame(32.3, $process->getTimeout());
+    }
+
+    public function test_it_has_a_name(): void
+    {
+        $this->assertSame('mago', MagoAdapterFactory::getAdapterName());
+    }
+
+    public function test_it_has_an_executable(): void
+    {
+        $this->assertSame('mago', MagoAdapterFactory::getExecutableName());
+    }
+
+    private function createAdapter(
+        ShellCommandRunner $shellCommandRunner,
+        TestFrameworkLogger $testFrameworkLogger,
+    ): MagoAdapter {
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withTimeout(32.3)
+            ->withStaticAnalysisToolOptions('--sort')
+            ->build()
+        ;
+        $fileSystem = $this->createStub(FileSystem::class);
+
+        return MagoAdapterFactory::create(
+            testFrameworkExecutable: '/path/to/mago.bat',
+            tmpDir: '/tmp',
+            testFrameworkConfigPath: '/path/to/config',
+            testFrameworkConfigDir: null,
+            jUnitFilePath: '',
+            projectDir: '/path/to/project',
+            sourceDirectories: ['/path/to/project/src'],
+            skipCoverage: true,
+            executeOnlyCoveringTestCases: false,
+            filteredSourceFilesToMutate: [],
+            mapSourceClassToTestStrategy: null,
+            shellCommandRunner: $shellCommandRunner,
+            sourceDirectoryBasePath: '/path/to/project',
+            useWindowsFilterLimit: false,
+            fileSystem: $fileSystem,
+            testFrameworkLogger: $testFrameworkLogger,
+            logger: new NullLogger(),
+            coverageCheckerFactory: new CoverageCheckerFactory(
+                $configuration,
+                JUnitReportLocator::create($fileSystem, ''),
+                IndexXmlCoverageLocator::create($fileSystem, ''),
+            ),
+            configuration: $configuration,
+            processFactory: $this->createStub(MutantProcessContainerFactory::class),
+            testFrameworkExtraOptionsFilter: $this->createStub(TestFrameworkExtraOptionsFilter::class),
+        );
     }
 }
