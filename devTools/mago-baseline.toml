@@ -4711,12 +4711,6 @@ message = 'Class `Infection\TestFramework\LegacyTestFrameworkBridge` is deprecat
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php"
-code = "deprecated-class"
-message = 'Class `Infection\TestFramework\NullStaticAnalysisTestFramework` is deprecated and should no longer be used.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
 code = "reference-to-undefined-variable"
 message = "Reference created from a previously undefined variable `$output`."
