@@ -114,6 +114,7 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
 
         $output = $this->retrieveProcessOutput($process);
 
+        return DetectionStatus::ESCAPED;
         if ($process->getExitCode() === 0 && $this->testFrameworkAdapter->testsPass($output)) {
             return DetectionStatus::ESCAPED;
         }
