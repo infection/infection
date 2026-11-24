@@ -38,13 +38,14 @@ namespace Infection\Tests\Mutant;
 use Closure;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationProcessDetails;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Process\MutantProcess;
 use Later\Interfaces\Deferred;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
 #[CoversClass(MutantExecutionResult::class)]
 final class MutantExecutionResultTest extends TestCase
@@ -63,22 +64,19 @@ final class MutantExecutionResultTest extends TestCase
         $mutant->method('getPrettyPrintedOriginalCode')->willReturn('original source');
         $mutant->method('getTests')->willReturn($source->getTests());
         $history = [
-            new EvaluationAttemptResult(
-                'PHPUnit',
-                DetectionStatus::ESCAPED,
-                'test output',
-                new EvaluationProcessDetails('phpunit', 1.25),
-            ),
-            new EvaluationAttemptResult(
-                'PHPStan',
-                DetectionStatus::ERROR,
-                'analysis failed',
-                new EvaluationProcessDetails('phpstan', 0.5),
-            ),
+            new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED),
+            new EvaluationAttemptResult('PHPStan', DetectionStatus::ERROR),
         ];
 
+        $process = $this->createStub(Process::class);
+        $process->method('getCommandLine')->willReturn('phpstan');
+        $lastProcess = $this->createStub(MutantProcess::class);
+        $lastProcess->method('getProcess')->willReturn($process);
+        $lastProcess->method('getResultOutput')->willReturn('analysis failed');
+        $lastProcess->method('getRuntime')->willReturn(0.5);
+
         // Final classification is an explicit decision, independent of the last attempt.
-        $result = MutantExecutionResult::createFromEvaluation($mutant, DetectionStatus::ESCAPED, $history);
+        $result = MutantExecutionResult::createFromEvaluation($mutant, DetectionStatus::ESCAPED, $history, $lastProcess);
 
         $this->assertSame(DetectionStatus::ESCAPED, $result->getDetectionStatus());
         $this->assertSame($history, $result->getEvaluationHistory());
@@ -95,14 +93,14 @@ final class MutantExecutionResultTest extends TestCase
         $this->assertSame($source->getMutation()->getOriginalEndingLine(), $result->getOriginalEndingLine());
     }
 
-    public function test_a_direct_attempt_preserves_output_without_process_details(): void
+    public function test_a_direct_attempt_has_empty_process_details(): void
     {
         $mutant = MutantBuilder::withCompleteTestData()->build();
-        $attempt = new EvaluationAttemptResult('Direct analyser', DetectionStatus::KILLED_BY_STATIC_ANALYSIS, 'Type mismatch', null);
+        $attempt = new EvaluationAttemptResult('Direct analyser', DetectionStatus::KILLED_BY_STATIC_ANALYSIS);
 
         $result = MutantExecutionResult::createFromEvaluation($mutant, DetectionStatus::KILLED_BY_STATIC_ANALYSIS, [$attempt]);
 
-        $this->assertSame('Type mismatch', $result->getProcessOutput());
+        $this->assertSame('', $result->getProcessOutput());
         $this->assertSame('', $result->getProcessCommandLine());
         $this->assertSame(0.0, $result->getProcessRuntime());
     }

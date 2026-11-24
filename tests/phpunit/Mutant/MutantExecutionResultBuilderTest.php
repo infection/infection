@@ -37,7 +37,6 @@ namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationProcessDetails;
 use Infection\Mutant\MutantExecutionResult;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -65,18 +64,8 @@ final class MutantExecutionResultBuilderTest extends TestCase
 
         yield 'execution history' => [
             MutantExecutionResultBuilder::withMinimalTestData()->withEvaluationHistory([
-                new EvaluationAttemptResult(
-                    'PHPUnit',
-                    DetectionStatus::ESCAPED,
-                    'test output',
-                    new EvaluationProcessDetails('phpunit', 1.0),
-                ),
-                new EvaluationAttemptResult(
-                    'PHPStan',
-                    DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
-                    'analysis output',
-                    new EvaluationProcessDetails('phpstan', 0.5),
-                ),
+                new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED),
+                new EvaluationAttemptResult('PHPStan', DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
             ])->build(),
         ];
 

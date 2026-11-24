@@ -202,8 +202,8 @@ The phase encompassing [mutant materialisation][mutant-materialisation] and [mut
 ### Mutant Evaluation
 
 The execution of tests and optional static analysis against a mutant, and recording of their results.
-Each evaluation attempt produces an immutable observation (`EvaluationAttemptResult`),
-with an evaluator identity, a detection status, output, and optional process details.
+Each completed evaluation contributes either an `EvaluationAttemptResult` with
+an evaluator name and detection status or the resolver's `SuspiciousResult`.
 A `MutantProcess` represents a process-backed attempt and classifies it once through
 its framework's `MutantProcessDetectionStatusResolver`. A framework can also return
 an observation directly without starting a subprocess.
@@ -218,8 +218,8 @@ It finishes a suspicious result as `ERROR`.
 
 The selected final status can differ from the last observation's status. Infection
 emits one final `MutantExecutionResult` after the decision is locked in. Its immutable
-history retains every completed observation in execution order for reporting;
-reporting does not rerun classification or strategy decisions. Synthetic results for
+history retains every completed observation in execution order. The command, output,
+and runtime describe the final attempt when it used a subprocess. Synthetic results for
 ignored, skipped, and uncovered mutants have no fabricated observations.
 Direct observations consume no process thread slot.
 

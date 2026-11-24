@@ -57,14 +57,14 @@ final class DryProcessRunnerTest extends TestCase
         $processes = (static function () use (&$called): iterable {
             yield MutantProcessContainer::from(
                 MutantBuilder::withMinimalTestData()->build(),
-                static fn (): EvaluationAttemptResult => new EvaluationAttemptResult('Direct', DetectionStatus::ESCAPED, '', null),
+                static fn (): EvaluationAttemptResult => new EvaluationAttemptResult('Direct', DetectionStatus::ESCAPED),
             );
 
             $called = true;
 
             yield MutantProcessContainer::from(
                 MutantBuilder::withMinimalTestData()->build(),
-                static fn (): EvaluationAttemptResult => new EvaluationAttemptResult('Direct', DetectionStatus::ESCAPED, '', null),
+                static fn (): EvaluationAttemptResult => new EvaluationAttemptResult('Direct', DetectionStatus::ESCAPED),
             );
         })();
 
@@ -83,7 +83,7 @@ final class DryProcessRunnerTest extends TestCase
         $factory = new MagoMutantDetectionStatusResolver();
         $first = new MutantProcess($firstProcess, $mutant, $factory, 'Mago');
         $second = new MutantProcess($secondProcess, $mutant, $factory, 'Mago');
-        $direct = new EvaluationAttemptResult('Direct', DetectionStatus::ESCAPED, 'direct output', null);
+        $direct = new EvaluationAttemptResult('Direct', DetectionStatus::ESCAPED);
         $pipe = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $first)
             ->append(static fn (): EvaluationAttemptResult => $direct)
             ->append(static fn (): MutantProcess => $second)
@@ -99,13 +99,9 @@ final class DryProcessRunnerTest extends TestCase
         $this->assertSame(DetectionStatus::ESCAPED, $result->getDetectionStatus());
         $this->assertCount(3, $history);
         $this->assertSame($direct, $history[1]);
-        $firstDetails = $history[0]->process;
-        $secondDetails = $history[2]->process;
-        $this->assertNotNull($firstDetails);
-        $this->assertNotNull($secondDetails);
-        $this->assertSame($firstProcess->getCommandLine(), $firstDetails->commandLine);
-        $this->assertSame($secondProcess->getCommandLine(), $secondDetails->commandLine);
-        $this->assertSame(0.0, $firstDetails->runtime);
-        $this->assertSame(0.0, $secondDetails->runtime);
+        $this->assertEquals(new EvaluationAttemptResult('Mago', DetectionStatus::ESCAPED), $history[0]);
+        $this->assertEquals(new EvaluationAttemptResult('Mago', DetectionStatus::ESCAPED), $history[2]);
+        $this->assertSame($secondProcess->getCommandLine(), $result->getProcessCommandLine());
+        $this->assertSame(0.0, $result->getProcessRuntime());
     }
 }

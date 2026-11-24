@@ -35,11 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use function array_keys;
-use function array_map;
 use Closure;
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationStrategy\Action\Action;
 use Infection\Mutant\EvaluationStrategy\Action\FinishEvaluation;
 use Infection\Mutant\EvaluationStrategy\Action\RunEvaluation;
 use Infection\Mutant\EvaluationStrategy\EvaluationStrategy;
@@ -61,11 +59,11 @@ class MutantProcessContainer
     private MutantProcess|EvaluationAttemptResult|self|null $current = null;
 
     /**
-     * @var list<EvaluationAttemptResult>
+     * @var list<EvaluationAttemptResult|SuspiciousResult>
      */
     private array $evaluationHistory = [];
 
-    private RunEvaluation|FinishEvaluation|null $decision = null;
+    private ?Action $decision = null;
 
     private ?MutantExecutionResult $finalResult = null;
 
@@ -139,7 +137,7 @@ class MutantProcessContainer
         $decision = $this->decide();
         Assert::isInstanceOf($decision, RunEvaluation::class, 'Cannot start another attempt after the strategy has finalized the mutant.');
 
-        $this->current = ($decision->createAttempt)();
+        $this->current = $this->evaluate($this->nextEvaluationIndex);
         $this->decision = null;
 
         return $this->getCurrent();
@@ -167,21 +165,32 @@ class MutantProcessContainer
         $history = $this->evaluationHistory;
         Assert::notEmpty($history, 'A completed evaluation must retain at least one observation.');
 
-        return $this->finalResult ??= MutantExecutionResult::createFromEvaluation(
+        if ($this->finalResult !== null) {
+            return $this->finalResult;
+        }
+
+        $lastAttempt = $this->getCurrent();
+        $lastProcess = $lastAttempt instanceof MutantProcess
+            ? $lastAttempt
+            : null;
+
+        return $this->finalResult = MutantExecutionResult::createFromEvaluation(
             $this->mutant,
             $decision->detectionStatus,
             $history,
+            $lastProcess,
         );
     }
 
     private function evaluate(int $index): MutantProcess|EvaluationAttemptResult|self
     {
+        $attempt = ($this->evaluations[$index])();
         $this->nextEvaluationIndex = $index + 1;
 
-        return ($this->evaluations[$index])();
+        return $attempt;
     }
 
-    private function decide(): RunEvaluation|FinishEvaluation
+    private function decide(): Action
     {
         if ($this->decision !== null) {
             return $this->decision;
@@ -190,36 +199,44 @@ class MutantProcessContainer
         $attempt = $this->current;
         Assert::notNull($attempt, 'Cannot decide an evaluation before its first attempt has been created.');
 
-        if ($attempt instanceof self) {
-            $result = $attempt->getMutantExecutionResult();
-            $observations = $result->getEvaluationHistory();
-            $status = $result->getDetectionStatus();
-        } else {
-            if ($attempt instanceof MutantProcess) {
-                Assert::greaterThan($attempt->getFinishedAt(), 0.0, 'Cannot collect evaluation history before the process has finished.');
-                $result = $attempt->getResult();
-                $status = $result instanceof SuspiciousResult ? DetectionStatus::ERROR : $result;
-                $attempt = EvaluationAttemptResult::fromProcess($status, $attempt->getResultOutput(), $attempt);
-            }
+        $history = [...$this->evaluationHistory, ...$this->observe($attempt)];
+        Assert::notEmpty($history, 'A completed evaluation must retain at least one observation.');
+        $hasNextEvaluation = isset($this->evaluations[$this->nextEvaluationIndex]);
+        $decision = $this->strategy->decide($history, $hasNextEvaluation);
+        Assert::true(
+            $decision instanceof FinishEvaluation || $decision instanceof RunEvaluation,
+            'The evaluation strategy returned an unsupported action.',
+        );
 
-            $observations = [$attempt];
-            $status = $attempt->detectionStatus;
+        if ($decision instanceof RunEvaluation) {
+            Assert::true($hasNextEvaluation, 'The strategy requested another evaluation after the configured sequence ended.');
         }
 
-        $history = [...$this->evaluationHistory, ...$observations];
-        Assert::notEmpty($history, 'A completed evaluation must retain at least one observation.');
-        $evaluations = array_map(
-            fn (int $index): Closure => fn (): MutantProcess|EvaluationAttemptResult|self => $this->evaluate($index),
-            array_keys($this->evaluations),
-        );
-        $decision = $this->strategy->decide(
-            $history,
-            $evaluations,
-            $evaluations[$this->nextEvaluationIndex] ?? null,
-            $status,
-        );
         $this->evaluationHistory = $history;
 
         return $this->decision = $decision;
+    }
+
+    /**
+     * @return list<EvaluationAttemptResult|SuspiciousResult>
+     */
+    private function observe(MutantProcess|EvaluationAttemptResult|self $attempt): array
+    {
+        if ($attempt instanceof self) {
+            return $attempt->evaluationHistory;
+        }
+
+        if ($attempt instanceof EvaluationAttemptResult) {
+            return [$attempt];
+        }
+
+        Assert::greaterThan($attempt->getFinishedAt(), 0.0, 'Cannot collect evaluation history before the process has finished.');
+        $result = $attempt->getResult();
+
+        if ($result instanceof SuspiciousResult) {
+            return [$result];
+        }
+
+        return [new EvaluationAttemptResult($attempt->getTestFrameworkName(), $result)];
     }
 }

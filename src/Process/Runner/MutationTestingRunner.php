@@ -110,9 +110,15 @@ class MutationTestingRunner
 
     private function evaluateMutant(Mutant $mutant): MutantProcessContainer
     {
+        $evaluation = $this->testFramework->test($mutant);
+
+        if ($evaluation instanceof MutantProcessContainer) {
+            return $evaluation;
+        }
+
         return MutantProcessContainer::from(
             $mutant,
-            fn (): MutantProcessContainer|EvaluationAttemptResult => $this->testFramework->test($mutant),
+            static fn (): EvaluationAttemptResult => $evaluation,
         );
     }
 

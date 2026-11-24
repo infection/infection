@@ -37,39 +37,17 @@ namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Process\MutantProcess;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
 
 #[CoversClass(EvaluationAttemptResult::class)]
 final class EvaluationAttemptResultTest extends TestCase
 {
-    public function test_it_can_retain_a_result_produced_without_a_process(): void
+    public function test_it_retains_the_evaluator_name_and_detection_status(): void
     {
-        $result = new EvaluationAttemptResult('In-memory analyser', DetectionStatus::ESCAPED, 'No issues', null);
+        $result = new EvaluationAttemptResult('In-memory analyser', DetectionStatus::ESCAPED);
 
         $this->assertSame('In-memory analyser', $result->evaluatorName);
         $this->assertSame(DetectionStatus::ESCAPED, $result->detectionStatus);
-        $this->assertSame('No issues', $result->output);
-        $this->assertNull($result->process);
-    }
-
-    public function test_it_retains_the_evaluators_process_evidence(): void
-    {
-        $process = $this->createStub(Process::class);
-        $process->method('getCommandLine')->willReturn('phpunit');
-        $attempt = $this->createStub(MutantProcess::class);
-        $attempt->method('getProcess')->willReturn($process);
-        $attempt->method('getTestFrameworkName')->willReturn('Custom test framework');
-        $attempt->method('getRuntime')->willReturn(1.25);
-
-        $result = EvaluationAttemptResult::fromProcess(DetectionStatus::ESCAPED, 'test output', $attempt);
-
-        $this->assertSame('Custom test framework', $result->evaluatorName);
-        $this->assertSame('phpunit', $result->process?->commandLine);
-        $this->assertSame('test output', $result->output);
-        $this->assertSame(DetectionStatus::ESCAPED, $result->detectionStatus);
-        $this->assertSame(1.25, $result->process->runtime);
     }
 }

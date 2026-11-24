@@ -35,9 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use function array_key_last;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\MutatorResolver;
+use Infection\Process\MutantProcess;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\SuspiciousResult;
 use Later\Interfaces\Deferred;
 use RuntimeException;
 use function sprintf;
@@ -57,7 +58,7 @@ class MutantExecutionResult
      * @param Deferred<string> $mutantDiff
      * @param Deferred<string> $mutatedCode
      * @param TestLocation[] $tests
-     * @param list<EvaluationAttemptResult> $evaluationHistory
+     * @param list<EvaluationAttemptResult|SuspiciousResult> $evaluationHistory
      */
     public function __construct(
         private readonly string $processCommandLine,
@@ -87,16 +88,19 @@ class MutantExecutionResult
      * The final status is selected by the coordinator. Legacy process details describe
      * the last attempt, while the history retains every completed attempt.
      *
-     * @param non-empty-list<EvaluationAttemptResult> $evaluationHistory
+     * @param non-empty-list<EvaluationAttemptResult|SuspiciousResult> $evaluationHistory
      */
-    public static function createFromEvaluation(Mutant $mutant, DetectionStatus $detectionStatus, array $evaluationHistory): self
-    {
+    public static function createFromEvaluation(
+        Mutant $mutant,
+        DetectionStatus $detectionStatus,
+        array $evaluationHistory,
+        ?MutantProcess $lastProcess = null,
+    ): self {
         $mutation = $mutant->getMutation();
-        $lastAttempt = $evaluationHistory[array_key_last($evaluationHistory)];
 
         return new self(
-            $lastAttempt->process->commandLine ?? '',
-            $lastAttempt->output,
+            $lastProcess?->getProcess()->getCommandLine() ?? '',
+            $lastProcess?->getResultOutput() ?? '',
             $detectionStatus,
             $mutant->getDiff(),
             $mutation->getHash(),
@@ -110,7 +114,7 @@ class MutantExecutionResult
             $mutant->getPrettyPrintedOriginalCode(),
             $mutant->getMutatedCode(),
             $mutant->getTests(),
-            $lastAttempt->process->runtime ?? 0.0,
+            $lastProcess?->getRuntime() ?? 0.0,
             $evaluationHistory,
         );
     }
@@ -214,7 +218,7 @@ class MutantExecutionResult
     }
 
     /**
-     * @return list<EvaluationAttemptResult>
+     * @return list<EvaluationAttemptResult|SuspiciousResult>
      */
     public function getEvaluationHistory(): array
     {

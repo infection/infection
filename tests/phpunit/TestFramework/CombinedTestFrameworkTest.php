@@ -36,8 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use function array_map;
-use Closure;
-use function count;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Mutant\EvaluationStrategy\Action\FinishEvaluation;
@@ -63,7 +61,7 @@ final class CombinedTestFrameworkTest extends TestCase
     {
         $mutant = MutantBuilder::withMinimalTestData()->build();
 
-        $attempt = new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED, '', null);
+        $attempt = new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED);
         $evaluation = MutantProcessContainer::from($mutant, static fn (): EvaluationAttemptResult => $attempt);
 
         $firstTestFramework = $this->createMock(TestFramework::class);
@@ -343,7 +341,7 @@ final class CombinedTestFrameworkTest extends TestCase
     public function test_it_uses_the_configured_strategy_to_finalize_before_the_follow_up_evaluation(): void
     {
         $mutant = MutantBuilder::withCompleteTestData()->build();
-        $attempt = new EvaluationAttemptResult('Evaluator', DetectionStatus::ESCAPED, '', null);
+        $attempt = new EvaluationAttemptResult('Evaluator', DetectionStatus::ESCAPED);
         $firstTestFramework = $this->createStub(TestFramework::class);
         $firstTestFramework
             ->method('test')
@@ -374,8 +372,8 @@ final class CombinedTestFrameworkTest extends TestCase
     public function test_it_composes_direct_results_using_the_same_continuation_rule(DetectionStatus $status, DetectionStatus $followUpStatus, bool $hasNext, bool $_hasLast): void
     {
         $mutant = MutantBuilder::withCompleteTestData()->build();
-        $first = new EvaluationAttemptResult('First evaluator', $status, 'First output', null);
-        $last = new EvaluationAttemptResult('Second evaluator', $followUpStatus, 'Second output', null);
+        $first = new EvaluationAttemptResult('First evaluator', $status);
+        $last = new EvaluationAttemptResult('Second evaluator', $followUpStatus);
         $firstTestFramework = $this->createStub(TestFramework::class);
         $firstTestFramework
             ->method('test')
@@ -413,7 +411,7 @@ final class CombinedTestFrameworkTest extends TestCase
     public function test_it_finalizes_a_direct_result_when_no_other_evaluator_is_configured(): void
     {
         $mutant = MutantBuilder::withCompleteTestData()->build();
-        $result = new EvaluationAttemptResult('Evaluator', DetectionStatus::ESCAPED, '', null);
+        $result = new EvaluationAttemptResult('Evaluator', DetectionStatus::ESCAPED);
         $firstTestFramework = $this->createStub(TestFramework::class);
         $firstTestFramework
             ->method('test')
@@ -426,18 +424,17 @@ final class CombinedTestFrameworkTest extends TestCase
         $this->assertSame([$result], $evaluation->getMutantExecutionResult()->getEvaluationHistory());
     }
 
-    public function test_retrying_a_direct_framework_invokes_it_again_and_can_select_an_earlier_status(): void
+    public function test_the_strategy_can_continue_after_timeout_and_select_an_earlier_status(): void
     {
         $mutant = MutantBuilder::withCompleteTestData()->build();
-        $first = new EvaluationAttemptResult('First evaluator', DetectionStatus::TIMED_OUT, 'first', null);
-        $retry = new EvaluationAttemptResult('First evaluator', DetectionStatus::ESCAPED, 'fresh retry', null);
-        $last = new EvaluationAttemptResult('Follow-up evaluator', DetectionStatus::ERROR, 'follow-up error', null);
+        $first = new EvaluationAttemptResult('First evaluator', DetectionStatus::TIMED_OUT);
+        $last = new EvaluationAttemptResult('Follow-up evaluator', DetectionStatus::ERROR);
         $firstTestFramework = $this->createMock(TestFramework::class);
         $firstTestFramework
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('test')
             ->with($mutant)
-            ->willReturnOnConsecutiveCalls($first, $retry)
+            ->willReturn($first)
         ;
         $followUpTestFramework = $this->createMock(TestFramework::class);
         $followUpTestFramework
@@ -448,35 +445,24 @@ final class CombinedTestFrameworkTest extends TestCase
         ;
         $strategy = $this->createMock(EvaluationStrategy::class);
         $strategy
-            ->expects($this->exactly(3))
+            ->expects($this->exactly(2))
             ->method('decide')
-            ->willReturnCallback(
-                /**
-                 * @param non-empty-list<EvaluationAttemptResult> $history
-                 * @param non-empty-list<Closure(): (MutantProcess|EvaluationAttemptResult|MutantProcessContainer)> $evaluations
-                 * @param (Closure(): (MutantProcess|EvaluationAttemptResult|MutantProcessContainer))|null $next
-                 */
-                fn (array $history, array $evaluations, ?Closure $next): RunEvaluation|FinishEvaluation => match (count($history)) {
-                    1 => new RunEvaluation($evaluations[0]),
-                    2 => new RunEvaluation($next ?? $this->fail('The follow-up remains available after retrying.')),
-                    3 => new FinishEvaluation($history[1]->detectionStatus),
-                    default => $this->fail('Unexpected number of evaluation attempts.'),
-                },
-            )
+            ->willReturnMap([
+                [[$first], true, new RunEvaluation()],
+                [[$first, $last], false, new FinishEvaluation(DetectionStatus::TIMED_OUT)],
+            ])
         ;
         $framework = new CombinedTestFramework($strategy, $firstTestFramework, $followUpTestFramework);
         $pipe = $framework->test($mutant);
 
         $this->assertSame($first, $pipe->getCurrent());
         $this->assertTrue($pipe->hasNext());
-        $this->assertSame($retry, $pipe->createNext());
-        $this->assertTrue($pipe->hasNext());
         $this->assertSame($last, $pipe->createNext());
         $this->assertFalse($pipe->hasNext());
         $result = $pipe->getMutantExecutionResult();
 
-        $this->assertSame([$first, $retry, $last], $result->getEvaluationHistory());
-        $this->assertSame(DetectionStatus::ESCAPED, $result->getDetectionStatus());
+        $this->assertSame([$first, $last], $result->getEvaluationHistory());
+        $this->assertSame(DetectionStatus::TIMED_OUT, $result->getDetectionStatus());
         $this->assertSame($result, $pipe->getMutantExecutionResult());
     }
 }

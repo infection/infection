@@ -39,7 +39,6 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use ArrayIterator;
-use Closure;
 use function count;
 use DuoClock\TimeSpy;
 use function implode;
@@ -51,7 +50,6 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationProcessDetails;
 use Infection\Mutant\EvaluationStrategy\Action\FinishEvaluation;
 use Infection\Mutant\EvaluationStrategy\Action\RunEvaluation;
 use Infection\Mutant\EvaluationStrategy\EvaluationStrategy;
@@ -60,7 +58,6 @@ use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
@@ -810,18 +807,8 @@ final class MutationTestingRunnerTest extends TestCase
     public function test_container_to_finished_event(): void
     {
         $history = [
-            new EvaluationAttemptResult(
-                'PHPUnit',
-                DetectionStatus::ESCAPED,
-                'test output',
-                new EvaluationProcessDetails('phpunit', 1.0),
-            ),
-            new EvaluationAttemptResult(
-                'PHPStan',
-                DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
-                'analysis output',
-                new EvaluationProcessDetails('phpstan', 0.5),
-            ),
+            new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED),
+            new EvaluationAttemptResult('PHPStan', DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
         ];
         $result = MutantExecutionResultBuilder::withMinimalTestData()
             ->withDetectionStatus(DetectionStatus::KILLED_BY_STATIC_ANALYSIS)
@@ -846,7 +833,7 @@ final class MutationTestingRunnerTest extends TestCase
     {
         $mutation = $this->createMutation(0);
         $mutant = MutantBuilder::withCompleteTestData()->withMutation($mutation)->build();
-        $attempt = new EvaluationAttemptResult('In-memory analyser', DetectionStatus::KILLED_BY_STATIC_ANALYSIS, 'Type mismatch', null);
+        $attempt = new EvaluationAttemptResult('In-memory analyser', DetectionStatus::KILLED_BY_STATIC_ANALYSIS);
         $this->mutantFactoryMock->method('create')->willReturn($mutant);
         $this->testFrameworkMock->expects($this->once())->method('test')->with($this->identicalTo($mutant))->willReturn($attempt);
         $this->processRunnerMock->method('run')->willReturnCallback(
@@ -876,8 +863,8 @@ final class MutationTestingRunnerTest extends TestCase
     {
         $mutation = $this->createMutation(0);
         $mutant = MutantBuilder::withCompleteTestData()->withMutation($mutation)->build();
-        $first = new EvaluationAttemptResult('Tests', DetectionStatus::ESCAPED, 'tests pass', null);
-        $last = new EvaluationAttemptResult('Analysis', DetectionStatus::ERROR, 'analysis failed', null);
+        $first = new EvaluationAttemptResult('Tests', DetectionStatus::ESCAPED);
+        $last = new EvaluationAttemptResult('Analysis', DetectionStatus::ERROR);
         $this->mutantFactoryMock->method('create')->willReturn($mutant);
         $assertNoFinalEvent = function (): void {
             $finished = array_filter(
@@ -902,12 +889,14 @@ final class MutationTestingRunnerTest extends TestCase
             },
         );
         $strategy = $this->createMock(EvaluationStrategy::class);
-        $strategy->expects($this->exactly(2))->method('decide')->willReturnCallback(
-            /** @param (Closure(): (MutantProcess|EvaluationAttemptResult|MutantProcessContainer))|null $next */
-            static fn (array $_history, array $_evaluations, ?Closure $next): RunEvaluation|FinishEvaluation => $next !== null
-                ? new RunEvaluation($next)
-                : new FinishEvaluation(DetectionStatus::ESCAPED),
-        );
+        $strategy
+            ->expects($this->exactly(2))
+            ->method('decide')
+            ->willReturnMap([
+                [[$first], true, new RunEvaluation()],
+                [[$first, $last], false, new FinishEvaluation(DetectionStatus::ESCAPED)],
+            ])
+        ;
         $framework = new CombinedTestFramework($strategy, $this->testFrameworkMock, $analysis);
         $runner = new MutationTestingRunner(
             $framework,
@@ -1049,7 +1038,7 @@ final class MutationTestingRunnerTest extends TestCase
     {
         return MutantProcessContainer::from(
             MutantBuilder::withMinimalTestData()->build(),
-            static fn (): EvaluationAttemptResult => new EvaluationAttemptResult('Evaluator', DetectionStatus::ESCAPED, '', null),
+            static fn (): EvaluationAttemptResult => new EvaluationAttemptResult('Evaluator', DetectionStatus::ESCAPED),
         );
     }
 

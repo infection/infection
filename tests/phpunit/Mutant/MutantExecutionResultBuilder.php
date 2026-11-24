@@ -40,6 +40,7 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\SuspiciousResult;
 use Infection\Testing\MutatorName;
 use function is_string;
 use Later\Interfaces\Deferred;
@@ -51,7 +52,7 @@ final class MutantExecutionResultBuilder
      * @param Deferred<string> $mutantDiff
      * @param Deferred<string> $mutatedCode
      * @param TestLocation[] $tests
-     * @param list<EvaluationAttemptResult> $evaluationHistory
+     * @param list<EvaluationAttemptResult|SuspiciousResult> $evaluationHistory
      */
     private function __construct(
         private string $processCommandLine,
@@ -329,7 +330,7 @@ final class MutantExecutionResultBuilder
     }
 
     /**
-     * @param list<EvaluationAttemptResult> $evaluationHistory
+     * @param list<EvaluationAttemptResult|SuspiciousResult> $evaluationHistory
      */
     public function withEvaluationHistory(array $evaluationHistory): self
     {
