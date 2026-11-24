@@ -47,10 +47,10 @@ final class DryRunProcessFactory implements ProcessFactory
     #[Override]
     public function create(
         array $command,
-        ?string $cwd,
-        array $env,
-        mixed $input,
-        ?float $timeout,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
+        ?float $timeout = ShellCommandRunner::DEFAULT_TIMEOUT,
     ): DryRunProcess {
         $env = array_merge(['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY], $env);
 

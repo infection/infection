@@ -37,19 +37,21 @@ namespace Infection\TestFramework;
 
 use function explode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
-use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
+use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\Mutant\Mutant;
-use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Logger\LegacyTestFrameworkLogger;
 use InvalidArgumentException;
+use function min;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 
 /**
@@ -59,6 +61,10 @@ use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntim
  */
 final class LegacyTestFrameworkBridge implements TestFramework
 {
+    private const int TIMEOUT_FACTOR = 5;
+
+    private const int TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
+
     private ?string $version = null;
 
     public function __construct(
@@ -67,7 +73,8 @@ final class LegacyTestFrameworkBridge implements TestFramework
         private readonly CoverageChecker $coverageChecker,
         private readonly InitialTestsRunner $initialTestsRunner,
         private readonly Configuration $config,
-        private readonly MutantProcessContainerFactory $processFactory,
+        private readonly ProcessFactory $processFactory,
+        private readonly EvaluationAttemptResultFactory $evaluationAttemptResultFactory,
         private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private readonly LegacyTestFrameworkLogger $logger,
     ) {
@@ -142,24 +149,35 @@ final class LegacyTestFrameworkBridge implements TestFramework
     {
         $adapter = $this->adapter;
 
-        return $this->processFactory->create(
-            $adapter->getMutantCommandLine(
-                $mutant->getTests(),
-                $mutant->getFilePath(),
-                $mutant->getMutation()->getHash(),
-                $mutant->getMutation()->getOriginalFilePath(),
-                $this->getFilteredExtraOptionsForMutant(),
-            ),
+        $command = $adapter->getMutantCommandLine(
+            $mutant->getTests(),
+            $mutant->getFilePath(),
+            $mutant->getMutation()->getHash(),
+            $mutant->getMutation()->getOriginalFilePath(),
+            $this->getFilteredExtraOptionsForMutant(),
+        );
+
+        return MutantProcessContainer::from(
             $mutant,
-            $adapter->getName(),
-            $adapter->testsPass(...),
-            $adapter instanceof SyntaxErrorAware ? $adapter->isSyntaxError(...) : null,
+            fn (): MutantProcess => $this->createMutantProcess($command, $mutant),
         );
     }
 
     public function hasJUnitReport(): bool
     {
         return $this->adapter->hasJUnitReport();
+    }
+
+    /**
+     * @param string[] $command
+     */
+    private function createMutantProcess(array $command, Mutant $mutant): MutantProcess
+    {
+        $testTime = $mutant->getMutation()->getNominalTestExecutionTime();
+        $timeout = min(self::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + self::TIMEOUT_FACTOR * $testTime, $this->config->processTimeout);
+        $process = $this->processFactory->create($command, timeout: $timeout);
+
+        return new MutantProcess($process, $mutant, $this->evaluationAttemptResultFactory);
     }
 
     /**

@@ -67,9 +67,6 @@ final readonly class MagoMutantProcessFactory
                 $mutant->getFilePath(),
                 $mutant->getMutation()->getOriginalFilePath(),
             ),
-            cwd: null,
-            env: [],
-            input: null,
             timeout: $this->timeout,
         );
 

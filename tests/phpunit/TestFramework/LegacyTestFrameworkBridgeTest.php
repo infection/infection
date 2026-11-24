@@ -36,11 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Closure;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Console\ConsoleOutput;
-use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Mutant\EvaluationAttemptResultFactory;
+use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -54,6 +57,7 @@ use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter;
 use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\Mutation\MutationBuilder;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -342,29 +346,37 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
 
     public function test_it_delegates_mutant_evaluation_to_the_legacy_process_factory(): void
     {
-        $mutant = MutantBuilder::withMinimalTestData()->build();
-        $processContainer = $this->createStub(MutantProcessContainer::class);
+        $mutation = MutationBuilder::withMinimalTestData()
+            ->withTests([new TestLocation('FooTest::test_it_works', '/project/tests/FooTest.php', 0.01)])
+            ->build()
+        ;
+        $mutant = MutantBuilder::withMinimalTestData()->withMutation($mutation)->build();
+        $process = $this->createStub(Process::class);
         $adapter = new DummyTestFrameworkAdapter();
 
-        $processFactoryMock = $this->createMock(MutantProcessContainerFactory::class);
+        $processFactoryMock = $this->createMock(ProcessFactory::class);
         $processFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with(['/bin/dummy'], $mutant, 'dummy', $this->isInstanceOf(Closure::class), null)
-            ->willReturn($processContainer)
+            ->with(['/bin/dummy'], null, [], null, 5.05)
+            ->willReturn($process)
         ;
 
         $testFramework = $this->createTestFramework(adapter: $adapter, processFactory: $processFactoryMock);
 
         $actual = $testFramework->test($mutant);
 
-        $this->assertSame($processContainer, $actual);
+        $this->assertInstanceOf(MutantProcessContainer::class, $actual);
+        $this->assertTrue($actual->isCold());
+        $attempt = $actual->getCurrent();
+        $this->assertInstanceOf(MutantProcess::class, $attempt);
+        $this->assertSame($process, $attempt->getProcess());
     }
 
     public function test_it_filters_initial_run_only_options_from_mutant_evaluation(): void
     {
         $mutant = MutantBuilder::withMinimalTestData()->build();
-        $processContainer = $this->createStub(MutantProcessContainer::class);
+        $process = $this->createStub(Process::class);
         /** @var TestFrameworkAdapter&ProvidesInitialRunOnlyOptions&MockObject $adapter */
         $adapter = $this->createMockForIntersectionOfInterfaces([
             TestFrameworkAdapter::class,
@@ -384,12 +396,12 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             )
         ;
 
-        $processFactoryMock = $this->createMock(MutantProcessContainerFactory::class);
+        $processFactoryMock = $this->createMock(ProcessFactory::class);
         $processFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with(['/bin/dummy'], $mutant, '', $this->isInstanceOf(Closure::class), null)
-            ->willReturn($processContainer)
+            ->with(['/bin/dummy'])
+            ->willReturn($process)
         ;
 
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
@@ -409,7 +421,11 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
 
         $actual = $testFramework->test($mutant);
 
-        $this->assertSame($processContainer, $actual);
+        $this->assertInstanceOf(MutantProcessContainer::class, $actual);
+        $this->assertTrue($actual->isCold());
+        $attempt = $actual->getCurrent();
+        $this->assertInstanceOf(MutantProcess::class, $attempt);
+        $this->assertSame($process, $attempt->getProcess());
     }
 
     private function createTestFramework(
@@ -417,7 +433,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         ?ConsoleOutput $consoleOutput = null,
         ?CoverageChecker $coverageChecker = null,
         ?InitialTestsRunner $initialTestsRunner = null,
-        ?MutantProcessContainerFactory $processFactory = null,
+        ?ProcessFactory $processFactory = null,
         ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter = null,
         bool $skipInitialTests = false,
         ?string $initialTestsPhpOptions = null,
@@ -436,7 +452,8 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
                 ->withSkipCoverage($skipCoverage)
                 ->withSkipInitialTests($skipInitialTests)
                 ->build(),
-            processFactory: $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
+            processFactory: $processFactory ?? $this->createStub(ProcessFactory::class),
+            evaluationAttemptResultFactory: $this->createStub(EvaluationAttemptResultFactory::class),
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter ?? $this->createStub(TestFrameworkExtraOptionsFilter::class),
             logger: $logger ?? $this->createStub(LegacyTestFrameworkLogger::class),
         );

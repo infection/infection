@@ -44,9 +44,9 @@ use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -318,7 +318,7 @@ final class FactoryTest extends TestCase
                 JUnitReportLocator::create($fileSystem, ''),
                 IndexXmlCoverageLocator::create($fileSystem, ''),
             ),
-            $this->createStub(MutantProcessContainerFactory::class),
+            $this->createStub(ProcessFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
             $staticAnalysisExecutableFinder ?? $this->createStub(StaticAnalysisToolExecutableFinder::class),
             $staticAnalysisConfigLocator ?? $this->createStub(TestFrameworkConfigLocatorInterface::class),

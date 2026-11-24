@@ -77,9 +77,6 @@ final readonly class PHPStanMutantProcessFactory
                     $mutant->getMutation()->getHash(),
                 ),
             ),
-            cwd: null,
-            env: [],
-            input: null,
             timeout: $this->timeout,
         );
 

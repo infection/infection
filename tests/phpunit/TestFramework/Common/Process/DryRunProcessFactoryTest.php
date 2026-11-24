@@ -62,11 +62,22 @@ final class DryRunProcessFactoryTest extends TestCase
         $this->assertSame(DryRunProcess::PASSING_TEST_OUTPUT, $process->getOutput());
     }
 
+    public function test_it_uses_the_shell_runner_defaults(): void
+    {
+        $factory = new DryRunProcessFactory();
+        $process = $factory->create(['php', '-v']);
+
+        $this->assertSame(60.0, $process->getTimeout());
+        $this->assertSame(['SHELL_VERBOSITY' => '0'], $process->getEnv());
+        $this->assertNull($process->getInput());
+    }
+
     public function test_it_preserves_explicit_shell_verbosity(): void
     {
         $factory = new DryRunProcessFactory();
         $process = $factory->create(['php', '-v'], null, ['SHELL_VERBOSITY' => '2'], null, null);
 
         $this->assertSame(['SHELL_VERBOSITY' => '2'], $process->getEnv());
+        $this->assertNull($process->getTimeout());
     }
 }

@@ -40,7 +40,7 @@ use function array_values;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
-use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Mutant\TestFrameworkEvaluationAttemptResultFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Common\Process\DryRunProcessFactory;
@@ -60,6 +60,8 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\PhpUnit\Log\PsrPhpUnitLogger;
 use Infection\TestFramework\PhpUnit\MemoryLimiter;
 use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
+use Infection\TestFramework\PhpUnit\Mutant\PHPUnitMutantOutput;
+use Infection\TestFramework\PhpUnit\Mutant\PHPUnitMutantProcessFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Psr\Log\LoggerInterface;
@@ -114,6 +116,36 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             ? new DryRunProcessFactory()
             : new SymfonyProcessFactory();
 
+        $commandLineBuilder = new CommandLineBuilder(new PhpExecutableFinder());
+        $memoryLimiter = new MemoryLimiter(new MemoryLimiterEnvironment());
+        $argumentsAndOptionsBuilder = new ArgumentsAndOptionsBuilder(
+            $executeOnlyCoveringTestCases,
+            $filteredSourceFilesToMutate,
+            $mapSourceClassToTestStrategy,
+            $useWindowsFilterLimit,
+        );
+        $mutantProcessFactory = new PHPUnitMutantProcessFactory(
+            $processFactory,
+            new TestFrameworkEvaluationAttemptResultFactory(
+                'PHPUnit',
+                PHPUnitMutantOutput::testsPass(...),
+                PHPUnitMutantOutput::isSyntaxError(...),
+            ),
+            $configuration->processTimeout,
+            $testFrameworkExecutable,
+            $commandLineBuilder,
+            new MutationConfigBuilder(
+                $tmpDir,
+                $testFrameworkConfigContent,
+                $configManipulator,
+                $projectDir,
+                new TestRunOrderResolver(),
+                $fileSystem,
+            ),
+            $argumentsAndOptionsBuilder,
+            $memoryLimiter,
+        );
+
         return new PhpUnitAdapter(
             $testFrameworkExecutable,
             $tmpDir,
@@ -139,33 +171,18 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
                     $filteredSourceFilesToMutate,
                 ),
             ),
-            new MutationConfigBuilder(
-                $tmpDir,
-                $testFrameworkConfigContent,
-                $configManipulator,
-                $projectDir,
-                new TestRunOrderResolver(),
-                $fileSystem,
-            ),
-            new ArgumentsAndOptionsBuilder(
-                $executeOnlyCoveringTestCases,
-                $filteredSourceFilesToMutate,
-                $mapSourceClassToTestStrategy,
-                $useWindowsFilterLimit,
-            ),
+            $argumentsAndOptionsBuilder,
             $shellCommandRunner,
             new VersionParser('PHPUnit'),
-            new CommandLineBuilder(
-                new PhpExecutableFinder(),
-            ),
+            $commandLineBuilder,
             $testFrameworkConfigPath,
             new PsrPhpUnitLogger($logger),
             $coverageCheckerFactory,
             new InitialTestsRunner($shellCommandRunner, $testFrameworkLogger),
             $configuration,
-            new MutantProcessContainerFactory($configuration->processTimeout, $processFactory),
+            $mutantProcessFactory,
             $testFrameworkExtraOptionsFilter,
-            new MemoryLimiter(new MemoryLimiterEnvironment()),
+            $memoryLimiter,
         );
     }
 

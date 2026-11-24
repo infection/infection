@@ -38,12 +38,10 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 use function array_key_exists;
 use function explode;
 use function implode;
-use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
-use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
@@ -56,10 +54,10 @@ use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
-use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Log\PhpUnitLogger;
 use Infection\TestFramework\PhpUnit\MemoryLimiter;
+use Infection\TestFramework\PhpUnit\Mutant\PHPUnitMutantProcessFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Override;
 use function Safe\preg_match;
@@ -86,7 +84,6 @@ final class PhpUnitAdapter implements TestFramework
         private readonly string $jUnitFilePath,
         private readonly PCOVDirectoryProvider $pcovDirectoryProvider,
         private readonly InitialConfigBuilder $initialConfigBuilder,
-        private readonly MutationConfigBuilder $mutationConfigBuilder,
         private readonly ArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
         private readonly ShellCommandRunner $shellCommandRunner,
         private readonly VersionParser $versionParser,
@@ -96,7 +93,7 @@ final class PhpUnitAdapter implements TestFramework
         CoverageCheckerFactory $coverageCheckerFactory,
         private readonly InitialTestsRunner $initialTestsRunner,
         private readonly Configuration $config,
-        private readonly MutantProcessContainerFactory $processFactory,
+        private readonly PHPUnitMutantProcessFactory $processFactory,
         private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private readonly MemoryLimiter $memoryLimiter,
         private ?string $version = null,
@@ -163,24 +160,17 @@ final class PhpUnitAdapter implements TestFramework
     #[Override]
     public function test(Mutant $mutant): MutantProcessContainer
     {
-        $command = $this->getMutantCommandLine(
-            $mutant->getTests(),
-            $mutant->getFilePath(),
-            $mutant->getMutation()->getHash(),
-            $mutant->getMutation()->getOriginalFilePath(),
-            $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
-                $this->config->testFrameworkExtraOptions,
-                $this->getInitialRunOnlyOptions(),
-                ['--warn-when-php-is-not-configured-for-development'],
-            ),
+        $extraOptions = $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
+            $this->config->testFrameworkExtraOptions,
+            $this->getInitialRunOnlyOptions(),
+            ['--warn-when-php-is-not-configured-for-development'],
         );
 
-        return $this->processFactory->create(
-            $command,
+        $version = $this->getVersion();
+
+        return MutantProcessContainer::from(
             $mutant,
-            $this->getName(),
-            $this->testsPass(...),
-            $this->isSyntaxError(...),
+            fn () => $this->processFactory->create($mutant, $version, $extraOptions),
         );
     }
 
@@ -277,65 +267,6 @@ final class PhpUnitAdapter implements TestFramework
                 $extraOptions,
             ),
         );
-    }
-
-    /**
-     * @param TestLocation[] $coverageTests
-     *
-     * @return string[]
-     */
-    private function getMutantCommandLine(
-        array $coverageTests,
-        string $mutatedFilePath,
-        string $mutationHash,
-        string $mutationOriginalFilePath,
-        string $extraOptions,
-    ): array {
-        return $this->getCommandLine(
-            $this->memoryLimiter->getPhpExtraArguments(),
-            $this->argumentsAndOptionsBuilder->buildForMutant(
-                $this->mutationConfigBuilder->build(
-                    $coverageTests,
-                    $mutatedFilePath,
-                    $mutationHash,
-                    $mutationOriginalFilePath,
-                    $this->getVersion(),
-                ),
-                $extraOptions,
-                $coverageTests,
-                $this->getVersion(),
-            ),
-        );
-    }
-
-    private function testsPass(string $output): bool
-    {
-        if (preg_match('/failures!/i', $output) === 1) {
-            return false;
-        }
-
-        if (preg_match('/errors!/i', $output) === 1) {
-            return false;
-        }
-
-        // OK (XX tests, YY assertions)
-        $isOk = preg_match('/OK\s\(/', $output) === 1;
-
-        // "OK, but incomplete, skipped, or risky tests!"
-        $isOkWithInfo = preg_match('/OK\s?,/', $output) === 1;
-
-        // "Warnings!" - e.g. when deprecated functions are used, but tests pass
-        $isWarning = preg_match('/warnings!/i', $output) === 1;
-
-        // "No tests executed!" - e.g. when --filter option contains too large regular expression
-        $isNoTestsExecuted = preg_match('/No tests executed!/i', $output) === 1;
-
-        return $isOk || $isOkWithInfo || $isWarning || $isNoTestsExecuted;
-    }
-
-    private function isSyntaxError(string $output): bool
-    {
-        return preg_match('/ParseError: syntax error/i', $output) === 1;
     }
 
     private function getInitialTestsFailRecommendations(string $commandLine): string

@@ -757,15 +757,9 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\Factory\MutantProcessContainerFactory
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\MutantProcessContainer
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
+			count: 2
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
@@ -794,12 +788,6 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Configuration\Configuration
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Process\Factory\MutantProcessContainerFactory
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
@@ -1399,18 +1387,6 @@ parameters:
 			identifier: phpunit.assertEmpty
 			count: 1
 			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/VisitorTestCaseTest.php
-
-		-
-			rawMessage: Variable $mutantDiff is never read.
-			identifier: variable.unused
-			count: 1
-			path: ../tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php
-
-		-
-			rawMessage: Variable $originalStartingLine is never read.
-			identifier: variable.unused
-			count: 1
-			path: ../tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php
 
 		-
 			rawMessage: Foreach value variable $item is never read.

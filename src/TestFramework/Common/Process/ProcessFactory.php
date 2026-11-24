@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Common\Process;
 
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Stringable;
 use Symfony\Component\Process\Process;
 
@@ -51,9 +52,9 @@ interface ProcessFactory
      */
     public function create(
         array $command,
-        ?string $cwd,
-        array $env,
-        mixed $input,
-        ?float $timeout,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
+        ?float $timeout = ShellCommandRunner::DEFAULT_TIMEOUT,
     ): Process;
 }

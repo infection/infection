@@ -38,6 +38,7 @@ namespace Infection\TestFramework;
 use function array_merge;
 use function dirname;
 use function implode;
+use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
@@ -46,9 +47,10 @@ use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
-use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Mutant\TestFrameworkEvaluationAttemptResultFactory;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -94,7 +96,7 @@ final readonly class Factory
         private TestFrameworkLogger $testFrameworkLogger,
         private LoggerInterface $logger,
         private CoverageCheckerFactory $coverageCheckerFactory,
-        private MutantProcessContainerFactory $containerFactory,
+        private ProcessFactory $legacyProcessFactory,
         private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
         private StaticAnalysisToolExecutableFinder $staticAnalysisExecutableFinder,
         private TestFrameworkConfigLocatorInterface $staticAnalysisConfigLocator,
@@ -116,7 +118,12 @@ final readonly class Factory
                 ),
                 new InitialTestsRunner($this->shellCommandRunner, $this->testFrameworkLogger),
                 $this->infectionConfig,
-                $this->containerFactory,
+                $this->legacyProcessFactory,
+                new TestFrameworkEvaluationAttemptResultFactory(
+                    $testFramework->getName(),
+                    $testFramework->testsPass(...),
+                    $testFramework instanceof SyntaxErrorAware ? $testFramework->isSyntaxError(...) : null,
+                ),
                 $this->extraOptionsFilter,
                 new PsrLegacyTestFrameworkLogger($this->logger),
             );
