@@ -33,24 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Mutant\EvaluationStrategy\Action;
 
-use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\RunEvaluation;
+use Infection\Mutant\EvaluationStrategy\Action\Action;
+use Infection\Mutant\EvaluationStrategy\Action\RunEvaluation;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(RunEvaluation::class)]
 final class RunEvaluationTest extends TestCase
 {
-    public function test_it_retains_the_selected_factory_without_executing_it(): void
+    public function test_it_is_an_evaluation_action(): void
     {
-        $factory = function (): EvaluationAttemptResult {
-            $this->fail('A decision must not execute the selected evaluation.');
-        };
-
-        $decision = new RunEvaluation($factory);
-
-        $this->assertSame($factory, $decision->createAttempt);
+        $this->assertInstanceOf(Action::class, new RunEvaluation());
     }
 }

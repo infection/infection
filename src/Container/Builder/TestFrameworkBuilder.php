@@ -37,7 +37,7 @@ namespace Infection\Container\Builder;
 
 use DIContainer\Builder;
 use Infection\Configuration\Configuration;
-use Infection\Mutant\SequentialEvaluationStrategy;
+use Infection\Mutant\EvaluationStrategy\SequentialEvaluationStrategy;
 use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Factory;

@@ -210,10 +210,11 @@ an observation directly without starting a subprocess.
 
 A `MutantProcessContainer` controls the lifecycle for one mutant. It creates evaluations
 lazily and retains complete nested containers, including their follow-ups. Each container's
-`EvaluationStrategy` decides whether to retry an evaluator, select another evaluator,
-or finish. An enclosing strategy receives a nested container's complete ordered history
-and selected status when that container finishes. The default sequential strategy advances
-to the next configured evaluator after `ESCAPED`.
+`EvaluationStrategy` receives the ordered history and a flag indicating whether
+another configured evaluation is available. The final history entry carries the
+latest detection result, including a suspicious result. The default sequential
+strategy requests the next evaluation after `ESCAPED` when one is available.
+It finishes a suspicious result as `ERROR`.
 
 The selected final status can differ from the last observation's status. Infection
 emits one final `MutantExecutionResult` after the decision is locked in. Its immutable

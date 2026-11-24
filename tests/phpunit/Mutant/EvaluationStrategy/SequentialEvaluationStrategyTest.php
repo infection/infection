@@ -33,13 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Mutant\EvaluationStrategy;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\FinishEvaluation;
-use Infection\Mutant\RunEvaluation;
-use Infection\Mutant\SequentialEvaluationStrategy;
+use Infection\Mutant\EvaluationStrategy\Action\FinishEvaluation;
+use Infection\Mutant\EvaluationStrategy\Action\RunEvaluation;
+use Infection\Mutant\EvaluationStrategy\SequentialEvaluationStrategy;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\SuspiciousResult;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -47,46 +48,35 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SequentialEvaluationStrategy::class)]
 final class SequentialEvaluationStrategyTest extends TestCase
 {
-    public function test_it_selects_the_next_configured_evaluator_without_running_it(): void
+    public function test_it_requests_the_next_evaluation_when_the_last_one_escaped(): void
     {
-        $first = new EvaluationAttemptResult('First', DetectionStatus::ESCAPED, '', null);
-        $second = new EvaluationAttemptResult('Second', DetectionStatus::ESCAPED, '', null);
-        $firstFactory = function (): EvaluationAttemptResult {
-            $this->fail('A completed evaluation must not be repeated by the sequential strategy.');
-        };
-        $secondFactory = $firstFactory;
-        $thirdFactory = function (): EvaluationAttemptResult {
-            $this->fail('Selecting an evaluator must not run it.');
-        };
+        $first = new EvaluationAttemptResult('First', DetectionStatus::KILLED_BY_TESTS);
+        $second = new EvaluationAttemptResult('Second', DetectionStatus::ESCAPED);
         $strategy = new SequentialEvaluationStrategy();
 
-        $decision = $strategy->decide(
-            [$first, $second],
-            [$firstFactory, $secondFactory, $thirdFactory],
-            $thirdFactory,
-            DetectionStatus::ESCAPED,
-        );
+        $decision = $strategy->decide([$first, $second], hasNextEvaluation: true);
 
         $this->assertInstanceOf(RunEvaluation::class, $decision);
-        $this->assertSame($thirdFactory, $decision->createAttempt);
+    }
+
+    public function test_it_finishes_with_an_error_when_the_last_result_is_suspicious(): void
+    {
+        $first = new EvaluationAttemptResult('First', DetectionStatus::ESCAPED);
+        $strategy = new SequentialEvaluationStrategy();
+
+        $decision = $strategy->decide([$first, new SuspiciousResult()], hasNextEvaluation: true);
+
+        $this->assertInstanceOf(FinishEvaluation::class, $decision);
+        $this->assertSame(DetectionStatus::ERROR, $decision->detectionStatus);
     }
 
     #[DataProvider('terminalStatusProvider')]
     public function test_it_finishes_with_the_last_status_when_continuation_is_not_needed(DetectionStatus $status, bool $hasAnotherEvaluator): void
     {
-        $result = new EvaluationAttemptResult('First', $status, '', null);
-        $factory = function (): EvaluationAttemptResult {
-            $this->fail('Finishing evaluation must not run another evaluator.');
-        };
-        $evaluations = $hasAnotherEvaluator
-            ? [$factory, $factory]
-            : [$factory];
+        $result = new EvaluationAttemptResult('First', $status);
         $strategy = new SequentialEvaluationStrategy();
 
-        $nextEvaluation = $hasAnotherEvaluator
-            ? $factory
-            : null;
-        $decision = $strategy->decide([$result], $evaluations, $nextEvaluation, $status);
+        $decision = $strategy->decide([$result], $hasAnotherEvaluator);
 
         $this->assertInstanceOf(FinishEvaluation::class, $decision);
         $this->assertSame($status, $decision->detectionStatus);

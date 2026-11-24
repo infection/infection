@@ -47,7 +47,7 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSu
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Framework\Str;
 use Infection\Git\Git;
-use Infection\Mutant\SequentialEvaluationStrategy;
+use Infection\Mutant\EvaluationStrategy\SequentialEvaluationStrategy;
 use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;

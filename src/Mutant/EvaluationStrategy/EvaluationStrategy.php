@@ -33,20 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Mutant\EvaluationStrategy;
 
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\FinishEvaluation;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationStrategy\Action\Action;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\SuspiciousResult;
 
-#[CoversClass(FinishEvaluation::class)]
-final class FinishEvaluationTest extends TestCase
+/**
+ * Chooses an action from the completed evaluations and the availability of a follow-up.
+ *
+ * @internal
+ */
+interface EvaluationStrategy
 {
-    public function test_it_retains_the_strategys_final_status(): void
-    {
-        $decision = new FinishEvaluation(DetectionStatus::ESCAPED);
-
-        $this->assertSame(DetectionStatus::ESCAPED, $decision->detectionStatus);
-    }
+    /**
+     * The last entry carries the most recent detection result, including suspicious results.
+     *
+     * @param non-empty-list<EvaluationAttemptResult|SuspiciousResult> $history
+     */
+    public function decide(
+        array $history,
+        bool $hasNextEvaluation,
+    ): Action;
 }

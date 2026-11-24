@@ -33,33 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\Mutant\EvaluationStrategy\Action;
 
-use Closure;
-use Override;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationStrategy\Action\FinishEvaluation;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Continues to the next configured evaluator after escape, otherwise keeps its status.
- *
- * @internal
- */
-final readonly class SequentialEvaluationStrategy implements EvaluationStrategy
+#[CoversClass(FinishEvaluation::class)]
+final class FinishEvaluationTest extends TestCase
 {
-    #[Override]
-    public function decide(
-        array $history,
-        array $evaluations,
-        ?Closure $nextEvaluation,
-        DetectionStatus $currentStatus,
-    ): RunEvaluation|FinishEvaluation {
-        if ($currentStatus !== DetectionStatus::ESCAPED) {
-            return new FinishEvaluation($currentStatus);
-        }
+    public function test_it_retains_the_strategys_final_status(): void
+    {
+        $decision = new FinishEvaluation(DetectionStatus::ESCAPED);
 
-        if ($nextEvaluation !== null) {
-            return new RunEvaluation($nextEvaluation);
-        }
-
-        return new FinishEvaluation($currentStatus);
+        $this->assertSame(DetectionStatus::ESCAPED, $decision->detectionStatus);
     }
 }

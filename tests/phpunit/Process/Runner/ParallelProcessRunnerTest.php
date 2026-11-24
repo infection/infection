@@ -37,14 +37,12 @@ namespace Infection\Tests\Process\Runner;
 
 use function array_map;
 use function array_search;
-use function count;
 use DuoClock\TimeSpy;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationStrategy;
-use Infection\Mutant\FinishEvaluation;
-use Infection\Mutant\Mutant;
-use Infection\Mutant\RunEvaluation;
+use Infection\Mutant\EvaluationStrategy\Action\FinishEvaluation;
+use Infection\Mutant\EvaluationStrategy\Action\RunEvaluation;
+use Infection\Mutant\EvaluationStrategy\EvaluationStrategy;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\IndexedMutantProcessContainer;

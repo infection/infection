@@ -33,24 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Mutant\EvaluationStrategy\Action;
 
-use Closure;
-use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
+use Infection\Mutant\DetectionStatus;
 
 /**
- * Requests fresh work from an evaluator, including a retry or a complete nested pipe.
+ * Locks in the final status independently of any individual observation.
  *
  * @internal
  */
-final readonly class RunEvaluation
+final readonly class FinishEvaluation implements Action
 {
-    /**
-     * @param Closure(): (MutantProcess|EvaluationAttemptResult|MutantProcessContainer) $createAttempt
-     */
     public function __construct(
-        public Closure $createAttempt,
+        public DetectionStatus $detectionStatus,
     ) {
     }
 }

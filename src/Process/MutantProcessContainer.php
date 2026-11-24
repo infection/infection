@@ -40,12 +40,12 @@ use function array_map;
 use Closure;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationStrategy;
-use Infection\Mutant\FinishEvaluation;
+use Infection\Mutant\EvaluationStrategy\Action\FinishEvaluation;
+use Infection\Mutant\EvaluationStrategy\Action\RunEvaluation;
+use Infection\Mutant\EvaluationStrategy\EvaluationStrategy;
+use Infection\Mutant\EvaluationStrategy\SequentialEvaluationStrategy;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\RunEvaluation;
-use Infection\Mutant\SequentialEvaluationStrategy;
 use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\SuspiciousResult;
 use Webmozart\Assert\Assert;
 

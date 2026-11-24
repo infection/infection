@@ -41,7 +41,7 @@ use function array_slice;
 use function array_values;
 use function implode;
 use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationStrategy;
+use Infection\Mutant\EvaluationStrategy\EvaluationStrategy;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\InitialRunResults;

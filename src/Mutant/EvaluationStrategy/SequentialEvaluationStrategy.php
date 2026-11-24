@@ -33,32 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Mutant\EvaluationStrategy;
 
-use Closure;
-use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
+use function array_key_last;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationStrategy\Action\FinishEvaluation;
+use Infection\Mutant\EvaluationStrategy\Action\RunEvaluation;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\SuspiciousResult;
+use Override;
 
 /**
- * Chooses another evaluation or a final status from all completed observations.
- * Factories remain lazy and may be selected again to retry an evaluator.
+ * Continues to the next configured evaluator after escape, otherwise keeps its status.
  *
  * @internal
  */
-interface EvaluationStrategy
+final readonly class SequentialEvaluationStrategy implements EvaluationStrategy
 {
-    /**
-     * A nested pipe contributes its complete history and its selected status.
-     * The next evaluator is tracked separately from the number of observations.
-     *
-     * @param non-empty-list<EvaluationAttemptResult> $history
-     * @param non-empty-list<Closure(): (MutantProcess|EvaluationAttemptResult|MutantProcessContainer)> $evaluations
-     * @param (Closure(): (MutantProcess|EvaluationAttemptResult|MutantProcessContainer))|null $nextEvaluation
-     */
+    #[Override]
     public function decide(
         array $history,
-        array $evaluations,
-        ?Closure $nextEvaluation,
-        DetectionStatus $currentStatus,
-    ): RunEvaluation|FinishEvaluation;
+        bool $hasNextEvaluation,
+    ): RunEvaluation|FinishEvaluation {
+        $lastResult = $history[array_key_last($history)];
+
+        if ($lastResult instanceof SuspiciousResult) {
+            return new FinishEvaluation(DetectionStatus::ERROR);
+        }
+
+        if ($lastResult->detectionStatus === DetectionStatus::ESCAPED && $hasNextEvaluation) {
+            return new RunEvaluation();
+        }
+
+        return new FinishEvaluation($lastResult->detectionStatus);
+    }
 }

@@ -33,17 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Mutant\EvaluationStrategy\Action;
 
 /**
- * Locks in the final status independently of any individual observation.
- *
  * @internal
  */
-final readonly class FinishEvaluation
+interface Action
 {
-    public function __construct(
-        public DetectionStatus $detectionStatus,
-    ) {
-    }
 }

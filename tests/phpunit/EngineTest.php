@@ -44,7 +44,7 @@ use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
-use Infection\Mutant\SequentialEvaluationStrategy;
+use Infection\Mutant\EvaluationStrategy\SequentialEvaluationStrategy;
 use Infection\Mutation\MutationGenerator;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Source\PreloadedSourceChecker;
