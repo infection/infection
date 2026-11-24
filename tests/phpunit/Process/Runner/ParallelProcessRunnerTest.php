@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use function array_map;
 use function array_search;
 use function count;
 use DuoClock\TimeSpy;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\Mutant\EvaluationStrategy;
 use Infection\Mutant\FinishEvaluation;
 use Infection\Mutant\Mutant;
@@ -50,6 +50,7 @@ use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessQueue;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\MutantProcessDetectionStatusResolver;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Infection\Tests\Mutant\MutantBuilder;
 use function iterator_count;
@@ -342,6 +343,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         // Create a timeout process that will throw ProcessTimedOutException
         $processMock = $this->createMock(Process::class);
+        $processMock->method('getExitCode')->willReturn(0);
         $processMock->expects($this->once())
             ->method('checkTimeout')
             ->willThrowException(new ProcessTimedOutException($processMock, 1))
@@ -391,12 +393,14 @@ final class ParallelProcessRunnerTest extends TestCase
         $reflection = new ReflectionClass($runner);
 
         $runningProcessMock = $this->createMock(Process::class);
+        $runningProcessMock->method('getExitCode')->willReturn(0);
         $runningProcessMock->expects($this->once())
             ->method('isRunning')
             ->willReturn(true)
         ;
 
         $finishedProcessMock = $this->createMock(Process::class);
+        $finishedProcessMock->method('getExitCode')->willReturn(0);
         $finishedProcessMock->expects($this->once())
             ->method('isRunning')
             ->willReturn(false)
@@ -433,6 +437,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         // Create a finished process
         $processMock = $this->createMock(Process::class);
+        $processMock->method('getExitCode')->willReturn(0);
         $processMock->expects($this->never())
             ->method('checkTimeout') // Finished processes are never checked for timeouts
         ;
@@ -500,13 +505,14 @@ final class ParallelProcessRunnerTest extends TestCase
 
         for ($i = 0; $i < 3; ++$i) {
             $process = $this->createMock(Process::class);
+            $process->method('getExitCode')->willReturn(0);
             $process->expects($this->once())->method('start');
             $process->method('isRunning')->willReturn(false);
 
             $mutantProcess = new DummyMutantProcess(
                 $process,
                 MutantBuilder::withMinimalTestData()->build(),
-                $this->createResultFactory(),
+                $this->createResolver(),
                 false,
             );
 
@@ -566,13 +572,14 @@ final class ParallelProcessRunnerTest extends TestCase
 
         for ($i = 0; $i < 2; ++$i) {
             $process = $this->createMock(Process::class);
+            $process->method('getExitCode')->willReturn(0);
             $process->method('start'); // May or may not be called depending on mock behavior
             $process->method('isRunning')->willReturn(false);
 
             $mutantProcess = new DummyMutantProcess(
                 $process,
                 MutantBuilder::withMinimalTestData()->build(),
-                $this->createResultFactory(),
+                $this->createResolver(),
                 false,
             );
 
@@ -654,13 +661,16 @@ final class ParallelProcessRunnerTest extends TestCase
             }
 
             $process = $this->createMock(Process::class);
+            $process->method('getExitCode')->willReturn(0);
             $process->expects($this->once())->method('start')->with(null, ['INFECTION' => '1', 'TEST_TOKEN' => 1]);
             $process->expects($this->once())->method('isRunning')->willReturn(false);
             $process->expects($this->never())->method('checkTimeout');
-            $factory = $this->createMock(EvaluationAttemptResultFactory::class);
-            $factory->expects($this->once())->method('createFromProcess')->willReturn($result);
+            $factory = $this->createMock(MutantProcessDetectionStatusResolver::class);
+            $factory->expects($this->once())->method('tryToResolve')->willReturn($result->detectionStatus);
 
-            return new MutantProcess($process, $mutant, $factory);
+            $process->method('getOutput')->willReturn($result->output);
+
+            return new MutantProcess($process, $mutant, $factory, $result->evaluatorName);
         };
 
         if ($firstUsesProcess) {
@@ -677,7 +687,12 @@ final class ParallelProcessRunnerTest extends TestCase
         $finished = iterator_to_array($runner->run([$evaluation]), false);
 
         $this->assertSame([$evaluation], $finished);
-        $this->assertSame([$first, $last], $finished[0]->getMutantExecutionResult()->getEvaluationHistory());
+        $history = $finished[0]->getMutantExecutionResult()->getEvaluationHistory();
+        $this->assertSame(
+            [$first->detectionStatus, $last->detectionStatus],
+            array_map(static fn (EvaluationAttemptResult $attempt): DetectionStatus => $attempt->detectionStatus, $history),
+        );
+        $this->assertSame([$first->output, $last->output], array_map(static fn (EvaluationAttemptResult $attempt): string => $attempt->output, $history));
         $this->assertSame(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, $finished[0]->getMutantExecutionResult()->getDetectionStatus());
     }
 
@@ -711,12 +726,10 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->assertSame(10, iterator_count($executedProcesses));
     }
 
-    private function createResultFactory(): EvaluationAttemptResultFactory
+    private function createResolver(): MutantProcessDetectionStatusResolver
     {
-        $factory = $this->createStub(EvaluationAttemptResultFactory::class);
-        $factory->method('createFromProcess')->willReturn(
-            new EvaluationAttemptResult('Evaluator', DetectionStatus::KILLED_BY_TESTS, '', null),
-        );
+        $factory = $this->createStub(MutantProcessDetectionStatusResolver::class);
+        $factory->method('tryToResolve')->willReturn(DetectionStatus::KILLED_BY_TESTS);
 
         return $factory;
     }
@@ -724,6 +737,7 @@ final class ParallelProcessRunnerTest extends TestCase
     private function createMutantProcessContainer(int $threadIndex): MutantProcessContainer
     {
         $processMock = $this->createMock(Process::class);
+        $processMock->method('getExitCode')->willReturn(0);
         $processMock
             ->expects($this->once())
             ->method('start')
@@ -754,7 +768,7 @@ final class ParallelProcessRunnerTest extends TestCase
             fn (): MutantProcess => new DummyMutantProcess(
                 $processMock,
                 $mutant,
-                $this->createResultFactory(),
+                $this->createResolver(),
                 false,
             ),
         );
@@ -763,6 +777,7 @@ final class ParallelProcessRunnerTest extends TestCase
     private function createMutantProcessContainerWithNextMutantProcess(int $threadCount): MutantProcessContainer
     {
         $phpUnitProcessMock = $this->createMock(Process::class);
+        $phpUnitProcessMock->method('getExitCode')->willReturn(0);
         $phpUnitProcessMock
             ->expects($this->once())
             ->method('start')
@@ -782,6 +797,7 @@ final class ParallelProcessRunnerTest extends TestCase
         ;
 
         $nextProcessMock = $this->createMock(Process::class);
+        $nextProcessMock->method('getExitCode')->willReturn(0);
         $nextProcessMock
             ->expects($this->once())
             ->method('start')
@@ -800,14 +816,12 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturn(false)
         ;
 
-        $observation = new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED, '', null);
-
-        $evaluationAttemptResultFactoryMock = $this->createMock(EvaluationAttemptResultFactory::class);
+        $evaluationAttemptResultFactoryMock = $this->createMock(MutantProcessDetectionStatusResolver::class);
 
         $evaluationAttemptResultFactoryMock
             ->expects($this->once())
-            ->method('createFromProcess')
-            ->willReturn($observation)
+            ->method('tryToResolve')
+            ->willReturn(DetectionStatus::ESCAPED)
         ;
 
         $mutant = MutantBuilder::withMinimalTestData()->build();
@@ -824,7 +838,8 @@ final class ParallelProcessRunnerTest extends TestCase
             fn (): MutantProcess => new MutantProcess(
                 $nextProcessMock,
                 $mutant,
-                $this->createResultFactory(),
+                $this->createResolver(),
+                'PHPUnit',
             ),
         );
     }
@@ -832,6 +847,7 @@ final class ParallelProcessRunnerTest extends TestCase
     private function createTimeOutMutantProcessContainer(): MutantProcessContainer
     {
         $processMock = $this->createMock(Process::class);
+        $processMock->method('getExitCode')->willReturn(0);
         $processMock
             ->expects($this->once())
             ->method('start')
@@ -855,7 +871,7 @@ final class ParallelProcessRunnerTest extends TestCase
             fn (): MutantProcess => new DummyMutantProcess(
                 $processMock,
                 $mutant,
-                $this->createResultFactory(),
+                $this->createResolver(),
                 true,
             ),
         );

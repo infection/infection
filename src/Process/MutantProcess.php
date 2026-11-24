@@ -35,12 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationAttemptResultFactory;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\TestFramework\Common\Process\DryRunProcess;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\MutantProcessDetectionStatusResolver;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\SuspiciousResult;
 use function microtime;
 use Symfony\Component\Process\Process;
+use function trim;
 use Webmozart\Assert\Assert;
 
 /**
@@ -49,16 +51,18 @@ use Webmozart\Assert\Assert;
  */
 class MutantProcess
 {
-    private ?EvaluationAttemptResult $evaluationAttemptResult = null;
-
     private bool $timedOut = false;
 
     private float $finishedAt = 0.0;
 
+    private DetectionStatus|SuspiciousResult|null $result = null;
+
     public function __construct(
         private Process $process,
         private readonly Mutant $mutant,
-        private readonly EvaluationAttemptResultFactory $evaluationAttemptResultFactory,
+        private readonly MutantProcessDetectionStatusResolver $resolver,
+        private readonly string $testFrameworkName,
+        private readonly bool $includeErrorOutput = false,
     ) {
     }
 
@@ -70,6 +74,11 @@ class MutantProcess
     public function getMutant(): Mutant
     {
         return $this->mutant;
+    }
+
+    public function getTestFrameworkName(): string
+    {
+        return $this->testFrameworkName;
     }
 
     public function markAsTimedOut(): void
@@ -90,6 +99,15 @@ class MutantProcess
     public function getFinishedAt(): float
     {
         return $this->finishedAt;
+    }
+
+    public function getStopSignal(): ?int
+    {
+        if ($this->process instanceof DryRunProcess || !$this->process->hasBeenStopped()) {
+            return null;
+        }
+
+        return $this->process->getStopSignal();
     }
 
     public function getRuntime(): float
@@ -114,10 +132,33 @@ class MutantProcess
         $this->markAsFinished();
     }
 
-    public function getEvaluationAttemptResult(): EvaluationAttemptResult
+    public function getResult(): DetectionStatus|SuspiciousResult
     {
         Assert::greaterThan($this->finishedAt, 0.0, 'Cannot classify an evaluation before its process has finished.');
 
-        return $this->evaluationAttemptResult ??= $this->evaluationAttemptResultFactory->createFromProcess($this);
+        return $this->result ??= $this->resolveResult();
+    }
+
+    public function getResultOutput(): string
+    {
+        $output = $this->process->getOutput();
+
+        return $this->includeErrorOutput
+            ? trim($output . "\n\n" . $this->process->getErrorOutput())
+            : $output;
+    }
+
+    private function resolveResult(): DetectionStatus|SuspiciousResult
+    {
+        $exitCode = $this->process->getExitCode();
+        Assert::notNull($exitCode, 'A completed process must have an exit code.');
+
+        return $this->resolver->tryToResolve(
+            $this->process->getOutput(),
+            $this->process->getErrorOutput(),
+            $exitCode,
+            $this->timedOut,
+            $this->getStopSignal(),
+        );
     }
 }

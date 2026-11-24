@@ -37,8 +37,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\Process\DryRunProcessFactory;
 use Infection\TestFramework\Common\Process\ProcessFactory;
@@ -91,6 +89,7 @@ final class PHPUnitMutantProcessFactoryTest extends TestCase
 
         $this->assertSame($process, $attempt->getProcess());
         $this->assertSame($mutant, $attempt->getMutant());
+        $this->assertSame('PHPUnit', $attempt->getTestFrameworkName());
     }
 
     #[DataProvider('timeoutDataProvider')]
@@ -116,21 +115,33 @@ final class PHPUnitMutantProcessFactoryTest extends TestCase
         yield 'configured limit' => [40.0, 10.0, 40.0];
     }
 
-    public function test_it_uses_the_injected_attempt_result_factory(): void
+    public function test_it_uses_the_phpunit_detection_status_resolver(): void
     {
-        $observation = new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED, 'passed', null);
-        $resultFactory = $this->createMock(EvaluationAttemptResultFactory::class);
-        $resultFactory->expects($this->once())->method('createFromProcess')->willReturn($observation);
-        $factory = $this->createFactory(new DryRunProcessFactory(), $resultFactory);
-        $attempt = $factory->create(MutantBuilder::withMinimalTestData()->build(), '12.5.0', '');
+        $mutant = MutantBuilder::withCompleteTestData()->build();
+        $factory = $this->createFactory(new DryRunProcessFactory());
+        $attempt = $factory->create($mutant, '12.5.0', '');
         $attempt->markAsFinished();
 
-        $this->assertSame($observation, $attempt->getEvaluationAttemptResult());
+        $this->assertSame(DetectionStatus::ESCAPED, $attempt->getResult());
+    }
+
+    public function test_it_treats_the_nominal_time_equal_to_the_timeout_as_expected(): void
+    {
+        $mutation = MutationBuilder::withMinimalTestData()
+            ->withTests([new TestLocation('FooTest::test_it_works', '/project/tests/FooTest.php', 10.0)])
+            ->build()
+        ;
+        $mutant = MutantBuilder::withMinimalTestData()->withMutation($mutation)->build();
+        $factory = $this->createFactory(new DryRunProcessFactory(), timeout: 10.0);
+        $attempt = $factory->create($mutant, '12.5.0', '');
+        $attempt->markAsTimedOut();
+        $attempt->markAsFinished();
+
+        $this->assertSame(DetectionStatus::SKIPPED, $attempt->getResult());
     }
 
     private function createFactory(
         ProcessFactory $processFactory,
-        ?EvaluationAttemptResultFactory $resultFactory = null,
         float $timeout = 90.0,
     ): PHPUnitMutantProcessFactory {
         $fileSystem = $this->createStub(Filesystem::class);
@@ -138,8 +149,8 @@ final class PHPUnitMutantProcessFactoryTest extends TestCase
         $phpExecutableFinder->method('find')->willReturn('/usr/bin/php');
 
         return new PHPUnitMutantProcessFactory(
+            'PHPUnit',
             $processFactory,
-            $resultFactory ?? $this->createStub(EvaluationAttemptResultFactory::class),
             $timeout,
             '/path/to/phpunit',
             new CommandLineBuilder($phpExecutableFinder),

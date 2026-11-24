@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Mago\Adapter;
 
 use Infection\AbstractTestFramework\InvalidVersion;
-use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
@@ -44,6 +43,7 @@ use Infection\TestFramework\Common\Process\SymfonyProcessFactory;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\MutantProcessDetectionStatusResolver;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
@@ -82,6 +82,7 @@ final class MagoAdapterTest extends TestCase
         $this->initialTestsRunner = $this->createMock(InitialTestsRunner::class);
 
         $this->adapter = new MagoAdapter(
+            'Mago',
             $this->createMutantProcessFactory(),
             '/path/to/mago-config-path',
             '/path/to/mago',
@@ -133,6 +134,7 @@ final class MagoAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_single_option(): void
     {
         $adapter = new MagoAdapter(
+            'Mago',
             $this->createMutantProcessFactory(options: ['--sort']),
             '/path/to/mago-config-path',
             '/path/to/mago',
@@ -180,6 +182,7 @@ final class MagoAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_multiple_options(): void
     {
         $adapter = new MagoAdapter(
+            'Mago',
             $this->createMutantProcessFactory(options: ['--no-progress']),
             '/path/to/mago-config-path',
             '/path/to/mago',
@@ -228,6 +231,7 @@ final class MagoAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_complex_options(): void
     {
         $adapter = new MagoAdapter(
+            'Mago',
             $this->createMutantProcessFactory(options: ['--no-stubs', '--baseline /path/to/baseline.toml']),
             '/path/to/mago-config-path',
             '/path/to/mago',
@@ -299,6 +303,7 @@ final class MagoAdapterTest extends TestCase
         ;
 
         $adapter = new MagoAdapter(
+            'Mago',
             $this->createMutantProcessFactory(),
             '/path/to/mago-config-path',
             '/path/to/mago',
@@ -331,6 +336,7 @@ final class MagoAdapterTest extends TestCase
         ;
 
         $adapter = new MagoAdapter(
+            'Mago',
             $this->createMutantProcessFactory('/path/to/executable'),
             '/path/to/config',
             '/path/to/executable',
@@ -362,6 +368,7 @@ final class MagoAdapterTest extends TestCase
         ;
 
         $adapter = new MagoAdapter(
+            'Mago',
             $this->createMutantProcessFactory('/path/to/executable'),
             '/path/to/config',
             '/path/to/executable',
@@ -393,6 +400,7 @@ final class MagoAdapterTest extends TestCase
         ;
 
         $adapter = new MagoAdapter(
+            'Mago',
             $this->createMutantProcessFactory('/path/to/executable'),
             '/path/to/config',
             '/path/to/executable',
@@ -480,6 +488,7 @@ final class MagoAdapterTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $adapter = new MagoAdapter(
+            'Mago',
             $this->createMutantProcessFactory(),
             '/path/to/mago-config-path',
             '/path/to/mago',
@@ -500,6 +509,7 @@ final class MagoAdapterTest extends TestCase
     public function test_it_rejects_invalid_versions(string $version): void
     {
         $adapter = new MagoAdapter(
+            'Mago',
             $this->createMutantProcessFactory(),
             '/path/to/mago-config-path',
             '/path/to/mago',
@@ -551,8 +561,9 @@ final class MagoAdapterTest extends TestCase
         array $options = [],
     ): MagoMutantProcessFactory {
         return new MagoMutantProcessFactory(
+            'Mago',
             new SymfonyProcessFactory(),
-            $this->createStub(EvaluationAttemptResultFactory::class),
+            $this->createStub(MutantProcessDetectionStatusResolver::class),
             $executable,
             $this->commandLineBuilder,
             31.0,

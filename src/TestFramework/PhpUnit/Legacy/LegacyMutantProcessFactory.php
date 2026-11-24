@@ -33,22 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Common;
+namespace Infection\TestFramework\PhpUnit\Legacy;
 
-use UnitEnum;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Mutant\Mutant;
+use Infection\Process\MutantProcess;
+use Infection\TestFramework\Common\Process\ProcessFactory;
+use function min;
 
 /**
- * @template-covariant TStatus of UnitEnum
- *
  * @internal
  */
-interface MutantProcessDetectionStatusResolver
+final readonly class LegacyMutantProcessFactory
 {
-    /** @return TStatus */
-    public function resolve(
-        string $stdout,
-        string $stderr,
-        ?int $exitCode,
-        bool $timedOut,
-    ): UnitEnum;
+    private const int TIMEOUT_FACTOR = 5;
+
+    private const int TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
+
+    public function __construct(
+        private ProcessFactory $processFactory,
+        private TestFrameworkAdapter $adapter,
+        private float $timeout,
+    ) {
+    }
+
+    /**
+     * @param string[] $command
+     */
+    public function create(array $command, Mutant $mutant): MutantProcess
+    {
+        $testTime = $mutant->getMutation()->getNominalTestExecutionTime();
+        $timeout = min(self::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + self::TIMEOUT_FACTOR * $testTime, $this->timeout);
+        $process = $this->processFactory->create($command, timeout: $timeout);
+
+        return new MutantProcess(
+            $process,
+            $mutant,
+            new LegacyMutantDetectionStatusResolver($this->adapter, $testTime >= $timeout),
+            $this->adapter->getName(),
+        );
+    }
 }

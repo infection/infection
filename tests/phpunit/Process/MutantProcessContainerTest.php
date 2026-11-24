@@ -44,10 +44,12 @@ use Infection\Mutant\FinishEvaluation;
 use Infection\Mutant\RunEvaluation;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\SuspiciousResult;
 use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 use Webmozart\Assert\InvalidArgumentException;
 
 #[CoversClass(MutantProcessContainer::class)]
@@ -86,16 +88,7 @@ final class MutantProcessContainerTest extends TestCase
     {
         $process = $this->createStub(MutantProcess::class);
         $process->method('getFinishedAt')->willReturn(2.0);
-        $result = new EvaluationAttemptResult(
-            'PHPUnit',
-            $status,
-            'output',
-            new EvaluationProcessDetails('phpunit', 1.0),
-        );
-        $process
-            ->method('getEvaluationAttemptResult')
-            ->willReturn($result)
-        ;
+        $process->method('getResult')->willReturn($status);
 
         $container = MutantProcessContainer::from(MutantBuilder::withCompleteTestData()->build(), static fn (): MutantProcess => $process)
             ->append(function (): MutantProcess {
@@ -114,30 +107,9 @@ final class MutantProcessContainerTest extends TestCase
         $first->method('getFinishedAt')->willReturn(2.0);
         $second->method('getFinishedAt')->willReturn(3.0);
         $third->method('getFinishedAt')->willReturn(4.0);
-        $escaped = new EvaluationAttemptResult(
-            'PHPUnit',
-            DetectionStatus::ESCAPED,
-            'output',
-            new EvaluationProcessDetails('phpunit', 1.0),
-        );
-        $first
-            ->method('getEvaluationAttemptResult')
-            ->willReturn($escaped)
-        ;
-        $second
-            ->method('getEvaluationAttemptResult')
-            ->willReturn($escaped)
-        ;
-        $killed = new EvaluationAttemptResult(
-            'PHPUnit',
-            DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
-            'output',
-            new EvaluationProcessDetails('phpunit', 1.0),
-        );
-        $third
-            ->method('getEvaluationAttemptResult')
-            ->willReturn($killed)
-        ;
+        $first->method('getResult')->willReturn(DetectionStatus::ESCAPED);
+        $second->method('getResult')->willReturn(DetectionStatus::ESCAPED);
+        $third->method('getResult')->willReturn(DetectionStatus::KILLED_BY_STATIC_ANALYSIS);
         $calls = new class {
             public int $first = 0;
 
@@ -192,7 +164,15 @@ final class MutantProcessContainerTest extends TestCase
         );
         $firstProcess = $this->createStub(MutantProcess::class);
         $firstProcess->method('getFinishedAt')->willReturn(2.0);
-        $firstProcess->method('getEvaluationAttemptResult')->willReturn($first);
+        $firstProcess->method('getResult')->willReturn($first->detectionStatus);
+        $firstProcess->method('getTestFrameworkName')->willReturn($first->evaluatorName);
+        $firstProcess->method('getResultOutput')->willReturn($first->output);
+        $details = $first->process;
+        $this->assertNotNull($details);
+        $firstProcess->method('getRuntime')->willReturn($details->runtime);
+        $underlying = $this->createStub(Process::class);
+        $underlying->method('getCommandLine')->willReturn($details->commandLine);
+        $firstProcess->method('getProcess')->willReturn($underlying);
         $firstProcess->method('getMutant')->willReturn($mutant);
         $container = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $firstProcess);
         $container->getCurrent();
@@ -208,7 +188,15 @@ final class MutantProcessContainerTest extends TestCase
             );
             $secondProcess = $this->createStub(MutantProcess::class);
             $secondProcess->method('getFinishedAt')->willReturn(3.0);
-            $secondProcess->method('getEvaluationAttemptResult')->willReturn($last);
+            $secondProcess->method('getResult')->willReturn($last->detectionStatus);
+            $secondProcess->method('getTestFrameworkName')->willReturn($last->evaluatorName);
+            $secondProcess->method('getResultOutput')->willReturn($last->output);
+            $details = $last->process;
+            $this->assertNotNull($details);
+            $secondProcess->method('getRuntime')->willReturn($details->runtime);
+            $underlying = $this->createStub(Process::class);
+            $underlying->method('getCommandLine')->willReturn($details->commandLine);
+            $secondProcess->method('getProcess')->willReturn($underlying);
             $secondProcess->method('getMutant')->willReturn($mutant);
             $container->append(static fn (): MutantProcess => $secondProcess);
             $this->assertTrue($container->hasNext());
@@ -224,7 +212,7 @@ final class MutantProcessContainerTest extends TestCase
 
         $actual = $container->getMutantExecutionResult();
 
-        $this->assertSame($expectedHistory, $actual->getEvaluationHistory());
+        $this->assertEquals($expectedHistory, $actual->getEvaluationHistory());
         $this->assertSame($last->detectionStatus, $actual->getDetectionStatus());
         $details = $last->process;
         $this->assertNotNull($details);
@@ -249,11 +237,26 @@ final class MutantProcessContainerTest extends TestCase
         $container->getMutantExecutionResult();
     }
 
+    public function test_it_records_a_suspicious_process_as_an_error(): void
+    {
+        $mutant = MutantBuilder::withCompleteTestData()->build();
+        $process = $this->createStub(MutantProcess::class);
+        $process->method('getFinishedAt')->willReturn(2.0);
+        $process->method('getResult')->willReturn(new SuspiciousResult());
+        $container = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $process);
+        $container->getCurrent();
+
+        $result = $container->getMutantExecutionResult();
+
+        $this->assertSame(DetectionStatus::ERROR, $result->getDetectionStatus());
+        $this->assertSame(DetectionStatus::ERROR, $result->getEvaluationHistory()[0]->detectionStatus);
+    }
+
     public function test_it_cannot_report_an_unfinished_process(): void
     {
         $process = $this->createMock(MutantProcess::class);
         $process->method('getFinishedAt')->willReturn(0.0);
-        $process->expects($this->never())->method('getEvaluationAttemptResult');
+        $process->expects($this->never())->method('getResult');
         $container = MutantProcessContainer::from(
             MutantBuilder::withMinimalTestData()->build(),
             static fn (): MutantProcess => $process,
@@ -322,14 +325,7 @@ final class MutantProcessContainerTest extends TestCase
     {
         $process = $this->createStub(MutantProcess::class);
         $process->method('getFinishedAt')->willReturn(2.0);
-        $process->method('getEvaluationAttemptResult')->willReturn(
-            new EvaluationAttemptResult(
-                'PHPUnit',
-                DetectionStatus::ESCAPED,
-                '',
-                new EvaluationProcessDetails('phpunit', 1.0),
-            ),
-        );
+        $process->method('getResult')->willReturn(DetectionStatus::ESCAPED);
         $container = MutantProcessContainer::from(MutantBuilder::withCompleteTestData()->build(), static fn (): MutantProcess => $process);
         $container->getCurrent();
         $container->append(function (): MutantProcess {

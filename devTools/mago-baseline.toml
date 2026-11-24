@@ -3007,7 +3007,7 @@ message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceF
 count = 1
 
 [[issues]]
-file = "src/TestFramework/LegacyMutantDetectionStatusResolver.php"
+file = "src/TestFramework/PhpUnit/Legacy/LegacyMutantDetectionStatusResolver.php"
 code = "mixed-operand"
 message = "Casting `mixed` to `bool`."
 count = 1

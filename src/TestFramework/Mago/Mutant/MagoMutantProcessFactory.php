@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Mago\Mutant;
 
 use function array_merge;
-use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\Process\ProcessFactory;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\MutantProcessDetectionStatusResolver;
 
 /**
  * @internal
@@ -51,8 +51,9 @@ final readonly class MagoMutantProcessFactory
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
+        private string $testFrameworkName,
         private ProcessFactory $processFactory,
-        private EvaluationAttemptResultFactory $evaluationAttemptResultFactory,
+        private MutantProcessDetectionStatusResolver $resolver,
         private string $staticAnalysisToolExecutable,
         private CommandLineBuilder $commandLineBuilder,
         private float $timeout,
@@ -73,7 +74,9 @@ final readonly class MagoMutantProcessFactory
         return new MutantProcess(
             $process,
             $mutant,
-            $this->evaluationAttemptResultFactory,
+            $this->resolver,
+            $this->testFrameworkName,
+            includeErrorOutput: true,
         );
     }
 

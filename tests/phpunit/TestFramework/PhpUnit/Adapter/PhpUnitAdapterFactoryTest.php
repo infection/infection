@@ -130,10 +130,11 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             $configuration,
         );
 
-        $container = $adapter->test(MutantBuilder::withMinimalTestData()->build());
+        $container = $adapter->test(MutantBuilder::withCompleteTestData()->build());
         $this->assertInstanceOf(MutantProcessContainer::class, $container);
         $attempt = $container->getCurrent();
         $this->assertInstanceOf(MutantProcess::class, $attempt);
+        $this->assertSame('PHPUnit', $attempt->getTestFrameworkName());
 
         $this->assertSame($dryRun, $attempt->getProcess() instanceof DryRunProcess);
     }

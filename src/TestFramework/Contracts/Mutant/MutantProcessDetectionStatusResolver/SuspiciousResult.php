@@ -33,12 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Fixtures\TestFramework;
+namespace Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 
-use Infection\Mutant\DetectionStatus;
-use Infection\TestFramework\Common\MutantProcessDetectionStatusResolver;
-
-/** @extends MutantProcessDetectionStatusResolver<DetectionStatus> */
-interface DetectionStatusResolver extends MutantProcessDetectionStatusResolver
+/**
+ * @internal
+ */
+final readonly class SuspiciousResult
 {
 }

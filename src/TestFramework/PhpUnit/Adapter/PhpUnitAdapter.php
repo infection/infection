@@ -41,6 +41,8 @@ use function implode;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\CommandLineBuilder;
@@ -79,6 +81,7 @@ final class PhpUnitAdapter implements TestFramework
     private readonly CoverageChecker $coverageChecker;
 
     public function __construct(
+        private readonly string $name,
         private readonly string $testFrameworkExecutable,
         private readonly string $tmpDir,
         private readonly string $jUnitFilePath,
@@ -160,6 +163,16 @@ final class PhpUnitAdapter implements TestFramework
     #[Override]
     public function test(Mutant $mutant): MutantProcessContainer
     {
+        if (!$mutant->getMutation()->isCoveredByTest()) {
+            return MutantProcessContainer::from(
+                $mutant,
+                fn (): EvaluationAttemptResult => new EvaluationAttemptResult(
+                    $this->getName(),
+                    DetectionStatus::NOT_COVERED,
+                ),
+            );
+        }
+
         $extraOptions = $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
             $this->config->testFrameworkExtraOptions,
             $this->getInitialRunOnlyOptions(),
@@ -181,7 +194,7 @@ final class PhpUnitAdapter implements TestFramework
 
     public function getName(): string
     {
-        return 'PHPUnit';
+        return $this->name;
     }
 
     public static function supportsExecutionOrderDefectsRandom(string $version): bool

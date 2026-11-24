@@ -36,12 +36,10 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PHPStan\Mutant;
 
 use Infection\Mutant\DetectionStatus;
-use Infection\TestFramework\Common\MutantProcessDetectionStatusResolver;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\MutantProcessDetectionStatusResolver;
 use Override;
 
 /**
- * @implements MutantProcessDetectionStatusResolver<DetectionStatus>
- *
  * @internal
  */
 final class PHPStanMutantDetectionStatusResolver implements MutantProcessDetectionStatusResolver
@@ -49,19 +47,18 @@ final class PHPStanMutantDetectionStatusResolver implements MutantProcessDetecti
     private const int PROCESS_MIN_ERROR_CODE = 100;
 
     #[Override]
-    public function resolve(
+    public function tryToResolve(
         string $stdout,
         string $stderr,
-        ?int $exitCode,
+        int $exitCode,
         bool $timedOut,
+        ?int $stopSignal,
     ): DetectionStatus {
         if ($timedOut) {
             return DetectionStatus::TIMED_OUT;
         }
 
-        if ($exitCode !== null
-            && $exitCode > self::PROCESS_MIN_ERROR_CODE
-        ) {
+        if ($exitCode > self::PROCESS_MIN_ERROR_CODE) {
             // See \Symfony\Component\Process\Process::$exitCodes
             return DetectionStatus::ERROR;
         }

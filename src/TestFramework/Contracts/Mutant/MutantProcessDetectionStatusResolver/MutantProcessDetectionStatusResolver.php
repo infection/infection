@@ -33,14 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 
-use Infection\Process\MutantProcess;
+use Infection\Mutant\DetectionStatus;
 
 /**
+ * Applies framework-specific rules to the result of one completed mutant evaluation process.
+ * Returns a detection status or flags the process result as suspicious.
+ *
  * @internal
  */
-interface EvaluationAttemptResultFactory
+interface MutantProcessDetectionStatusResolver
 {
-    public function createFromProcess(MutantProcess $mutantProcess): EvaluationAttemptResult;
+    public function tryToResolve(
+        string $stdout,
+        string $stderr,
+        int $exitCode,
+        bool $timedOut,
+        ?int $stopSignal,
+    ): DetectionStatus|SuspiciousResult;
 }

@@ -40,7 +40,6 @@ use function array_values;
 use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
-use Infection\Mutant\TestFrameworkEvaluationAttemptResultFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Common\Process\DryRunProcessFactory;
@@ -60,7 +59,6 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\PhpUnit\Log\PsrPhpUnitLogger;
 use Infection\TestFramework\PhpUnit\MemoryLimiter;
 use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
-use Infection\TestFramework\PhpUnit\Mutant\PHPUnitMutantOutput;
 use Infection\TestFramework\PhpUnit\Mutant\PHPUnitMutantProcessFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
@@ -76,6 +74,8 @@ use Webmozart\Assert\Assert;
 final class PhpUnitAdapterFactory implements TestFrameworkFactory
 {
     use CannotBeInstantiated;
+
+    private const string ADAPTER_NAME = 'PHPUnit';
 
     public static function create(
         string $testFrameworkExecutable,
@@ -125,12 +125,8 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $useWindowsFilterLimit,
         );
         $mutantProcessFactory = new PHPUnitMutantProcessFactory(
+            self::ADAPTER_NAME,
             $processFactory,
-            new TestFrameworkEvaluationAttemptResultFactory(
-                'PHPUnit',
-                PHPUnitMutantOutput::testsPass(...),
-                PHPUnitMutantOutput::isSyntaxError(...),
-            ),
             $configuration->processTimeout,
             $testFrameworkExecutable,
             $commandLineBuilder,
@@ -147,6 +143,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         );
 
         return new PhpUnitAdapter(
+            self::ADAPTER_NAME,
             $testFrameworkExecutable,
             $tmpDir,
             $jUnitFilePath,
@@ -173,7 +170,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             ),
             $argumentsAndOptionsBuilder,
             $shellCommandRunner,
-            new VersionParser('PHPUnit'),
+            new VersionParser(self::ADAPTER_NAME),
             $commandLineBuilder,
             $testFrameworkConfigPath,
             new PsrPhpUnitLogger($logger),

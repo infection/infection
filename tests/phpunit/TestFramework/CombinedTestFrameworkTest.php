@@ -91,26 +91,18 @@ final class CombinedTestFrameworkTest extends TestCase
         $followUpTestFramework = $this->createMock(TestFramework::class);
         $followUpProcess = $this->createStub(MutantProcess::class);
         $followUpProcess->method('getFinishedAt')->willReturn(2.0);
-        $followUpProcess->method('getEvaluationAttemptResult')->willReturn(
-            new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED, '', null),
-        );
+        $followUpProcess->method('getResult')->willReturn(DetectionStatus::ESCAPED);
         $lastProcess = $this->createStub(MutantProcess::class);
         $lastProcess->method('getFinishedAt')->willReturn(2.0);
-        $lastProcess->method('getEvaluationAttemptResult')->willReturn(
-            new EvaluationAttemptResult('PHPUnit', $followUpStatus, '', null),
-        );
+        $lastProcess->method('getResult')->willReturn($followUpStatus);
         $finalProcess = $this->createStub(MutantProcess::class);
         $finalProcess->method('getFinishedAt')->willReturn(2.0);
-        $finalProcess->method('getEvaluationAttemptResult')->willReturn(
-            new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED, '', null),
-        );
+        $finalProcess->method('getResult')->willReturn(DetectionStatus::ESCAPED);
         $lastTestFramework = $this->createMock(TestFramework::class);
 
         $firstProcess = $this->createStub(MutantProcess::class);
         $firstProcess->method('getFinishedAt')->willReturn(2.0);
-        $firstProcess->method('getEvaluationAttemptResult')->willReturn(
-            new EvaluationAttemptResult('PHPUnit', $firstStatus, '', null),
-        );
+        $firstProcess->method('getResult')->willReturn($firstStatus);
         $firstEvaluation = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $firstProcess);
         $firstTestFramework = $this->createMock(TestFramework::class);
         $firstTestFramework

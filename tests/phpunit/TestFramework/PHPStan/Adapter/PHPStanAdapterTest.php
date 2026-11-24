@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PHPStan\Adapter;
 
 use Infection\AbstractTestFramework\InvalidVersion;
-use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
@@ -44,6 +43,7 @@ use Infection\TestFramework\Common\Process\SymfonyProcessFactory;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\MutantProcessDetectionStatusResolver;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
@@ -85,9 +85,10 @@ final class PHPStanAdapterTest extends TestCase
         $this->initialTestsRunner = $this->createMock(InitialTestsRunner::class);
 
         $this->mutantProcessFactory = new PHPStanMutantProcessFactory(
+            'PHPStan',
             new SymfonyProcessFactory(),
             $this->createStub(Filesystem::class),
-            $this->createStub(EvaluationAttemptResultFactory::class),
+            $this->createStub(MutantProcessDetectionStatusResolver::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -97,6 +98,7 @@ final class PHPStanAdapterTest extends TestCase
         );
 
         $this->adapter = new PHPStanAdapter(
+            'PHPStan',
             $this->mutantProcessFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
@@ -148,6 +150,7 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_single_option(): void
     {
         $adapter = new PHPStanAdapter(
+            'PHPStan',
             $this->mutantProcessFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
@@ -195,6 +198,7 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_multiple_options(): void
     {
         $adapter = new PHPStanAdapter(
+            'PHPStan',
             $this->mutantProcessFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
@@ -244,6 +248,7 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_complex_options(): void
     {
         $adapter = new PHPStanAdapter(
+            'PHPStan',
             $this->mutantProcessFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
@@ -316,6 +321,7 @@ final class PHPStanAdapterTest extends TestCase
         ;
 
         $adapter = new PHPStanAdapter(
+            'PHPStan',
             $this->mutantProcessFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
@@ -348,6 +354,7 @@ final class PHPStanAdapterTest extends TestCase
         ;
 
         $adapter = new PHPStanAdapter(
+            'PHPStan',
             $this->mutantProcessFactory,
             '/path/to/config',
             '/path/to/executable',
@@ -379,6 +386,7 @@ final class PHPStanAdapterTest extends TestCase
         ;
 
         $adapter = new PHPStanAdapter(
+            'PHPStan',
             $this->mutantProcessFactory,
             '/path/to/config',
             '/path/to/executable',
@@ -410,6 +418,7 @@ final class PHPStanAdapterTest extends TestCase
         ;
 
         $adapter = new PHPStanAdapter(
+            'PHPStan',
             $this->mutantProcessFactory,
             '/path/to/config',
             '/path/to/executable',
@@ -497,6 +506,7 @@ final class PHPStanAdapterTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $adapter = new PHPStanAdapter(
+            'PHPStan',
             $this->mutantProcessFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
@@ -517,6 +527,7 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_rejects_invalid_versions(string $version): void
     {
         $adapter = new PHPStanAdapter(
+            'PHPStan',
             $this->mutantProcessFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',

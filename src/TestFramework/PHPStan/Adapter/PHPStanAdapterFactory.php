@@ -47,7 +47,6 @@ use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PHPStan\Logger\PsrPHPStanLogger;
-use Infection\TestFramework\PHPStan\Mutant\PHPStanEvaluationAttemptResultFactory;
 use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantDetectionStatusResolver;
 use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantProcessFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -62,6 +61,8 @@ use Symfony\Component\Process\PhpExecutableFinder;
 final class PHPStanAdapterFactory implements TestFrameworkFactory
 {
     use CannotBeInstantiated;
+
+    private const string ADAPTER_NAME = 'PHPStan';
 
     #[Override]
     public static function create(
@@ -94,11 +95,10 @@ final class PHPStanAdapterFactory implements TestFrameworkFactory
             : new SymfonyProcessFactory();
 
         $mutantProcessFactory = new PHPStanMutantProcessFactory(
+            self::ADAPTER_NAME,
             $processFactory,
             $fileSystem,
-            new PHPStanEvaluationAttemptResultFactory(
-                new PHPStanMutantDetectionStatusResolver(),
-            ),
+            new PHPStanMutantDetectionStatusResolver(),
             $testFrameworkConfigPath,
             $testFrameworkExecutable,
             $commandLineBuilder,
@@ -108,11 +108,12 @@ final class PHPStanAdapterFactory implements TestFrameworkFactory
         );
 
         return new PHPStanAdapter(
+            self::ADAPTER_NAME,
             $mutantProcessFactory,
             $testFrameworkConfigPath,
             $testFrameworkExecutable,
             $commandLineBuilder,
-            new VersionParser('PHPStan'),
+            new VersionParser(self::ADAPTER_NAME),
             $staticAnalysisToolOptions,
             $shellCommandRunner,
             new InitialTestsRunner($shellCommandRunner, $testFrameworkLogger),

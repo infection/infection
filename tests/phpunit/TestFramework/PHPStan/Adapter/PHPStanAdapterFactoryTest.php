@@ -103,6 +103,7 @@ final class PHPStanAdapterFactoryTest extends TestCase
         $mutant = MutantBuilder::withMinimalTestData()->build();
         $attempt = $adapter->test($mutant)->getCurrent();
         $this->assertInstanceOf(MutantProcess::class, $attempt);
+        $this->assertSame('PHPStan', $attempt->getTestFrameworkName());
         $process = $attempt->getProcess();
 
         $this->assertSame(32.3, $process->getTimeout());

@@ -46,7 +46,7 @@ final class PHPStanMutantDetectionStatusResolverTest extends TestCase
 {
     #[DataProvider('statusesProvider')]
     public function test_it_resolves_the_detection_status(
-        ?int $exitCode,
+        int $exitCode,
         bool $timedOut,
         DetectionStatus $expected,
     ): void {
@@ -54,14 +54,12 @@ final class PHPStanMutantDetectionStatusResolverTest extends TestCase
 
         $this->assertSame(
             $expected,
-            $resolver->resolve('', '', $exitCode, $timedOut),
+            $resolver->tryToResolve('', '', $exitCode, $timedOut, null),
         );
     }
 
     public static function statusesProvider(): iterable
     {
-        yield 'unknown exit code' => [null, false, DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
-
         yield 'timeout takes precedence over process error' => [101, true, DetectionStatus::TIMED_OUT];
 
         yield 'timed out' => [0, true, DetectionStatus::TIMED_OUT];

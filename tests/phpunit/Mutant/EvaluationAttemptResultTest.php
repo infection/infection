@@ -37,9 +37,10 @@ namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationProcessDetails;
+use Infection\Process\MutantProcess;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
 #[CoversClass(EvaluationAttemptResult::class)]
 final class EvaluationAttemptResultTest extends TestCase
@@ -56,14 +57,16 @@ final class EvaluationAttemptResultTest extends TestCase
 
     public function test_it_retains_the_evaluators_process_evidence(): void
     {
-        $result = new EvaluationAttemptResult(
-            'PHPUnit',
-            DetectionStatus::ESCAPED,
-            'test output',
-            new EvaluationProcessDetails('phpunit', 1.25),
-        );
+        $process = $this->createStub(Process::class);
+        $process->method('getCommandLine')->willReturn('phpunit');
+        $attempt = $this->createStub(MutantProcess::class);
+        $attempt->method('getProcess')->willReturn($process);
+        $attempt->method('getTestFrameworkName')->willReturn('Custom test framework');
+        $attempt->method('getRuntime')->willReturn(1.25);
 
-        $this->assertSame('PHPUnit', $result->evaluatorName);
+        $result = EvaluationAttemptResult::fromProcess(DetectionStatus::ESCAPED, 'test output', $attempt);
+
+        $this->assertSame('Custom test framework', $result->evaluatorName);
         $this->assertSame('phpunit', $result->process?->commandLine);
         $this->assertSame('test output', $result->output);
         $this->assertSame(DetectionStatus::ESCAPED, $result->detectionStatus);

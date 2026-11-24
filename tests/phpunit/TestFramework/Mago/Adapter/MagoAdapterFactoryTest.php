@@ -103,6 +103,7 @@ final class MagoAdapterFactoryTest extends TestCase
         $mutant = MutantBuilder::withMinimalTestData()->build();
         $attempt = $adapter->test($mutant)->getCurrent();
         $this->assertInstanceOf(MutantProcess::class, $attempt);
+        $this->assertSame('Mago', $attempt->getTestFrameworkName());
         $process = $attempt->getProcess();
 
         $this->assertSame(32.3, $process->getTimeout());

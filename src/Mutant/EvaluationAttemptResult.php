@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\Process\MutantProcess;
-
 /**
  * Immutable evidence from one completed evaluation, with or without a subprocess.
  *
@@ -47,25 +45,6 @@ final readonly class EvaluationAttemptResult
     public function __construct(
         public string $evaluatorName,
         public DetectionStatus $detectionStatus,
-        public string $output,
-        public ?EvaluationProcessDetails $process,
     ) {
-    }
-
-    public static function fromProcess(
-        string $evaluatorName,
-        DetectionStatus $detectionStatus,
-        string $output,
-        MutantProcess $attempt,
-    ): self {
-        return new self(
-            $evaluatorName,
-            $detectionStatus,
-            $output,
-            new EvaluationProcessDetails(
-                $attempt->getProcess()->getCommandLine(),
-                $attempt->getRuntime(),
-            ),
-        );
     }
 }

@@ -38,7 +38,6 @@ namespace Infection\TestFramework;
 use function array_merge;
 use function dirname;
 use function implode;
-use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
@@ -47,7 +46,6 @@ use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
-use Infection\Mutant\TestFrameworkEvaluationAttemptResultFactory;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Common\Process\ProcessFactory;
@@ -61,6 +59,7 @@ use Infection\TestFramework\Logger\PsrLegacyTestFrameworkLogger;
 use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
 use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapterFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
+use Infection\TestFramework\PhpUnit\Legacy\LegacyMutantProcessFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
 use InvalidArgumentException;
@@ -118,11 +117,10 @@ final readonly class Factory
                 ),
                 new InitialTestsRunner($this->shellCommandRunner, $this->testFrameworkLogger),
                 $this->infectionConfig,
-                $this->legacyProcessFactory,
-                new TestFrameworkEvaluationAttemptResultFactory(
-                    $testFramework->getName(),
-                    $testFramework->testsPass(...),
-                    $testFramework instanceof SyntaxErrorAware ? $testFramework->isSyntaxError(...) : null,
+                new LegacyMutantProcessFactory(
+                    $this->legacyProcessFactory,
+                    $testFramework,
+                    $this->infectionConfig->processTimeout,
                 ),
                 $this->extraOptionsFilter,
                 new PsrLegacyTestFrameworkLogger($this->logger),

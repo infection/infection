@@ -40,7 +40,6 @@ use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\DryProcessRunner;
-use Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory;
 use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
 use Infection\Tests\Mutant\MutantBuilder;
 use function iterator_to_array;
@@ -81,9 +80,9 @@ final class DryProcessRunnerTest extends TestCase
         $mutant = MutantBuilder::withCompleteTestData()->build();
         $firstProcess = new Process(['must-not-run']);
         $secondProcess = new Process(['must-not-run-either']);
-        $factory = new MagoEvaluationAttemptResultFactory(new MagoMutantDetectionStatusResolver());
-        $first = new MutantProcess($firstProcess, $mutant, $factory);
-        $second = new MutantProcess($secondProcess, $mutant, $factory);
+        $factory = new MagoMutantDetectionStatusResolver();
+        $first = new MutantProcess($firstProcess, $mutant, $factory, 'Mago');
+        $second = new MutantProcess($secondProcess, $mutant, $factory, 'Mago');
         $direct = new EvaluationAttemptResult('Direct', DetectionStatus::ESCAPED, 'direct output', null);
         $pipe = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $first)
             ->append(static fn (): EvaluationAttemptResult => $direct)

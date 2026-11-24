@@ -691,43 +691,13 @@ parameters:
 			path: ../src/TestFramework/Mago/Adapter/MagoAdapterFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory should not depend on Infection\Mutant\DetectionStatus
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 2
-			path: ../src/TestFramework/Mago/Mutant/MagoEvaluationAttemptResultFactory.php
-
-		-
 			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver should not depend on Infection\Mutant\DetectionStatus
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 5
 			path: ../src/TestFramework/Mago/Mutant/MagoMutantDetectionStatusResolver.php
 
 		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory should not depend on Infection\Mutant\EvaluationAttemptResult
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 2
-			path: ../src/TestFramework/Mago/Mutant/MagoEvaluationAttemptResultFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory should not depend on Infection\Mutant\EvaluationAttemptResultFactory
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Mutant/MagoEvaluationAttemptResultFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory should not depend on Infection\Process\MutantProcess
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 2
-			path: ../src/TestFramework/Mago/Mutant/MagoEvaluationAttemptResultFactory.php
-
-		-
 			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantProcessFactory should not depend on Infection\Mutant\Mutant
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Mutant/MagoMutantProcessFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantProcessFactory should not depend on Infection\Mutant\EvaluationAttemptResultFactory
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Mago/Mutant/MagoMutantProcessFactory.php

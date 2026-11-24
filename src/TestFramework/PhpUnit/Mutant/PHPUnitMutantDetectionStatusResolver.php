@@ -33,69 +33,76 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\TestFramework\PhpUnit\Mutant;
 
-use Closure;
 use Infection\Mutant\DetectionStatus;
-use Infection\TestFramework\Common\MutantProcessDetectionStatusResolver;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\MutantProcessDetectionStatusResolver;
 use Override;
+use function Safe\preg_match;
 
 /**
- * Classifies processes for the compatibility layer with the old AbstractTestFramework contract.
- *
- * @implements MutantProcessDetectionStatusResolver<DetectionStatus>
- *
  * @internal
  */
-final readonly class LegacyMutantDetectionStatusResolver implements MutantProcessDetectionStatusResolver
+final readonly class PHPUnitMutantDetectionStatusResolver implements MutantProcessDetectionStatusResolver
 {
     private const int PROCESS_MIN_ERROR_CODE = 100;
 
-    /**
-     * @param Closure(string): bool $testsPass
-     * @param (Closure(string): mixed)|null $isSyntaxError Legacy adapters do not declare a return type.
-     */
     public function __construct(
-        private Closure $testsPass,
-        private bool $hasTests,
         private bool $timeoutExpected,
-        private ?Closure $isSyntaxError = null,
     ) {
     }
 
     #[Override]
-    public function resolve(string $stdout, string $stderr, ?int $exitCode, bool $timedOut): DetectionStatus
-    {
-        if (!$this->hasTests) {
-            return DetectionStatus::NOT_COVERED;
-        }
-
+    public function tryToResolve(
+        string $stdout,
+        string $stderr,
+        int $exitCode,
+        bool $timedOut,
+        ?int $stopSignal,
+    ): DetectionStatus {
         if ($timedOut) {
             return $this->timeoutExpected
                 ? DetectionStatus::SKIPPED
                 : DetectionStatus::TIMED_OUT;
         }
 
-        if ($exitCode !== null
-            && $exitCode > self::PROCESS_MIN_ERROR_CODE
-        ) {
+        if ($exitCode > self::PROCESS_MIN_ERROR_CODE) {
             return DetectionStatus::ERROR;
         }
 
-        if ($exitCode === 0
-            && ($this->testsPass)($stdout)
-        ) {
+        if ($exitCode === 0 && self::testsPass($stdout)) {
             return DetectionStatus::ESCAPED;
         }
 
-        if ($this->isSyntaxError === null) {
-            return DetectionStatus::KILLED_BY_TESTS;
-        }
-
-        if ((bool) ($this->isSyntaxError)($stdout)) {
+        if (preg_match('/ParseError: syntax error/i', $stdout) === 1) {
             return DetectionStatus::SYNTAX_ERROR;
         }
 
         return DetectionStatus::KILLED_BY_TESTS;
+    }
+
+    private static function testsPass(string $output): bool
+    {
+        if (preg_match('/failures!/i', $output) === 1) {
+            return false;
+        }
+
+        if (preg_match('/errors!/i', $output) === 1) {
+            return false;
+        }
+
+        // OK (XX tests, YY assertions)
+        $isOk = preg_match('/OK\s\(/', $output) === 1;
+
+        // "OK, but incomplete, skipped, or risky tests!"
+        $isOkWithInfo = preg_match('/OK\s?,/', $output) === 1;
+
+        // "Warnings!" - e.g. when deprecated functions are used, but tests pass
+        $isWarning = preg_match('/warnings!/i', $output) === 1;
+
+        // "No tests executed!" - e.g. when --filter option contains too large regular expression
+        $isNoTestsExecuted = preg_match('/No tests executed!/i', $output) === 1;
+
+        return $isOk || $isOkWithInfo || $isWarning || $isNoTestsExecuted;
     }
 }

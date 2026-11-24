@@ -63,6 +63,7 @@ final class MagoAdapter implements TestFramework
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
+        private readonly string $name,
         private readonly MagoMutantProcessFactory $mutantProcessFactory,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
@@ -79,7 +80,7 @@ final class MagoAdapter implements TestFramework
     #[Override]
     public function getName(): string
     {
-        return 'Mago';
+        return $this->name;
     }
 
     #[Override]

@@ -38,6 +38,7 @@ namespace Infection\Process;
 use function array_keys;
 use function array_map;
 use Closure;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Mutant\EvaluationStrategy;
 use Infection\Mutant\FinishEvaluation;
@@ -45,6 +46,7 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\RunEvaluation;
 use Infection\Mutant\SequentialEvaluationStrategy;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\SuspiciousResult;
 use Webmozart\Assert\Assert;
 
 /**
@@ -195,7 +197,9 @@ class MutantProcessContainer
         } else {
             if ($attempt instanceof MutantProcess) {
                 Assert::greaterThan($attempt->getFinishedAt(), 0.0, 'Cannot collect evaluation history before the process has finished.');
-                $attempt = $attempt->getEvaluationAttemptResult();
+                $result = $attempt->getResult();
+                $status = $result instanceof SuspiciousResult ? DetectionStatus::ERROR : $result;
+                $attempt = EvaluationAttemptResult::fromProcess($status, $attempt->getResultOutput(), $attempt);
             }
 
             $observations = [$attempt];

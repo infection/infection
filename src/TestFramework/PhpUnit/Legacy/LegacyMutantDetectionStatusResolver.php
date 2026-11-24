@@ -33,63 +33,61 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Mago\Mutant;
+namespace Infection\TestFramework\PhpUnit\Legacy;
 
+use Infection\AbstractTestFramework\SyntaxErrorAware;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationAttemptResultFactory;
-use Infection\Process\MutantProcess;
-use Infection\TestFramework\Common\MutantProcessDetectionStatusResolver;
-use function sprintf;
-use Symfony\Component\Process\Process;
-use function trim;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\MutantProcessDetectionStatusResolver;
+use Override;
 
 /**
+ * Classifies processes for the compatibility layer with the old AbstractTestFramework contract.
+ *
  * @internal
  */
-final readonly class MagoEvaluationAttemptResultFactory implements EvaluationAttemptResultFactory
+final readonly class LegacyMutantDetectionStatusResolver implements MutantProcessDetectionStatusResolver
 {
-    /** @param MutantProcessDetectionStatusResolver<DetectionStatus> $detectionStatusResolver */
+    private const int PROCESS_MIN_ERROR_CODE = 100;
+
     public function __construct(
-        private MutantProcessDetectionStatusResolver $detectionStatusResolver,
+        private TestFrameworkAdapter $adapter,
+        private bool $timeoutExpected,
     ) {
     }
 
-    public function createFromProcess(MutantProcess $mutantProcess): EvaluationAttemptResult
-    {
-        $process = $mutantProcess->getProcess();
+    #[Override]
+    public function tryToResolve(
+        string $stdout,
+        string $stderr,
+        int $exitCode,
+        bool $timedOut,
+        ?int $stopSignal,
+    ): DetectionStatus {
+        if ($timedOut) {
+            return $this->timeoutExpected
+                ? DetectionStatus::SKIPPED
+                : DetectionStatus::TIMED_OUT;
+        }
 
-        return EvaluationAttemptResult::fromProcess(
-            'Mago',
-            $this->retrieveDetectionStatus($mutantProcess),
-            $this->retrieveProcessOutput($process),
-            $mutantProcess,
-        );
-    }
+        if ($exitCode > self::PROCESS_MIN_ERROR_CODE) {
+            return DetectionStatus::ERROR;
+        }
 
-    private function retrieveProcessOutput(Process $process): string
-    {
-        Assert::true(
-            $process->isTerminated(),
-            sprintf(
-                'Cannot retrieve a non-terminated process output. Got "%s"',
-                $process->getStatus(),
-            ),
-        );
+        if ($exitCode === 0
+            && $this->adapter->testsPass($stdout)
+        ) {
+            return DetectionStatus::ESCAPED;
+        }
 
-        return trim($process->getOutput() . "\n\n" . $process->getErrorOutput());
-    }
+        if (!$this->adapter instanceof SyntaxErrorAware) {
+            return DetectionStatus::KILLED_BY_TESTS;
+        }
 
-    private function retrieveDetectionStatus(MutantProcess $mutantProcess): DetectionStatus
-    {
-        $process = $mutantProcess->getProcess();
+        if ((bool) $this->adapter->isSyntaxError($stdout)) {
+            return DetectionStatus::SYNTAX_ERROR;
+        }
 
-        return $this->detectionStatusResolver->resolve(
-            $process->getOutput(),
-            $process->getErrorOutput(),
-            $process->getExitCode(),
-            $mutantProcess->isTimedOut(),
-        );
+        return DetectionStatus::KILLED_BY_TESTS;
     }
 }

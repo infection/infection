@@ -47,7 +47,6 @@ use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Mago\Logger\PsrMagoLogger;
-use Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory;
 use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
 use Infection\TestFramework\Mago\Mutant\MagoMutantProcessFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -62,6 +61,8 @@ use Symfony\Component\Process\PhpExecutableFinder;
 final class MagoAdapterFactory implements TestFrameworkFactory
 {
     use CannotBeInstantiated;
+
+    private const string ADAPTER_NAME = 'Mago';
 
     #[Override]
     public static function create(
@@ -94,10 +95,9 @@ final class MagoAdapterFactory implements TestFrameworkFactory
             : new SymfonyProcessFactory();
 
         $mutantProcessFactory = new MagoMutantProcessFactory(
+            self::ADAPTER_NAME,
             $processFactory,
-            new MagoEvaluationAttemptResultFactory(
-                new MagoMutantDetectionStatusResolver(),
-            ),
+            new MagoMutantDetectionStatusResolver(),
             $testFrameworkExecutable,
             $commandLineBuilder,
             $configuration->processTimeout,
@@ -105,11 +105,12 @@ final class MagoAdapterFactory implements TestFrameworkFactory
         );
 
         return new MagoAdapter(
+            self::ADAPTER_NAME,
             $mutantProcessFactory,
             $testFrameworkConfigPath,
             $testFrameworkExecutable,
             $commandLineBuilder,
-            new VersionParser('Mago'),
+            new VersionParser(self::ADAPTER_NAME),
             $staticAnalysisToolOptions,
             $shellCommandRunner,
             new InitialTestsRunner($shellCommandRunner, $testFrameworkLogger),

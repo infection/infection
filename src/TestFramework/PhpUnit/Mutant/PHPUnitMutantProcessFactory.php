@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Mutant;
 
-use Infection\Mutant\EvaluationAttemptResultFactory;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
@@ -55,8 +54,8 @@ final readonly class PHPUnitMutantProcessFactory
     private const int TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
 
     public function __construct(
+        private string $testFrameworkName,
         private ProcessFactory $processFactory,
-        private EvaluationAttemptResultFactory $evaluationAttemptResultFactory,
         private float $timeout,
         private string $testFrameworkExecutable,
         private CommandLineBuilder $commandLineBuilder,
@@ -77,7 +76,12 @@ final readonly class PHPUnitMutantProcessFactory
             timeout: $timeout,
         );
 
-        return new MutantProcess($process, $mutant, $this->evaluationAttemptResultFactory);
+        return new MutantProcess(
+            $process,
+            $mutant,
+            new PHPUnitMutantDetectionStatusResolver($testTime >= $timeout),
+            $this->testFrameworkName,
+        );
     }
 
     /**

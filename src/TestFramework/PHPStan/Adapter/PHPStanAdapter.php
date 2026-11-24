@@ -82,6 +82,7 @@ final class PHPStanAdapter implements TestFramework
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
+        private readonly string $name,
         private readonly PHPStanMutantProcessFactory $mutantProcessFactory,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
@@ -98,7 +99,7 @@ final class PHPStanAdapter implements TestFramework
     #[Override]
     public function getName(): string
     {
-        return 'PHPStan';
+        return $this->name;
     }
 
     /**
