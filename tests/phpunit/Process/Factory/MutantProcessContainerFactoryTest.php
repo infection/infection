@@ -41,6 +41,7 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
@@ -127,7 +128,12 @@ final class MutantProcessContainerFactoryTest extends TestCase
             $configuration,
         );
 
-        $mutantProcess = $factory->create($testFrameworkAdapterMock, $mutant, $testFrameworkExtraOptions);
+        $mutantProcess = $factory->create(
+            $testFrameworkAdapterMock,
+            $mutant,
+            $this->createStub(MutantProcessDetectionStatusResolver::class),
+            $testFrameworkExtraOptions,
+        );
 
         $process = $mutantProcess->getCurrent()->getProcess();
 

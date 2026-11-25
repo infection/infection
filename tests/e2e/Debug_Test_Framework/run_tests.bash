@@ -22,6 +22,6 @@ if XDEBUG_MODE=coverage php -r 'exit(extension_loaded("xdebug") ? 0 : 1);'; then
 fi
 
 XDEBUG_MODE=coverage php vendor/bin/phpunit --coverage-xml=var/coverage
-XDEBUG_MODE=coverage php -d memory_limit=-1 "$INFECTION" --coverage=var/coverage --no-progress
+XDEBUG_MODE=coverage php -d memory_limit=-1 "$INFECTION" --coverage=var/coverage --no-progress --min-msi=100
 
 php verify.php var/infection.debug.jsonl "expected/$environment.json"

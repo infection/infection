@@ -43,6 +43,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Legacy\LegacyMutantDetectionStatusResolver;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -287,7 +288,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $processFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with($adapter, $mutant, '')
+            ->with($adapter, $mutant, $this->isInstanceOf(LegacyMutantDetectionStatusResolver::class), '')
             ->willReturn($processContainer)
         ;
 
@@ -308,7 +309,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $processFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with($adapter, $mutant, '--filter FooTest')
+            ->with($adapter, $mutant, $this->isInstanceOf(LegacyMutantDetectionStatusResolver::class), '--filter FooTest')
             ->willReturn($processContainer)
         ;
 

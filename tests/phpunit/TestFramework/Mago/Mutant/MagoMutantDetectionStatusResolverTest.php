@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\Mago\Mutant;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
+use Infection\Tests\TestFramework\Mutant\DetectionStatusScenario;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -45,33 +46,61 @@ use PHPUnit\Framework\TestCase;
 final class MagoMutantDetectionStatusResolverTest extends TestCase
 {
     #[DataProvider('statusesProvider')]
-    public function test_it_resolves_the_detection_status(
-        ?int $exitCode,
-        bool $timedOut,
-        DetectionStatus $expected,
-    ): void {
+    public function test_it_resolves_the_detection_status(DetectionStatusScenario $scenario): void
+    {
         $resolver = new MagoMutantDetectionStatusResolver();
 
-        $this->assertSame(
-            $expected,
-            $resolver->resolve('', $exitCode, $timedOut),
-        );
+        $actual = $resolver->resolve($scenario->stdout, $scenario->exitCode, $scenario->timedOut);
+
+        $this->assertSame($scenario->expected, $actual);
     }
 
+    /**
+     * @return iterable<string, array{DetectionStatusScenario}>
+     */
     public static function statusesProvider(): iterable
     {
-        yield 'unknown exit code' => [null, false, DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
+        $baseScenario = DetectionStatusScenario::withTestData();
 
-        yield 'timeout takes precedence over process error' => [101, true, DetectionStatus::TIMED_OUT];
+        yield 'unknown exit code' => [
+            $baseScenario
+                ->withExitCode(null)
+                ->withExpected(DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
+        ];
 
-        yield 'timed out' => [0, true, DetectionStatus::TIMED_OUT];
+        yield 'timeout takes precedence over process error' => [
+            $baseScenario
+                ->withExitCode(101)
+                ->withTimedOut(true)
+                ->withExpected(DetectionStatus::TIMED_OUT),
+        ];
 
-        yield 'process error' => [101, false, DetectionStatus::ERROR];
+        yield 'timed out' => [
+            $baseScenario
+                ->withTimedOut(true)
+                ->withExpected(DetectionStatus::TIMED_OUT),
+        ];
 
-        yield 'escaped' => [0, false, DetectionStatus::ESCAPED];
+        yield 'process error' => [
+            $baseScenario
+                ->withExitCode(101)
+                ->withExpected(DetectionStatus::ERROR),
+        ];
 
-        yield 'killed by static analysis' => [1, false, DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
+        yield 'escaped' => [
+            $baseScenario->withExpected(DetectionStatus::ESCAPED),
+        ];
 
-        yield 'highest standard error code' => [100, false, DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
+        yield 'killed by static analysis' => [
+            $baseScenario
+                ->withExitCode(1)
+                ->withExpected(DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
+        ];
+
+        yield 'highest standard error code' => [
+            $baseScenario
+                ->withExitCode(100)
+                ->withExpected(DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
+        ];
     }
 }

@@ -56,9 +56,7 @@ final class MagoMutantDetectionStatusResolver implements MutantProcessDetectionS
             return DetectionStatus::TIMED_OUT;
         }
 
-        if ($exitCode !== null
-            && $exitCode > self::PROCESS_MIN_ERROR_CODE
-        ) {
+        if ($exitCode !== null && $exitCode > self::PROCESS_MIN_ERROR_CODE) {
             // See \Symfony\Component\Process\Process::$exitCodes
             return DetectionStatus::ERROR;
         }

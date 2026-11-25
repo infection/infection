@@ -42,27 +42,21 @@ use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolve
 use Override;
 
 /**
- * Classifies processes for the compatibility layer with the old AbstractTestFramework contract.
- *
  * @internal
  */
 final readonly class LegacyMutantDetectionStatusResolver implements MutantProcessDetectionStatusResolver
 {
     private const int PROCESS_MIN_ERROR_CODE = 100;
 
-    public function __construct(
-        private TestFrameworkAdapter $adapter,
-        private bool $timeoutExpected,
-    ) {
+    public function __construct(private TestFrameworkAdapter $adapter)
+    {
     }
 
     #[Override]
     public function resolve(string $stdout, ?int $exitCode, bool $timedOut): DetectionStatus
     {
         if ($timedOut) {
-            return $this->timeoutExpected
-                ? DetectionStatus::SKIPPED
-                : DetectionStatus::TIMED_OUT;
+            return DetectionStatus::TIMED_OUT;
         }
 
         if ($exitCode !== null

@@ -38,6 +38,8 @@ namespace Infection\TestFramework\Contracts\Mutant;
 use Infection\Mutant\DetectionStatus;
 
 /**
+ * Resolves the detection status from the outcome of a mutant process.
+ *
  * @internal
  */
 interface MutantProcessDetectionStatusResolver

@@ -385,12 +385,6 @@ parameters:
 			path: ../src/Mutant/MutantExecutionResult.php
 
 		-
-			rawMessage: Infection\Mutant\TestFrameworkMutantExecutionResultFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Mutant/TestFrameworkMutantExecutionResultFactory.php
-
-		-
 			rawMessage: Do not use magic number as a function argument. Move to constant with a suitable name.
 			count: 8
 			path: ../src/Mutator/Extensions/BCMath.php

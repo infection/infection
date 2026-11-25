@@ -49,43 +49,11 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
 {
     public function test_it_reports_a_timed_out_mutant(): void
     {
-        $resolver = new LegacyMutantDetectionStatusResolver($this->createStub(TestFrameworkAdapter::class), false);
+        $resolver = new LegacyMutantDetectionStatusResolver($this->createStub(TestFrameworkAdapter::class));
 
         $this->assertSame(
             DetectionStatus::TIMED_OUT,
             $resolver->resolve('', 0, true),
-        );
-    }
-
-    public function test_it_reports_an_expected_timeout_as_skipped(): void
-    {
-        $adapter = $this->createMock(TestFrameworkAdapter::class);
-        $adapter
-            ->expects($this->never())
-            ->method('testsPass')
-        ;
-        $resolver = new LegacyMutantDetectionStatusResolver($adapter, true);
-
-        $this->assertSame(
-            DetectionStatus::SKIPPED,
-            $resolver->resolve('', null, true),
-        );
-    }
-
-    public function test_expected_timeout_does_not_override_a_completed_evaluation(): void
-    {
-        $adapter = $this->createMock(TestFrameworkAdapter::class);
-        $adapter
-            ->expects($this->once())
-            ->method('testsPass')
-            ->with('passed')
-            ->willReturn(true)
-        ;
-        $resolver = new LegacyMutantDetectionStatusResolver($adapter, true);
-
-        $this->assertSame(
-            DetectionStatus::ESCAPED,
-            $resolver->resolve('passed', 0, false),
         );
     }
 
@@ -96,7 +64,7 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
             ->expects($this->never())
             ->method('testsPass')
         ;
-        $resolver = new LegacyMutantDetectionStatusResolver($adapter, false);
+        $resolver = new LegacyMutantDetectionStatusResolver($adapter);
 
         $this->assertSame(
             DetectionStatus::KILLED_BY_TESTS,
@@ -106,7 +74,7 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
 
     public function test_it_reports_a_process_error(): void
     {
-        $resolver = new LegacyMutantDetectionStatusResolver($this->createStub(TestFrameworkAdapter::class), false);
+        $resolver = new LegacyMutantDetectionStatusResolver($this->createStub(TestFrameworkAdapter::class));
 
         $this->assertSame(
             DetectionStatus::ERROR,
@@ -123,7 +91,7 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
             ->with('output')
             ->willReturn(true)
         ;
-        $resolver = new LegacyMutantDetectionStatusResolver($adapter, false);
+        $resolver = new LegacyMutantDetectionStatusResolver($adapter);
 
         $this->assertSame(
             DetectionStatus::ESCAPED,
@@ -144,7 +112,7 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
             ->with('output')
             ->willReturn(true)
         ;
-        $resolver = new LegacyMutantDetectionStatusResolver($adapter, false);
+        $resolver = new LegacyMutantDetectionStatusResolver($adapter);
 
         $this->assertSame(
             DetectionStatus::SYNTAX_ERROR,
@@ -168,7 +136,7 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
             ->with('output')
             ->willReturn($syntaxError)
         ;
-        $resolver = new LegacyMutantDetectionStatusResolver($adapter, false);
+        $resolver = new LegacyMutantDetectionStatusResolver($adapter);
 
         $this->assertSame(
             $expected,
@@ -178,9 +146,15 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
 
     public static function unknownExitCodeProvider(): iterable
     {
-        yield 'syntax error' => [true, DetectionStatus::SYNTAX_ERROR];
+        yield 'syntax error' => [
+            true,
+            DetectionStatus::SYNTAX_ERROR,
+        ];
 
-        yield 'other failure' => [false, DetectionStatus::KILLED_BY_TESTS];
+        yield 'other failure' => [
+            false,
+            DetectionStatus::KILLED_BY_TESTS,
+        ];
     }
 
     public function test_it_reports_a_mutant_killed_by_tests(): void
@@ -190,7 +164,7 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
             ->method('testsPass')
             ->willReturn(false)
         ;
-        $resolver = new LegacyMutantDetectionStatusResolver($adapter, false);
+        $resolver = new LegacyMutantDetectionStatusResolver($adapter);
 
         $this->assertSame(
             DetectionStatus::KILLED_BY_TESTS,

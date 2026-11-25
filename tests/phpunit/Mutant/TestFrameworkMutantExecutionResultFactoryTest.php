@@ -44,6 +44,7 @@ use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
+use Infection\TestFramework\Legacy\LegacyMutantDetectionStatusResolver;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutation\MutationBuilder;
 use PhpParser\Node\Stmt\Nop;
@@ -69,7 +70,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
     {
         $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
 
-        $this->resultFactory = new TestFrameworkMutantExecutionResultFactory($this->testFrameworkAdapterMock);
+        $this->resultFactory = new TestFrameworkMutantExecutionResultFactory(
+            new LegacyMutantDetectionStatusResolver($this->testFrameworkAdapterMock),
+        );
     }
 
     public function test_it_can_create_a_result_from_a_non_covered_mutant_process(): void

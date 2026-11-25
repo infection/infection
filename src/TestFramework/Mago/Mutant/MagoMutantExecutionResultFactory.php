@@ -64,7 +64,11 @@ final readonly class MagoMutantExecutionResultFactory implements MutantExecution
         return new MutantExecutionResult(
             $process->getCommandLine(),
             $this->retrieveProcessOutput($process),
-            $this->retrieveDetectionStatus($mutantProcess),
+            $this->detectionStatusResolver->resolve(
+                $process->getOutput(),
+                $process->getExitCode(),
+                $mutantProcess->isTimedOut(),
+            ),
             $mutant->getDiff(),
             $mutation->getHash(),
             $mutation->getMutatorClass(),
@@ -92,16 +96,5 @@ final readonly class MagoMutantExecutionResultFactory implements MutantExecution
         );
 
         return trim($process->getOutput() . "\n\n" . $process->getErrorOutput());
-    }
-
-    private function retrieveDetectionStatus(MutantProcess $mutantProcess): DetectionStatus
-    {
-        $process = $mutantProcess->getProcess();
-
-        return $this->detectionStatusResolver->resolve(
-            $process->getOutput(),
-            $process->getExitCode(),
-            $mutantProcess->isTimedOut(),
-        );
     }
 }

@@ -48,6 +48,7 @@ use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Legacy\LegacyMutantDetectionStatusResolver;
 
 /**
  * @internal
@@ -131,6 +132,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         return $this->processFactory->create(
             $this->adapter,
             $mutant,
+            new LegacyMutantDetectionStatusResolver($this->adapter),
             $this->getFilteredExtraOptionsForMutant(),
         );
     }

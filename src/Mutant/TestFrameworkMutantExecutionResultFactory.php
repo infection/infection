@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\Legacy\LegacyMutantDetectionStatusResolver;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use function sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
@@ -48,7 +47,7 @@ use Webmozart\Assert\Assert;
 final readonly class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResultFactory
 {
     public function __construct(
-        private TestFrameworkAdapter $testFrameworkAdapter,
+        private MutantProcessDetectionStatusResolver $detectionStatusResolver,
     ) {
     }
 
@@ -99,12 +98,12 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
         }
 
         $timedOut = $mutantProcess->isTimedOut();
-        $resolver = new LegacyMutantDetectionStatusResolver(
-            $this->testFrameworkAdapter,
-            $timedOut && self::isTimeoutExpected($mutantProcess),
-        );
 
-        return $resolver->resolve(
+        if ($timedOut && self::isTimeoutExpected($mutantProcess)) {
+            return DetectionStatus::SKIPPED;
+        }
+
+        return $this->detectionStatusResolver->resolve(
             $stdout,
             $mutantProcess->getProcess()->getExitCode(),
             $timedOut,

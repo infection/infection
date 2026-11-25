@@ -64,6 +64,7 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\PhpUnit\Log\PhpUnitLogger;
 use Infection\TestFramework\PhpUnit\MemoryLimiter;
 use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
+use Infection\TestFramework\PhpUnit\Mutant\PHPUnitMutantDetectionStatusResolver;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -71,6 +72,7 @@ use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -81,6 +83,8 @@ use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(PhpUnitAdapter::class)]
+#[CoversMethod(PHPUnitMutantDetectionStatusResolver::class, 'testsPass')]
+#[CoversMethod(PHPUnitMutantDetectionStatusResolver::class, 'isSyntaxError')]
 final class PhpUnitAdapterTest extends TestCase
 {
     use ExpectsThrowables;
@@ -275,6 +279,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->with(
                 $adapter,
                 $mutant,
+                $this->isInstanceOf(PHPUnitMutantDetectionStatusResolver::class),
                 '--verbose',
             )
             ->willReturn($processContainer)
