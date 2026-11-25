@@ -33,12 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\TestFramework\Legacy;
 
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\DetectionStatus;
-use Infection\TestFramework\LegacyMutantDetectionStatusResolver;
+use Infection\TestFramework\Legacy\LegacyMutantDetectionStatusResolver;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -47,23 +47,13 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(LegacyMutantDetectionStatusResolver::class)]
 final class LegacyMutantDetectionStatusResolverTest extends TestCase
 {
-    public function test_it_reports_an_uncovered_mutant(): void
-    {
-        $resolver = new LegacyMutantDetectionStatusResolver($this->createStub(TestFrameworkAdapter::class), false, false);
-
-        $this->assertSame(
-            DetectionStatus::NOT_COVERED,
-            $resolver->resolve('', '', 0, false),
-        );
-    }
-
     public function test_it_reports_a_timed_out_mutant(): void
     {
-        $resolver = new LegacyMutantDetectionStatusResolver($this->createStub(TestFrameworkAdapter::class), true, false);
+        $resolver = new LegacyMutantDetectionStatusResolver($this->createStub(TestFrameworkAdapter::class), false);
 
         $this->assertSame(
             DetectionStatus::TIMED_OUT,
-            $resolver->resolve('', '', 0, true),
+            $resolver->resolve('', 0, true),
         );
     }
 
@@ -74,11 +64,11 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
             ->expects($this->never())
             ->method('testsPass')
         ;
-        $resolver = new LegacyMutantDetectionStatusResolver($adapter, true, true);
+        $resolver = new LegacyMutantDetectionStatusResolver($adapter, true);
 
         $this->assertSame(
             DetectionStatus::SKIPPED,
-            $resolver->resolve('', '', null, true),
+            $resolver->resolve('', null, true),
         );
     }
 
@@ -91,21 +81,11 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
             ->with('passed')
             ->willReturn(true)
         ;
-        $resolver = new LegacyMutantDetectionStatusResolver($adapter, true, true);
+        $resolver = new LegacyMutantDetectionStatusResolver($adapter, true);
 
         $this->assertSame(
             DetectionStatus::ESCAPED,
-            $resolver->resolve('passed', '', 0, false),
-        );
-    }
-
-    public function test_uncovered_takes_precedence_over_timeout_and_process_error(): void
-    {
-        $resolver = new LegacyMutantDetectionStatusResolver($this->createStub(TestFrameworkAdapter::class), false, true);
-
-        $this->assertSame(
-            DetectionStatus::NOT_COVERED,
-            $resolver->resolve('', '', 101, true),
+            $resolver->resolve('passed', 0, false),
         );
     }
 
@@ -116,21 +96,21 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
             ->expects($this->never())
             ->method('testsPass')
         ;
-        $resolver = new LegacyMutantDetectionStatusResolver($adapter, true, false);
+        $resolver = new LegacyMutantDetectionStatusResolver($adapter, false);
 
         $this->assertSame(
             DetectionStatus::KILLED_BY_TESTS,
-            $resolver->resolve('passed', '', 100, false),
+            $resolver->resolve('passed', 100, false),
         );
     }
 
     public function test_it_reports_a_process_error(): void
     {
-        $resolver = new LegacyMutantDetectionStatusResolver($this->createStub(TestFrameworkAdapter::class), true, false);
+        $resolver = new LegacyMutantDetectionStatusResolver($this->createStub(TestFrameworkAdapter::class), false);
 
         $this->assertSame(
             DetectionStatus::ERROR,
-            $resolver->resolve('', '', 101, false),
+            $resolver->resolve('', 101, false),
         );
     }
 
@@ -143,11 +123,11 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
             ->with('output')
             ->willReturn(true)
         ;
-        $resolver = new LegacyMutantDetectionStatusResolver($adapter, true, false);
+        $resolver = new LegacyMutantDetectionStatusResolver($adapter, false);
 
         $this->assertSame(
             DetectionStatus::ESCAPED,
-            $resolver->resolve('output', '', 0, false),
+            $resolver->resolve('output', 0, false),
         );
     }
 
@@ -164,11 +144,11 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
             ->with('output')
             ->willReturn(true)
         ;
-        $resolver = new LegacyMutantDetectionStatusResolver($adapter, true, false);
+        $resolver = new LegacyMutantDetectionStatusResolver($adapter, false);
 
         $this->assertSame(
             DetectionStatus::SYNTAX_ERROR,
-            $resolver->resolve('output', '', 1, false),
+            $resolver->resolve('output', 1, false),
         );
     }
 
@@ -188,11 +168,11 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
             ->with('output')
             ->willReturn($syntaxError)
         ;
-        $resolver = new LegacyMutantDetectionStatusResolver($adapter, true, false);
+        $resolver = new LegacyMutantDetectionStatusResolver($adapter, false);
 
         $this->assertSame(
             $expected,
-            $resolver->resolve('output', 'stderr', null, false),
+            $resolver->resolve('output', null, false),
         );
     }
 
@@ -210,11 +190,11 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
             ->method('testsPass')
             ->willReturn(false)
         ;
-        $resolver = new LegacyMutantDetectionStatusResolver($adapter, true, false);
+        $resolver = new LegacyMutantDetectionStatusResolver($adapter, false);
 
         $this->assertSame(
             DetectionStatus::KILLED_BY_TESTS,
-            $resolver->resolve('output', '', 1, false),
+            $resolver->resolve('output', 1, false),
         );
     }
 

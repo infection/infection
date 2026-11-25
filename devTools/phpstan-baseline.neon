@@ -679,6 +679,12 @@ parameters:
 			path: ../src/TestFramework/Contracts/InitialRunResults.php
 
 		-
+			rawMessage: Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver should not depend on Infection\Mutant\DetectionStatus
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/Mutant/MutantProcessDetectionStatusResolver.php
+
+		-
 			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\Mutant
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1
@@ -805,6 +811,12 @@ parameters:
 			path: ../src/TestFramework/Factory.php
 
 		-
+			rawMessage: Infection\TestFramework\Legacy\LegacyMutantDetectionStatusResolver should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/TestFramework/Legacy/LegacyMutantDetectionStatusResolver.php
+
+		-
 			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\Mutant\MutantExecutionResultFactory
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -835,9 +847,15 @@ parameters:
 			path: ../src/TestFramework/Mago/Adapter/MagoAdapterFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\DetectionStatus
+			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver should not depend on Infection\Mutant\DetectionStatus
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 5
+			path: ../src/TestFramework/Mago/Mutant/MagoMutantDetectionStatusResolver.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\DetectionStatus
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
 			path: ../src/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactory.php
 
 		-

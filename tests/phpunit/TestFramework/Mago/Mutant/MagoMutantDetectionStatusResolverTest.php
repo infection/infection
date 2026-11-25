@@ -54,7 +54,7 @@ final class MagoMutantDetectionStatusResolverTest extends TestCase
 
         $this->assertSame(
             $expected,
-            $resolver->resolve('', '', $exitCode, $timedOut),
+            $resolver->resolve('', $exitCode, $timedOut),
         );
     }
 

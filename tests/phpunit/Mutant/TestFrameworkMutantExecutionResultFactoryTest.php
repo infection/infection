@@ -89,6 +89,10 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
             ->method('getOutput')
             ->willReturn($processOutput = 'Passed!')
         ;
+        $processMock
+            ->expects($this->never())
+            ->method('getExitCode')
+        ;
 
         $this->testFrameworkAdapterMock
             ->expects($this->never())
@@ -133,6 +137,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                 ->build(),
             $this->resultFactory,
         );
+        $mutantProcess->markAsTimedOut();
 
         $this->assertResultStateIs(
             $this->resultFactory->createFromProcess($mutantProcess),
@@ -391,28 +396,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
         );
     }
 
-    public function test_it_can_crate_a_result_from_an_escaped_mutant_process(): void
+    public function test_it_reports_a_dry_run_mutant_as_escaped(): void
     {
-        $processMock = $this->createMock(Process::class);
-        $processMock
-            ->method('getCommandLine')
-            ->willReturn(
-                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-            )
-        ;
-        $processMock
-            ->method('isTerminated')
-            ->willReturn(true)
-        ;
-        $processMock
-            ->method('getOutput')
-            ->willReturn(DryRunProcess::PASSING_TEST_OUTPUT)
-        ;
-        $processMock
-            ->expects($this->once())
-            ->method('getExitCode')
-            ->willReturn(0)
-        ;
+        $process = new Process(['bin/phpunit', '--configuration', 'infection-tmp-phpunit.xml']);
 
         $this->testFrameworkAdapterMock
             ->expects($this->once())
@@ -422,7 +408,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
         ;
 
         $mutantProcess = new MutantProcess(
-            $processMock,
+            DryRunProcess::fromProcess($process),
             MutantBuilder::withMinimalTestData()
                 ->withMutantFilePath('/path/to/mutant')
                 ->withMutation(new Mutation(
@@ -468,7 +454,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
 
         $this->assertResultStateIs(
             $this->resultFactory->createFromProcess($mutantProcess),
-            $processCommandLine,
+            $process->getCommandLine(),
             DryRunProcess::PASSING_TEST_OUTPUT,
             DetectionStatus::ESCAPED,
             $mutantDiff,

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Common;
+namespace Infection\TestFramework\Contracts\Mutant;
 
 use Infection\Mutant\DetectionStatus;
 
@@ -44,7 +44,6 @@ interface MutantProcessDetectionStatusResolver
 {
     public function resolve(
         string $stdout,
-        string $stderr,
         ?int $exitCode,
         bool $timedOut,
     ): DetectionStatus;

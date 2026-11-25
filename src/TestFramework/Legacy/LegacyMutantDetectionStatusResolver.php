@@ -33,12 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\TestFramework\Legacy;
 
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\DetectionStatus;
-use Infection\TestFramework\Common\MutantProcessDetectionStatusResolver;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use Override;
 
 /**
@@ -52,18 +52,13 @@ final readonly class LegacyMutantDetectionStatusResolver implements MutantProces
 
     public function __construct(
         private TestFrameworkAdapter $adapter,
-        private bool $hasTests,
         private bool $timeoutExpected,
     ) {
     }
 
     #[Override]
-    public function resolve(string $stdout, string $stderr, ?int $exitCode, bool $timedOut): DetectionStatus
+    public function resolve(string $stdout, ?int $exitCode, bool $timedOut): DetectionStatus
     {
-        if (!$this->hasTests) {
-            return DetectionStatus::NOT_COVERED;
-        }
-
         if ($timedOut) {
             return $this->timeoutExpected
                 ? DetectionStatus::SKIPPED

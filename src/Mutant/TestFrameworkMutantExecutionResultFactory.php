@@ -37,7 +37,7 @@ namespace Infection\Mutant;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\LegacyMutantDetectionStatusResolver;
+use Infection\TestFramework\Legacy\LegacyMutantDetectionStatusResolver;
 use function sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
@@ -57,11 +57,12 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
         $process = $mutantProcess->getProcess();
         $mutant = $mutantProcess->getMutant();
         $mutation = $mutant->getMutation();
+        $output = $this->retrieveProcessOutput($process);
 
         return new MutantExecutionResult(
             $process->getCommandLine(),
-            $this->retrieveProcessOutput($process),
-            $this->retrieveDetectionStatus($mutantProcess),
+            $output,
+            $this->retrieveDetectionStatus($mutantProcess, $output),
             $mutant->getDiff(),
             $mutation->getHash(),
             $mutation->getMutatorClass(),
@@ -91,20 +92,22 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
         return $process->getOutput();
     }
 
-    private function retrieveDetectionStatus(MutantProcess $mutantProcess): DetectionStatus
+    private function retrieveDetectionStatus(MutantProcess $mutantProcess, string $stdout): DetectionStatus
     {
-        $process = $mutantProcess->getProcess();
+        if (!$mutantProcess->getMutant()->isCoveredByTest()) {
+            return DetectionStatus::NOT_COVERED;
+        }
+
+        $timedOut = $mutantProcess->isTimedOut();
         $resolver = new LegacyMutantDetectionStatusResolver(
             $this->testFrameworkAdapter,
-            $mutantProcess->getMutant()->isCoveredByTest(),
-            $mutantProcess->isTimedOut() && self::isTimeoutExpected($mutantProcess),
+            $timedOut && self::isTimeoutExpected($mutantProcess),
         );
 
         return $resolver->resolve(
-            $process->getOutput(),
-            $process->getErrorOutput(),
-            $process->getExitCode(),
-            $mutantProcess->isTimedOut(),
+            $stdout,
+            $mutantProcess->getProcess()->getExitCode(),
+            $timedOut,
         );
     }
 

@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PHPStan\Mutant;
 
 use Infection\Mutant\DetectionStatus;
-use Infection\TestFramework\Common\MutantProcessDetectionStatusResolver;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use Override;
 
 /**
@@ -49,7 +49,6 @@ final class PHPStanMutantDetectionStatusResolver implements MutantProcessDetecti
     #[Override]
     public function resolve(
         string $stdout,
-        string $stderr,
         ?int $exitCode,
         bool $timedOut,
     ): DetectionStatus {

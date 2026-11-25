@@ -39,7 +39,7 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\Common\MutantProcessDetectionStatusResolver;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use function sprintf;
 use Symfony\Component\Process\Process;
 use function trim;
@@ -100,7 +100,6 @@ final readonly class MagoMutantExecutionResultFactory implements MutantExecution
 
         return $this->detectionStatusResolver->resolve(
             $process->getOutput(),
-            $process->getErrorOutput(),
             $process->getExitCode(),
             $mutantProcess->isTimedOut(),
         );
