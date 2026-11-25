@@ -1,0 +1,6 @@
+interface:
+    display_name: "Docker Sandbox"
+    short_description: "Maintain Infection's Docker Sandbox image and sbx template."
+    default_prompt: "Use $docker-sandbox to update Infection's sbx image or template."
+policy:
+    allow_implicit_invocation: true
