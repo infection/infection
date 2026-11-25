@@ -35,9 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat;
 
-use Infection\Mutant\DetectionStatus;
 use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
-use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 
@@ -105,12 +103,11 @@ final class AdapterExtractionBoundariesTest
                 InfectionSelector::phpUnitAdapterCandidate(),
                 InfectionSelector::testFrameworkContractCandidate(),
                 InfectionSelector::adapterCommonCandidate(),
-                Selector::classname(DetectionStatus::class),
                 // Note that this is only true because adapters are not available
                 // here, otherwise we would need to be stricter.
                 InfectionSelector::nonSourceCode(),
             )
-            ->because('A future PHPUnit package should stay within its package boundary: the adapter itself, the test framework contracts and their detection status type, shared adapter utilities, infection/abstract-testframework-adapter, and external packages.')
+            ->because('A future PHPUnit package should stay within its package boundary: the adapter itself, the test framework contracts, shared adapter utilities, infection/abstract-testframework-adapter, and external packages.')
         ;
     }
 

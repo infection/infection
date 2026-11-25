@@ -1063,6 +1063,12 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
 
 		-
+			rawMessage: Infection\TestFramework\PhpUnit\Mutant\PHPUnitMutantDetectionStatusResolver should not depend on Infection\Mutant\DetectionStatus
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 6
+			path: ../src/TestFramework/PhpUnit/Mutant/PHPUnitMutantDetectionStatusResolver.php
+
+		-
 			rawMessage: Infection\TestFramework\TestFrameworkTypes should not depend on Infection\AbstractTestFramework\TestFrameworkAdapterFactory
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
 			count: 1
