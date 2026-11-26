@@ -37,6 +37,7 @@ namespace Infection\StaticAnalysis;
 
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 
 /**
  * @internal
@@ -57,5 +58,8 @@ interface StaticAnalysisToolAdapter
      */
     public function getVersion(): string;
 
+    /**
+     * @throws RequirementChecksFailed
+     */
     public function assertMinimumVersionSatisfied(): void;
 }

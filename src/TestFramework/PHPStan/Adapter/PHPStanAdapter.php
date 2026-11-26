@@ -42,12 +42,12 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\Throwable\UnsupportedVersion;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\PHPStan\Logger\PHPStanLogger;
 use Infection\TestFramework\PHPStan\Process\PHPStanMutantProcessFactory;
-use RuntimeException;
 use function sprintf;
 use function str_starts_with;
 use Symfony\Component\Filesystem\Filesystem;
@@ -152,7 +152,14 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
 
     public function assertMinimumVersionSatisfied(): void
     {
-        $version = $this->getVersion();
+        try {
+            $version = $this->getVersion();
+        } catch (InvalidVersion $exception) {
+            throw new UnsupportedVersion(
+                $exception->getMessage(),
+                previous: $exception,
+            );
+        }
 
         if ($version === TestFramework::UNKNOWN_VERSION) {
             return;
@@ -190,7 +197,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
             return;
         }
 
-        throw new RuntimeException(sprintf(
+        throw new UnsupportedVersion(sprintf(
             'Infection requires PHPStan version >=1.12.27 or >=2.1.17, but "%s" is installed.',
             $version,
         ));

@@ -3103,30 +3103,6 @@ message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceF
 count = 1
 
 [[issues]]
-file = "src/TestFramework/Mago/Adapter/MagoAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\TestFramework\Mago\Adapter\MagoAdapter::assertMinimumVersionSatisfied`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/Mago/Adapter/MagoAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\TestFramework\Mago\Adapter\MagoAdapter::assertMinimumVersionSatisfied`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PHPStan/Adapter/PHPStanAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter::assertMinimumVersionSatisfied`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PHPStan/Adapter/PHPStanAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter::assertMinimumVersionSatisfied`.'
-count = 1
-
-[[issues]]
 file = "src/TestFramework/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php"
 code = "possibly-null-operand"
 message = "Left operand in `>` comparison might be `null` (type `int|null`)."
