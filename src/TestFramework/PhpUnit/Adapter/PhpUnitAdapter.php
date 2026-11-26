@@ -120,7 +120,6 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
 
     /**
      * @throws InitialTestsFailedContract
-     * @throws SymfonyProcessRuntimeException When the initial command cannot complete.
      * @throws InvalidVersion
      * @throws InvalidPhpUnitConfiguration
      */

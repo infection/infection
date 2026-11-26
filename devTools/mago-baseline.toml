@@ -2809,6 +2809,12 @@ message = 'Potentially unhandled exception `Infection\FileSystem\Finder\Exceptio
 count = 1
 
 [[issues]]
+file = "src/TestFramework/Common/InitialTestsRunner.php"
+code = "unused-parameter"
+message = "Parameter `$commandLine` is never used."
+count = 1
+
+[[issues]]
 file = "src/TestFramework/Common/VersionParser.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\TestFramework\Common\VersionParser::parse`: expected `string`, but found `null|string`.'

@@ -51,6 +51,7 @@ use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Logger\EventDispatchingTestFrameworkLogger;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -58,12 +59,15 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
 
 #[CoversClass(InitialTestsRunner::class)]
 final class InitialTestsRunnerTest extends TestCase
 {
+    use ExpectsThrowables;
+
     private ShellCommandRunner&MockObject $shellCommandRunner;
 
     private EventDispatcherCollector $eventDispatcher;
@@ -205,6 +209,33 @@ final class InitialTestsRunnerTest extends TestCase
             $command,
             testFrameworkType: $testFrameworkType,
             buildFailureRecommendations: $getFailureRecommendations,
+        );
+    }
+
+    public function test_it_reports_process_errors_as_initial_test_failures(): void
+    {
+        $command = ['phpunit'];
+        $failure = new RuntimeException('The process could not be started.', 17);
+        $this->testFramework->expects($this->once())->method('getName')->willReturn('PHPUnit');
+        $this->testFramework->expects($this->once())->method('getVersion')->willReturn('6.5.4');
+        $this->shellCommandRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with($command, $this->isInstanceOf(Closure::class), null, [], null, null, null, false)
+            ->willThrowException($failure)
+        ;
+
+        $exception = $this->expectToThrow(
+            fn () => $this->runner->run($this->testFramework, $command),
+        );
+
+        $this->assertInstanceOf(InitialTestsFailed::class, $exception);
+        $this->assertSame('The process could not be started.', $exception->getMessage());
+        $this->assertSame(17, $exception->getCode());
+        $this->assertSame($failure, $exception->getPrevious());
+        $this->assertEquals(
+            [new InitialTestSuiteWasStarted('PHPUnit', '6.5.4')],
+            $this->eventDispatcher->getEvents(),
         );
     }
 
