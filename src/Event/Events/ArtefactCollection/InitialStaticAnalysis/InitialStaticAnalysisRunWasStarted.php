@@ -40,4 +40,10 @@ namespace Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis;
  */
 final readonly class InitialStaticAnalysisRunWasStarted
 {
+    public function __construct(
+        public string $commandLine,
+        public string $testFrameworkName,
+        public string $testFrameworkVersion,
+    ) {
+    }
 }

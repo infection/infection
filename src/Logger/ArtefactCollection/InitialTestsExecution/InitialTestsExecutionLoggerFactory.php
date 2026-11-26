@@ -37,7 +37,6 @@ namespace Infection\Logger\ArtefactCollection\InitialTestsExecution;
 
 use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
 use Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger;
-use Infection\TestFramework\Contracts\TestFramework;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -47,7 +46,6 @@ final readonly class InitialTestsExecutionLoggerFactory
 {
     public function __construct(
         private bool $skipProgressBar,
-        private TestFramework $testFramework,
         private bool $debug,
         private OutputInterface $output,
     ) {
@@ -56,14 +54,7 @@ final readonly class InitialTestsExecutionLoggerFactory
     public function create(): InitialTestsExecutionLogger
     {
         return $this->skipProgressBar
-            ? new ConsoleNoProgressLogger(
-                $this->testFramework,
-                $this->output,
-            )
-            : new ConsoleProgressBarLogger(
-                $this->output,
-                $this->testFramework,
-                $this->debug,
-            );
+            ? new ConsoleNoProgressLogger($this->output)
+            : new ConsoleProgressBarLogger($this->output, $this->debug);
     }
 }

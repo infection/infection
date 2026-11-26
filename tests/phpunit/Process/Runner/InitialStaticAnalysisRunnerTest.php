@@ -46,7 +46,9 @@ use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -76,9 +78,23 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
         );
     }
 
-    public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(): void
+    #[DataProvider('versionProvider')]
+    public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(?string $version, string $expectedVersion): void
     {
-        $command = ['phpstan', 'analyse'];
+        $this->staticAnalysisToolAdapter
+            ->method('getName')
+            ->willReturn('PHPStan')
+        ;
+        $versionExpectation = $this->staticAnalysisToolAdapter->method('getVersion');
+
+        if ($version === null) {
+            $versionExpectation->willThrowException(new InvalidArgumentException('Invalid version output.'));
+        } else {
+            $versionExpectation->willReturn($version);
+        }
+
+        $command = ['phpstan', 'analyse', '--configuration=some config.neon'];
+        $commandLine = "'phpstan' 'analyse' '--configuration=some config.neon'";
 
         $this->staticAnalysisToolAdapter
             ->expects($this->once())
@@ -90,11 +106,16 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             ->expects($this->once())
             ->method('run')
             ->with($command, $this->isInstanceOf(Closure::class), null, [], null, null)
-            ->willReturnCallback(static function (array $_command, Closure $callback): CompletedProcess {
+            ->willReturnCallback(function (array $_command, Closure $callback) use ($command, $commandLine, $expectedVersion): CompletedProcess {
+                $this->assertEquals(
+                    [new InitialStaticAnalysisRunWasStarted($commandLine, 'PHPStan', $expectedVersion)],
+                    $this->eventDispatcher->getEvents(),
+                );
+
                 $callback();
 
                 return CompletedProcessBuilder::withMinimalTestData()
-                    ->withCommand(['phpstan', 'analyse'])
+                    ->withCommand($command)
                     ->withStdout('pingpong')
                     ->build()
                 ;
@@ -105,7 +126,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
         $this->assertEquals(
             [
-                new InitialStaticAnalysisRunWasStarted(),
+                new InitialStaticAnalysisRunWasStarted($commandLine, 'PHPStan', $expectedVersion),
                 new InitialStaticAnalysisSubStepWasCompleted(),
                 new InitialStaticAnalysisRunWasFinished('pingpong'),
             ],
@@ -123,7 +144,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             ->willReturn($command)
         ;
         $this->staticAnalysisToolAdapter
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getName')
             ->willReturn('phpstan')
         ;
@@ -157,5 +178,12 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
         );
 
         $this->runner->run();
+    }
+
+    public static function versionProvider(): iterable
+    {
+        yield 'known version' => ['2.1.0', '2.1.0'];
+
+        yield 'unknown version' => [null, 'unknown'];
     }
 }
