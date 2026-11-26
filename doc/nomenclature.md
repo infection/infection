@@ -201,24 +201,8 @@ The phase encompassing [mutant materialisation][mutant-materialisation] and [mut
 
 ### Mutant Evaluation
 
-The execution of tests and optional static analysis against a mutant, and recording of their results.
-A completed `MutantProcess` retains its framework name, subprocess details, and
-detection status. It resolves that status once using its framework's
-`MutantProcessDetectionStatusResolver`. A framework that evaluates in memory can
-return a `DirectEvaluationResult` with its status and output.
+The execution of tests against the mutant process(es) and recording of the outcome.
 
-A `MutantProcessContainer` creates evaluations lazily for one mutant. It finishes
-any nested container before moving on. It advances to the next configured evaluator
-only when the completed evaluation returns `ESCAPED`.
-
-The container builds the final `MutantExecutionResult` with the last status
-and the completed attempts in execution order. Its history holds each
-`MutantProcess` or direct result. Synthetic results for ignored, skipped, and
-uncovered mutants have an empty history. Direct results consume no process
-worker slot.
-
-In a dry run, the parallel runner starts processes that complete without
-launching a subprocess. These attempts have zero process runtime.
 
 ### Mutant Materialisation
 

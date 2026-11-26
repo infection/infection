@@ -118,6 +118,8 @@ final class MutantProcessTest extends TestCase
         $process->start();
         $mutantProcess->markAsFinished();
 
+        $this->assertSame($process, $mutantProcess->getProcess());
+        $this->assertGreaterThan(0.0, $mutantProcess->getFinishedAt());
         $this->assertSame(0.0, $mutantProcess->getRuntime());
     }
 

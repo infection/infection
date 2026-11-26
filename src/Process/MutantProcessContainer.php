@@ -43,9 +43,6 @@ use Infection\Mutant\MutantExecutionResult;
 use Webmozart\Assert\Assert;
 
 /**
- * Coordinates lazy evaluators and retains completed processes and direct results in order.
- * Nested containers retain their own lifecycle and contribute their complete history.
- *
  * @phpstan-type MutantProcessFactory = Closure(): (MutantProcess|DirectEvaluationResult|self)
  *
  * @internal
