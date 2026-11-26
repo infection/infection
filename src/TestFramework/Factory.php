@@ -60,7 +60,6 @@ use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
 use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapterFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
-use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
 use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
 use InvalidArgumentException;
 use function is_a;
@@ -75,9 +74,6 @@ use Webmozart\Assert\Assert;
  */
 final readonly class Factory
 {
-    // Both CLI options use `debug`, but they select different adapters.
-    public const string DEBUG_STATIC_ANALYSIS = 'debug-static-analysis';
-
     private const string DEBUG_RUNTIME_SCRIPT = __DIR__ . '/../../resources/debug-runtime.php';
 
     /**
@@ -136,17 +132,7 @@ final readonly class Factory
             );
         }
 
-        if ($adapterName === self::DEBUG_STATIC_ANALYSIS) {
-            return new DebugStaticAnalysisAdapter(
-                self::DEBUG_RUNTIME_SCRIPT,
-                $this->infectionConfig->debugTestFrameworkLogFile,
-                $this->infectionConfig->processTimeout,
-                new DebugCommandLine(new PhpExecutableFinder()),
-                new InitialTestsRunner($this->shellCommandRunner, $this->testFrameworkLogger),
-            );
-        }
-
-        $availableTestFrameworks = [TestFrameworkTypes::DEBUG, self::DEBUG_STATIC_ANALYSIS];
+        $availableTestFrameworks = [TestFrameworkTypes::DEBUG];
 
         $installedExtensions = array_merge(
             [

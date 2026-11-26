@@ -1761,15 +1761,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php
 
 		-
-			rawMessage: '''
-				Call to deprecated method hasJUnitReport() of class Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter:
-				This is only for making the migration easier, to be removed.
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: ../tests/phpunit/Testing/TestFramework/Debug/DebugStaticAnalysisAdapterTest.php
-
-		-
 			rawMessage: Infection\Tests\TestingUtility\Console\Command\TestOptionCommand should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1

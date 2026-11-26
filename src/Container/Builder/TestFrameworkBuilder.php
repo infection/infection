@@ -37,7 +37,6 @@ namespace Infection\Container\Builder;
 
 use DIContainer\Builder;
 use Infection\Configuration\Configuration;
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Factory;
@@ -67,14 +66,10 @@ final readonly class TestFrameworkBuilder implements Builder
             return $testFramework;
         }
 
-        $staticAnalysisAdapter = $staticAnalysisTool === StaticAnalysisToolTypes::DEBUG
-            ? Factory::DEBUG_STATIC_ANALYSIS
-            : $staticAnalysisTool;
-
         return new CombinedTestFramework(
             $testFramework,
             $this->testFrameworkFactory->create(
-                $staticAnalysisAdapter,
+                $staticAnalysisTool,
                 true,
             ),
         );

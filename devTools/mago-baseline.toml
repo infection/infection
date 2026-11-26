@@ -3379,18 +3379,6 @@ message = 'Invalid return type for function `Infection\Testing\TestFramework\Deb
 count = 1
 
 [[issues]]
-file = "src/Testing/TestFramework/Debug/DebugStaticAnalysisAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Finder\Exception\FinderException` in `Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter::getInitialRunCommandLine`.'
-count = 1
-
-[[issues]]
-file = "src/Testing/TestFramework/Debug/DebugStaticAnalysisMutantProcessFactory.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Finder\Exception\FinderException` in `Infection\Testing\TestFramework\Debug\DebugStaticAnalysisMutantProcessFactory::create`.'
-count = 1
-
-[[issues]]
 file = "src/Testing/TestFramework/Debug/DebugTestFrameworkAdapter.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Finder\Exception\FinderException` in `Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter::getInitialTestRunCommandLine`.'
