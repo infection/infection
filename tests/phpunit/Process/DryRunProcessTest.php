@@ -51,6 +51,7 @@ final class DryRunProcessTest extends TestCase
         $this->assertTrue($dryRunProcess->isTerminated());
         $this->assertTrue($dryRunProcess->isStarted());
         $this->assertSame(DryRunProcess::PASSING_TEST_OUTPUT, $dryRunProcess->getOutput());
+        $this->assertSame('', $dryRunProcess->getErrorOutput());
         $this->assertSame(0.0, $dryRunProcess->getStartTime());
         $this->assertSame(0, $dryRunProcess->getExitCode());
         $this->assertSame(Process::STATUS_TERMINATED, $dryRunProcess->getStatus());
