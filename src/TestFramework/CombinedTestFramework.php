@@ -37,7 +37,6 @@ namespace Infection\TestFramework;
 
 use BadMethodCallException;
 use Infection\Mutant\Mutant;
-use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -89,7 +88,7 @@ final readonly class CombinedTestFramework implements TestFramework
 
         // Defer the follow-up framework setup until the preceding evaluation has escaped.
         return $evaluation->append(
-            static fn (): MutantProcess => $followUpTestFramework->test($mutant)->getCurrent(),
+            static fn (): MutantProcessContainer => $followUpTestFramework->test($mutant),
         );
     }
 
