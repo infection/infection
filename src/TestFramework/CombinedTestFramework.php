@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use BadMethodCallException;
-use Infection\Mutant\DirectEvaluationResult;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -81,13 +80,13 @@ final readonly class CombinedTestFramework implements TestFramework
     {
         $evaluation = MutantProcessContainer::from(
             $mutant,
-            fn (): MutantProcessContainer|DirectEvaluationResult => $this->firstTestFramework->test($mutant),
+            fn (): MutantProcessContainer => $this->firstTestFramework->test($mutant),
         );
         $followUpTestFramework = $this->followUpTestFramework;
 
         if ($followUpTestFramework !== null) {
             $evaluation->append(
-                static fn (): MutantProcessContainer|DirectEvaluationResult => $followUpTestFramework->test($mutant),
+                static fn (): MutantProcessContainer => $followUpTestFramework->test($mutant),
             );
         }
 

@@ -58,7 +58,7 @@ class MutantExecutionResult
      * @param Deferred<string> $mutantDiff
      * @param Deferred<string> $mutatedCode
      * @param TestLocation[] $tests
-     * @param list<MutantProcess|DirectEvaluationResult> $evaluationHistory
+     * @param list<MutantProcess> $evaluationHistory
      */
     public function __construct(
         private readonly string $processCommandLine,
@@ -87,19 +87,16 @@ class MutantExecutionResult
     /**
      * The status and process details describe the last completed evaluation.
      *
-     * @param non-empty-list<MutantProcess|DirectEvaluationResult> $evaluationHistory
+     * @param non-empty-list<MutantProcess> $evaluationHistory
      */
     public static function createFromEvaluation(Mutant $mutant, DetectionStatus $detectionStatus, array $evaluationHistory): self
     {
         $mutation = $mutant->getMutation();
-        $lastAttempt = $evaluationHistory[array_key_last($evaluationHistory)];
-        $lastProcess = $lastAttempt instanceof MutantProcess ? $lastAttempt : null;
+        $lastProcess = $evaluationHistory[array_key_last($evaluationHistory)];
 
         return new self(
-            $lastProcess?->getProcess()->getCommandLine() ?? '',
-            $lastAttempt instanceof MutantProcess
-                ? $lastAttempt->getResultOutput()
-                : $lastAttempt->output,
+            $lastProcess->getProcess()->getCommandLine(),
+            $lastProcess->getResultOutput(),
             $detectionStatus,
             $mutant->getDiff(),
             $mutation->getHash(),
@@ -113,7 +110,7 @@ class MutantExecutionResult
             $mutant->getPrettyPrintedOriginalCode(),
             $mutant->getMutatedCode(),
             $mutant->getTests(),
-            $lastProcess?->getRuntime() ?? 0.0,
+            $lastProcess->getRuntime(),
             $evaluationHistory,
         );
     }
@@ -217,7 +214,7 @@ class MutantExecutionResult
     }
 
     /**
-     * @return list<MutantProcess|DirectEvaluationResult>
+     * @return list<MutantProcess>
      */
     public function getEvaluationHistory(): array
     {

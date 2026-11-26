@@ -201,7 +201,8 @@ The phase encompassing [mutant materialisation][mutant-materialisation] and [mut
 
 ### Mutant Evaluation
 
-The execution of tests against the mutant process(es) and recording of the outcome.
+The execution of tests and optional static analysis against a mutant, and the
+recording of the outcome.
 
 
 ### Mutant Materialisation

@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Contracts;
 
 use Infection\AbstractTestFramework\InvalidVersion;
-use Infection\Mutant\DirectEvaluationResult;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
@@ -83,11 +82,9 @@ interface TestFramework
     public function executeInitialRun(): InitialRunResults;
 
     /**
-     * Supplies a complete evaluation pipe or an immutable result from direct evaluation.
-     * A returned pipe must be cold; the runner executes its processes on demand.
-     * Calling test() again must perform a fresh evaluation, including for direct results.
+     * Supplies a cold evaluation container. The runner executes its processes on demand.
      */
-    public function test(Mutant $mutant): MutantProcessContainer|DirectEvaluationResult;
+    public function test(Mutant $mutant): MutantProcessContainer;
 
     /**
      * @deprecated This is only for making the migration easier, to be removed.

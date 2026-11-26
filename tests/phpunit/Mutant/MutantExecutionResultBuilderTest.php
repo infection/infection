@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\DirectEvaluationResult;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Process\MutantProcess;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -56,25 +55,23 @@ final class MutantExecutionResultBuilderTest extends TestCase
         $this->assertSame($result->getEvaluationHistory(), $actual->getEvaluationHistory());
     }
 
+    public function test_it_copies_the_evaluation_history(): void
+    {
+        $history = [$this->createStub(MutantProcess::class)];
+        $result = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withEvaluationHistory($history)
+            ->build()
+        ;
+
+        $actual = MutantExecutionResultBuilder::from($result)->build();
+
+        $this->assertSame($history, $actual->getEvaluationHistory());
+    }
+
     public static function executionResultProvider(): iterable
     {
         yield 'minimal execution result' => [
             MutantExecutionResultBuilder::withMinimalTestData()->build(),
-        ];
-
-        yield 'execution history' => [
-            MutantExecutionResultBuilder::withMinimalTestData()->withEvaluationHistory([
-                new DirectEvaluationResult(
-                    'PHPUnit',
-                    DetectionStatus::ESCAPED,
-                    'test output',
-                ),
-                new DirectEvaluationResult(
-                    'PHPStan',
-                    DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
-                    'analysis output',
-                ),
-            ])->build(),
         ];
 
         yield 'complete execution result' => [

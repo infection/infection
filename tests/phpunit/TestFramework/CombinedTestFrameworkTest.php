@@ -38,7 +38,6 @@ namespace Infection\Tests\TestFramework;
 use BadMethodCallException;
 use Closure;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\DirectEvaluationResult;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\CombinedTestFramework;
@@ -172,74 +171,22 @@ final class CombinedTestFrameworkTest extends TestCase
         ];
     }
 
-    #[DataProvider('evaluationStatusProvider')]
-    public function test_it_composes_direct_results_using_the_same_continuation_rule(DetectionStatus $status, bool $hasNext): void
-    {
-        $mutant = MutantBuilder::withCompleteTestData()->build();
-        $first = new DirectEvaluationResult('First evaluator', $status, 'First output');
-        $last = new DirectEvaluationResult('Second evaluator', DetectionStatus::KILLED_BY_STATIC_ANALYSIS, 'Second output');
-        $firstTestFramework = $this->createStub(TestFramework::class);
-        $firstTestFramework
-            ->method('test')
-            ->willReturn($first)
-        ;
-        $followUpTestFramework = $this->createMock(TestFramework::class);
-        $followUpTestFramework
-            ->expects(
-                $hasNext
-                    ? $this->once()
-                    : $this->never(),
-            )
-            ->method('test')
-            ->with($this->identicalTo($mutant))
-            ->willReturn($last)
-        ;
-        $framework = new CombinedTestFramework($firstTestFramework, $followUpTestFramework);
-
-        $evaluation = $framework->test($mutant);
-
-        $this->assertInstanceOf(MutantProcessContainer::class, $evaluation);
-        $this->assertSame($first, $evaluation->getCurrent());
-        $this->assertSame($hasNext, $evaluation->hasNext());
-
-        if ($hasNext) {
-            $this->assertSame($last, $evaluation->createNext());
-            $this->assertSame([$first, $last], $evaluation->getMutantExecutionResult()->getEvaluationHistory());
-
-            return;
-        }
-
-        $this->assertSame([$first], $evaluation->getMutantExecutionResult()->getEvaluationHistory());
-    }
-
-    public function test_it_finalizes_a_direct_result_when_no_other_evaluator_is_configured(): void
-    {
-        $mutant = MutantBuilder::withCompleteTestData()->build();
-        $result = new DirectEvaluationResult('Evaluator', DetectionStatus::ESCAPED, '');
-        $firstTestFramework = $this->createStub(TestFramework::class);
-        $firstTestFramework
-            ->method('test')
-            ->willReturn($result)
-        ;
-        $framework = new CombinedTestFramework($firstTestFramework, null);
-
-        $evaluation = $framework->test($mutant);
-        $evaluation->getCurrent();
-        $this->assertSame([$result], $evaluation->getMutantExecutionResult()->getEvaluationHistory());
-    }
-
     public function test_it_preserves_a_frameworks_whole_pipe_before_invoking_the_next_framework(): void
     {
         $mutant = MutantBuilder::withCompleteTestData()->build();
-        $first = new DirectEvaluationResult('First evaluator, first attempt', DetectionStatus::ESCAPED, '');
-        $second = new DirectEvaluationResult('First evaluator, second attempt', DetectionStatus::ESCAPED, '');
-        $third = new DirectEvaluationResult('Follow-up evaluator, first attempt', DetectionStatus::ESCAPED, '');
-        $fourth = new DirectEvaluationResult('Follow-up evaluator, second attempt', DetectionStatus::KILLED_BY_STATIC_ANALYSIS, '');
-        $firstEvaluation = MutantProcessContainer::from($mutant, static fn (): DirectEvaluationResult => $first)
-            ->append(static fn (): DirectEvaluationResult => $second)
+        $first = $this->createStub(MutantProcess::class);
+        $first->method('getResult')->willReturn(DetectionStatus::ESCAPED);
+        $second = $this->createStub(MutantProcess::class);
+        $second->method('getResult')->willReturn(DetectionStatus::ESCAPED);
+        $third = $this->createStub(MutantProcess::class);
+        $third->method('getResult')->willReturn(DetectionStatus::ESCAPED);
+        $fourth = $this->createStub(MutantProcess::class);
+        $fourth->method('getResult')->willReturn(DetectionStatus::KILLED_BY_STATIC_ANALYSIS);
+        $firstEvaluation = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $first)
+            ->append(static fn (): MutantProcess => $second)
         ;
-        $followUpEvaluation = MutantProcessContainer::from($mutant, static fn (): DirectEvaluationResult => $third)
-            ->append(static fn (): DirectEvaluationResult => $fourth)
+        $followUpEvaluation = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $third)
+            ->append(static fn (): MutantProcess => $fourth)
         ;
         $firstTestFramework = $this->createMock(TestFramework::class);
         $firstTestFramework

@@ -166,8 +166,8 @@ final class TestSuiteMutantDetectionStatusResolverTest extends TestCase
         $process = new MutantProcess(
             $dryRunProcess,
             $mutant,
-            $resolver,
             'PHPUnit',
+            $resolver,
             includeErrorOutput: false,
         );
         $dryRunProcess->start();

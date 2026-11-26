@@ -84,8 +84,8 @@ final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFac
         return new MutantProcess(
             $process,
             $mutant,
-            $this->detectionStatusResolver,
             'PHPStan',
+            $this->detectionStatusResolver,
             includeErrorOutput: true,
         );
     }

@@ -40,7 +40,6 @@ use function array_map;
 use function array_values;
 use ArrayIterator;
 use function count;
-use DuoClock\TimeSpy;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\DiffSourceCodeMatcher;
@@ -49,12 +48,14 @@ use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluatio
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\DirectEvaluationResult;
+use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
+use Infection\Process\DryRunProcess;
+use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
@@ -62,6 +63,7 @@ use Infection\Process\Runner\ProcessRunner;
 use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\Testing\MutatorName;
+use Infection\Testing\TestFramework\Debug\FixedMutantProcessDetectionStatusResolver;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
@@ -803,18 +805,7 @@ final class MutationTestingRunnerTest extends TestCase
 
     public function test_container_to_finished_event(): void
     {
-        $history = [
-            new DirectEvaluationResult(
-                'PHPUnit',
-                DetectionStatus::ESCAPED,
-                'test output',
-            ),
-            new DirectEvaluationResult(
-                'PHPStan',
-                DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
-                'analysis output',
-            ),
-        ];
+        $history = [$this->createStub(MutantProcess::class)];
         $result = MutantExecutionResultBuilder::withMinimalTestData()
             ->withDetectionStatus(DetectionStatus::KILLED_BY_STATIC_ANALYSIS)
             ->withEvaluationHistory($history)
@@ -834,39 +825,12 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertSame($history, $event->executionResult->getEvaluationHistory());
     }
 
-    public function test_it_emits_a_final_result_when_the_framework_evaluates_without_a_process(): void
-    {
-        $mutation = $this->createMutation(0);
-        $mutant = MutantBuilder::withCompleteTestData()->withMutation($mutation)->build();
-        $attempt = new DirectEvaluationResult('In-memory analyser', DetectionStatus::KILLED_BY_STATIC_ANALYSIS, 'Type mismatch');
-        $this->mutantFactoryMock->method('create')->willReturn($mutant);
-        $this->testFrameworkMock->expects($this->once())->method('test')->with($this->identicalTo($mutant))->willReturn($attempt);
-        $this->processRunnerMock->method('run')->willReturnCallback(static function (iterable $evaluations): iterable {
-            foreach ($evaluations as $evaluation) {
-                $evaluation->getCurrent();
-
-                yield $evaluation;
-            }
-        });
-
-        $this->runner->run([$mutation]);
-
-        $finished = array_values(array_filter(
-            $this->eventDispatcher->getEvents(),
-            static fn (object $event): bool => $event instanceof MutantProcessWasFinished,
-        ));
-
-        $this->assertCount(1, $finished);
-        $this->assertSame([$attempt], $finished[0]->executionResult->getEvaluationHistory());
-        $this->assertSame(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, $finished[0]->executionResult->getDetectionStatus());
-    }
-
     public function test_it_emits_one_final_event_after_all_evaluators_finish(): void
     {
         $mutation = $this->createMutation(0);
         $mutant = MutantBuilder::withCompleteTestData()->withMutation($mutation)->build();
-        $first = new DirectEvaluationResult('Tests', DetectionStatus::ESCAPED, 'tests pass');
-        $last = new DirectEvaluationResult('Analysis', DetectionStatus::ERROR, 'analysis failed');
+        $first = $this->createDryRunMutantProcess($mutant, 'PHPUnit', DetectionStatus::ESCAPED);
+        $last = $this->createDryRunMutantProcess($mutant, 'PHPStan', DetectionStatus::ERROR);
         $this->mutantFactoryMock->method('create')->willReturn($mutant);
         $assertNoFinalEvent = function (): void {
             $finished = array_filter(
@@ -876,25 +840,25 @@ final class MutationTestingRunnerTest extends TestCase
             $this->assertSame([], $finished);
         };
         $this->testFrameworkMock->expects($this->once())->method('test')->willReturnCallback(
-            static function () use ($assertNoFinalEvent, $first): DirectEvaluationResult {
+            static function () use ($assertNoFinalEvent, $mutant, $first): MutantProcessContainer {
                 $assertNoFinalEvent();
 
-                return $first;
+                return MutantProcessContainer::from($mutant, static fn (): MutantProcess => $first);
             },
         );
         $analysis = $this->createMock(TestFramework::class);
         $analysis->expects($this->once())->method('test')->willReturnCallback(
-            static function () use ($assertNoFinalEvent, $last): DirectEvaluationResult {
+            static function () use ($assertNoFinalEvent, $mutant, $last): MutantProcessContainer {
                 $assertNoFinalEvent();
 
-                return $last;
+                return MutantProcessContainer::from($mutant, static fn (): MutantProcess => $last);
             },
         );
         $framework = new CombinedTestFramework($this->testFrameworkMock, $analysis);
         $runner = new MutationTestingRunner(
             $framework,
             $this->mutantFactoryMock,
-            new ParallelProcessRunner(1, 0, new TimeSpy()),
+            new ParallelProcessRunner(1, poll: 0),
             $this->eventDispatcher,
             $this->fileSystemMock,
             $this->diffSourceCodeMatcher,
@@ -912,6 +876,17 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertCount(1, $finished);
         $this->assertSame([$first, $last], $finished[0]->executionResult->getEvaluationHistory());
         $this->assertSame(DetectionStatus::ERROR, $finished[0]->executionResult->getDetectionStatus());
+    }
+
+    private function createDryRunMutantProcess(Mutant $mutant, string $testFrameworkName, DetectionStatus $status): MutantProcess
+    {
+        return new MutantProcess(
+            new DryRunProcess([$testFrameworkName]),
+            $mutant,
+            $testFrameworkName,
+            new FixedMutantProcessDetectionStatusResolver($status),
+            includeErrorOutput: false,
+        );
     }
 
     private function invokeMethod(string $methodName, mixed ...$args): mixed
@@ -1029,9 +1004,12 @@ final class MutationTestingRunnerTest extends TestCase
 
     private function buildCoveredMutantProcessContainer(): MutantProcessContainer
     {
+        $process = $this->createStub(MutantProcess::class);
+        $process->method('getResult')->willReturn(DetectionStatus::ESCAPED);
+
         return MutantProcessContainer::from(
             MutantBuilder::withMinimalTestData()->build(),
-            static fn (): DirectEvaluationResult => new DirectEvaluationResult('Evaluator', DetectionStatus::ESCAPED, ''),
+            static fn (): MutantProcess => $process,
         );
     }
 

@@ -18,7 +18,7 @@ final class DummyMutantProcess extends MutantProcess
         MutantProcessDetectionStatusResolver $resolver,
         private readonly bool $expectTimeOut
     ) {
-        parent::__construct($process, $mutant, $resolver, 'Evaluator', includeErrorOutput: false);
+        parent::__construct($process, $mutant, 'Evaluator', $resolver, includeErrorOutput: false);
     }
 
     #[\Override]

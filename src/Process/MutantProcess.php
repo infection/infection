@@ -59,8 +59,8 @@ class MutantProcess
     public function __construct(
         private readonly Process $process,
         private readonly Mutant $mutant,
-        private readonly MutantProcessDetectionStatusResolver $detectionStatusResolver,
         private readonly string $testFrameworkName,
+        private readonly MutantProcessDetectionStatusResolver $detectionStatusResolver,
         private readonly bool $includeErrorOutput,
     ) {
     }

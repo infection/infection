@@ -66,8 +66,8 @@ final class MutantProcessTest extends TestCase
         $this->mutantProcess = new MutantProcess(
             $this->processStub,
             $this->mutant,
-            $resolver,
             'PHPUnit',
+            $resolver,
             includeErrorOutput: false,
         );
     }
@@ -111,8 +111,8 @@ final class MutantProcessTest extends TestCase
         $mutantProcess = new MutantProcess(
             $process,
             $this->mutant,
-            $resolver,
             'PHPUnit',
+            $resolver,
             includeErrorOutput: false,
         );
         $process->start();
@@ -129,7 +129,7 @@ final class MutantProcessTest extends TestCase
         $this->processStub->method('getExitCode')->willReturn(0);
         $resolver = $this->createMock(MutantProcessDetectionStatusResolver::class);
         $resolver->expects($this->once())->method('resolve')->with('output', 0, true)->willReturn(DetectionStatus::ESCAPED);
-        $process = new MutantProcess($this->processStub, $this->mutant, $resolver, 'PHPUnit', includeErrorOutput: false);
+        $process = new MutantProcess($this->processStub, $this->mutant, 'PHPUnit', $resolver, includeErrorOutput: false);
         $process->markAsTimedOut();
         $process->markAsFinished();
 
@@ -143,7 +143,7 @@ final class MutantProcessTest extends TestCase
         $this->processStub->method('getOutput')->willReturn("test output\n");
         $this->processStub->method('getErrorOutput')->willReturn("stderr\n");
         $resolver = $this->createStub(MutantProcessDetectionStatusResolver::class);
-        $process = new MutantProcess($this->processStub, $this->mutant, $resolver, 'Evaluator', $includeErrorOutput);
+        $process = new MutantProcess($this->processStub, $this->mutant, 'Evaluator', $resolver, $includeErrorOutput);
         $process->markAsFinished();
 
         $this->assertSame($expected, $process->getResultOutput());
@@ -160,7 +160,7 @@ final class MutantProcessTest extends TestCase
     {
         $resolver = $this->createMock(MutantProcessDetectionStatusResolver::class);
         $resolver->expects($this->never())->method('resolve');
-        $process = new MutantProcess($this->processStub, $this->mutant, $resolver, 'PHPUnit', includeErrorOutput: false);
+        $process = new MutantProcess($this->processStub, $this->mutant, 'PHPUnit', $resolver, includeErrorOutput: false);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot resolve the detection status before the mutant process has finished.');

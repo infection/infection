@@ -37,7 +37,6 @@ namespace Infection\Tests\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\DirectEvaluationResult;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Process\MutantProcess;
@@ -52,7 +51,7 @@ final class MutantExecutionResultBuilder
      * @param Deferred<string> $mutantDiff
      * @param Deferred<string> $mutatedCode
      * @param TestLocation[] $tests
-     * @param list<MutantProcess|DirectEvaluationResult> $evaluationHistory
+     * @param list<MutantProcess> $evaluationHistory
      */
     private function __construct(
         private string $processCommandLine,
@@ -330,7 +329,7 @@ final class MutantExecutionResultBuilder
     }
 
     /**
-     * @param list<MutantProcess|DirectEvaluationResult> $evaluationHistory
+     * @param list<MutantProcess> $evaluationHistory
      */
     public function withEvaluationHistory(array $evaluationHistory): self
     {

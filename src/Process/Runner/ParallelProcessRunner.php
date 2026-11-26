@@ -39,7 +39,6 @@ use function array_shift;
 use function count;
 use DuoClock\DuoClock;
 use Generator;
-use Infection\Mutant\DirectEvaluationResult;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Iterator;
@@ -122,19 +121,10 @@ class ParallelProcessRunner implements ProcessRunner
                 $mutantProcessContainer = $this->queue->dequeue();
                 $attempt = $mutantProcessContainer->getCurrent();
 
-                if ($attempt instanceof DirectEvaluationResult) {
-                    if ($mutantProcessContainer->hasNext()) {
-                        $mutantProcessContainer->createNext();
-                        $this->queue->enqueue($mutantProcessContainer);
-                    } else {
-                        yield $mutantProcessContainer;
-                    }
-                } else {
-                    $threadIndex = array_shift($this->availableThreadIndexes);
-                    Assert::integer($threadIndex, 'Thread index cannot be null. This indicates a bug - verify the isEmpty() check is present before dequeue().');
+                $threadIndex = array_shift($this->availableThreadIndexes);
+                Assert::integer($threadIndex, 'Thread index cannot be null. This indicates a bug - verify the isEmpty() check is present before dequeue().');
 
-                    $this->startProcess($mutantProcessContainer, $attempt, $threadIndex);
-                }
+                $this->startProcess($mutantProcessContainer, $attempt, $threadIndex);
             }
 
             while ($this->hasProcessesThatCouldBeFreed($threadCount)) {
@@ -190,7 +180,6 @@ class ParallelProcessRunner implements ProcessRunner
         foreach ($this->runningProcessContainers as $index => $indexedMutantProcess) {
             $mutantProcessContainer = $indexedMutantProcess->mutantProcessContainer;
             $mutantProcess = $mutantProcessContainer->getCurrent();
-            Assert::isInstanceOf($mutantProcess, MutantProcess::class, 'A running worker must retain its process-backed evaluation attempt.');
             $process = $mutantProcess->getProcess();
 
             $isRunning = $process->isRunning();

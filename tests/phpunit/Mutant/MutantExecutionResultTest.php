@@ -37,7 +37,6 @@ namespace Infection\Tests\Mutant;
 
 use Closure;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\DirectEvaluationResult;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
@@ -69,10 +68,8 @@ final class MutantExecutionResultTest extends TestCase
         $analysis->method('getProcess')->willReturn($process);
         $analysis->method('getResultOutput')->willReturn('analysis failed');
         $analysis->method('getRuntime')->willReturn(0.5);
-        $history = [
-            new DirectEvaluationResult('In-memory evaluator', DetectionStatus::ESCAPED, 'test output'),
-            $analysis,
-        ];
+        $tests = $this->createStub(MutantProcess::class);
+        $history = [$tests, $analysis];
 
         $result = MutantExecutionResult::createFromEvaluation($mutant, DetectionStatus::ERROR, $history);
 

@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\DirectEvaluationResult;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Testing\TestFramework\Debug\FixedMutantProcessDetectionStatusResolver;
@@ -65,8 +64,9 @@ final class MutantProcessContainerTest extends TestCase
 
     public function test_it_finishes_a_completed_attempt_without_a_follow_up_factory(): void
     {
-        $result = new DirectEvaluationResult('Evaluator', DetectionStatus::ESCAPED, '');
-        $container = MutantProcessContainer::from(MutantBuilder::withCompleteTestData()->build(), static fn (): DirectEvaluationResult => $result);
+        $result = $this->createStub(MutantProcess::class);
+        $result->method('getResult')->willReturn(DetectionStatus::ESCAPED);
+        $container = MutantProcessContainer::from(MutantBuilder::withCompleteTestData()->build(), static fn (): MutantProcess => $result);
 
         $this->assertSame($result, $container->getCurrent());
         $this->assertFalse($container->hasNext());
@@ -197,8 +197,8 @@ final class MutantProcessContainerTest extends TestCase
         $process = new MutantProcess(
             new Process(['phpunit']),
             $mutant,
-            new FixedMutantProcessDetectionStatusResolver(DetectionStatus::ESCAPED),
             'PHPUnit',
+            new FixedMutantProcessDetectionStatusResolver(DetectionStatus::ESCAPED),
             includeErrorOutput: false,
         );
         $container = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $process);
@@ -208,24 +208,6 @@ final class MutantProcessContainerTest extends TestCase
         $this->expectExceptionMessage('Cannot resolve the detection status before the mutant process has finished.');
 
         $container->getMutantExecutionResult();
-    }
-
-    public function test_it_finalizes_a_direct_result_without_process_details(): void
-    {
-        $mutant = MutantBuilder::withCompleteTestData()->build();
-        $result = new DirectEvaluationResult('In-memory analyser', DetectionStatus::KILLED_BY_STATIC_ANALYSIS, 'Type mismatch');
-        $evaluation = MutantProcessContainer::from($mutant, static fn (): DirectEvaluationResult => $result);
-
-        $evaluation->getCurrent();
-        $final = $evaluation->getMutantExecutionResult();
-
-        $this->assertSame($result, $evaluation->getCurrent());
-        $this->assertSame([$result], $final->getEvaluationHistory());
-        $this->assertSame(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, $final->getDetectionStatus());
-        $this->assertSame('Type mismatch', $final->getProcessOutput());
-        $this->assertSame('', $final->getProcessCommandLine());
-        $this->assertSame(0.0, $final->getProcessRuntime());
-        $this->assertSame($mutant->getMutation()->getHash(), $final->getMutantHash());
     }
 
     public function test_it_cannot_finalize_while_a_follow_up_is_pending(): void
@@ -311,10 +293,10 @@ final class MutantProcessContainerTest extends TestCase
     public function test_it_finishes_nested_follow_ups_without_another_outer_evaluator(): void
     {
         $mutant = MutantBuilder::withCompleteTestData()->build();
-        $first = new DirectEvaluationResult('Tests', DetectionStatus::ESCAPED, '');
-        $last = new DirectEvaluationResult('Analysis', DetectionStatus::KILLED_BY_STATIC_ANALYSIS, '');
-        $child = MutantProcessContainer::from($mutant, static fn (): DirectEvaluationResult => $first)
-            ->append(static fn (): DirectEvaluationResult => $last)
+        $first = $this->stubCompletedProcess(DetectionStatus::ESCAPED, 'phpunit', 'test output', 1.25);
+        $last = $this->stubCompletedProcess(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, 'phpstan', 'analysis output', 0.25);
+        $child = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $first)
+            ->append(static fn (): MutantProcess => $last)
         ;
         $container = MutantProcessContainer::from($mutant, static fn (): MutantProcessContainer => $child);
 

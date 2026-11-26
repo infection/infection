@@ -673,12 +673,6 @@ parameters:
 			path: ../src/TestFramework/Contracts/Mutant/MutantProcessDetectionStatusResolver.php
 
 		-
-			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\DirectEvaluationResult
-			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Contracts/TestFramework.php
-
-		-
 			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\Mutant
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1

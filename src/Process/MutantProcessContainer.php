@@ -37,23 +37,22 @@ namespace Infection\Process;
 
 use Closure;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\DirectEvaluationResult;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Webmozart\Assert\Assert;
 
 /**
- * @phpstan-type MutantProcessFactory = Closure(): (MutantProcess|DirectEvaluationResult|self)
+ * @phpstan-type MutantProcessFactory = Closure(): (MutantProcess|self)
  *
  * @internal
  * @final
  */
 class MutantProcessContainer
 {
-    private MutantProcess|DirectEvaluationResult|self|null $current = null;
+    private MutantProcess|self|null $current = null;
 
     /**
-     * @var list<MutantProcess|DirectEvaluationResult>
+     * @var list<MutantProcess>
      */
     private array $evaluationHistory = [];
 
@@ -102,7 +101,7 @@ class MutantProcessContainer
         return $this->current === null;
     }
 
-    public function getCurrent(): MutantProcess|DirectEvaluationResult
+    public function getCurrent(): MutantProcess
     {
         $this->current ??= $this->evaluate(0);
 
@@ -124,7 +123,7 @@ class MutantProcessContainer
         return $this->hasNextEvaluation();
     }
 
-    public function createNext(): MutantProcess|DirectEvaluationResult
+    public function createNext(): MutantProcess
     {
         if ($this->current instanceof self
             && $this->current->hasNext()
@@ -155,7 +154,7 @@ class MutantProcessContainer
         );
     }
 
-    private function evaluate(int $index): MutantProcess|DirectEvaluationResult|self
+    private function evaluate(int $index): MutantProcess|self
     {
         $attempt = ($this->factories[$index])();
         $this->nextEvaluationIndex = $index + 1;
@@ -192,9 +191,7 @@ class MutantProcessContainer
             return $this->completedStatus = $status;
         }
 
-        $status = $attempt instanceof MutantProcess
-            ? $attempt->getResult()
-            : $attempt->detectionStatus;
+        $status = $attempt->getResult();
         $this->evaluationHistory[] = $attempt;
 
         return $this->completedStatus = $status;

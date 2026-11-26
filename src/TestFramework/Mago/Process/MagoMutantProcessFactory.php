@@ -74,8 +74,8 @@ final readonly class MagoMutantProcessFactory implements LazyMutantProcessFactor
         return new MutantProcess(
             $process,
             $mutant,
-            $this->detectionStatusResolver,
             'Mago',
+            $this->detectionStatusResolver,
             includeErrorOutput: true,
         );
     }

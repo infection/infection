@@ -71,8 +71,8 @@ final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMuta
                 timeout: $this->timeout,
             ),
             $mutant,
-            new FixedMutantProcessDetectionStatusResolver(DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
             'PHPStan',
+            new FixedMutantProcessDetectionStatusResolver(DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
             includeErrorOutput: true,
         );
     }

@@ -85,8 +85,8 @@ class MutantProcessContainerFactory
             static fn (): MutantProcess => new MutantProcess(
                 $process,
                 $mutant,
-                new TestSuiteMutantDetectionStatusResolver($detectionStatusResolver, $mutant, $timeout),
                 $testFrameworkAdapter->getName(),
+                new TestSuiteMutantDetectionStatusResolver($detectionStatusResolver, $mutant, $timeout),
                 includeErrorOutput: false,
             ),
         );
