@@ -42,6 +42,7 @@ use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
@@ -357,6 +358,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
                 ->build(),
             processFactory: $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter ?? $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            testFrameworkLogger: $this->createStub(TestFrameworkLogger::class),
         );
     }
 

@@ -53,6 +53,7 @@ use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
@@ -100,6 +101,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         private readonly MutantProcessContainerFactory $processFactory,
         private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private readonly MemoryLimiter $memoryLimiter,
+        private readonly TestFrameworkLogger $testFrameworkLogger,
         private ?string $version = null,
     ) {
         $this->coverageChecker = $coverageCheckerFactory->create($this);
@@ -129,6 +131,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
                 (string) $this->config->initialTestsPhpOptions,
             ),
             $this->config->skipCoverage,
+            $this->testFrameworkLogger,
         );
 
         if (!$initialTestSuiteProcess->isSuccessful()) {

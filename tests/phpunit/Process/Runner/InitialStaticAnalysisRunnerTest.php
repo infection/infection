@@ -44,6 +44,7 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Logger\EventDispatchingTestFrameworkLogger;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use InvalidArgumentException;
@@ -73,7 +74,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
         $this->runner = new InitialStaticAnalysisRunner(
             $this->shellCommandRunner,
-            $this->eventDispatcher,
+            new EventDispatchingTestFrameworkLogger($this->eventDispatcher),
             $this->staticAnalysisToolAdapter,
         );
     }

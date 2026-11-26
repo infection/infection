@@ -71,6 +71,7 @@ interface TestFrameworkFactory
         string $sourceDirectoryBasePath,
         bool $useWindowsFilterLimit,
         Filesystem $fileSystem,
+        TestFrameworkLogger $testFrameworkLogger,
         LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
         InitialTestsRunner $initialTestsRunner,

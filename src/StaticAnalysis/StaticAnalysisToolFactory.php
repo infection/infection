@@ -37,13 +37,13 @@ namespace Infection\StaticAnalysis;
 
 use function implode;
 use Infection\Configuration\Configuration;
-use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\LegacyStaticAnalysisBridge;
 use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
 use Infection\TestFramework\NullStaticAnalysisTestFramework;
@@ -68,7 +68,7 @@ final readonly class StaticAnalysisToolFactory
         private ShellCommandRunner $shellCommandRunner,
         private PhpExecutableFinder $phpExecutableFinder,
         private FileSystem $fileSystem,
-        private EventDispatcher $eventDispatcher,
+        private TestFrameworkLogger $testFrameworkLogger,
     ) {
     }
 
@@ -83,7 +83,7 @@ final readonly class StaticAnalysisToolFactory
         return new LegacyStaticAnalysisBridge(
             new InitialStaticAnalysisRunner(
                 $this->shellCommandRunner,
-                $this->eventDispatcher,
+                $this->testFrameworkLogger,
                 $adapter,
             ),
             $adapter,

@@ -543,7 +543,7 @@ parameters:
 		-
 			rawMessage: Infection\Process\Runner\InitialTestsRunner should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
 			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
+			count: 2
 			path: ../src/Process/Runner/InitialTestsRunner.php
 
 		-

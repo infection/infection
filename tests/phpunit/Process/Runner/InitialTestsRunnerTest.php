@@ -48,6 +48,7 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSu
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Logger\EventDispatchingTestFrameworkLogger;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use InvalidArgumentException;
@@ -71,6 +72,8 @@ final class InitialTestsRunnerTest extends TestCase
 
     private InitialTestsRunner $runner;
 
+    private EventDispatchingTestFrameworkLogger $testFrameworkLogger;
+
     private TestFrameworkAdapter&Stub $testFrameworkAdapter;
 
     protected function setUp(): void
@@ -83,7 +86,8 @@ final class InitialTestsRunnerTest extends TestCase
 
         $this->eventDispatcher = new EventDispatcherCollector();
 
-        $this->runner = new InitialTestsRunner($this->processFactoryMock, $this->eventDispatcher);
+        $this->testFrameworkLogger = new EventDispatchingTestFrameworkLogger($this->eventDispatcher);
+        $this->runner = new InitialTestsRunner($this->processFactoryMock);
         $this->testFrameworkAdapter = $this->createStub(TestFrameworkAdapter::class);
     }
 
@@ -118,7 +122,7 @@ final class InitialTestsRunnerTest extends TestCase
             ->willReturn($process)
         ;
 
-        $this->runner->run($this->testFrameworkAdapter, $testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
+        $this->runner->run($this->testFrameworkAdapter, $testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage, $this->testFrameworkLogger);
 
         $this->assertSame(
             [
@@ -166,7 +170,7 @@ final class InitialTestsRunnerTest extends TestCase
         ;
 
         try {
-            $this->runner->run($this->testFrameworkAdapter, $testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
+            $this->runner->run($this->testFrameworkAdapter, $testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage, $this->testFrameworkLogger);
         } catch (RuntimeException $e) {
             // Signal 11, AKA "segmentation fault", is not something we can do anything about
             if (extension_loaded('xdebug') && str_contains($e->getMessage(), 'The process has been signaled with signal "11"')) {

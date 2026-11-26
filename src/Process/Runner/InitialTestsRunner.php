@@ -36,11 +36,8 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use InvalidArgumentException;
 use Symfony\Component\Process\Process;
 
@@ -52,7 +49,6 @@ class InitialTestsRunner
 {
     public function __construct(
         private readonly InitialTestsRunProcessFactory $processBuilder,
-        private readonly EventDispatcher $eventDispatcher,
     ) {
     }
 
@@ -64,6 +60,7 @@ class InitialTestsRunner
         string $testFrameworkExtraOptions,
         array $phpExtraOptions,
         bool $skipCoverage,
+        TestFrameworkLogger $testFrameworkLogger,
     ): Process {
         $process = $this->processBuilder->createProcess(
             $testFrameworkAdapter,
@@ -74,24 +71,22 @@ class InitialTestsRunner
 
         $testFrameworkName = $testFrameworkAdapter->getName();
 
-        $this->eventDispatcher->dispatch(
-            new InitialTestSuiteWasStarted(
-                commandLine: $process->getCommandLine(),
-                testFrameworkName: $testFrameworkName,
-                testFrameworkVersion: $this->getVersion($testFrameworkAdapter),
-            ),
+        $testFrameworkLogger->initialRunStarted(
+            $testFrameworkName,
+            $this->getVersion($testFrameworkAdapter),
+            $process->getCommandLine(),
         );
 
-        $process->run(function (string $type) use ($process, $testFrameworkName): void {
+        $process->run(static function (string $type) use ($process, $testFrameworkName, $testFrameworkLogger): void {
             if ($type === Process::ERR) {
                 // Stop on the first error encountered
                 $process->stop();
             }
 
-            $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted($testFrameworkName));
+            $testFrameworkLogger->initialRunProgressed($testFrameworkName);
         });
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($testFrameworkName, $process->getOutput()));
+        $testFrameworkLogger->initialRunFinished($testFrameworkName, $process->getOutput());
 
         return $process;
     }

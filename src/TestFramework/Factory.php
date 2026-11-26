@@ -52,6 +52,7 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
@@ -86,6 +87,7 @@ final readonly class Factory
         private ShellCommandRunner $shellCommandRunner,
         private FileSystem $fileSystem,
         private ConsoleOutput $consoleOutput,
+        private TestFrameworkLogger $testFrameworkLogger,
         private LoggerInterface $logger,
         private CoverageCheckerFactory $coverageCheckerFactory,
         private InitialTestsRunner $initialTestsRunner,
@@ -108,6 +110,7 @@ final readonly class Factory
                 $this->infectionConfig,
                 $this->containerFactory,
                 $this->extraOptionsFilter,
+                $this->testFrameworkLogger,
             );
     }
 
@@ -170,6 +173,7 @@ final readonly class Factory
                         dirname($configuration->configurationPathname),
                         OperatingSystem::isWindows(),
                         $this->fileSystem,
+                        $this->testFrameworkLogger,
                         $this->logger,
                         $this->coverageCheckerFactory,
                         $this->initialTestsRunner,

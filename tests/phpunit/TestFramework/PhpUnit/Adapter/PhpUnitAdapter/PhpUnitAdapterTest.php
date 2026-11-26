@@ -49,6 +49,7 @@ use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
@@ -2004,6 +2005,7 @@ final class PhpUnitAdapterTest extends TestCase
             $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
             new TestFrameworkExtraOptionsFilter(),
             $memoryLimiter ?? new MemoryLimiter($this->createStub(MemoryLimiterEnvironment::class)),
+            $this->createStub(TestFrameworkLogger::class),
             $version,
         );
     }

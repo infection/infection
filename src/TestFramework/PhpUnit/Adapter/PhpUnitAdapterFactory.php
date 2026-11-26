@@ -47,6 +47,7 @@ use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
@@ -88,6 +89,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
         string $sourceDirectoryBasePath,
         bool $useWindowsFilterLimit,
         Filesystem $fileSystem,
+        TestFrameworkLogger $testFrameworkLogger,
         LoggerInterface $logger,
         CoverageCheckerFactory $coverageCheckerFactory,
         InitialTestsRunner $initialTestsRunner,
@@ -160,6 +162,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $processFactory,
             $testFrameworkExtraOptionsFilter,
             new MemoryLimiter(new MemoryLimiterEnvironment()),
+            $testFrameworkLogger,
         );
     }
 

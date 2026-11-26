@@ -46,6 +46,7 @@ use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
@@ -173,6 +174,7 @@ final class FactoryTest extends TestCase
             $this->createStub(ShellCommandRunner::class),
             $fileSystem,
             $this->createStub(ConsoleOutput::class),
+            $this->createStub(TestFrameworkLogger::class),
             $this->createStub(LoggerInterface::class),
             new CoverageCheckerFactory(
                 $configuration,

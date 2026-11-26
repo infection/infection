@@ -47,6 +47,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageChecker;
 
 /**
@@ -64,6 +65,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         private Configuration $config,
         private MutantProcessContainerFactory $processFactory,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private TestFrameworkLogger $testFrameworkLogger,
     ) {
     }
 
@@ -96,6 +98,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
             $this->config->testFrameworkExtraOptions,
             $this->getInitialTestsPhpOptionsArray(),
             $this->config->skipCoverage,
+            $this->testFrameworkLogger,
         );
 
         if (!$initialTestSuiteProcess->isSuccessful()) {

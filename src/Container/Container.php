@@ -162,6 +162,7 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
@@ -174,6 +175,7 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\Logger\EventDispatchingTestFrameworkLogger;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
@@ -316,6 +318,7 @@ final class Container extends DIContainer
                     $container->getShellCommandRunner(),
                     $container->getFileSystem(),
                     $container->getConsoleOutput(),
+                    $container->get(TestFrameworkLogger::class),
                     $container->getLogger(),
                     $container->getCoverageCheckerFactory(),
                     $container->getInitialTestsRunner(),
@@ -333,7 +336,7 @@ final class Container extends DIContainer
                     $container->getShellCommandRunner(),
                     new PhpExecutableFinder(),
                     $container->getFileSystem(),
-                    $container->getEventDispatcher(),
+                    $container->get(TestFrameworkLogger::class),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
@@ -554,6 +557,7 @@ final class Container extends DIContainer
                 $container->getTestFramework(),
                 $container->get(MemoizedTestFileDataProvider::class),
             ),
+            TestFrameworkLogger::class => static fn (self $container): TestFrameworkLogger => new EventDispatchingTestFrameworkLogger($container->getEventDispatcher()),
             StaticAnalysisTestFramework::class => static fn (self $container) => $container->getStaticAnalysisToolFactory()->create(
                 $container->getConfiguration()->staticAnalysisTool,
                 $container->getConfiguration()->processTimeout,

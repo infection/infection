@@ -39,6 +39,7 @@ use Infection\FileSystem\FileSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\SymfonyProcessShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
@@ -76,6 +77,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             sourceDirectoryBasePath: '/path/to/project',
             useWindowsFilterLimit: false,
             fileSystem: new FileSystem(),
+            testFrameworkLogger: $this->createStub(TestFrameworkLogger::class),
             logger: $this->createStub(LoggerInterface::class),
             coverageCheckerFactory: new CoverageCheckerFactory(
                 $configuration,

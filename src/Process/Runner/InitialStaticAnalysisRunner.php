@@ -35,13 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use InvalidArgumentException;
 use Symfony\Component\Process\Process;
 
@@ -58,7 +55,7 @@ readonly class InitialStaticAnalysisRunner
 {
     public function __construct(
         private ShellCommandRunner $shellCommandRunner,
-        private EventDispatcher $eventDispatcher,
+        private TestFrameworkLogger $testFrameworkLogger,
         private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
     ) {
     }
@@ -77,21 +74,19 @@ readonly class InitialStaticAnalysisRunner
 
         $testFrameworkName = $this->staticAnalysisToolAdapter->getName();
 
-        $this->eventDispatcher->dispatch(
-            new InitialTestSuiteWasStarted(
-                commandLine: $commandLine,
-                testFrameworkName: $testFrameworkName,
-                testFrameworkVersion: $this->getVersion(),
-            ),
+        $this->testFrameworkLogger->initialRunStarted(
+            $testFrameworkName,
+            $this->getVersion(),
+            $commandLine,
         );
 
         $process = $this->shellCommandRunner->run(
             command: $command,
-            callback: fn () => $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted($testFrameworkName)),
+            callback: fn () => $this->testFrameworkLogger->initialRunProgressed($testFrameworkName),
             timeout: null,
         );
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($testFrameworkName, $process->stdout));
+        $this->testFrameworkLogger->initialRunFinished($testFrameworkName, $process->stdout);
 
         if (!$process->isSuccessful()) {
             throw InitialTestsFailed::fromCompletedProcess(
