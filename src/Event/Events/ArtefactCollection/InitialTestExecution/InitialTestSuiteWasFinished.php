@@ -42,6 +42,7 @@ final readonly class InitialTestSuiteWasFinished
 {
     public function __construct(
         public string $testFrameworkName,
+        public string $commandLine,
         public string $outputText,
     ) {
     }

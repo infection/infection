@@ -90,12 +90,12 @@ final readonly class DebugEventsDataProducer implements DataProducer
         // recorded by name; their payloads have no known serialization contract.
         return match (true) {
             $event instanceof InitialTestSuiteWasStarted => [
-                'commandLine' => $event->commandLine,
                 'testFrameworkName' => $event->testFrameworkName,
                 'testFrameworkVersion' => $event->testFrameworkVersion,
             ],
             $event instanceof InitialTestSuiteWasFinished => [
                 'testFrameworkName' => $event->testFrameworkName,
+                'commandLine' => $event->commandLine,
                 'outputText' => $event->outputText,
             ],
             $event instanceof InitialTestCaseWasCompleted => [

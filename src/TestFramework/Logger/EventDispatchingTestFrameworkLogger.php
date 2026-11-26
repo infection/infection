@@ -41,6 +41,7 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSu
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Override;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -55,11 +56,9 @@ final readonly class EventDispatchingTestFrameworkLogger implements TestFramewor
     public function initialRunStarted(
         string $testFrameworkName,
         string $testFrameworkVersion,
-        string $commandLine,
     ): void {
         $this->eventDispatcher->dispatch(
             new InitialTestSuiteWasStarted(
-                $commandLine,
                 $testFrameworkName,
                 $testFrameworkVersion,
             ),
@@ -74,12 +73,19 @@ final readonly class EventDispatchingTestFrameworkLogger implements TestFramewor
         );
     }
 
+    /**
+     * @param string[] $command
+     */
     #[Override]
-    public function initialRunFinished(string $testFrameworkName, string $executionOutput): void
-    {
+    public function initialRunFinished(
+        string $testFrameworkName,
+        array $command,
+        string $executionOutput,
+    ): void {
         $this->eventDispatcher->dispatch(
             new InitialTestSuiteWasFinished(
                 $testFrameworkName,
+                (new Process($command))->getCommandLine(),
                 $executionOutput,
             ),
         );

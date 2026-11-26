@@ -45,8 +45,8 @@ use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Command\Option\TestFrameworkOption;
 use Infection\Configuration\Configuration;
 use Infection\Console\IO;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
 use Infection\Logger\Console\ConsoleLogger;
 use function sprintf;
 use Webmozart\Assert\Assert;
@@ -101,13 +101,13 @@ final class InitialTestRunCommand extends BaseCommand
         // TODO: this is not very elegant but done this way for now to keep the same behaviour
         //   as we migrate to the new test framework API.
         $container->getEventDispatcher()->addSubscriber(
-            new readonly class($io) implements InitialTestSuiteWasStartedSubscriber {
+            new readonly class($io) implements InitialTestSuiteWasFinishedSubscriber {
                 public function __construct(
                     private IO $io,
                 ) {
                 }
 
-                public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
+                public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
                 {
                     $this->io->writeln([
                         'Command executed:',

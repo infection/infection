@@ -76,7 +76,7 @@ final class InitialTestsExecutionLoggerSubscriberTest extends TestCase
         ;
 
         $this->dispatcher->dispatch(
-            new InitialTestSuiteWasStarted('<command line>', $testFrameworkName, '6.5.4'),
+            new InitialTestSuiteWasStarted($testFrameworkName, '6.5.4'),
         );
     }
 
@@ -104,7 +104,7 @@ final class InitialTestsExecutionLoggerSubscriberTest extends TestCase
         ;
 
         $this->dispatcher->dispatch(
-            new InitialTestSuiteWasFinished($testFrameworkName, 'output'),
+            new InitialTestSuiteWasFinished($testFrameworkName, '<command line>', 'output'),
         );
     }
 

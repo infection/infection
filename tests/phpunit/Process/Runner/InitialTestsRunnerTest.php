@@ -105,9 +105,10 @@ final class InitialTestsRunnerTest extends TestCase
         $testFrameworkExtraOptions = '--stop-on-failure';
         $phpExtraOptions = ['-d', 'memory_limit=-1'];
         $command = ['php', '-d', 'memory_limit=-1', 'phpunit', '--configuration=some config.xml'];
-        $commandLine = (new Process($command))->getCommandLine();
+        $executedCommand = ['/usr/bin/php', '-d', 'memory_limit=-1', 'phpunit', '--configuration=some config.xml'];
+        $commandLine = (new Process($executedCommand))->getCommandLine();
         $expected = CompletedProcessBuilder::withMinimalTestData()
-            ->withCommand($command)
+            ->withCommand($executedCommand)
             ->withExitCode($exitCode)
             ->withStdout('pingpong')
             ->withStderr('warning')
@@ -129,9 +130,9 @@ final class InitialTestsRunnerTest extends TestCase
             ->expects($this->once())
             ->method('run')
             ->with($command, $this->isInstanceOf(Closure::class), null, $expectedEnv, null, null, null, !$skipCoverage)
-            ->willReturnCallback(function (array $_command, Closure $callback) use ($commandLine, $expectedVersion, $expected): CompletedProcess {
+            ->willReturnCallback(function (array $_command, Closure $callback) use ($expectedVersion, $expected): CompletedProcess {
                 $this->assertEquals(
-                    [new InitialTestSuiteWasStarted($commandLine, 'PHPUnit', $expectedVersion)],
+                    [new InitialTestSuiteWasStarted('PHPUnit', $expectedVersion)],
                     $this->eventDispatcher->getEvents(),
                 );
 
@@ -154,11 +155,11 @@ final class InitialTestsRunnerTest extends TestCase
         $this->assertSame($expected, $actual);
         $this->assertEquals(
             [
-                new InitialTestSuiteWasStarted($commandLine, 'PHPUnit', $expectedVersion),
+                new InitialTestSuiteWasStarted('PHPUnit', $expectedVersion),
                 new InitialTestCaseWasCompleted('PHPUnit'),
                 new InitialTestCaseWasCompleted('PHPUnit'),
                 new InitialTestCaseWasCompleted('PHPUnit'),
-                new InitialTestSuiteWasFinished('PHPUnit', 'pingpong'),
+                new InitialTestSuiteWasFinished('PHPUnit', $commandLine, 'pingpong'),
             ],
             $this->eventDispatcher->getEvents(),
         );

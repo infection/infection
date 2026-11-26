@@ -216,12 +216,12 @@ final class ContainerTest extends TestCase
 
         $container->getSubscriberRegisterer()->registerSubscribers();
 
-        $dispatcher->dispatch(new InitialTestSuiteWasStarted('phpunit', 'PHPUnit', '6.5.4'));
-        $dispatcher->dispatch(new InitialTestSuiteWasStarted('phpstan analyse', 'PHPStan', '2.1.0'));
+        $dispatcher->dispatch(new InitialTestSuiteWasStarted('PHPUnit', '6.5.4'));
+        $dispatcher->dispatch(new InitialTestSuiteWasStarted('PHPStan', '2.1.0'));
         $dispatcher->dispatch(new InitialTestCaseWasCompleted('PHPUnit'));
         $dispatcher->dispatch(new InitialTestCaseWasCompleted('PHPStan'));
-        $dispatcher->dispatch(new InitialTestSuiteWasFinished('PHPUnit', 'Tests passed'));
-        $dispatcher->dispatch(new InitialTestSuiteWasFinished('PHPStan', 'No errors'));
+        $dispatcher->dispatch(new InitialTestSuiteWasFinished('PHPUnit', 'phpunit run', 'Tests passed'));
+        $dispatcher->dispatch(new InitialTestSuiteWasFinished('PHPStan', 'phpstan analyse', 'No errors'));
     }
 
     /**

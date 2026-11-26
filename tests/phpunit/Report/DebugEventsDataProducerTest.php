@@ -157,42 +157,56 @@ final class DebugEventsDataProducerTest extends TestCase
             ['testFrameworkName' => 'PHPStan'],
         ];
 
-        yield 'initial test command' => [
-            new InitialTestSuiteWasStarted('phpunit --coverage-xml=coverage', 'PHPUnit', '6.5.4'),
+        yield 'initial test start' => [
+            new InitialTestSuiteWasStarted('PHPUnit', '6.5.4'),
             [
-                'commandLine' => 'phpunit --coverage-xml=coverage',
                 'testFrameworkName' => 'PHPUnit',
                 'testFrameworkVersion' => '6.5.4',
             ],
         ];
 
-        yield 'initial static analysis command' => [
-            new InitialTestSuiteWasStarted('phpstan analyse', 'PHPStan', '2.1.0'),
+        yield 'initial static analysis start' => [
+            new InitialTestSuiteWasStarted('PHPStan', '2.1.0'),
             [
-                'commandLine' => 'phpstan analyse',
                 'testFrameworkName' => 'PHPStan',
                 'testFrameworkVersion' => '2.1.0',
             ],
         ];
 
         yield 'initial test output with newlines' => [
-            new InitialTestSuiteWasFinished('PHPUnit', "Tests: 2\nOK"),
-            ['testFrameworkName' => 'PHPUnit', 'outputText' => "Tests: 2\nOK"],
+            new InitialTestSuiteWasFinished('PHPUnit', 'phpunit run', "Tests: 2\nOK"),
+            [
+                'testFrameworkName' => 'PHPUnit',
+                'commandLine' => 'phpunit run',
+                'outputText' => "Tests: 2\nOK",
+            ],
         ];
 
         yield 'initial test output with invalid UTF-8' => [
-            new InitialTestSuiteWasFinished('PHPUnit', "output: \xFF"),
-            ['testFrameworkName' => 'PHPUnit', 'outputText' => "output: \u{FFFD}"],
+            new InitialTestSuiteWasFinished('PHPUnit', 'phpunit run', "output: \xFF"),
+            [
+                'testFrameworkName' => 'PHPUnit',
+                'commandLine' => 'phpunit run',
+                'outputText' => "output: \u{FFFD}",
+            ],
         ];
 
         yield 'initial static analysis output' => [
-            new InitialTestSuiteWasFinished('PHPStan', 'No errors'),
-            ['testFrameworkName' => 'PHPStan', 'outputText' => 'No errors'],
+            new InitialTestSuiteWasFinished('PHPStan', 'phpstan analyse', 'No errors'),
+            [
+                'testFrameworkName' => 'PHPStan',
+                'commandLine' => 'phpstan analyse',
+                'outputText' => 'No errors',
+            ],
         ];
 
         yield 'initial static analysis output with invalid UTF-8' => [
-            new InitialTestSuiteWasFinished('PHPStan', "output: \xFF"),
-            ['testFrameworkName' => 'PHPStan', 'outputText' => "output: \u{FFFD}"],
+            new InitialTestSuiteWasFinished('PHPStan', 'phpstan analyse', "output: \xFF"),
+            [
+                'testFrameworkName' => 'PHPStan',
+                'commandLine' => 'phpstan analyse',
+                'outputText' => "output: \u{FFFD}",
+            ],
         ];
 
         yield 'mutation generation count' => [

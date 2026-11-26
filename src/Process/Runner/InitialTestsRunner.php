@@ -43,7 +43,6 @@ use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use const PHP_SAPI;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -72,13 +71,11 @@ class InitialTestsRunner
             $skipCoverage,
         );
 
-        $commandLine = (new Process($command))->getCommandLine();
         $testFrameworkName = $testFrameworkAdapter->getName();
 
         $testFrameworkLogger->initialRunStarted(
             $testFrameworkName,
             $this->getVersion($testFrameworkAdapter),
-            $commandLine,
         );
 
         $env = [];
@@ -98,7 +95,11 @@ class InitialTestsRunner
             useOriginalPhpConfiguration: !$skipCoverage,
         );
 
-        $testFrameworkLogger->initialRunFinished($testFrameworkName, $process->stdout);
+        $testFrameworkLogger->initialRunFinished(
+            $testFrameworkName,
+            $process->command,
+            $process->stdout,
+        );
 
         return $process;
     }

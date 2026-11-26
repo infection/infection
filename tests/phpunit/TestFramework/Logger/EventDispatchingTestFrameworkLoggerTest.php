@@ -59,18 +59,18 @@ final class EventDispatchingTestFrameworkLoggerTest extends TestCase
         ;
         $logger = new EventDispatchingTestFrameworkLogger($dispatcher);
 
-        $logger->initialRunStarted('PHPUnit', '12.5', 'phpunit run');
+        $logger->initialRunStarted('PHPUnit', '12.5');
         $logger->initialRunProgressed('PHPUnit');
-        $logger->initialRunFinished('PHPUnit', 'test output');
-        $logger->initialRunStarted('PHPStan', '2.1', 'phpstan analyse');
-        $logger->initialRunFinished('PHPStan', 'analysis output');
+        $logger->initialRunFinished('PHPUnit', ['phpunit', '--configuration=some config.xml'], 'test output');
+        $logger->initialRunStarted('PHPStan', '2.1');
+        $logger->initialRunFinished('PHPStan', ['phpstan', 'analyse'], 'analysis output');
 
         $expected = [
-            new InitialTestSuiteWasStarted('phpunit run', 'PHPUnit', '12.5'),
+            new InitialTestSuiteWasStarted('PHPUnit', '12.5'),
             new InitialTestCaseWasCompleted('PHPUnit'),
-            new InitialTestSuiteWasFinished('PHPUnit', 'test output'),
-            new InitialTestSuiteWasStarted('phpstan analyse', 'PHPStan', '2.1'),
-            new InitialTestSuiteWasFinished('PHPStan', 'analysis output'),
+            new InitialTestSuiteWasFinished('PHPUnit', "'phpunit' '--configuration=some config.xml'", 'test output'),
+            new InitialTestSuiteWasStarted('PHPStan', '2.1'),
+            new InitialTestSuiteWasFinished('PHPStan', "'phpstan' 'analyse'", 'analysis output'),
         ];
 
         $this->assertEquals($expected, $events);
