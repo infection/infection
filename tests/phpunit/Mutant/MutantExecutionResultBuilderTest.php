@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Mutant\MutantExecutionResult;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -51,12 +53,20 @@ final class MutantExecutionResultBuilderTest extends TestCase
         $actual = MutantExecutionResultBuilder::from($result)->build();
 
         $this->assertResultEquals($result, $actual);
+        $this->assertSame($result->getEvaluationHistory(), $actual->getEvaluationHistory());
     }
 
     public static function executionResultProvider(): iterable
     {
         yield 'minimal execution result' => [
             MutantExecutionResultBuilder::withMinimalTestData()->build(),
+        ];
+
+        yield 'execution history' => [
+            MutantExecutionResultBuilder::withMinimalTestData()->withEvaluationHistory([
+                new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED),
+                new EvaluationAttemptResult('PHPStan', DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
+            ])->build(),
         ];
 
         yield 'complete execution result' => [

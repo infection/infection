@@ -121,7 +121,6 @@ use Infection\PhpParser\FileParser;
 use Infection\PhpParser\InfectionPrettyPrinter;
 use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeTraverserFactory;
-use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
@@ -155,6 +154,9 @@ use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
+use Infection\TestFramework\Common\Process\DryRunProcessFactory;
+use Infection\TestFramework\Common\Process\ProcessFactory;
+use Infection\TestFramework\Common\Process\SymfonyProcessFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -316,7 +318,7 @@ final class Container extends DIContainer
                     $container->get(TestFrameworkLogger::class),
                     $container->getLogger(),
                     $container->getCoverageCheckerFactory(),
-                    $container->getMutantProcessContainerFactory(),
+                    $container->getLegacyProcessFactory(),
                     $container->getTestFrameworkExtraOptionsFilter(),
                     $container->getStaticAnalysisToolExecutableFinder(),
                     $container->getStaticAnalysisConfigLocator(),
@@ -539,10 +541,9 @@ final class Container extends DIContainer
                 $container->get(MemoizedTestFileDataProvider::class),
             ),
             TestFrameworkLogger::class => static fn (self $container): TestFrameworkLogger => new EventDispatchingTestFrameworkLogger($container->getEventDispatcher()),
-            MutantProcessContainerFactory::class => static fn (self $container): MutantProcessContainerFactory => new MutantProcessContainerFactory(
-                $container->getConfiguration()->processTimeout,
-                $container->getConfiguration(),
-            ),
+            ProcessFactory::class => static fn (self $container): ProcessFactory => $container->getConfiguration()->isDryRun
+                ? new DryRunProcessFactory()
+                : new SymfonyProcessFactory(),
             MutationGenerator::class => static function (self $container): MutationGenerator {
                 $config = $container->getConfiguration();
 
@@ -892,9 +893,9 @@ final class Container extends DIContainer
         return $this->get(TestFramework::class);
     }
 
-    public function getMutantProcessContainerFactory(): MutantProcessContainerFactory
+    public function getLegacyProcessFactory(): ProcessFactory
     {
-        return $this->get(MutantProcessContainerFactory::class);
+        return $this->get(ProcessFactory::class);
     }
 
     public function getMutationGenerator(): MutationGenerator

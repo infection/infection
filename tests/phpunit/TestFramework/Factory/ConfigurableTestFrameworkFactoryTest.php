@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Factory;
 
 use Infection\FileSystem\FileSystem;
-use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
@@ -177,7 +176,6 @@ final class ConfigurableTestFrameworkFactoryTest extends TestCase
                 IndexXmlCoverageLocator::create($fileSystem, ''),
             ),
             $configuration,
-            $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
     }

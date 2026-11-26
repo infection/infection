@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use function array_filter;
 use function array_map;
+use function array_values;
 use ArrayIterator;
 use function count;
+use DuoClock\TimeSpy;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\DiffSourceCodeMatcher;
@@ -46,6 +49,10 @@ use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluatio
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationStrategy\Action\FinishEvaluation;
+use Infection\Mutant\EvaluationStrategy\Action\RunEvaluation;
+use Infection\Mutant\EvaluationStrategy\EvaluationStrategy;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
@@ -53,7 +60,9 @@ use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\MutationTestingRunner;
+use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
+use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
@@ -797,18 +806,119 @@ final class MutationTestingRunnerTest extends TestCase
 
     public function test_container_to_finished_event(): void
     {
-        $result = $this->createStub(MutantExecutionResult::class);
-
+        $history = [
+            new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED),
+            new EvaluationAttemptResult('PHPStan', DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
+        ];
+        $result = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withDetectionStatus(DetectionStatus::KILLED_BY_STATIC_ANALYSIS)
+            ->withEvaluationHistory($history)
+            ->build()
+        ;
         $container = $this->createMock(MutantProcessContainer::class);
         $container->expects($this->once())
             ->method('getMutantExecutionResult')
             ->willReturn($result)
         ;
+        $container->expects($this->never())->method('getCurrent');
 
         $event = $this->invokeMethod('containerToFinishedEvent', $container);
 
         $this->assertInstanceOf(MutantProcessWasFinished::class, $event);
         $this->assertSame($result, $event->executionResult);
+        $this->assertSame($history, $event->executionResult->getEvaluationHistory());
+    }
+
+    public function test_it_emits_a_final_result_when_the_framework_evaluates_without_a_process(): void
+    {
+        $mutation = $this->createMutation(0);
+        $mutant = MutantBuilder::withCompleteTestData()->withMutation($mutation)->build();
+        $attempt = new EvaluationAttemptResult('In-memory analyser', DetectionStatus::KILLED_BY_STATIC_ANALYSIS);
+        $this->mutantFactoryMock->method('create')->willReturn($mutant);
+        $this->testFrameworkMock->expects($this->once())->method('test')->with($this->identicalTo($mutant))->willReturn($attempt);
+        $this->processRunnerMock->method('run')->willReturnCallback(
+            /** @param iterable<MutantProcessContainer> $evaluations */
+            static function (iterable $evaluations): iterable {
+                foreach ($evaluations as $evaluation) {
+                    $evaluation->getCurrent();
+
+                    yield $evaluation;
+                }
+            },
+        );
+
+        $this->runner->run([$mutation]);
+
+        $finished = array_values(array_filter(
+            $this->eventDispatcher->getEvents(),
+            static fn (object $event): bool => $event instanceof MutantProcessWasFinished,
+        ));
+
+        $this->assertCount(1, $finished);
+        $this->assertSame([$attempt], $finished[0]->executionResult->getEvaluationHistory());
+        $this->assertSame(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, $finished[0]->executionResult->getDetectionStatus());
+    }
+
+    public function test_it_emits_one_final_event_after_the_strategy_finishes_all_attempts(): void
+    {
+        $mutation = $this->createMutation(0);
+        $mutant = MutantBuilder::withCompleteTestData()->withMutation($mutation)->build();
+        $first = new EvaluationAttemptResult('Tests', DetectionStatus::ESCAPED);
+        $last = new EvaluationAttemptResult('Analysis', DetectionStatus::ERROR);
+        $this->mutantFactoryMock->method('create')->willReturn($mutant);
+        $assertNoFinalEvent = function (): void {
+            $finished = array_filter(
+                $this->eventDispatcher->getEvents(),
+                static fn (object $event): bool => $event instanceof MutantProcessWasFinished,
+            );
+            $this->assertSame([], $finished);
+        };
+        $this->testFrameworkMock->expects($this->once())->method('test')->willReturnCallback(
+            static function () use ($assertNoFinalEvent, $first): EvaluationAttemptResult {
+                $assertNoFinalEvent();
+
+                return $first;
+            },
+        );
+        $analysis = $this->createMock(TestFramework::class);
+        $analysis->expects($this->once())->method('test')->willReturnCallback(
+            static function () use ($assertNoFinalEvent, $last): EvaluationAttemptResult {
+                $assertNoFinalEvent();
+
+                return $last;
+            },
+        );
+        $strategy = $this->createMock(EvaluationStrategy::class);
+        $strategy
+            ->expects($this->exactly(2))
+            ->method('decide')
+            ->willReturnMap([
+                [[$first], true, new RunEvaluation()],
+                [[$first, $last], false, new FinishEvaluation(DetectionStatus::ESCAPED)],
+            ])
+        ;
+        $framework = new CombinedTestFramework($strategy, $this->testFrameworkMock, $analysis);
+        $runner = new MutationTestingRunner(
+            $framework,
+            $this->mutantFactoryMock,
+            new ParallelProcessRunner(1, 0, new TimeSpy()),
+            $this->eventDispatcher,
+            $this->fileSystemMock,
+            $this->diffSourceCodeMatcher,
+            false,
+            self::TIMEOUT,
+            [],
+        );
+
+        $runner->run([$mutation]);
+
+        $finished = array_values(array_filter(
+            $this->eventDispatcher->getEvents(),
+            static fn (object $event): bool => $event instanceof MutantProcessWasFinished,
+        ));
+        $this->assertCount(1, $finished);
+        $this->assertSame([$first, $last], $finished[0]->executionResult->getEvaluationHistory());
+        $this->assertSame(DetectionStatus::ESCAPED, $finished[0]->executionResult->getDetectionStatus());
     }
 
     private function invokeMethod(string $methodName, mixed ...$args): mixed
@@ -926,7 +1036,10 @@ final class MutationTestingRunnerTest extends TestCase
 
     private function buildCoveredMutantProcessContainer(): MutantProcessContainer
     {
-        return $this->createMock(MutantProcessContainer::class);
+        return MutantProcessContainer::from(
+            MutantBuilder::withMinimalTestData()->build(),
+            static fn (): EvaluationAttemptResult => new EvaluationAttemptResult('Evaluator', DetectionStatus::ESCAPED),
+        );
     }
 
     private function someIterable(?callable $callback = null): Callback
@@ -960,10 +1073,14 @@ final class MutationTestingRunnerTest extends TestCase
             $actual = [];
 
             foreach ($subject as $value) {
-                $actual[] = $value;
+                if (!$value instanceof MutantProcessContainer) {
+                    return false;
+                }
+
+                $actual[] = $value->getCurrent();
             }
 
-            return $expected === $actual;
+            return array_map(static fn (MutantProcessContainer $pipe) => $pipe->getCurrent(), $expected) === $actual;
         });
     }
 

@@ -39,7 +39,6 @@ use function array_merge;
 use function explode;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\CommandLineBuilder;
@@ -51,11 +50,10 @@ use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\PHPStan\Logger\PHPStanLogger;
-use Infection\TestFramework\PHPStan\Process\PHPStanMutantProcessFactory;
+use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantProcessFactory;
 use Override;
 use function sprintf;
 use function str_starts_with;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use function version_compare;
 
@@ -84,14 +82,12 @@ final class PHPStanAdapter implements TestFramework
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
-        private readonly Filesystem $fileSystem,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly string $name,
+        private readonly PHPStanMutantProcessFactory $mutantProcessFactory,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly VersionParser $versionParser,
-        private readonly float $timeout,
-        private readonly string $tmpDir,
         private readonly array $staticAnalysisToolOptions,
         private readonly ShellCommandRunner $shellCommandRunner,
         private readonly InitialTestsRunner $initialTestsRunner,
@@ -103,7 +99,7 @@ final class PHPStanAdapter implements TestFramework
     #[Override]
     public function getName(): string
     {
-        return 'PHPStan';
+        return $this->name;
     }
 
     /**
@@ -125,19 +121,9 @@ final class PHPStanAdapter implements TestFramework
     #[Override]
     public function test(Mutant $mutant): MutantProcessContainer
     {
-        $factory = new PHPStanMutantProcessFactory(
-            $this->fileSystem,
-            $this->mutantExecutionResultFactory,
-            $this->staticAnalysisConfigPath,
-            $this->staticAnalysisToolExecutable,
-            $this->commandLineBuilder,
-            $this->timeout,
-            $this->tmpDir,
-            $this->staticAnalysisToolOptions,
-        );
-
         return MutantProcessContainer::from(
-            static fn (): MutantProcess => $factory->create($mutant),
+            $mutant,
+            fn (): MutantProcess => $this->mutantProcessFactory->create($mutant),
         );
     }
 

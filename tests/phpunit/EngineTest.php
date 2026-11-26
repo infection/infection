@@ -44,6 +44,7 @@ use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
+use Infection\Mutant\EvaluationStrategy\SequentialEvaluationStrategy;
 use Infection\Mutation\MutationGenerator;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Source\PreloadedSourceChecker;
@@ -265,7 +266,7 @@ final class EngineTest extends TestCase
 
         $engine = $this->createEngine(
             $config,
-            new CombinedTestFramework($this->testFramework, $initialStaticAnalysis),
+            new CombinedTestFramework(new SequentialEvaluationStrategy(), $this->testFramework, $initialStaticAnalysis),
         );
 
         $engine->execute();
@@ -307,7 +308,7 @@ final class EngineTest extends TestCase
         $this->expectExceptionObject($failure);
 
         $engine = $this->createEngine(
-            testFramework: new CombinedTestFramework($this->testFramework, $staticAnalysis),
+            testFramework: new CombinedTestFramework(new SequentialEvaluationStrategy(), $this->testFramework, $staticAnalysis),
         );
 
         $engine->execute();

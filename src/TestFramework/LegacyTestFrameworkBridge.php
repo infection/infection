@@ -37,18 +37,20 @@ namespace Infection\TestFramework;
 
 use function explode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
-use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Mutant\Mutant;
-use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Logger\LegacyTestFrameworkLogger;
+use Infection\TestFramework\PhpUnit\Legacy\LegacyMutantProcessFactory;
 use InvalidArgumentException;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 
@@ -67,7 +69,7 @@ final class LegacyTestFrameworkBridge implements TestFramework
         private readonly CoverageChecker $coverageChecker,
         private readonly InitialTestsRunner $initialTestsRunner,
         private readonly Configuration $config,
-        private readonly MutantProcessContainerFactory $processFactory,
+        private readonly LegacyMutantProcessFactory $mutantProcessFactory,
         private readonly TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private readonly LegacyTestFrameworkLogger $logger,
     ) {
@@ -140,19 +142,27 @@ final class LegacyTestFrameworkBridge implements TestFramework
 
     public function test(Mutant $mutant): MutantProcessContainer
     {
-        $adapter = $this->adapter;
+        if (!$mutant->getMutation()->isCoveredByTest()) {
+            return MutantProcessContainer::from(
+                $mutant,
+                fn (): EvaluationAttemptResult => new EvaluationAttemptResult(
+                    $this->getName(),
+                    DetectionStatus::NOT_COVERED,
+                ),
+            );
+        }
 
-        return $this->processFactory->create(
-            $adapter->getMutantCommandLine(
-                $mutant->getTests(),
-                $mutant->getFilePath(),
-                $mutant->getMutation()->getHash(),
-                $mutant->getMutation()->getOriginalFilePath(),
-                $this->getFilteredExtraOptionsForMutant(),
-            ),
+        $command = $this->adapter->getMutantCommandLine(
+            $mutant->getTests(),
+            $mutant->getFilePath(),
+            $mutant->getMutation()->getHash(),
+            $mutant->getMutation()->getOriginalFilePath(),
+            $this->getFilteredExtraOptionsForMutant(),
+        );
+
+        return MutantProcessContainer::from(
             $mutant,
-            $adapter->testsPass(...),
-            $adapter instanceof SyntaxErrorAware ? $adapter->isSyntaxError(...) : null,
+            fn (): MutantProcess => $this->mutantProcessFactory->create($command, $mutant),
         );
     }
 

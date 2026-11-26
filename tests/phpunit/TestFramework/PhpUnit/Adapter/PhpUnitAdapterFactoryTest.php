@@ -37,8 +37,10 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\FileSystem;
-use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessContainer;
 use Infection\Process\SymfonyProcessShellCommandRunner;
+use Infection\TestFramework\Common\Process\DryRunProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
@@ -49,8 +51,10 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -102,12 +106,44 @@ final class PhpUnitAdapterFactoryTest extends TestCase
         $fileSystem = $this->createStub(FileSystem::class);
         $fileSystem->method('readFile')->willReturn('<phpunit/>');
         $fileSystem->method('isReadableFile')->willReturn(true);
-        $configuration = ConfigurationBuilder::withMinimalTestData()->withSkipCoverage(true)->build();
+        $configuration = ConfigurationBuilder::withMinimalTestData()->withSkipCoverage(true)->withDryRun(true)->build();
         $adapter = $this->createAdapter($shellCommandRunner, $testFrameworkLogger, $fileSystem, $configuration);
 
         $initialRun = $adapter->executeInitialRun();
 
         $this->assertSame('phpunit output', $initialRun->output);
+    }
+
+    #[DataProvider('runModes')]
+    public function test_it_creates_mutant_processes_for_the_configured_run_mode(bool $dryRun): void
+    {
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner->expects($this->once())->method('mustRun')->willReturn('PHPUnit 12.5.0');
+        $shellCommandRunner->expects($this->never())->method('run');
+        $fileSystem = $this->createStub(FileSystem::class);
+        $fileSystem->method('readFile')->willReturn('<phpunit/>');
+        $configuration = ConfigurationBuilder::withMinimalTestData()->withDryRun($dryRun)->build();
+        $adapter = $this->createAdapter(
+            $shellCommandRunner,
+            $this->createStub(TestFrameworkLogger::class),
+            $fileSystem,
+            $configuration,
+        );
+
+        $container = $adapter->test(MutantBuilder::withCompleteTestData()->build());
+        $this->assertInstanceOf(MutantProcessContainer::class, $container);
+        $attempt = $container->getCurrent();
+        $this->assertInstanceOf(MutantProcess::class, $attempt);
+        $this->assertSame('PHPUnit', $attempt->getTestFrameworkName());
+
+        $this->assertSame($dryRun, $attempt->getProcess() instanceof DryRunProcess);
+    }
+
+    public static function runModes(): iterable
+    {
+        yield 'normal' => [false];
+
+        yield 'dry run' => [true];
     }
 
     public function test_it_has_a_name(): void
@@ -152,7 +188,6 @@ final class PhpUnitAdapterFactoryTest extends TestCase
                 IndexXmlCoverageLocator::create($fileSystem, ''),
             ),
             configuration: $configuration,
-            processFactory: $this->createStub(MutantProcessContainerFactory::class),
             testFrameworkExtraOptionsFilter: $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
     }

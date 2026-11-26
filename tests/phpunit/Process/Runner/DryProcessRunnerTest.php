@@ -35,10 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\DryProcessRunner;
+use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
+use Infection\Tests\Mutant\MutantBuilder;
+use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
 #[CoversClass(DryProcessRunner::class)]
 final class DryProcessRunnerTest extends TestCase
@@ -47,12 +54,18 @@ final class DryProcessRunnerTest extends TestCase
     {
         $called = false;
 
-        $processes = (function () use (&$called): iterable {
-            yield $this->createStub(MutantProcessContainer::class);
+        $processes = (static function () use (&$called): iterable {
+            yield MutantProcessContainer::from(
+                MutantBuilder::withMinimalTestData()->build(),
+                static fn (): EvaluationAttemptResult => new EvaluationAttemptResult('Direct', DetectionStatus::ESCAPED),
+            );
 
             $called = true;
 
-            yield $this->createStub(MutantProcessContainer::class);
+            yield MutantProcessContainer::from(
+                MutantBuilder::withMinimalTestData()->build(),
+                static fn (): EvaluationAttemptResult => new EvaluationAttemptResult('Direct', DetectionStatus::ESCAPED),
+            );
         })();
 
         foreach ((new DryProcessRunner())->run($processes) as $item) {
@@ -60,5 +73,35 @@ final class DryProcessRunnerTest extends TestCase
         }
 
         $this->assertTrue($called);
+    }
+
+    public function test_it_finalizes_mixed_evaluations_without_starting_processes(): void
+    {
+        $mutant = MutantBuilder::withCompleteTestData()->build();
+        $firstProcess = new Process(['must-not-run']);
+        $secondProcess = new Process(['must-not-run-either']);
+        $factory = new MagoMutantDetectionStatusResolver();
+        $first = new MutantProcess($firstProcess, $mutant, $factory, 'Mago');
+        $second = new MutantProcess($secondProcess, $mutant, $factory, 'Mago');
+        $direct = new EvaluationAttemptResult('Direct', DetectionStatus::ESCAPED);
+        $pipe = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $first)
+            ->append(static fn (): EvaluationAttemptResult => $direct)
+            ->append(static fn (): MutantProcess => $second)
+        ;
+
+        $completed = iterator_to_array((new DryProcessRunner())->run([$pipe]), false);
+        $result = $completed[0]->getMutantExecutionResult();
+        $history = $result->getEvaluationHistory();
+
+        $this->assertSame([$pipe], $completed);
+        $this->assertFalse($firstProcess->isStarted());
+        $this->assertFalse($secondProcess->isStarted());
+        $this->assertSame(DetectionStatus::ESCAPED, $result->getDetectionStatus());
+        $this->assertCount(3, $history);
+        $this->assertSame($direct, $history[1]);
+        $this->assertEquals(new EvaluationAttemptResult('Mago', DetectionStatus::ESCAPED), $history[0]);
+        $this->assertEquals(new EvaluationAttemptResult('Mago', DetectionStatus::ESCAPED), $history[2]);
+        $this->assertSame($secondProcess->getCommandLine(), $result->getProcessCommandLine());
+        $this->assertSame(0.0, $result->getProcessRuntime());
     }
 }

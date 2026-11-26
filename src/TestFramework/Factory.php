@@ -46,9 +46,9 @@ use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
-use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -59,6 +59,7 @@ use Infection\TestFramework\Logger\PsrLegacyTestFrameworkLogger;
 use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
 use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapterFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
+use Infection\TestFramework\PhpUnit\Legacy\LegacyMutantProcessFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
 use InvalidArgumentException;
@@ -94,7 +95,7 @@ final readonly class Factory
         private TestFrameworkLogger $testFrameworkLogger,
         private LoggerInterface $logger,
         private CoverageCheckerFactory $coverageCheckerFactory,
-        private MutantProcessContainerFactory $containerFactory,
+        private ProcessFactory $legacyProcessFactory,
         private TestFrameworkExtraOptionsFilter $extraOptionsFilter,
         private StaticAnalysisToolExecutableFinder $staticAnalysisExecutableFinder,
         private TestFrameworkConfigLocatorInterface $staticAnalysisConfigLocator,
@@ -116,7 +117,11 @@ final readonly class Factory
                 ),
                 new InitialTestsRunner($this->shellCommandRunner, $this->testFrameworkLogger),
                 $this->infectionConfig,
-                $this->containerFactory,
+                new LegacyMutantProcessFactory(
+                    $this->legacyProcessFactory,
+                    $testFramework,
+                    $this->infectionConfig->processTimeout,
+                ),
                 $this->extraOptionsFilter,
                 new PsrLegacyTestFrameworkLogger($this->logger),
             );
@@ -203,7 +208,6 @@ final readonly class Factory
                         $this->logger,
                         $this->coverageCheckerFactory,
                         $configuration,
-                        $this->containerFactory,
                         $this->extraOptionsFilter,
                     )
                     : $factory::create(

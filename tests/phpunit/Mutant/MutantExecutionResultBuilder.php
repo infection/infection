@@ -37,8 +37,10 @@ namespace Infection\Tests\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\SuspiciousResult;
 use Infection\Testing\MutatorName;
 use function is_string;
 use Later\Interfaces\Deferred;
@@ -50,6 +52,7 @@ final class MutantExecutionResultBuilder
      * @param Deferred<string> $mutantDiff
      * @param Deferred<string> $mutatedCode
      * @param TestLocation[] $tests
+     * @param list<EvaluationAttemptResult|SuspiciousResult> $evaluationHistory
      */
     private function __construct(
         private string $processCommandLine,
@@ -66,6 +69,7 @@ final class MutantExecutionResultBuilder
         private Deferred $mutatedCode,
         private array $tests,
         private float $processRuntime,
+        private array $evaluationHistory = [],
     ) {
     }
 
@@ -86,6 +90,7 @@ final class MutantExecutionResultBuilder
             now($result->getMutatedCode()),
             $result->getTests(),
             $result->getProcessRuntime(),
+            $result->getEvaluationHistory(),
         );
     }
 
@@ -324,6 +329,17 @@ final class MutantExecutionResultBuilder
         return $clone;
     }
 
+    /**
+     * @param list<EvaluationAttemptResult|SuspiciousResult> $evaluationHistory
+     */
+    public function withEvaluationHistory(array $evaluationHistory): self
+    {
+        $clone = clone $this;
+        $clone->evaluationHistory = $evaluationHistory;
+
+        return $clone;
+    }
+
     public function build(): MutantExecutionResult
     {
         return new MutantExecutionResult(
@@ -343,6 +359,7 @@ final class MutantExecutionResultBuilder
             $this->mutatedCode,
             $this->tests,
             $this->processRuntime,
+            $this->evaluationHistory,
         );
     }
 }

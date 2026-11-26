@@ -35,101 +35,208 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use function array_key_exists;
 use Closure;
-use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\EvaluationStrategy\Action\Action;
+use Infection\Mutant\EvaluationStrategy\Action\FinishEvaluation;
+use Infection\Mutant\EvaluationStrategy\Action\RunEvaluation;
+use Infection\Mutant\EvaluationStrategy\EvaluationStrategy;
+use Infection\Mutant\EvaluationStrategy\SequentialEvaluationStrategy;
+use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver\SuspiciousResult;
+use Webmozart\Assert\Assert;
 
 /**
+ * Coordinates lazy evaluators and retains their observations after a final decision.
+ * A nested container retains its own lifecycle; it is never reduced to its first process.
+ *
  * @internal
  * @final
  */
 class MutantProcessContainer
 {
-    /**
-     * @var array<non-negative-int, MutantProcess|self>
-     */
-    private array $processes = [];
+    private MutantProcess|EvaluationAttemptResult|self|null $current = null;
 
     /**
-     * @var non-negative-int
+     * @var list<EvaluationAttemptResult|SuspiciousResult>
      */
-    private int $currentProcessIndex = 0;
+    private array $evaluationHistory = [];
+
+    private ?Action $decision = null;
+
+    private ?MutantExecutionResult $finalResult = null;
+
+    private int $nextEvaluationIndex = 0;
 
     /**
-     * @param non-empty-list<Closure(): (MutantProcess|self)> $mutantProcessFactories
+     * @param non-empty-list<Closure(): (MutantProcess|EvaluationAttemptResult|self)> $evaluations
      */
     private function __construct(
-        private array $mutantProcessFactories,
+        private readonly Mutant $mutant,
+        private array $evaluations,
+        private EvaluationStrategy $strategy,
     ) {
     }
 
     /**
-     * @param Closure(): (MutantProcess|self) $factory
+     * @param Closure(): (MutantProcess|EvaluationAttemptResult|self) $factory
      */
-    public static function from(Closure $factory): self
+    public static function from(Mutant $mutant, Closure $factory): self
     {
-        return new self([$factory]);
+        return new self($mutant, [$factory], new SequentialEvaluationStrategy());
     }
 
-    /**
-     * Completes nested follow-ups before advancing to another factory after escape.
-     */
+    public function isCold(): bool
+    {
+        return $this->current === null;
+    }
+
+    public function withStrategy(EvaluationStrategy $strategy): self
+    {
+        Assert::true($this->isCold(), 'Cannot replace an evaluation strategy after evaluation has started.');
+
+        $clone = clone $this;
+        $clone->strategy = $strategy;
+
+        return $clone;
+    }
+
+    public function getCurrent(): MutantProcess|EvaluationAttemptResult
+    {
+        $this->current ??= $this->evaluate(0);
+
+        return $this->current instanceof self
+            ? $this->current->getCurrent()
+            : $this->current;
+    }
+
     public function hasNext(): bool
     {
-        $current = $this->getCurrentEvaluation();
+        $this->getCurrent();
 
-        if ($current instanceof self
-            && $current->hasNext()
+        // The nested container's strategy owns its internal follow-ups. Our strategy
+        // decides between evaluators after that complete sequence contributes history.
+        if ($this->current instanceof self
+            && $this->current->hasNext()
         ) {
             return true;
         }
 
-        return array_key_exists($this->currentProcessIndex + 1, $this->mutantProcessFactories)
-            && $this->getMutantExecutionResult()->getDetectionStatus() === DetectionStatus::ESCAPED;
+        return $this->decide() instanceof RunEvaluation;
     }
 
-    public function createNext(): MutantProcess
+    public function createNext(): MutantProcess|EvaluationAttemptResult
     {
-        $current = $this->getCurrentEvaluation();
-
-        if ($current instanceof self
-            && $current->hasNext()
+        if ($this->current instanceof self
+            && $this->current->hasNext()
         ) {
-            return $current->createNext();
+            return $this->current->createNext();
         }
 
-        ++$this->currentProcessIndex;
+        $decision = $this->decide();
+        Assert::isInstanceOf($decision, RunEvaluation::class, 'Cannot start another attempt after the strategy has finalized the mutant.');
+
+        $this->current = $this->evaluate($this->nextEvaluationIndex);
+        $this->decision = null;
 
         return $this->getCurrent();
     }
 
-    public function getCurrent(): MutantProcess
-    {
-        $current = $this->getCurrentEvaluation();
-
-        return $current instanceof self
-            ? $current->getCurrent()
-            : $current;
-    }
-
     /**
-     * @param Closure(): (MutantProcess|self) $factory
+     * @param Closure(): (MutantProcess|EvaluationAttemptResult|self) $factory
      */
     public function append(Closure $factory): self
     {
-        $this->mutantProcessFactories[] = $factory;
+        Assert::null($this->decision, 'Cannot change the configured evaluations after the strategy has decided what to do.');
+
+        $this->evaluations[] = $factory;
 
         return $this;
     }
 
     public function getMutantExecutionResult(): MutantExecutionResult
     {
-        return $this->getCurrent()->getMutantExecutionResult();
+        Assert::false($this->isCold(), 'Cannot finalize a mutant before evaluation has started.');
+        Assert::false($this->hasNext(), 'Cannot finalize a mutant while another evaluation attempt is pending.');
+        $decision = $this->decision;
+        Assert::isInstanceOf($decision, FinishEvaluation::class, 'Only a finish decision permits construction of a mutant result.');
+
+        $history = $this->evaluationHistory;
+        Assert::notEmpty($history, 'A completed evaluation must retain at least one observation.');
+
+        if ($this->finalResult !== null) {
+            return $this->finalResult;
+        }
+
+        $lastAttempt = $this->getCurrent();
+        $lastProcess = $lastAttempt instanceof MutantProcess
+            ? $lastAttempt
+            : null;
+
+        return $this->finalResult = MutantExecutionResult::createFromEvaluation(
+            $this->mutant,
+            $decision->detectionStatus,
+            $history,
+            $lastProcess,
+        );
     }
 
-    private function getCurrentEvaluation(): MutantProcess|self
+    private function evaluate(int $index): MutantProcess|EvaluationAttemptResult|self
     {
-        return $this->processes[$this->currentProcessIndex] ??= ($this->mutantProcessFactories[$this->currentProcessIndex])();
+        $attempt = ($this->evaluations[$index])();
+        $this->nextEvaluationIndex = $index + 1;
+
+        return $attempt;
+    }
+
+    private function decide(): Action
+    {
+        if ($this->decision !== null) {
+            return $this->decision;
+        }
+
+        $attempt = $this->current;
+        Assert::notNull($attempt, 'Cannot decide an evaluation before its first attempt has been created.');
+
+        $history = [...$this->evaluationHistory, ...$this->observe($attempt)];
+        Assert::notEmpty($history, 'A completed evaluation must retain at least one observation.');
+        $hasNextEvaluation = isset($this->evaluations[$this->nextEvaluationIndex]);
+        $decision = $this->strategy->decide($history, $hasNextEvaluation);
+        Assert::true(
+            $decision instanceof FinishEvaluation || $decision instanceof RunEvaluation,
+            'The evaluation strategy returned an unsupported action.',
+        );
+
+        if ($decision instanceof RunEvaluation) {
+            Assert::true($hasNextEvaluation, 'The strategy requested another evaluation after the configured sequence ended.');
+        }
+
+        $this->evaluationHistory = $history;
+
+        return $this->decision = $decision;
+    }
+
+    /**
+     * @return list<EvaluationAttemptResult|SuspiciousResult>
+     */
+    private function observe(MutantProcess|EvaluationAttemptResult|self $attempt): array
+    {
+        if ($attempt instanceof self) {
+            return $attempt->evaluationHistory;
+        }
+
+        if ($attempt instanceof EvaluationAttemptResult) {
+            return [$attempt];
+        }
+
+        Assert::greaterThan($attempt->getFinishedAt(), 0.0, 'Cannot collect evaluation history before the process has finished.');
+        $result = $attempt->getResult();
+
+        if ($result instanceof SuspiciousResult) {
+            return [$result];
+        }
+
+        return [new EvaluationAttemptResult($attempt->getTestFrameworkName(), $result)];
     }
 }

@@ -38,7 +38,6 @@ namespace Infection\TestFramework\Mago\Adapter;
 use function array_merge;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\CommandLineBuilder;
@@ -49,7 +48,7 @@ use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Mago\Logger\MagoLogger;
-use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
+use Infection\TestFramework\Mago\Mutant\MagoMutantProcessFactory;
 use Override;
 use function sprintf;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
@@ -64,12 +63,12 @@ final class MagoAdapter implements TestFramework
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly string $name,
+        private readonly MagoMutantProcessFactory $mutantProcessFactory,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly VersionParser $versionParser,
-        private readonly float $timeout,
         private readonly array $staticAnalysisToolOptions,
         private readonly ShellCommandRunner $shellCommandRunner,
         private readonly InitialTestsRunner $initialTestsRunner,
@@ -81,7 +80,7 @@ final class MagoAdapter implements TestFramework
     #[Override]
     public function getName(): string
     {
-        return 'Mago';
+        return $this->name;
     }
 
     #[Override]
@@ -99,16 +98,9 @@ final class MagoAdapter implements TestFramework
     #[Override]
     public function test(Mutant $mutant): MutantProcessContainer
     {
-        $factory = new MagoMutantProcessFactory(
-            $this->mutantExecutionResultFactory,
-            $this->staticAnalysisToolExecutable,
-            $this->commandLineBuilder,
-            $this->timeout,
-            $this->staticAnalysisToolOptions,
-        );
-
         return MutantProcessContainer::from(
-            static fn (): MutantProcess => $factory->create($mutant),
+            $mutant,
+            fn (): MutantProcess => $this->mutantProcessFactory->create($mutant),
         );
     }
 

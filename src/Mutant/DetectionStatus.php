@@ -39,6 +39,8 @@ use function array_udiff;
 use function array_values;
 
 /**
+ * TODO: should be moved to Infection\TestFramework\Contracts\Mutant in a separate PR.
+ *
  * @internal
  */
 enum DetectionStatus: string

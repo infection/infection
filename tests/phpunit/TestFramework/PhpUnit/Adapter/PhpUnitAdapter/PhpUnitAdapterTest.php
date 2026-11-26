@@ -45,13 +45,11 @@ use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\FileSystem;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\Mutant;
-use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
-use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -74,6 +72,8 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\PhpUnit\Log\PhpUnitLogger;
 use Infection\TestFramework\PhpUnit\MemoryLimiter;
 use Infection\TestFramework\PhpUnit\MemoryLimiterEnvironment;
+use Infection\TestFramework\PhpUnit\Mutant\PHPUnitMutantDetectionStatusResolver;
+use Infection\TestFramework\PhpUnit\Mutant\PHPUnitMutantProcessFactory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -93,6 +93,7 @@ use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(PhpUnitAdapter::class)]
+#[CoversClass(PHPUnitMutantDetectionStatusResolver::class)]
 final class PhpUnitAdapterTest extends TestCase
 {
     use ExpectsThrowables;
@@ -330,11 +331,29 @@ final class PhpUnitAdapterTest extends TestCase
         ];
     }
 
+    public function test_it_does_not_create_a_process_for_an_uncovered_mutant(): void
+    {
+        $processFactory = $this->createMock(ProcessFactory::class);
+        $processFactory->expects($this->never())->method('create');
+        $adapter = $this->createAdapter(
+            '<phpunit/>',
+            executeOnlyCoveringTestCases: true,
+            processFactory: $processFactory,
+        );
+
+        $container = $adapter->test(MutantBuilder::withMinimalTestData()->build());
+
+        $this->assertEquals(
+            new EvaluationAttemptResult('PHPUnit', DetectionStatus::NOT_COVERED),
+            $container->getCurrent(),
+        );
+    }
+
     public function test_it_filters_initial_run_only_options_from_mutant_evaluation(): void
     {
-        $mutant = MutantBuilder::withMinimalTestData()->build();
-        $processContainer = $this->createStub(MutantProcessContainer::class);
-        $processFactory = $this->createMock(MutantProcessContainerFactory::class);
+        $mutant = MutantBuilder::withCompleteTestData()->build();
+        $symfonyProcess = $this->createStub(Process::class);
+        $processFactory = $this->createMock(ProcessFactory::class);
         $adapter = $this->createAdapter(
             '<phpunit/>',
             configuration: ConfigurationBuilder::withMinimalTestData()
@@ -353,18 +372,14 @@ final class PhpUnitAdapterTest extends TestCase
                     '/tmp/phpunitConfiguration.' . $mutant->getMutation()->getHash() . '.infection.xml',
                     '--verbose',
                 ],
-                $mutant,
-                $this->isInstanceOf(Closure::class),
-                $this->isInstanceOf(Closure::class),
             )
-            ->willReturn($processContainer)
+            ->willReturn($symfonyProcess)
         ;
 
-        $this->assertSame(
-            $processContainer,
-            $adapter->test($mutant),
-            'Mutant evaluation must use the process factory with initial-run options removed.',
-        );
+        $attempt = $adapter->test($mutant)->getCurrent();
+        $this->assertInstanceOf(MutantProcess::class, $attempt);
+
+        $this->assertSame($symfonyProcess, $attempt->getProcess());
     }
 
     #[DataProvider('mutantOutputProvider')]
@@ -736,18 +751,13 @@ final class PhpUnitAdapterTest extends TestCase
             )
             ->build()
         ;
-        $processContainer = $this->createStub(MutantProcessContainer::class);
-        $processFactory = $this->createMock(MutantProcessContainerFactory::class);
+        $symfonyProcess = $this->createStub(Process::class);
+        $processFactory = $this->createMock(ProcessFactory::class);
         $processFactory
             ->expects($this->once())
             ->method('create')
-            ->with(
-                $scenario->expected,
-                $mutant,
-                $this->isInstanceOf(Closure::class),
-                $this->isInstanceOf(Closure::class),
-            )
-            ->willReturn($processContainer)
+            ->with($scenario->expected)
+            ->willReturn($symfonyProcess)
         ;
 
         $adapter = $this->createAdapter(
@@ -762,7 +772,10 @@ final class PhpUnitAdapterTest extends TestCase
 
         $actual = $adapter->test($mutant);
 
-        $this->assertSame($processContainer, $actual);
+        $this->assertTrue($actual->isCold());
+        $attempt = $actual->getCurrent();
+        $this->assertInstanceOf(MutantProcess::class, $attempt);
+        $this->assertSame($symfonyProcess, $attempt->getProcess());
     }
 
     public function test_it_applies_the_initial_run_memory_usage_to_mutant_commands(): void
@@ -778,15 +791,15 @@ final class PhpUnitAdapterTest extends TestCase
         $environment = $this->createMock(MemoryLimiterEnvironment::class);
         $environment->expects($this->once())->method('hasMemoryLimitSet')->willReturn(false);
         $memoryLimiter = new MemoryLimiter($environment);
-        $processFactory = $this->createMock(MutantProcessContainerFactory::class);
-        $processContainer = $this->createStub(MutantProcessContainer::class);
+        $processFactory = $this->createMock(ProcessFactory::class);
+        $symfonyProcess = $this->createStub(Process::class);
         $processFactory
             ->expects($this->once())
             ->method('create')
-            ->willReturnCallback(function (array $command) use ($processContainer): MutantProcessContainer {
+            ->willReturnCallback(function (array $command) use ($symfonyProcess): Process {
                 $this->assertSame(['-d', 'memory_limit=25M'], array_slice($command, 1, 2));
 
-                return $processContainer;
+                return $symfonyProcess;
             })
         ;
         $adapter = $this->createAdapter(
@@ -811,7 +824,7 @@ final class PhpUnitAdapterTest extends TestCase
         ;
         $adapter->executeInitialRun();
 
-        $adapter->test(MutantBuilder::withMinimalTestData()->build());
+        $adapter->test(MutantBuilder::withCompleteTestData()->build())->getCurrent();
     }
 
     public static function passOutputProvider(): iterable
@@ -1925,18 +1938,6 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
-        yield 'with empty coverage tests and only covering test cases enabled' => [
-            $default
-                ->withExecuteOnlyCoveringTestCases(true)
-                ->withCoverageTests([])
-                ->withExpected([
-                    self::PHP_EXECUTABLE,
-                    '/path/to/phpunit',
-                    '--configuration',
-                    '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                ]),
-        ];
-
         yield 'with only covering test cases disabled' => [
             $default
                 ->withExecuteOnlyCoveringTestCases(false)
@@ -2149,34 +2150,21 @@ final class PhpUnitAdapterTest extends TestCase
         $process->method('getOutput')->willReturn($output);
         $process->method('getExitCode')->willReturn($exitCode);
         $process->method('getStartTime')->willReturn(0.0);
-        $processFactory = $this->createMock(MutantProcessContainerFactory::class);
+        $processFactory = $this->createMock(ProcessFactory::class);
         $processFactory
             ->expects($this->once())
             ->method('create')
-            ->willReturnCallback(
-                /**
-                 * @param Closure(string): bool $testsPass
-                 * @param (Closure(string): mixed)|null $isSyntaxError
-                 */
-                static function (array $_command, Mutant $mutant, Closure $testsPass, ?Closure $isSyntaxError) use ($process): MutantProcessContainer {
-                    $mutantProcess = new MutantProcess(
-                        $process,
-                        $mutant,
-                        new TestFrameworkMutantExecutionResultFactory($testsPass, $isSyntaxError),
-                    );
-                    $mutantProcess->markAsFinished();
-
-                    return MutantProcessContainer::from(
-                        static fn (): MutantProcess => $mutantProcess,
-                    );
-                },
-            )
+            ->willReturn($process)
         ;
         $adapter = $this->createAdapter('<phpunit/>', processFactory: $processFactory);
 
-        $result = $adapter->test($mutant)->getCurrent()->getMutantExecutionResult();
+        $attempt = $adapter->test($mutant)->getCurrent();
+        $this->assertInstanceOf(MutantProcess::class, $attempt);
+        $attempt->markAsFinished();
+        $result = $attempt->getResult();
+        $this->assertInstanceOf(DetectionStatus::class, $result);
 
-        return $result->getDetectionStatus();
+        return $result;
     }
 
     /**
@@ -2193,7 +2181,7 @@ final class PhpUnitAdapterTest extends TestCase
         ?MemoryLimiter $memoryLimiter = null,
         ?Configuration $configuration = null,
         ?InitialTestsRunner $initialTestsRunner = null,
-        ?MutantProcessContainerFactory $processFactory = null,
+        ?ProcessFactory $processFactory = null,
         ?PhpUnitLogger $logger = null,
     ): PhpUnitAdapter {
         $configuration ??= ConfigurationBuilder::withMinimalTestData()->build();
@@ -2213,7 +2201,34 @@ final class PhpUnitAdapterTest extends TestCase
             $testFrameworkConfigDir,
         );
 
+        $commandLineBuilder = new CommandLineBuilder($this->phpExecutableFinderMock);
+        $memoryLimiter ??= new MemoryLimiter($this->createStub(MemoryLimiterEnvironment::class));
+        $argumentsAndOptionsBuilder = new ArgumentsAndOptionsBuilder(
+            $executeOnlyCoveringTestCases,
+            $filteredSourceFilesToMutate,
+            $mapSourceClassToTestStrategy,
+            false,
+        );
+        $mutantProcessFactory = new PHPUnitMutantProcessFactory(
+            'PHPUnit',
+            $processFactory ?? $this->createStub(ProcessFactory::class),
+            $configuration->processTimeout,
+            '/path/to/phpunit',
+            $commandLineBuilder,
+            new MutationConfigBuilder(
+                $tmpDir,
+                $testFrameworkConfigContent,
+                $configManipulator,
+                $projectDir,
+                new TestRunOrderResolver(),
+                $this->fileSystemMock,
+            ),
+            $argumentsAndOptionsBuilder,
+            $memoryLimiter,
+        );
+
         return new PhpUnitAdapter(
+            'PHPUnit',
             '/path/to/phpunit',
             $tmpDir,
             '/tmp/infection/junit.xml',
@@ -2227,23 +2242,10 @@ final class PhpUnitAdapterTest extends TestCase
                 ['bin', 'src'],
                 $filteredSourceFilePathsToMutate,
             ),
-            new MutationConfigBuilder(
-                $tmpDir,
-                $testFrameworkConfigContent,
-                $configManipulator,
-                $projectDir,
-                new TestRunOrderResolver(),
-                $this->fileSystemMock,
-            ),
-            new ArgumentsAndOptionsBuilder(
-                $executeOnlyCoveringTestCases,
-                $filteredSourceFilesToMutate,
-                $mapSourceClassToTestStrategy,
-                false,
-            ),
+            $argumentsAndOptionsBuilder,
             $shellCommandRunner ?? $this->createStub(ShellCommandRunner::class),
             new VersionParser('PHPUnit'),    // won't be used since we pass the version
-            new CommandLineBuilder($this->phpExecutableFinderMock),
+            $commandLineBuilder,
             '/path/to/project/tools/phpunit/phpunit.xml',
             $logger ?? $this->createStub(PhpUnitLogger::class),
             new CoverageCheckerFactory(
@@ -2259,9 +2261,9 @@ final class PhpUnitAdapterTest extends TestCase
             ),
             $initialTestsRunner ?? $this->createStub(InitialTestsRunner::class),
             $configuration,
-            $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
+            $mutantProcessFactory,
             new TestFrameworkExtraOptionsFilter(),
-            $memoryLimiter ?? new MemoryLimiter($this->createStub(MemoryLimiterEnvironment::class)),
+            $memoryLimiter,
             $version,
         );
     }

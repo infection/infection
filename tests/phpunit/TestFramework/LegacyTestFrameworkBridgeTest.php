@@ -36,11 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Closure;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Console\ConsoleOutput;
-use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\InitialTestsRunner;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -48,12 +52,14 @@ use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
 use Infection\TestFramework\Logger\LegacyTestFrameworkLogger;
+use Infection\TestFramework\PhpUnit\Legacy\LegacyMutantProcessFactory;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter;
 use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\Mutation\MutationBuilder;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -342,29 +348,55 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
 
     public function test_it_delegates_mutant_evaluation_to_the_legacy_process_factory(): void
     {
-        $mutant = MutantBuilder::withMinimalTestData()->build();
-        $processContainer = $this->createStub(MutantProcessContainer::class);
+        $mutation = MutationBuilder::withMinimalTestData()
+            ->withTests([new TestLocation('FooTest::test_it_works', '/project/tests/FooTest.php', 0.01)])
+            ->build()
+        ;
+        $mutant = MutantBuilder::withMinimalTestData()->withMutation($mutation)->build();
+        $process = $this->createStub(Process::class);
         $adapter = new DummyTestFrameworkAdapter();
 
-        $processFactoryMock = $this->createMock(MutantProcessContainerFactory::class);
+        $processFactoryMock = $this->createMock(ProcessFactory::class);
         $processFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with(['/bin/dummy'], $mutant, $this->isInstanceOf(Closure::class), null)
-            ->willReturn($processContainer)
+            ->with(['/bin/dummy'], null, [], null, 5.05)
+            ->willReturn($process)
         ;
 
         $testFramework = $this->createTestFramework(adapter: $adapter, processFactory: $processFactoryMock);
 
         $actual = $testFramework->test($mutant);
 
-        $this->assertSame($processContainer, $actual);
+        $this->assertInstanceOf(MutantProcessContainer::class, $actual);
+        $this->assertTrue($actual->isCold());
+        $attempt = $actual->getCurrent();
+        $this->assertInstanceOf(MutantProcess::class, $attempt);
+        $this->assertSame($process, $attempt->getProcess());
+        $this->assertSame('dummy', $attempt->getTestFrameworkName());
+    }
+
+    public function test_it_does_not_create_a_process_for_an_uncovered_mutant(): void
+    {
+        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter->method('getName')->willReturn('Legacy framework');
+        $adapter->expects($this->never())->method('getMutantCommandLine');
+        $processFactory = $this->createMock(ProcessFactory::class);
+        $processFactory->expects($this->never())->method('create');
+        $framework = $this->createTestFramework(adapter: $adapter, processFactory: $processFactory);
+
+        $container = $framework->test(MutantBuilder::withMinimalTestData()->build());
+        $this->assertInstanceOf(MutantProcessContainer::class, $container);
+        $this->assertEquals(
+            new EvaluationAttemptResult('Legacy framework', DetectionStatus::NOT_COVERED),
+            $container->getCurrent(),
+        );
     }
 
     public function test_it_filters_initial_run_only_options_from_mutant_evaluation(): void
     {
-        $mutant = MutantBuilder::withMinimalTestData()->build();
-        $processContainer = $this->createStub(MutantProcessContainer::class);
+        $mutant = MutantBuilder::withCompleteTestData()->build();
+        $process = $this->createStub(Process::class);
         /** @var TestFrameworkAdapter&ProvidesInitialRunOnlyOptions&MockObject $adapter */
         $adapter = $this->createMockForIntersectionOfInterfaces([
             TestFrameworkAdapter::class,
@@ -384,12 +416,12 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             )
         ;
 
-        $processFactoryMock = $this->createMock(MutantProcessContainerFactory::class);
+        $processFactoryMock = $this->createMock(ProcessFactory::class);
         $processFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with(['/bin/dummy'], $mutant, $this->isInstanceOf(Closure::class), null)
-            ->willReturn($processContainer)
+            ->with(['/bin/dummy'])
+            ->willReturn($process)
         ;
 
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
@@ -409,7 +441,11 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
 
         $actual = $testFramework->test($mutant);
 
-        $this->assertSame($processContainer, $actual);
+        $this->assertInstanceOf(MutantProcessContainer::class, $actual);
+        $this->assertTrue($actual->isCold());
+        $attempt = $actual->getCurrent();
+        $this->assertInstanceOf(MutantProcess::class, $attempt);
+        $this->assertSame($process, $attempt->getProcess());
     }
 
     private function createTestFramework(
@@ -417,7 +453,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         ?ConsoleOutput $consoleOutput = null,
         ?CoverageChecker $coverageChecker = null,
         ?InitialTestsRunner $initialTestsRunner = null,
-        ?MutantProcessContainerFactory $processFactory = null,
+        ?ProcessFactory $processFactory = null,
         ?TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter = null,
         bool $skipInitialTests = false,
         ?string $initialTestsPhpOptions = null,
@@ -425,18 +461,26 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         bool $skipCoverage = false,
         ?LegacyTestFrameworkLogger $logger = null,
     ): TestFramework {
+        $adapter ??= new FakeAwareAdapter(1.0);
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withInitialTestsPhpOptions($initialTestsPhpOptions)
+            ->withTestFrameworkExtraOptions($testFrameworkExtraOptions)
+            ->withSkipCoverage($skipCoverage)
+            ->withSkipInitialTests($skipInitialTests)
+            ->build()
+        ;
+
         return new LegacyTestFrameworkBridge(
-            adapter: $adapter ?? new FakeAwareAdapter(1.0),
+            adapter: $adapter,
             consoleOutput: $consoleOutput ?? $this->createStub(ConsoleOutput::class),
             coverageChecker: $coverageChecker ?? $this->createStub(CoverageChecker::class),
             initialTestsRunner: $initialTestsRunner ?? $this->createStub(InitialTestsRunner::class),
-            config: ConfigurationBuilder::withMinimalTestData()
-                ->withInitialTestsPhpOptions($initialTestsPhpOptions)
-                ->withTestFrameworkExtraOptions($testFrameworkExtraOptions)
-                ->withSkipCoverage($skipCoverage)
-                ->withSkipInitialTests($skipInitialTests)
-                ->build(),
-            processFactory: $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
+            config: $configuration,
+            mutantProcessFactory: new LegacyMutantProcessFactory(
+                $processFactory ?? $this->createStub(ProcessFactory::class),
+                $adapter,
+                $configuration->processTimeout,
+            ),
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter ?? $this->createStub(TestFrameworkExtraOptionsFilter::class),
             logger: $logger ?? $this->createStub(LegacyTestFrameworkLogger::class),
         );

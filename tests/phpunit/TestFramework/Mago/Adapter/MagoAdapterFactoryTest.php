@@ -36,7 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Mago\Adapter;
 
 use Infection\FileSystem\FileSystem;
-use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcess;
+use Infection\TestFramework\Common\Process\DryRunProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
@@ -49,6 +50,7 @@ use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
@@ -82,7 +84,7 @@ final class MagoAdapterFactoryTest extends TestCase
             ->method('initialRunFinished')
             ->with('Mago', $result->command, 'Analysis passed.')
         ;
-        $adapter = $this->createAdapter($shellCommandRunner, $testFrameworkLogger);
+        $adapter = $this->createAdapter($shellCommandRunner, $testFrameworkLogger, dryRun: true);
 
         $this->assertSame('Mago', $adapter->getName());
         $initialRun = $adapter->executeInitialRun();
@@ -90,16 +92,29 @@ final class MagoAdapterFactoryTest extends TestCase
         $this->assertSame('Analysis passed.', $initialRun->output);
     }
 
-    public function test_it_uses_the_configured_timeout_for_mutants(): void
+    #[DataProvider('runModes')]
+    public function test_it_creates_mutant_processes_for_the_configured_run_mode(bool $dryRun): void
     {
         $adapter = $this->createAdapter(
             $this->createStub(ShellCommandRunner::class),
             $this->createStub(TestFrameworkLogger::class),
+            $dryRun,
         );
         $mutant = MutantBuilder::withMinimalTestData()->build();
-        $process = $adapter->test($mutant)->getCurrent()->getProcess();
+        $attempt = $adapter->test($mutant)->getCurrent();
+        $this->assertInstanceOf(MutantProcess::class, $attempt);
+        $this->assertSame('Mago', $attempt->getTestFrameworkName());
+        $process = $attempt->getProcess();
 
         $this->assertSame(32.3, $process->getTimeout());
+        $this->assertSame($dryRun, $process instanceof DryRunProcess);
+    }
+
+    public static function runModes(): iterable
+    {
+        yield 'normal' => [false];
+
+        yield 'dry run' => [true];
     }
 
     public function test_it_has_a_name(): void
@@ -115,8 +130,10 @@ final class MagoAdapterFactoryTest extends TestCase
     private function createAdapter(
         ShellCommandRunner $shellCommandRunner,
         TestFrameworkLogger $testFrameworkLogger,
+        bool $dryRun,
     ): MagoAdapter {
         $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withDryRun($dryRun)
             ->withTimeout(32.3)
             ->withStaticAnalysisToolOptions('--sort')
             ->build()
@@ -147,7 +164,6 @@ final class MagoAdapterFactoryTest extends TestCase
                 IndexXmlCoverageLocator::create($fileSystem, ''),
             ),
             configuration: $configuration,
-            processFactory: $this->createStub(MutantProcessContainerFactory::class),
             testFrameworkExtraOptionsFilter: $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );
     }
