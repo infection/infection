@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
+use const DIRECTORY_SEPARATOR;
 use Infection\Process\OriginalPhpProcess;
 use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
@@ -295,6 +296,23 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
         $actual = $this->runner->run($command);
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function test_it_returns_the_executed_command_line_with_escaped_arguments(): void
+    {
+        $command = ['php', '-r', 'echo $argv[1];', '--', "it's quoted"];
+        $expectedCommandLine = DIRECTORY_SEPARATOR === '\\'
+            ? <<<'COMMAND'
+                php -r "echo $argv[1];" -- "it's quoted"
+                COMMAND
+            : <<<'COMMAND'
+                'php' '-r' 'echo $argv[1];' '--' 'it'\''s quoted'
+                COMMAND;
+
+        $result = $this->runner->run($command);
+
+        $this->assertSame($expectedCommandLine, $result->commandLine);
+        $this->assertSame("it's quoted", $result->stdout);
     }
 
     public function test_it_returns_a_process_run_with_the_given_execution_context(): void

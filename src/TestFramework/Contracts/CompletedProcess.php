@@ -45,6 +45,7 @@ final readonly class CompletedProcess
      */
     public function __construct(
         public array $command,
+        public string $commandLine,
         public int $exitCode,
         public string $stdout,
         public string $stderr,

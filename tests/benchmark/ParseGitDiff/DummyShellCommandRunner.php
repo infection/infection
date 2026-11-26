@@ -79,6 +79,7 @@ final readonly class DummyShellCommandRunner implements ShellCommandRunner
     ): CompletedProcess {
         return new CompletedProcess(
             command: $command,
+            commandLine: '',
             exitCode: 0,
             stdout: $this->executeResult,
             stderr: '',

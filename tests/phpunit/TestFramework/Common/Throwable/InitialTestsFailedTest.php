@@ -105,6 +105,7 @@ final class InitialTestsFailedTest extends TestCase
     ): void {
         $process = new CompletedProcess(
             ['phpstan', 'analyse'],
+            "'phpstan' 'analyse'",
             3,
             $stdout,
             $stderr,

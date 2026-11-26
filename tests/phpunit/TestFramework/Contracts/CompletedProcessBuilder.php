@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Contracts;
 
 use Infection\TestFramework\Contracts\CompletedProcess;
+use Symfony\Component\Process\Process;
 
 final class CompletedProcessBuilder
 {
@@ -99,6 +100,7 @@ final class CompletedProcessBuilder
     {
         return new CompletedProcess(
             $this->command,
+            (new Process($this->command))->getCommandLine(),
             $this->exitCode,
             $this->stdout,
             $this->stderr,
