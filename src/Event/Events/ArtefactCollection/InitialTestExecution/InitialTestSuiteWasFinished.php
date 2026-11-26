@@ -41,6 +41,7 @@ namespace Infection\Event\Events\ArtefactCollection\InitialTestExecution;
 final readonly class InitialTestSuiteWasFinished
 {
     public function __construct(
+        public string $testFrameworkName,
         public string $outputText,
     ) {
     }

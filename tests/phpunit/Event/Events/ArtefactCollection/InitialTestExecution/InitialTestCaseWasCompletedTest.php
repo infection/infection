@@ -42,13 +42,10 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(InitialTestCaseWasCompleted::class)]
 final class InitialTestCaseWasCompletedTest extends TestCase
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_instantiated(): void
+    public function test_it_exposes_the_framework_name(): void
     {
-        $class = new InitialTestCaseWasCompleted();
+        $event = new InitialTestCaseWasCompleted('PHPUnit');
 
-        $this->assertInstanceOf(InitialTestCaseWasCompleted::class, $class);
+        $this->assertSame('PHPUnit', $event->testFrameworkName);
     }
 }

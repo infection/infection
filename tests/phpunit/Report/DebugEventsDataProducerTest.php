@@ -143,8 +143,8 @@ final class DebugEventsDataProducerTest extends TestCase
         foreach ([
             new ApplicationExecutionWasStarted(),
             new ApplicationExecutionWasFinished(),
-            new InitialTestCaseWasCompleted(),
-            new InitialStaticAnalysisSubStepWasCompleted(),
+            new InitialTestCaseWasCompleted('PHPUnit'),
+            new InitialStaticAnalysisSubStepWasCompleted('PHPStan'),
             new MutationGenerationWasFinished(),
             new MutationTestingWasFinished(),
             new stdClass(),
@@ -171,22 +171,22 @@ final class DebugEventsDataProducerTest extends TestCase
         ];
 
         yield 'initial test output with newlines' => [
-            new InitialTestSuiteWasFinished("Tests: 2\nOK"),
+            new InitialTestSuiteWasFinished('PHPUnit', "Tests: 2\nOK"),
             ['outputText' => "Tests: 2\nOK"],
         ];
 
         yield 'initial test output with invalid UTF-8' => [
-            new InitialTestSuiteWasFinished("output: \xFF"),
+            new InitialTestSuiteWasFinished('PHPUnit', "output: \xFF"),
             ['outputText' => "output: \u{FFFD}"],
         ];
 
         yield 'initial static analysis output' => [
-            new InitialStaticAnalysisRunWasFinished('No errors'),
+            new InitialStaticAnalysisRunWasFinished('PHPStan', 'No errors'),
             ['outputText' => 'No errors'],
         ];
 
         yield 'initial static analysis output with invalid UTF-8' => [
-            new InitialStaticAnalysisRunWasFinished("output: \xFF"),
+            new InitialStaticAnalysisRunWasFinished('PHPStan', "output: \xFF"),
             ['outputText' => "output: \u{FFFD}"],
         ];
 

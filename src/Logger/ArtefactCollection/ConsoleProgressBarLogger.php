@@ -44,16 +44,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final readonly class ConsoleProgressBarLogger implements InitialStaticAnalysisExecutionLogger, InitialTestsExecutionLogger
+final class ConsoleProgressBarLogger implements InitialStaticAnalysisExecutionLogger, InitialTestsExecutionLogger
 {
-    private ProgressBar $progressBar;
+    /**
+     * @var array<string, ProgressBar>
+     */
+    private array $progressBars = [];
 
     public function __construct(
-        private OutputInterface $output,
-        private bool $debug,
+        private readonly OutputInterface $output,
+        private readonly bool $debug,
     ) {
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('verbose');
     }
 
     public function start(string $testFrameworkName, string $testFrameworkVersion): void
@@ -68,17 +69,22 @@ final readonly class ConsoleProgressBarLogger implements InitialStaticAnalysisEx
             '',
         ]);
 
-        $this->progressBar->start();
+        $progressBar = $this->createProgressBar();
+
+        $this->progressBars[$testFrameworkName] = $progressBar;
+        $progressBar->start();
     }
 
-    public function advance(): void
+    public function advance(string $testFrameworkName): void
     {
-        $this->progressBar->advance();
+        $this->progressBars[$testFrameworkName]->advance();
     }
 
-    public function finish(string $executionOutput): void
+    public function finish(string $testFrameworkName, string $executionOutput): void
     {
-        $this->progressBar->finish();
+        $this->progressBars[$testFrameworkName]->finish();
+        unset($this->progressBars[$testFrameworkName]);
+
         $this->output->writeln('');
 
         if ($this->debug) {
@@ -87,5 +93,13 @@ final readonly class ConsoleProgressBarLogger implements InitialStaticAnalysisEx
                 $executionOutput,
             ]);
         }
+    }
+
+    private function createProgressBar(): ProgressBar
+    {
+        $progressBar = new ProgressBar($this->output);
+        $progressBar->setFormat('verbose');
+
+        return $progressBar;
     }
 }

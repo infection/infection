@@ -62,12 +62,12 @@ final readonly class ConsoleNoProgressLogger implements InitialStaticAnalysisExe
         ]);
     }
 
-    public function advance(): void
+    public function advance(string $testFrameworkName): void
     {
         // Do nothing.
     }
 
-    public function finish(string $executionOutput): void
+    public function finish(string $testFrameworkName, string $executionOutput): void
     {
         // Do nothing.
     }

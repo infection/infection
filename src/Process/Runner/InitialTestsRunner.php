@@ -72,24 +72,26 @@ class InitialTestsRunner
             $skipCoverage,
         );
 
+        $testFrameworkName = $testFrameworkAdapter->getName();
+
         $this->eventDispatcher->dispatch(
             new InitialTestSuiteWasStarted(
                 commandLine: $process->getCommandLine(),
-                testFrameworkName: $testFrameworkAdapter->getName(),
+                testFrameworkName: $testFrameworkName,
                 testFrameworkVersion: $this->getVersion($testFrameworkAdapter),
             ),
         );
 
-        $process->run(function (string $type) use ($process): void {
+        $process->run(function (string $type) use ($process, $testFrameworkName): void {
             if ($type === Process::ERR) {
                 // Stop on the first error encountered
                 $process->stop();
             }
 
-            $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted());
+            $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted($testFrameworkName));
         });
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($process->getOutput()));
+        $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($testFrameworkName, $process->getOutput()));
 
         return $process;
     }

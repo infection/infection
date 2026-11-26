@@ -40,4 +40,8 @@ namespace Infection\Event\Events\ArtefactCollection\InitialTestExecution;
  */
 final readonly class InitialTestCaseWasCompleted
 {
+    public function __construct(
+        public string $testFrameworkName,
+    ) {
+    }
 }

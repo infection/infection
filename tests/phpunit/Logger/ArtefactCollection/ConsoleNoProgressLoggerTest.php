@@ -70,4 +70,19 @@ final class ConsoleNoProgressLoggerTest extends TestCase
 
         $this->assertSame($expected, $actual);
     }
+
+    public function test_it_logs_multiple_frameworks_without_progress(): void
+    {
+        $this->logger->start('PHPUnit', '6.5.4');
+        $this->logger->start('Pest', '3.0.0');
+        $this->logger->advance('PHPUnit');
+        $this->logger->advance('Pest');
+        $this->logger->finish('Pest', 'Pest output');
+        $this->logger->finish('PHPUnit', 'PHPUnit output');
+
+        $expected = "\nRunning initial tests with PHPUnit version 6.5.4\n\nRunning initial tests with Pest version 3.0.0\n";
+        $actual = Str::toUnixLineEndings($this->output->fetch());
+
+        $this->assertSame($expected, $actual);
+    }
 }

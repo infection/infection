@@ -63,11 +63,14 @@ final readonly class InitialStaticAnalysisExecutionLoggerSubscriber implements I
 
     public function onInitialStaticAnalysisSubStepWasCompleted(InitialStaticAnalysisSubStepWasCompleted $event): void
     {
-        $this->logger->advance();
+        $this->logger->advance($event->testFrameworkName);
     }
 
     public function onInitialStaticAnalysisRunWasFinished(InitialStaticAnalysisRunWasFinished $event): void
     {
-        $this->logger->finish($event->outputText);
+        $this->logger->finish(
+            $event->testFrameworkName,
+            $event->outputText,
+        );
     }
 }

@@ -40,4 +40,8 @@ namespace Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis;
  */
 final readonly class InitialStaticAnalysisSubStepWasCompleted
 {
+    public function __construct(
+        public string $testFrameworkName,
+    ) {
+    }
 }

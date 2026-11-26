@@ -127,8 +127,8 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
         $this->assertEquals(
             [
                 new InitialStaticAnalysisRunWasStarted($commandLine, 'PHPStan', $expectedVersion),
-                new InitialStaticAnalysisSubStepWasCompleted(),
-                new InitialStaticAnalysisRunWasFinished('pingpong'),
+                new InitialStaticAnalysisSubStepWasCompleted('PHPStan'),
+                new InitialStaticAnalysisRunWasFinished('PHPStan', 'pingpong'),
             ],
             $this->eventDispatcher->getEvents(),
         );

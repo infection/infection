@@ -37,7 +37,8 @@ namespace Infection\Logger\ArtefactCollection\InitialTestsExecution;
 
 /**
  * Logger for the initial tests execution phase. Beware that this phase can be skipped (if no
- * initial tests are executed).
+ * initial tests are executed). Framework names identify runs: each advance and finish
+ * call must name a framework whose run has started.
  *
  * @internal
  */
@@ -45,7 +46,7 @@ interface InitialTestsExecutionLogger
 {
     public function start(string $testFrameworkName, string $testFrameworkVersion): void;
 
-    public function advance(): void;
+    public function advance(string $testFrameworkName): void;
 
-    public function finish(string $executionOutput): void;
+    public function finish(string $testFrameworkName, string $executionOutput): void;
 }
