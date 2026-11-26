@@ -35,8 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
+use function array_keys;
 use function get_debug_type;
 use Infection\Configuration\ResolvedSource;
+use Infection\Configuration\SourceFilter\ChangedLinesFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFileFilter;
@@ -68,6 +70,10 @@ final readonly class SourceCollectorFactory
                 $this->git,
                 $source,
                 $sourceFilter,
+            ),
+            $sourceFilter instanceof ChangedLinesFilter => new BasicSourceCollector(
+                $source,
+                new PlainFilter(array_keys($sourceFilter->changedLinesRangesByFilePath)),
             ),
             $sourceFilter === null || $sourceFilter instanceof PlainFilter => new BasicSourceCollector(
                 $source,

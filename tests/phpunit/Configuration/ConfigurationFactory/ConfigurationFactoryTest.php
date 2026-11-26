@@ -51,6 +51,8 @@ use Infection\Configuration\PositionalArgumentsClassifier;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\ResolvedSource;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\SourceFilter\ChangedLinesFilter;
+use Infection\Configuration\SourceFilter\GitDiffFileFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
@@ -59,6 +61,7 @@ use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelector;
 use Infection\Configuration\SourceSymbol\SourceSymbolSelectorParser;
 use Infection\Console\LogVerbosity;
+use Infection\Differ\ChangedLinesRange;
 use Infection\Differ\Differ;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\TmpDirProvider;
@@ -73,6 +76,7 @@ use Infection\Mutator\MutatorParser;
 use Infection\Mutator\NoopMutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -90,6 +94,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use function str_contains;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 
@@ -1532,6 +1537,45 @@ final class ConfigurationFactoryTest extends TestCase
                 ->forSourceFilter(
                     sourceFilter: new IncompleteGitDiffFilter('AD', null),
                     expectedSourceFilter: new GitDiffFilter('AD', 'reference(test/default)'),
+                ),
+        ];
+
+        yield 'with a git diff file' => [
+            $defaultScenario
+                ->forSourceFilter(
+                    sourceFilter: new GitDiffFileFilter(
+                        __DIR__ . '/../../Fixtures/Files/git-diff-file/changes.diff',
+                    ),
+                    expectedSourceFilter: new ChangedLinesFilter([
+                        '/path/to/src/Foo.php' => [ChangedLinesRange::forRange(10, 3)],
+                    ]),
+                ),
+        ];
+
+        yield 'with a git diff file that does not exist' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(new GitDiffFileFilter('unknown.diff')),
+                )
+                ->withExpected(
+                    // The message differs between Symfony versions, but both contain the path.
+                    new IOException('/path/to/unknown.diff'),
+                ),
+        ];
+
+        yield 'with a git diff file without added or modified lines' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new GitDiffFileFilter(
+                            __DIR__ . '/../../Fixtures/Files/git-diff-file/removed-lines-only.diff',
+                        ),
+                    ),
+                )
+                ->withExpected(
+                    NoSourceFound::noChangedLinesForGitDiffFile(
+                        __DIR__ . '/../../Fixtures/Files/git-diff-file/removed-lines-only.diff',
+                    ),
                 ),
         ];
 

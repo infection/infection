@@ -42,6 +42,9 @@ use Infection\CannotBeInstantiated;
 use function Safe\preg_match;
 use function sprintf;
 use function str_starts_with;
+use function stripcslashes;
+use function strlen;
+use function substr;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
@@ -54,7 +57,7 @@ final class ChangedLinesParser
 {
     use CannotBeInstantiated;
 
-    private const string DIFF_LINE_REGEX = '/diff.*a\/.*\sb\/(?<filePath>.*)/';
+    private const string DIFF_LINE_REGEX = '~^diff --git (?:"(?:[^"\\\\]|\\\\.)*"|a/.*) (?<filePath>"b/.*"|b/.*)$~';
 
     private const string DIFF_LINE_PATH_KEY = 'filePath';
 
@@ -66,22 +69,40 @@ final class ChangedLinesParser
      * @param string[] $lines
      * @param string $baseDirectory Directory the paths of the diff are relative to.
      *
-     * @return array<string, list<ChangedLinesRange>> The changed lines ranges by absolute file path.
+     * @return array<non-empty-string, list<ChangedLinesRange>> The changed lines ranges by absolute file path.
      */
     public static function parse(array $lines, string $baseDirectory): array
     {
-        $filePath = '';
+        $filePath = null;
         $result = [];
 
         foreach ($lines as $line) {
             if (str_starts_with($line, 'diff ')) {
-                $filePath = self::parseFilePathFromLine($line);
+                $filePath = Path::join($baseDirectory, self::parseFilePathFromLine($line));
+                Assert::stringNotEmpty($filePath);
             } elseif (str_starts_with($line, '@@ ')) {
+                Assert::notNull(
+                    $filePath,
+                    sprintf(
+                        'The following hunk line comes before any diff line: "%s"',
+                        $line,
+                    ),
+                );
+
                 $changedLinesRange = self::parseChangedLinesRangeFromLine($line);
 
                 if ($changedLinesRange !== null) {
-                    $result[Path::join($baseDirectory, $filePath)][] = $changedLinesRange;
+                    $result[$filePath][] = $changedLinesRange;
                 }
+            } else {
+                // Only the hunk headers are read, which gives the changed lines only when the diff has no context lines.
+                Assert::false(
+                    str_starts_with($line, ' '),
+                    sprintf(
+                        'Expected a diff without context lines, e.g. the output of "git diff --unified=0", but found the following context line: "%s"',
+                        $line,
+                    ),
+                );
             }
         }
 
@@ -91,17 +112,24 @@ final class ChangedLinesParser
     private static function parseFilePathFromLine(string $line): string
     {
         preg_match(self::DIFF_LINE_REGEX, $line, $matches);
+        $filePath = $matches[self::DIFF_LINE_PATH_KEY] ?? null;
 
-        Assert::keyExists(
-            $matches,
-            self::DIFF_LINE_PATH_KEY,
+        Assert::string(
+            $filePath,
             sprintf(
                 'Source file can not be found in the following diff line: "%s"',
                 $line,
             ),
         );
 
-        return $matches[self::DIFF_LINE_PATH_KEY];
+        if (str_starts_with($filePath, '"')) {
+            // Git quotes paths using C-style escapes, including octal-encoded filename bytes.
+            $encodedFilePath = substr($filePath, strlen('"b/'), -strlen('"'));
+
+            return stripcslashes($encodedFilePath);
+        }
+
+        return substr($filePath, strlen('b/'));
     }
 
     /**

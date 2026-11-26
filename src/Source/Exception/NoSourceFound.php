@@ -116,6 +116,17 @@ final class NoSourceFound extends RuntimeException
         );
     }
 
+    public static function noChangedLinesForGitDiffFile(string $pathname): self
+    {
+        return new self(
+            isSourceFiltered: true,
+            message: sprintf(
+                'Could not find any added or modified lines in the git diff file "%s".',
+                $pathname,
+            ),
+        );
+    }
+
     public static function noSourceFileFound(?PlainFilter $filter): self
     {
         return new self(
