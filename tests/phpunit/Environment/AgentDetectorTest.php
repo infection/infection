@@ -55,9 +55,9 @@ final class AgentDetectorTest extends TestCase
 
         yield 'generic AI_AGENT' => [['AI_AGENT' => 'my-agent'], true];
 
-        yield 'NOT_AI_AGENT alone' => [['NOT_AI_AGENT' => ''], false];
+        yield 'AGENT_DETECTOR_DISABLE alone' => [['AGENT_DETECTOR_DISABLE' => ''], false];
 
-        yield 'NOT_AI_AGENT with a known agent' => [['NOT_AI_AGENT' => '', 'CLAUDECODE' => '1'], false];
+        yield 'AGENT_DETECTOR_DISABLE with a known agent' => [['AGENT_DETECTOR_DISABLE' => '', 'CLAUDECODE' => '1'], false];
     }
 
     /**

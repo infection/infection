@@ -63,14 +63,17 @@ class AgentDetector
         'REPL_ID',
     ];
 
-    private const string NOT_AI_AGENT = 'NOT_AI_AGENT';
+    /**
+     * @see https://github.com/ergebnis/agent-detector#disabling-the-detection
+     */
+    private const string AGENT_DETECTOR_DISABLE = 'AGENT_DETECTOR_DISABLE';
 
     /**
      * @param array<string, string> $environment
      */
     public function isRunningInAgent(array $environment): bool
     {
-        if (array_key_exists(self::NOT_AI_AGENT, $environment)) {
+        if (array_key_exists(self::AGENT_DETECTOR_DISABLE, $environment)) {
             return false;
         }
 
