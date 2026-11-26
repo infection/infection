@@ -71,7 +71,6 @@ use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
-use Infection\Event\Subscriber\InitialStaticAnalysisExecutionLoggerSubscriber;
 use Infection\Event\Subscriber\InitialTestsExecutionLoggerSubscriber;
 use Infection\Event\Subscriber\MutationAnalysisLoggerSubscriber;
 use Infection\Event\Subscriber\MutationGenerationLoggerSubscriber;
@@ -95,8 +94,6 @@ use Infection\FileSystem\ProjectDirProvider;
 use Infection\Git\CiAwareGit;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
-use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
-use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLoggerFactory;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLoggerFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
@@ -408,10 +405,6 @@ final class Container extends DIContainer
                     $container->get(DispatchPcntlSignalSubscriber::class),
                 ];
 
-                if ($container->getConfiguration()->isStaticAnalysisEnabled()) {
-                    $subscriberFactories[] = $container->get(InitialStaticAnalysisExecutionLoggerSubscriber::class);
-                }
-
                 return new ChainSubscriberFactory(...$subscriberFactories);
             },
             CleanUpAfterMutationTestingFinishedSubscriberFactory::class => static function (self $container): CleanUpAfterMutationTestingFinishedSubscriberFactory {
@@ -433,16 +426,6 @@ final class Container extends DIContainer
                 );
             },
             InitialTestsExecutionLogger::class => static fn (self $container): InitialTestsExecutionLogger => $container->get(InitialTestsExecutionLoggerFactory::class)->create(),
-            InitialStaticAnalysisExecutionLoggerFactory::class => static function (self $container): InitialStaticAnalysisExecutionLoggerFactory {
-                $config = $container->getConfiguration();
-
-                return new InitialStaticAnalysisExecutionLoggerFactory(
-                    $config->noProgress,
-                    $config->isDebugEnabled,
-                    $container->getOutput(),
-                );
-            },
-            InitialStaticAnalysisExecutionLogger::class => static fn (self $container): InitialStaticAnalysisExecutionLogger => $container->get(InitialStaticAnalysisExecutionLoggerFactory::class)->create(),
             MutationGenerationLogger::class => static fn (self $container): MutationGenerationLogger => $container->get(MutationGenerationLoggerFactory::class)->create(),
             MutationGenerationDiagnosticLogger::class => static fn (self $container): MutationGenerationDiagnosticLogger => new PsrMutationGenerationDiagnosticLogger(
                 $container->getLogger(),

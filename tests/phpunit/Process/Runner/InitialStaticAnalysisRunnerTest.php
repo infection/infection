@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner;
 
 use Closure;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
@@ -108,7 +108,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             ->with($command, $this->isInstanceOf(Closure::class), null, [], null, null)
             ->willReturnCallback(function (array $_command, Closure $callback) use ($command, $commandLine, $expectedVersion): CompletedProcess {
                 $this->assertEquals(
-                    [new InitialStaticAnalysisRunWasStarted($commandLine, 'PHPStan', $expectedVersion)],
+                    [new InitialTestSuiteWasStarted($commandLine, 'PHPStan', $expectedVersion)],
                     $this->eventDispatcher->getEvents(),
                 );
 
@@ -126,9 +126,9 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
         $this->assertEquals(
             [
-                new InitialStaticAnalysisRunWasStarted($commandLine, 'PHPStan', $expectedVersion),
-                new InitialStaticAnalysisSubStepWasCompleted('PHPStan'),
-                new InitialStaticAnalysisRunWasFinished('PHPStan', 'pingpong'),
+                new InitialTestSuiteWasStarted($commandLine, 'PHPStan', $expectedVersion),
+                new InitialTestCaseWasCompleted('PHPStan'),
+                new InitialTestSuiteWasFinished('PHPStan', 'pingpong'),
             ],
             $this->eventDispatcher->getEvents(),
         );

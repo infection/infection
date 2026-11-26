@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Logger\ArtefactCollection;
 
-use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -43,7 +42,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final readonly class ConsoleNoProgressLogger implements InitialStaticAnalysisExecutionLogger, InitialTestsExecutionLogger
+final readonly class ConsoleNoProgressLogger implements InitialTestsExecutionLogger
 {
     public function __construct(
         private OutputInterface $output,
