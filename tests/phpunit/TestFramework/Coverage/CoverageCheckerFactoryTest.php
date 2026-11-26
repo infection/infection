@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
@@ -60,9 +59,6 @@ final class CoverageCheckerFactoryTest extends TestCase
         $fileSystem = $this->createStub(FileSystem::class);
         $jUnitReportLocator = JUnitReportLocator::create($fileSystem, 'coverage');
         $indexXmlCoverageLocator = IndexXmlCoverageLocator::create($fileSystem, 'coverage');
-        $adapter = $this->createMock(TestFrameworkAdapter::class);
-        $adapter->expects($this->once())->method('hasJUnitReport')->willReturn(true);
-        $adapter->expects($this->once())->method('getName')->willReturn('framework');
 
         $factory = new CoverageCheckerFactory(
             $configuration,
@@ -81,7 +77,7 @@ final class CoverageCheckerFactoryTest extends TestCase
                 'framework',
                 $indexXmlCoverageLocator,
             ),
-            $factory->create($adapter),
+            $factory->create('framework', true),
         );
     }
 }

@@ -35,8 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\AbstractTestFramework\SyntaxErrorAware;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Closure;
 use Infection\Process\MutantProcess;
 use function sprintf;
 use Symfony\Component\Process\Process;
@@ -49,8 +48,13 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
 {
     private const int PROCESS_MIN_ERROR_CODE = 100;
 
+    /**
+     * @param Closure(string): bool $testsPass
+     * @param (Closure(string): mixed)|null $isSyntaxError Legacy adapters do not declare a return type.
+     */
     public function __construct(
-        private TestFrameworkAdapter $testFrameworkAdapter,
+        private Closure $testsPass,
+        private ?Closure $isSyntaxError = null,
     ) {
     }
 
@@ -114,11 +118,11 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
 
         $output = $this->retrieveProcessOutput($process);
 
-        if ($process->getExitCode() === 0 && $this->testFrameworkAdapter->testsPass($output)) {
+        if ($process->getExitCode() === 0 && ($this->testsPass)($output)) {
             return DetectionStatus::ESCAPED;
         }
 
-        if ($this->testFrameworkAdapter instanceof SyntaxErrorAware && $this->testFrameworkAdapter->isSyntaxError($output)) {
+        if ($this->isSyntaxError !== null && (bool) ($this->isSyntaxError)($output)) {
             return DetectionStatus::SYNTAX_ERROR;
         }
 

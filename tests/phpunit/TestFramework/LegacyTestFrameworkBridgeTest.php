@@ -59,6 +59,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use Symfony\Component\Process\Process;
@@ -349,7 +350,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $processFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with($adapter, $mutant, '')
+            ->with(['/bin/dummy'], $mutant, $this->isInstanceOf(Closure::class), null)
             ->willReturn($processContainer)
         ;
 
@@ -364,13 +365,30 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
     {
         $mutant = MutantBuilder::withMinimalTestData()->build();
         $processContainer = $this->createStub(MutantProcessContainer::class);
-        $adapter = $this->createInitialRunOnlyOptionsAdapter();
+        /** @var TestFrameworkAdapter&ProvidesInitialRunOnlyOptions&MockObject $adapter */
+        $adapter = $this->createMockForIntersectionOfInterfaces([
+            TestFrameworkAdapter::class,
+            ProvidesInitialRunOnlyOptions::class,
+        ]);
+        $adapter->method('getMutantCommandLine')->willReturn(['/bin/dummy']);
+        $adapter->method('getInitialRunOnlyOptions')->willReturn(['--configuration']);
+        $adapter
+            ->expects($this->once())
+            ->method('getMutantCommandLine')
+            ->with(
+                $mutant->getTests(),
+                $mutant->getFilePath(),
+                $mutant->getMutation()->getHash(),
+                $mutant->getMutation()->getOriginalFilePath(),
+                '--filter FooTest',
+            )
+        ;
 
         $processFactoryMock = $this->createMock(MutantProcessContainerFactory::class);
         $processFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with($adapter, $mutant, '--filter FooTest')
+            ->with(['/bin/dummy'], $mutant, $this->isInstanceOf(Closure::class), null)
             ->willReturn($processContainer)
         ;
 
@@ -442,19 +460,5 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             ->withStderr('error')
             ->build()
         ;
-    }
-
-    private function createInitialRunOnlyOptionsAdapter(): TestFrameworkAdapter&ProvidesInitialRunOnlyOptions
-    {
-        $adapter = $this->createMockForIntersectionOfInterfaces([
-            TestFrameworkAdapter::class,
-            ProvidesInitialRunOnlyOptions::class,
-        ]);
-        $adapter
-            ->method('getInitialRunOnlyOptions')
-            ->willReturn(['--configuration'])
-        ;
-
-        return $adapter;
     }
 }

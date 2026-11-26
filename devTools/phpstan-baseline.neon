@@ -373,12 +373,6 @@ parameters:
 			path: ../src/Mutant/MutantExecutionResult.php
 
 		-
-			rawMessage: Infection\Mutant\TestFrameworkMutantExecutionResultFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Mutant/TestFrameworkMutantExecutionResultFactory.php
-
-		-
 			rawMessage: Do not use magic number as a function argument. Move to constant with a suitable name.
 			count: 8
 			path: ../src/Mutator/Extensions/BCMath.php
@@ -515,12 +509,6 @@ parameters:
 			identifier: return.unusedType
 			count: 1
 			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
-
-		-
-			rawMessage: Infection\Process\Factory\MutantProcessContainerFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Process/Factory/MutantProcessContainerFactory.php
 
 		-
 			rawMessage: 'Parameter #2 $env (array<bool|string>|null) of method Infection\Process\OriginalPhpProcess::start() should be contravariant with parameter $env (array) of method Symfony\Component\Process\Process::start()'
@@ -679,12 +667,6 @@ parameters:
 			path: ../src/TestFramework/Coverage/CoverageChecker.php
 
 		-
-			rawMessage: Infection\TestFramework\Coverage\CoverageCheckerFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/TestFramework/Coverage/CoverageCheckerFactory.php
-
-		-
 			rawMessage: '''
 				Call to deprecated method hasJUnitReport() of interface Infection\TestFramework\Contracts\TestFramework:
 				This is only for making the migration easier, to be removed.
@@ -839,12 +821,6 @@ parameters:
 			identifier: class.implementsDeprecatedInterface
 			count: 1
 			path: ../src/TestFramework/PHPStan/Adapter/PHPStanAdapter.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider

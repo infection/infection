@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
@@ -52,16 +51,16 @@ final readonly class CoverageCheckerFactory
     ) {
     }
 
-    public function create(TestFrameworkAdapter $adapter): CoverageChecker
+    public function create(string $testFrameworkName, bool $hasJUnitReport): CoverageChecker
     {
         return new CoverageChecker(
             $this->configuration->skipCoverage,
             $this->configuration->skipInitialTests,
             $this->configuration->initialTestsPhpOptions ?? '',
             $this->configuration->coveragePath,
-            $adapter->hasJUnitReport(),
+            $hasJUnitReport,
             $this->jUnitReportLocator,
-            $adapter->getName(),
+            $testFrameworkName,
             $this->indexXmlCoverageLocator,
         );
     }

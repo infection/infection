@@ -38,9 +38,8 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 use function array_key_exists;
 use function explode;
 use function implode;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\InvalidVersion;
-use Infection\AbstractTestFramework\SyntaxErrorAware;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
@@ -73,7 +72,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrameworkAdapter
+final class PhpUnitAdapter implements TestFramework
 {
     public const string COVERAGE_DIR = 'coverage-xml';
 
@@ -102,7 +101,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         private readonly MemoryLimiter $memoryLimiter,
         private ?string $version = null,
     ) {
-        $this->coverageChecker = $coverageCheckerFactory->create($this);
+        $this->coverageChecker = $coverageCheckerFactory->create($this->getName(), true);
     }
 
     #[Override]
@@ -163,20 +162,59 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
     #[Override]
     public function test(Mutant $mutant): MutantProcessContainer
     {
-        return $this->processFactory->create(
-            $this,
-            $mutant,
+        $command = $this->getMutantCommandLine(
+            $mutant->getTests(),
+            $mutant->getFilePath(),
+            $mutant->getMutation()->getHash(),
+            $mutant->getMutation()->getOriginalFilePath(),
             $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
                 $this->config->testFrameworkExtraOptions,
                 $this->getInitialRunOnlyOptions(),
                 ['--warn-when-php-is-not-configured-for-development'],
             ),
         );
+
+        return $this->processFactory->create($command, $mutant, $this->testsPass(...), $this->isSyntaxError(...));
     }
 
     public function hasJUnitReport(): bool
     {
         return true;
+    }
+
+    public function getName(): string
+    {
+        return 'PHPUnit';
+    }
+
+    public static function supportsExecutionOrderDefectsRandom(string $version): bool
+    {
+        // ordering by defects needs the test run history, which the initial run deactivates. PHPUnit ignored that combination silently until 13.3 turned it into a warning https://github.com/sebastianbergmann/phpunit/blob/13.3.0/src/TextUI/Application.php
+        if (version_compare($version, '13.0', '>=')) {
+            return false;
+        }
+
+        return
+            version_compare($version, '10.5.48', '>=') && version_compare($version, '11.0', '<')
+            || version_compare($version, '11.5.27', '>=') && version_compare($version, '12.0', '<')
+            || version_compare($version, '12.2.7', '>=');
+    }
+
+    public function getVersion(): string
+    {
+        if ($this->version !== null) {
+            return $this->version;
+        }
+
+        try {
+            $this->version = $this->versionParser->parse($this->getVersionOutput());
+        } catch (SymfonyProcessRuntimeException $exception) {
+            $this->logger->logVersionDetectionFailure($exception);
+
+            $this->version = TestFramework::UNKNOWN_VERSION;
+        }
+
+        return $this->version;
     }
 
     /**
@@ -189,8 +227,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
      *
      * @return string[]
      */
-    #[Override]
-    public function getInitialTestRunCommandLine(
+    private function getInitialTestRunCommandLine(
         string $extraOptions,
         array $phpExtraArgs,
         bool $skipCoverage,
@@ -235,7 +272,12 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         );
     }
 
-    public function getMutantCommandLine(
+    /**
+     * @param TestLocation[] $coverageTests
+     *
+     * @return string[]
+     */
+    private function getMutantCommandLine(
         array $coverageTests,
         string $mutatedFilePath,
         string $mutationHash,
@@ -259,24 +301,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         );
     }
 
-    public function getVersion(): string
-    {
-        if ($this->version !== null) {
-            return $this->version;
-        }
-
-        try {
-            $this->version = $this->versionParser->parse($this->getVersionOutput());
-        } catch (SymfonyProcessRuntimeException $exception) {
-            $this->logger->logVersionDetectionFailure($exception);
-
-            $this->version = TestFramework::UNKNOWN_VERSION;
-        }
-
-        return $this->version;
-    }
-
-    public function testsPass(string $output): bool
+    private function testsPass(string $output): bool
     {
         if (preg_match('/failures!/i', $output) === 1) {
             return false;
@@ -301,18 +326,12 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         return $isOk || $isOkWithInfo || $isWarning || $isNoTestsExecuted;
     }
 
-    public function isSyntaxError(string $output): bool
+    private function isSyntaxError(string $output): bool
     {
         return preg_match('/ParseError: syntax error/i', $output) === 1;
     }
 
-    public function getName(): string
-    {
-        return 'PHPUnit';
-    }
-
-    #[Override]
-    public function getInitialTestsFailRecommendations(string $commandLine): string
+    private function getInitialTestsFailRecommendations(string $commandLine): string
     {
         $recommendations = $this->createInitialTestsFailRecommendations($commandLine);
 
@@ -340,22 +359,9 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
     /**
      * As of PHPUnit 12.5, the `--exclude-source-from-xml-coverage` is available which removes the `source` element from the XML report which contained the list of tokens of the source code file.
      */
-    public static function supportsExcludingSourceFromCoverage(string $version): bool
+    private static function supportsExcludingSourceFromCoverage(string $version): bool
     {
         return version_compare($version, '12.5', '>=');
-    }
-
-    public static function supportsExecutionOrderDefectsRandom(string $version): bool
-    {
-        // ordering by defects needs the test run history, which the initial run deactivates. PHPUnit ignored that combination silently until 13.3 turned it into a warning https://github.com/sebastianbergmann/phpunit/blob/13.3.0/src/TextUI/Application.php
-        if (version_compare($version, '13.0', '>=')) {
-            return false;
-        }
-
-        return
-            version_compare($version, '10.5.48', '>=') && version_compare($version, '11.0', '<')
-            || version_compare($version, '11.5.27', '>=') && version_compare($version, '12.0', '<')
-            || version_compare($version, '12.2.7', '>=');
     }
 
     /**

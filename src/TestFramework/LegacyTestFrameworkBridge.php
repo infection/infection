@@ -37,6 +37,7 @@ namespace Infection\TestFramework;
 
 use function explode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
+use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
@@ -46,7 +47,6 @@ use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
-use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed as InitialTestsFailedContract;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Logger\LegacyTestFrameworkLogger;
 use InvalidArgumentException;
@@ -140,10 +140,19 @@ final class LegacyTestFrameworkBridge implements TestFramework
 
     public function test(Mutant $mutant): MutantProcessContainer
     {
+        $adapter = $this->adapter;
+
         return $this->processFactory->create(
-            $this->adapter,
+            $adapter->getMutantCommandLine(
+                $mutant->getTests(),
+                $mutant->getFilePath(),
+                $mutant->getMutation()->getHash(),
+                $mutant->getMutation()->getOriginalFilePath(),
+                $this->getFilteredExtraOptionsForMutant(),
+            ),
             $mutant,
-            $this->getFilteredExtraOptionsForMutant(),
+            $adapter->testsPass(...),
+            $adapter instanceof SyntaxErrorAware ? $adapter->isSyntaxError(...) : null,
         );
     }
 
