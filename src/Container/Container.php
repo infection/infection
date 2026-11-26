@@ -153,7 +153,6 @@ use Infection\Source\MatcherLine\NullSourceLineMatcher;
 use Infection\Source\MatcherLine\SourceLineMatcher;
 use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
-use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -187,7 +186,6 @@ use Psr\Log\NullLogger;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
 /**
@@ -320,20 +318,8 @@ final class Container extends DIContainer
                     $container->getCoverageCheckerFactory(),
                     $container->getMutantProcessContainerFactory(),
                     $container->getTestFrameworkExtraOptionsFilter(),
-                );
-            },
-            StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
-                $config = $container->getConfiguration();
-
-                return new StaticAnalysisToolFactory(
-                    $config,
                     $container->getStaticAnalysisToolExecutableFinder(),
                     $container->getStaticAnalysisConfigLocator(),
-                    $container->getShellCommandRunner(),
-                    new PhpExecutableFinder(),
-                    $container->getFileSystem(),
-                    $container->get(TestFrameworkLogger::class),
-                    $container->getLogger(),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(

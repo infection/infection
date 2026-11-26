@@ -37,7 +37,7 @@ namespace Infection\Container\Builder;
 
 use DIContainer\Builder;
 use Infection\Configuration\Configuration;
-use Infection\StaticAnalysis\StaticAnalysisToolFactory;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Factory;
@@ -51,7 +51,6 @@ final readonly class TestFrameworkBuilder implements Builder
     public function __construct(
         private Configuration $configuration,
         private Factory $testFrameworkFactory,
-        private StaticAnalysisToolFactory $staticAnalysisToolFactory,
     ) {
     }
 
@@ -62,15 +61,21 @@ final readonly class TestFrameworkBuilder implements Builder
             $this->configuration->skipCoverage,
         );
 
-        if (!$this->configuration->isStaticAnalysisEnabled()) {
+        $staticAnalysisTool = $this->configuration->staticAnalysisTool;
+
+        if ($staticAnalysisTool === null) {
             return $testFramework;
         }
 
+        $staticAnalysisAdapter = $staticAnalysisTool === StaticAnalysisToolTypes::DEBUG
+            ? Factory::DEBUG_STATIC_ANALYSIS
+            : $staticAnalysisTool;
+
         return new CombinedTestFramework(
             $testFramework,
-            $this->staticAnalysisToolFactory->create(
-                $this->configuration->staticAnalysisTool,
-                $this->configuration->processTimeout,
+            $this->testFrameworkFactory->create(
+                $staticAnalysisAdapter,
+                true,
             ),
         );
     }

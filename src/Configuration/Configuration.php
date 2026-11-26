@@ -128,11 +128,6 @@ readonly class Configuration
         }
     }
 
-    public function isStaticAnalysisEnabled(): bool
-    {
-        return $this->staticAnalysisTool !== null;
-    }
-
     /**
      * @return list<string>
      */

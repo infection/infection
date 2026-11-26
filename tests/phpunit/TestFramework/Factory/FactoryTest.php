@@ -36,12 +36,17 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Factory;
 
 use Infection\Configuration\Configuration;
+use Infection\Configuration\Entry\Mago;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\ConsoleOutput;
 use Infection\FileSystem\FileSystem;
+use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Source\Collector\FakeSourceCollector;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -50,15 +55,23 @@ use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\Mago\Adapter\MagoAdapter;
+use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+use Psr\Log\Test\TestLogger;
+use function sprintf;
+use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 
 #[Group('integration')]
 #[CoversClass(Factory::class)]
@@ -75,7 +88,7 @@ final class FactoryTest extends TestCase
 
         $this->expectExceptionObject(
             new InvalidArgumentException(
-                'Invalid name of test framework "Fake Test Framework". Available names are: debug, phpunit',
+                'Invalid name of test framework "Fake Test Framework". Available names are: debug, debug-static-analysis, phpunit, phpstan, mago',
             ),
         );
 
@@ -178,6 +191,99 @@ final class FactoryTest extends TestCase
     }
 
     /**
+     * @param class-string<TestFramework> $expectedClass
+     */
+    #[DataProvider('frameworkProvider')]
+    public function test_it_creates_built_in_static_analysis_adapters_without_installed_extensions(string $name, string $expectedClass): void
+    {
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withSourceFilter(new PlainFilter(['/path/to/project/src/Example.php']))
+            ->build()
+        ;
+        $factory = $this->createFactory(
+            installedExtensions: [],
+            configuration: $configuration,
+        );
+
+        $framework = $factory->create($name, true);
+
+        $this->assertInstanceOf($expectedClass, $framework);
+    }
+
+    public static function frameworkProvider(): iterable
+    {
+        yield 'PHPStan' => [StaticAnalysisToolTypes::PHPSTAN, PHPStanAdapter::class];
+
+        yield 'Mago' => [StaticAnalysisToolTypes::MAGO, MagoAdapter::class];
+
+        yield 'debug' => [Factory::DEBUG_STATIC_ANALYSIS, DebugStaticAnalysisAdapter::class];
+    }
+
+    #[DataProvider('builtInAdapterProvider')]
+    public function test_it_connects_built_in_adapter_version_warnings_to_the_logger(
+        string $adapterName,
+        string $expectedName,
+        string $expectedCustomPath,
+    ): void {
+        $configLocator = $this->createMock(TestFrameworkConfigLocatorInterface::class);
+        $configLocator
+            ->expects($this->once())
+            ->method('locate')
+            ->with($adapterName)
+            ->willReturn('/path/to/config')
+        ;
+        $executableFinder = $this->createMock(StaticAnalysisToolExecutableFinder::class);
+        $executableFinder
+            ->expects($this->once())
+            ->method('find')
+            ->with($adapterName, $expectedCustomPath)
+            ->willReturn('/path/to/tool.bat')
+        ;
+        $exception = new SymfonyProcessRuntimeException('Could not launch the version command.');
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->expects($this->once())
+            ->method('mustRun')
+            ->with(['/path/to/tool.bat', '--version'])
+            ->willThrowException($exception)
+        ;
+        $logger = new TestLogger();
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withPhpStan(new PhpStan(null, '/custom/phpstan'))
+            ->withMago(new Mago(null, '/custom/mago'))
+            ->build()
+        ;
+        $factory = $this->createFactory(
+            configuration: $configuration,
+            shellCommandRunner: $shellCommandRunner,
+            staticAnalysisExecutableFinder: $executableFinder,
+            staticAnalysisConfigLocator: $configLocator,
+            logger: $logger,
+        );
+
+        $framework = $factory->create($adapterName, true);
+
+        $this->assertSame($expectedName, $framework->getName());
+        $this->assertSame(TestFramework::UNKNOWN_VERSION, $framework->getVersion());
+        $this->assertSame(TestFramework::UNKNOWN_VERSION, $framework->getVersion());
+
+        $expected = [[
+            'level' => LogLevel::WARNING,
+            'message' => sprintf('Could not determine the %s version. Continuing with an unknown version.', $expectedName),
+            'context' => ['exception' => $exception],
+        ]];
+
+        $this->assertSame($expected, $logger->records);
+    }
+
+    public static function builtInAdapterProvider(): iterable
+    {
+        yield 'PHPStan' => [StaticAnalysisToolTypes::PHPSTAN, 'PHPStan', '/custom/phpstan'];
+
+        yield 'Mago' => [StaticAnalysisToolTypes::MAGO, 'Mago', '/custom/mago'];
+    }
+
+    /**
      * @param array<string, array<string, mixed>> $installedExtensions
      */
     private function createFactory(
@@ -187,6 +293,9 @@ final class FactoryTest extends TestCase
         ?TestFrameworkFinder $testFrameworkFinder = null,
         ?ShellCommandRunner $shellCommandRunner = null,
         ?TestFrameworkLogger $testFrameworkLogger = null,
+        ?StaticAnalysisToolExecutableFinder $staticAnalysisExecutableFinder = null,
+        ?TestFrameworkConfigLocatorInterface $staticAnalysisConfigLocator = null,
+        ?LoggerInterface $logger = null,
     ): Factory {
         $configuration ??= ConfigurationBuilder::withMinimalTestData()->build();
         $fileSystem = $this->createStub(FileSystem::class);
@@ -206,7 +315,7 @@ final class FactoryTest extends TestCase
             $fileSystem,
             $this->createStub(ConsoleOutput::class),
             $testFrameworkLogger ?? $this->createStub(TestFrameworkLogger::class),
-            $this->createStub(LoggerInterface::class),
+            $logger ?? $this->createStub(LoggerInterface::class),
             new CoverageCheckerFactory(
                 $configuration,
                 JUnitReportLocator::create($fileSystem, ''),
@@ -214,6 +323,8 @@ final class FactoryTest extends TestCase
             ),
             $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
+            $staticAnalysisExecutableFinder ?? $this->createStub(StaticAnalysisToolExecutableFinder::class),
+            $staticAnalysisConfigLocator ?? $this->createStub(TestFrameworkConfigLocatorInterface::class),
         );
     }
 }

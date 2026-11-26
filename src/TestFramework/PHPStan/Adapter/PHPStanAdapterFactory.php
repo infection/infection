@@ -36,13 +36,19 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PHPStan\Adapter;
 
 use Infection\CannotBeInstantiated;
+use Infection\Configuration\Configuration;
+use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
+use Infection\TestFramework\Coverage\CoverageCheckerFactory;
 use Infection\TestFramework\PHPStan\Logger\PsrPHPStanLogger;
 use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -50,39 +56,61 @@ use Symfony\Component\Process\PhpExecutableFinder;
 /**
  * @internal
  */
-final class PHPStanAdapterFactory
+final class PHPStanAdapterFactory implements TestFrameworkFactory
 {
     use CannotBeInstantiated;
 
-    /**
-     * @param list<string> $staticAnalysisToolOptions
-     */
+    #[Override]
     public static function create(
-        string $staticAnalysisConfigPath,
-        string $staticAnalysisToolExecutable,
-        float $timeout,
+        string $testFrameworkExecutable,
         string $tmpDir,
-        array $staticAnalysisToolOptions,
+        string $testFrameworkConfigPath,
+        ?string $testFrameworkConfigDir,
+        string $jUnitFilePath,
+        string $projectDir,
+        array $sourceDirectories,
+        bool $skipCoverage,
+        bool $executeOnlyCoveringTestCases,
+        array $filteredSourceFilesToMutate,
+        ?string $mapSourceClassToTestStrategy,
         ShellCommandRunner $shellCommandRunner,
+        string $sourceDirectoryBasePath,
+        bool $useWindowsFilterLimit,
+        Filesystem $fileSystem,
         TestFrameworkLogger $testFrameworkLogger,
         LoggerInterface $logger,
-        Filesystem $fileSystem,
+        CoverageCheckerFactory $coverageCheckerFactory,
+        Configuration $configuration,
+        MutantProcessContainerFactory $processFactory,
+        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ): PHPStanAdapter {
         return new PHPStanAdapter(
             $fileSystem,
             new PHPStanMutantExecutionResultFactory(),
-            $staticAnalysisConfigPath,
-            $staticAnalysisToolExecutable,
+            $testFrameworkConfigPath,
+            $testFrameworkExecutable,
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
             new VersionParser('PHPStan'),
-            $timeout,
+            $configuration->processTimeout,
             $tmpDir,
-            $staticAnalysisToolOptions,
+            $configuration->getStaticAnalysisToolOptions(),
             $shellCommandRunner,
             new InitialTestsRunner($shellCommandRunner, $testFrameworkLogger),
             new PsrPHPStanLogger($logger),
         );
+    }
+
+    #[Override]
+    public static function getAdapterName(): string
+    {
+        return 'phpstan';
+    }
+
+    #[Override]
+    public static function getExecutableName(): string
+    {
+        return 'phpstan';
     }
 }
