@@ -48,7 +48,6 @@ use Infection\PhpParser\UnparsableFile;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\PreloadedSourceChecker;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
@@ -73,7 +72,6 @@ final readonly class Engine
         private MaxTimeoutsChecker $maxTimeoutsChecker,
         private MetricsCalculator $metricsCalculator,
         private PreloadedSourceChecker $preloadedSourceChecker,
-        private StaticAnalysisTestFramework $staticAnalysisTestFramework,
     ) {
     }
 
@@ -94,9 +92,7 @@ final readonly class Engine
     {
         $this->preloadedSourceChecker->check();
 
-        $this->staticAnalysisTestFramework->checkRequirements();
         $this->runInitialTestSuite();
-        $this->staticAnalysisTestFramework->executeInitialRun();
 
         $this->runMutationAnalysis();
 

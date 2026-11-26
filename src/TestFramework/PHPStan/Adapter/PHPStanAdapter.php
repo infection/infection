@@ -49,7 +49,6 @@ use Infection\TestFramework\Common\Throwable\UnsupportedVersion;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\PHPStan\Logger\PHPStanLogger;
 use Infection\TestFramework\PHPStan\Process\PHPStanMutantProcessFactory;
@@ -63,7 +62,7 @@ use function version_compare;
 /**
  * @internal
  */
-final class PHPStanAdapter implements StaticAnalysisTestFramework
+final class PHPStanAdapter implements TestFramework
 {
     /**
      * At the time of writing, `-d memory_limit`, which sets the main process's memory limit, is
