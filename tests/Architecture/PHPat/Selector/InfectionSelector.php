@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use Infection\CannotBeInstantiated;
+use Infection\Process\DryRunProcess;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Architecture\PHPat\Selector\Support\EnvironmentVariableUsageDetector;
@@ -109,8 +110,9 @@ final class InfectionSelector
         return Selector::AnyOf(
             Selector::inNamespace('Infection\TestFramework\Common'),
             new ClassNamedAny([
-                // This class can simply be copied when we need it.
+                // These classes can be moved into the future package.
                 CannotBeInstantiated::class,
+                DryRunProcess::class,
             ]),
         );
     }

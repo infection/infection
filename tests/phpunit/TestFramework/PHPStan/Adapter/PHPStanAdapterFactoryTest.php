@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PHPStan\Adapter;
 
 use Infection\FileSystem\FileSystem;
+use Infection\TestFramework\Common\Process\DryRunAwareProcessFactory;
 use Infection\TestFramework\Contracts\FakeShellCommandRunner;
 use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -49,6 +50,7 @@ final class PHPStanAdapterFactoryTest extends TestCase
     public function test_it_can_create_an_adapter(): void
     {
         $adapter = PHPStanAdapterFactory::create(
+            new DryRunAwareProcessFactory(false),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             32.3,

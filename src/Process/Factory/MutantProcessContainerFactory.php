@@ -36,16 +36,13 @@ declare(strict_types=1);
 namespace Infection\Process\Factory;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
-use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
 use function min;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -59,7 +56,7 @@ class MutantProcessContainerFactory
 
     public function __construct(
         private readonly float $timeout,
-        private readonly Configuration $configuration,
+        private readonly ProcessFactory $processFactory,
     ) {
     }
 
@@ -72,7 +69,7 @@ class MutantProcessContainerFactory
         // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
         $timeout = min(self::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (self::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime()), $this->timeout);
 
-        $process = new Process(
+        $process = $this->processFactory->create(
             command: $testFrameworkAdapter->getMutantCommandLine(
                 $mutant->getTests(),
                 $mutant->getFilePath(),
@@ -80,13 +77,8 @@ class MutantProcessContainerFactory
                 $mutant->getMutation()->getOriginalFilePath(),
                 $testFrameworkExtraOptions,
             ),
-            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
             timeout: $timeout,
         );
-
-        if ($this->configuration->isDryRun) {
-            $process = DryRunProcess::fromProcess($process);
-        }
 
         return MutantProcessContainer::from(
             static fn (): MutantProcess => new MutantProcess(

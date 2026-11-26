@@ -41,6 +41,7 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PHPStan\Process\PHPStanMutantProcessFactory;
@@ -75,6 +76,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
+        private readonly ProcessFactory $processFactory,
         private readonly Filesystem $fileSystem,
         private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisConfigPath,
@@ -117,6 +119,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     public function createMutantProcessFactory(): LazyMutantProcessFactory
     {
         return new PHPStanMutantProcessFactory(
+            $this->processFactory,
             $this->fileSystem,
             $this->mutantExecutionResultFactory,
             $this->staticAnalysisConfigPath,

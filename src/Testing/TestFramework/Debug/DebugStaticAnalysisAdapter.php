@@ -37,6 +37,7 @@ namespace Infection\Testing\TestFramework\Debug;
 
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 
 /**
  * @internal
@@ -44,6 +45,7 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAdapter
 {
     public function __construct(
+        private ProcessFactory $processFactory,
         private string $runtime,
         private string $logFile,
         private float $timeout,
@@ -71,6 +73,7 @@ final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAda
     public function createMutantProcessFactory(): LazyMutantProcessFactory
     {
         return new DebugStaticAnalysisMutantProcessFactory(
+            $this->processFactory,
             $this->runtime,
             $this->logFile,
             $this->timeout,

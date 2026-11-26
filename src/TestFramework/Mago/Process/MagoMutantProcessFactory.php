@@ -41,8 +41,7 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Symfony\Component\Process\Process;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 
 /**
  * @internal
@@ -53,6 +52,7 @@ final readonly class MagoMutantProcessFactory implements LazyMutantProcessFactor
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
+        private ProcessFactory $processFactory,
         private MutantExecutionResultFactory $mutantExecutionResultFactory,
         private string $staticAnalysisToolExecutable,
         private CommandLineBuilder $commandLineBuilder,
@@ -63,12 +63,11 @@ final readonly class MagoMutantProcessFactory implements LazyMutantProcessFactor
 
     public function create(Mutant $mutant): MutantProcess
     {
-        $process = new Process(
+        $process = $this->processFactory->create(
             command: $this->getMutantCommandLine(
                 $mutant->getFilePath(),
                 $mutant->getMutation()->getOriginalFilePath(),
             ),
-            env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
             timeout: $this->timeout,
         );
 

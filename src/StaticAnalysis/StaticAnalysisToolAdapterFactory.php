@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis;
 
+use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 
 /**
@@ -46,6 +47,7 @@ interface StaticAnalysisToolAdapterFactory
      * @param list<string> $staticAnalysisToolOptions
      */
     public static function create(
+        ProcessFactory $processFactory,
         string $staticAnalysisConfigPath,
         string $staticAnalysisToolExecutable,
         float $timeout,

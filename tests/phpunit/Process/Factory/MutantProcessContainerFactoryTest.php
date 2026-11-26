@@ -40,10 +40,11 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
+use Infection\Process\DryRunProcess;
 use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\TestFramework\Common\Process\DryRunAwareProcessFactory;
 use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use Infection\Testing\MutatorName;
-use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
 use PhpParser\Node\Stmt\Nop;
@@ -51,14 +52,19 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(MutantProcessContainerFactory::class)]
 final class MutantProcessContainerFactoryTest extends TestCase
 {
     #[DataProvider('timeoutDataProvider')]
-    public function test_it_creates_a_process_with_timeout(float $expectedProcessTimeout, float $testLocationExecutionTime, int $processFactoryTimeout): void
-    {
+    public function test_it_creates_a_process_with_timeout(
+        float $expectedProcessTimeout,
+        float $testLocationExecutionTime,
+        int $processFactoryTimeout,
+        bool $dryRun = false,
+    ): void {
         $mutant = MutantBuilder::withMinimalTestData()
             ->withMutantFilePath($mutantFilePath = '/path/to/mutant')
             ->withMutation(new Mutation(
@@ -118,14 +124,9 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
         $eventDispatcher = new EventDispatcherCollector();
 
-        $configuration = ConfigurationBuilder::withMinimalTestData()
-            ->withDryRun(false)
-            ->build()
-        ;
-
         $factory = new MutantProcessContainerFactory(
             $processFactoryTimeout,
-            $configuration,
+            new DryRunAwareProcessFactory($dryRun),
         );
 
         $mutantProcess = $factory->create(
@@ -146,7 +147,11 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
         $this->assertSame($expectedProcessTimeout, $process->getTimeout());
         $this->assertSame(['SHELL_VERBOSITY' => '0'], $process->getEnv());
-        $this->assertFalse($process->isStarted());
+        $expectedProcessClass = $dryRun
+            ? DryRunProcess::class
+            : Process::class;
+        $processClass = $process::class;
+        $this->assertSame($expectedProcessClass, $processClass);
 
         $this->assertSame($mutant, $mutantProcess->getCurrent()->getMutant());
         $this->assertFalse($mutantProcess->getCurrent()->isTimedOut());
@@ -161,5 +166,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
         yield 'allows 5x more time than test-execution' => [30.0, 5.0, 90];
 
         yield 'slow tests do not get more time than factory-timeout' => [40.0, 10.0, 40];
+
+        yield 'dry runs preserve the calculated timeout' => [30.0, 5.0, 90, true];
     }
 }

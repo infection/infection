@@ -40,19 +40,24 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
+use Infection\Process\DryRunProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\Process\DryRunAwareProcessFactory;
 use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\Process;
 
 #[CoversClass(MagoMutantProcessFactory::class)]
 final class MagoMutantProcessFactoryTest extends TestCase
 {
-    public function test_it_creates_a_process_with_timeout(): void
+    #[DataProvider('processModeProvider')]
+    public function test_it_creates_a_process_with_timeout(bool $dryRun, string $expectedProcessClass): void
     {
         $mutant = MutantBuilder::withMinimalTestData()
             ->withMutantFilePath($mutantFilePath = '/path/to/mutant')
@@ -118,6 +123,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
         ;
 
         $factory = new MagoMutantProcessFactory(
+            new DryRunAwareProcessFactory($dryRun),
             $phpStanMutantExecutionResultFactory,
             '/path/to/mago',
             $commandLineBuilder,
@@ -131,10 +137,20 @@ final class MagoMutantProcessFactoryTest extends TestCase
 
         $this->assertSame(100.0, $process->getTimeout());
         $this->assertSame(['SHELL_VERBOSITY' => '0'], $process->getEnv());
-        $this->assertFalse($process->isStarted());
+        $processClass = $process::class;
+        $this->assertSame($expectedProcessClass, $processClass);
+        $expectedCommandLine = (new Process(['/path/to/mago']))->getCommandLine();
+        $this->assertSame($expectedCommandLine, $process->getCommandLine());
 
         $this->assertSame($mutant, $mutantProcess->getMutant());
         $this->assertFalse($mutantProcess->isTimedOut());
+    }
+
+    public static function processModeProvider(): iterable
+    {
+        yield 'ordinary process' => [false, Process::class];
+
+        yield 'dry-run process' => [true, DryRunProcess::class];
     }
 
     public function test_it_creates_a_process_with_multiple_options(): void
@@ -205,6 +221,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
         ;
 
         $factory = new MagoMutantProcessFactory(
+            new DryRunAwareProcessFactory(false),
             $phpStanMutantExecutionResultFactory,
             '/path/to/mago',
             $commandLineBuilder,
@@ -292,6 +309,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
         ;
 
         $factory = new MagoMutantProcessFactory(
+            new DryRunAwareProcessFactory(false),
             $phpStanMutantExecutionResultFactory,
             '/path/to/mago',
             $commandLineBuilder,

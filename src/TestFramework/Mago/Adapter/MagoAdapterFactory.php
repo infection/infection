@@ -39,6 +39,7 @@ use Infection\CannotBeInstantiated;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
@@ -56,6 +57,7 @@ final class MagoAdapterFactory implements StaticAnalysisToolAdapterFactory
      * @param list<string> $staticAnalysisToolOptions
      */
     public static function create(
+        ProcessFactory $processFactory,
         string $staticAnalysisConfigPath,
         string $staticAnalysisToolExecutable,
         float $timeout,
@@ -64,6 +66,7 @@ final class MagoAdapterFactory implements StaticAnalysisToolAdapterFactory
         ShellCommandRunner $shellCommandRunner,
     ): StaticAnalysisToolAdapter {
         return new MagoAdapter(
+            $processFactory,
             new MagoMutantExecutionResultFactory(
                 new MagoMutantDetectionStatusResolver(),
             ),

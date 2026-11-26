@@ -38,6 +38,7 @@ namespace Infection\Tests\StaticAnalysis;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
+use Infection\Process\DryRunProcess;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
@@ -45,10 +46,13 @@ use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\NullStaticAnalysisTestFramework;
 use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Mutant\MutantBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 #[CoversClass(StaticAnalysisToolFactory::class)]
 final class StaticAnalysisToolFactoryTest extends TestCase
@@ -76,14 +80,57 @@ final class StaticAnalysisToolFactoryTest extends TestCase
         $this->assertSame('Debug', $framework->getName());
     }
 
-    private function createFactory(): StaticAnalysisToolFactory
+    #[DataProvider('mutantProcessProvider')]
+    public function test_it_configures_mutant_processes_through_the_bridge(
+        string $tool,
+        bool $dryRun,
+        string $expectedProcessClass,
+    ): void {
+        $framework = $this->createFactory($dryRun)->create($tool, 30);
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+        $process = $framework->test($mutant)->getCurrent()->getProcess();
+
+        $processClass = $process::class;
+        $this->assertSame($expectedProcessClass, $processClass);
+        $this->assertSame(30.0, $process->getTimeout());
+    }
+
+    public static function mutantProcessProvider(): iterable
     {
+        yield 'ordinary debug process' => [StaticAnalysisToolTypes::DEBUG, false, Process::class];
+
+        yield 'dry-run debug process' => [StaticAnalysisToolTypes::DEBUG, true, DryRunProcess::class];
+
+        yield 'ordinary Mago process' => [StaticAnalysisToolTypes::MAGO, false, Process::class];
+
+        yield 'dry-run Mago process' => [StaticAnalysisToolTypes::MAGO, true, DryRunProcess::class];
+
+        yield 'ordinary PHPStan process' => [StaticAnalysisToolTypes::PHPSTAN, false, Process::class];
+
+        yield 'dry-run PHPStan process' => [StaticAnalysisToolTypes::PHPSTAN, true, DryRunProcess::class];
+    }
+
+    private function createFactory(bool $dryRun = false): StaticAnalysisToolFactory
+    {
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withDryRun($dryRun)
+            ->build()
+        ;
+        $executableFinder = $this->createStub(StaticAnalysisToolExecutableFinder::class);
+        $executableFinder->method('find')->willReturn('/path/to/analyser');
+
+        $phpExecutableFinder = $this->createStub(PhpExecutableFinder::class);
+        $phpExecutableFinder->method('find')->willReturn('/path/to/php');
+
+        $configLocator = $this->createStub(TestFrameworkConfigLocatorInterface::class);
+        $configLocator->method('locate')->willReturn('/path/to/config');
+
         return new StaticAnalysisToolFactory(
-            ConfigurationBuilder::withMinimalTestData()->build(),
-            $this->createStub(StaticAnalysisToolExecutableFinder::class),
-            $this->createStub(TestFrameworkConfigLocatorInterface::class),
+            $configuration,
+            $executableFinder,
+            $configLocator,
             $this->createStub(ShellCommandRunner::class),
-            $this->createStub(PhpExecutableFinder::class),
+            $phpExecutableFinder,
             $this->createStub(FileSystem::class),
             $this->createStub(EventDispatcher::class),
         );

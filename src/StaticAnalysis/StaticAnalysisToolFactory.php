@@ -41,6 +41,7 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\TestFramework\Common\Process\DryRunAwareProcessFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
@@ -92,8 +93,11 @@ final readonly class StaticAnalysisToolFactory
 
     private function createAdapter(string $adapterName, float $timeout): StaticAnalysisToolAdapter
     {
+        $processFactory = new DryRunAwareProcessFactory($this->infectionConfig->isDryRun);
+
         if ($adapterName === StaticAnalysisToolTypes::DEBUG) {
             return new DebugStaticAnalysisAdapter(
+                $processFactory,
                 self::DEBUG_RUNTIME_SCRIPT,
                 $this->infectionConfig->debugTestFrameworkLogFile,
                 $timeout,
@@ -105,6 +109,7 @@ final readonly class StaticAnalysisToolFactory
             $phpStanConfigPath = $this->staticAnalysisConfigLocator->locate(StaticAnalysisToolTypes::PHPSTAN);
 
             return PHPStanAdapterFactory::create(
+                $processFactory,
                 $phpStanConfigPath,
                 $this->staticAnalysisToolExecutableFiner->find(
                     StaticAnalysisToolTypes::PHPSTAN,
@@ -122,6 +127,7 @@ final readonly class StaticAnalysisToolFactory
             $magoConfigPath = $this->staticAnalysisConfigLocator->locate(StaticAnalysisToolTypes::MAGO);
 
             return MagoAdapterFactory::create(
+                $processFactory,
                 $magoConfigPath,
                 $this->staticAnalysisToolExecutableFiner->find(
                     StaticAnalysisToolTypes::MAGO,

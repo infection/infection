@@ -35,19 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Testing\TestFramework\Debug;
 
+use Infection\Process\DryRunProcess;
+use Infection\TestFramework\Common\Process\DryRunAwareProcessFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisMutantProcessFactory;
 use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 #[CoversClass(DebugStaticAnalysisMutantProcessFactory::class)]
 final class DebugStaticAnalysisMutantProcessFactoryTest extends TestCase
 {
-    public function test_it_creates_a_process_with_normal_shell_verbosity(): void
+    #[DataProvider('processModeProvider')]
+    public function test_it_creates_a_process_with_normal_shell_verbosity(bool $dryRun, string $expectedProcessClass): void
     {
         $factory = new DebugStaticAnalysisMutantProcessFactory(
+            new DryRunAwareProcessFactory($dryRun),
             '/debug.php',
             '/debug.jsonl',
             10.,
@@ -59,6 +65,17 @@ final class DebugStaticAnalysisMutantProcessFactoryTest extends TestCase
             ->getProcess()
         ;
 
+        $processClass = $process::class;
+        $this->assertSame($expectedProcessClass, $processClass);
         $this->assertSame(['SHELL_VERBOSITY' => '0'], $process->getEnv());
+        $this->assertSame(10.0, $process->getTimeout());
+        $this->assertStringContainsString('static-analysis-mutant', $process->getCommandLine());
+    }
+
+    public static function processModeProvider(): iterable
+    {
+        yield 'ordinary process' => [false, Process::class];
+
+        yield 'dry-run process' => [true, DryRunProcess::class];
     }
 }
