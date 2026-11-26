@@ -37,19 +37,20 @@ namespace Infection\Tests\Mutant;
 
 use Closure;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationProcessDetails;
+use Infection\Mutant\DirectEvaluationResult;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Process\MutantProcess;
 use Later\Interfaces\Deferred;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
 #[CoversClass(MutantExecutionResult::class)]
 final class MutantExecutionResultTest extends TestCase
 {
-    public function test_it_finalizes_with_the_selected_status_and_retains_attempt_evidence_without_forcing_deferred_values(): void
+    public function test_it_retains_attempt_evidence_without_forcing_deferred_values(): void
     {
         $diff = $this->createMock(Deferred::class);
         $diff->expects($this->never())->method('get');
@@ -62,25 +63,20 @@ final class MutantExecutionResultTest extends TestCase
         $mutant->method('getMutatedCode')->willReturn($code);
         $mutant->method('getPrettyPrintedOriginalCode')->willReturn('original source');
         $mutant->method('getTests')->willReturn($source->getTests());
+        $process = $this->createStub(Process::class);
+        $process->method('getCommandLine')->willReturn('phpstan');
+        $analysis = $this->createStub(MutantProcess::class);
+        $analysis->method('getProcess')->willReturn($process);
+        $analysis->method('getResultOutput')->willReturn('analysis failed');
+        $analysis->method('getRuntime')->willReturn(0.5);
         $history = [
-            new EvaluationAttemptResult(
-                'PHPUnit',
-                DetectionStatus::ESCAPED,
-                'test output',
-                new EvaluationProcessDetails('phpunit', 1.25),
-            ),
-            new EvaluationAttemptResult(
-                'PHPStan',
-                DetectionStatus::ERROR,
-                'analysis failed',
-                new EvaluationProcessDetails('phpstan', 0.5),
-            ),
+            new DirectEvaluationResult('In-memory evaluator', DetectionStatus::ESCAPED, 'test output'),
+            $analysis,
         ];
 
-        // Final classification is an explicit decision, independent of the last attempt.
-        $result = MutantExecutionResult::createFromEvaluation($mutant, DetectionStatus::ESCAPED, $history);
+        $result = MutantExecutionResult::createFromEvaluation($mutant, DetectionStatus::ERROR, $history);
 
-        $this->assertSame(DetectionStatus::ESCAPED, $result->getDetectionStatus());
+        $this->assertSame(DetectionStatus::ERROR, $result->getDetectionStatus());
         $this->assertSame($history, $result->getEvaluationHistory());
         $this->assertSame('phpstan', $result->getProcessCommandLine());
         $this->assertSame('analysis failed', $result->getProcessOutput());

@@ -44,7 +44,7 @@ use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluatio
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Framework\Iterable\IterableCounter;
-use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\DirectEvaluationResult;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
@@ -112,7 +112,7 @@ class MutationTestingRunner
     {
         return MutantProcessContainer::from(
             $mutant,
-            fn (): MutantProcessContainer|EvaluationAttemptResult => $this->testFramework->test($mutant),
+            fn (): MutantProcessContainer|DirectEvaluationResult => $this->testFramework->test($mutant),
         );
     }
 

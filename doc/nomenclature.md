@@ -202,24 +202,20 @@ The phase encompassing [mutant materialisation][mutant-materialisation] and [mut
 ### Mutant Evaluation
 
 The execution of tests and optional static analysis against a mutant, and recording of their results.
-Each evaluation attempt produces an immutable observation (`EvaluationAttemptResult`),
-with an evaluator identity, a detection status, output, and optional process details.
-A `MutantProcess` represents a process-backed attempt and memoizes the observation produced using
-its framework's `MutantProcessDetectionStatusResolver`. A framework can also return
-an observation directly without starting a subprocess.
+A completed `MutantProcess` retains its framework name, subprocess details, and
+detection status. It resolves that status once using its framework's
+`MutantProcessDetectionStatusResolver`. A framework that evaluates in memory can
+return a `DirectEvaluationResult` with its status and output.
 
-A `MutantProcessContainer` controls the lifecycle for one mutant. It creates evaluations
-lazily and retains nested containers, including their follow-ups. Each container's
-`EvaluationStrategy` decides whether to retry an evaluator, select another evaluator,
-or finish. An enclosing strategy receives a nested container's complete ordered history
-and selected status when that container finishes. The default sequential strategy advances
-to the next configured evaluator after `ESCAPED`.
+A `MutantProcessContainer` creates evaluations lazily for one mutant. It finishes
+any nested container before moving on. It advances to the next configured evaluator
+only when the completed evaluation returns `ESCAPED`.
 
-The selected final status can differ from the last observation's status. Infection
-emits one final `MutantExecutionResult` after the decision is locked in. Its immutable
-history retains every completed observation in execution order for reporting. Reading the report reuses the final result. Synthetic results for
-ignored, skipped, and uncovered mutants have no fabricated observations.
-Direct observations consume no process thread slot.
+The container builds the final `MutantExecutionResult` with the last status
+and the completed attempts in execution order. Its history holds each
+`MutantProcess` or direct result. Synthetic results for ignored, skipped, and
+uncovered mutants have an empty history. Direct results consume no process
+worker slot.
 
 In a dry run, the parallel runner starts processes that complete without
 launching a subprocess. These attempts have zero process runtime.

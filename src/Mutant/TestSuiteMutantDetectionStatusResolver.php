@@ -35,31 +35,38 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Closure;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use Override;
 
 /**
- * Continues to the next configured evaluator after escape, otherwise keeps its status.
+ * Accounts for coverage and the expected test runtime when resolving detection status.
  *
  * @internal
  */
-final readonly class SequentialEvaluationStrategy implements EvaluationStrategy
+final readonly class TestSuiteMutantDetectionStatusResolver implements MutantProcessDetectionStatusResolver
 {
+    public function __construct(
+        private MutantProcessDetectionStatusResolver $resolver,
+        private Mutant $mutant,
+        private ?float $timeout,
+    ) {
+    }
+
     #[Override]
-    public function decide(
-        array $history,
-        array $evaluations,
-        ?Closure $nextEvaluation,
-        DetectionStatus $currentStatus,
-    ): RunEvaluation|FinishEvaluation {
-        if ($currentStatus !== DetectionStatus::ESCAPED) {
-            return new FinishEvaluation($currentStatus);
+    public function resolve(string $stdout, ?int $exitCode, bool $timedOut): DetectionStatus
+    {
+        if (!$this->mutant->isCoveredByTest()) {
+            return DetectionStatus::NOT_COVERED;
         }
 
-        if ($nextEvaluation !== null) {
-            return new RunEvaluation($nextEvaluation);
+        // If only some tests fit the budget, a timeout does not establish an infinite loop.
+        if ($timedOut
+            && $this->timeout !== null
+            && $this->mutant->getMutation()->getNominalTestExecutionTime() >= $this->timeout
+        ) {
+            return DetectionStatus::SKIPPED;
         }
 
-        return new FinishEvaluation($currentStatus);
+        return $this->resolver->resolve($stdout, $exitCode, $timedOut);
     }
 }

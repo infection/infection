@@ -36,14 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationAttemptResultFactory;
-use Infection\Mutant\EvaluationProcessDetails;
 use Infection\Mutant\Mutant;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -62,17 +61,20 @@ final class MutantProcessTest extends TestCase
     {
         $this->processStub = $this->createStub(Process::class);
         $this->mutant = MutantBuilder::withMinimalTestData()->build();
-        $evaluationAttemptResultFactory = $this->createStub(EvaluationAttemptResultFactory::class);
+        $resolver = $this->createStub(MutantProcessDetectionStatusResolver::class);
 
         $this->mutantProcess = new MutantProcess(
             $this->processStub,
             $this->mutant,
-            $evaluationAttemptResultFactory,
+            $resolver,
+            'PHPUnit',
+            includeErrorOutput: false,
         );
     }
 
     public function test_it_exposes_its_state(): void
     {
+        $this->assertSame('PHPUnit', $this->mutantProcess->getTestFrameworkName());
         $this->assertMutantProcessStateIs(
             $this->mutantProcess,
             $this->processStub,
@@ -105,10 +107,13 @@ final class MutantProcessTest extends TestCase
     public function test_it_reports_zero_runtime_for_a_completed_dry_run_process(): void
     {
         $process = new DryRunProcess(['phpunit']);
+        $resolver = $this->createStub(MutantProcessDetectionStatusResolver::class);
         $mutantProcess = new MutantProcess(
             $process,
             $this->mutant,
-            $this->createStub(EvaluationAttemptResultFactory::class),
+            $resolver,
+            'PHPUnit',
+            includeErrorOutput: false,
         );
         $process->start();
         $mutantProcess->markAsFinished();
@@ -116,33 +121,49 @@ final class MutantProcessTest extends TestCase
         $this->assertSame(0.0, $mutantProcess->getRuntime());
     }
 
-    public function test_it_classifies_a_completed_attempt_once_and_retains_the_same_result(): void
+    public function test_it_resolves_detection_status_once_after_the_process_finishes(): void
     {
-        $expected = new EvaluationAttemptResult(
-            'PHPUnit',
-            DetectionStatus::ESCAPED,
-            'output',
-            new EvaluationProcessDetails('phpunit', 1.25),
-        );
-        $factory = $this->createMock(EvaluationAttemptResultFactory::class);
-        $process = new MutantProcess($this->processStub, $this->mutant, $factory);
-        $factory->expects($this->once())->method('createFromProcess')->with($this->identicalTo($process))->willReturn($expected);
+        $this->processStub->method('getOutput')->willReturn('output');
+        $this->processStub->method('getExitCode')->willReturn(0);
+        $resolver = $this->createMock(MutantProcessDetectionStatusResolver::class);
+        $resolver->expects($this->once())->method('resolve')->with('output', 0, true)->willReturn(DetectionStatus::ESCAPED);
+        $process = new MutantProcess($this->processStub, $this->mutant, $resolver, 'PHPUnit', includeErrorOutput: false);
+        $process->markAsTimedOut();
         $process->markAsFinished();
 
-        $this->assertSame($expected, $process->getEvaluationAttemptResult());
-        $this->assertSame($expected, $process->getEvaluationAttemptResult());
+        $this->assertSame(DetectionStatus::ESCAPED, $process->getResult());
+        $this->assertSame(DetectionStatus::ESCAPED, $process->getResult());
     }
 
-    public function test_it_cannot_classify_an_unfinished_attempt(): void
+    #[DataProvider('resultOutputProvider')]
+    public function test_it_reads_the_configured_output_streams(bool $includeErrorOutput, string $expected): void
     {
-        $factory = $this->createMock(EvaluationAttemptResultFactory::class);
-        $factory->expects($this->never())->method('createFromProcess');
-        $process = new MutantProcess($this->processStub, $this->mutant, $factory);
+        $this->processStub->method('getOutput')->willReturn("test output\n");
+        $this->processStub->method('getErrorOutput')->willReturn("stderr\n");
+        $resolver = $this->createStub(MutantProcessDetectionStatusResolver::class);
+        $process = new MutantProcess($this->processStub, $this->mutant, $resolver, 'Evaluator', $includeErrorOutput);
+        $process->markAsFinished();
+
+        $this->assertSame($expected, $process->getResultOutput());
+    }
+
+    public static function resultOutputProvider(): iterable
+    {
+        yield 'test framework stdout' => [false, "test output\n"];
+
+        yield 'static analysis stdout and stderr' => [true, "test output\n\n\nstderr"];
+    }
+
+    public function test_it_cannot_resolve_detection_status_before_the_process_finishes(): void
+    {
+        $resolver = $this->createMock(MutantProcessDetectionStatusResolver::class);
+        $resolver->expects($this->never())->method('resolve');
+        $process = new MutantProcess($this->processStub, $this->mutant, $resolver, 'PHPUnit', includeErrorOutput: false);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot classify an evaluation before its process has finished.');
+        $this->expectExceptionMessage('Cannot resolve the detection status before the mutant process has finished.');
 
-        $process->getEvaluationAttemptResult();
+        $process->getResult();
     }
 
     private function assertMutantProcessStateIs(

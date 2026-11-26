@@ -39,7 +39,7 @@ use function array_shift;
 use function count;
 use DuoClock\DuoClock;
 use Generator;
-use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\DirectEvaluationResult;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Iterator;
@@ -122,7 +122,7 @@ class ParallelProcessRunner implements ProcessRunner
                 $mutantProcessContainer = $this->queue->dequeue();
                 $attempt = $mutantProcessContainer->getCurrent();
 
-                if ($attempt instanceof EvaluationAttemptResult) {
+                if ($attempt instanceof DirectEvaluationResult) {
                     if ($mutantProcessContainer->hasNext()) {
                         $mutantProcessContainer->createNext();
                         $this->queue->enqueue($mutantProcessContainer);

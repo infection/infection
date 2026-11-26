@@ -42,7 +42,6 @@ use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Infection\TestFramework\PHPStan\Mutant\PHPStanEvaluationAttemptResultFactory;
 use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantDetectionStatusResolver;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -73,9 +72,7 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
         return new PHPStanAdapter(
             $processFactory,
             $fileSystem,
-            new PHPStanEvaluationAttemptResultFactory(
-                new PHPStanMutantDetectionStatusResolver(),
-            ),
+            new PHPStanMutantDetectionStatusResolver(),
             $staticAnalysisConfigPath,
             $staticAnalysisToolExecutable,
             new CommandLineBuilder(

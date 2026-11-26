@@ -40,7 +40,6 @@ use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\Process\ProcessFactory;
-use Infection\TestFramework\PHPStan\Mutant\PHPStanEvaluationAttemptResultFactory;
 
 /**
  * @internal
@@ -72,10 +71,9 @@ final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMuta
                 timeout: $this->timeout,
             ),
             $mutant,
-            // There is not enough differences to warrant a different factory yet at the time of writing.
-            new PHPStanEvaluationAttemptResultFactory(
-                new FixedMutantProcessDetectionStatusResolver(DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
-            ),
+            new FixedMutantProcessDetectionStatusResolver(DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
+            'PHPStan',
+            includeErrorOutput: true,
         );
     }
 }

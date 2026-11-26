@@ -673,7 +673,7 @@ parameters:
 			path: ../src/TestFramework/Contracts/Mutant/MutantProcessDetectionStatusResolver.php
 
 		-
-			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\EvaluationAttemptResult
+			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\DirectEvaluationResult
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/Contracts/TestFramework.php
@@ -811,12 +811,6 @@ parameters:
 			path: ../src/TestFramework/Legacy/LegacyMutantDetectionStatusResolver.php
 
 		-
-			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\Mutant\EvaluationAttemptResultFactory
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Adapter/MagoAdapter.php
-
-		-
 			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\Process\Factory\LazyMutantProcessFactory
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -841,40 +835,10 @@ parameters:
 			path: ../src/TestFramework/Mago/Adapter/MagoAdapterFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory should not depend on Infection\Mutant\EvaluationAttemptResult
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 2
-			path: ../src/TestFramework/Mago/Mutant/MagoEvaluationAttemptResultFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory should not depend on Infection\Mutant\EvaluationAttemptResultFactory
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Mutant/MagoEvaluationAttemptResultFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory should not depend on Infection\Mutant\EvaluationProcessDetails
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Mutant/MagoEvaluationAttemptResultFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory should not depend on Infection\Process\MutantProcess
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Mutant/MagoEvaluationAttemptResultFactory.php
-
-		-
 			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver should not depend on Infection\Mutant\DetectionStatus
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 5
 			path: ../src/TestFramework/Mago/Mutant/MagoMutantDetectionStatusResolver.php
-
-		-
-			rawMessage: Infection\TestFramework\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Mutant\EvaluationAttemptResultFactory
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Process/MagoMutantProcessFactory.php
 
 		-
 			rawMessage: Infection\TestFramework\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Mutant\Mutant

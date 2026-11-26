@@ -121,7 +121,7 @@ final class LegacyMutantDetectionStatusResolverTest extends TestCase
     }
 
     #[DataProvider('unknownExitCodeProvider')]
-    public function test_it_classifies_output_with_an_unknown_exit_code(
+    public function test_it_resolves_detection_status_from_output_with_an_unknown_exit_code(
         bool $syntaxError,
         DetectionStatus $expected,
     ): void {

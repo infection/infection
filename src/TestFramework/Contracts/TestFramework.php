@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Contracts;
 
 use Infection\AbstractTestFramework\InvalidVersion;
-use Infection\Mutant\EvaluationAttemptResult;
+use Infection\Mutant\DirectEvaluationResult;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
@@ -87,7 +87,7 @@ interface TestFramework
      * A returned pipe must be cold; the runner executes its processes on demand.
      * Calling test() again must perform a fresh evaluation, including for direct results.
      */
-    public function test(Mutant $mutant): MutantProcessContainer|EvaluationAttemptResult;
+    public function test(Mutant $mutant): MutantProcessContainer|DirectEvaluationResult;
 
     /**
      * @deprecated This is only for making the migration easier, to be removed.

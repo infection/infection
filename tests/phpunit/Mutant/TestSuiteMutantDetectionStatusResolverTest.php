@@ -36,13 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationProcessDetails;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\TestFrameworkEvaluationAttemptResultFactory;
+use Infection\Mutant\TestSuiteMutantDetectionStatusResolver;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Legacy\LegacyMutantDetectionStatusResolver;
@@ -52,48 +49,26 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
-use Symfony\Component\Process\Process;
 
-#[CoversClass(TestFrameworkEvaluationAttemptResultFactory::class)]
-final class TestFrameworkEvaluationAttemptResultFactoryTest extends TestCase
+#[CoversClass(TestSuiteMutantDetectionStatusResolver::class)]
+final class TestSuiteMutantDetectionStatusResolverTest extends TestCase
 {
     private Stub&TestFrameworkAdapter $adapter;
-
-    private TestFrameworkEvaluationAttemptResultFactory $resultFactory;
 
     protected function setUp(): void
     {
         $this->adapter = $this->createStub(TestFrameworkAdapter::class);
-        $this->resultFactory = new TestFrameworkEvaluationAttemptResultFactory('PHPUnit', new LegacyMutantDetectionStatusResolver($this->adapter));
     }
 
     #[DataProvider('detectionStatusProvider')]
-    public function test_it_classifies_the_attempt_and_retains_its_evidence(int $exitCode, bool $testsPass, bool $covered, DetectionStatus $status): void
+    public function test_it_resolves_the_detection_status(int $exitCode, bool $testsPass, bool $covered, DetectionStatus $status): void
     {
         $this->adapter->method('testsPass')->willReturn($testsPass);
-        $process = $this->createStub(Process::class);
-        $process->method('isTerminated')->willReturn(true);
-        $process->method('getCommandLine')->willReturn('phpunit');
-        $process->method('getOutput')->willReturn('test output');
-        $process->method('getExitCode')->willReturn($exitCode);
-        $process->method('getStartTime')->willReturn(10.0);
         $mutant = $this->createStub(Mutant::class);
         $mutant->method('isCoveredByTest')->willReturn($covered);
-        $mutantProcess = $this->createStub(MutantProcess::class);
-        $mutantProcess->method('getProcess')->willReturn($process);
-        $mutantProcess->method('getMutant')->willReturn($mutant);
-        $mutantProcess->method('isTimedOut')->willReturn(!$covered);
-        $mutantProcess->method('getRuntime')->willReturn(1.5);
-        $expected = new EvaluationAttemptResult(
-            'PHPUnit',
-            $status,
-            'test output',
-            new EvaluationProcessDetails('phpunit', 1.5),
-        );
+        $resolver = new TestSuiteMutantDetectionStatusResolver(new LegacyMutantDetectionStatusResolver($this->adapter), $mutant, 10.0);
 
-        $actual = $this->resultFactory->createFromProcess($mutantProcess);
-
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($status, $resolver->resolve('test output', $exitCode, timedOut: !$covered));
     }
 
     public static function detectionStatusProvider(): iterable
@@ -125,20 +100,6 @@ final class TestFrameworkEvaluationAttemptResultFactoryTest extends TestCase
         array $testTimes,
         DetectionStatus $expected,
     ): void {
-        $processMock = $this->createStub(Process::class);
-        $processMock
-            ->method('isTerminated')
-            ->willReturn(true)
-        ;
-        $processMock
-            ->method('getOutput')
-            ->willReturn('')
-        ;
-        $processMock
-            ->method('getTimeout')
-            ->willReturn($processTimeout)
-        ;
-
         $tests = [];
 
         foreach ($testTimes as $index => $testTime) {
@@ -149,23 +110,21 @@ final class TestFrameworkEvaluationAttemptResultFactoryTest extends TestCase
             );
         }
 
-        $mutantProcess = new MutantProcess(
-            $processMock,
-            MutantBuilder::withMinimalTestData()
-                ->withMutation(
-                    MutationBuilder::withMinimalTestData()
-                        ->withTests($tests)
-                        ->build(),
-                )
-                ->build(),
-            $this->resultFactory,
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutation(
+                MutationBuilder::withMinimalTestData()
+                    ->withTests($tests)
+                    ->build(),
+            )
+            ->build()
+        ;
+        $resolver = new TestSuiteMutantDetectionStatusResolver(
+            new LegacyMutantDetectionStatusResolver($this->adapter),
+            $mutant,
+            $processTimeout,
         );
-        $mutantProcess->markAsTimedOut();
 
-        $this->assertSame(
-            $expected,
-            $this->resultFactory->createFromProcess($mutantProcess)->detectionStatus,
-        );
+        $this->assertSame($expected, $resolver->resolve('', null, timedOut: true));
     }
 
     public static function timedOutProcessProvider(): iterable
@@ -195,24 +154,6 @@ final class TestFrameworkEvaluationAttemptResultFactoryTest extends TestCase
         ];
     }
 
-    public function test_it_recognizes_syntax_errors_when_the_framework_supports_it(): void
-    {
-        /**
-         * @var Stub&TestFrameworkAdapter&SyntaxErrorAware $adapter
-         */
-        $adapter = $this->createStubForIntersectionOfInterfaces([TestFrameworkAdapter::class, SyntaxErrorAware::class]);
-        $adapter->method('testsPass')->willReturn(false);
-        $adapter->method('isSyntaxError')->willReturn(true);
-        $process = $this->createStub(Process::class);
-        $process->method('isTerminated')->willReturn(true);
-        $process->method('getOutput')->willReturn('syntax error');
-        $process->method('getExitCode')->willReturn(1);
-        $factory = new TestFrameworkEvaluationAttemptResultFactory('PHPUnit', new LegacyMutantDetectionStatusResolver($adapter));
-        $mutantProcess = new MutantProcess($process, MutantBuilder::withCompleteTestData()->build(), $factory);
-
-        $this->assertSame(DetectionStatus::SYNTAX_ERROR, $factory->createFromProcess($mutantProcess)->detectionStatus);
-    }
-
     public function test_it_reports_a_dry_run_attempt_as_escaped(): void
     {
         $this->adapter->method('testsPass')->willReturnCallback(
@@ -220,15 +161,20 @@ final class TestFrameworkEvaluationAttemptResultFactoryTest extends TestCase
         );
         $mutant = $this->createStub(Mutant::class);
         $mutant->method('isCoveredByTest')->willReturn(true);
+        $resolver = new TestSuiteMutantDetectionStatusResolver(new LegacyMutantDetectionStatusResolver($this->adapter), $mutant, 10.0);
         $dryRunProcess = new DryRunProcess(['phpunit']);
-        $process = new MutantProcess($dryRunProcess, $mutant, $this->resultFactory);
+        $process = new MutantProcess(
+            $dryRunProcess,
+            $mutant,
+            $resolver,
+            'PHPUnit',
+            includeErrorOutput: false,
+        );
         $dryRunProcess->start();
         $process->markAsFinished();
 
-        $attempt = $process->getEvaluationAttemptResult();
-
-        $this->assertSame(DetectionStatus::ESCAPED, $attempt->detectionStatus);
-        $this->assertSame(DryRunProcess::PASSING_TEST_OUTPUT, $attempt->output);
+        $this->assertSame(DetectionStatus::ESCAPED, $process->getResult());
+        $this->assertSame(DryRunProcess::PASSING_TEST_OUTPUT, $process->getResultOutput());
         $this->assertSame(0.0, $process->getRuntime());
     }
 }

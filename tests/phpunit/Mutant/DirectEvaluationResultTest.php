@@ -33,14 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\Mutant;
 
-use Infection\Process\MutantProcess;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\DirectEvaluationResult;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-interface EvaluationAttemptResultFactory
+#[CoversClass(DirectEvaluationResult::class)]
+final class DirectEvaluationResultTest extends TestCase
 {
-    public function createFromProcess(MutantProcess $mutantProcess): EvaluationAttemptResult;
+    public function test_it_can_retain_a_result_produced_without_a_process(): void
+    {
+        $result = new DirectEvaluationResult('In-memory analyser', DetectionStatus::ESCAPED, 'No issues');
+
+        $this->assertSame('In-memory analyser', $result->evaluatorName);
+        $this->assertSame(DetectionStatus::ESCAPED, $result->detectionStatus);
+        $this->assertSame('No issues', $result->output);
+    }
 }

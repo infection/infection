@@ -38,6 +38,7 @@ namespace Infection\Mutant;
 use function array_key_last;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\MutatorResolver;
+use Infection\Process\MutantProcess;
 use Later\Interfaces\Deferred;
 use RuntimeException;
 use function sprintf;
@@ -57,7 +58,7 @@ class MutantExecutionResult
      * @param Deferred<string> $mutantDiff
      * @param Deferred<string> $mutatedCode
      * @param TestLocation[] $tests
-     * @param list<EvaluationAttemptResult> $evaluationHistory
+     * @param list<MutantProcess|DirectEvaluationResult> $evaluationHistory
      */
     public function __construct(
         private readonly string $processCommandLine,
@@ -84,19 +85,21 @@ class MutantExecutionResult
     }
 
     /**
-     * The final status is selected by the coordinator. Legacy process details describe
-     * the last attempt, while the history retains every completed attempt.
+     * The status and process details describe the last completed evaluation.
      *
-     * @param non-empty-list<EvaluationAttemptResult> $evaluationHistory
+     * @param non-empty-list<MutantProcess|DirectEvaluationResult> $evaluationHistory
      */
     public static function createFromEvaluation(Mutant $mutant, DetectionStatus $detectionStatus, array $evaluationHistory): self
     {
         $mutation = $mutant->getMutation();
         $lastAttempt = $evaluationHistory[array_key_last($evaluationHistory)];
+        $lastProcess = $lastAttempt instanceof MutantProcess ? $lastAttempt : null;
 
         return new self(
-            $lastAttempt->process->commandLine ?? '',
-            $lastAttempt->output,
+            $lastProcess?->getProcess()->getCommandLine() ?? '',
+            $lastAttempt instanceof MutantProcess
+                ? $lastAttempt->getResultOutput()
+                : $lastAttempt->output,
             $detectionStatus,
             $mutant->getDiff(),
             $mutation->getHash(),
@@ -110,7 +113,7 @@ class MutantExecutionResult
             $mutant->getPrettyPrintedOriginalCode(),
             $mutant->getMutatedCode(),
             $mutant->getTests(),
-            $lastAttempt->process->runtime ?? 0.0,
+            $lastProcess?->getRuntime() ?? 0.0,
             $evaluationHistory,
         );
     }
@@ -214,7 +217,7 @@ class MutantExecutionResult
     }
 
     /**
-     * @return list<EvaluationAttemptResult>
+     * @return list<MutantProcess|DirectEvaluationResult>
      */
     public function getEvaluationHistory(): array
     {

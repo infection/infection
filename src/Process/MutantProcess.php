@@ -35,11 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationAttemptResultFactory;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use function microtime;
+use function sprintf;
 use Symfony\Component\Process\Process;
+use function trim;
 use Webmozart\Assert\Assert;
 
 /**
@@ -48,7 +50,7 @@ use Webmozart\Assert\Assert;
  */
 class MutantProcess
 {
-    private ?EvaluationAttemptResult $evaluationAttemptResult = null;
+    private ?DetectionStatus $result = null;
 
     private bool $timedOut = false;
 
@@ -57,7 +59,9 @@ class MutantProcess
     public function __construct(
         private readonly Process $process,
         private readonly Mutant $mutant,
-        private readonly EvaluationAttemptResultFactory $evaluationAttemptResultFactory,
+        private readonly MutantProcessDetectionStatusResolver $detectionStatusResolver,
+        private readonly string $testFrameworkName,
+        private readonly bool $includeErrorOutput,
     ) {
     }
 
@@ -69,6 +73,11 @@ class MutantProcess
     public function getMutant(): Mutant
     {
         return $this->mutant;
+    }
+
+    public function getTestFrameworkName(): string
+    {
+        return $this->testFrameworkName;
     }
 
     public function markAsTimedOut(): void
@@ -98,10 +107,33 @@ class MutantProcess
             : $this->finishedAt - $this->process->getStartTime();
     }
 
-    public function getEvaluationAttemptResult(): EvaluationAttemptResult
+    public function getResult(): DetectionStatus
     {
-        Assert::greaterThan($this->finishedAt, 0.0, 'Cannot classify an evaluation before its process has finished.');
+        Assert::greaterThan(
+            $this->finishedAt,
+            0.0,
+            'Cannot resolve the detection status before the mutant process has finished.',
+        );
 
-        return $this->evaluationAttemptResult ??= $this->evaluationAttemptResultFactory->createFromProcess($this);
+        return $this->result ??= $this->detectionStatusResolver->resolve(
+            $this->process->getOutput(),
+            $this->process->getExitCode(),
+            $this->timedOut,
+        );
+    }
+
+    public function getResultOutput(): string
+    {
+        $output = $this->process->getOutput();
+
+        return $this->includeErrorOutput
+            ? trim(
+                sprintf(
+                    "%s\n\n%s",
+                    $output,
+                    $this->process->getErrorOutput(),
+                ),
+            )
+            : $output;
     }
 }

@@ -39,19 +39,15 @@ use function array_search;
 use function count;
 use DuoClock\TimeSpy;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationAttemptResultFactory;
-use Infection\Mutant\EvaluationStrategy;
-use Infection\Mutant\FinishEvaluation;
+use Infection\Mutant\DirectEvaluationResult;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\RunEvaluation;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessQueue;
-use Infection\TestFramework\Mago\Mutant\MagoEvaluationAttemptResultFactory;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Infection\Tests\Mutant\MutantBuilder;
@@ -74,11 +70,11 @@ final class ParallelProcessRunnerTest extends TestCase
     public function test_it_finishes_each_dry_run_process_before_yielding_the_container(): void
     {
         $mutant = MutantBuilder::withCompleteTestData()->build();
-        $resultFactory = new MagoEvaluationAttemptResultFactory(new MagoMutantDetectionStatusResolver());
+        $resolver = new MagoMutantDetectionStatusResolver();
         $firstProcess = new DryRunProcess(['check-first'], cwd: __FILE__);
         $secondProcess = new DryRunProcess(['check-second'], cwd: __FILE__);
-        $first = new MutantProcess($firstProcess, $mutant, $resultFactory);
-        $second = new MutantProcess($secondProcess, $mutant, $resultFactory);
+        $first = new MutantProcess($firstProcess, $mutant, $resolver, 'Mago', includeErrorOutput: true);
+        $second = new MutantProcess($secondProcess, $mutant, $resolver, 'Mago', includeErrorOutput: true);
         $container = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $first)
             ->append(static fn (): MutantProcess => $second)
         ;
@@ -95,7 +91,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $result = $container->getMutantExecutionResult();
         $this->assertSame(DetectionStatus::ESCAPED, $result->getDetectionStatus());
         $this->assertSame(0.0, $result->getProcessRuntime());
-        $this->assertCount(2, $result->getEvaluationHistory());
+        $this->assertSame([$first, $second], $result->getEvaluationHistory());
     }
 
     public function test_it_does_nothing_when_no_process_is_given(): void
@@ -536,7 +532,7 @@ final class ParallelProcessRunnerTest extends TestCase
             $mutantProcess = new DummyMutantProcess(
                 $process,
                 MutantBuilder::withMinimalTestData()->build(),
-                $this->createResultFactory(),
+                $this->createDetectionStatusResolver(),
                 false,
             );
 
@@ -602,7 +598,7 @@ final class ParallelProcessRunnerTest extends TestCase
             $mutantProcess = new DummyMutantProcess(
                 $process,
                 MutantBuilder::withMinimalTestData()->build(),
-                $this->createResultFactory(),
+                $this->createDetectionStatusResolver(),
                 false,
             );
 
@@ -620,50 +616,11 @@ final class ParallelProcessRunnerTest extends TestCase
         iterator_count($runner->run($processes));
     }
 
-    public function test_it_follows_a_retry_decision_and_yields_only_the_final_evaluation(): void
-    {
-        $mutant = MutantBuilder::withCompleteTestData()->build();
-        $first = new EvaluationAttemptResult('Evaluator', DetectionStatus::TIMED_OUT, 'First attempt', null);
-        $retried = new EvaluationAttemptResult('Evaluator', DetectionStatus::ESCAPED, 'Retry completed', null);
-        $retry = static fn (): EvaluationAttemptResult => $retried;
-        $unused = function (): EvaluationAttemptResult {
-            $this->fail('A retry must run the evaluator selected by the strategy.');
-        };
-        $strategy = $this->createMock(EvaluationStrategy::class);
-        $strategy
-            ->expects($this->exactly(2))
-            ->method('decide')
-            ->willReturnCallback(function (array $history, array $evaluations) use ($first, $retried, $retry): RunEvaluation|FinishEvaluation {
-                $this->assertCount(2, $evaluations);
-                $this->assertIsCallable($evaluations[1]);
-
-                if ($history === [$first]) {
-                    return new RunEvaluation($retry);
-                }
-
-                $this->assertSame([$first, $retried], $history);
-
-                return new FinishEvaluation(DetectionStatus::ESCAPED);
-            })
-        ;
-        $evaluation = MutantProcessContainer::from($mutant, static fn (): EvaluationAttemptResult => $first)
-            ->append($unused)
-            ->withStrategy($strategy)
-        ;
-        $runner = new ParallelProcessRunner(1, 0, new TimeSpy());
-
-        $finished = iterator_to_array($runner->run([$evaluation]), false);
-
-        $this->assertSame([$evaluation], $finished);
-        $this->assertSame([$first, $retried], $finished[0]->getMutantExecutionResult()->getEvaluationHistory());
-        $this->assertSame(DetectionStatus::ESCAPED, $finished[0]->getMutantExecutionResult()->getDetectionStatus());
-    }
-
     public function test_it_yields_a_direct_result_without_using_a_worker(): void
     {
         $mutant = MutantBuilder::withCompleteTestData()->build();
-        $result = new EvaluationAttemptResult('In-memory analyser', DetectionStatus::ESCAPED, 'No issues', null);
-        $evaluation = MutantProcessContainer::from($mutant, static fn (): EvaluationAttemptResult => $result);
+        $result = new DirectEvaluationResult('In-memory analyser', DetectionStatus::ESCAPED, 'No issues');
+        $evaluation = MutantProcessContainer::from($mutant, static fn (): DirectEvaluationResult => $result);
         $runner = new ParallelProcessRunner(1, 0, new TimeSpy());
 
         $finished = iterator_to_array($runner->run([$evaluation]), false);
@@ -676,9 +633,9 @@ final class ParallelProcessRunnerTest extends TestCase
     public function test_it_finishes_mixed_attempts_once_in_execution_order(bool $firstUsesProcess, bool $lastUsesProcess): void
     {
         $mutant = MutantBuilder::withCompleteTestData()->build();
-        $first = new EvaluationAttemptResult('First evaluator', DetectionStatus::ESCAPED, 'First output', null);
-        $last = new EvaluationAttemptResult('Second evaluator', DetectionStatus::KILLED_BY_STATIC_ANALYSIS, 'Second output', null);
-        $createAttempt = function (EvaluationAttemptResult $result, bool $usesProcess) use ($mutant): MutantProcess|EvaluationAttemptResult {
+        $first = new DirectEvaluationResult('First evaluator', DetectionStatus::ESCAPED, 'First output');
+        $last = new DirectEvaluationResult('Second evaluator', DetectionStatus::KILLED_BY_STATIC_ANALYSIS, 'Second output');
+        $createAttempt = function (DirectEvaluationResult $result, bool $usesProcess) use ($mutant): MutantProcess|DirectEvaluationResult {
             if (!$usesProcess) {
                 return $result;
             }
@@ -687,27 +644,24 @@ final class ParallelProcessRunnerTest extends TestCase
             $process->expects($this->once())->method('start')->with(null, ['INFECTION' => '1', 'TEST_TOKEN' => 1]);
             $process->expects($this->once())->method('isRunning')->willReturn(false);
             $process->expects($this->never())->method('checkTimeout');
-            $factory = $this->createMock(EvaluationAttemptResultFactory::class);
-            $factory->expects($this->once())->method('createFromProcess')->willReturn($result);
+            $process->method('getOutput')->willReturn($result->output);
+            $resolver = $this->createMock(MutantProcessDetectionStatusResolver::class);
+            $resolver->expects($this->once())->method('resolve')->willReturn($result->detectionStatus);
 
-            return new MutantProcess($process, $mutant, $factory);
+            return new MutantProcess($process, $mutant, $resolver, $result->evaluatorName, includeErrorOutput: false);
         };
 
-        if ($firstUsesProcess) {
-            $firstProcess = $createAttempt($first, true);
-            $this->assertInstanceOf(MutantProcess::class, $firstProcess);
-            $evaluation = MutantProcessContainer::from($mutant, static fn (): MutantProcess => $firstProcess);
-        } else {
-            $evaluation = MutantProcessContainer::from($mutant, static fn (): EvaluationAttemptResult => $first);
-        }
-
-        $evaluation->append(static fn (): MutantProcess|EvaluationAttemptResult => $createAttempt($last, $lastUsesProcess));
+        $firstAttempt = $createAttempt($first, $firstUsesProcess);
+        $lastAttempt = $createAttempt($last, $lastUsesProcess);
+        $evaluation = MutantProcessContainer::from($mutant, static fn (): MutantProcess|DirectEvaluationResult => $firstAttempt)
+            ->append(static fn (): MutantProcess|DirectEvaluationResult => $lastAttempt)
+        ;
         $runner = new ParallelProcessRunner(1, 0, new TimeSpy());
 
         $finished = iterator_to_array($runner->run([$evaluation]), false);
 
         $this->assertSame([$evaluation], $finished);
-        $this->assertSame([$first, $last], $finished[0]->getMutantExecutionResult()->getEvaluationHistory());
+        $this->assertSame([$firstAttempt, $lastAttempt], $finished[0]->getMutantExecutionResult()->getEvaluationHistory());
         $this->assertSame(DetectionStatus::KILLED_BY_STATIC_ANALYSIS, $finished[0]->getMutantExecutionResult()->getDetectionStatus());
     }
 
@@ -741,14 +695,12 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->assertSame(10, iterator_count($executedProcesses));
     }
 
-    private function createResultFactory(): EvaluationAttemptResultFactory
+    private function createDetectionStatusResolver(): MutantProcessDetectionStatusResolver
     {
-        $factory = $this->createStub(EvaluationAttemptResultFactory::class);
-        $factory->method('createFromProcess')->willReturn(
-            new EvaluationAttemptResult('Evaluator', DetectionStatus::KILLED_BY_TESTS, '', null),
-        );
+        $resolver = $this->createStub(MutantProcessDetectionStatusResolver::class);
+        $resolver->method('resolve')->willReturn(DetectionStatus::KILLED_BY_TESTS);
 
-        return $factory;
+        return $resolver;
     }
 
     private function createMutantProcessContainer(int $threadIndex): MutantProcessContainer
@@ -782,7 +734,7 @@ final class ParallelProcessRunnerTest extends TestCase
             fn (): MutantProcess => new DummyMutantProcess(
                 $processMock,
                 MutantBuilder::withMinimalTestData()->build(),
-                $this->createResultFactory(),
+                $this->createDetectionStatusResolver(),
                 false,
             ),
         );
@@ -828,14 +780,12 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturn(false)
         ;
 
-        $observation = new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED, '', null);
+        $resolver = $this->createMock(MutantProcessDetectionStatusResolver::class);
 
-        $evaluationAttemptResultFactoryMock = $this->createMock(EvaluationAttemptResultFactory::class);
-
-        $evaluationAttemptResultFactoryMock
+        $resolver
             ->expects($this->once())
-            ->method('createFromProcess')
-            ->willReturn($observation)
+            ->method('resolve')
+            ->willReturn(DetectionStatus::ESCAPED)
         ;
 
         $mutant = MutantBuilder::withMinimalTestData()->build();
@@ -845,14 +795,16 @@ final class ParallelProcessRunnerTest extends TestCase
             static fn (): MutantProcess => new DummyMutantProcess(
                 $phpUnitProcessMock,
                 $mutant,
-                $evaluationAttemptResultFactoryMock,
+                $resolver,
                 false,
             ),
         )->append(
             fn (): MutantProcess => new MutantProcess(
                 $nextProcessMock,
                 $mutant,
-                $this->createResultFactory(),
+                $this->createDetectionStatusResolver(),
+                'Evaluator',
+                includeErrorOutput: false,
             ),
         );
     }
@@ -881,7 +833,7 @@ final class ParallelProcessRunnerTest extends TestCase
             fn (): MutantProcess => new DummyMutantProcess(
                 $processMock,
                 MutantBuilder::withMinimalTestData()->build(),
-                $this->createResultFactory(),
+                $this->createDetectionStatusResolver(),
                 true,
             ),
         );

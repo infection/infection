@@ -36,14 +36,16 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 /**
- * Locks in the final status independently of any individual observation.
+ * Result of an evaluator that did not start a subprocess.
  *
  * @internal
  */
-final readonly class FinishEvaluation
+final readonly class DirectEvaluationResult
 {
     public function __construct(
+        public string $evaluatorName,
         public DetectionStatus $detectionStatus,
+        public string $output,
     ) {
     }
 }

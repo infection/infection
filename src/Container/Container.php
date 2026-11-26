@@ -116,7 +116,6 @@ use Infection\Metrics\ResultsCollector;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantFactory;
-use Infection\Mutant\SequentialEvaluationStrategy;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
@@ -585,7 +584,6 @@ final class Container extends DIContainer
                 $container->getConfiguration()->isStaticAnalysisEnabled()
                     ? $container->getStaticAnalysisTestFramework()
                     : null,
-                new SequentialEvaluationStrategy(),
             ),
             MutantProcessContainerFactory::class => static fn (self $container): MutantProcessContainerFactory => new MutantProcessContainerFactory(
                 $container->getConfiguration()->processTimeout,
