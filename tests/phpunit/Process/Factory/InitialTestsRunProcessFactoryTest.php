@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Factory;
 
+use function extension_loaded;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\OriginalPhpProcess;
+use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -112,7 +114,12 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
         ]);
 
         $this->assertNull($process->getTimeout());
-        $this->assertSame(['SHELL_VERBOSITY' => '0'], $process->getEnv());
+
+        $expectedEnv = !extension_loaded('pcov') && PHP_SAPI !== 'phpdbg'
+            ? ['SHELL_VERBOSITY' => '0', 'XDEBUG_MODE' => 'coverage']
+            : ['SHELL_VERBOSITY' => '0'];
+
+        $this->assertSame($expectedEnv, $process->getEnv());
         $this->assertInstanceOf(OriginalPhpProcess::class, $process);
     }
 }

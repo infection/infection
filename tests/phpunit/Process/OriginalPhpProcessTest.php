@@ -35,10 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
-use function extension_loaded;
 use Infection\Process\OriginalPhpProcess;
-use function ini_get as ini_get_unsafe;
-use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -61,24 +58,12 @@ final class OriginalPhpProcessTest extends TestCase
     }
 
     #[Group('integration')]
-    public function test_it_injects_xdebug_env_vars(): void
+    public function test_it_preserves_the_supplied_environment(): void
     {
         $process = new OriginalPhpProcess(['env']);
-        $process->run(null, ['TESTING' => 'test']);
+        $process->run(null, ['TESTING' => 'test', 'XDEBUG_MODE' => 'off']);
 
-        if (
-            !extension_loaded('pcov')
-            && PHP_SAPI !== 'phpdbg'
-            && (
-                ini_get_unsafe('xdebug.mode') === false
-                || ini_get_unsafe('xdebug.mode') !== 'coverage'
-            )
-        ) {
-            $this->assertStringContainsString('XDEBUG_MODE=coverage', $process->getOutput());
-        } else {
-            $this->assertStringNotContainsString('XDEBUG_MODE=coverage', $process->getOutput());
-        }
-
+        $this->assertStringContainsString('XDEBUG_MODE=off', $process->getOutput());
         $this->assertStringContainsString('TESTING=test', $process->getOutput());
     }
 }
