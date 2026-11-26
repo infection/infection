@@ -33,25 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework\Common;
 
+use Closure;
+use Stringable;
+use function extension_loaded;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
-use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
+use const PHP_SAPI;
+use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
- * This is needed for 2 purposes:
- *
- * 1. To warm up the SA tool's cache
- * 2. To make sure SA passes before using it inside Infection to kill Mutants
- *
  * @internal
  * @final
  */
-readonly class InitialStaticAnalysisRunner
+readonly class InitialTestsRunner
 {
     public function __construct(
         private ShellCommandRunner $shellCommandRunner,
@@ -61,40 +61,50 @@ readonly class InitialStaticAnalysisRunner
 
     /**
      * @param string[] $command
+     * @param (Closure(string): string)|null $buildFailureRecommendations
      *
      * @throws InitialTestsFailed
+     * @throws RuntimeException When the initial command cannot complete.
      */
-    public function run(TestFramework $testFramework, array $command): InitialRunResults
-    {
+    public function run(
+        TestFramework $testFramework,
+        array $command,
+        bool $skipCoverage = true,
+        string $testFrameworkType = 'tests',
+        ?Closure $buildFailureRecommendations = null,
+    ): CompletedProcess {
         $testFrameworkName = $testFramework->getName();
+        $buildFailureRecommendations ??= static fn (string $commandLine) => '';
 
         $this->testFrameworkLogger->initialRunStarted(
             $testFrameworkName,
             $this->getVersion($testFramework),
         );
 
-        $process = $this->shellCommandRunner->run(
+        $result = $this->shellCommandRunner->run(
             command: $command,
             callback: fn () => $this->testFrameworkLogger->initialRunProgressed($testFrameworkName),
+            env: $this->buildProcessEnvironmentOverrides($skipCoverage),
             timeout: null,
+            useOriginalPhpConfiguration: !$skipCoverage,
         );
 
         $this->testFrameworkLogger->initialRunFinished(
             $testFrameworkName,
-            $process->command,
-            $process->stdout,
+            $result->command,
+            $result->stdout,
         );
 
-        if (!$process->isSuccessful()) {
+        if (!$result->isSuccessful()) {
             throw InitialTestsFailed::fromCompletedProcess(
-                $process,
-                $testFramework->getName(),
-                'static analysis',
-                '',
+                $result,
+                $testFrameworkName,
+                $testFrameworkType,
+                $buildFailureRecommendations($result->commandLine),
             );
         }
 
-        return new InitialRunResults($process->stdout, null);
+        return $result;
     }
 
     private function getVersion(TestFramework $testFramework): string
@@ -104,5 +114,23 @@ readonly class InitialStaticAnalysisRunner
         } catch (InvalidVersion) {
             return TestFramework::UNKNOWN_VERSION;
         }
+    }
+
+    private static function shouldEnableXdebugCoverage(): bool
+    {
+        // Prefer PCOV and phpdbg over enabling Xdebug for coverage.
+        return !extension_loaded('pcov') && PHP_SAPI !== 'phpdbg';
+    }
+
+    /**
+     * @param bool $skipCoverage
+     *
+     * @return array<string, string|Stringable|false>
+     */
+    public function buildProcessEnvironmentOverrides(bool $skipCoverage): array
+    {
+        return !$skipCoverage && self::shouldEnableXdebugCoverage()
+            ? ['XDEBUG_MODE' => 'coverage']
+            : [];
     }
 }

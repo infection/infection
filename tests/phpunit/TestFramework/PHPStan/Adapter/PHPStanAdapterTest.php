@@ -37,8 +37,8 @@ namespace Infection\Tests\TestFramework\PHPStan\Adapter;
 
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -71,13 +71,13 @@ final class PHPStanAdapterTest extends TestCase
 
     private ShellCommandRunner $shellCommandRunner;
 
-    private InitialStaticAnalysisRunner&MockObject $initialStaticAnalysisRunner;
+    private InitialTestsRunner&MockObject $initialTestsRunner;
 
     protected function setUp(): void
     {
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $this->shellCommandRunner = $this->createStub(ShellCommandRunner::class);
-        $this->initialStaticAnalysisRunner = $this->createMock(InitialStaticAnalysisRunner::class);
+        $this->initialTestsRunner = $this->createMock(InitialTestsRunner::class);
 
         $this->adapter = new PHPStanAdapter(
             $this->createStub(Filesystem::class),
@@ -90,7 +90,7 @@ final class PHPStanAdapterTest extends TestCase
             '/tmp',
             [],
             $this->shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $this->createStub(PHPStanLogger::class),
             '9.0',
         );
@@ -110,19 +110,25 @@ final class PHPStanAdapterTest extends TestCase
             ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path'])
         ;
 
+        $process = CompletedProcessBuilder::withMinimalTestData()->withStdout('Analysis passed.')->build();
         $result = new InitialRunResults('Analysis passed.', null);
-        $this->initialStaticAnalysisRunner
+        $this->initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($this->adapter, [
-                '/usr/bin/php',
-                '/path/to/phpstan',
-                '--configuration=/path/to/phpstan-config-path',
-            ])
-            ->willReturn($result)
+            ->with(
+                $this->adapter,
+                [
+                    '/usr/bin/php',
+                    '/path/to/phpstan',
+                    '--configuration=/path/to/phpstan-config-path',
+                ],
+                true,
+                'static analysis',
+            )
+            ->willReturn($process)
         ;
 
-        $this->assertSame($result, $this->adapter->executeInitialRun());
+        $this->assertEquals($result, $this->adapter->executeInitialRun());
     }
 
     public function test_it_builds_initial_run_command_line_with_single_option(): void
@@ -138,7 +144,7 @@ final class PHPStanAdapterTest extends TestCase
             '/tmp',
             ['--memory-limit=1G'],
             $this->shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $this->createStub(PHPStanLogger::class),
             '9.0',
         );
@@ -153,20 +159,26 @@ final class PHPStanAdapterTest extends TestCase
             ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=1G'])
         ;
 
+        $process = CompletedProcessBuilder::withMinimalTestData()->withStdout('Analysis passed.')->build();
         $result = new InitialRunResults('Analysis passed.', null);
-        $this->initialStaticAnalysisRunner
+        $this->initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($adapter, [
-                '/usr/bin/php',
-                '/path/to/phpstan',
-                '--configuration=/path/to/phpstan-config-path',
-                '--memory-limit=1G',
-            ])
-            ->willReturn($result)
+            ->with(
+                $adapter,
+                [
+                    '/usr/bin/php',
+                    '/path/to/phpstan',
+                    '--configuration=/path/to/phpstan-config-path',
+                    '--memory-limit=1G',
+                ],
+                true,
+                'static analysis',
+            )
+            ->willReturn($process)
         ;
 
-        $this->assertSame($result, $adapter->executeInitialRun());
+        $this->assertEquals($result, $adapter->executeInitialRun());
     }
 
     public function test_it_builds_initial_run_command_line_with_multiple_options(): void
@@ -182,7 +194,7 @@ final class PHPStanAdapterTest extends TestCase
             '/tmp',
             ['--memory-limit=-1', '--no-progress'],
             $this->shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $this->createStub(PHPStanLogger::class),
             '9.0',
         );
@@ -198,21 +210,27 @@ final class PHPStanAdapterTest extends TestCase
             ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=-1', '--no-progress'])
         ;
 
+        $process = CompletedProcessBuilder::withMinimalTestData()->withStdout('Analysis passed.')->build();
         $result = new InitialRunResults('Analysis passed.', null);
-        $this->initialStaticAnalysisRunner
+        $this->initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($adapter, [
-                '/usr/bin/php',
-                '/path/to/phpstan',
-                '--configuration=/path/to/phpstan-config-path',
-                '--memory-limit=-1',
-                '--no-progress',
-            ])
-            ->willReturn($result)
+            ->with(
+                $adapter,
+                [
+                    '/usr/bin/php',
+                    '/path/to/phpstan',
+                    '--configuration=/path/to/phpstan-config-path',
+                    '--memory-limit=-1',
+                    '--no-progress',
+                ],
+                true,
+                'static analysis',
+            )
+            ->willReturn($process)
         ;
 
-        $this->assertSame($result, $adapter->executeInitialRun());
+        $this->assertEquals($result, $adapter->executeInitialRun());
     }
 
     public function test_it_builds_initial_run_command_line_with_complex_options(): void
@@ -228,7 +246,7 @@ final class PHPStanAdapterTest extends TestCase
             '/tmp',
             ['--memory-limit=2G', '--level=max', '--no-progress'],
             $this->shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $this->createStub(PHPStanLogger::class),
             '9.0',
         );
@@ -245,22 +263,28 @@ final class PHPStanAdapterTest extends TestCase
             ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=2G', '--level=max', '--no-progress'])
         ;
 
+        $process = CompletedProcessBuilder::withMinimalTestData()->withStdout('Analysis passed.')->build();
         $result = new InitialRunResults('Analysis passed.', null);
-        $this->initialStaticAnalysisRunner
+        $this->initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($adapter, [
-                '/usr/bin/php',
-                '/path/to/phpstan',
-                '--configuration=/path/to/phpstan-config-path',
-                '--memory-limit=2G',
-                '--level=max',
-                '--no-progress',
-            ])
-            ->willReturn($result)
+            ->with(
+                $adapter,
+                [
+                    '/usr/bin/php',
+                    '/path/to/phpstan',
+                    '--configuration=/path/to/phpstan-config-path',
+                    '--memory-limit=2G',
+                    '--level=max',
+                    '--no-progress',
+                ],
+                true,
+                'static analysis',
+            )
+            ->willReturn($process)
         ;
 
-        $this->assertSame($result, $adapter->executeInitialRun());
+        $this->assertEquals($result, $adapter->executeInitialRun());
     }
 
     public function test_it_returns_version(): void
@@ -297,7 +321,7 @@ final class PHPStanAdapterTest extends TestCase
             '/tmp',
             [],
             $shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $this->createStub(PHPStanLogger::class),
         );
 
@@ -332,7 +356,7 @@ final class PHPStanAdapterTest extends TestCase
             '/tmp',
             [],
             $shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $logger,
         );
 
@@ -366,7 +390,7 @@ final class PHPStanAdapterTest extends TestCase
             '/tmp',
             [],
             $shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $logger,
         );
 
@@ -400,7 +424,7 @@ final class PHPStanAdapterTest extends TestCase
             '/tmp',
             [],
             $shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $logger,
         );
 
@@ -457,10 +481,15 @@ final class PHPStanAdapterTest extends TestCase
             ->method('build')
             ->willReturn(['/path/to/phpstan'])
         ;
-        $this->initialStaticAnalysisRunner
+        $this->initialTestsRunner
             ->expects($this->once())
             ->method('run')
-            ->with($this->adapter, ['/path/to/phpstan'])
+            ->with(
+                $this->adapter,
+                ['/path/to/phpstan'],
+                true,
+                'static analysis',
+            )
             ->willThrowException($failure)
         ;
 
@@ -485,7 +514,7 @@ final class PHPStanAdapterTest extends TestCase
             '/tmp',
             ['--memory-limit=-1'],
             $this->shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $this->createStub(PHPStanLogger::class),
             $version,
         );
@@ -508,7 +537,7 @@ final class PHPStanAdapterTest extends TestCase
             '/tmp',
             [],
             $this->shellCommandRunner,
-            $this->initialStaticAnalysisRunner,
+            $this->initialTestsRunner,
             $this->createStub(PHPStanLogger::class),
             $version,
         );

@@ -46,8 +46,8 @@ use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Source\Collector\SourceCollector;
+use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -111,7 +111,6 @@ final readonly class Factory
                 $this->infectionConfig,
                 $this->containerFactory,
                 $this->extraOptionsFilter,
-                $this->testFrameworkLogger,
                 new PsrLegacyTestFrameworkLogger($this->logger),
             );
     }

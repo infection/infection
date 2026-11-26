@@ -41,8 +41,8 @@ use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Configuration\Configuration;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -162,7 +162,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
             $processFactory,
             $testFrameworkExtraOptionsFilter,
             new MemoryLimiter(new MemoryLimiterEnvironment()),
-            $testFrameworkLogger,
         );
     }
 

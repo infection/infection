@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Mago\Adapter;
 
 use Infection\CannotBeInstantiated;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
@@ -76,7 +76,7 @@ final class MagoAdapterFactory
             $timeout,
             $staticAnalysisToolOptions,
             $shellCommandRunner,
-            new InitialStaticAnalysisRunner($shellCommandRunner, $testFrameworkLogger),
+            new InitialTestsRunner($shellCommandRunner, $testFrameworkLogger),
             new PsrMagoLogger($logger),
         );
     }
