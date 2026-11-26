@@ -35,28 +35,74 @@ declare(strict_types=1);
 
 namespace Infection\Testing\TestFramework\Debug;
 
-use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\Mutant\Mutant;
+use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use Override;
 
 /**
  * @internal
  */
-final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAdapter
+final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisTestFramework
 {
     public function __construct(
         private string $runtime,
         private string $logFile,
         private float $timeout,
         private DebugCommandLine $commandLine,
+        private InitialStaticAnalysisRunner $initialStaticAnalysisRunner,
     ) {
     }
 
+    #[Override]
     public function getName(): string
     {
         return 'Debug';
     }
 
-    public function getInitialRunCommandLine(): array
+    #[Override]
+    public function executeInitialRun(): InitialRunResults
+    {
+        return $this->initialStaticAnalysisRunner->run($this, $this->getInitialRunCommandLine());
+    }
+
+    #[Override]
+    public function test(Mutant $mutant): MutantProcessContainer
+    {
+        $factory = new DebugStaticAnalysisMutantProcessFactory(
+            $this->runtime,
+            $this->logFile,
+            $this->timeout,
+            $this->commandLine,
+        );
+
+        return new MutantProcessContainer($factory->create($mutant), []);
+    }
+
+    #[Override]
+    public function hasJUnitReport(): bool
+    {
+        return false;
+    }
+
+    #[Override]
+    public function getVersion(): string
+    {
+        return '1.0.0';
+    }
+
+    #[Override]
+    public function checkRequirements(): void
+    {
+        // Nothing to do.
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getInitialRunCommandLine(): array
     {
         return $this->commandLine->create(
             runtime: $this->runtime,
@@ -66,25 +112,5 @@ final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAda
                 'log' => $this->logFile,
             ],
         );
-    }
-
-    public function createMutantProcessFactory(): LazyMutantProcessFactory
-    {
-        return new DebugStaticAnalysisMutantProcessFactory(
-            $this->runtime,
-            $this->logFile,
-            $this->timeout,
-            $this->commandLine,
-        );
-    }
-
-    public function getVersion(): string
-    {
-        return '1.0.0';
-    }
-
-    public function assertMinimumVersionSatisfied(): void
-    {
-        // Nothing to do.
     }
 }

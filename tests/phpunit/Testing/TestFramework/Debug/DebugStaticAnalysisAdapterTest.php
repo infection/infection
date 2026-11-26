@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Testing\TestFramework\Debug;
 
+use function array_slice;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
-use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisMutantProcessFactory;
+use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -47,19 +50,80 @@ final class DebugStaticAnalysisAdapterTest extends TestCase
 {
     public function test_it_builds_debug_processes(): void
     {
+        $adapter = $this->createAdapter($this->createStub(InitialStaticAnalysisRunner::class));
+        $mutant = MutantBuilder::withMinimalTestData()->build();
+
+        $container = $adapter->test($mutant);
+        $mutantProcess = $container->getCurrent();
+        $process = $mutantProcess->getProcess();
+        $hash = $mutant->getMutation()->getHash();
+
+        $this->assertSame($mutant, $mutantProcess->getMutant());
+        $this->assertStringStartsWith(
+            "'/php' '/debug.php' '--stage' 'static-analysis-mutant' '--log' '/tmp/infection' '--mutationHash' '$hash' '--command' ",
+            $process->getCommandLine(),
+        );
+        $this->assertSame(10.0, $process->getTimeout());
+        $this->assertFalse($process->isStarted());
+        $this->assertFalse($container->hasNext());
+    }
+
+    public function test_it_executes_the_initial_run(): void
+    {
+        $runner = $this->createMock(InitialStaticAnalysisRunner::class);
+        $adapter = $this->createAdapter($runner);
+        $result = new InitialRunResults('Analysis passed.', null);
+        $runner
+            ->expects($this->once())
+            ->method('run')
+            ->with(
+                $adapter,
+                $this->callback(function (array $command): bool {
+                    $expected = [
+                        '/php',
+                        '/debug.php',
+                        '--stage',
+                        'static-analysis-initial',
+                        '--log',
+                        '/tmp/infection',
+                    ];
+                    $actual = array_slice($command, 0, 6);
+
+                    $this->assertSame($expected, $actual);
+
+                    return true;
+                }),
+            )
+            ->willReturn($result)
+        ;
+
+        $this->assertSame($result, $adapter->executeInitialRun());
+    }
+
+    public function test_it_exposes_its_identity_and_requirements(): void
+    {
+        $adapter = $this->createAdapter($this->createStub(InitialStaticAnalysisRunner::class));
+
+        $this->assertSame('Debug', $adapter->getName());
+        $this->assertSame('1.0.0', $adapter->getVersion());
+        $this->assertFalse($adapter->hasJUnitReport());
+        $adapter->checkRequirements();
+    }
+
+    private function createAdapter(InitialStaticAnalysisRunner $runner): DebugStaticAnalysisAdapter
+    {
         $phpExecutableFinder = $this->createStub(PhpExecutableFinder::class);
         $phpExecutableFinder
             ->method('find')
             ->willReturn('/php')
         ;
 
-        $adapter = new DebugStaticAnalysisAdapter(
+        return new DebugStaticAnalysisAdapter(
             '/debug.php',
             '/tmp/infection',
             10.,
             new DebugCommandLine($phpExecutableFinder),
+            $runner,
         );
-
-        $this->assertInstanceOf(DebugStaticAnalysisMutantProcessFactory::class, $adapter->createMutantProcessFactory());
     }
 }

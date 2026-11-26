@@ -36,22 +36,21 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PHPStan\Adapter;
 
 use Infection\CannotBeInstantiated;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\PHPStan\Logger\PsrPHPStanLogger;
 use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
+final class PHPStanAdapterFactory
 {
     use CannotBeInstantiated;
 
@@ -65,11 +64,10 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
         string $tmpDir,
         array $staticAnalysisToolOptions,
         ShellCommandRunner $shellCommandRunner,
+        TestFrameworkLogger $testFrameworkLogger,
         LoggerInterface $logger,
-        ?Filesystem $fileSystem = null,
-    ): StaticAnalysisToolAdapter {
-        Assert::notNull($fileSystem);
-
+        Filesystem $fileSystem,
+    ): PHPStanAdapter {
         return new PHPStanAdapter(
             $fileSystem,
             new PHPStanMutantExecutionResultFactory(),
@@ -83,6 +81,7 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
             $tmpDir,
             $staticAnalysisToolOptions,
             $shellCommandRunner,
+            new InitialStaticAnalysisRunner($shellCommandRunner, $testFrameworkLogger),
             new PsrPHPStanLogger($logger),
         );
     }

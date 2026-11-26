@@ -41,10 +41,11 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCa
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\CompletedProcess;
+use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Logger\EventDispatchingTestFrameworkLogger;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
@@ -60,7 +61,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
     private EventDispatcherCollector $eventDispatcher;
 
-    private StaticAnalysisToolAdapter&MockObject $staticAnalysisToolAdapter;
+    private TestFramework&MockObject $testFramework;
 
     private InitialStaticAnalysisRunner $runner;
 
@@ -70,23 +71,23 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
         $this->eventDispatcher = new EventDispatcherCollector();
 
-        $this->staticAnalysisToolAdapter = $this->createMock(StaticAnalysisToolAdapter::class);
+        $this->testFramework = $this->createMock(TestFramework::class);
 
         $this->runner = new InitialStaticAnalysisRunner(
             $this->shellCommandRunner,
             new EventDispatchingTestFrameworkLogger($this->eventDispatcher),
-            $this->staticAnalysisToolAdapter,
         );
     }
 
     #[DataProvider('versionProvider')]
     public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(?string $version, string $expectedVersion): void
     {
-        $this->staticAnalysisToolAdapter
+        $this->testFramework
+            ->expects($this->once())
             ->method('getName')
             ->willReturn('PHPStan')
         ;
-        $versionExpectation = $this->staticAnalysisToolAdapter->method('getVersion');
+        $versionExpectation = $this->testFramework->method('getVersion');
 
         if ($version === null) {
             $versionExpectation->willThrowException(new InvalidVersion('Invalid version output.'));
@@ -96,12 +97,6 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
         $command = ['phpstan', 'analyse', '--configuration=some config.neon'];
         $commandLine = "'phpstan' 'analyse' '--configuration=some config.neon'";
-
-        $this->staticAnalysisToolAdapter
-            ->expects($this->once())
-            ->method('getInitialRunCommandLine')
-            ->willReturn($command)
-        ;
 
         $this->shellCommandRunner
             ->expects($this->once())
@@ -123,7 +118,9 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             })
         ;
 
-        $this->runner->run();
+        $result = $this->runner->run($this->testFramework, $command);
+
+        $this->assertEquals(new InitialRunResults('pingpong', null), $result);
 
         $this->assertEquals(
             [
@@ -139,12 +136,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
     {
         $command = ['phpstan', 'analyse'];
 
-        $this->staticAnalysisToolAdapter
-            ->expects($this->once())
-            ->method('getInitialRunCommandLine')
-            ->willReturn($command)
-        ;
-        $this->staticAnalysisToolAdapter
+        $this->testFramework
             ->expects($this->exactly(2))
             ->method('getName')
             ->willReturn('phpstan')
@@ -178,7 +170,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
                 MESSAGE,
         );
 
-        $this->runner->run();
+        $this->runner->run($this->testFramework, $command);
     }
 
     public static function versionProvider(): iterable

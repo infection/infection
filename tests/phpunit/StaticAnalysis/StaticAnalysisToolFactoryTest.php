@@ -43,7 +43,10 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
+use Infection\TestFramework\Mago\Adapter\MagoAdapter;
 use Infection\TestFramework\NullStaticAnalysisTestFramework;
+use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter;
+use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -74,12 +77,24 @@ final class StaticAnalysisToolFactoryTest extends TestCase
         $this->assertInstanceOf(NullStaticAnalysisTestFramework::class, $this->createFactory()->create(null, 30));
     }
 
-    public function test_it_wraps_the_static_analysis_adapter_in_a_test_framework(): void
+    /**
+     * @param class-string<TestFramework> $expectedClass
+     */
+    #[DataProvider('frameworkProvider')]
+    public function test_it_creates_a_native_static_analysis_framework(string $name, string $expectedClass): void
     {
-        $framework = $this->createFactory()->create(StaticAnalysisToolTypes::DEBUG, 30);
+        $framework = $this->createFactory()->create($name, 30);
 
-        $this->assertInstanceOf(TestFramework::class, $framework);
-        $this->assertSame('Debug', $framework->getName());
+        $this->assertInstanceOf($expectedClass, $framework);
+    }
+
+    public static function frameworkProvider(): iterable
+    {
+        yield 'PHPStan' => [StaticAnalysisToolTypes::PHPSTAN, PHPStanAdapter::class];
+
+        yield 'Mago' => [StaticAnalysisToolTypes::MAGO, MagoAdapter::class];
+
+        yield 'debug' => [StaticAnalysisToolTypes::DEBUG, DebugStaticAnalysisAdapter::class];
     }
 
     #[DataProvider('builtInAdapterProvider')]

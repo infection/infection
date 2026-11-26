@@ -2805,12 +2805,6 @@ count = 1
 [[issues]]
 file = "src/StaticAnalysis/StaticAnalysisToolFactory.php"
 code = "deprecated-class"
-message = 'Class `Infection\TestFramework\LegacyStaticAnalysisBridge` is deprecated and should no longer be used.'
-count = 1
-
-[[issues]]
-file = "src/StaticAnalysis/StaticAnalysisToolFactory.php"
-code = "deprecated-class"
 message = 'Class `Infection\TestFramework\NullStaticAnalysisTestFramework` is deprecated and should no longer be used.'
 count = 1
 
@@ -4805,12 +4799,6 @@ file = "tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php"
 code = "possibly-invalid-argument"
 message = 'Possible argument type mismatch for argument #1 of `Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer::normalize`: expected `array<array-key, Infection\AbstractTestFramework\Coverage\TestLocation|Infection\TestFramework\Tracing\Trace\TestLocations>`, but possibly received `iterable<mixed, Infection\AbstractTestFramework\Coverage\TestLocation>`.'
 count = 2
-
-[[issues]]
-file = "tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php"
-code = "deprecated-class"
-message = 'Class `Infection\TestFramework\LegacyStaticAnalysisBridge` is deprecated and should no longer be used.'
-count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php"
