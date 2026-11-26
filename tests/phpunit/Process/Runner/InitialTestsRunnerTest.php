@@ -35,26 +35,27 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use function array_map;
-use function array_unique;
-use function array_values;
-use function end;
+use Closure;
+use function extension_loaded;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\Process\SymfonyProcessShellCommandRunner;
+use Infection\TestFramework\Contracts\CompletedProcess;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Logger\EventDispatchingTestFrameworkLogger;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
@@ -62,7 +63,7 @@ use Symfony\Component\Process\Process;
 #[CoversClass(InitialTestsRunner::class)]
 final class InitialTestsRunnerTest extends TestCase
 {
-    private MockObject&InitialTestsRunProcessFactory $processFactoryMock;
+    private ShellCommandRunner&MockObject $shellCommandRunner;
 
     private EventDispatcherCollector $eventDispatcher;
 
@@ -70,31 +71,30 @@ final class InitialTestsRunnerTest extends TestCase
 
     private EventDispatchingTestFrameworkLogger $testFrameworkLogger;
 
-    private TestFrameworkAdapter&Stub $testFrameworkAdapter;
+    private TestFrameworkAdapter&MockObject $testFrameworkAdapter;
 
     protected function setUp(): void
     {
-        if (PHP_SAPI === 'phpdbg') {
-            $this->markTestSkipped('The processes do not work the same way in PGPDBG');
-        }
-
-        $this->processFactoryMock = $this->createMock(InitialTestsRunProcessFactory::class);
-
+        $this->shellCommandRunner = $this->createMock(ShellCommandRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();
-
         $this->testFrameworkLogger = new EventDispatchingTestFrameworkLogger($this->eventDispatcher);
-        $this->runner = new InitialTestsRunner($this->processFactoryMock);
-        $this->testFrameworkAdapter = $this->createStub(TestFrameworkAdapter::class);
+        $this->runner = new InitialTestsRunner($this->shellCommandRunner);
+        $this->testFrameworkAdapter = $this->createMock(TestFrameworkAdapter::class);
     }
 
-    #[DataProvider('versionProvider')]
-    public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(?string $version, string $expectedVersion): void
-    {
+    #[DataProvider('initialRunProvider')]
+    public function test_it_runs_the_command_and_reports_progress(
+        ?string $version,
+        string $expectedVersion,
+        bool $skipCoverage,
+        int $exitCode,
+    ): void {
         $this->testFrameworkAdapter
+            ->expects($this->once())
             ->method('getName')
             ->willReturn('PHPUnit')
         ;
-        $versionExpectation = $this->testFrameworkAdapter->method('getVersion');
+        $versionExpectation = $this->testFrameworkAdapter->expects($this->once())->method('getVersion');
 
         if ($version === null) {
             $versionExpectation->willThrowException(new InvalidVersion('Invalid version output.'));
@@ -103,69 +103,109 @@ final class InitialTestsRunnerTest extends TestCase
         }
 
         $testFrameworkExtraOptions = '--stop-on-failure';
-        $phpExtraOptions = ['-d memory_limit=-1'];
-        $skipCoverage = false;
-
-        $process = $this->createProcessForCode(<<<STR
-            echo 'ping';
-            echo 'pong';
-            STR
-        );
-
-        $this->processFactoryMock
-            ->method('createProcess')
-            ->with($this->testFrameworkAdapter, $testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage)
-            ->willReturn($process)
+        $phpExtraOptions = ['-d', 'memory_limit=-1'];
+        $command = ['php', '-d', 'memory_limit=-1', 'phpunit', '--configuration=some config.xml'];
+        $commandLine = (new Process($command))->getCommandLine();
+        $expected = CompletedProcessBuilder::withMinimalTestData()
+            ->withCommand($command)
+            ->withExitCode($exitCode)
+            ->withStdout('pingpong')
+            ->withStderr('warning')
+            ->build()
         ;
 
-        $this->runner->run($this->testFrameworkAdapter, $testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage, $this->testFrameworkLogger);
+        $this->testFrameworkAdapter
+            ->expects($this->once())
+            ->method('getInitialTestRunCommandLine')
+            ->with($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage)
+            ->willReturn($command)
+        ;
 
-        $this->assertSame(
+        $expectedEnv = $skipCoverage || extension_loaded('pcov') || PHP_SAPI === 'phpdbg'
+            ? []
+            : ['XDEBUG_MODE' => 'coverage'];
+
+        $this->shellCommandRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with($command, $this->isInstanceOf(Closure::class), null, $expectedEnv, null, null, null, !$skipCoverage)
+            ->willReturnCallback(function (array $_command, Closure $callback) use ($commandLine, $expectedVersion, $expected): CompletedProcess {
+                $this->assertEquals(
+                    [new InitialTestSuiteWasStarted($commandLine, 'PHPUnit', $expectedVersion)],
+                    $this->eventDispatcher->getEvents(),
+                );
+
+                $callback(Process::OUT, 'ping');
+                $callback(Process::ERR, 'warning');
+                $callback(Process::OUT, 'pong');
+
+                return $expected;
+            })
+        ;
+
+        $actual = $this->runner->run(
+            $this->testFrameworkAdapter,
+            $testFrameworkExtraOptions,
+            $phpExtraOptions,
+            $skipCoverage,
+            $this->testFrameworkLogger,
+        );
+
+        $this->assertSame($expected, $actual);
+        $this->assertEquals(
             [
-                InitialTestSuiteWasStarted::class,
-                InitialTestCaseWasCompleted::class,
-                InitialTestSuiteWasFinished::class,
+                new InitialTestSuiteWasStarted($commandLine, 'PHPUnit', $expectedVersion),
+                new InitialTestCaseWasCompleted('PHPUnit'),
+                new InitialTestCaseWasCompleted('PHPUnit'),
+                new InitialTestCaseWasCompleted('PHPUnit'),
+                new InitialTestSuiteWasFinished('PHPUnit', 'pingpong'),
             ],
-            array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
-        );
-        $this->assertEquals(
-            new InitialTestSuiteWasStarted($process->getCommandLine(), 'PHPUnit', $expectedVersion),
-            $this->eventDispatcher->getEvents()[0],
-        );
-
-        $events = $this->eventDispatcher->getEvents();
-
-        $this->assertContainsEquals(new InitialTestCaseWasCompleted('PHPUnit'), $events);
-        $this->assertEquals(
-            new InitialTestSuiteWasFinished('PHPUnit', 'pingpong'),
-            end($events),
+            $this->eventDispatcher->getEvents(),
         );
     }
 
     #[DataProvider('exitCodeProvider')]
+    #[Group('integration')]
     public function test_it_continues_after_stderr_output_and_preserves_the_exit_code(int $exitCode): void
     {
         $this->testFrameworkAdapter->method('getName')->willReturn('PHPUnit');
-        $testFrameworkExtraOptions = '--stop-on-failure';
-        $phpExtraOptions = ['-d memory_limit=-1'];
-        $skipCoverage = false;
-        $input = new InputStream();
-
         // Wait for the progress notification before continuing after stderr output.
-        $process = $this->createProcessForCode(<<<PHP
-            fwrite(STDERR, 'diagnostic');
-            fgets(STDIN);
-            echo 'continued';
-            exit($exitCode);
-            PHP
-        );
-        $process->setInput($input);
-        $process->setTimeout(2.0);
+        $input = new InputStream();
+        $command = [
+            TestPhpExecutableFinder::find(),
+            '-r',
+            <<<PHP
+                fwrite(STDERR, 'diagnostic');
+                fgets(STDIN);
+                echo 'continued';
+                exit($exitCode);
+                PHP,
+        ];
+        $this->testFrameworkAdapter
+            ->expects($this->once())
+            ->method('getInitialTestRunCommandLine')
+            ->willReturn($command)
+        ;
 
-        $this->processFactoryMock
-            ->method('createProcess')
-            ->with($this->testFrameworkAdapter, $testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage)
-            ->willReturn($process)
+        $shellCommandRunner = new SymfonyProcessShellCommandRunner();
+        $this->shellCommandRunner
+            ->expects($this->once())
+            ->method('run')
+            ->willReturnCallback(
+                /**
+                 * @param string[] $command
+                 * @param array<string, string> $env
+                 */
+                static fn (array $command, Closure $callback, ?string $cwd, array $env): CompletedProcess => $shellCommandRunner->run(
+                    command: $command,
+                    callback: $callback,
+                    cwd: $cwd,
+                    env: $env,
+                    input: $input,
+                    timeout: 2.0,
+                    useOriginalPhpConfiguration: true,
+                ),
+            )
         ;
 
         $logger = $this->createMock(TestFrameworkLogger::class);
@@ -185,19 +225,12 @@ final class InitialTestsRunnerTest extends TestCase
             ->method('initialRunFinished')
             ->with('PHPUnit', 'continued')
         ;
+        $actual = $this->runner->run($this->testFrameworkAdapter, '', [], false, $logger);
 
-        $actual = $this->runner->run(
-            $this->testFrameworkAdapter,
-            $testFrameworkExtraOptions,
-            $phpExtraOptions,
-            $skipCoverage,
-            $logger,
-        );
-
-        $this->assertSame($process, $actual);
-        $this->assertSame($exitCode, $actual->getExitCode());
-        $this->assertSame('continued', $actual->getOutput());
-        $this->assertSame('diagnostic', $actual->getErrorOutput());
+        $this->assertSame($command, $actual->command);
+        $this->assertSame($exitCode, $actual->exitCode);
+        $this->assertSame('continued', $actual->stdout);
+        $this->assertSame('diagnostic', $actual->stderr);
     }
 
     public static function exitCodeProvider(): iterable
@@ -207,19 +240,14 @@ final class InitialTestsRunnerTest extends TestCase
         yield 'failed command with stderr output' => [1];
     }
 
-    public static function versionProvider(): iterable
+    public static function initialRunProvider(): iterable
     {
-        yield 'known version' => ['6.5.4', '6.5.4'];
+        yield 'coverage with a known version' => ['6.5.4', '6.5.4', false, 0];
 
-        yield 'unknown version' => [null, 'unknown'];
-    }
+        yield 'coverage with an unknown version' => [null, 'unknown', false, 0];
 
-    private function createProcessForCode(string $code): Process
-    {
-        return new Process([
-            TestPhpExecutableFinder::find(),
-            '-r',
-            $code,
-        ]);
+        yield 'coverage skipped' => ['6.5.4', '6.5.4', true, 0];
+
+        yield 'unsuccessful command' => ['6.5.4', '6.5.4', false, 3];
     }
 }

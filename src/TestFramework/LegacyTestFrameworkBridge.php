@@ -52,6 +52,7 @@ use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Logger\LegacyTestFrameworkLogger;
 use InvalidArgumentException;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -119,21 +120,23 @@ final class LegacyTestFrameworkBridge implements TestFramework
             $this->testFrameworkLogger,
         );
 
+        $commandLine = (new Process($initialTestSuiteProcess->command))->getCommandLine();
+
         if (!$initialTestSuiteProcess->isSuccessful()) {
-            throw InitialTestsFailed::fromProcess(
+            throw InitialTestsFailed::fromCompletedProcess(
                 $initialTestSuiteProcess,
                 $this->getName(),
                 'tests',
                 $this->adapter->getInitialTestsFailRecommendations(
-                    $initialTestSuiteProcess->getCommandLine(),
+                    $commandLine,
                 ),
             );
         }
 
-        $output = $initialTestSuiteProcess->getOutput();
+        $output = $initialTestSuiteProcess->stdout;
 
         $this->coverageChecker->checkCoverageHasBeenGenerated(
-            $initialTestSuiteProcess->getCommandLine(),
+            $commandLine,
             $output,
         );
 

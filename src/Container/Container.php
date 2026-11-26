@@ -120,7 +120,6 @@ use Infection\PhpParser\FileParser;
 use Infection\PhpParser\InfectionPrettyPrinter;
 use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeTraverserFactory;
-use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Factory\TestFrameworkMutantProcessFactory;
 use Infection\Process\Runner\DryProcessRunner;
@@ -934,16 +933,6 @@ final class Container extends DIContainer
     public function getTestFramework(): TestFramework
     {
         return $this->get(TestFramework::class);
-    }
-
-    public function getInitialTestRunProcessFactory(): InitialTestsRunProcessFactory
-    {
-        return $this->get(InitialTestsRunProcessFactory::class);
-    }
-
-    public function getInitialTestsRunProcessFactory(): InitialTestsRunProcessFactory
-    {
-        return $this->get(InitialTestsRunProcessFactory::class);
     }
 
     public function getInitialTestsRunner(): InitialTestsRunner

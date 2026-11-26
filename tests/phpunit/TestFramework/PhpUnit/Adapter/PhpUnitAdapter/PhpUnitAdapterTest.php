@@ -73,6 +73,7 @@ use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -153,14 +154,9 @@ final class PhpUnitAdapterTest extends TestCase
         string $output,
         ?float $memoryUsage,
     ): void {
-        $process = $this->createStub(Process::class);
-        $process
-            ->method('isSuccessful')
-            ->willReturn(true)
-        ;
-        $process
-            ->method('getOutput')
-            ->willReturn($output)
+        $process = CompletedProcessBuilder::withMinimalTestData()
+            ->withStdout($output)
+            ->build()
         ;
 
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
@@ -216,11 +212,7 @@ final class PhpUnitAdapterTest extends TestCase
 
     public function test_it_reports_missing_generated_coverage_as_an_initial_run_failure(): void
     {
-        $process = $this->createStub(Process::class);
-        $process
-            ->method('isSuccessful')
-            ->willReturn(true)
-        ;
+        $process = CompletedProcessBuilder::withMinimalTestData()->build();
         $initialTestsRunner = $this->createStub(InitialTestsRunner::class);
         $initialTestsRunner
             ->method('run')
@@ -239,20 +231,12 @@ final class PhpUnitAdapterTest extends TestCase
 
     public function test_it_throws_when_the_initial_run_fails(): void
     {
-        $process = $this->createStub(Process::class);
-        $process
-            ->method('isSuccessful')
-            ->willReturn(false)
+        $process = CompletedProcessBuilder::withMinimalTestData()
+            ->withCommand(['vendor/bin/phpunit', '--configuration', 'failing.xml'])
+            ->withExitCode(1)
+            ->build()
         ;
-        $process
-            ->method('getExitCode')
-            ->willReturn(1)
-        ;
-
-        $process
-            ->method('getCommandLine')
-            ->willReturn('vendor/bin/phpunit --configuration failing.xml')
-        ;
+        $commandLine = (new Process($process->command))->getCommandLine();
 
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $adapter = $this->createAdapter(
@@ -277,9 +261,7 @@ final class PhpUnitAdapterTest extends TestCase
 
         $this->expectException(InitialTestsFailed::class);
         $this->expectExceptionMessage(
-            $adapter->getInitialTestsFailRecommendations(
-                'vendor/bin/phpunit --configuration failing.xml',
-            ),
+            $adapter->getInitialTestsFailRecommendations($commandLine),
         );
 
         $adapter->executeInitialRun();
@@ -681,9 +663,10 @@ final class PhpUnitAdapterTest extends TestCase
 
     public function test_it_applies_the_initial_run_memory_usage_to_mutant_commands(): void
     {
-        $process = $this->createStub(Process::class);
-        $process->method('isSuccessful')->willReturn(true);
-        $process->method('getOutput')->willReturn('Memory: 12.50MB');
+        $process = CompletedProcessBuilder::withMinimalTestData()
+            ->withStdout('Memory: 12.50MB')
+            ->build()
+        ;
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $configuration = ConfigurationBuilder::withMinimalTestData()->withSkipCoverage(true)->build();
         $this->fileSystemMock->expects($this->exactly(2))->method('isReadableFile')->willReturn(true);

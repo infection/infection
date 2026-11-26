@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use function extension_loaded;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Process\Factory\InitialTestsRunProcessFactory;
+use Infection\TestFramework\Contracts\CompletedProcess;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
+use const PHP_SAPI;
 use Symfony\Component\Process\Process;
 
 /**
@@ -49,7 +52,7 @@ use Symfony\Component\Process\Process;
 class InitialTestsRunner
 {
     public function __construct(
-        private readonly InitialTestsRunProcessFactory $processBuilder,
+        private readonly ShellCommandRunner $shellCommandRunner,
     ) {
     }
 
@@ -62,27 +65,40 @@ class InitialTestsRunner
         array $phpExtraOptions,
         bool $skipCoverage,
         TestFrameworkLogger $testFrameworkLogger,
-    ): Process {
-        $process = $this->processBuilder->createProcess(
-            $testFrameworkAdapter,
+    ): CompletedProcess {
+        $command = $testFrameworkAdapter->getInitialTestRunCommandLine(
             $testFrameworkExtraOptions,
             $phpExtraOptions,
             $skipCoverage,
         );
 
+        $commandLine = (new Process($command))->getCommandLine();
         $testFrameworkName = $testFrameworkAdapter->getName();
 
         $testFrameworkLogger->initialRunStarted(
             $testFrameworkName,
             $this->getVersion($testFrameworkAdapter),
-            $process->getCommandLine(),
+            $commandLine,
         );
 
-        $process->run(
-            static fn () => $testFrameworkLogger->initialRunProgressed($testFrameworkName),
+        $env = [];
+
+        if (
+            !$skipCoverage
+            && self::shouldEnableXdebugCoverage()
+        ) {
+            $env['XDEBUG_MODE'] = 'coverage';
+        }
+
+        $process = $this->shellCommandRunner->run(
+            command: $command,
+            callback: static fn () => $testFrameworkLogger->initialRunProgressed($testFrameworkName),
+            env: $env,
+            timeout: null,
+            useOriginalPhpConfiguration: !$skipCoverage,
         );
 
-        $testFrameworkLogger->initialRunFinished($testFrameworkName, $process->getOutput());
+        $testFrameworkLogger->initialRunFinished($testFrameworkName, $process->stdout);
 
         return $process;
     }
@@ -94,5 +110,11 @@ class InitialTestsRunner
         } catch (InvalidVersion) {
             return TestFramework::UNKNOWN_VERSION;
         }
+    }
+
+    private static function shouldEnableXdebugCoverage(): bool
+    {
+        // Prefer PCOV and phpdbg over enabling Xdebug for coverage.
+        return !extension_loaded('pcov') && PHP_SAPI !== 'phpdbg';
     }
 }

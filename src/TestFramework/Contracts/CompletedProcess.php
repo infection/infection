@@ -44,7 +44,6 @@ final readonly class CompletedProcess
      * @param string[] $command
      */
     public function __construct(
-        // @phpstan-ignore shipmonk.deadProperty.neverRead
         public array $command,
         public int $exitCode,
         public string $stdout,
