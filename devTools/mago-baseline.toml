@@ -2815,6 +2815,12 @@ message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\
 count = 1
 
 [[issues]]
+file = "src/TestFramework/CombinedTestFramework.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `{closure:src/TestFramework/CombinedTestFramework.php:86:17}`.'
+count = 1
+
+[[issues]]
 file = "src/TestFramework/Common/CommandLineBuilder.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Finder\Exception\FinderException` in `Infection\TestFramework\Common\CommandLineBuilder::findPhp`.'

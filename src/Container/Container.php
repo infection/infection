@@ -562,9 +562,9 @@ final class Container extends DIContainer
             ),
             CombinedTestFramework::class => static fn (self $container): CombinedTestFramework => new CombinedTestFramework(
                 $container->getTestFramework(),
-                $container->getConfiguration()->isStaticAnalysisEnabled()
-                    ? $container->getStaticAnalysisTestFramework()
-                    : null,
+                ...($container->getConfiguration()->isStaticAnalysisEnabled()
+                    ? [$container->getStaticAnalysisTestFramework()]
+                    : []),
             ),
             MutantProcessContainerFactory::class => static fn (self $container): MutantProcessContainerFactory => new MutantProcessContainerFactory(
                 $container->getConfiguration()->processTimeout,
