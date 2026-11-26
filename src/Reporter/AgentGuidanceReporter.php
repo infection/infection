@@ -46,9 +46,29 @@ final readonly class AgentGuidanceReporter implements Reporter
     private const string GUIDANCE = <<<'TXT'
         When dealing with escaped mutations, consider applicable techniques:
 
-        Assertion Amplification, Boundary Value Analysis, Equivalence Partitioning, State Verification, RIPR (Reachability, Infection, Propagation, Revealability), Property-Based Testing, Parameterized Tests, Decision Table Testing, MC/DC, Invariants, Independent Test Oracles, Behavioral Contracts, Behavior Verification, Test Seams, Test Stubs, Test Spies, Effect Analysis, Metamorphic Testing, State Transition Testing, Exception Verification, Delta Assertions, Preconditions, Postconditions, Indirect Output Verification, Dependency Injection, Fake Objects, Mock Objects, Fault Injection, Extract and Override Call, Sensing and Separation, Pinch Points, Enabling Points, Program Slicing, Inflection Points, Effect Sketches, Combinatorial Testing, Differential Testing, Round-Trip Properties, Idempotence, Monotonicity, Conservation Properties, Guard Assertions, Constraint-Based Test Generation, Model-Based Testing, Deterministic Tests, Test Isolation, Minimal Fixture, Fresh Fixture, Test Orthogonality, Humble Object, Pure Functions, Functional Core/Imperative Shell, Command–Query Separation, Dependency Inversion, Parameterize Constructor, Parameterize Method, Extract Interface, Introduce Instance Delegator, Extract and Override Factory Method, Test-Specific Subclasses, Subclass and Override Method, Adapt Parameter, Extract Implementer, Replace Global Reference, Encapsulate Global References, Break Out Method Object, Ports and Adapters, Sprout Method, Sprout Class, Wrap Method, Wrap Class.
+        Assertion Amplification, Boundary Value Analysis, Equivalence Partitioning,
+        State Verification, RIPR (Reachability, Infection, Propagation, Revealability),
+        Property-Based Testing, Parameterized Tests, Decision Table Testing, MC/DC,
+        Invariants, Independent Test Oracles, Behavioral Contracts, Behavior
+        Verification, Test Seams, Test Stubs, Test Spies, Effect Analysis, Metamorphic
+        Testing, State Transition Testing, Exception Verification, Delta Assertions,
+        Preconditions, Postconditions, Indirect Output Verification, Dependency
+        Injection, Fake Objects, Mock Objects, Fault Injection, Extract and Override
+        Call, Sensing and Separation, Pinch Points, Enabling Points, Program Slicing,
+        Inflection Points, Effect Sketches, Combinatorial Testing, Differential Testing,
+        Round-Trip Properties, Idempotence, Monotonicity, Conservation Properties, Guard
+        Assertions, Constraint-Based Test Generation, Model-Based Testing, Deterministic
+        Tests, Test Isolation, Minimal Fixture, Fresh Fixture, Test Orthogonality,
+        Humble Object, Pure Functions, Functional Core/Imperative Shell, Command–Query
+        Separation, Dependency Inversion, Parameterize Constructor, Parameterize Method,
+        Extract Interface, Introduce Instance Delegator, Extract and Override Factory
+        Method, Test-Specific Subclasses, Subclass and Override Method, Adapt Parameter,
+        Extract Implementer, Replace Global Reference, Encapsulate Global References,
+        Break Out Method Object, Ports and Adapters, Sprout Method, Sprout Class, Wrap
+        Method, Wrap Class.
 
-        Prefer minimal, behavior-preserving changes, meaningful behavioral assertions, and strengthening existing tests.
+        Prefer minimal, behavior-preserving changes, meaningful behavioral assertions,
+        and strengthening existing tests.
         TXT;
 
     public function __construct(
