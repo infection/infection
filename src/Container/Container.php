@@ -126,7 +126,6 @@ use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
@@ -1225,11 +1224,7 @@ final class Container extends DIContainer
 
     private function getProcessRunner(): ProcessRunner
     {
-        $config = $this->getConfiguration();
-
-        return $config->isDryRun
-            ? $this->get(DryProcessRunner::class)
-            : $this->get(ParallelProcessRunner::class);
+        return $this->get(ParallelProcessRunner::class);
     }
 
     private function getMutantFactory(): MutantFactory

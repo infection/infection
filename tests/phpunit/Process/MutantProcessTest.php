@@ -37,15 +37,15 @@ namespace Infection\Tests\Process;
 
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessContainer;
 use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-#[CoversClass(MutantProcessContainer::class)]
+#[CoversClass(MutantProcess::class)]
 final class MutantProcessTest extends TestCase
 {
     private Stub&Process $processStub;
@@ -87,6 +87,29 @@ final class MutantProcessTest extends TestCase
             $this->mutant,
             true,
         );
+    }
+
+    public function test_it_reports_the_time_between_start_and_completion(): void
+    {
+        $this->processStub->method('getStartTime')->willReturn(10.0);
+        $this->mutantProcess->markAsFinished();
+        $expected = $this->mutantProcess->getFinishedAt() - 10.0;
+
+        $this->assertSame($expected, $this->mutantProcess->getRuntime());
+    }
+
+    public function test_it_reports_zero_runtime_for_a_completed_dry_run_process(): void
+    {
+        $process = new DryRunProcess(['phpunit']);
+        $mutantProcess = new MutantProcess(
+            $process,
+            $this->mutant,
+            $this->createStub(MutantExecutionResultFactory::class),
+        );
+        $process->start();
+        $mutantProcess->markAsFinished();
+
+        $this->assertSame(0.0, $mutantProcess->getRuntime());
     }
 
     private function assertMutantProcessStateIs(

@@ -53,7 +53,7 @@ use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGeneratio
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Mutator\Loop\For_;
-use Infection\Process\Runner\DryProcessRunner;
+use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Report\DebugEventsDataProducer;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\Mutation\MutationBuilder;
@@ -197,11 +197,11 @@ final class DebugEventsDataProducerTest extends TestCase
         yield 'mutation testing count and runner type' => [
             new MutationTestingWasStarted(
                 3,
-                new DryProcessRunner(),
+                new ParallelProcessRunner(1),
             ),
             [
                 'mutationCount' => 3,
-                'processRunner' => DryProcessRunner::class,
+                'processRunner' => ParallelProcessRunner::class,
             ],
         ];
 

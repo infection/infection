@@ -41,11 +41,14 @@ use DuoClock\TimeSpy;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessQueue;
+use Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver;
+use Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
@@ -64,6 +67,32 @@ use Symfony\Component\Process\Process;
 final class ParallelProcessRunnerTest extends TestCase
 {
     private const int SIMULATED_TIME_MICROSECONDS = 1_000;
+
+    public function test_it_finishes_each_dry_run_process_before_yielding_the_container(): void
+    {
+        $mutant = MutantBuilder::withCompleteTestData()->build();
+        $resultFactory = new MagoMutantExecutionResultFactory(new MagoMutantDetectionStatusResolver());
+        $firstProcess = new DryRunProcess(['check-first'], cwd: __FILE__);
+        $secondProcess = new DryRunProcess(['check-second'], cwd: __FILE__);
+        $first = new MutantProcess($firstProcess, $mutant, $resultFactory);
+        $second = new MutantProcess($secondProcess, $mutant, $resultFactory);
+        $container = MutantProcessContainer::from(static fn (): MutantProcess => $first)
+            ->append(static fn (): MutantProcess => $second)
+        ;
+        $runner = new ParallelProcessRunner(1, 0, new TimeSpy());
+
+        $completed = iterator_to_array($runner->run([$container]), false);
+
+        $this->assertSame([$container], $completed);
+        $this->assertSame($second, $container->getCurrent());
+        $this->assertTrue($firstProcess->isTerminated());
+        $this->assertTrue($secondProcess->isTerminated());
+        $this->assertGreaterThan(0.0, $first->getFinishedAt());
+        $this->assertGreaterThan(0.0, $second->getFinishedAt());
+        $result = $container->getMutantExecutionResult();
+        $this->assertSame(DetectionStatus::ESCAPED, $result->getDetectionStatus());
+        $this->assertSame(0.0, $result->getProcessRuntime());
+    }
 
     public function test_it_does_nothing_when_no_process_is_given(): void
     {

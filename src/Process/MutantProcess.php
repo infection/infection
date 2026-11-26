@@ -88,6 +88,13 @@ class MutantProcess
         return $this->finishedAt;
     }
 
+    public function getRuntime(): float
+    {
+        return $this->process instanceof DryRunProcess
+            ? 0.0
+            : $this->finishedAt - $this->process->getStartTime();
+    }
+
     public function getMutantExecutionResult(): MutantExecutionResult
     {
         // todo [phpstan-integration] cache it

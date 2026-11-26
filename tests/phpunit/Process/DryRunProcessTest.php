@@ -43,18 +43,32 @@ use Symfony\Component\Process\Process;
 #[CoversClass(DryRunProcess::class)]
 final class DryRunProcessTest extends TestCase
 {
-    public function test_it_presents_process_as_expected(): void
+    public function test_it_completes_on_start_without_launching_the_command(): void
     {
-        $realProcess = new Process(['php', 'vendor/bin/phpunit']);
-        $dryRunProcess = DryRunProcess::fromProcess($realProcess);
+        $command = ['php', 'vendor/bin/phpunit'];
+        $dryRunProcess = new DryRunProcess($command, cwd: __FILE__);
+        $output = [];
 
+        $this->assertFalse($dryRunProcess->isStarted());
+        $this->assertFalse($dryRunProcess->isTerminated());
+        $this->assertFalse($dryRunProcess->isRunning());
+        $this->assertSame(Process::STATUS_READY, $dryRunProcess->getStatus());
+        $this->assertNull($dryRunProcess->getExitCode());
+        $this->assertSame('', $dryRunProcess->getOutput());
+
+        $dryRunProcess->start(static function (string $type, string $data) use (&$output): void {
+            $output[] = [$type, $data];
+        });
+
+        $this->assertSame([[Process::OUT, DryRunProcess::PASSING_TEST_OUTPUT]], $output);
         $this->assertTrue($dryRunProcess->isTerminated());
         $this->assertTrue($dryRunProcess->isStarted());
+        $this->assertFalse($dryRunProcess->isRunning());
         $this->assertSame(DryRunProcess::PASSING_TEST_OUTPUT, $dryRunProcess->getOutput());
         $this->assertSame('', $dryRunProcess->getErrorOutput());
         $this->assertSame(0.0, $dryRunProcess->getStartTime());
         $this->assertSame(0, $dryRunProcess->getExitCode());
         $this->assertSame(Process::STATUS_TERMINATED, $dryRunProcess->getStatus());
-        $this->assertSame($realProcess->getCommandLine(), $dryRunProcess->getCommandLine());
+        $this->assertSame((new Process($command))->getCommandLine(), $dryRunProcess->getCommandLine());
     }
 }

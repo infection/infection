@@ -402,6 +402,8 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
     public function test_it_reports_a_dry_run_mutant_as_escaped(): void
     {
         $process = new Process(['bin/phpunit', '--configuration', 'infection-tmp-phpunit.xml']);
+        $dryRunProcess = DryRunProcess::fromProcess($process);
+        $dryRunProcess->start();
 
         $this->testFrameworkAdapterMock
             ->expects($this->once())
@@ -411,7 +413,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
         ;
 
         $mutantProcess = new MutantProcess(
-            DryRunProcess::fromProcess($process),
+            $dryRunProcess,
             MutantBuilder::withMinimalTestData()
                 ->withMutantFilePath('/path/to/mutant')
                 ->withMutation(new Mutation(
