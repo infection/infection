@@ -51,6 +51,7 @@ final readonly class FakeShellCommandRunner implements ShellCommandRunner
         mixed $input = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
         ?float $idleTimeout = null,
+        bool $useOriginalPhpConfiguration = false,
     ): string {
         throw new DomainException('Unexpected call.');
     }
@@ -63,6 +64,7 @@ final readonly class FakeShellCommandRunner implements ShellCommandRunner
         mixed $input = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
         ?float $idleTimeout = null,
+        bool $useOriginalPhpConfiguration = false,
     ): CompletedProcess {
         throw new DomainException('Unexpected call.');
     }

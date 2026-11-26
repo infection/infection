@@ -35,8 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
+use Infection\Process\OriginalPhpProcess;
 use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use const PHP_BINARY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -51,6 +53,8 @@ use Symfony\Component\Process\Process;
 #[Group('integration')]
 final class SymfonyProcessShellCommandRunnerTest extends TestCase
 {
+    use ExpectsThrowables;
+
     private SymfonyProcessShellCommandRunner $runner;
 
     protected function setUp(): void
@@ -96,6 +100,70 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
         yield 'empty output' => [
             [PHP_BINARY, '-r', ''],
             '',
+        ];
+    }
+
+    /**
+     * @param 'run'|'mustRun' $method
+     * @param array{useOriginalPhpConfiguration?: bool} $arguments
+     * @param class-string<Process> $expectedProcessClass
+     */
+    #[DataProvider('phpConfigurationProvider')]
+    public function test_it_uses_the_requested_php_configuration(
+        string $method,
+        array $arguments,
+        string $expectedProcessClass,
+    ): void {
+        $command = [PHP_BINARY, '-r', 'sleep(1);'];
+        $exception = $this->expectToThrow(
+            fn () => match ($method) {
+                'run' => $this->runner->run($command, ...$arguments, timeout: 0.01),
+                'mustRun' => $this->runner->mustRun($command, ...$arguments, timeout: 0.01),
+            },
+        );
+
+        $this->assertInstanceOf(ProcessTimedOutException::class, $exception);
+        $actualProcessClass = $exception->getProcess()::class;
+
+        $this->assertSame($expectedProcessClass, $actualProcessClass);
+    }
+
+    public static function phpConfigurationProvider(): iterable
+    {
+        yield 'mustRun uses persistent configuration by default' => [
+            'mustRun',
+            [],
+            Process::class,
+        ];
+
+        yield 'mustRun explicitly uses persistent configuration' => [
+            'mustRun',
+            ['useOriginalPhpConfiguration' => false],
+            Process::class,
+        ];
+
+        yield 'mustRun uses original configuration when enabled' => [
+            'mustRun',
+            ['useOriginalPhpConfiguration' => true],
+            OriginalPhpProcess::class,
+        ];
+
+        yield 'run uses persistent configuration by default' => [
+            'run',
+            [],
+            Process::class,
+        ];
+
+        yield 'run explicitly uses persistent configuration' => [
+            'run',
+            ['useOriginalPhpConfiguration' => false],
+            Process::class,
+        ];
+
+        yield 'run uses original configuration when enabled' => [
+            'run',
+            ['useOriginalPhpConfiguration' => true],
+            OriginalPhpProcess::class,
         ];
     }
 

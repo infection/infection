@@ -70,6 +70,7 @@ interface ShellCommandRunner
      * @param string[] $command
      * @param ProcessCallback|null $callback
      * @param array<string, string|Stringable|false> $env
+     * @param bool $useOriginalPhpConfiguration Whether to run the child with the PHP configuration from before XdebugHandler restarted Infection.
      *
      * @throws ProcessFailedException When process didn't terminate successfully.
      * @throws RuntimeException When process can't be launched.
@@ -84,12 +85,14 @@ interface ShellCommandRunner
         mixed $input = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
         ?float $idleTimeout = null,
+        bool $useOriginalPhpConfiguration = false,
     ): string;
 
     /**
      * @param string[] $command
      * @param ProcessCallback|null $callback
      * @param array<string, string|Stringable|false> $env
+     * @param bool $useOriginalPhpConfiguration Whether to run the child with the PHP configuration from before XdebugHandler restarted Infection.
      *
      * @throws RuntimeException When process can't be launched.
      * @throws ProcessTimedOutException When process timed out.
@@ -103,5 +106,6 @@ interface ShellCommandRunner
         mixed $input = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
         ?float $idleTimeout = null,
+        bool $useOriginalPhpConfiguration = false,
     ): CompletedProcess;
 }
