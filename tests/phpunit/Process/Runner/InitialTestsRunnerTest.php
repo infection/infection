@@ -35,13 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use function array_filter;
 use function array_map;
 use function array_unique;
 use function array_values;
-use function count;
 use function end;
-use function extension_loaded;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
@@ -49,6 +46,7 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSu
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Logger\EventDispatchingTestFrameworkLogger;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
@@ -58,8 +56,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
-use function str_contains;
-use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
 
@@ -146,22 +142,25 @@ final class InitialTestsRunnerTest extends TestCase
         );
     }
 
-    public function test_it_stops_the_process_execution_on_the_first_error(): void
+    #[DataProvider('exitCodeProvider')]
+    public function test_it_continues_after_stderr_output_and_preserves_the_exit_code(int $exitCode): void
     {
+        $this->testFrameworkAdapter->method('getName')->willReturn('PHPUnit');
         $testFrameworkExtraOptions = '--stop-on-failure';
         $phpExtraOptions = ['-d memory_limit=-1'];
         $skipCoverage = false;
-
         $input = new InputStream();
 
-        $process = $this->createProcessForCode(<<<STR
-            fwrite(STDOUT, 123);
-            fwrite(STDERR, 321);
-            fwrite(STDOUT, 123);
-            fwrite(STDERR, 321);
-            STR
+        // Wait for the progress notification before continuing after stderr output.
+        $process = $this->createProcessForCode(<<<PHP
+            fwrite(STDERR, 'diagnostic');
+            fgets(STDIN);
+            echo 'continued';
+            exit($exitCode);
+            PHP
         );
         $process->setInput($input);
+        $process->setTimeout(2.0);
 
         $this->processFactoryMock
             ->method('createProcess')
@@ -169,32 +168,43 @@ final class InitialTestsRunnerTest extends TestCase
             ->willReturn($process)
         ;
 
-        try {
-            $this->runner->run($this->testFrameworkAdapter, $testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage, $this->testFrameworkLogger);
-        } catch (RuntimeException $e) {
-            // Signal 11, AKA "segmentation fault", is not something we can do anything about
-            if (extension_loaded('xdebug') && str_contains($e->getMessage(), 'The process has been signaled with signal "11"')) {
-                $this->markTestIncomplete($e->getMessage());
-            }
+        $logger = $this->createMock(TestFrameworkLogger::class);
+        $logger
+            ->expects($this->atLeastOnce())
+            ->method('initialRunProgressed')
+            ->with('PHPUnit')
+            ->willReturnCallback(static function () use ($input): void {
+                if (!$input->isClosed()) {
+                    $input->write("continue\n");
+                    $input->close();
+                }
+            })
+        ;
+        $logger
+            ->expects($this->once())
+            ->method('initialRunFinished')
+            ->with('PHPUnit', 'continued')
+        ;
 
-            throw $e;
-        }
+        $actual = $this->runner->run(
+            $this->testFrameworkAdapter,
+            $testFrameworkExtraOptions,
+            $phpExtraOptions,
+            $skipCoverage,
+            $logger,
+        );
 
-        $events = $this->eventDispatcher->getEvents();
+        $this->assertSame($process, $actual);
+        $this->assertSame($exitCode, $actual->getExitCode());
+        $this->assertSame('continued', $actual->getOutput());
+        $this->assertSame('diagnostic', $actual->getErrorOutput());
+    }
 
-        // First event must be suite start, last must be suite finish
-        $this->assertInstanceOf(InitialTestSuiteWasStarted::class, $events[0]);
-        $this->assertInstanceOf(InitialTestSuiteWasFinished::class, end($events));
+    public static function exitCodeProvider(): iterable
+    {
+        yield 'successful command with stderr output' => [0];
 
-        // Count completed events - OS buffering makes exact count non-deterministic
-        // Minimum 1: at least one output chunk was processed
-        // Maximum 4: the test script has 4 writes total
-        $completedCount = count(array_filter(
-            $events,
-            static fn ($e) => $e instanceof InitialTestCaseWasCompleted,
-        ));
-        $this->assertGreaterThanOrEqual(1, $completedCount, 'Should process at least one output');
-        $this->assertLessThanOrEqual(4, $completedCount, 'Should stop after error, max 4 outputs');
+        yield 'failed command with stderr output' => [1];
     }
 
     public static function versionProvider(): iterable

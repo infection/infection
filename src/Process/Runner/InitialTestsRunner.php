@@ -78,14 +78,9 @@ class InitialTestsRunner
             $process->getCommandLine(),
         );
 
-        $process->run(static function (string $type) use ($process, $testFrameworkName, $testFrameworkLogger): void {
-            if ($type === Process::ERR) {
-                // Stop on the first error encountered
-                $process->stop();
-            }
-
-            $testFrameworkLogger->initialRunProgressed($testFrameworkName);
-        });
+        $process->run(
+            static fn () => $testFrameworkLogger->initialRunProgressed($testFrameworkName),
+        );
 
         $testFrameworkLogger->initialRunFinished($testFrameworkName, $process->getOutput());
 
