@@ -42,7 +42,6 @@ use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Source\Collector\FakeSourceCollector;
-use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -54,6 +53,7 @@ use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
+use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -84,17 +84,45 @@ final class FactoryTest extends TestCase
 
     public function test_it_uses_installed_test_framework_adapters(): void
     {
-        $factory = $this->createFactory([
-            'infection/dummy-adapter' => [
-                'install_path' => '/path/to/dummy/adapter/factory.php',
-                'extra' => ['class' => DummyTestFrameworkFactory::class],
-                'version' => '1.0.0',
+        $result = CompletedProcessBuilder::withMinimalTestData()
+            ->withStdout('legacy output')
+            ->build()
+        ;
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
+            ->expects($this->once())
+            ->method('run')
+            ->willReturn($result)
+        ;
+        $testFrameworkLogger = $this->createMock(TestFrameworkLogger::class);
+        $testFrameworkLogger
+            ->expects($this->once())
+            ->method('initialRunStarted')
+            ->with('dummy', '1.0.0')
+        ;
+        $testFrameworkLogger
+            ->expects($this->once())
+            ->method('initialRunFinished')
+            ->with('dummy', $result->command, 'legacy output')
+        ;
+        $factory = $this->createFactory(
+            [
+                'infection/dummy-adapter' => [
+                    'install_path' => '/path/to/dummy/adapter/factory.php',
+                    'extra' => ['class' => DummyTestFrameworkFactory::class],
+                    'version' => '1.0.0',
+                ],
             ],
-        ]);
+            shellCommandRunner: $shellCommandRunner,
+            testFrameworkLogger: $testFrameworkLogger,
+        );
 
         $adapter = $factory->create('dummy', false);
 
         $this->assertInstanceOf(TestFramework::class, $adapter);
+        $initialRun = $adapter->executeInitialRun();
+
+        $this->assertSame('legacy output', $initialRun->output);
     }
 
     public function test_it_uses_installed_test_frameworks(): void
@@ -157,10 +185,13 @@ final class FactoryTest extends TestCase
         ?Configuration $configuration = null,
         ?TestFrameworkConfigLocatorInterface $configLocator = null,
         ?TestFrameworkFinder $testFrameworkFinder = null,
+        ?ShellCommandRunner $shellCommandRunner = null,
+        ?TestFrameworkLogger $testFrameworkLogger = null,
     ): Factory {
         $configuration ??= ConfigurationBuilder::withMinimalTestData()->build();
         $fileSystem = $this->createStub(FileSystem::class);
         $fileSystem->method('readFile')->willReturn('<phpunit/>');
+        $fileSystem->method('isReadableFile')->willReturn(true);
 
         return new Factory(
             '',
@@ -171,17 +202,16 @@ final class FactoryTest extends TestCase
             $configuration,
             new FakeSourceCollector(),
             $installedExtensions,
-            $this->createStub(ShellCommandRunner::class),
+            $shellCommandRunner ?? $this->createStub(ShellCommandRunner::class),
             $fileSystem,
             $this->createStub(ConsoleOutput::class),
-            $this->createStub(TestFrameworkLogger::class),
+            $testFrameworkLogger ?? $this->createStub(TestFrameworkLogger::class),
             $this->createStub(LoggerInterface::class),
             new CoverageCheckerFactory(
                 $configuration,
                 JUnitReportLocator::create($fileSystem, ''),
                 IndexXmlCoverageLocator::create($fileSystem, ''),
             ),
-            $this->createStub(InitialTestsRunner::class),
             $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
         );

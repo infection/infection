@@ -37,7 +37,6 @@ namespace Infection\Tests\TestFramework\Factory;
 
 use Infection\FileSystem\FileSystem;
 use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\TestFramework\Common\InitialTestsRunner;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
@@ -177,7 +176,6 @@ final class ConfigurableTestFrameworkFactoryTest extends TestCase
                 JUnitReportLocator::create($fileSystem, ''),
                 IndexXmlCoverageLocator::create($fileSystem, ''),
             ),
-            $this->createStub(InitialTestsRunner::class),
             $configuration,
             $this->createStub(MutantProcessContainerFactory::class),
             $this->createStub(TestFrameworkExtraOptionsFilter::class),
