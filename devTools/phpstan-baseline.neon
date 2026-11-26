@@ -1636,24 +1636,6 @@ parameters:
 
 		-
 			rawMessage: '''
-				Fetching class constant class of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
-				The DI builder skips static analysis when no analyser is configured.
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
-
-		-
-			rawMessage: '''
-				Instantiation of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
-				The DI builder skips static analysis when no analyser is configured.
-			'''
-			identifier: new.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/NullStaticAnalysisTestFrameworkTest.php
-
-		-
-			rawMessage: '''
 				Call to deprecated method getExecutableName() of class Infection\TestFramework\PHPStan\Adapter\PHPStanAdapterFactory:
 				It is here only to smoothen the migration, should be removed.
 			'''
