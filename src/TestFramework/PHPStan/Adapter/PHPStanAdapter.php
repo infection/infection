@@ -40,6 +40,7 @@ use function explode;
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\InitialTestsRunner;
@@ -136,7 +137,9 @@ final class PHPStanAdapter implements StaticAnalysisTestFramework
             $this->staticAnalysisToolOptions,
         );
 
-        return new MutantProcessContainer($factory->create($mutant), []);
+        return MutantProcessContainer::from(
+            static fn (): MutantProcess => $factory->create($mutant),
+        );
     }
 
     #[Override]

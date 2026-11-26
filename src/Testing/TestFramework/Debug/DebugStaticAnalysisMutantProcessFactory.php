@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Testing\TestFramework\Debug;
 
 use Infection\Mutant\Mutant;
-use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
@@ -45,7 +44,7 @@ use Symfony\Component\Process\Process;
 /**
  * @internal
  */
-final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMutantProcessFactory
+final readonly class DebugStaticAnalysisMutantProcessFactory
 {
     public function __construct(
         private string $runtime,
