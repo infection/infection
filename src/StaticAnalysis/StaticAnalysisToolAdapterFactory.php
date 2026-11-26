@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\StaticAnalysis;
 
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Psr\Log\LoggerInterface;
 
 /**
  * @internal
@@ -52,5 +53,6 @@ interface StaticAnalysisToolAdapterFactory
         string $tmpDir,
         array $staticAnalysisToolOptions,
         ShellCommandRunner $shellCommandRunner,
+        LoggerInterface $logger,
     ): StaticAnalysisToolAdapter;
 }

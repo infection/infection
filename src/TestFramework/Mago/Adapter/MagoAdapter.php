@@ -36,19 +36,19 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Mago\Adapter;
 
 use function array_merge;
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\Mago\Logger\MagoLogger;
 use Infection\TestFramework\Mago\Process\MagoMutantProcessFactory;
 use RuntimeException;
-use Safe\Exceptions\PcreException;
 use function sprintf;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\ProcessSignaledException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use function version_compare;
 
 /**
@@ -68,6 +68,7 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
         private readonly float $timeout,
         private readonly array $staticAnalysisToolOptions,
         private readonly ShellCommandRunner $shellCommandRunner,
+        private readonly MagoLogger $logger,
         private ?string $version = null,
     ) {
     }
@@ -105,20 +106,30 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
         );
     }
 
-    /**
-     * @throws PcreException|ProcessTimedOutException|RuntimeException|ProcessSignaledException|ProcessFailedException
-     */
     public function getVersion(): string
     {
-        return $this->version ??= $this->retrieveVersion();
+        if ($this->version !== null) {
+            return $this->version;
+        }
+
+        try {
+            $this->version = $this->retrieveVersion();
+        } catch (SymfonyProcessRuntimeException $exception) {
+            $this->logger->logVersionDetectionFailure($exception);
+
+            $this->version = TestFramework::UNKNOWN_VERSION;
+        }
+
+        return $this->version;
     }
 
-    /**
-     * @throws RuntimeException|PcreException
-     */
     public function assertMinimumVersionSatisfied(): void
     {
         $version = $this->getVersion();
+
+        if ($version === TestFramework::UNKNOWN_VERSION) {
+            return;
+        }
 
         if (version_compare($version, '1.23.0', '>=')) {
             return;
@@ -131,7 +142,8 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
     }
 
     /**
-     * @throws PcreException|ProcessTimedOutException|RuntimeException|ProcessSignaledException|ProcessFailedException
+     * @throws InvalidVersion
+     * @throws SymfonyProcessRuntimeException
      */
     private function retrieveVersion(): string
     {

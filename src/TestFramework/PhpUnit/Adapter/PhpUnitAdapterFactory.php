@@ -150,7 +150,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkFactory
                 $useWindowsFilterLimit,
             ),
             $shellCommandRunner,
-            new VersionParser(),
+            new VersionParser('PHPUnit'),
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),

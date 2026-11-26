@@ -41,7 +41,9 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\PHPStan\Logger\PsrPHPStanLogger;
 use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
@@ -63,6 +65,7 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
         string $tmpDir,
         array $staticAnalysisToolOptions,
         ShellCommandRunner $shellCommandRunner,
+        LoggerInterface $logger,
         ?Filesystem $fileSystem = null,
     ): StaticAnalysisToolAdapter {
         Assert::notNull($fileSystem);
@@ -75,11 +78,12 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
-            new VersionParser(),
+            new VersionParser('PHPStan'),
             $timeout,
             $tmpDir,
             $staticAnalysisToolOptions,
             $shellCommandRunner,
+            new PsrPHPStanLogger($logger),
         );
     }
 }

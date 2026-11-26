@@ -54,6 +54,7 @@ use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkFactory;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageCheckerFactory;
+use Infection\TestFramework\Logger\PsrLegacyTestFrameworkLogger;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
@@ -111,6 +112,7 @@ final readonly class Factory
                 $this->containerFactory,
                 $this->extraOptionsFilter,
                 $this->testFrameworkLogger,
+                new PsrLegacyTestFrameworkLogger($this->logger),
             );
     }
 

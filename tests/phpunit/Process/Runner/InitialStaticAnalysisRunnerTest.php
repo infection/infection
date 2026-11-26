@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner;
 
 use Closure;
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
@@ -47,7 +48,6 @@ use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Logger\EventDispatchingTestFrameworkLogger;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -89,7 +89,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
         $versionExpectation = $this->staticAnalysisToolAdapter->method('getVersion');
 
         if ($version === null) {
-            $versionExpectation->willThrowException(new InvalidArgumentException('Invalid version output.'));
+            $versionExpectation->willThrowException(new InvalidVersion('Invalid version output.'));
         } else {
             $versionExpectation->willReturn($version);
         }

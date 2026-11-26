@@ -37,17 +37,21 @@ namespace Infection\TestFramework\PHPStan\Adapter;
 
 use function array_merge;
 use function explode;
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Contracts\TestFramework;
+use Infection\TestFramework\PHPStan\Logger\PHPStanLogger;
 use Infection\TestFramework\PHPStan\Process\PHPStanMutantProcessFactory;
 use RuntimeException;
 use function sprintf;
 use function str_starts_with;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use function version_compare;
 
 /**
@@ -85,6 +89,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         private readonly string $tmpDir,
         private readonly array $staticAnalysisToolOptions,
         private readonly ShellCommandRunner $shellCommandRunner,
+        private readonly PHPStanLogger $logger,
         private ?string $version = null,
     ) {
     }
@@ -130,12 +135,28 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
 
     public function getVersion(): string
     {
-        return $this->version ??= $this->retrieveVersion();
+        if ($this->version !== null) {
+            return $this->version;
+        }
+
+        try {
+            $this->version = $this->retrieveVersion();
+        } catch (SymfonyProcessRuntimeException $exception) {
+            $this->logger->logVersionDetectionFailure($exception);
+
+            $this->version = TestFramework::UNKNOWN_VERSION;
+        }
+
+        return $this->version;
     }
 
     public function assertMinimumVersionSatisfied(): void
     {
         $version = $this->getVersion();
+
+        if ($version === TestFramework::UNKNOWN_VERSION) {
+            return;
+        }
 
         // running on phpstan-src itself
         if (str_starts_with($version, 'dev-')) {
@@ -175,6 +196,10 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         ));
     }
 
+    /**
+     * @throws InvalidVersion
+     * @throws SymfonyProcessRuntimeException
+     */
     private function retrieveVersion(): string
     {
         $testFrameworkVersionExecutable = $this->commandLineBuilder->build(

@@ -51,6 +51,7 @@ use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapterFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use function sprintf;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -69,6 +70,7 @@ final readonly class StaticAnalysisToolFactory
         private PhpExecutableFinder $phpExecutableFinder,
         private FileSystem $fileSystem,
         private TestFrameworkLogger $testFrameworkLogger,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -114,6 +116,7 @@ final readonly class StaticAnalysisToolFactory
                 $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
                 $this->shellCommandRunner,
+                $this->logger,
                 $this->fileSystem,
             );
         }
@@ -131,6 +134,7 @@ final readonly class StaticAnalysisToolFactory
                 $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
                 $this->shellCommandRunner,
+                $this->logger,
             );
         }
 

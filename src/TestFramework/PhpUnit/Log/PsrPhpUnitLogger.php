@@ -39,6 +39,7 @@ use function implode;
 use Override;
 use const PHP_EOL;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 /**
  * @internal
@@ -62,6 +63,15 @@ final readonly class PsrPhpUnitLogger implements PhpUnitLogger
                     'If this is not done then mutations may report as caught when they are not.',
                 ],
             ),
+        );
+    }
+
+    #[Override]
+    public function logVersionDetectionFailure(Throwable $throwable): void
+    {
+        $this->logger->warning(
+            'Could not determine the PHPUnit version. Continuing with an unknown version.',
+            ['exception' => $throwable],
         );
     }
 }

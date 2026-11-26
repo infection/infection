@@ -42,19 +42,25 @@ use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Common\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Contracts\TestFrameworkLogger;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\LegacyTestFrameworkBridge;
+use Infection\TestFramework\Logger\LegacyTestFrameworkLogger;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter;
 use Infection\Tests\Mutant\MutantBuilder;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use Symfony\Component\Process\Process;
+use Throwable;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(LegacyTestFrameworkBridge::class)]
@@ -71,15 +77,53 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         $this->assertSame('dummy', $actual);
     }
 
-    public function test_it_exposes_the_adapter_version(): void
+    public function test_it_memoizes_the_adapter_version(): void
     {
+        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter
+            ->expects($this->once())
+            ->method('getVersion')
+            ->willReturn('1.0.0')
+        ;
+        $testFramework = $this->createTestFramework(adapter: $adapter);
+
+        $this->assertSame('1.0.0', $testFramework->getVersion());
+        $this->assertSame('1.0.0', $testFramework->getVersion());
+    }
+
+    #[DataProvider('versionDetectionFailureProvider')]
+    public function test_it_memoizes_an_unknown_version_when_legacy_version_detection_fails(Throwable $exception): void
+    {
+        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter
+            ->expects($this->once())
+            ->method('getVersion')
+            ->willThrowException($exception)
+        ;
+        $adapter
+            ->method('getName')
+            ->willReturn('LegacyFramework')
+        ;
+        $logger = $this->createMock(LegacyTestFrameworkLogger::class);
+        $logger
+            ->expects($this->once())
+            ->method('logVersionDetectionFailure')
+            ->with('LegacyFramework', $exception)
+        ;
         $testFramework = $this->createTestFramework(
-            adapter: new DummyTestFrameworkAdapter(),
+            adapter: $adapter,
+            logger: $logger,
         );
 
-        $actual = $testFramework->getVersion();
+        $this->assertSame(TestFramework::UNKNOWN_VERSION, $testFramework->getVersion());
+        $this->assertSame(TestFramework::UNKNOWN_VERSION, $testFramework->getVersion());
+    }
 
-        $this->assertSame('1.0.0', $actual);
+    public static function versionDetectionFailureProvider(): iterable
+    {
+        yield 'legacy parsing failure' => [new InvalidArgumentException('Unrecognized version output.')];
+
+        yield 'version command failure' => [new SymfonyProcessRuntimeException('Could not launch the version command.')];
     }
 
     public function test_it_checks_existing_coverage_when_initial_tests_are_skipped(): void
@@ -344,7 +388,8 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
         ?string $initialTestsPhpOptions = null,
         string $testFrameworkExtraOptions = '',
         bool $skipCoverage = false,
-    ): LegacyTestFrameworkBridge {
+        ?LegacyTestFrameworkLogger $logger = null,
+    ): TestFramework {
         return new LegacyTestFrameworkBridge(
             adapter: $adapter ?? new FakeAwareAdapter(1.0),
             consoleOutput: $consoleOutput ?? $this->createStub(ConsoleOutput::class),
@@ -359,6 +404,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             processFactory: $processFactory ?? $this->createStub(MutantProcessContainerFactory::class),
             testFrameworkExtraOptionsFilter: $testFrameworkExtraOptionsFilter ?? $this->createStub(TestFrameworkExtraOptionsFilter::class),
             testFrameworkLogger: $this->createStub(TestFrameworkLogger::class),
+            logger: $logger ?? $this->createStub(LegacyTestFrameworkLogger::class),
         );
     }
 

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis;
 
+use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 
 /**
@@ -51,6 +52,9 @@ interface StaticAnalysisToolAdapter
 
     public function createMutantProcessFactory(): LazyMutantProcessFactory;
 
+    /**
+     * @throws InvalidVersion
+     */
     public function getVersion(): string;
 
     public function assertMinimumVersionSatisfied(): void;

@@ -337,6 +337,7 @@ final class Container extends DIContainer
                     new PhpExecutableFinder(),
                     $container->getFileSystem(),
                     $container->get(TestFrameworkLogger::class),
+                    $container->getLogger(),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(

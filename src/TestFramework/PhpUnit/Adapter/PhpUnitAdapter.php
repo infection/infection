@@ -265,15 +265,19 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
 
     public function getVersion(): string
     {
-        return $this->version ??= $this->versionParser->parse(
-            $this->shellCommandRunner->mustRun(
-                $this->commandLineBuilder->build(
-                    $this->testFrameworkExecutable,
-                    [],
-                    ['--version'],
-                ),
-            ),
-        );
+        if ($this->version !== null) {
+            return $this->version;
+        }
+
+        try {
+            $this->version = $this->versionParser->parse($this->getVersionOutput());
+        } catch (SymfonyProcessRuntimeException $exception) {
+            $this->logger->logVersionDetectionFailure($exception);
+
+            $this->version = TestFramework::UNKNOWN_VERSION;
+        }
+
+        return $this->version;
     }
 
     public function testsPass(string $output): bool
@@ -446,5 +450,19 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         }
 
         return $versions[$testFrameworkVersion];
+    }
+
+    /**
+     * @throws SymfonyProcessRuntimeException
+     */
+    private function getVersionOutput(): string
+    {
+        return $this->shellCommandRunner->mustRun(
+            $this->commandLineBuilder->build(
+                $this->testFrameworkExecutable,
+                [],
+                ['--version'],
+            ),
+        );
     }
 }
