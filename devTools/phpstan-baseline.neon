@@ -133,18 +133,18 @@ parameters:
 			path: ../src/Console/XdebugHandler.php
 
 		-
-			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
-			identifier: arrayFilter.strict
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
 			rawMessage: '''
-				Fetching class constant class of deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
+				Access to constant on deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
 				Remove once CombinedTestFramework composes static analysis with the test suite.
 			'''
 			identifier: classConstant.deprecatedInterface
 			count: 2
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
+			identifier: arrayFilter.strict
+			count: 1
 			path: ../src/Container/Container.php
 
 		-
@@ -443,7 +443,7 @@ parameters:
 
 		-
 			rawMessage: '''
-				Fetching class constant class of deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
+				Access to constant on deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
 				This mutator is a semantic addition
 			'''
 			identifier: classConstant.deprecatedClass
@@ -1252,7 +1252,7 @@ parameters:
 
 		-
 			rawMessage: '''
-				Fetching class constant class of deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
+				Access to constant on deprecated interface Infection\TestFramework\Contracts\StaticAnalysisTestFramework:
 				Remove once CombinedTestFramework composes static analysis with the test suite.
 			'''
 			identifier: classConstant.deprecatedInterface
@@ -1363,7 +1363,7 @@ parameters:
 
 		-
 			rawMessage: '''
-				Fetching class constant class of deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
+				Access to constant on deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
 				This mutator is a semantic addition
 			'''
 			identifier: classConstant.deprecatedClass
@@ -1450,7 +1450,7 @@ parameters:
 
 		-
 			rawMessage: '''
-				Fetching class constant class of deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
+				Access to constant on deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
 				This mutator is a semantic addition
 			'''
 			identifier: classConstant.deprecatedClass
@@ -1717,7 +1717,7 @@ parameters:
 
 		-
 			rawMessage: '''
-				Fetching class constant class of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				Access to constant on deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
 				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
 			'''
 			identifier: classConstant.deprecatedClass
@@ -1738,6 +1738,15 @@ parameters:
 			identifier: staticMethod.deprecated
 			count: 3
 			path: ../tests/phpunit/TestFramework/Factory/ConfigurableTestFrameworkFactoryTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
+				Remove once the built-in static-analysis adapters implement TestFramework directly.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
 
 		-
 			rawMessage: '''
@@ -1795,15 +1804,6 @@ parameters:
 
 		-
 			rawMessage: '''
-				Fetching class constant class of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
-				Remove once the built-in static-analysis adapters implement TestFramework directly.
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
-
-		-
-			rawMessage: '''
 				Instantiation of deprecated class Infection\TestFramework\LegacyStaticAnalysisBridge:
 				Remove once the built-in static-analysis adapters implement TestFramework directly.
 			'''
@@ -1819,6 +1819,15 @@ parameters:
 			identifier: property.deprecatedClass
 			count: 1
 			path: ../tests/phpunit/TestFramework/LegacyStaticAnalysisBridgeTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
 
 		-
 			rawMessage: '''
@@ -1876,15 +1885,6 @@ parameters:
 
 		-
 			rawMessage: '''
-				Fetching class constant class of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
-				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
-
-		-
-			rawMessage: '''
 				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
 				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
 			'''
@@ -1933,7 +1933,7 @@ parameters:
 
 		-
 			rawMessage: '''
-				Fetching class constant class of deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
+				Access to constant on deprecated class Infection\TestFramework\NullStaticAnalysisTestFramework:
 				To be removed: this is only to be able to allow to use StaticAnalysisTestFramework without guarding against `null`.
 			'''
 			identifier: classConstant.deprecatedClass
