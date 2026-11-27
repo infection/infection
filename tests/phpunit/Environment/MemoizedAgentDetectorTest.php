@@ -33,22 +33,51 @@
 
 declare(strict_types=1);
 
-namespace Infection\Environment;
+namespace Infection\Tests\Environment;
 
-use Ergebnis\AgentDetector\Detector;
+use Ergebnis\AgentDetector\Detector as AgentDetectorContract;
+use Infection\Environment\MemoizedAgentDetector;
+use Infection\Testing\SingletonContainer;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class AgentDetector
+#[CoversClass(MemoizedAgentDetector::class)]
+final class MemoizedAgentDetectorTest extends TestCase
 {
-    public function __construct(private readonly Detector $detector)
+    public function test_container_can_build_it(): void
     {
+        $this->assertInstanceOf(MemoizedAgentDetector::class, SingletonContainer::getContainer()->get(MemoizedAgentDetector::class));
     }
 
-    public function isRunningInAgent(): bool
+    public function test_it_keeps_the_dependency_resolution_simple(): void
     {
-        return $this->detector->isAgentPresent();
+        $this->assertNotInstanceOf(
+            AgentDetectorContract::class,
+            SingletonContainer::getContainer()->get(MemoizedAgentDetector::class),
+        );
+    }
+
+    public static function agentStateProvider(): iterable
+    {
+        yield [true];
+
+        yield [false];
+    }
+
+    #[DataProvider('agentStateProvider')]
+    public function test_it_memoizes_the_state(bool $isRunningInAgent): void
+    {
+        $agentDetector = $this->createMock(AgentDetectorContract::class);
+        $agentDetector
+            ->expects($this->once())
+            ->method('isAgentPresent')
+            ->willReturn($isRunningInAgent)
+        ;
+
+        $memoizingDetector = new MemoizedAgentDetector($agentDetector);
+
+        $this->assertSame($isRunningInAgent, $memoizingDetector->isRunningInAgent());
+        $this->assertSame($isRunningInAgent, $memoizingDetector->isRunningInAgent(), 'memoizingDetector should call the actual detector only once');
     }
 }

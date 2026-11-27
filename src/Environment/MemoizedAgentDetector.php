@@ -33,26 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Environment;
+namespace Infection\Environment;
 
-use Infection\Environment\AgentDetector;
-use Infection\Testing\SingletonContainer;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
-use PHPUnit\Framework\TestCase;
+use Ergebnis\AgentDetector\Detector;
+use Later\Interfaces\Deferred;
+use function Later\later;
 
-#[CoversClass(AgentDetector::class)]
-final class AgentDetectorTest extends TestCase
+/**
+ * @internal
+ * @final
+ */
+class MemoizedAgentDetector
 {
-    #[WithEnvironmentVariable('AGENT_DETECTOR_DISABLE', '1')]
-    public function test_it_ignores_an_agent_harness(): void
+    /** @var Deferred<bool> */
+    private readonly Deferred $detectionResult;
+
+    public function __construct(Detector $detector)
     {
-        $this->assertFalse(SingletonContainer::getContainer()->get(AgentDetector::class)->isRunningInAgent());
+        $this->detectionResult = later(static fn () => yield $detector->isAgentPresent());
     }
 
-    #[WithEnvironmentVariable('AI_AGENT', '1')]
-    public function test_it_detects_an_agent_harness(): void
+    public function isRunningInAgent(): bool
     {
-        $this->assertTrue(SingletonContainer::getContainer()->get(AgentDetector::class)->isRunningInAgent());
+        return $this->detectionResult->get();
     }
 }

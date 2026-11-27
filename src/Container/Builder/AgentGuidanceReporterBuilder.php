@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Container\Builder;
 
-use Infection\Environment\AgentDetector;
+use Infection\Environment\MemoizedAgentDetector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Reporter\AgentGuidanceReporter;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -48,7 +48,7 @@ final readonly class AgentGuidanceReporterBuilder
     public function __construct(
         private OutputInterface $output,
         private MetricsCalculator $metricsCalculator,
-        private AgentDetector $agentDetector,
+        private MemoizedAgentDetector $agentDetector,
     ) {
     }
 
