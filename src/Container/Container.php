@@ -40,8 +40,6 @@ use function array_keys;
 use Closure;
 use DIContainer\Container as DIContainer;
 use function dirname;
-use Ergebnis\AgentDetector\Detector as AgentDetectorContract;
-use Ergebnis\AgentDetector\EnvironmentDetector as BaseAgentDetector;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
@@ -549,7 +547,6 @@ final class Container extends DIContainer
                     $config->numberOfShownMutations,
                 );
             },
-            AgentDetectorContract::class => BaseAgentDetector::class,
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
                 $config = $container->getConfiguration();
 

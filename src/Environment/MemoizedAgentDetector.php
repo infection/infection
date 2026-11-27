@@ -36,8 +36,7 @@ declare(strict_types=1);
 namespace Infection\Environment;
 
 use Ergebnis\AgentDetector\Detector;
-use Later\Interfaces\Deferred;
-use function Later\later;
+use Ergebnis\AgentDetector\EnvironmentDetector;
 
 /**
  * @internal
@@ -45,16 +44,14 @@ use function Later\later;
  */
 class MemoizedAgentDetector
 {
-    /** @var Deferred<bool> */
-    private readonly Deferred $detectionResult;
+    private bool $detectionResult;
 
-    public function __construct(Detector $detector)
+    public function __construct(private readonly Detector $detector = new EnvironmentDetector())
     {
-        $this->detectionResult = later(static fn () => yield $detector->isAgentPresent());
     }
 
     public function isRunningInAgent(): bool
     {
-        return $this->detectionResult->get();
+        return $this->detectionResult ??= $this->detector->isAgentPresent();
     }
 }
