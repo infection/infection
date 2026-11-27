@@ -28,6 +28,7 @@
 /tests/benchmark/GitParseDiff/diff
 /tests/e2e/*/coverage/
 /tests/e2e/*/infection/
+/tests/e2e/*/var/
 /tests/e2e/Configure/infection.json.dist
 /tests/e2e/SymfonyFlex/.env*
 /tests/e2e/SymfonyFlex/.gitignore
