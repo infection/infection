@@ -40,6 +40,8 @@ use Closure;
 use Infection\Mutant\DetectionStatus;
 
 /**
+ * @phpstan-type MutantProcessFactory = Closure(): MutantProcess
+ *
  * @internal
  * @final
  */
@@ -56,15 +58,15 @@ class MutantProcessContainer
     private int $currentProcessIndex = 0;
 
     /**
-     * @param non-empty-list<Closure(): MutantProcess> $mutantProcessFactories
+     * @param non-empty-list<MutantProcessFactory> $factories
      */
     private function __construct(
-        private array $mutantProcessFactories,
+        private array $factories,
     ) {
     }
 
     /**
-     * @param Closure(): MutantProcess $factory
+     * @param MutantProcessFactory $factory
      */
     public static function from(Closure $factory): self
     {
@@ -72,11 +74,21 @@ class MutantProcessContainer
     }
 
     /**
+     * @param MutantProcessFactory $factory
+     */
+    public function append(Closure $factory): self
+    {
+        $this->factories[] = $factory;
+
+        return $this;
+    }
+
+    /**
      * Container has a next process only if Mutant is Escaped
      */
     public function hasNext(): bool
     {
-        return array_key_exists($this->currentProcessIndex + 1, $this->mutantProcessFactories)
+        return array_key_exists($this->currentProcessIndex + 1, $this->factories)
             && $this->getCurrentMutantProcessDetectionStatus() === DetectionStatus::ESCAPED;
     }
 
@@ -89,17 +101,7 @@ class MutantProcessContainer
 
     public function getCurrent(): MutantProcess
     {
-        return $this->processes[$this->currentProcessIndex] ??= ($this->mutantProcessFactories[$this->currentProcessIndex])();
-    }
-
-    /**
-     * @param Closure(): MutantProcess $factory
-     */
-    public function append(Closure $factory): self
-    {
-        $this->mutantProcessFactories[] = $factory;
-
-        return $this;
+        return $this->processes[$this->currentProcessIndex] ??= ($this->factories[$this->currentProcessIndex])();
     }
 
     private function getCurrentMutantProcessDetectionStatus(): DetectionStatus
