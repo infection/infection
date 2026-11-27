@@ -169,6 +169,7 @@ rector: vendor $(RECTOR)
 
 .PHONY: rector-check
 rector-check: vendor $(RECTOR)
+	$(RECTOR) validate-config
 	$(RECTOR) process --dry-run
 
 .PHONY: validate
