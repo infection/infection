@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Container\Builder;
 
-use function getenv;
 use Infection\Container\Builder\AgentGuidanceReporterBuilder;
 use Infection\Environment\AgentDetector;
 use Infection\Metrics\MetricsCalculator;
@@ -62,7 +61,6 @@ final class AgentGuidanceReporterBuilderTest extends TestCase
         $agentDetector
             ->expects($this->once())
             ->method('isRunningInAgent')
-            ->with(getenv())
             ->willReturn($isRunningInAgent)
         ;
 
