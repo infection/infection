@@ -59,6 +59,7 @@ use Infection\Configuration\SourceFilter\PositionalArgumentsFilter;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
+use Infection\Container\Builder\AgentGuidanceReporterBuilder;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
@@ -519,6 +520,7 @@ final class Container extends DIContainer
                             $config->minCoveredMsi,
                         ),
                         new AdvisoryReporter($output),
+                        $container->get(AgentGuidanceReporterBuilder::class)->build(),
                         $container->getFileReporterFactory()->createFromConfiguration(
                             $container->getConfiguration()->logs,
                         ),
