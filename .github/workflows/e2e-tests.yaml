@@ -157,8 +157,6 @@ jobs:
 
       - name: Run the turbocov E2E tests
         if: runner.os != 'Windows' && matrix.coverage-driver == 'turbocov'
-        env:
-          TERM: xterm-256color
         run: |
           # Includes a unit test that requires turbocov to be loaded
           vendor/bin/phpunit tests/phpunit/TestFramework/PhpUnit/Adapter/TurbocovCollectPathsProviderTest.php
