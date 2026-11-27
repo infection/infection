@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "da9caaa02cc483736aa03fa0c0d20a94",
+    "content-hash": "0fb35de40e95f7ac292709b9452be96b",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -233,23 +233,23 @@
         },
         {
             "name": "ergebnis/agent-detector",
-            "version": "2.2.0",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ergebnis/agent-detector.git",
-                "reference": "b575df5338fa3208485e4ed169660a8a9388194c"
+                "reference": "d1a9b8d9fd33a5deaff5b56b7378105dae63bb9b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ergebnis/agent-detector/zipball/b575df5338fa3208485e4ed169660a8a9388194c",
-                "reference": "b575df5338fa3208485e4ed169660a8a9388194c",
+                "url": "https://api.github.com/repos/ergebnis/agent-detector/zipball/d1a9b8d9fd33a5deaff5b56b7378105dae63bb9b",
+                "reference": "d1a9b8d9fd33a5deaff5b56b7378105dae63bb9b",
                 "shasum": ""
             },
             "require": {
                 "php": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 || ~8.6.0 || ~8.7.0"
             },
             "require-dev": {
-                "ergebnis/composer-normalize": "^2.56.1",
+                "ergebnis/composer-normalize": "^2.57.0",
                 "ergebnis/license": "^2.9.0",
                 "ergebnis/php-cs-fixer-config": "^6.60.2",
                 "ergebnis/phpstan-rules": "^2.17.1",
@@ -259,16 +259,16 @@
                 "infection/infection": "^0.26.6",
                 "phpstan/extension-installer": "^1.4.3",
                 "phpstan/phpstan": "^2.2.14",
-                "phpstan/phpstan-deprecation-rules": "^2.0.5",
-                "phpstan/phpstan-phpunit": "^2.1.2",
-                "phpstan/phpstan-strict-rules": "^2.1.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0.6",
+                "phpstan/phpstan-phpunit": "^2.1.3",
+                "phpstan/phpstan-strict-rules": "^2.1.2",
                 "phpunit/phpunit": "^9.6.34",
                 "rector/rector": "^2.7.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "2.2-dev"
+                    "dev-main": "3.0-dev"
                 },
                 "composer-normalize": {
                     "indent-size": 2,
@@ -298,8 +298,8 @@
                 "security": "https://github.com/ergebnis/agent-detector/blob/main/.github/SECURITY.md",
                 "source": "https://github.com/ergebnis/agent-detector"
             },
-            "time": "2026-11-24T09:23:24+00:00",
-            "published-time": "2026-11-24T09:24:49+00:00"
+            "time": "2026-11-27T07:26:05+00:00",
+            "published-time": "2026-11-27T07:27:29+00:00"
         },
         {
             "name": "fidry/cpu-core-counter",
