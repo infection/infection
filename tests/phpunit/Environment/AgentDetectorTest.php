@@ -49,15 +49,15 @@ final class AgentDetectorTest extends TestCase
 
         yield 'known agent' => [['CLAUDECODE' => '1'], true];
 
-        yield 'agent variable with an empty value' => [['CODEX_SANDBOX' => ''], true];
+        yield 'agent variable with an empty value does not mean a thing' => [['CODEX_SANDBOX' => ''], false];
 
         yield 'last agent in the list' => [['REPL_ID' => 'x'], true];
 
         yield 'generic AI_AGENT' => [['AI_AGENT' => 'my-agent'], true];
 
-        yield 'AGENT_DETECTOR_DISABLE alone' => [['AGENT_DETECTOR_DISABLE' => ''], false];
+        yield 'empty AGENT_DETECTOR_DISABLE does not opt out' => [['AGENT_DETECTOR_DISABLE' => '', 'AI_AGENT' => '1'], true];
 
-        yield 'AGENT_DETECTOR_DISABLE with a known agent' => [['AGENT_DETECTOR_DISABLE' => '', 'CLAUDECODE' => '1'], false];
+        yield 'AGENT_DETECTOR_DISABLE with a value opts out' => [['AGENT_DETECTOR_DISABLE' => '1', 'AI_AGENT' => '1'], false];
     }
 
     /**

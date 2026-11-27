@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Environment;
 
-use function array_key_exists;
-
 /**
  * @internal
  * @final
@@ -64,6 +62,8 @@ class AgentDetector
     ];
 
     /**
+     * We match ergebnis/agent-detector to enable a future switch and offer a common user experience.
+     *
      * @see https://github.com/ergebnis/agent-detector#disabling-the-detection
      */
     private const string AGENT_DETECTOR_DISABLE = 'AGENT_DETECTOR_DISABLE';
@@ -73,12 +73,12 @@ class AgentDetector
      */
     public function isRunningInAgent(array $environment): bool
     {
-        if (array_key_exists(self::AGENT_DETECTOR_DISABLE, $environment)) {
+        if (($environment[self::AGENT_DETECTOR_DISABLE] ?? '') !== '') {
             return false;
         }
 
         foreach (self::AGENT_MARKERS as $name) {
-            if (array_key_exists($name, $environment)) {
+            if (($environment[$name] ?? '') !== '') {
                 return true;
             }
         }
