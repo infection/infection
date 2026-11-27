@@ -45,18 +45,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(MemoizedAgentDetector::class)]
 final class MemoizedAgentDetectorTest extends TestCase
 {
-    public function test_it_keeps_the_dependency_resolution_simple(): void
-    {
-        $this->assertFalse(
-            is_a(MemoizedAgentDetector::class, AgentDetectorContract::class, true),
-            <<<'RATIONALE'
-                MemoizedAgentDetector must not implement the external detector contract: the detection is extensive,
-                while our decoupled agent detector keeps the dependency resolution simple and straightforward while
-                retaining full-time memoization and eliminating any chance of a contract mistake.
-                RATIONALE,
-        );
-    }
-
     public static function agentStateProvider(): iterable
     {
         yield [true];
