@@ -37,7 +37,6 @@ namespace Infection\Tests\Environment;
 
 use Ergebnis\AgentDetector\Detector as AgentDetectorContract;
 use Infection\Environment\MemoizedAgentDetector;
-use function is_a;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
