@@ -155,12 +155,13 @@ jobs:
           TERM: xterm-256color
         run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
 
+      - name: Run the unit tests requiring turbocov
+        if: runner.os != 'Windows' && matrix.coverage-driver == 'turbocov'
+        run: vendor/bin/phpunit tests/phpunit/TestFramework/PhpUnit/Adapter/TurbocovCollectPathsProviderTest.php
+
       - name: Run the turbocov E2E tests
         if: runner.os != 'Windows' && matrix.coverage-driver == 'turbocov'
-        run: |
-          # Includes a unit test that requires turbocov to be loaded
-          vendor/bin/phpunit tests/phpunit/TestFramework/PhpUnit/Adapter/TurbocovCollectPathsProviderTest.php
-          ./tests/e2e_tests bin/infection Turbocov
+        run: ./tests/e2e_tests bin/infection Turbocov
 
       - name: Compile the prefixed PHAR
         if: &prefixed-phar-condition runner.os != 'Windows' && matrix.e2e-runner == 'dist/infection.phar' && matrix.php-version == '8.3'
