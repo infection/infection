@@ -37,6 +37,7 @@ namespace Infection\Tests\Environment;
 
 use Ergebnis\AgentDetector\Detector as AgentDetectorContract;
 use Infection\Environment\MemoizedAgentDetector;
+use function is_a;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +47,14 @@ final class MemoizedAgentDetectorTest extends TestCase
 {
     public function test_it_keeps_the_dependency_resolution_simple(): void
     {
-        $this->assertNotInstanceOf(AgentDetectorContract::class, MemoizedAgentDetector::class);
+        $this->assertFalse(
+            is_a(MemoizedAgentDetector::class, AgentDetectorContract::class, true),
+            <<<'RATIONALE'
+                MemoizedAgentDetector must not implement the external detector contract: the detection is extensive,
+                while our decoupled agent detector keeps the dependency resolution simple and straightforward while
+                retaining full-time memoization and eliminating any chance of a contract mistake.
+                RATIONALE,
+        );
     }
 
     public static function agentStateProvider(): iterable
