@@ -36,36 +36,23 @@ declare(strict_types=1);
 namespace Infection\Tests\Environment;
 
 use Infection\Environment\AgentDetector;
+use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(AgentDetector::class)]
 final class AgentDetectorTest extends TestCase
 {
-    public static function environmentProvider(): iterable
+    #[WithEnvironmentVariable('AGENT_DETECTOR_DISABLE', '1')]
+    public function test_it_ignores_an_agent_harness(): void
     {
-        yield 'unrelated variables' => [['PATH' => '/usr/bin', 'CI' => 'true'], false];
-
-        yield 'known agent' => [['CLAUDECODE' => '1'], true];
-
-        yield 'agent variable with an empty value does not mean a thing' => [['CODEX_SANDBOX' => ''], false];
-
-        yield 'last agent in the list' => [['REPL_ID' => 'x'], true];
-
-        yield 'generic AI_AGENT' => [['AI_AGENT' => 'my-agent'], true];
-
-        yield 'empty AGENT_DETECTOR_DISABLE does not opt out' => [['AGENT_DETECTOR_DISABLE' => '', 'AI_AGENT' => '1'], true];
-
-        yield 'AGENT_DETECTOR_DISABLE with a value opts out' => [['AGENT_DETECTOR_DISABLE' => '1', 'AI_AGENT' => '1'], false];
+        $this->assertFalse(SingletonContainer::getContainer()->get(AgentDetector::class)->isRunningInAgent());
     }
 
-    /**
-     * @param array<string, string> $environment
-     */
-    #[DataProvider('environmentProvider')]
-    public function test_it_detects_an_agent_harness(array $environment, bool $expected): void
+    #[WithEnvironmentVariable('AI_AGENT', '1')]
+    public function test_it_detects_an_agent_harness(): void
     {
-        $this->assertSame($expected, (new AgentDetector())->isRunningInAgent($environment));
+        $this->assertTrue(SingletonContainer::getContainer()->get(AgentDetector::class)->isRunningInAgent());
     }
 }

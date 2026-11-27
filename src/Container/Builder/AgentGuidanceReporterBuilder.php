@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Container\Builder;
 
-use function getenv;
 use Infection\Environment\AgentDetector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Reporter\AgentGuidanceReporter;
@@ -55,7 +54,7 @@ final readonly class AgentGuidanceReporterBuilder
 
     public function build(): ?AgentGuidanceReporter
     {
-        if (!$this->agentDetector->isRunningInAgent(getenv())) {
+        if (!$this->agentDetector->isRunningInAgent()) {
             return null;
         }
 

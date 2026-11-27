@@ -35,54 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Environment;
 
+use Ergebnis\AgentDetector\Detector;
+
 /**
  * @internal
  * @final
  */
 class AgentDetector
 {
-    /**
-     * @see https://github.com/shipfastlabs/agent-detector
-     * @see https://github.com/phpstan/phpstan-src/blob/2.1.x/src/Internal/AgentDetector.php
-     */
-    private const array AGENT_MARKERS = [
-        'AI_AGENT',
-        'AMP_CURRENT_THREAD_ID',
-        'AUGMENT_AGENT',
-        'CLAUDECODE',
-        'CLAUDE_CODE',
-        'CODEX_SANDBOX',
-        'CODEX_THREAD_ID',
-        'CURSOR_AGENT',
-        'CURSOR_TRACE_ID',
-        'GEMINI_CLI',
-        'OPENCODE',
-        'OPENCODE_CLIENT',
-        'REPL_ID',
-    ];
-
-    /**
-     * We match ergebnis/agent-detector to enable a future switch and offer a common user experience.
-     *
-     * @see https://github.com/ergebnis/agent-detector#disabling-the-detection
-     */
-    private const string AGENT_DETECTOR_DISABLE = 'AGENT_DETECTOR_DISABLE';
-
-    /**
-     * @param array<string, string> $environment
-     */
-    public function isRunningInAgent(array $environment): bool
+    public function __construct(private readonly Detector $detector)
     {
-        if (($environment[self::AGENT_DETECTOR_DISABLE] ?? '') !== '') {
-            return false;
-        }
+    }
 
-        foreach (self::AGENT_MARKERS as $name) {
-            if (($environment[$name] ?? '') !== '') {
-                return true;
-            }
-        }
-
-        return false;
+    public function isRunningInAgent(): bool
+    {
+        return $this->detector->isAgentPresent();
     }
 }
