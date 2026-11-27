@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PHPStan\Mutant;
 
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
@@ -97,5 +96,4 @@ final readonly class PHPStanMutantExecutionResultFactory implements MutantExecut
 
         return trim($process->getOutput() . "\n\n" . $process->getErrorOutput());
     }
-
 }
