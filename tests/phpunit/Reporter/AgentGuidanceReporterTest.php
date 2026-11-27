@@ -48,9 +48,11 @@ final class AgentGuidanceReporterTest extends TestCase
 {
     public static function escapedCountProvider(): iterable
     {
+        yield [0];
+
         yield [1];
 
-        yield [0];
+        yield [100];
     }
 
     #[DataProvider('escapedCountProvider')]
@@ -64,8 +66,8 @@ final class AgentGuidanceReporterTest extends TestCase
         (new AgentGuidanceReporter($output, $metricsCalculator))->report();
 
         match ($escapedCount) {
-            1 => $this->assertStringStartsWith("\nWhen dealing with escaped mutations", Str::toUnixLineEndings($output->fetch())),
-            default => $this->assertSame('', $output->fetch()),
+            0 => $this->assertSame('', $output->fetch()),
+            default => $this->assertStringStartsWith("\nWhen dealing with escaped mutations", Str::toUnixLineEndings($output->fetch())),
         };
     }
 }
