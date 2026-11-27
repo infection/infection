@@ -610,6 +610,41 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['ERRORS!', false];
 
         yield ['No tests executed!', true];
+
+        yield 'PAO reports passing tests' => [
+            '{"tool":"phpunit","result":"passed","tests":2,"passed":2,"assertions":3}',
+            true,
+        ];
+
+        yield 'PAO reports passing tests after bootstrap output' => [
+            "Bootstrap output\r\n{\"tool\":\"phpunit\",\"result\":\"passed\",\"tests\":2}\r\n",
+            true,
+        ];
+
+        yield 'PAO reports failing tests' => [
+            "OK (5 tests, 3 assertions)\n{\"tool\":\"phpunit\",\"result\":\"failed\",\"tests\":2,\"failures\":1}",
+            false,
+        ];
+
+        yield 'unrelated JSON does not report passing tests' => [
+            '{"tool":"other","result":"passed","tests":2}',
+            false,
+        ];
+
+        yield 'a PAO result must report the test count' => [
+            '{"tool":"phpunit","result":"passed"}',
+            false,
+        ];
+
+        yield 'invalid JSON leaves the text result intact' => [
+            "OK (5 tests, 3 assertions)\n{not JSON}",
+            true,
+        ];
+
+        yield 'an unknown PAO result leaves the text result intact' => [
+            "OK (5 tests, 3 assertions)\n{\"tool\":\"phpunit\",\"result\":\"unknown\",\"tests\":2}",
+            true,
+        ];
     }
 
     public static function syntaxErrorOutputProvider(): iterable

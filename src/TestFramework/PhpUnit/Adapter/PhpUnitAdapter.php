@@ -62,9 +62,16 @@ use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Log\PhpUnitLogger;
 use Infection\TestFramework\PhpUnit\MemoryLimiter;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use function is_array;
+use function is_int;
 use Override;
+use function rtrim;
+use Safe\Exceptions\JsonException;
+use function Safe\json_decode;
 use function Safe\preg_match;
 use function sprintf;
+use function str_ends_with;
+use function strrchr;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use function trim;
 use function version_compare;
@@ -275,6 +282,19 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
 
     public function testsPass(string $output): bool
     {
+        // Laravel PAO writes a JSON summary after any PHPUnit bootstrap output.
+        $trimmedOutput = rtrim($output);
+
+        if (str_ends_with($trimmedOutput, '}')) {
+            $lastLine = strrchr($trimmedOutput, "\n");
+
+            $paoResult = self::findPaoTestResult($lastLine === false ? $trimmedOutput : $lastLine);
+
+            if ($paoResult !== null) {
+                return $paoResult;
+            }
+        }
+
         if (preg_match('/failures!/i', $output) === 1) {
             return false;
         }
@@ -361,6 +381,26 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
     private function getInitialRunOnlyOptions(): array
     {
         return ['--configuration', '--filter', '--testsuite'];
+    }
+
+    private static function findPaoTestResult(string $output): ?bool
+    {
+        try {
+            /** @var array<array-key, mixed>|bool|float|int|string|null $summary */
+            $summary = json_decode($output, true);
+        } catch (JsonException) {
+            return null;
+        }
+
+        if (!is_array($summary) || ($summary['tool'] ?? null) !== 'phpunit' || !is_int($summary['tests'] ?? null)) {
+            return null;
+        }
+
+        return match ($summary['result'] ?? null) {
+            'passed' => true,
+            'failed' => false,
+            default => null,
+        };
     }
 
     private function getMemoryUsed(string $output): float
