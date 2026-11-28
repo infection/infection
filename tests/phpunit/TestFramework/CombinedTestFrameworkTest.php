@@ -85,6 +85,15 @@ final class CombinedTestFrameworkTest extends TestCase
 
         $followUpTestFramework = $this->createMock(TestFramework::class);
         $followUpProcess = $this->createStub(MutantProcess::class);
+        $followUpProcess
+            ->method('getMutantExecutionResult')
+            ->willReturn(
+                MutantExecutionResultBuilder::withMinimalTestData()
+                    ->withDetectionStatus(DetectionStatus::ESCAPED)
+                    ->build(),
+            )
+        ;
+        $lastProcess = $this->createStub(MutantProcess::class);
 
         $firstProcess = $this->createStub(MutantProcess::class);
         $firstProcess
@@ -110,10 +119,12 @@ final class CombinedTestFrameworkTest extends TestCase
             )
             ->method('test')
             ->with($this->identicalTo($mutant))
-            ->willReturnCallback(function () use ($state, $followUpProcess): MutantProcessContainer {
+            ->willReturnCallback(function () use ($state, $followUpProcess, $lastProcess): MutantProcessContainer {
                 $this->assertTrue($state->firstEvaluationFinished);
 
-                return MutantProcessContainer::from(static fn (): MutantProcess => $followUpProcess);
+                return MutantProcessContainer::from(static fn (): MutantProcess => $followUpProcess)
+                    ->append(static fn (): MutantProcess => $lastProcess)
+                ;
             })
         ;
 
@@ -128,6 +139,9 @@ final class CombinedTestFrameworkTest extends TestCase
         if ($hasNext) {
             $this->assertSame($followUpProcess, $evaluation->createNext());
             $this->assertSame($followUpProcess, $evaluation->getCurrent());
+            $this->assertTrue($evaluation->hasNext());
+            $this->assertSame($lastProcess, $evaluation->createNext());
+            $this->assertSame($lastProcess, $evaluation->getCurrent());
             $this->assertFalse($evaluation->hasNext());
         }
     }
