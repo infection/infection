@@ -80,7 +80,7 @@ final readonly class MagoMutantExecutionResultFactory implements MutantExecution
             $mutant->getPrettyPrintedOriginalCode(),
             $mutant->getMutatedCode(),
             $mutant->getTests(),
-            $mutantProcess->getFinishedAt() - $process->getStartTime(),
+            $mutantProcess->getRuntime(),
         );
     }
 

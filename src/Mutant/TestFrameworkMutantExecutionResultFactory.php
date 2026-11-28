@@ -74,7 +74,7 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
             $mutant->getPrettyPrintedOriginalCode(),
             $mutant->getMutatedCode(),
             $mutant->getTests(),
-            $mutantProcess->getFinishedAt() - $process->getStartTime(),
+            $mutantProcess->getRuntime(),
         );
     }
 

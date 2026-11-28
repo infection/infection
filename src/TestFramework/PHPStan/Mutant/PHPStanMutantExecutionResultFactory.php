@@ -80,7 +80,7 @@ final readonly class PHPStanMutantExecutionResultFactory implements MutantExecut
             $mutant->getPrettyPrintedOriginalCode(),
             $mutant->getMutatedCode(),
             $mutant->getTests(),
-            $mutantProcess->getFinishedAt() - $process->getStartTime(),
+            $mutantProcess->getRuntime(),
         );
     }
 

@@ -41,11 +41,7 @@ use Symfony\Component\Process\Process;
 /**
  * @internal
  *
- * Wraps a real Process to simulate a terminated process for dry-run mode.
- *
- * The real process is constructed normally but never started. This wrapper
- * presents it as already terminated with passing test output, causing
- * all mutants to be marked as ESCAPED.
+ * Completes successfully on start without launching a subprocess.
  */
 final class DryRunProcess extends Process
 {
@@ -55,27 +51,42 @@ final class DryRunProcess extends Process
      */
     public const string PASSING_TEST_OUTPUT = 'OK (0 tests, 0 assertions)';
 
+    private bool $started = false;
+
     public static function fromProcess(Process $process): self
     {
         return self::fromShellCommandline($process->getCommandLine());
     }
 
+    /**
+     * @param array<array-key, mixed> $env
+     */
+    #[Override]
+    public function start(?callable $callback = null, array $env = []): void
+    {
+        $this->started = true;
+
+        if ($callback !== null) {
+            $callback(self::OUT, self::PASSING_TEST_OUTPUT);
+        }
+    }
+
     #[Override]
     public function isTerminated(): bool
     {
-        return true;
+        return $this->started;
     }
 
     #[Override]
     public function isStarted(): bool
     {
-        return true;
+        return $this->started;
     }
 
     #[Override]
     public function getOutput(): string
     {
-        return self::PASSING_TEST_OUTPUT;
+        return $this->started ? self::PASSING_TEST_OUTPUT : '';
     }
 
     #[Override]
@@ -91,14 +102,16 @@ final class DryRunProcess extends Process
     }
 
     #[Override]
-    public function getExitCode(): int
+    public function getExitCode(): ?int
     {
-        return 0;
+        return $this->started ? 0 : null;
     }
 
     #[Override]
     public function getStatus(): string
     {
-        return Process::STATUS_TERMINATED;
+        return $this->started
+            ? self::STATUS_TERMINATED
+            : self::STATUS_READY;
     }
 }

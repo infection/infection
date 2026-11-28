@@ -847,12 +847,6 @@ parameters:
 			path: ../src/TestFramework/Mago/Mutant/MagoMutantDetectionStatusResolver.php
 
 		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\DetectionStatus
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactory.php
-
-		-
 			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResult
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 2
@@ -867,7 +861,7 @@ parameters:
 		-
 			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Process\MutantProcess
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 2
+			count: 1
 			path: ../src/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactory.php
 
 		-
@@ -1618,12 +1612,6 @@ parameters:
 			identifier: variable.unused
 			count: 1
 			path: ../tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php
-
-		-
-			rawMessage: Foreach value variable $item is never read.
-			identifier: foreach.unusedValue
-			count: 1
-			path: ../tests/phpunit/Process/Runner/DryProcessRunnerTest.php
 
 		-
 			rawMessage: Foreach value variable $value is never read.

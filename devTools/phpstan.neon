@@ -146,10 +146,6 @@ parameters:
             identifier: theCodingMachineSafe.function
             count: 2
             path: ../tests/phpunit/Process/OriginalPhpProcessTest.php
-        -
-            message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
-            count: 1
-            path: ../tests/phpunit/Process/Runner/DryProcessRunnerTest.php
 
         # SourceSymbolMatcher requires an enriched AST and is covered by ExcludeNonSelectedSourceNodesVisitorTest.
         -

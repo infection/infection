@@ -55,7 +55,7 @@ final class DryRunAwareProcessFactoryTest extends TestCase
         $this->assertSame(20.0, $process->getTimeout());
     }
 
-    public function test_it_creates_a_terminated_dry_run_process(): void
+    public function test_it_creates_an_unstarted_dry_run_process(): void
     {
         $command = ['php', 'tests with spaces.php'];
         $factory = new DryRunAwareProcessFactory(true);
@@ -63,12 +63,9 @@ final class DryRunAwareProcessFactoryTest extends TestCase
         $expectedCommandLine = (new Process($command))->getCommandLine();
 
         $this->assertInstanceOf(DryRunProcess::class, $process);
-        $this->assertTrue($process->isTerminated());
+        $this->assertFalse($process->isStarted());
         $this->assertSame($expectedCommandLine, $process->getCommandLine());
         $this->assertSame(['SHELL_VERBOSITY' => '0'], $process->getEnv());
         $this->assertSame(20.0, $process->getTimeout());
-        $this->assertSame(DryRunProcess::PASSING_TEST_OUTPUT, $process->getOutput());
-        $this->assertSame('', $process->getErrorOutput());
-        $this->assertSame(0, $process->getExitCode());
     }
 }
