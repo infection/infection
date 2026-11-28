@@ -25,7 +25,7 @@ final readonly class DummyCiDetector implements CiDetectorInterface
 
     public function isCiDetected(): bool
     {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+        return $this->ciDetected;
     }
 
     public function detect(): CiInterface
