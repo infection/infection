@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat;
 
 use Infection\Framework\CiDetector\MemoizedCiDetector;
+use Infection\Framework\ClassName;
 use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use OndraM\CiDetector\CiDetector;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
@@ -48,12 +50,12 @@ final class CiDetectionShouldStayBehindItsBoundaryTest
         return PHPat::rule()
             ->classes(InfectionSelector::sourceCode())
             ->excluding(
-                Selector::classname(MemoizedCiDetector::class),
+                Selector::inNamespace(ClassName::getNamespace(MemoizedCiDetector::class)), // @phpstan-ignore argument.type
             )
             ->shouldNot()
             ->dependOn()
-            ->classes(Selector::inNamespace('OndraM\CiDetector'))
-            ->because('Only MemoizedCiDetector should use ondram/ci-detector, so that there is one CI detector to wire.')
+            ->classes(Selector::inNamespace(ClassName::getNamespace(CiDetector::class))) // @phpstan-ignore argument.type
+            ->because('Only the CI detector boundary should use ondram/ci-detector; other code depends on MemoizedCiDetector.')
         ;
     }
 }

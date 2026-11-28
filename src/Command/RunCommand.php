@@ -42,7 +42,6 @@ use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\DebugOption;
 use Infection\Command\Option\MapSourceClassToTestOption;
 use Infection\Command\Option\PathsArgument;
-use Infection\Command\Option\ProgressOption;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Command\Option\TestFrameworkOption;
@@ -111,6 +110,10 @@ final class RunCommand extends BaseCommand
     private const string OPTION_STATIC_ANALYSIS_TOOL_OPTIONS = 'static-analysis-tool-options';
 
     private const string OPTION_WITH_UNCOVERED = 'with-uncovered';
+
+    private const string OPTION_NO_PROGRESS = 'no-progress';
+
+    private const string OPTION_FORCE_PROGRESS = 'force-progress';
 
     private const string OPTION_COVERAGE = 'coverage';
 
@@ -199,9 +202,19 @@ final class RunCommand extends BaseCommand
                 'Number of maximum escaped (and non-covered in verbose mode) mutations shown to the console. Use "max" to show all.',
                 Container::DEFAULT_SHOW_MUTATIONS,
             )
+            ->addOption(
+                self::OPTION_NO_PROGRESS,
+                null,
+                InputOption::VALUE_NONE,
+                'Do not output progress bars and mutation count during progress. Automatically enabled if a CI is detected',
+            )
+            ->addOption(
+                self::OPTION_FORCE_PROGRESS,
+                null,
+                InputOption::VALUE_NONE,
+                'Output progress bars and mutation count during progress even if a CI is detected',
+            )
         ;
-
-        ProgressOption::addOption($this);
 
         ConfigurationOption::addOption($this)
             ->addOption(
@@ -421,6 +434,18 @@ final class RunCommand extends BaseCommand
 
         $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
+        $noProgress = (bool) $input->getOption(self::OPTION_NO_PROGRESS);
+        $forceProgress = (bool) $input->getOption(self::OPTION_FORCE_PROGRESS);
+
+        Assert::false(
+            $noProgress && $forceProgress,
+            sprintf(
+                'Cannot pass both "%s" and "%s" option: use none or only one of them',
+                self::OPTION_NO_PROGRESS,
+                self::OPTION_FORCE_PROGRESS,
+            ),
+        );
+
         self::assertTestFrameworkOptionsAreNotBothProvided($io);
 
         return $this->getApplication()->getContainer()->withValues(
@@ -437,7 +462,9 @@ final class RunCommand extends BaseCommand
                 $commandHelper,
                 (bool) $input->getOption(self::OPTION_TEAMCITY),
             ),
-            noProgress: ProgressOption::get($io),
+            // To keep in sync with Container::DEFAULT_NO_PROGRESS
+            noProgress: $noProgress,
+            forceProgress: $forceProgress,
             existingCoveragePath: $commandHelper->getStringOption(self::OPTION_COVERAGE, Container::DEFAULT_EXISTING_COVERAGE_PATH),
             initialTestsPhpOptions: InitialTestsPhpOptionsOption::get($io),
             // To keep in sync with Container::DEFAULT_SKIP_INITIAL_TESTS

@@ -368,7 +368,7 @@ final class ConfigurationFactoryScenario
 
     public function forValueForNoProgress(
         bool $ciDetected,
-        ?bool $noProgress,
+        bool $noProgress,
         bool $expectedNoProgress,
     ): self {
         $previousExpected = $this->expected;

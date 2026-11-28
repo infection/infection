@@ -91,6 +91,7 @@ use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
 use Infection\Framework\CiDetector\MemoizedCiDetector;
+use Infection\Framework\CiDetector\NullCiDetector;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
@@ -232,7 +233,9 @@ final class Container extends DIContainer
 
     public const bool DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES = false;
 
-    public const null DEFAULT_NO_PROGRESS = null;
+    public const bool DEFAULT_NO_PROGRESS = false;
+
+    public const bool DEFAULT_FORCE_PROGRESS = false;
 
     public const null DEFAULT_EXISTING_COVERAGE_PATH = null;
 
@@ -706,7 +709,8 @@ final class Container extends DIContainer
         bool $debug = self::DEFAULT_DEBUG,
         bool $withUncovered = self::DEFAULT_WITH_UNCOVERED,
         MutationAnalysisLoggerName $loggerName = self::DEFAULT_FORMATTER_NAME,
-        ?bool $noProgress = self::DEFAULT_NO_PROGRESS,
+        bool $noProgress = self::DEFAULT_NO_PROGRESS,
+        bool $forceProgress = self::DEFAULT_FORCE_PROGRESS,
         ?string $existingCoveragePath = self::DEFAULT_EXISTING_COVERAGE_PATH,
         ?string $initialTestsPhpOptions = self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
         bool $skipInitialTests = self::DEFAULT_SKIP_INITIAL_TESTS,
@@ -737,6 +741,17 @@ final class Container extends DIContainer
         ?string $mutantId = self::DEFAULT_MUTANT_ID,
     ): self {
         $clone = clone $this;
+
+        if ($forceProgress) {
+            Assert::false($noProgress, 'Cannot force progress and set no progress at the same time');
+        }
+
+        $clone->offsetSet(
+            MemoizedCiDetector::class,
+            static fn (): MemoizedCiDetector => $forceProgress
+                ? new MemoizedCiDetector(new NullCiDetector())
+                : new MemoizedCiDetector(),
+        );
 
         $clone->offsetSet(
             LoggerInterface::class,

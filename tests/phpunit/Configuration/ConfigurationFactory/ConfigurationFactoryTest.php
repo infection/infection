@@ -182,7 +182,7 @@ final class ConfigurationFactoryTest extends TestCase
                 logVerbosity: 'none',
                 debug: false,
                 withUncovered: false,
-                noProgress: null,
+                noProgress: false,
                 ignoreMsiWithNoMutations: false,
                 minMsi: null,
                 numberOfShownMutations: 0,
@@ -256,7 +256,7 @@ final class ConfigurationFactoryTest extends TestCase
             logVerbosity: LogVerbosity::NONE,
             debug: false,
             withUncovered: false,
-            noProgress: null,
+            noProgress: false,
             ignoreMsiWithNoMutations: false,
             minMsi: null,
             numberOfShownMutations: 0,
@@ -571,49 +571,33 @@ final class ConfigurationFactoryTest extends TestCase
 
         yield 'progress in non-CI environment' => [
             $defaultScenario->forValueForNoProgress(
-                ciDetected: false,
-                noProgress: null,
-                expectedNoProgress: false,
+                false,
+                false,
+                false,
             ),
         ];
 
-        yield 'no progress in CI environment by default' => [
+        yield 'progress in CI environment' => [
             $defaultScenario->forValueForNoProgress(
-                ciDetected: true,
-                noProgress: null,
-                expectedNoProgress: true,
+                true,
+                false,
+                true,
             ),
         ];
 
         yield 'no progress in non-CI environment' => [
             $defaultScenario->forValueForNoProgress(
-                ciDetected: false,
-                noProgress: true,
-                expectedNoProgress: true,
+                false,
+                true,
+                true,
             ),
         ];
 
         yield 'no progress in CI environment' => [
             $defaultScenario->forValueForNoProgress(
-                ciDetected: true,
-                noProgress: true,
-                expectedNoProgress: true,
-            ),
-        ];
-
-        yield 'forced progress in non-CI environment' => [
-            $defaultScenario->forValueForNoProgress(
-                ciDetected: false,
-                noProgress: false,
-                expectedNoProgress: false,
-            ),
-        ];
-
-        yield 'forced progress in CI environment' => [
-            $defaultScenario->forValueForNoProgress(
-                ciDetected: true,
-                noProgress: false,
-                expectedNoProgress: false,
+                true,
+                true,
+                true,
             ),
         ];
 
