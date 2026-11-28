@@ -54,11 +54,6 @@ use Webmozart\Assert\Assert;
  * setting when it is not configured, be it in the PHP configuration or in the
  * initial tests PHP options.
  *
- * When it is configured for the Infection process only, e.g. with
- * `php -d turbocov.collect_paths=src infection`, it is forwarded to the initial
- * test run: unlike the PHP configuration, the `-d` options of the Infection
- * process are not inherited by it.
- *
  * @see https://github.com/shipmonk-rnd/turbocov#settings
  *
  * @internal
@@ -92,7 +87,6 @@ readonly class TurbocovCollectPathsProvider
         try {
             $collectPathsIniValue = ini_get('turbocov.collect_paths');
         } catch (InfoException) {
-            // turbocov is not loaded in the Infection process
             $collectPathsIniValue = null;
         }
 
@@ -105,18 +99,14 @@ readonly class TurbocovCollectPathsProvider
 
     public function shouldProvide(): bool
     {
-        // A setting explicitly passed for the initial test run takes precedence.
         if ($this->isCollectPathsSetInInitialTestsPhpOptions()) {
             return false;
         }
 
-        // turbocov is loaded in the Infection process: its setting is either
-        // provided or forwarded.
         if ($this->collectPathsIniValue !== null) {
             return true;
         }
 
-        // turbocov may be loaded for the initial test run only.
         return $this->isTurbocovLoadedInInitialTestsPhpOptions();
     }
 
