@@ -56,12 +56,8 @@ class MutantProcessContainerFactory
 
     private const int TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
 
-    /**
-     * @param list<LazyMutantProcessFactory> $lazyMutantProcessCreators
-     */
     public function __construct(
         private readonly float $timeout,
-        private readonly array $lazyMutantProcessCreators,
         private readonly Configuration $configuration,
     ) {
     }
@@ -90,13 +86,12 @@ class MutantProcessContainerFactory
             $process = DryRunProcess::fromProcess($process);
         }
 
-        return new MutantProcessContainer(
-            new MutantProcess(
+        return MutantProcessContainer::from(
+            static fn (): MutantProcess => new MutantProcess(
                 $process,
                 $mutant,
                 new TestFrameworkMutantExecutionResultFactory($testFrameworkAdapter),
             ),
-            $this->lazyMutantProcessCreators,
         );
     }
 }
