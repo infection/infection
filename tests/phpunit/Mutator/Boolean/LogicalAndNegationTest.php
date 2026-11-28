@@ -54,6 +54,14 @@ final class LogicalAndNegationTest extends BaseMutatorTestCase
 
     public static function mutationsProvider(): iterable
     {
+        yield 'It does not mutate logical and used as a statement' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    isset($key) && $this->save($key);
+                    PHP,
+            ),
+        ];
+
         yield 'It mutates and with two expressions' => [
             self::wrapCodeInMethod(
                 <<<'PHP'
