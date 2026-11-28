@@ -55,6 +55,7 @@ use Infection\Reporter\PerMutatorReporter;
 use Infection\Reporter\Reporter;
 use Infection\Reporter\SummaryFileReporter;
 use Infection\Reporter\SummaryJsonReporter;
+use Infection\Reporter\SvgBadgeReporter;
 use Infection\Reporter\TextFileReporter;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -97,6 +98,7 @@ final class FileReporterFactoryTest extends TestCase
                 null,
                 '/a/file',
                 null,
+                '/a/file',
             ),
         );
 
@@ -139,6 +141,7 @@ final class FileReporterFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
             ),
             [TextFileReporter::class],
         ];
@@ -153,6 +156,7 @@ final class FileReporterFactoryTest extends TestCase
                 null,
                 null,
                 false,
+                null,
                 null,
                 null,
                 null,
@@ -173,6 +177,7 @@ final class FileReporterFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
             ),
             [GitHubActionsLogTextFileReporter::class, GitHubAnnotationsReporter::class],
         ];
@@ -187,6 +192,7 @@ final class FileReporterFactoryTest extends TestCase
                 null,
                 null,
                 false,
+                null,
                 null,
                 null,
                 null,
@@ -207,6 +213,7 @@ final class FileReporterFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
             ),
             [SummaryFileReporter::class],
         ];
@@ -221,6 +228,7 @@ final class FileReporterFactoryTest extends TestCase
                 'debug_file',
                 null,
                 false,
+                null,
                 null,
                 null,
                 null,
@@ -241,6 +249,7 @@ final class FileReporterFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
             ),
             [JsonReporter::class],
         ];
@@ -255,6 +264,7 @@ final class FileReporterFactoryTest extends TestCase
                 null,
                 null,
                 false,
+                null,
                 null,
                 null,
                 null,
@@ -275,6 +285,7 @@ final class FileReporterFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
             ),
             [PerMutatorReporter::class],
         ];
@@ -289,6 +300,7 @@ final class FileReporterFactoryTest extends TestCase
                 null,
                 null,
                 true,
+                null,
                 null,
                 null,
                 null,
@@ -309,8 +321,27 @@ final class FileReporterFactoryTest extends TestCase
                 null,
                 'summary-json',
                 null,
+                null,
             ),
             [SummaryJsonReporter::class],
+        ];
+
+        yield 'svg-badge reporter' => [
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false,
+                null,
+                null,
+                null,
+                'svg-badge',
+            ),
+            [SvgBadgeReporter::class],
         ];
 
         yield 'all reporters' => [
@@ -326,6 +357,7 @@ final class FileReporterFactoryTest extends TestCase
                 StrykerConfig::forBadge('branch'),
                 'summary-json',
                 null,
+                'svg-badge',
             ),
             [
                 TextFileReporter::class,
@@ -336,6 +368,7 @@ final class FileReporterFactoryTest extends TestCase
                 DebugFileReporter::class,
                 PerMutatorReporter::class,
                 SummaryJsonReporter::class,
+                SvgBadgeReporter::class,
                 GitHubAnnotationsReporter::class,
             ],
         ];

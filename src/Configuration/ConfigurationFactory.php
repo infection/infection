@@ -539,6 +539,10 @@ class ConfigurationFactory
                 $logs->debugEventsLogFilePath,
                 $configDir,
             ),
+            self::pathToAbsolute(
+                $logs->svgBadgeLogFilePath,
+                $configDir,
+            ),
         );
     }
 

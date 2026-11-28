@@ -383,6 +383,20 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
+        yield 'svg badge relative path' => [
+            $defaultScenario->forValueForSvgBadgeLogFilePath(
+                'var/badge.svg',
+                '/path/to/var/badge.svg',
+            ),
+        ];
+
+        yield 'svg badge absolute path' => [
+            $defaultScenario->forValueForSvgBadgeLogFilePath(
+                '/var/badge.svg',
+                '/var/badge.svg',
+            ),
+        ];
+
         yield 'null html file log path' => [
             $defaultScenario->forValueForHtmlLogFilePath(
                 '/path/to/from-config.html',
@@ -1775,6 +1789,7 @@ final class ConfigurationFactoryTest extends TestCase
                             ->withStrykerConfig(StrykerConfig::forFullReport('master'))
                             ->withSummaryJsonLogFilePath('/summary.json')
                             ->withDebugEventsLogFilePath('/debug-events.jsonl')
+                            ->withSvgBadgeLogFilePath('/badge.svg')
                             ->build(),
                     )
                     ->withTmpDir('config/tmp')
@@ -1858,6 +1873,7 @@ final class ConfigurationFactoryTest extends TestCase
                             ->withStrykerConfig(StrykerConfig::forFullReport('master'))
                             ->withSummaryJsonLogFilePath('/summary.json')
                             ->withDebugEventsLogFilePath('/debug-events.jsonl')
+                            ->withSvgBadgeLogFilePath('/badge.svg')
                             ->build(),
                     )
                     ->withLogVerbosity(LogVerbosity::NONE)

@@ -161,6 +161,7 @@ final class SchemaConfigurationBuilder
                 strykerConfig: StrykerConfig::forBadge('master'),
                 summaryJsonLogFilePath: 'summary.json',
                 debugEventsLogFilePath: null,
+                svgBadgeLogFilePath: null,
             ),
             tmpDir: '/tmp/infection',
             phpUnit: new PhpUnit('/config/phpunit', '/custom/phpunit'),

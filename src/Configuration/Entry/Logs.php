@@ -53,6 +53,7 @@ class Logs
         private readonly ?StrykerConfig $strykerConfig,
         private ?string $summaryJsonLogFilePath,
         public readonly ?string $debugEventsLogFilePath,
+        public readonly ?string $svgBadgeLogFilePath,
     ) {
     }
 
@@ -67,6 +68,7 @@ class Logs
             null,
             null,
             false,
+            null,
             null,
             null,
             null,
