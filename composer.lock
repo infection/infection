@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0fb35de40e95f7ac292709b9452be96b",
+    "content-hash": "4e85f8671e1eb47787b40fc17304a2f8",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -1096,7 +1096,8 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-11-09T10:32:19+00:00"
+            "time": "2026-11-09T10:32:19+00:00",
+            "published-time": "2026-11-09T10:34:41+00:00"
         },
         {
             "name": "sanmai/duoclock",
