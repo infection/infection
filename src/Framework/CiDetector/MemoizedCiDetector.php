@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Framework\CiDetector;
 
 use Later\Interfaces\Deferred;
-use function Later\later;
+use function Later\lazy;
 use OndraM\CiDetector\Ci\CiInterface;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
@@ -57,13 +57,7 @@ final readonly class MemoizedCiDetector
 
     public function __construct(CiDetectorInterface $detector = new CiDetector())
     {
-        $this->ci = later(static function () use ($detector) {
-            try {
-                yield $detector->detect();
-            } catch (CiNotDetectedException) {
-                yield null;
-            }
-        });
+        $this->ci = lazy(self::wrapDetector($detector));
     }
 
     public function isCiDetected(): bool
@@ -79,5 +73,17 @@ final readonly class MemoizedCiDetector
     public function findCi(): ?CiInterface
     {
         return $this->ci->get();
+    }
+
+    /**
+     * @return iterable<CiInterface|null>
+     */
+    private static function wrapDetector(CiDetectorInterface $detector): iterable
+    {
+        try {
+            yield $detector->detect();
+        } catch (CiNotDetectedException) {
+            yield null;
+        }
     }
 }
