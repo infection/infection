@@ -183,7 +183,7 @@ final class TurbocovCollectPathsProviderTest extends TestCase
         $this->assertSame($expected, $provider->getCollectPaths());
     }
 
-    public function test_it_passes_nothing_when_turbocov_is_not_loaded_in_the_infection_process(): void
+    public function test_it_passes_nothing_when_turbocov_is_not_loaded(): void
     {
         if (extension_loaded('turbocov')) {
             $this->markTestSkipped('Test requires turbocov to be disabled to run.');
