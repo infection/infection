@@ -84,6 +84,5 @@ jobs:
                exit 1 ;;
           esac
 
-          # Unambiguous now that exactly one draft exists for the tag.
           gh release upload "${GITHUB_REF_NAME}" dist/infection.phar dist/infection.phar.asc --clobber
           gh api -X PATCH "repos/${GITHUB_REPOSITORY}/releases/${release_id}" -F draft=false -f make_latest=legacy > /dev/null
