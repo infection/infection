@@ -62,8 +62,28 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release view "${GITHUB_REF_NAME}" > /dev/null 2>&1 \
-            || gh release create "${GITHUB_REF_NAME}" --verify-tag --draft --title "${GITHUB_REF_NAME}" --generate-notes
+          set -euo pipefail
 
+          # Fails the job on API errors instead of treating them as "no release".
+          releases="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/releases" \
+            --jq '.[] | select(.tag_name == env.GITHUB_REF_NAME) | "\(.id) \(.draft)"')"
+
+          if grep -q ' false$' <<< "$releases"; then
+            echo "::error::Release ${GITHUB_REF_NAME} is already published."
+            exit 1
+          fi
+
+          drafts="$(grep -c ' true$' <<< "$releases" || true)"
+
+          case "$drafts" in
+            0) release_id="$(gh api -X POST "repos/${GITHUB_REPOSITORY}/releases" \
+                 -f tag_name="${GITHUB_REF_NAME}" -f name="${GITHUB_REF_NAME}" \
+                 -F draft=true -F generate_release_notes=true --jq .id)" ;;
+            1) release_id="${releases%% *}" ;;
+            *) echo "::error::Found ${drafts} drafts for ${GITHUB_REF_NAME}, expected one."
+               exit 1 ;;
+          esac
+
+          # Unambiguous now that exactly one draft exists for the tag.
           gh release upload "${GITHUB_REF_NAME}" dist/infection.phar dist/infection.phar.asc --clobber
-          gh release edit "${GITHUB_REF_NAME}" --draft=false
+          gh api -X PATCH "repos/${GITHUB_REPOSITORY}/releases/${release_id}" -F draft=false -f make_latest=legacy > /dev/null
