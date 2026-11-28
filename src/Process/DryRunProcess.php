@@ -79,6 +79,12 @@ final class DryRunProcess extends Process
     }
 
     #[Override]
+    public function getErrorOutput(): string
+    {
+        return '';
+    }
+
+    #[Override]
     public function getStartTime(): float
     {
         return 0.0;
