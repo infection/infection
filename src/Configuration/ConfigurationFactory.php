@@ -58,6 +58,7 @@ use Infection\Configuration\SourceFilter\SourceFileFilter;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Framework\CiDetector\MemoizedCiDetector;
 use Infection\Git\Git;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
@@ -69,9 +70,6 @@ use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
 use function ltrim;
-use OndraM\CiDetector\CiDetector;
-use OndraM\CiDetector\CiDetectorInterface;
-use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PhpParser\Node;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
@@ -96,7 +94,7 @@ class ConfigurationFactory
         private readonly MutatorResolver $mutatorResolver,
         private readonly MutatorFactory $mutatorFactory,
         private readonly MutatorParser $mutatorParser,
-        private readonly CiDetectorInterface $ciDetector,
+        private readonly MemoizedCiDetector $ciDetector,
         private readonly Git $git,
         private readonly ProjectDirectoryProvider $projectDirectoryProvider,
         private readonly CpuCoresCountProvider $cpuCoresCountProvider,
@@ -121,7 +119,7 @@ class ConfigurationFactory
         string $logVerbosity,
         bool $debug,
         bool $withUncovered,
-        bool $noProgress,
+        ?bool $noProgress,
         ?bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         ?int $numberOfShownMutations,
@@ -371,9 +369,9 @@ class ConfigurationFactory
         return $staticAnalysisToolOptions ?? $schema->staticAnalysisToolOptions;
     }
 
-    private function retrieveNoProgress(bool $noProgress): bool
+    private function retrieveNoProgress(?bool $noProgress): bool
     {
-        return $noProgress || $this->ciDetector->isCiDetected();
+        return $noProgress ?? $this->ciDetector->isCiDetected();
     }
 
     private static function retrieveIgnoreMsiWithNoMutations(
@@ -482,7 +480,7 @@ class ConfigurationFactory
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath, ?string $summaryJsonLogFilePath): Logs
     {
-        $useGitHubLogger ??= $this->detectCiGithubActions();
+        $useGitHubLogger ??= $this->ciDetector->isGitHubActions();
 
         if ($useGitHubLogger) {
             $logs->setUseGitHubAnnotationsLogger($useGitHubLogger);
@@ -520,17 +518,6 @@ class ConfigurationFactory
                 $configDir,
             ),
         );
-    }
-
-    private function detectCiGithubActions(): bool
-    {
-        try {
-            $ci = $this->ciDetector->detect();
-        } catch (CiNotDetectedException) {
-            return false;
-        }
-
-        return $ci->getCiName() === CiDetector::CI_GITHUB_ACTIONS;
     }
 
     private static function pathToAbsolute(

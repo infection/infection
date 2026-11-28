@@ -33,27 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Framework\CiDetector;
+namespace Infection\Tests\Architecture\PHPat;
 
-use OndraM\CiDetector\Ci\CiInterface;
-use OndraM\CiDetector\CiDetectorInterface;
-use OndraM\CiDetector\Exception\CiNotDetectedException;
-use Override;
+use Infection\Framework\CiDetector\MemoizedCiDetector;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-/**
- * @internal
- */
-final class NullCiDetector implements CiDetectorInterface
+final class CiDetectionShouldStayBehindItsBoundaryTest
 {
-    #[Override]
-    public function isCiDetected(): bool
+    public function testTheVendorCiDetectorIsOnlyUsedBehindTheBoundary(): Rule
     {
-        return false;
-    }
-
-    #[Override]
-    public function detect(): CiInterface
-    {
-        throw new CiNotDetectedException('No CI server detectable with this detector');
+        return PHPat::rule()
+            ->classes(InfectionSelector::sourceCode())
+            ->excluding(
+                Selector::classname(MemoizedCiDetector::class),
+            )
+            ->shouldNot()
+            ->dependOn()
+            ->classes(Selector::inNamespace('OndraM\CiDetector'))
+            ->because('Only MemoizedCiDetector should use ondram/ci-detector, so that there is one CI detector to wire.')
+        ;
     }
 }

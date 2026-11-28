@@ -368,7 +368,7 @@ final class ConfigurationFactoryScenario
 
     public function forValueForNoProgress(
         bool $ciDetected,
-        bool $noProgress,
+        ?bool $noProgress,
         bool $expectedNoProgress,
     ): self {
         $previousExpected = $this->expected;
@@ -408,6 +408,8 @@ final class ConfigurationFactoryScenario
             )
             ->withExpected(
                 ConfigurationBuilder::from($previousExpected)
+                    // GitHub Actions is a CI: progress is off by default there.
+                    ->withNoProgress($githubActionsDetected)
                     ->withLogs(
                         LogsBuilder::from($previousExpected->logs)
                             ->withUseGitHubAnnotationsLogger($useGitHubAnnotationsLogger)

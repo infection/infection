@@ -37,6 +37,7 @@ namespace Infection\Tests\Reporter;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\Framework\CiDetector\MemoizedCiDetector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
@@ -181,7 +182,7 @@ final class StrykerReporterFactoryTest extends TestCase
         return new StrykerReporterFactory(
             new MetricsCalculator(2),
             new StrykerHtmlReportBuilder($metricsCalculator, new ResultsCollector()),
-            new FakeCiDetector(),
+            new MemoizedCiDetector(new FakeCiDetector()),
             new FakeLogger(),
         );
     }

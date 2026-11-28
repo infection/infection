@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Framework\CiDetector;
 
 use Infection\Framework\CiDetector\MemoizedCiDetector;
-use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use OndraM\CiDetector\Ci\CiInterface;
+use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -47,8 +47,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(MemoizedCiDetector::class)]
 final class MemoizedCiDetectorTest extends TestCase
 {
-    use ExpectsThrowables;
-
     public function test_it_defers_detection_until_needed(): void
     {
         $decoratedDetector = $this->createMock(CiDetectorInterface::class);
@@ -60,10 +58,19 @@ final class MemoizedCiDetectorTest extends TestCase
         new MemoizedCiDetector($decoratedDetector);
     }
 
-    #[DataProvider('detectionOrderProvider')]
-    public function test_it_memoizes_the_detected_ci(bool $detectFirst): void
+    public static function ciNameProvider(): iterable
+    {
+        yield 'GitHub Actions' => [CiDetector::CI_GITHUB_ACTIONS, true];
+
+        yield 'another CI' => [CiDetector::CI_GITLAB, false];
+    }
+
+    #[DataProvider('ciNameProvider')]
+    public function test_it_memoizes_the_detected_ci(string $ciName, bool $expectedGitHubActions): void
     {
         $ci = $this->createStub(CiInterface::class);
+        $ci->method('getCiName')->willReturn($ciName);
+
         $decoratedDetector = $this->createMock(CiDetectorInterface::class);
         $decoratedDetector
             ->expects($this->once())
@@ -73,49 +80,26 @@ final class MemoizedCiDetectorTest extends TestCase
 
         $detector = new MemoizedCiDetector($decoratedDetector);
 
-        if ($detectFirst) {
-            $this->assertSame($ci, $detector->detect());
-        }
-
+        $this->assertSame($ci, $detector->findCi());
         $this->assertTrue($detector->isCiDetected());
-        $this->assertSame($ci, $detector->detect());
-        $this->assertTrue($detector->isCiDetected());
-        $this->assertSame($ci, $detector->detect());
+        $this->assertSame($expectedGitHubActions, $detector->isGitHubActions());
+        $this->assertSame($ci, $detector->findCi());
     }
 
-    #[DataProvider('detectionOrderProvider')]
-    public function test_it_memoizes_the_absence_of_ci(bool $detectFirst): void
+    public function test_it_memoizes_the_absence_of_ci(): void
     {
-        $exception = new CiNotDetectedException('No CI server detected');
-
         $decoratedDetector = $this->createMock(CiDetectorInterface::class);
         $decoratedDetector
             ->expects($this->once())
             ->method('detect')
-            ->willThrowException($exception)
+            ->willThrowException(new CiNotDetectedException())
         ;
 
         $detector = new MemoizedCiDetector($decoratedDetector);
 
-        if (!$detectFirst) {
-            $this->assertFalse($detector->isCiDetected());
-        }
-
-        $actual1 = $this->expectToThrow($detector->detect(...));
-
+        $this->assertNull($detector->findCi());
         $this->assertFalse($detector->isCiDetected());
-        $this->assertFalse($detector->isCiDetected());
-
-        $actual2 = $this->expectToThrow($detector->detect(...));
-
-        $this->assertSame($exception, $actual1);
-        $this->assertSame($exception, $actual2);
-    }
-
-    public static function detectionOrderProvider(): iterable
-    {
-        yield 'detect() called first' => [true];
-
-        yield 'isCiDetected() called first' => [false];
+        $this->assertFalse($detector->isGitHubActions());
+        $this->assertNull($detector->findCi());
     }
 }

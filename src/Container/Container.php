@@ -91,7 +91,6 @@ use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
 use Infection\Framework\CiDetector\MemoizedCiDetector;
-use Infection\Framework\CiDetector\NullCiDetector;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
@@ -181,8 +180,6 @@ use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
-use OndraM\CiDetector\CiDetector;
-use OndraM\CiDetector\CiDetectorInterface;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinterAbstract;
@@ -235,9 +232,7 @@ final class Container extends DIContainer
 
     public const bool DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES = false;
 
-    public const bool DEFAULT_NO_PROGRESS = false;
-
-    public const bool DEFAULT_FORCE_PROGRESS = false;
+    public const null DEFAULT_NO_PROGRESS = null;
 
     public const null DEFAULT_EXISTING_COVERAGE_PATH = null;
 
@@ -711,8 +706,7 @@ final class Container extends DIContainer
         bool $debug = self::DEFAULT_DEBUG,
         bool $withUncovered = self::DEFAULT_WITH_UNCOVERED,
         MutationAnalysisLoggerName $loggerName = self::DEFAULT_FORMATTER_NAME,
-        bool $noProgress = self::DEFAULT_NO_PROGRESS,
-        bool $forceProgress = self::DEFAULT_FORCE_PROGRESS,
+        ?bool $noProgress = self::DEFAULT_NO_PROGRESS,
         ?string $existingCoveragePath = self::DEFAULT_EXISTING_COVERAGE_PATH,
         ?string $initialTestsPhpOptions = self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
         bool $skipInitialTests = self::DEFAULT_SKIP_INITIAL_TESTS,
@@ -743,17 +737,6 @@ final class Container extends DIContainer
         ?string $mutantId = self::DEFAULT_MUTANT_ID,
     ): self {
         $clone = clone $this;
-
-        if ($forceProgress) {
-            Assert::false($noProgress, 'Cannot force progress and set no progress at the same time');
-        }
-
-        $clone->offsetSet(
-            CiDetectorInterface::class,
-            static fn (): CiDetectorInterface => $forceProgress
-                ? new NullCiDetector()
-                : new MemoizedCiDetector(new CiDetector()),
-        );
 
         $clone->offsetSet(
             LoggerInterface::class,
@@ -1038,9 +1021,9 @@ final class Container extends DIContainer
         return $this->get(AdapterInstaller::class);
     }
 
-    public function getCiDetector(): CiDetectorInterface
+    public function getCiDetector(): MemoizedCiDetector
     {
-        return $this->get(CiDetectorInterface::class);
+        return $this->get(MemoizedCiDetector::class);
     }
 
     public function getLogger(): LoggerInterface

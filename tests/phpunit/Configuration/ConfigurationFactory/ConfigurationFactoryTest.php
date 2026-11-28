@@ -56,6 +56,7 @@ use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\LogVerbosity;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Framework\CiDetector\MemoizedCiDetector;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
@@ -181,7 +182,7 @@ final class ConfigurationFactoryTest extends TestCase
                 logVerbosity: 'none',
                 debug: false,
                 withUncovered: false,
-                noProgress: false,
+                noProgress: null,
                 ignoreMsiWithNoMutations: false,
                 minMsi: null,
                 numberOfShownMutations: 0,
@@ -255,7 +256,7 @@ final class ConfigurationFactoryTest extends TestCase
             logVerbosity: LogVerbosity::NONE,
             debug: false,
             withUncovered: false,
-            noProgress: false,
+            noProgress: null,
             ignoreMsiWithNoMutations: false,
             minMsi: null,
             numberOfShownMutations: 0,
@@ -570,33 +571,49 @@ final class ConfigurationFactoryTest extends TestCase
 
         yield 'progress in non-CI environment' => [
             $defaultScenario->forValueForNoProgress(
-                false,
-                false,
-                false,
+                ciDetected: false,
+                noProgress: null,
+                expectedNoProgress: false,
             ),
         ];
 
-        yield 'progress in CI environment' => [
+        yield 'no progress in CI environment by default' => [
             $defaultScenario->forValueForNoProgress(
-                true,
-                false,
-                true,
+                ciDetected: true,
+                noProgress: null,
+                expectedNoProgress: true,
             ),
         ];
 
         yield 'no progress in non-CI environment' => [
             $defaultScenario->forValueForNoProgress(
-                false,
-                true,
-                true,
+                ciDetected: false,
+                noProgress: true,
+                expectedNoProgress: true,
             ),
         ];
 
         yield 'no progress in CI environment' => [
             $defaultScenario->forValueForNoProgress(
-                true,
-                true,
-                true,
+                ciDetected: true,
+                noProgress: true,
+                expectedNoProgress: true,
+            ),
+        ];
+
+        yield 'forced progress in non-CI environment' => [
+            $defaultScenario->forValueForNoProgress(
+                ciDetected: false,
+                noProgress: false,
+                expectedNoProgress: false,
+            ),
+        ];
+
+        yield 'forced progress in CI environment' => [
+            $defaultScenario->forValueForNoProgress(
+                ciDetected: true,
+                noProgress: false,
+                expectedNoProgress: false,
             ),
         ];
 
@@ -1806,7 +1823,7 @@ final class ConfigurationFactoryTest extends TestCase
             SingletonContainer::getContainer()->getMutatorResolver(),
             SingletonContainer::getContainer()->getMutatorFactory(),
             new MutatorParser(),
-            new DummyCiDetector($ciDetected, $githubActionsDetected),
+            new MemoizedCiDetector(new DummyCiDetector($ciDetected, $githubActionsDetected)),
             new ConfigurationFactoryGit(
                 self::GIT_DEFAULT_BASE,
             ),

@@ -38,6 +38,7 @@ namespace Infection\Tests\Reporter;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
+use Infection\Framework\CiDetector\MemoizedCiDetector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
@@ -78,7 +79,7 @@ final class StrykerReporterTest extends TestCase
         $this->logger = new DummyLogger();
 
         $this->reporter = new StrykerReporter(
-            new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
+            new BuildContextResolver(new MemoizedCiDetector(CiDetector::fromEnvironment($this->ciDetectorEnv))),
             new StrykerApiKeyResolver(),
             $this->strykerDashboardClient,
             $this->metricsCalculatorMock,
@@ -238,7 +239,7 @@ final class StrykerReporterTest extends TestCase
         ;
 
         $strykerLogger = new StrykerReporter(
-            new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
+            new BuildContextResolver(new MemoizedCiDetector(CiDetector::fromEnvironment($this->ciDetectorEnv))),
             new StrykerApiKeyResolver(),
             $this->strykerDashboardClient,
             $this->metricsCalculatorMock,
@@ -351,7 +352,7 @@ final class StrykerReporterTest extends TestCase
         ;
 
         $strykerLogger = new StrykerReporter(
-            new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
+            new BuildContextResolver(new MemoizedCiDetector(CiDetector::fromEnvironment($this->ciDetectorEnv))),
             new StrykerApiKeyResolver(),
             $this->strykerDashboardClient,
             $this->metricsCalculatorMock,
@@ -413,7 +414,7 @@ final class StrykerReporterTest extends TestCase
     public function test_it_sends_report_when_everything_is_ok_with_our_key_for_full_report(): void
     {
         $this->reporter = new StrykerReporter(
-            new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
+            new BuildContextResolver(new MemoizedCiDetector(CiDetector::fromEnvironment($this->ciDetectorEnv))),
             new StrykerApiKeyResolver(),
             $this->strykerDashboardClient,
             $this->metricsCalculatorMock,

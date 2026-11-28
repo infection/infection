@@ -35,8 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Environment;
 
-use OndraM\CiDetector\CiDetectorInterface;
-use OndraM\CiDetector\Exception\CiNotDetectedException;
+use Infection\Framework\CiDetector\MemoizedCiDetector;
 use function trim;
 
 /**
@@ -45,15 +44,15 @@ use function trim;
 final readonly class BuildContextResolver
 {
     public function __construct(
-        private CiDetectorInterface $ciDetector,
+        private MemoizedCiDetector $ciDetector,
     ) {
     }
 
     public function resolve(): BuildContext
     {
-        try {
-            $ci = $this->ciDetector->detect();
-        } catch (CiNotDetectedException) {
+        $ci = $this->ciDetector->findCi();
+
+        if ($ci === null) {
             throw new CouldNotResolveBuildContext('The current process is not executed in a CI build');
         }
 
