@@ -58,11 +58,14 @@ jobs:
               --output dist/infection.phar.asc \
               dist/infection.phar
 
-      - name: Upload PHAR to release
+      # Immutable releases lock assets on publish, so the PHAR must be uploaded
+      # to a draft first. See doc/releasing.md.
+      - name: Publish release with PHAR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release view "${GITHUB_REF_NAME}" > /dev/null 2>&1 \
-            || gh release create "${GITHUB_REF_NAME}" --verify-tag --title "${GITHUB_REF_NAME}"
+            || gh release create "${GITHUB_REF_NAME}" --verify-tag --draft --title "${GITHUB_REF_NAME}" --generate-notes
 
-          gh release upload "${GITHUB_REF_NAME}" dist/infection.phar*
+          gh release upload "${GITHUB_REF_NAME}" dist/infection.phar dist/infection.phar.asc --clobber
+          gh release edit "${GITHUB_REF_NAME}" --draft=false
