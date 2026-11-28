@@ -33,33 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\CI;
+namespace Infection\Tests\Command\Option;
 
-use Infection\CI\NullCiDetector;
-use OndraM\CiDetector\Env;
-use OndraM\CiDetector\Exception\CiNotDetectedException;
+use Infection\Command\Option\ProgressOption;
+use Infection\Tests\Command\CommandOptionTestCase;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\StringInput;
 
-#[CoversClass(NullCiDetector::class)]
-final class NullCiDetectorTest extends TestCase
+#[CoversClass(ProgressOption::class)]
+final class ProgressOptionTest extends CommandOptionTestCase
 {
-    public function test_it_can_be_instantiated_from_environment(): void
+    public static function optionProvider(): iterable
     {
-        $detector = NullCiDetector::fromEnvironment(new Env());
+        yield 'no option leaves the decision to CI detection' => [
+            new StringInput(''),
+            null,
+        ];
 
-        $this->assertInstanceOf(NullCiDetector::class, $detector);
+        yield 'no progress' => [
+            new StringInput('--no-progress'),
+            true,
+        ];
+
+        yield 'forced progress' => [
+            new StringInput('--force-progress'),
+            false,
+        ];
+
+        yield 'both options' => [
+            new StringInput('--no-progress --force-progress'),
+            new InvalidArgumentException('Cannot pass both "no-progress" and "force-progress" option: use none or only one of them'),
+        ];
     }
 
-    public function test_it_does_not_detect_any__ci(): void
+    protected function getOptionClassName(): string
     {
-        $detector = new NullCiDetector();
-
-        $this->assertFalse($detector->isCiDetected());
-
-        $this->expectException(CiNotDetectedException::class);
-        $this->expectExceptionMessage('No CI server detectable with this detector');
-
-        $detector->detect();
+        return ProgressOption::class;
     }
 }
