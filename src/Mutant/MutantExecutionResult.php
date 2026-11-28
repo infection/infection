@@ -35,8 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
+use function array_key_last;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\MutatorResolver;
+use Infection\Process\MutantProcess;
 use Later\Interfaces\Deferred;
 use RuntimeException;
 use function sprintf;
@@ -56,6 +58,7 @@ class MutantExecutionResult
      * @param Deferred<string> $mutantDiff
      * @param Deferred<string> $mutatedCode
      * @param TestLocation[] $tests
+     * @param list<MutantProcess> $evaluationHistory
      */
     public function __construct(
         private readonly string $processCommandLine,
@@ -74,10 +77,42 @@ class MutantExecutionResult
         private readonly Deferred $mutatedCode,
         private readonly array $tests,
         private readonly float $processRuntime,
+        private readonly array $evaluationHistory,
     ) {
         Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
         $this->mutatorClass = $mutatorClass;
+    }
+
+    /**
+     * The status and process details describe the last completed evaluation.
+     *
+     * @param non-empty-list<MutantProcess> $evaluationHistory
+     */
+    public static function createFromEvaluation(Mutant $mutant, DetectionStatus $detectionStatus, array $evaluationHistory): self
+    {
+        $mutation = $mutant->getMutation();
+        $lastProcess = $evaluationHistory[array_key_last($evaluationHistory)];
+
+        return new self(
+            $lastProcess->getProcess()->getCommandLine(),
+            $lastProcess->getResultOutput(),
+            $detectionStatus,
+            $mutant->getDiff(),
+            $mutation->getHash(),
+            $mutation->getMutatorClass(),
+            $mutation->getMutatorName(),
+            $mutation->getOriginalFilePath(),
+            $mutation->getOriginalStartingLine(),
+            $mutation->getOriginalEndingLine(),
+            $mutation->getOriginalStartFilePosition(),
+            $mutation->getOriginalEndFilePosition(),
+            $mutant->getPrettyPrintedOriginalCode(),
+            $mutant->getMutatedCode(),
+            $mutant->getTests(),
+            $lastProcess->getRuntime(),
+            $evaluationHistory,
+        );
     }
 
     public static function createFromNonCoveredMutant(Mutant $mutant): self
@@ -179,6 +214,14 @@ class MutantExecutionResult
     }
 
     /**
+     * @return list<MutantProcess>
+     */
+    public function getEvaluationHistory(): array
+    {
+        return $this->evaluationHistory;
+    }
+
+    /**
      * Adopted from https://github.com/nikic/PHP-Parser/blob/4abdcde5f16269959a834e4e58ea0ba0938ab133/lib/PhpParser/Error.php#L155
      */
     private function toColumn(string $code, int $position): int
@@ -217,6 +260,7 @@ class MutantExecutionResult
             $mutant->getMutatedCode(),
             $mutant->getTests(),
             0.0,
+            [],
         );
     }
 }

@@ -35,12 +35,38 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\Process\MutantProcess;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
+use Override;
 
 /**
+ * Accounts for coverage and the expected test runtime when resolving detection status.
+ *
  * @internal
  */
-interface MutantExecutionResultFactory
+final readonly class TestSuiteMutantDetectionStatusResolver implements MutantProcessDetectionStatusResolver
 {
-    public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult;
+    public function __construct(
+        private MutantProcessDetectionStatusResolver $resolver,
+        private Mutant $mutant,
+        private ?float $timeout,
+    ) {
+    }
+
+    #[Override]
+    public function resolve(string $stdout, ?int $exitCode, bool $timedOut): DetectionStatus
+    {
+        if (!$this->mutant->isCoveredByTest()) {
+            return DetectionStatus::NOT_COVERED;
+        }
+
+        // If only some tests fit the budget, a timeout does not establish an infinite loop.
+        if ($timedOut
+            && $this->timeout !== null
+            && $this->mutant->getMutation()->getNominalTestExecutionTime() >= $this->timeout
+        ) {
+            return DetectionStatus::SKIPPED;
+        }
+
+        return $this->resolver->resolve($stdout, $exitCode, $timedOut);
+    }
 }

@@ -78,18 +78,19 @@ final readonly class CombinedTestFramework implements TestFramework
 
     public function test(Mutant $mutant): MutantProcessContainer
     {
-        $evaluation = $this->firstTestFramework->test($mutant);
-
+        $evaluation = MutantProcessContainer::from(
+            $mutant,
+            fn (): MutantProcessContainer => $this->firstTestFramework->test($mutant),
+        );
         $followUpTestFramework = $this->followUpTestFramework;
 
-        if ($followUpTestFramework === null) {
-            return $evaluation;
+        if ($followUpTestFramework !== null) {
+            $evaluation->append(
+                static fn (): MutantProcessContainer => $followUpTestFramework->test($mutant),
+            );
         }
 
-        // Defer the follow-up framework setup until the preceding evaluation has escaped.
-        return $evaluation->append(
-            static fn (): MutantProcessContainer => $followUpTestFramework->test($mutant),
-        );
+        return $evaluation;
     }
 
     public function hasJUnitReport(): bool

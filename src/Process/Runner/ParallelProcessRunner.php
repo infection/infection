@@ -39,6 +39,7 @@ use function array_shift;
 use function count;
 use DuoClock\DuoClock;
 use Generator;
+use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Iterator;
 use function max;
@@ -118,11 +119,12 @@ class ParallelProcessRunner implements ProcessRunner
 
             if (!$this->queue->isEmpty()) {
                 $mutantProcessContainer = $this->queue->dequeue();
-                $threadIndex = array_shift($this->availableThreadIndexes);
+                $attempt = $mutantProcessContainer->getCurrent();
 
+                $threadIndex = array_shift($this->availableThreadIndexes);
                 Assert::integer($threadIndex, 'Thread index cannot be null. This indicates a bug - verify the isEmpty() check is present before dequeue().');
 
-                $this->startProcess($mutantProcessContainer, $threadIndex);
+                $this->startProcess($mutantProcessContainer, $attempt, $threadIndex);
             }
 
             while ($this->hasProcessesThatCouldBeFreed($threadCount)) {
@@ -205,7 +207,7 @@ class ParallelProcessRunner implements ProcessRunner
             if ($mutantProcessContainer->hasNext()) {
                 $mutantProcessContainer->createNext();
 
-                // Enqueue the needed static analysis run
+                // Requeue the next evaluation selected by the pipe.
                 $this->queue->enqueue($mutantProcessContainer);
 
                 return;
@@ -216,9 +218,9 @@ class ParallelProcessRunner implements ProcessRunner
         }
     }
 
-    private function startProcess(MutantProcessContainer $mutantProcessContainer, int $threadIndex): void
+    private function startProcess(MutantProcessContainer $mutantProcessContainer, MutantProcess $attempt, int $threadIndex): void
     {
-        $mutantProcessContainer->getCurrent()->getProcess()->start(null, [
+        $attempt->getProcess()->start(null, [
             'INFECTION' => '1',
             'TEST_TOKEN' => $threadIndex,
         ]);

@@ -37,12 +37,12 @@ namespace Infection\TestFramework\PHPStan\Adapter;
 
 use function array_merge;
 use function explode;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PHPStan\Process\PHPStanMutantProcessFactory;
 use RuntimeException;
@@ -78,7 +78,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     public function __construct(
         private readonly ProcessFactory $processFactory,
         private readonly Filesystem $fileSystem,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly MutantProcessDetectionStatusResolver $detectionStatusResolver,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
@@ -121,7 +121,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         return new PHPStanMutantProcessFactory(
             $this->processFactory,
             $this->fileSystem,
-            $this->mutantExecutionResultFactory,
+            $this->detectionStatusResolver,
             $this->staticAnalysisConfigPath,
             $this->staticAnalysisToolExecutable,
             $this->commandLineBuilder,

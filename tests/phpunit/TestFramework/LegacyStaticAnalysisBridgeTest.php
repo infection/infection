@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
+use Infection\Mutant\DetectionStatus;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
@@ -127,6 +128,7 @@ final class LegacyStaticAnalysisBridgeTest extends TestCase
             ->build()
         ;
         $process = $this->createStub(MutantProcess::class);
+        $process->method('getResult')->willReturn(DetectionStatus::ESCAPED);
         $factory = $this->createMock(LazyMutantProcessFactory::class);
         $factory
             ->expects($this->once())

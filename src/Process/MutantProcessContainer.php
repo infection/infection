@@ -35,10 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use function array_key_exists;
 use Closure;
 use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
+use Webmozart\Assert\Assert;
 
 /**
  * @phpstan-type MutantProcessFactory = Closure(): (MutantProcess|self)
@@ -48,20 +49,24 @@ use Infection\Mutant\MutantExecutionResult;
  */
 class MutantProcessContainer
 {
-    /**
-     * @var array<non-negative-int, MutantProcess|self>
-     */
-    private array $processes = [];
+    private MutantProcess|self|null $current = null;
 
     /**
-     * @var non-negative-int
+     * @var list<MutantProcess>
      */
-    private int $currentProcessIndex = 0;
+    private array $evaluationHistory = [];
+
+    private ?DetectionStatus $completedStatus = null;
+
+    private ?MutantExecutionResult $finalResult = null;
+
+    private int $nextEvaluationIndex = 0;
 
     /**
      * @param non-empty-list<MutantProcessFactory> $factories
      */
     private function __construct(
+        private readonly Mutant $mutant,
         private array $factories,
     ) {
     }
@@ -69,9 +74,9 @@ class MutantProcessContainer
     /**
      * @param MutantProcessFactory $factory
      */
-    public static function from(Closure $factory): self
+    public static function from(Mutant $mutant, Closure $factory): self
     {
-        return new self([$factory]);
+        return new self($mutant, [$factory]);
     }
 
     /**
@@ -79,59 +84,116 @@ class MutantProcessContainer
      */
     public function append(Closure $factory): self
     {
+        Assert::null($this->completedStatus, 'Cannot append an evaluation after the current evaluation has been recorded.');
+
         $this->factories[] = $factory;
 
         return $this;
     }
 
-    /**
-     * Completes nested follow-ups before advancing to another factory after escape.
-     */
-    public function hasNext(): bool
+    public function getMutant(): Mutant
     {
-        $current = $this->getCurrentEvaluation();
-
-        if ($current instanceof self
-            && $current->hasNext()
-        ) {
-            return true;
-        }
-
-        return array_key_exists($this->currentProcessIndex + 1, $this->factories)
-            && $this->getMutantExecutionResult()->getDetectionStatus() === DetectionStatus::ESCAPED;
+        return $this->mutant;
     }
 
-    public function createNext(): MutantProcess
+    public function isCold(): bool
     {
-        $current = $this->getCurrentEvaluation();
-
-        if ($current instanceof self
-            && $current->hasNext()
-        ) {
-            return $current->createNext();
-        }
-
-        ++$this->currentProcessIndex;
-
-        return $this->getCurrent();
+        return $this->current === null;
     }
 
     public function getCurrent(): MutantProcess
     {
-        $current = $this->getCurrentEvaluation();
+        $this->current ??= $this->evaluate(0);
 
-        return $current instanceof self
-            ? $current->getCurrent()
-            : $current;
+        return $this->current instanceof self
+            ? $this->current->getCurrent()
+            : $this->current;
+    }
+
+    public function hasNext(): bool
+    {
+        $this->getCurrent();
+
+        if ($this->current instanceof self
+            && $this->current->hasNext()
+        ) {
+            return true;
+        }
+
+        return $this->hasNextEvaluation();
+    }
+
+    public function createNext(): MutantProcess
+    {
+        if ($this->current instanceof self
+            && $this->current->hasNext()
+        ) {
+            return $this->current->createNext();
+        }
+
+        Assert::true($this->hasNextEvaluation(), 'Cannot start another attempt without a pending evaluation.');
+
+        $this->current = $this->evaluate($this->nextEvaluationIndex);
+        $this->completedStatus = null;
+
+        return $this->getCurrent();
     }
 
     public function getMutantExecutionResult(): MutantExecutionResult
     {
-        return $this->getCurrent()->getMutantExecutionResult();
+        Assert::false($this->isCold(), 'Cannot finalize a mutant before evaluation has started.');
+        Assert::false($this->hasNext(), 'Cannot finalize a mutant while another evaluation attempt is pending.');
+        $status = $this->recordCompletedEvaluation();
+        $history = $this->evaluationHistory;
+        Assert::notEmpty($history, 'Cannot build a final mutant result without a completed evaluation.');
+
+        return $this->finalResult ??= MutantExecutionResult::createFromEvaluation(
+            $this->mutant,
+            $status,
+            $history,
+        );
     }
 
-    private function getCurrentEvaluation(): MutantProcess|self
+    private function evaluate(int $index): MutantProcess|self
     {
-        return $this->processes[$this->currentProcessIndex] ??= ($this->factories[$this->currentProcessIndex])();
+        $attempt = ($this->factories[$index])();
+        $this->nextEvaluationIndex = $index + 1;
+
+        return $attempt;
+    }
+
+    /**
+     * Checks for a follow-up in this container once the current evaluator has finished.
+     */
+    private function hasNextEvaluation(): bool
+    {
+        if ($this->recordCompletedEvaluation() !== DetectionStatus::ESCAPED) {
+            return false;
+        }
+
+        return isset($this->factories[$this->nextEvaluationIndex]);
+    }
+
+    private function recordCompletedEvaluation(): DetectionStatus
+    {
+        if ($this->completedStatus !== null) {
+            return $this->completedStatus;
+        }
+
+        $attempt = $this->current;
+        Assert::notNull($attempt, 'Cannot record an evaluation before its first attempt has been created.');
+
+        if ($attempt instanceof self) {
+            // The caller has checked for nested follow-ups, so the child's history is complete.
+            $status = $attempt->recordCompletedEvaluation();
+            $this->evaluationHistory = [...$this->evaluationHistory, ...$attempt->evaluationHistory];
+
+            return $this->completedStatus = $status;
+        }
+
+        $status = $attempt->getResult();
+        $this->evaluationHistory[] = $attempt;
+
+        return $this->completedStatus = $status;
     }
 }

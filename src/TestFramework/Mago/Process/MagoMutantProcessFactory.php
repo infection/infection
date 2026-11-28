@@ -37,11 +37,11 @@ namespace Infection\TestFramework\Mago\Process;
 
 use function array_merge;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\Process\ProcessFactory;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 
 /**
  * @internal
@@ -53,7 +53,7 @@ final readonly class MagoMutantProcessFactory implements LazyMutantProcessFactor
      */
     public function __construct(
         private ProcessFactory $processFactory,
-        private MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private MutantProcessDetectionStatusResolver $detectionStatusResolver,
         private string $staticAnalysisToolExecutable,
         private CommandLineBuilder $commandLineBuilder,
         private float $timeout,
@@ -74,7 +74,9 @@ final readonly class MagoMutantProcessFactory implements LazyMutantProcessFactor
         return new MutantProcess(
             $process,
             $mutant,
-            $this->mutantExecutionResultFactory,
+            'Mago',
+            $this->detectionStatusResolver,
+            includeErrorOutput: true,
         );
     }
 

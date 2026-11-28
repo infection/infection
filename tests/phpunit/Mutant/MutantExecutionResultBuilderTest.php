@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Process\MutantProcess;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -51,6 +52,20 @@ final class MutantExecutionResultBuilderTest extends TestCase
         $actual = MutantExecutionResultBuilder::from($result)->build();
 
         $this->assertResultEquals($result, $actual);
+        $this->assertSame($result->getEvaluationHistory(), $actual->getEvaluationHistory());
+    }
+
+    public function test_it_copies_the_evaluation_history(): void
+    {
+        $history = [$this->createStub(MutantProcess::class)];
+        $result = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withEvaluationHistory($history)
+            ->build()
+        ;
+
+        $actual = MutantExecutionResultBuilder::from($result)->build();
+
+        $this->assertSame($history, $actual->getEvaluationHistory());
     }
 
     public static function executionResultProvider(): iterable

@@ -82,10 +82,7 @@ interface TestFramework
     public function executeInitialRun(): InitialRunResults;
 
     /**
-     * Evaluates the Mutant. Some test frameworks may be able to do this in-memory, e.g.
-     * Psalm, or it requires to launch a process in which case the process execution is
-     * delegated to an orchestrator. A process encapsulates how the result of the process
-     * is interpreted.
+     * Supplies a cold evaluation container. The runner executes its processes on demand.
      */
     public function test(Mutant $mutant): MutantProcessContainer;
 

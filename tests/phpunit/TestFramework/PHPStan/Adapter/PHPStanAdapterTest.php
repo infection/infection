@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PHPStan\Adapter;
 
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\Process\DryRunAwareProcessFactory;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PHPStan\Adapter\PHPStanAdapter;
 use Infection\TestFramework\PHPStan\Process\PHPStanMutantProcessFactory;
@@ -69,7 +69,7 @@ final class PHPStanAdapterTest extends TestCase
         $this->adapter = new PHPStanAdapter(
             new DryRunAwareProcessFactory(false),
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(MutantProcessDetectionStatusResolver::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -108,7 +108,7 @@ final class PHPStanAdapterTest extends TestCase
         $adapter = new PHPStanAdapter(
             new DryRunAwareProcessFactory(false),
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(MutantProcessDetectionStatusResolver::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -143,7 +143,7 @@ final class PHPStanAdapterTest extends TestCase
         $adapter = new PHPStanAdapter(
             new DryRunAwareProcessFactory(false),
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(MutantProcessDetectionStatusResolver::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -180,7 +180,7 @@ final class PHPStanAdapterTest extends TestCase
         $adapter = new PHPStanAdapter(
             new DryRunAwareProcessFactory(false),
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(MutantProcessDetectionStatusResolver::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -240,7 +240,7 @@ final class PHPStanAdapterTest extends TestCase
         $adapter = new PHPStanAdapter(
             new DryRunAwareProcessFactory(false),
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(MutantProcessDetectionStatusResolver::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -270,7 +270,7 @@ final class PHPStanAdapterTest extends TestCase
         $adapter = new PHPStanAdapter(
             new DryRunAwareProcessFactory(false),
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(MutantProcessDetectionStatusResolver::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -292,7 +292,7 @@ final class PHPStanAdapterTest extends TestCase
         $adapter = new PHPStanAdapter(
             new DryRunAwareProcessFactory(false),
             $this->createStub(Filesystem::class),
-            $this->createStub(MutantExecutionResultFactory::class),
+            $this->createStub(MutantProcessDetectionStatusResolver::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,

@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use function array_filter;
 use function array_map;
+use function array_values;
 use ArrayIterator;
 use function count;
 use function implode;
@@ -46,16 +48,22 @@ use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluatio
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
+use Infection\Process\DryRunProcess;
+use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\MutationTestingRunner;
+use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
+use Infection\TestFramework\CombinedTestFramework;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\Testing\MutatorName;
+use Infection\Testing\TestFramework\Debug\FixedMutantProcessDetectionStatusResolver;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
@@ -797,18 +805,88 @@ final class MutationTestingRunnerTest extends TestCase
 
     public function test_container_to_finished_event(): void
     {
-        $result = $this->createStub(MutantExecutionResult::class);
-
+        $history = [$this->createStub(MutantProcess::class)];
+        $result = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withDetectionStatus(DetectionStatus::KILLED_BY_STATIC_ANALYSIS)
+            ->withEvaluationHistory($history)
+            ->build()
+        ;
         $container = $this->createMock(MutantProcessContainer::class);
         $container->expects($this->once())
             ->method('getMutantExecutionResult')
             ->willReturn($result)
         ;
+        $container->expects($this->never())->method('getCurrent');
 
         $event = $this->invokeMethod('containerToFinishedEvent', $container);
 
         $this->assertInstanceOf(MutantProcessWasFinished::class, $event);
         $this->assertSame($result, $event->executionResult);
+        $this->assertSame($history, $event->executionResult->getEvaluationHistory());
+    }
+
+    public function test_it_emits_one_final_event_after_all_evaluators_finish(): void
+    {
+        $mutation = $this->createMutation(0);
+        $mutant = MutantBuilder::withCompleteTestData()->withMutation($mutation)->build();
+        $first = $this->createDryRunMutantProcess($mutant, 'PHPUnit', DetectionStatus::ESCAPED);
+        $last = $this->createDryRunMutantProcess($mutant, 'PHPStan', DetectionStatus::ERROR);
+        $this->mutantFactoryMock->method('create')->willReturn($mutant);
+        $assertNoFinalEvent = function (): void {
+            $finished = array_filter(
+                $this->eventDispatcher->getEvents(),
+                static fn (object $event): bool => $event instanceof MutantProcessWasFinished,
+            );
+            $this->assertSame([], $finished);
+        };
+        $this->testFrameworkMock->expects($this->once())->method('test')->willReturnCallback(
+            static function () use ($assertNoFinalEvent, $mutant, $first): MutantProcessContainer {
+                $assertNoFinalEvent();
+
+                return MutantProcessContainer::from($mutant, static fn (): MutantProcess => $first);
+            },
+        );
+        $analysis = $this->createMock(TestFramework::class);
+        $analysis->expects($this->once())->method('test')->willReturnCallback(
+            static function () use ($assertNoFinalEvent, $mutant, $last): MutantProcessContainer {
+                $assertNoFinalEvent();
+
+                return MutantProcessContainer::from($mutant, static fn (): MutantProcess => $last);
+            },
+        );
+        $framework = new CombinedTestFramework($this->testFrameworkMock, $analysis);
+        $runner = new MutationTestingRunner(
+            $framework,
+            $this->mutantFactoryMock,
+            new ParallelProcessRunner(1, poll: 0),
+            $this->eventDispatcher,
+            $this->fileSystemMock,
+            $this->diffSourceCodeMatcher,
+            false,
+            self::TIMEOUT,
+            [],
+        );
+
+        $runner->run([$mutation]);
+
+        $finished = array_values(array_filter(
+            $this->eventDispatcher->getEvents(),
+            static fn (object $event): bool => $event instanceof MutantProcessWasFinished,
+        ));
+        $this->assertCount(1, $finished);
+        $this->assertSame([$first, $last], $finished[0]->executionResult->getEvaluationHistory());
+        $this->assertSame(DetectionStatus::ERROR, $finished[0]->executionResult->getDetectionStatus());
+    }
+
+    private function createDryRunMutantProcess(Mutant $mutant, string $testFrameworkName, DetectionStatus $status): MutantProcess
+    {
+        return new MutantProcess(
+            new DryRunProcess([$testFrameworkName]),
+            $mutant,
+            $testFrameworkName,
+            new FixedMutantProcessDetectionStatusResolver($status),
+            includeErrorOutput: false,
+        );
     }
 
     private function invokeMethod(string $methodName, mixed ...$args): mixed
@@ -926,7 +1004,13 @@ final class MutationTestingRunnerTest extends TestCase
 
     private function buildCoveredMutantProcessContainer(): MutantProcessContainer
     {
-        return $this->createMock(MutantProcessContainer::class);
+        $process = $this->createStub(MutantProcess::class);
+        $process->method('getResult')->willReturn(DetectionStatus::ESCAPED);
+
+        return MutantProcessContainer::from(
+            MutantBuilder::withMinimalTestData()->build(),
+            static fn (): MutantProcess => $process,
+        );
     }
 
     private function someIterable(?callable $callback = null): Callback
@@ -960,10 +1044,10 @@ final class MutationTestingRunnerTest extends TestCase
             $actual = [];
 
             foreach ($subject as $value) {
-                $actual[] = $value;
+                $actual[] = $value->getCurrent();
             }
 
-            return $expected === $actual;
+            return array_map(static fn (MutantProcessContainer $pipe) => $pipe->getCurrent(), $expected) === $actual;
         });
     }
 

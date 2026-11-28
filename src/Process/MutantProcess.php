@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use function microtime;
+use function sprintf;
 use Symfony\Component\Process\Process;
+use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -47,6 +50,8 @@ use Symfony\Component\Process\Process;
  */
 class MutantProcess
 {
+    private ?DetectionStatus $result = null;
+
     private bool $timedOut = false;
 
     private float $finishedAt = 0.0;
@@ -54,7 +59,9 @@ class MutantProcess
     public function __construct(
         private readonly Process $process,
         private readonly Mutant $mutant,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly string $testFrameworkName,
+        private readonly MutantProcessDetectionStatusResolver $detectionStatusResolver,
+        private readonly bool $includeErrorOutput,
     ) {
     }
 
@@ -66,6 +73,11 @@ class MutantProcess
     public function getMutant(): Mutant
     {
         return $this->mutant;
+    }
+
+    public function getTestFrameworkName(): string
+    {
+        return $this->testFrameworkName;
     }
 
     public function markAsTimedOut(): void
@@ -95,9 +107,33 @@ class MutantProcess
             : $this->finishedAt - $this->process->getStartTime();
     }
 
-    public function getMutantExecutionResult(): MutantExecutionResult
+    public function getResult(): DetectionStatus
     {
-        // todo [phpstan-integration] cache it
-        return $this->mutantExecutionResultFactory->createFromProcess($this);
+        Assert::greaterThan(
+            $this->finishedAt,
+            0.0,
+            'Cannot resolve the detection status before the mutant process has finished.',
+        );
+
+        return $this->result ??= $this->detectionStatusResolver->resolve(
+            $this->process->getOutput(),
+            $this->process->getExitCode(),
+            $this->timedOut,
+        );
+    }
+
+    public function getResultOutput(): string
+    {
+        $output = $this->process->getOutput();
+
+        return $this->includeErrorOutput
+            ? trim(
+                sprintf(
+                    "%s\n\n%s",
+                    $output,
+                    $this->process->getErrorOutput(),
+                ),
+            )
+            : $output;
     }
 }

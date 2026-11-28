@@ -37,7 +37,7 @@ namespace Infection\Process\Factory;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
+use Infection\Mutant\TestSuiteMutantDetectionStatusResolver;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Common\Process\ProcessFactory;
@@ -81,10 +81,13 @@ class MutantProcessContainerFactory
         );
 
         return MutantProcessContainer::from(
+            $mutant,
             static fn (): MutantProcess => new MutantProcess(
                 $process,
                 $mutant,
-                new TestFrameworkMutantExecutionResultFactory($detectionStatusResolver),
+                $testFrameworkAdapter->getName(),
+                new TestSuiteMutantDetectionStatusResolver($detectionStatusResolver, $mutant, $timeout),
+                includeErrorOutput: false,
             ),
         );
     }
