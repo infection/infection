@@ -73,12 +73,12 @@ readonly class TurbocovCollectPathsProvider
 
     /**
      * @param non-empty-array<string> $sourceDirectoryPaths
-     * @param string|null $phpConfiguredCollectPaths The `turbocov.collect_paths` setting of the Infection process; `null` if turbocov is not loaded in it.
+     * @param string|null $collectPathsIniValue The `turbocov.collect_paths` setting of the Infection process; `null` if turbocov is not loaded in it.
      */
     public function __construct(
         private array $sourceDirectoryPaths,
         private string $initialTestsPhpOptions,
-        private ?string $phpConfiguredCollectPaths,
+        private ?string $collectPathsIniValue,
     ) {
     }
 
@@ -90,16 +90,16 @@ readonly class TurbocovCollectPathsProvider
         ?string $initialTestsPhpOptions,
     ): self {
         try {
-            $phpConfiguredCollectPaths = ini_get('turbocov.collect_paths');
+            $collectPathsIniValue = ini_get('turbocov.collect_paths');
         } catch (InfoException) {
             // turbocov is not loaded in the Infection process
-            $phpConfiguredCollectPaths = null;
+            $collectPathsIniValue = null;
         }
 
         return new self(
             $sourceDirectoryPaths,
             (string) $initialTestsPhpOptions,
-            $phpConfiguredCollectPaths,
+            $collectPathsIniValue,
         );
     }
 
@@ -112,7 +112,7 @@ readonly class TurbocovCollectPathsProvider
 
         // turbocov is loaded in the Infection process: its setting is either
         // provided or forwarded.
-        if ($this->phpConfiguredCollectPaths !== null) {
+        if ($this->collectPathsIniValue !== null) {
             return true;
         }
 
@@ -122,12 +122,16 @@ readonly class TurbocovCollectPathsProvider
 
     public function getCollectPaths(): string
     {
-        if ($this->phpConfiguredCollectPaths !== null
-            && $this->phpConfiguredCollectPaths !== self::DEFAULT_COLLECT_PATHS
-        ) {
-            return $this->phpConfiguredCollectPaths;
-        }
+        $forwardIniValue = $this->collectPathsIniValue !== null
+            && $this->collectPathsIniValue !== self::DEFAULT_COLLECT_PATHS;
 
+        return $forwardIniValue
+            ? $this->collectPathsIniValue
+            : $this->getCollectPathsFromSourceDirectories();
+    }
+
+    private function getCollectPathsFromSourceDirectories(): string
+    {
         foreach ($this->sourceDirectoryPaths as $sourceDirectoryPath) {
             Assert::notContains(
                 $sourceDirectoryPath,
