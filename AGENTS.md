@@ -89,7 +89,7 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
   `devTools/phpstan-baseline.neon` and `devTools/mago-baseline.toml` (Mago's config itself is
   `mago.toml` in the root). Baselines are for pre-existing debt only; never baseline a finding
   your new code introduced. Regenerate with `make phpstan-baseline` or `make mago-baseline`.
-- `doc/` - `nomenclature.md`, `benchmarking.md`. User docs are NOT here - they live in the
+- `doc/` - `nomenclature.md`, `benchmarking.md`, `releasing.md`. User docs are NOT here - they live in the
   separate repo github.com/infection/infection.github.io (`infection/site` is archived).
 - `adr/` - Architecture Decision Records; short rationale for standing conventions. See
   `## Suggest Architecture Decision Records` for when to read, update, or create one.
