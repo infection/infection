@@ -44,19 +44,11 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use function Safe\ini_get;
 
-/**
- * The initial test run is a separate PHP process: it reads the PHP configuration
- * (php.ini) again, but does not inherit the `-d` options of the Infection process.
- */
 #[CoversClass(TurbocovCollectPathsProvider::class)]
 final class TurbocovCollectPathsProviderTest extends TestCase
 {
     private const array SOURCE_DIRECTORIES = ['/project/src', '/project/lib'];
 
-    /**
-     * @param string|null $infectionProcessCollectPaths `null` when turbocov is not loaded in the Infection process
-     * @param string|null $expectedCollectPathsPassedToInitialTestRun `null` when no `-d turbocov.collect_paths=…` is added
-     */
     #[DataProvider('collectPathsProvider')]
     public function test_it_passes_the_collect_paths_to_the_initial_test_run(
         ?string $infectionProcessCollectPaths,
