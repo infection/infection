@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "16e2fb25b6d231c460843124fe26f03d",
+    "content-hash": "38de2a2ab1c07fe774abc4f8d5c7188a",
     "packages": [
         {
             "name": "colinodell/json5",
