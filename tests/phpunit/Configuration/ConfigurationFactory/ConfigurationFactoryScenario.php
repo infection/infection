@@ -408,7 +408,6 @@ final class ConfigurationFactoryScenario
             )
             ->withExpected(
                 ConfigurationBuilder::from($previousExpected)
-                    // GitHub Actions is a CI: progress is off by default there.
                     ->withNoProgress($githubActionsDetected)
                     ->withLogs(
                         LogsBuilder::from($previousExpected->logs)
