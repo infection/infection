@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Container\Builder;
 
-use function getenv;
 use Infection\Container\Builder\AgentGuidanceReporterBuilder;
-use Infection\Environment\AgentDetector;
+use Infection\Environment\MemoizedAgentDetector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Reporter\AgentGuidanceReporter;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -58,11 +57,10 @@ final class AgentGuidanceReporterBuilderTest extends TestCase
     #[DataProvider('agentStateProvider')]
     public function test_it_builds_the_reporter_for_the_detected_environment(bool $isRunningInAgent): void
     {
-        $agentDetector = $this->createMock(AgentDetector::class);
+        $agentDetector = $this->createMock(MemoizedAgentDetector::class);
         $agentDetector
             ->expects($this->once())
             ->method('isRunningInAgent')
-            ->with(getenv())
             ->willReturn($isRunningInAgent)
         ;
 

@@ -33,39 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Environment;
+namespace Infection\Environment;
 
-use Infection\Environment\AgentDetector;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
+use Ergebnis\AgentDetector\Detector;
+use Ergebnis\AgentDetector\EnvironmentDetector;
 
-#[CoversClass(AgentDetector::class)]
-final class AgentDetectorTest extends TestCase
+/**
+ * @internal
+ * @final
+ */
+class MemoizedAgentDetector
 {
-    public static function environmentProvider(): iterable
+    private bool $detectionResult;
+
+    public function __construct(private readonly Detector $detector = new EnvironmentDetector())
     {
-        yield 'unrelated variables' => [['PATH' => '/usr/bin', 'CI' => 'true'], false];
-
-        yield 'known agent' => [['CLAUDECODE' => '1'], true];
-
-        yield 'agent variable with an empty value does not mean a thing' => [['CODEX_SANDBOX' => ''], false];
-
-        yield 'last agent in the list' => [['REPL_ID' => 'x'], true];
-
-        yield 'generic AI_AGENT' => [['AI_AGENT' => 'my-agent'], true];
-
-        yield 'empty AGENT_DETECTOR_DISABLE does not opt out' => [['AGENT_DETECTOR_DISABLE' => '', 'AI_AGENT' => '1'], true];
-
-        yield 'AGENT_DETECTOR_DISABLE with a value opts out' => [['AGENT_DETECTOR_DISABLE' => '1', 'AI_AGENT' => '1'], false];
     }
 
-    /**
-     * @param array<string, string> $environment
-     */
-    #[DataProvider('environmentProvider')]
-    public function test_it_detects_an_agent_harness(array $environment, bool $expected): void
+    public function isRunningInAgent(): bool
     {
-        $this->assertSame($expected, (new AgentDetector())->isRunningInAgent($environment));
+        return $this->detectionResult ??= $this->detector->isAgentPresent();
     }
 }

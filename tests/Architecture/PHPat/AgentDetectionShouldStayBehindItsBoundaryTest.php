@@ -33,56 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Environment;
+namespace Infection\Tests\Architecture\PHPat;
 
-/**
- * @internal
- * @final
- */
-class AgentDetector
+use Ergebnis\AgentDetector\Detector;
+use Infection\Environment\MemoizedAgentDetector;
+use Infection\Framework\ClassName;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
+
+final class AgentDetectionShouldStayBehindItsBoundaryTest
 {
-    /**
-     * @see https://github.com/shipfastlabs/agent-detector
-     * @see https://github.com/phpstan/phpstan-src/blob/2.1.x/src/Internal/AgentDetector.php
-     */
-    private const array AGENT_MARKERS = [
-        'AI_AGENT',
-        'AMP_CURRENT_THREAD_ID',
-        'AUGMENT_AGENT',
-        'CLAUDECODE',
-        'CLAUDE_CODE',
-        'CODEX_SANDBOX',
-        'CODEX_THREAD_ID',
-        'CURSOR_AGENT',
-        'CURSOR_TRACE_ID',
-        'GEMINI_CLI',
-        'OPENCODE',
-        'OPENCODE_CLIENT',
-        'REPL_ID',
-    ];
-
-    /**
-     * We match ergebnis/agent-detector to enable a future switch and offer a common user experience.
-     *
-     * @see https://github.com/ergebnis/agent-detector#disabling-the-detection
-     */
-    private const string AGENT_DETECTOR_DISABLE = 'AGENT_DETECTOR_DISABLE';
-
-    /**
-     * @param array<string, string> $environment
-     */
-    public function isRunningInAgent(array $environment): bool
+    public function testTheVendorDetectorIsOnlyUsedByMemoizedAgentDetector(): Rule
     {
-        if (($environment[self::AGENT_DETECTOR_DISABLE] ?? '') !== '') {
-            return false;
-        }
-
-        foreach (self::AGENT_MARKERS as $name) {
-            if (($environment[$name] ?? '') !== '') {
-                return true;
-            }
-        }
-
-        return false;
+        return PHPat::rule()
+            ->classes(InfectionSelector::sourceCode())
+            ->excluding(
+                Selector::classname(MemoizedAgentDetector::class),
+            )
+            ->shouldNot()
+            ->dependOn()
+            ->classes(Selector::inNamespace(ClassName::getNamespace(Detector::class))) // @phpstan-ignore argument.type
+            ->because('Only the decoupled memoized agent detector should be used.')
+        ;
     }
 }
