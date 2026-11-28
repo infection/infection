@@ -44,6 +44,7 @@ use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
+use Infection\TestFramework\Legacy\LegacyMutantDetectionStatusResolver;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutation\MutationBuilder;
 use PhpParser\Node\Stmt\Nop;
@@ -69,7 +70,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
     {
         $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
 
-        $this->resultFactory = new TestFrameworkMutantExecutionResultFactory($this->testFrameworkAdapterMock);
+        $this->resultFactory = new TestFrameworkMutantExecutionResultFactory(
+            new LegacyMutantDetectionStatusResolver($this->testFrameworkAdapterMock),
+        );
     }
 
     public function test_it_can_create_a_result_from_a_non_covered_mutant_process(): void
@@ -88,6 +91,10 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
         $processMock
             ->method('getOutput')
             ->willReturn($processOutput = 'Passed!')
+        ;
+        $processMock
+            ->expects($this->never())
+            ->method('getExitCode')
         ;
 
         $this->testFrameworkAdapterMock
@@ -133,6 +140,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                 ->build(),
             $this->resultFactory,
         );
+        $mutantProcess->markAsTimedOut();
 
         $this->assertResultStateIs(
             $this->resultFactory->createFromProcess($mutantProcess),
@@ -391,28 +399,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
         );
     }
 
-    public function test_it_can_crate_a_result_from_an_escaped_mutant_process(): void
+    public function test_it_reports_a_dry_run_mutant_as_escaped(): void
     {
-        $processMock = $this->createMock(Process::class);
-        $processMock
-            ->method('getCommandLine')
-            ->willReturn(
-                $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
-            )
-        ;
-        $processMock
-            ->method('isTerminated')
-            ->willReturn(true)
-        ;
-        $processMock
-            ->method('getOutput')
-            ->willReturn(DryRunProcess::PASSING_TEST_OUTPUT)
-        ;
-        $processMock
-            ->expects($this->exactly(2))
-            ->method('getExitCode')
-            ->willReturn(0)
-        ;
+        $process = new Process(['bin/phpunit', '--configuration', 'infection-tmp-phpunit.xml']);
 
         $this->testFrameworkAdapterMock
             ->expects($this->once())
@@ -422,7 +411,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
         ;
 
         $mutantProcess = new MutantProcess(
-            $processMock,
+            DryRunProcess::fromProcess($process),
             MutantBuilder::withMinimalTestData()
                 ->withMutantFilePath('/path/to/mutant')
                 ->withMutation(new Mutation(
@@ -468,7 +457,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
 
         $this->assertResultStateIs(
             $this->resultFactory->createFromProcess($mutantProcess),
-            $processCommandLine,
+            $process->getCommandLine(),
             DryRunProcess::PASSING_TEST_OUTPUT,
             DetectionStatus::ESCAPED,
             $mutantDiff,
@@ -496,7 +485,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
             ->willReturn('Tests failed!')
         ;
         $processMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getExitCode')
             ->willReturn(0)
         ;
@@ -592,7 +581,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
             ->willReturn('Tests passed! OK (10 tests, 32 assertions)')
         ;
         $processMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getExitCode')
             ->willReturn(1) // PHPUnit says tests passed, but return code is non-zero
         ;

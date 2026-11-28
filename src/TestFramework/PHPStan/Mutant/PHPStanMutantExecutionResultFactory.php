@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PHPStan\Mutant;
 
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use function sprintf;
 use Symfony\Component\Process\Process;
 use function trim;
@@ -47,9 +47,12 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class PHPStanMutantExecutionResultFactory implements MutantExecutionResultFactory
+final readonly class PHPStanMutantExecutionResultFactory implements MutantExecutionResultFactory
 {
-    private const int PROCESS_MIN_ERROR_CODE = 100;
+    public function __construct(
+        private MutantProcessDetectionStatusResolver $detectionStatusResolver,
+    ) {
+    }
 
     public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult
     {
@@ -60,7 +63,11 @@ final class PHPStanMutantExecutionResultFactory implements MutantExecutionResult
         return new MutantExecutionResult(
             $process->getCommandLine(),
             $this->retrieveProcessOutput($process),
-            $this->retrieveDetectionStatus($mutantProcess),
+            $this->detectionStatusResolver->resolve(
+                $process->getOutput(),
+                $process->getExitCode(),
+                $mutantProcess->isTimedOut(),
+            ),
             $mutant->getDiff(),
             $mutation->getHash(),
             $mutation->getMutatorClass(),
@@ -88,25 +95,5 @@ final class PHPStanMutantExecutionResultFactory implements MutantExecutionResult
         );
 
         return trim($process->getOutput() . "\n\n" . $process->getErrorOutput());
-    }
-
-    private function retrieveDetectionStatus(MutantProcess $mutantProcess): DetectionStatus
-    {
-        if ($mutantProcess->isTimedOut()) {
-            return DetectionStatus::TIMED_OUT;
-        }
-
-        $process = $mutantProcess->getProcess();
-
-        if ($process->getExitCode() > self::PROCESS_MIN_ERROR_CODE) {
-            // See \Symfony\Component\Process\Process::$exitCodes
-            return DetectionStatus::ERROR;
-        }
-
-        if ($process->getExitCode() === 0) {
-            return DetectionStatus::ESCAPED;
-        }
-
-        return DetectionStatus::KILLED_BY_STATIC_ANALYSIS;
     }
 }

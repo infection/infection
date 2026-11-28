@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Testing\TestFramework\Debug;
 
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
@@ -73,7 +74,9 @@ final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMuta
             ),
             $mutant,
             // There is not enough differences to warrant a different factory yet at the time of writing.
-            new PHPStanMutantExecutionResultFactory(),
+            new PHPStanMutantExecutionResultFactory(
+                new FixedMutantProcessDetectionStatusResolver(DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
+            ),
         );
     }
 }

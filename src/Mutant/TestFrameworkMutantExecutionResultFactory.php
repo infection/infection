@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\AbstractTestFramework\SyntaxErrorAware;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\MutantProcess;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use function sprintf;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
@@ -47,10 +46,8 @@ use Webmozart\Assert\Assert;
  */
 final readonly class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResultFactory
 {
-    private const int PROCESS_MIN_ERROR_CODE = 100;
-
     public function __construct(
-        private TestFrameworkAdapter $testFrameworkAdapter,
+        private MutantProcessDetectionStatusResolver $detectionStatusResolver,
     ) {
     }
 
@@ -59,11 +56,12 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
         $process = $mutantProcess->getProcess();
         $mutant = $mutantProcess->getMutant();
         $mutation = $mutant->getMutation();
+        $output = $this->retrieveProcessOutput($process);
 
         return new MutantExecutionResult(
             $process->getCommandLine(),
-            $this->retrieveProcessOutput($process),
-            $this->retrieveDetectionStatus($mutantProcess),
+            $output,
+            $this->retrieveDetectionStatus($mutantProcess, $output),
             $mutant->getDiff(),
             $mutation->getHash(),
             $mutation->getMutatorClass(),
@@ -93,36 +91,23 @@ final readonly class TestFrameworkMutantExecutionResultFactory implements Mutant
         return $process->getOutput();
     }
 
-    private function retrieveDetectionStatus(MutantProcess $mutantProcess): DetectionStatus
+    private function retrieveDetectionStatus(MutantProcess $mutantProcess, string $stdout): DetectionStatus
     {
         if (!$mutantProcess->getMutant()->isCoveredByTest()) {
             return DetectionStatus::NOT_COVERED;
         }
 
-        if ($mutantProcess->isTimedOut()) {
-            return self::isTimeoutExpected($mutantProcess)
-                ? DetectionStatus::SKIPPED
-                : DetectionStatus::TIMED_OUT;
+        $timedOut = $mutantProcess->isTimedOut();
+
+        if ($timedOut && self::isTimeoutExpected($mutantProcess)) {
+            return DetectionStatus::SKIPPED;
         }
 
-        $process = $mutantProcess->getProcess();
-
-        if ($process->getExitCode() > self::PROCESS_MIN_ERROR_CODE) {
-            // See \Symfony\Component\Process\Process::$exitCodes
-            return DetectionStatus::ERROR;
-        }
-
-        $output = $this->retrieveProcessOutput($process);
-
-        if ($process->getExitCode() === 0 && $this->testFrameworkAdapter->testsPass($output)) {
-            return DetectionStatus::ESCAPED;
-        }
-
-        if ($this->testFrameworkAdapter instanceof SyntaxErrorAware && $this->testFrameworkAdapter->isSyntaxError($output)) {
-            return DetectionStatus::SYNTAX_ERROR;
-        }
-
-        return DetectionStatus::KILLED_BY_TESTS;
+        return $this->detectionStatusResolver->resolve(
+            $stdout,
+            $mutantProcess->getProcess()->getExitCode(),
+            $timedOut,
+        );
     }
 
     /**

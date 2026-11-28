@@ -385,12 +385,6 @@ parameters:
 			path: ../src/Mutant/MutantExecutionResult.php
 
 		-
-			rawMessage: Infection\Mutant\TestFrameworkMutantExecutionResultFactory should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
-			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
-			count: 1
-			path: ../src/Mutant/TestFrameworkMutantExecutionResultFactory.php
-
-		-
 			rawMessage: Do not use magic number as a function argument. Move to constant with a suitable name.
 			count: 8
 			path: ../src/Mutator/Extensions/BCMath.php
@@ -679,6 +673,12 @@ parameters:
 			path: ../src/TestFramework/Contracts/InitialRunResults.php
 
 		-
+			rawMessage: Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver should not depend on Infection\Mutant\DetectionStatus
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/Mutant/MutantProcessDetectionStatusResolver.php
+
+		-
 			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\Mutant
 			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
 			count: 1
@@ -805,6 +805,12 @@ parameters:
 			path: ../src/TestFramework/Factory.php
 
 		-
+			rawMessage: Infection\TestFramework\Legacy\LegacyMutantDetectionStatusResolver should not depend on Infection\AbstractTestFramework\TestFrameworkAdapter
+			identifier: phpat.testLegacyTestFrameworkAdaptersAreOnlyUsedInTheLegacyDirectory
+			count: 1
+			path: ../src/TestFramework/Legacy/LegacyMutantDetectionStatusResolver.php
+
+		-
 			rawMessage: Infection\TestFramework\Mago\Adapter\MagoAdapter should not depend on Infection\Mutant\MutantExecutionResultFactory
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -835,9 +841,15 @@ parameters:
 			path: ../src/TestFramework/Mago/Adapter/MagoAdapterFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\DetectionStatus
+			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantDetectionStatusResolver should not depend on Infection\Mutant\DetectionStatus
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 5
+			path: ../src/TestFramework/Mago/Mutant/MagoMutantDetectionStatusResolver.php
+
+		-
+			rawMessage: Infection\TestFramework\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\DetectionStatus
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
 			path: ../src/TestFramework/Mago/Mutant/MagoMutantExecutionResultFactory.php
 
 		-
@@ -1049,6 +1061,12 @@ parameters:
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 2
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Mutant\PHPUnitMutantDetectionStatusResolver should not depend on Infection\Mutant\DetectionStatus
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 6
+			path: ../src/TestFramework/PhpUnit/Mutant/PHPUnitMutantDetectionStatusResolver.php
 
 		-
 			rawMessage: Infection\TestFramework\TestFrameworkTypes should not depend on Infection\AbstractTestFramework\TestFrameworkAdapterFactory

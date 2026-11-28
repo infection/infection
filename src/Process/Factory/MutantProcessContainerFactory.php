@@ -42,6 +42,7 @@ use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\TestFramework\Contracts\Mutant\MutantProcessDetectionStatusResolver;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use function min;
 use Symfony\Component\Process\Process;
@@ -65,6 +66,7 @@ class MutantProcessContainerFactory
     public function create(
         TestFrameworkAdapter $testFrameworkAdapter,
         Mutant $mutant,
+        MutantProcessDetectionStatusResolver $detectionStatusResolver,
         string $testFrameworkExtraOptions = '',
     ): MutantProcessContainer {
         // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
@@ -90,7 +92,7 @@ class MutantProcessContainerFactory
             static fn (): MutantProcess => new MutantProcess(
                 $process,
                 $mutant,
-                new TestFrameworkMutantExecutionResultFactory($testFrameworkAdapter),
+                new TestFrameworkMutantExecutionResultFactory($detectionStatusResolver),
             ),
         );
     }
