@@ -204,6 +204,9 @@ The phase encompassing [mutant materialisation][mutant-materialisation] and [mut
 The execution of tests and optional static analysis against a mutant, and the
 recording of the outcome.
 
+Active evaluation time is the sum of the completed process runtimes. Dry runs
+have zero active time. Elapsed evaluation time runs from first scheduling through
+final completion and includes queue waits, evaluator preparation, and follow-ups.
 
 ### Mutant Materialisation
 

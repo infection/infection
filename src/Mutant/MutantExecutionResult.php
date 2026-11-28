@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use function array_key_last;
+use function array_map;
+use function array_sum;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\MutatorResolver;
 use Infection\Process\MutantProcess;
@@ -52,6 +54,8 @@ use Webmozart\Assert\Assert;
  */
 class MutantExecutionResult
 {
+    private ?float $evaluationElapsedTime = null;
+
     private readonly string $mutatorClass;
 
     /**
@@ -211,6 +215,38 @@ class MutantExecutionResult
     public function getProcessRuntime(): float
     {
         return $this->processRuntime;
+    }
+
+    /**
+     * Sum of completed process runtimes in seconds, excluding queue time.
+     */
+    public function getEvaluationActiveTime(): float
+    {
+        if ($this->evaluationHistory === []) {
+            return $this->processRuntime;
+        }
+
+        return array_sum(array_map(
+            static fn (MutantProcess $attempt): float => $attempt->getRuntime(),
+            $this->evaluationHistory,
+        ));
+    }
+
+    /**
+     * Seconds from first enqueue to final completion, or null when not observed.
+     * This excludes mutation generation and heuristic suppression.
+     */
+    public function getEvaluationElapsedTime(): ?float
+    {
+        return $this->evaluationElapsedTime;
+    }
+
+    public function withEvaluationElapsedTime(float $evaluationElapsedTime): self
+    {
+        $clone = clone $this;
+        $clone->evaluationElapsedTime = $evaluationElapsedTime;
+
+        return $clone;
     }
 
     /**

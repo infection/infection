@@ -39,8 +39,7 @@ use function array_map;
 use Infection\Framework\Str;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\EvaluationAttemptResult;
-use Infection\Mutant\EvaluationProcessDetails;
+use Infection\Process\MutantProcess;
 use Infection\Reporter\BaseTextFileReporter;
 use Infection\Reporter\TextFileReporter;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -183,10 +182,10 @@ final class TextFileReporterTest extends TestCase
     }
 
     /**
-     * @param non-empty-list<EvaluationAttemptResult> $history
+     * @param non-empty-list<MutantProcess> $history
      */
-    #[DataProvider('mixedEvaluationHistoryProvider')]
-    public function test_it_reports_process_and_direct_observations_from_the_locked_history(
+    #[DataProvider('recordedEvaluationHistoryProvider')]
+    public function test_it_reports_processes_from_the_recorded_history(
         array $history,
         bool $debugVerbosity,
         bool $debugMode,
@@ -212,40 +211,19 @@ final class TextFileReporterTest extends TestCase
         $this->assertSame($sections, array_map(Str::toUnixLineEndings(...), $reporter->getLines()));
     }
 
-    public static function mixedEvaluationHistoryProvider(): iterable
+    public static function recordedEvaluationHistoryProvider(): iterable
     {
-        $direct = new EvaluationAttemptResult('In-memory analyser', DetectionStatus::KILLED_BY_STATIC_ANALYSIS, "\r\nType mismatch \r\nnext line \r\n", null);
-        $tests = new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED, 'Tests pass', new EvaluationProcessDetails('vendor/bin/phpunit', 1.0));
-        $analysis = new EvaluationAttemptResult('PHPStan', DetectionStatus::ERROR, 'Analysis failed', new EvaluationProcessDetails('vendor/bin/phpstan', 0.25));
+        $analysis = self::stubReportedProcess('PHPStan', DetectionStatus::ERROR, 'Analysis failed', 'vendor/bin/phpstan', 0.25);
+        $tests = self::stubReportedProcess(
+            "\r\nPHPUnit \r\n",
+            DetectionStatus::ESCAPED,
+            "\r\nTests pass \r\n",
+            'vendor/bin/phpunit',
+            1.0,
+        );
 
-        yield 'one direct observation has output without a command or label' => [
-            [$direct],
-            true,
-            true,
-            <<<'TXT'
-
-
-                  Type mismatch
-                  next line
-                TXT,
-        ];
-
-        yield 'one direct observation has output with verbosity only' => [
-            [$direct],
-            true,
-            false,
-            <<<'TXT'
-
-
-                  Type mismatch
-                  next line
-                TXT,
-        ];
-
-        yield 'one direct observation adds no empty command in debug-only mode' => [[$direct], false, true, ''];
-
-        yield 'process then direct observation retains both outputs' => [
-            [$tests, $direct],
+        yield 'process history sanitizes evaluator labels and output' => [
+            [$tests, $analysis],
             true,
             true,
             <<<'TXT'
@@ -255,82 +233,16 @@ final class TextFileReporterTest extends TestCase
                 $ vendor/bin/phpunit
                   Tests pass
 
-                In-memory analyser:
-                  Type mismatch
-                  next line
-                TXT,
-        ];
-
-        yield 'direct observation then process retains both outputs' => [
-            [$direct, $analysis],
-            true,
-            true,
-            <<<'TXT'
-
-
-                In-memory analyser:
-                  Type mismatch
-                  next line
-
                 PHPStan:
                 $ vendor/bin/phpstan
                   Analysis failed
                 TXT,
         ];
 
-        yield 'mixed observations retain labels and real commands in debug-only mode' => [
-            [$direct, $analysis],
-            false,
-            true,
-            <<<'TXT'
-
-
-                In-memory analyser:
-
-                PHPStan:
-                $ vendor/bin/phpstan
-                TXT,
-        ];
-
-        yield 'mixed observations omit commands with verbosity only' => [
-            [$tests, $direct],
-            true,
-            false,
-            <<<'TXT'
-
-
-                PHPUnit:
-                  Tests pass
-
-                In-memory analyser:
-                  Type mismatch
-                  next line
-                TXT,
-        ];
-
-        yield 'direct observations sanitize labels and outputs' => [
-            [
-                new EvaluationAttemptResult("\r\nFirst analyser \r\n", DetectionStatus::ESCAPED, "\r\nNo issues \r\n", null),
-                $direct,
-            ],
-            true,
-            true,
-            <<<'TXT'
-
-
-                First analyser:
-                  No issues
-
-                In-memory analyser:
-                  Type mismatch
-                  next line
-                TXT,
-        ];
-
         yield 'retries retain repeated evaluator labels in execution order' => [
             [
-                new EvaluationAttemptResult('PHPUnit', DetectionStatus::TIMED_OUT, 'First attempt timed out', new EvaluationProcessDetails('vendor/bin/phpunit --first', 1.0)),
-                new EvaluationAttemptResult('PHPUnit', DetectionStatus::ESCAPED, 'Retry passed', new EvaluationProcessDetails('vendor/bin/phpunit --retry', 0.5)),
+                self::stubReportedProcess('PHPUnit', DetectionStatus::TIMED_OUT, 'First attempt timed out', 'vendor/bin/phpunit --first', 1.0),
+                self::stubReportedProcess('PHPUnit', DetectionStatus::ESCAPED, 'Retry passed', 'vendor/bin/phpunit --retry', 0.5),
                 $analysis,
             ],
             true,
@@ -352,7 +264,7 @@ final class TextFileReporterTest extends TestCase
                 TXT,
         ];
 
-        yield 'mixed observations remain hidden when neither flag is enabled' => [[$tests, $direct], false, false, ''];
+        yield 'process history remains hidden when neither flag is enabled' => [[$tests, $analysis], false, false, ''];
     }
 
     public static function emptyMetricsProvider(): iterable

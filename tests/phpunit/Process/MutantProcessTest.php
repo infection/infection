@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
+use DuoClock\TimeSpy;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Process\DryRunProcess;
@@ -57,11 +58,14 @@ final class MutantProcessTest extends TestCase
 
     private MutantProcess $mutantProcess;
 
+    private TimeSpy $clock;
+
     protected function setUp(): void
     {
         $this->processStub = $this->createStub(Process::class);
         $this->mutant = MutantBuilder::withMinimalTestData()->build();
         $resolver = $this->createStub(MutantProcessDetectionStatusResolver::class);
+        $this->clock = new TimeSpy(100.0);
 
         $this->mutantProcess = new MutantProcess(
             $this->processStub,
@@ -69,6 +73,7 @@ final class MutantProcessTest extends TestCase
             'PHPUnit',
             $resolver,
             includeErrorOutput: false,
+            clock: $this->clock,
         );
     }
 
@@ -129,7 +134,14 @@ final class MutantProcessTest extends TestCase
         $this->processStub->method('getExitCode')->willReturn(0);
         $resolver = $this->createMock(MutantProcessDetectionStatusResolver::class);
         $resolver->expects($this->once())->method('resolve')->with('output', 0, true)->willReturn(DetectionStatus::ESCAPED);
-        $process = new MutantProcess($this->processStub, $this->mutant, 'PHPUnit', $resolver, includeErrorOutput: false);
+        $process = new MutantProcess(
+            $this->processStub,
+            $this->mutant,
+            'PHPUnit',
+            $resolver,
+            includeErrorOutput: false,
+            clock: new TimeSpy(0.25),
+        );
         $process->markAsTimedOut();
         $process->markAsFinished();
 
@@ -166,6 +178,17 @@ final class MutantProcessTest extends TestCase
         $this->expectExceptionMessage('Cannot resolve the detection status before the mutant process has finished.');
 
         $process->getResult();
+    }
+
+    public function test_it_records_when_completion_is_observed(): void
+    {
+        $this->assertSame(0.0, $this->mutantProcess->getFinishedAt());
+
+        $this->clock->usleep(250_000);
+        $this->mutantProcess->markAsFinished();
+        $this->clock->sleep(2);
+
+        $this->assertSame(100.25, $this->mutantProcess->getFinishedAt());
     }
 
     private function assertMutantProcessStateIs(

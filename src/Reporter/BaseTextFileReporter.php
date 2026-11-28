@@ -43,8 +43,8 @@ use function explode;
 use function implode;
 use Infection\Framework\Str;
 use Infection\Metrics\ResultsCollector;
-use Infection\Mutant\EvaluationAttemptResult;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Process\MutantProcess;
 use const PHP_EOL;
 use function Pipeline\take;
 use function sprintf;
@@ -196,11 +196,11 @@ abstract readonly class BaseTextFileReporter implements LineMutationTestingResul
 
         $showEvaluator = count($history) > 1;
         $lines = take($history)
-            ->cast(fn (EvaluationAttemptResult $attempt): array => $this->getProcessLines(
-                $attempt->process?->commandLine,
-                $attempt->output,
+            ->cast(fn (MutantProcess $attempt): array => $this->getProcessLines(
+                $attempt->getProcess()->getCommandLine(),
+                $attempt->getResultOutput(),
                 $showEvaluator
-                    ? $attempt->evaluatorName
+                    ? $attempt->getTestFrameworkName()
                     : null,
             ))
             ->toList()
