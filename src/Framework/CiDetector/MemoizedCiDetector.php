@@ -46,8 +46,9 @@ use OndraM\CiDetector\Exception\CiNotDetectedException;
  * Only classes in this namespace can depend on ondram/ci-detector (a PHPat rule).
  *
  * @internal
+ * @final
  */
-final readonly class MemoizedCiDetector
+readonly class MemoizedCiDetector
 {
     /**
      * @var Deferred<CiInterface|null>
