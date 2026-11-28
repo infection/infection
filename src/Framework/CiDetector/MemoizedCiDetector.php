@@ -44,7 +44,6 @@ use OndraM\CiDetector\Exception\CiNotDetectedException;
 
 /**
  * Only classes in this namespace can depend on ondram/ci-detector (a PHPat rule).
- * The constructor default lets the container autowire this class.
  *
  * @internal
  */
