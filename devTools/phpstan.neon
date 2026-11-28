@@ -81,6 +81,10 @@ services:
         tags:
             - phpat.test
     -
+        class: Infection\Tests\Architecture\PHPat\CiDetectionShouldStayBehindItsBoundaryTest
+        tags:
+            - phpat.test
+    -
         class: Infection\Tests\Architecture\PHPat\StaticOrConstOnlyClassesShouldNotBeInstantiableTest
         tags:
             - phpat.test

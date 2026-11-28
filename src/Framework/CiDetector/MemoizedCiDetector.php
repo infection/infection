@@ -36,42 +36,54 @@ declare(strict_types=1);
 namespace Infection\Framework\CiDetector;
 
 use Later\Interfaces\Deferred;
-use function Later\later;
+use function Later\lazy;
 use OndraM\CiDetector\Ci\CiInterface;
+use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
-use Override;
 
 /**
+ * Only classes in this namespace can depend on ondram/ci-detector (a PHPat rule).
+ *
  * @internal
+ * @final
  */
-final readonly class MemoizedCiDetector implements CiDetectorInterface
+readonly class MemoizedCiDetector
 {
     /**
-     * @var Deferred<CiInterface>
+     * @var Deferred<CiInterface|null>
      */
     private Deferred $ci;
 
-    public function __construct(CiDetectorInterface $decoratedDetector)
+    public function __construct(CiDetectorInterface $detector = new CiDetector())
     {
-        $this->ci = later(static fn () => yield $decoratedDetector->detect());
+        $this->ci = lazy(self::wrapDetector($detector));
     }
 
-    #[Override]
     public function isCiDetected(): bool
     {
-        try {
-            $this->detect();
-        } catch (CiNotDetectedException) {
-            return false;
-        }
-
-        return true;
+        return $this->findCi() !== null;
     }
 
-    #[Override]
-    public function detect(): CiInterface
+    public function isGitHubActions(): bool
+    {
+        return $this->findCi()?->getCiName() === CiDetector::CI_GITHUB_ACTIONS;
+    }
+
+    public function findCi(): ?CiInterface
     {
         return $this->ci->get();
+    }
+
+    /**
+     * @return iterable<CiInterface|null>
+     */
+    private static function wrapDetector(CiDetectorInterface $detector): iterable
+    {
+        try {
+            yield $detector->detect();
+        } catch (CiNotDetectedException) {
+            yield null;
+        }
     }
 }

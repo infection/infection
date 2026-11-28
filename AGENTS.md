@@ -328,8 +328,14 @@ This style rule often surprises agents. Code is structured for killability:
 - Mock expectations assert exact arguments (`->with([...])`) - loose mocks let mutants
   escape and the self-mutation CI gate flags them on your PR.
 - No default parameter values in constructors ("increases the risk of forgetting to pass
-  it"). Data providers, by contrast, SHOULD use defaults + named arguments so each case
-  states only what it exercises.
+  it"). One exception: a boundary class over an external package may default its vendor
+  collaborator to the production implementation
+  (`MemoizedCiDetector(CiDetectorInterface $detector = new CiDetector())`). No caller
+  forwards that value, the container autowires the class without a factory, and tests pass
+  a double. A PHPat rule keeps the package behind that class's namespace
+  (`tests/Architecture/PHPat/CiDetectionShouldStayBehindItsBoundaryTest.php`). Data
+  providers, by contrast, SHOULD use defaults + named arguments so each case states only
+  what it exercises.
 - Infection's own config globally skips mutating `Assert::` calls
   (`infection.json5` `global-ignoreSourceCodeByRegex`) - assertion messages are not worth
   killing.

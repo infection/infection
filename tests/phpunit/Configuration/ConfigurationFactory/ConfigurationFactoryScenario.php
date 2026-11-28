@@ -408,6 +408,7 @@ final class ConfigurationFactoryScenario
             )
             ->withExpected(
                 ConfigurationBuilder::from($previousExpected)
+                    ->withNoProgress($githubActionsDetected)
                     ->withLogs(
                         LogsBuilder::from($previousExpected->logs)
                             ->withUseGitHubAnnotationsLogger($useGitHubAnnotationsLogger)

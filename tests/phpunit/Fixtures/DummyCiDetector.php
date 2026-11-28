@@ -7,6 +7,7 @@ namespace Infection\Tests\Fixtures;
 use Infection\Tests\UnsupportedMethod;
 use OndraM\CiDetector\Ci\CiInterface;
 use OndraM\CiDetector\Ci\GitHubActions;
+use OndraM\CiDetector\Ci\GitLab;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Env;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
@@ -31,6 +32,10 @@ final readonly class DummyCiDetector implements CiDetectorInterface
     {
         if ($this->githubActionsDetected) {
             return new GitHubActions(new Env());
+        }
+
+        if ($this->ciDetected) {
+            return new GitLab(new Env());
         }
 
         throw new CiNotDetectedException('No CI server detected in current environment');

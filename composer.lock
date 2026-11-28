@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "16e2fb25b6d231c460843124fe26f03d",
+    "content-hash": "38de2a2ab1c07fe774abc4f8d5c7188a",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -951,16 +951,16 @@
         },
         {
             "name": "sanmai/di-container",
-            "version": "0.2",
+            "version": "0.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sanmai/di-container.git",
-                "reference": "c14ca816bb5527e2361e3dc554a20829674c7ee1"
+                "reference": "428b00f3c18ef4d324703ba63f4968813066edc8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sanmai/di-container/zipball/c14ca816bb5527e2361e3dc554a20829674c7ee1",
-                "reference": "c14ca816bb5527e2361e3dc554a20829674c7ee1",
+                "url": "https://api.github.com/repos/sanmai/di-container/zipball/428b00f3c18ef4d324703ba63f4968813066edc8",
+                "reference": "428b00f3c18ef4d324703ba63f4968813066edc8",
                 "shasum": ""
             },
             "require": {
@@ -1018,7 +1018,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sanmai/di-container/issues",
-                "source": "https://github.com/sanmai/di-container/tree/0.2"
+                "source": "https://github.com/sanmai/di-container/tree/0.2.2"
             },
             "funding": [
                 {
@@ -1026,7 +1026,8 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-11T06:42:18+00:00"
+            "time": "2026-11-09T10:32:19+00:00",
+            "published-time": "2026-11-09T10:34:41+00:00"
         },
         {
             "name": "sanmai/duoclock",
@@ -5850,5 +5851,5 @@
     "platform-overrides": {
         "php": "8.3.0"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.11.0"
 }

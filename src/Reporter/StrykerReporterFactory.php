@@ -38,11 +38,11 @@ namespace Infection\Reporter;
 use Infection\Configuration\Entry\Logs;
 use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
+use Infection\Framework\CiDetector\MemoizedCiDetector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\Http\StrykerCurlClient;
 use Infection\Reporter\Http\StrykerDashboardClient;
-use OndraM\CiDetector\CiDetectorInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -54,7 +54,7 @@ class StrykerReporterFactory
     public function __construct(
         private readonly MetricsCalculator $metricsCalculator,
         private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
-        private readonly CiDetectorInterface $ciDetector,
+        private readonly MemoizedCiDetector $ciDetector,
         private readonly LoggerInterface $logger,
     ) {
     }

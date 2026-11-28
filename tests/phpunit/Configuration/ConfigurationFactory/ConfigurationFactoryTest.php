@@ -56,6 +56,7 @@ use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\LogVerbosity;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Framework\CiDetector\MemoizedCiDetector;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
@@ -1806,7 +1807,7 @@ final class ConfigurationFactoryTest extends TestCase
             SingletonContainer::getContainer()->getMutatorResolver(),
             SingletonContainer::getContainer()->getMutatorFactory(),
             new MutatorParser(),
-            new DummyCiDetector($ciDetected, $githubActionsDetected),
+            new MemoizedCiDetector(new DummyCiDetector($ciDetected, $githubActionsDetected)),
             new ConfigurationFactoryGit(
                 self::GIT_DEFAULT_BASE,
             ),
