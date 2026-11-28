@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Testing\TestFramework\Debug;
 
+use Infection\TestFramework\Common\Process\DryRunAwareProcessFactory;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
 use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisMutantProcessFactory;
@@ -54,6 +55,7 @@ final class DebugStaticAnalysisAdapterTest extends TestCase
         ;
 
         $adapter = new DebugStaticAnalysisAdapter(
+            new DryRunAwareProcessFactory(false),
             '/debug.php',
             '/tmp/infection',
             10.,

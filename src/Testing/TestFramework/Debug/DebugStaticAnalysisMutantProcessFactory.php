@@ -39,9 +39,8 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\TestFramework\Common\Process\ProcessFactory;
 use Infection\TestFramework\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -49,6 +48,7 @@ use Symfony\Component\Process\Process;
 final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMutantProcessFactory
 {
     public function __construct(
+        private ProcessFactory $processFactory,
         private string $runtime,
         private string $logFile,
         private float $timeout,
@@ -59,7 +59,7 @@ final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMuta
     public function create(Mutant $mutant): MutantProcess
     {
         return new MutantProcess(
-            new Process(
+            $this->processFactory->create(
                 command: $this->commandLine->create(
                     runtime: $this->runtime,
                     phpArguments: [],
@@ -69,7 +69,6 @@ final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMuta
                         'mutationHash' => $mutant->getMutation()->getHash(),
                     ],
                 ),
-                env: ['SHELL_VERBOSITY' => ShellCommandRunner::DEFAULT_SHELL_VERBOSITY],
                 timeout: $this->timeout,
             ),
             $mutant,

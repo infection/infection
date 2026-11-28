@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Mago\Adapter;
 
+use Infection\TestFramework\Common\Process\DryRunAwareProcessFactory;
 use Infection\TestFramework\Contracts\FakeShellCommandRunner;
 use Infection\TestFramework\Mago\Adapter\MagoAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -46,6 +47,7 @@ final class MagoAdapterFactoryTest extends TestCase
     public function test_it_can_create_an_adapter(): void
     {
         $adapter = MagoAdapterFactory::create(
+            new DryRunAwareProcessFactory(false),
             '/path/to/mago-config-path',
             '/path/to/mago',
             32.3,
