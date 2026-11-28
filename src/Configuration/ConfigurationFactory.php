@@ -122,7 +122,7 @@ class ConfigurationFactory
         string $logVerbosity,
         bool $debug,
         bool $withUncovered,
-        bool $noProgress,
+        ?bool $noProgress,
         ?bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         ?int $numberOfShownMutations,
@@ -379,9 +379,9 @@ class ConfigurationFactory
         return $staticAnalysisToolOptions ?? $schema->staticAnalysisToolOptions;
     }
 
-    private function retrieveNoProgress(bool $noProgress): bool
+    private function retrieveNoProgress(?bool $noProgress): bool
     {
-        return $noProgress || $this->ciDetector->isCiDetected();
+        return $noProgress ?? $this->ciDetector->isCiDetected();
     }
 
     private static function retrieveIgnoreMsiWithNoMutations(

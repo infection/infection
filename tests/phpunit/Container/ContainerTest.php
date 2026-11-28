@@ -140,21 +140,6 @@ final class ContainerTest extends TestCase
         }
     }
 
-    public function test_it_provides_a_friendly_error_when_attempting_to_configure_it_with_both_no_progress_and_force_progress(): void
-    {
-        $container = SingletonContainer::getContainer();
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot force progress and set no progress at the same time');
-
-        $container->withValues(
-            new NullLogger(),
-            new NullOutput(),
-            noProgress: true,
-            forceProgress: true,
-        );
-    }
-
     public function test_it_uses_the_standard_dispatcher_when_event_collection_is_disabled(): void
     {
         $container = Container::create()->cloneWithService(

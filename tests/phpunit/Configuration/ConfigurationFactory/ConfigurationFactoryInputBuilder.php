@@ -55,7 +55,7 @@ final class ConfigurationFactoryInputBuilder
         private string $logVerbosity,
         private bool $debug,
         private bool $withUncovered,
-        private bool $noProgress,
+        private ?bool $noProgress,
         private ?bool $ignoreMsiWithNoMutations,
         private ?float $minMsi,
         private ?int $numberOfShownMutations,
@@ -135,7 +135,7 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
-    public function withNoProgress(bool $noProgress): self
+    public function withNoProgress(?bool $noProgress): self
     {
         $clone = clone $this;
         $clone->noProgress = $noProgress;
@@ -388,7 +388,7 @@ final class ConfigurationFactoryInputBuilder
      *     4: string,
      *     5: bool,
      *     6: bool,
-     *     7: bool,
+     *     7: bool|null,
      *     8: bool|null,
      *     9: float|null,
      *     10: int|null,
