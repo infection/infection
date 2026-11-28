@@ -86,9 +86,10 @@ class CoverageChecker
 
         if (!$this->skipCoverage && !$this->hasCoverageGeneratorEnabled()) {
             throw new CoverageNotFound(<<<TXT
-                Coverage needs to be generated but no code coverage generator (pcov, phpdbg or xdebug) has been detected. Please either:
+                Coverage needs to be generated but no code coverage generator (pcov, phpdbg, xdebug or turbocov) has been detected. Please either:
                 - Enable pcov and run Infection again
                 - Use phpdbg, e.g. `phpdbg -qrr infection`
+                - Enable turbocov (requires PHPUnit 13.3+ with the `ShipMonk\Turbocov\TurbocovDriver` coverage driver configured) and run Infection again
                 - Enable Xdebug (in case of using Xdebug 3 check that `xdebug.mode` or environment variable XDEBUG_MODE set to `coverage`) and run Infection again
                 - Use the "--coverage" option with path to the existing coverage report
                 - Enable the code generator tool for the initial test run only, e.g. with `--initial-tests-php-options -d zend_extension=xdebug.so`
@@ -159,10 +160,12 @@ class CoverageChecker
         return PHP_SAPI === 'phpdbg'
             || XdebugHandler::isXdebugActive()
             || extension_loaded('pcov')
+            || extension_loaded('turbocov')
             || XdebugHandler::getSkippedVersion() !== ''
             || ini_get_unsafe('xdebug.mode') !== false
             || $this->isXdebugIncludedInInitialTestPhpOptions()
-            || $this->isPcovIncludedInInitialTestPhpOptions();
+            || $this->isPcovIncludedInInitialTestPhpOptions()
+            || $this->isTurbocovIncludedInInitialTestPhpOptions();
     }
 
     private function isXdebugIncludedInInitialTestPhpOptions(): bool
@@ -177,6 +180,14 @@ class CoverageChecker
     {
         return (bool) preg_match(
             '/(extension\s*=.*pcov.*)/mi',
+            $this->initialTestPhpOptions,
+        );
+    }
+
+    private function isTurbocovIncludedInInitialTestPhpOptions(): bool
+    {
+        return (bool) preg_match(
+            '/extension\s*=\s*\S*turbocov/',
             $this->initialTestPhpOptions,
         );
     }

@@ -86,6 +86,7 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
         private readonly string $tmpDir,
         private readonly string $jUnitFilePath,
         private readonly PCOVDirectoryProvider $pcovDirectoryProvider,
+        private readonly TurbocovCollectPathsProvider $turbocovCollectPathsProvider,
         private readonly InitialConfigBuilder $initialConfigBuilder,
         private readonly MutationConfigBuilder $mutationConfigBuilder,
         private readonly ArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
@@ -223,6 +224,16 @@ final class PhpUnitAdapter implements SyntaxErrorAware, TestFramework, TestFrame
                 $phpExtraArgs[] = sprintf(
                     'pcov.directory=%s',
                     $this->pcovDirectoryProvider->getDirectory(),
+                );
+            }
+
+            // turbocov does not collect any coverage unless `turbocov.collect_paths`
+            // lists the target source code.
+            if ($this->turbocovCollectPathsProvider->shouldProvide()) {
+                $phpExtraArgs[] = '-d';
+                $phpExtraArgs[] = sprintf(
+                    'turbocov.collect_paths=%s',
+                    $this->turbocovCollectPathsProvider->getCollectPaths(),
                 );
             }
         }

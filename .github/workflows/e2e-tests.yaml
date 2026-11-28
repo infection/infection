@@ -42,6 +42,8 @@ jobs:
           - { operating-system: 'ubuntu-latest', php-version: '8.5', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.6', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.6', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
+          # The other E2E tests do not configure the turbocov PHPUnit driver, so only the turbocov ones are executed
+          - { operating-system: 'ubuntu-latest', php-version: '8.4', dependencies: 'locked', composer: 'composer', coverage-driver: 'turbocov', e2e-runner: 'bin/infection' }
 
     name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependencies }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
@@ -55,12 +57,20 @@ jobs:
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: ${{ matrix.php-version }}
-          coverage: ${{ matrix.coverage-driver }}
+          # turbocov is not supported by setup-php, it is installed in a dedicated step.
+          # It cannot run alongside Xdebug or PCOV, so neither is installed in that case.
+          coverage: ${{ matrix.coverage-driver == 'turbocov' && 'none' || matrix.coverage-driver }}
           ini-values: memory_limit=512M, xdebug.mode=off
-          tools: ${{ matrix.composer }}
+          tools: ${{ matrix.composer }}${{ matrix.coverage-driver == 'turbocov' && ', pie' || '' }}
         env:
           # This is necessary when installing a tool with a specific version
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install turbocov
+        if: matrix.coverage-driver == 'turbocov'
+        run: |
+          sudo pie install shipmonk/turbocov:0.1.1
+          php --ri turbocov
 
       - name: Remove the configured PHP platform
         if: matrix.dependencies != 'locked'
@@ -140,10 +150,18 @@ jobs:
           make test-e2e-phpunit PHP='phpdbg -qrr' E2E_PHPUNIT_GROUP=e2e BENCHMARK_SOURCES=
 
       - name: Run the whole set of E2E tests
-        if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection'
+        if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection' && matrix.coverage-driver != 'turbocov'
         env:
           TERM: xterm-256color
         run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
+
+      - name: Run the unit tests requiring turbocov
+        if: runner.os != 'Windows' && matrix.coverage-driver == 'turbocov'
+        run: vendor/bin/phpunit tests/phpunit/TestFramework/PhpUnit/Adapter/TurbocovCollectPathsProviderTest.php
+
+      - name: Run the turbocov E2E tests
+        if: runner.os != 'Windows' && matrix.coverage-driver == 'turbocov'
+        run: ./tests/e2e_tests bin/infection Turbocov
 
       - name: Compile the prefixed PHAR
         if: &prefixed-phar-condition runner.os != 'Windows' && matrix.e2e-runner == 'dist/infection.phar' && matrix.php-version == '8.3'
