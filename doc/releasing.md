@@ -15,6 +15,7 @@ CI therefore attaches the PHAR to a draft and publishes it itself. Never click *
 3. The `Release` workflow builds and signs the PHAR, uploads it to the draft and publishes it.
    Without a draft, it publishes one with generated notes.
 
-If the workflow fails, the draft stays unpublished: fix the problem, then re-push the tag
-(`git push --delete origin 0.35.13 && git tag -d 0.35.13`, then step 2). A published release
-cannot be fixed; release the next patch version instead.
+Never move or re-push a tag: Packagist picks it up as soon as it is pushed. If the workflow
+fails, the draft stays unpublished. For a CI-only failure (e.g. flaky step, expired secret),
+re-run the failed job. If the code needs a fix, release the next patch version and change
+the draft's tag to it.
