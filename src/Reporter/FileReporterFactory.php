@@ -116,6 +116,10 @@ class FileReporterFactory
             yield $logConfig->getSummaryJsonLogFilePath() => $this->createSummaryJsonLogger();
         }
 
+        if ($logConfig->svgBadgeLogFilePath !== null) {
+            yield $logConfig->svgBadgeLogFilePath => $this->createSvgBadgeLogger();
+        }
+
         if ($logConfig->getUseGitHubAnnotationsLogger()) {
             yield GitHubAnnotationsReporter::DEFAULT_OUTPUT => $this->createGitHubAnnotationsLogger();
         }
@@ -205,5 +209,10 @@ class FileReporterFactory
     private function createSummaryJsonLogger(): LineMutationTestingResultsReporter
     {
         return new SummaryJsonReporter($this->metricsCalculator);
+    }
+
+    private function createSvgBadgeLogger(): LineMutationTestingResultsReporter
+    {
+        return new SvgBadgeReporter($this->metricsCalculator);
     }
 }

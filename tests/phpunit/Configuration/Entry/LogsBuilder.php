@@ -52,6 +52,7 @@ final class LogsBuilder
         private ?StrykerConfig $strykerConfig,
         private ?string $summaryJsonLogFilePath,
         private ?string $debugEventsLogFilePath,
+        private ?string $svgBadgeLogFilePath,
     ) {
     }
 
@@ -69,6 +70,7 @@ final class LogsBuilder
             $logs->getStrykerConfig(),
             $logs->getSummaryJsonLogFilePath(),
             $logs->debugEventsLogFilePath,
+            $logs->svgBadgeLogFilePath,
         );
     }
 
@@ -86,6 +88,7 @@ final class LogsBuilder
             strykerConfig: null,
             summaryJsonLogFilePath: null,
             debugEventsLogFilePath: null,
+            svgBadgeLogFilePath: null,
         );
     }
 
@@ -103,6 +106,7 @@ final class LogsBuilder
             strykerConfig: StrykerConfig::forFullReport('master'),
             summaryJsonLogFilePath: '/var/log/infection/summary.json',
             debugEventsLogFilePath: '/var/log/infection/debug-events.jsonl',
+            svgBadgeLogFilePath: '/var/log/infection/badge.svg',
         );
     }
 
@@ -194,6 +198,14 @@ final class LogsBuilder
         return $clone;
     }
 
+    public function withSvgBadgeLogFilePath(?string $svgBadgeLogFilePath): self
+    {
+        $clone = clone $this;
+        $clone->svgBadgeLogFilePath = $svgBadgeLogFilePath;
+
+        return $clone;
+    }
+
     public function build(): Logs
     {
         return new Logs(
@@ -208,6 +220,7 @@ final class LogsBuilder
             $this->strykerConfig,
             $this->summaryJsonLogFilePath,
             $this->debugEventsLogFilePath,
+            $this->svgBadgeLogFilePath,
         );
     }
 }

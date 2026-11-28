@@ -233,6 +233,7 @@ final class ConfigurationBuilder
                 strykerConfig: StrykerConfig::forBadge('master'),
                 summaryJsonLogFilePath: 'summary.json',
                 debugEventsLogFilePath: null,
+                svgBadgeLogFilePath: null,
             ),
             logVerbosity: 'default',
             tmpDir: '/tmp/infection-test',

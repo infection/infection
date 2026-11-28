@@ -162,6 +162,8 @@ class SchemaConfigurationFactory
     {
         /** @var string|null $debugEvents */
         $debugEvents = $logs->debugEvents ?? null;
+        /** @var string|null $svgBadge */
+        $svgBadge = $logs->svgBadge ?? null;
 
         return new Logs(
             self::normalizeString($logs->text ?? null),
@@ -175,6 +177,7 @@ class SchemaConfigurationFactory
             self::createStrykerConfig($logs->stryker ?? null),
             self::normalizeString($logs->summaryJson ?? null),
             self::normalizeString($debugEvents),
+            self::normalizeString($svgBadge),
         );
     }
 

@@ -132,6 +132,10 @@
                 "summaryJson": {
                     "type": "string",
                     "definition": "Summary JSON log file, which contains only the statistics from the complete JSON file."
+                },
+                "svgBadge": {
+                    "type": "string",
+                    "description": "SVG badge file showing the Mutation Score Indicator. Useful as a self-hosted badge, e.g. for GitLab or private repositories, without the Stryker dashboard."
                 }
             }
         },

@@ -68,6 +68,7 @@ final class StrykerReporterFactoryTest extends TestCase
                 null,
                 '/a/file',
                 null,
+                '/a/file',
             ),
         );
 
@@ -89,6 +90,7 @@ final class StrykerReporterFactoryTest extends TestCase
                 null,
                 false,
                 StrykerConfig::forBadge('master'),
+                null,
                 null,
                 null,
             ),
@@ -135,6 +137,7 @@ final class StrykerReporterFactoryTest extends TestCase
                 StrykerConfig::forBadge('foo'),
                 null,
                 null,
+                null,
             ),
             StrykerReporter::class,
         ];
@@ -150,6 +153,7 @@ final class StrykerReporterFactoryTest extends TestCase
                 null,
                 false,
                 StrykerConfig::forFullReport('foo'),
+                null,
                 null,
                 null,
             ),
@@ -168,6 +172,7 @@ final class StrykerReporterFactoryTest extends TestCase
                 true,
                 StrykerConfig::forBadge('branch'),
                 'summary_json',
+                null,
                 null,
             ),
             StrykerReporter::class,
