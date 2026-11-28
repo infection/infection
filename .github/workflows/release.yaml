@@ -58,9 +58,7 @@ jobs:
               --output dist/infection.phar.asc \
               dist/infection.phar
 
-      # Immutable releases lock assets on publish, so the PHAR must be uploaded
-      # to a draft first. See doc/releasing.md.
-      - name: Publish release with PHAR
+      - name: Publish release with PHAR (see doc/releasing.md)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
